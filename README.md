@@ -2,7 +2,7 @@
 SQL Management Objects, or SMO, provides objects and APIs to discover, modify, and script out SQL Server entities. 
 
 ## Documentation
-See https://docs.microsoft.com/en-us/sql/relational-databases/server-management-objects-smo/overview-smo?view=sql-server-ver15
+See https://docs.microsoft.com/sql/relational-databases/server-management-objects-smo/overview-smo?view=sql-server-ver15
 
 ## Usage
 SMO binaries are distributed via the Microsoft.SqlServer.SqlManagementObjects nuget package, available from Nuget.org.
