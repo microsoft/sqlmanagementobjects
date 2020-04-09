@@ -49,13 +49,14 @@ This file will log substantial changes made to SMO between public releases to nu
 - Remove FORCE ORDER hint from table enumeration that was causing major performance issues
 - Fix Transfer with PrefetchAllObjects == false for pre-Sql 2014 versions so it doesn't throw an exception
 - Extend value range for platform, name, and engineEdition JSON properties of SQL Assessment targets with arrays of strings:
-    
+
     ```JSON
         "target": {
             "platform": ["Windows", "Linux"],
             "name": ["master", "temp"]
         }
     ```
+
 - Add 13 new [SQL Assessment rules](https://github.com/microsoft/sql-server-samples/blob/master/samples/manage/sql-assessment-api/release-notes.md)
 - Fix help link in XTPHashAvgChainBuckets SQL Assessment rule
 - Units for threshold parameter of FullBackup SQL Assessment rule changed from hours to days
