@@ -2,13 +2,48 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
-## 160.1911221.0-preview
+## 161.40241.8-msdata and 161.40241.8-preview
 
-- Increase major version from 15 to 16
-- Remove dependency on native batch parser from NetFx components
-- Change NetStandard client driver to Microsoft.Data.SqlClient
-- Add distribution property for DW materialized views
-- Script FILLFACTOR for indexes on Azure SQL Database
+- Increase package major version to 161. Assembly major version remains 16
+- Change assembly minor version to 200 for Microsoft.SqlServer.SqlManagementObjects package
+- Change NetFx binaries to use Microsoft.Data.SqlClient as their SQL client driver, replacing System.Data.SqlClient
+- Created new package, Microsoft.SqlServer.SqlManagementObjects.SSMS, for use by SSMS and SSDT.
+  This package has NetFx binaries still dependent on System.Data.SqlClient. It uses assembly minor version 100
+- Update Microsoft.Data.SqlClient dependency to version 2.0.0
+- Handle SQL error code 4060 during fetch of Database.DatabaseEngineEdition and use default value of Unknown
+- Fixed Database.Size property to report the accurate size of the database when
+  DatabaseEngineType is SqlAzureDatabase
+- Fixed issue where Database.SpaceAvailable was reported as negative for Hyperscale Azure SQL Databases
+  (the value is reported as 0, meaning *Unavailable*)
+- Implement IObjectPermission on DatabaseScopedCredential. <https://github.com/microsoft/sqlmanagementobjects/issues/14>
+- Enabled Server.EnumServerAttributes API on Azure SQL Database
+- Enabled Lock enumeration APIs on Azure SQL Database
+- Deleted the Database.CheckIdentityValues API
+- Added new property "RequestMaximumMemoryGrantPercentageAsDouble" in WorkloadGroup to accept decimal values in Resource Governor (SQL2019 and above).
+- Fixed a scripting issue with statistics on filtered indexes where the filter from the index would be scripted with the UPDATE STATISTICS TSQL.
+- Enabled Security Policy and Security Predicate objects on Azure SQL DataWarehouse
+
+## 160.2004021.0
+
+- First non-preview 160 release, aligned with [SQL Server Management Studio](https://aka.ms/ssmsfullsetup) 18.5
+- Script extended properties for Azure SQL Database objects
+- Enable Jupyter Notebook output for SqlScriptPublishModel. SSMS 18.5 can output a Notebook for Azure Data Studio in Generate Scripts now.
+- Fix issue where Table.EnableAllIndexes(Recreate) did nothing
+- Fix Database.EnumObjectPermissions usage in NetStandard binaries
+- Remove FORCE ORDER hint from table enumeration that was causing major performance issues
+- Fix Transfer with PrefetchAllObjects == false for pre-Sql 2014 versions so it doesn't throw an exception
+- Extend value range for platform, name, and engineEdition JSON properties of SQL Assessment targets with arrays of strings:
+
+    ```JSON
+        "target": {
+            "platform": ["Windows", "Linux"],
+            "name": ["master", "temp"]
+        }
+    ```
+
+- Add 13 new [SQL Assessment rules](https://github.com/microsoft/sql-server-samples/blob/master/samples/manage/sql-assessment-api/release-notes.md)
+- Fix help link in XTPHashAvgChainBuckets SQL Assessment rule
+- Units for threshold parameter of FullBackup SQL Assessment rule changed from hours to days
 
 ## 160.201141.0-preview
 
@@ -39,24 +74,10 @@ This file will log substantial changes made to SMO between public releases to nu
 - Fixed [error scripting external tables](https://feedback.azure.com/forums/908035-sql-server/suggestions/38267746-cannot-script-external-table-in-ssms-18-2) for Azure SQL Database
 - Replace Microsoft.SqlServer.Management.SqlParser.dll with a dependency to its Nuget package
 
-## 160.2001141.0
+## 160.1911221.0-preview
 
-- First non-preview 160 release, aligned with [SQL Server Management Studio](https://aka.ms/ssmsfullsetup) 18.5
-- Script extended properties for Azure SQL Database objects
-- Enable Jupyter Notebook output for SqlScriptPublishModel. SSMS 18.5 can output a Notebook for Azure Data Studio in Generate Scripts now.
-- Fix issue where Table.EnableAllIndexes(Recreate) did nothing
-- Fix Database.EnumObjectPermissions usage in NetStandard binaries
-- Remove FORCE ORDER hint from table enumeration that was causing major performance issues
-- Fix Transfer with PrefetchAllObjects == false for pre-Sql 2014 versions so it doesn't throw an exception
-- Extend value range for platform, name, and engineEdition JSON properties of SQL Assessment targets with arrays of strings:
-
-    ```JSON
-        "target": {
-            "platform": ["Windows", "Linux"],
-            "name": ["master", "temp"]
-        }
-    ```
-
-- Add 13 new [SQL Assessment rules](https://github.com/microsoft/sql-server-samples/blob/master/samples/manage/sql-assessment-api/release-notes.md)
-- Fix help link in XTPHashAvgChainBuckets SQL Assessment rule
-- Units for threshold parameter of FullBackup SQL Assessment rule changed from hours to days
+- Increase major version from 15 to 16
+- Remove dependency on native batch parser from NetFx components
+- Change NetStandard client driver to Microsoft.Data.SqlClient
+- Add distribution property for DW materialized views
+- Script FILLFACTOR for indexes on Azure SQL Database
