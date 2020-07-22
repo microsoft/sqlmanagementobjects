@@ -2,6 +2,12 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.41011.9
+
+- First non-preview release of major package version 161
+- Microsoft.SqlServer.SqlManagementObjects.SSMS has binaries matching those shipping in SSMS 18.6
+- Put `begin try/begin catch` around TSQL querying `sys.database_service_objectives` in Azure SQL Database. This view may throw if Azure control plane has an outage and was blocking expansion of the Databases node in SSMS.
+
 ## 161.40241.8-msdata and 161.40241.8-preview
 
 - Increase package major version to 161. Assembly major version remains 16
