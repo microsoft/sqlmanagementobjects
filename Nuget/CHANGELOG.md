@@ -2,6 +2,18 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.41981.14-msdata, 161.41981.14-preview
+
+- Expose [accelerated database recovery](https://github.com/microsoft/sqlmanagementobjects/issues/22) settings for Database class
+- Enable Column.BindDefault on Azure SQL Database
+- Add DestinationServerConnection property to Transfer
+  - [Github issue 16](https://github.com/microsoft/sqlmanagementobjects/issues/16)
+  - Allows for use of Azure SQL Database as a destination server
+  - Enables full customization of the destination connection
+- [Script User objects for Azure SQL Database correctly](https://github.com/microsoft/sqlmanagementobjects/issues/18)
+- [Enable CreateOrAlter behavior for Scripter](https://github.com/microsoft/sqlmanagementobjects/issues/11)
+- Fixed issue where MaxSize value was reported as negative for Hyperscale Azure SQL Databases - Added new property "IsMaxSizeApplicable" and disabled negative values for Hyperscale Azure SQL Databases.
+
 ## 161.41011.9
 
 - First non-preview release of major package version 161
