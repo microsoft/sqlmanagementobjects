@@ -2,6 +2,14 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.42121.15-msdata
+
+- Add netcoreapp3.1 build output
+- Fix [logins using impersonation](https://github.com/microsoft/sqlmanagementobjects/issues/24)
+- Expose OlapConnectionInfo class in non-netfx ConnectionInfo
+- Expose WmiMgmtScopeConnection in non-netfx ConnectionInfo
+- Enable OPTIMIZE_FOR_SEQUENTIAL_KEY index option for Azure SQL Database
+
 ## 161.41981.14-msdata, 161.41981.14-preview
 
 - Expose [accelerated database recovery](https://github.com/microsoft/sqlmanagementobjects/issues/22) settings for Database class
