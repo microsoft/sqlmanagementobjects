@@ -2,6 +2,14 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.44091.28
+
+- Make ISmoScriptWriter interface public
+- Enable apps to provide custom ISmoScriptWriter implementation to SqlScriptPublishModel and ScriptMaker
+- Enabled Security Policy objects to be included in Transfer
+- Change association of DatabaseEngineEdition.SqlOnDemand to DatabaseEngineType.SqlAzureDatabase
+- Fix implementation of Microsoft.SqlServer.Management.HadrModel.FailoverTask.Perform to handle AvailabilityGroupClusterType.None correctly
+
 ## 161.42121.15-msdata
 
 - Add netcoreapp3.1 build output
