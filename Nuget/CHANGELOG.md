@@ -2,6 +2,15 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.46041.41
+
+- Add descriptions to more Facet properties
+- Add net461 binaries due to customer demand. Only core scripting functionality is included in lib\net461
+- Make RegisteredServersStore.InitializeLocalRegisteredServersStore public to enable loading and saving registered servers in a custom location
+- Fixed an [issue](https://github.com/microsoft/sqlmanagementobjects/issues/34)
+  where the creation of a DataFile may fail when targeting a SQL Azure Managed Instance
+- Fix Database.Checkpoint to always checkpoint the correct database. [Issue 32](https://github.com/microsoft/sqlmanagementobjects/issues/32)
+
 ## 161.44091.28
 
 - Make ISmoScriptWriter interface public
