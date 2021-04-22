@@ -2,6 +2,18 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.46347.54
+
+- Add Microsoft.SqlServer.SqlWmiManagement and Microsoft.SqlServer.Management.Smo.Wmi to lib\netcoreapp3.1
+- Add missing resource files for netcoreapp3.1 and netstandard2.0
+- Fix an [issue](https://github.com/microsoft/sqlmanagementobjects/issues/50) with scripting Azure Synapse Analytics databases
+- Add missing values to AuditActionType enum
+- Fixed an issue where AffinityInfo.Alter() may throw an error like `An item with the same key has already been added` when
+  trying to update the AffinityMask of a specific CPU, particularly on machines with Soft-NUMA.
+- Updated formatting logic of Predicate values in XEvent scripts
+- Fix for scripting distributed Availability Groups
+- Add support for resumable option on create constraints and low priority wait
+
 ## 161.46041.41
 
 - Add descriptions to more Facet properties
