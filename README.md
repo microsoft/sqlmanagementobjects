@@ -27,6 +27,14 @@ This package has NetFx binaries that continue to use System.Data.SqlClient as th
 It is mainly intended for use by Sql Server Management Studio and Sql Server Data Tools until such time as those tools can upgrade to Microsoft.Data.SqlClient.
 If you are building SSMS 18 extensions that depend on SMO, use this package instead of Microsoft.SqlServer.SqlManagementObjects.
 
+## Microsoft.SqlServer.Management.SmoMetadataProvider
+
+SmoMetadataProvider provides completion support for TSQL language services in Azure Data Studio and the Sql Server extension for VS Code.
+
+## Microsoft.SqlServer.Management.SmoMetadataProvider.SSMS
+
+SmoMetadataProvider.SSMS provides completion support for the TSQL language service in Sql Server Management Studio.
+
 ## Versioning
 
 The major version for each SMO release corresponds with the highest Sql Server compatibility level that version of SMO supports.
