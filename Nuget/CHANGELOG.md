@@ -2,6 +2,16 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.46437.65
+
+- Update Microsoft.Data.SqlClient dependency to version 3.0.0
+- Added Scripting Support for Ledger table in Azure Sql db
+- Change `Server.MasterDBPath` and `Server.MasterDBLogPath` properties to use `file_id` instead of `name` from `sys.database_files`
+- Enable Index creation for memory optimized tables in Azure
+- Fix Server/Logins to show external Logins for Azure SQLDB as they are now supported
+- Split SmoMetadataProvider into its own nuget packages
+- Adding support for External Languages
+
 ## 161.46347.54
 
 - Add Microsoft.SqlServer.SqlWmiManagement and Microsoft.SqlServer.Management.Smo.Wmi to lib\netcoreapp3.1
