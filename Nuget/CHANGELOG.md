@@ -2,6 +2,15 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.46521.71
+
+- Handle Dedicated SQL Pool login error 110003 during enumerate of Databases
+- Enable asymmetric and symmetric key objects for dedicated SQL Pool database
+- Fix Tables enumeration on Azure SQL Database instances using a case sensitive catalog collation
+- Fix scripting of [hidden columns](https://github.com/microsoft/sqlmanagementobjects/issues/65)
+- Enable Generate Scripts to script temporal tables when the destination is a pre-2016 version of SQL Server. System versioning DDL will be omitted from the generated script.
+
+
 ## 161.46437.65
 
 - Update Microsoft.Data.SqlClient dependency to version 3.0.0
