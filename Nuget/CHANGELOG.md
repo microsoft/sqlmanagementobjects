@@ -2,6 +2,19 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 161.47008.0
+
+- Fix an issue that caused `ServerConnection.SqlExecutionModes` property to be set to `ExecuteSql` during lazy property fetches of SMO objects despite being set to `CaptureSql` by the calling application.
+- Add `LoginType` property to `ILoginOptions` interface.
+- `Login.PasswordPolicyEnforced` now returns `false` for Windows logins instead of throwing an exception
+- Remove net461 binaries from nuget packages
+- Added Scripting Support for Ledger tables for Sql 2022+
+- Change the `Size` property on `Server/Drive` objects to `System.Int64`. These objects don't have a C# wrapper class so it's not breaking any compilation.
+- Add support for Sql Server version 16
+- Add new permissions for Sql 2019+ to SMO enumerations
+- Added External Stream object and External Streaming Jobs object for scripting
+- Add support for XML compression
+
 ## 161.46521.71
 
 - Handle Dedicated SQL Pool login error 110003 during enumerate of Databases
