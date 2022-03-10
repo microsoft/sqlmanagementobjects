@@ -1,0 +1,32 @@
+<?xml version='1.0' ?>
+<EnumObject type='AppDatabaseFile' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="Name" local="FileGroupName" /> 
+		</parent_link>
+		<property_link table='#tmp_AppDatabaseFiles' alias='adf'/>
+		<prefix>
+CREATE TABLE #tmp_AppDatabaseFiles (
+    LogicalName nvarchar(128),
+    FilePath nvarchar(260),
+    FileGroupName nvarchar(128),
+    InitialSize nvarchar(32),
+    MaxSize nvarchar(32),
+    GrowthIncrement nvarchar(16)
+)
+INSERT INTO #tmp_AppDatabaseFiles EXEC [SchemaPrefix].NSGetDatabaseFiles 'DATA_ONLY'
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_AppDatabaseFiles
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '128'>adf.LogicalName</property>
+		<property name='FileName' type='nvarchar' size = '260'>adf.FilePath</property>
+		<property name='FileGroupName' type='nvarchar' size = '128'>adf.FileGroupName</property>
+		<property name='InitialSize' type='nvarchar' size = '32'>adf.InitialSize</property>
+		<property name='MaxSize' type='nvarchar' size = '32'>adf.MaxSize</property>
+		<property name='GrowthIncrement' type='nvarchar' size = '16'>adf.GrowthIncrement</property>
+	</properties>
+</EnumObject>

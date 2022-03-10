@@ -1,0 +1,31 @@
+<?xml version='1.0' ?>
+<EnumObject type='AppDatabaseFile' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table='#tmp_ApplicationDatabaseFileGroups' alias='adfg'/>
+		<prefix>
+CREATE TABLE #tmp_AppDatabaseFiles1 (
+    LogicalName nvarchar(128),
+    FilePath nvarchar(260),
+    FileGroupName nvarchar(128),
+    InitialSize nvarchar(32),
+    MaxSize nvarchar(32),
+    GrowthIncrement nvarchar(16)
+)
+
+CREATE TABLE #tmp_ApplicationDatabaseFileGroups (
+    FileGroupName nvarchar(128)
+)
+
+INSERT INTO #tmp_AppDatabaseFiles1 EXEC [SchemaPrefix].NSGetDatabaseFiles 'DATA_ONLY'
+INSERT INTO #tmp_ApplicationDatabaseFileGroups SELECT DISTINCT FileGroupName FROM #tmp_AppDatabaseFiles1
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_ApplicationDatabaseFileGroups
+DROP TABLE #tmp_AppDatabaseFiles1
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '128'>adfg.FileGroupName</property>
+	</properties>
+</EnumObject>

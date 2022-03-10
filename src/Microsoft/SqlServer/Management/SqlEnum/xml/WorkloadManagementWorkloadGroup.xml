@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="WorkloadManagementWorkloadGroup" impl_type="SqlObject" datawarehouse_enabled='true'>
+  <settings>
+    <property_link table="sys.workload_management_workload_groups AS wkg"/>
+    <property_link fields="#HasClassifier" left_join="sys.workload_management_workload_classifiers AS wkc">wkg.name = wkc.group_name</property_link>
+  </settings>
+
+  <properties>
+    <version datawarehouse_enabled='true'>
+      <property name="Name" type="sysname">wkg.name</property>
+      <property name="CapPercentageResource" type="int" cast='true'>wkg.cap_percentage_resource</property>
+      <property name="GroupId" type="int" cast='true'>wkg.group_id</property>
+      <property name="HasClassifier" type="bit" cast='true' expensive='true'>CASE WHEN wkc.group_name IS NULL THEN 0 ELSE 1 END</property>
+      <property name="Importance" type="int" report_type="WorkloadManagementImportance">CASE WHEN N'Low' = wkg.importance THEN 0 WHEN N'Below_Normal' = wkg.importance THEN 1 WHEN N'Normal' = wkg.importance THEN 2 WHEN N'Above_Normal' = wkg.importance THEN 3 WHEN N'High' = wkg.importance THEN 4 ELSE 2 END</property>
+      <property name="IsSystemObject" type="bit" access='Read' cast='true'>CASE WHEN wkg.group_id &lt; 13 THEN 1 ELSE 0 END</property>
+      <property name="MinPercentageResource" type="int" cast='true'>wkg.min_percentage_resource</property>
+      <property name="QueryExecutionTimeoutSec" type="int" cast='true'>wkg.query_execution_timeout_sec</property>
+      <property name="RequestMaxResourceGrantPercent" type="float" cast='true'>wkg.request_max_resource_grant_percent</property>
+      <property name="RequestMinResourceGrantPercent" type="float" cast='true'>wkg.request_min_resource_grant_percent</property>
+    </version>
+  </properties>
+</EnumObject>

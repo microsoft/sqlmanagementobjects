@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ProxyAccountPrincipal " impl_type="SqlObject" min_major='9'>
+    <settings>
+    	<version min_major='9'>
+			<parent_link>
+				<link parent="ID" local="ParentID" />
+			</parent_link>
+
+			<property_link table='#tmp_sp_enum_login_for_proxy' alias='spl'/>
+			<prefix>
+				create table #tmp_sp_enum_login_for_proxy(proxy_id int null, proxy_name nvarchar(128), flags int null, name nvarchar(128) null, sid varbinary(85) null, principal_id int null )
+				insert into #tmp_sp_enum_login_for_proxy(proxy_id, proxy_name, flags, name, sid, principal_id) exec msdb.dbo.sp_enum_login_for_proxy
+				delete from #tmp_sp_enum_login_for_proxy where name is NULL
+			</prefix>
+			<postfix>
+				drop table #tmp_sp_enum_login_for_proxy
+			</postfix>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="NType" type="sysname" access='Read' hidden='true'>ProxyAccountPrincipal</property>
+		<version min_major='9'>
+    		<property name="Name" type="sysname">spl.name</property>
+    		<property name="Flag" type="int">spl.flags</property>
+            <property name="ParentID" type="int" hidden='true'>spl.proxy_id</property>
+        </version>
+	</properties>
+</EnumObject>
+
+

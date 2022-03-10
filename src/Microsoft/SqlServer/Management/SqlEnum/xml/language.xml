@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject type="Language" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+    <settings>
+        <version min_major='7' max_major='8'>
+            <property_link table="master.dbo.syslanguages s" />
+        </version>
+        <version min_major='9' cloud_min_major='12'>
+          <property_link table="sys.syslanguages s" />
+        </version>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="NType" type="sysname" access='Read' hidden='true'>Language</property>
+        <property name="Name" type="sysname" access="ReadWrite"> s.name</property>
+        <property name="LangID" type="smallint" access="Read"> s.langid</property>
+        <property name="DateFormat" type="sysname" access="Read"> s.dateformat</property>
+        <property name="Alias" type="sysname" access="Read"> s.alias</property>
+        <property name="Days" type="sysname" access="Read"> s.days</property>
+        <property name="FirstDayOfWeek" type="tinyint" access="Read"> s.datefirst</property>
+        <property name="Months" type="sysname" access="Read"> s.months</property>
+        <property name="ShortMonths" type="sysname" access="Read"> s.shortmonths</property>
+        <property name="Upgrade" type="int" access="Read"> s.upgrade</property>
+        <property name="LocaleID" type="int" access="Read"> s.lcid</property>
+        <property name="MsgLangID" type="smallint" access="Read"> s.msglangid</property>
+    </properties>
+</EnumObject>

@@ -1,0 +1,43 @@
+<?xml version='1.0' ?>
+<EnumObject type='DatabaseMirroringEndpoints' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="ID" local="EndpointID" />
+		</parent_link>
+	
+		<property_link table='sys.database_mirroring_endpoints' alias='dme'/>
+		<property_link fields='#Certificate#' left_join='sys.certificates AS cert'>cert.certificate_id = dme.certificate_id</property_link>		
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />	
+		<property name='ServerMirroringRole' type='tinyint' report_type = 'ServerMirroringRole'>dme.role</property>
+		<property name='Certificate' type='sysname'>(case when SERVERPROPERTY('EngineEdition') != 8 then ISNULL(cert.name,N'') else ISNULL(cert.name, N'##MS_InstanceCertificate##') end)</property>
+		<property name='EndpointEncryption' type='int' report_type='EndpointEncryption'>case 
+                            when dme.encryption_algorithm = 0 then 0 
+                            when dme.encryption_algorithm in (3,4,7,8) then 1 
+                            when dme.encryption_algorithm in (1,2,5,6) then 2 
+                            else 0 
+                        end
+        </property>
+		<property name='EndpointEncryptionAlgorithm' type='int' report_type='EndpointEncryptionAlgorithm'>case dme.encryption_algorithm 
+                            when 0 then 0
+                            when 1 then 1
+                            when 2 then 2
+                            when 3 then 1
+                            when 4 then 2
+                            when 5 then 4
+                            when 6 then 3
+                            when 7 then 4
+                            when 8 then 3
+                            else 0
+                        end
+        </property>
+		<property name='EndpointAuthenticationOrder' type='int' report_type='EndpointAuthenticationOrder'>dme.connection_auth</property>
+		
+		<property name='EndpointID' type='int' hidden='true'>dme.endpoint_id</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when dme.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>

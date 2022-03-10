@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="Event" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.server_event_session_events' alias='event'>session.event_session_id = event.event_session_id</property_link>
+    
+    <!--use object2/package2 since EventField.xml/Action.xml use object/package to join these 2 views-->
+    <property_link join='sys.dm_xe_objects' alias='object2'>event.name = object2.name AND object2.object_type='event'</property_link>
+    <property_link join='sys.dm_xe_packages' alias='package2'>event.module = package2.module_guid AND event.package = package2.name AND package2.guid = object2.package_guid</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='ID' type='int'>event.event_id</property>
+    <property name='Name' type='nvarchar' size='128'>event.package + '.' + event.name</property>
+    <property name='ModuleID' type='nvarchar' size='128'>event.module</property>
+    <property name='PackageName' type='nvarchar' size='60'>event.package</property>
+    <property name='PredicateExpression' type='nvarchar' size='3000'>event.predicate</property>
+        
+    <property name='PredicateXml' type='nvarchar' size='max'>event.predicate_xml</property>
+        
+    <property name='Description' type='nvarchar' size='512'>object2.description</property>
+  </properties>
+</EnumObject>

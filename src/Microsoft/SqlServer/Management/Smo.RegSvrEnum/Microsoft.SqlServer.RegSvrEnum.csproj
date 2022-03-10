@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetFxVersion)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.Smo.RegSvrEnum</RootNamespace>
+    <ClsCompliant>true</ClsCompliant>
+  </PropertyGroup>
+  <ItemGroup>
+    <SqlStringResource Include="SRError.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+<!-- BEGIN NOGITHUB -->
+<!-- END NOGITHUB -->
+</Project>

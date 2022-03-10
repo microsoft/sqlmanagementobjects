@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ColumnMasterKey" impl_type="SqlObject" min_major='13' cloud_min_major='12'>
+  <settings>
+    <property_link table='sys.column_master_keys AS cmk' />
+  </settings>
+  <properties>
+    <include file='inc_urn.xml'/>
+    <property name="Name" type="sysname">cmk.name</property>
+    <property name="ID" type="int" read_only_after_creation="true">cmk.column_master_key_id</property>
+    <property name="KeyStoreProviderName" type="sysname" read_only_after_creation="true">cmk.key_store_provider_name</property>
+    <property name="KeyPath" type="nvarchar" size='4000' read_only_after_creation="true">cmk.key_path</property>
+    <property name="CreateDate" type="datetime" read_only_after_creation="true">cmk.create_date</property>
+    <property name="DateLastModified" type="datetime" read_only_after_creation="true">cmk.modify_date</property>
+  </properties>
+  <version min_major='15' cloud_min_major='12'>
+    <property name="Signature" type="varbinary" cast='true' size='4000' read_only_after_creation="true">ISNULL(cmk.signature, CONVERT(varbinary(4000), N''))</property>
+    <property name="AllowEnclaveComputations" type="bit" cast='true' read_only_after_creation="true">cmk.allow_enclave_computations</property>
+  </version>
+</EnumObject>

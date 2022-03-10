@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<EnumObject type="SqlAssembly" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+	<settings>
+		<property_link table='sys.assemblies AS asmbl' />
+		<property_link fields='#Owner#' join='sys.database_principals AS princip'>princip.principal_id = asmbl.principal_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">asmbl.name</property>
+		<property name="ID" type="int" access='Read'>asmbl.assembly_id</property>
+		<property name="CreateDate" type="datetime" access='Read'>asmbl.create_date</property>
+		<property name="Culture" type="nvarchar" size='30' access='Read' cast='true'>ISNULL(ASSEMBLYPROPERTY(asmbl.assembly_id, N'CultureInfo'), N'')</property>
+		<property name="AssemblySecurityLevel" type="int" report_type="AssemblySecurityLevel">asmbl.permission_set</property>
+		<property name="Owner" type="sysname">princip.name</property>
+		<property name="IsVisible" type="bit">asmbl.is_visible</property>
+		<property name="PublicKey" type="varbinary" size='8000' cast='true'>ISNULL(ASSEMBLYPROPERTY(asmbl.name, N'PublicKey'), CONVERT(varbinary(8000), N''))</property>
+		<property name="VersionMajor" type="int" access='Read' cast='true'>ASSEMBLYPROPERTY(asmbl.name, N'VersionMajor')</property>
+		<property name="VersionMinor" type="int" access='Read' cast='true'>ASSEMBLYPROPERTY(asmbl.name, N'VersionMinor')</property>
+		<property name="VersionBuild" type="int" access='Read' cast='true'>ASSEMBLYPROPERTY(asmbl.name, N'VersionBuild')</property>
+		<property name="VersionRevision" type="int" access='Read' cast='true'>ASSEMBLYPROPERTY(asmbl.name, N'VersionRevision')</property>
+		<property name="IsSystemObject" type="bit" access="Read" cast='true'>case when asmbl.assembly_id &lt; 65536 then 1 else 0 end</property>
+		<!-- extended properties support --> 
+		<property name="ExtPropClass" type="int" hidden='true'>5</property>
+        <property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>		
+	</properties>
+</EnumObject>

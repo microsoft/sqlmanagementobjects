@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="DatabaseAuditSpecificationDetail" impl_type="SqlObject" min_major="10">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table="sys.database_audit_specification_details AS details"></property_link>
+    <property_link fields="#ObjectSchema#ObjectName#" left_join="sys.all_objects AS o">details.is_group = 0 and o.object_id = details.major_id and details.class_desc != 'SCHEMA' and details.class_desc != 'DATABASE'</property_link>
+    <property_link fields="#ObjectName#" left_join="sys.schemas as sch">details.is_group = 0 and sch.schema_id = details.major_id and details.class_desc = 'SCHEMA'</property_link>
+    <property_link fields="#Principal#" left_join="sys.database_principals as p">details.is_group = 0 and p.principal_id = details.audited_principal_id</property_link>
+    <property_link fields="#ObjectClass#" left_join="sys.securable_classes as s">details.is_group = 0 and s.class = details.class</property_link>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='1' expression="{0} + '/DatabaseAuditSpecificationDetail'">
+        <link_field type='parent' field="Urn" />
+      </link_multiple>
+    </property>
+    <property name="ParentID" type="int">details.database_specification_id</property>
+    <property name="AuditActionType" type="sysname">details.audit_action_name</property>
+    <property name="ObjectClass" type="sysname">ISNULL(case when s.class_desc != 'DATABASE' and s.class_desc != 'SCHEMA' then 'OBJECT' else s.class_desc end,'')</property>
+    <property name="ObjectSchema" type="sysname">ISNULL(SCHEMA_NAME(o.schema_id), '')</property>
+    <property name="ObjectName" type="sysname">ISNULL(case when details.is_group = 0 and details.class_desc = 'DATABASE' then db_name() when details.class_desc = 'SCHEMA' then sch.name else o.name end,'')</property>
+    <property name="Principal" type="sysname">ISNULL(p.name, '')</property>
+  </properties>
+</EnumObject>

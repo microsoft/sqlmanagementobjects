@@ -1,0 +1,20 @@
+FROM ubuntu:18.04
+
+# Install prerequisites including repo config for SQL server and PolyBase.
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get install -y gnupg && \
+    apt-get install -yq apt-transport-https curl && \
+    # Get official Microsoft repository configuration
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/ubuntu/18.04/mssql-server-2019.list | tee /etc/apt/sources.list.d/mssql-server-2019.list && \
+    curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | tee /etc/apt/sources.list.d/msprod.list && \
+    apt-get update && \
+    # Install PolyBase will also install SQL Server via dependency mechanism.
+    apt-get install -y mssql-server-polybase && \
+    # Cleanup the Dockerfile
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists
+
+# Run SQL Server process
+CMD /opt/mssql/bin/sqlservr

@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="Database" impl_type="Database" min_major='7'  cloud_min_major='10'>
+  <settings>
+    <version min_major='10'>
+	  <prefix fields='#HasDatabaseEncryptionKey#'>
+        create table #tmp_db_encryption_keys (database_id int)
+      </prefix>
+	  <prefix fields='#AvailabilityGroupName#AvailabilityDatabaseSynchronizationState#HasDatabaseEncryptionKey#'>
+        declare @HasViewPermission int
+        select @HasViewPermission = HAS_PERMS_BY_NAME(null, null, 'VIEW SERVER STATE')
+      </prefix>
+      <prefix fields='#HasDatabaseEncryptionKey#'>
+        if (@HasViewPermission = 1)
+        begin
+        insert into #tmp_db_encryption_keys select database_id from master.sys.dm_database_encryption_keys
+        end
+      </prefix>
+	</version>
+    <version min_major='11'>
+      <prefix fields='#AvailabilityGroupName#'>
+        create table #tmp_db_ars (replica_id uniqueidentifier, group_id uniqueidentifier)
+        create table #tmp_db_ags (group_id uniqueidentifier, name sysname)
+      </prefix>
+      <prefix fields='#AvailabilityDatabaseSynchronizationState#'>
+        create table #tmp_db_hadr_dbrs (group_database_id uniqueidentifier, synchronization_state tinyint, is_local bit)
+      </prefix>
+      <prefix fields='#AvailabilityGroupName#'>
+        if (@HasViewPermission = 1)
+        begin
+        insert into #tmp_db_ars select replica_id, group_id  from  master.sys.availability_replicas
+        insert into #tmp_db_ags select group_id, name from master.sys.availability_groups            
+        end
+      </prefix>
+      <prefix fields='#AvailabilityDatabaseSynchronizationState#'>
+        if (@HasViewPermission = 1)
+        begin
+        insert into #tmp_db_hadr_dbrs select group_database_id, synchronization_state, is_local from master.sys.dm_hadr_database_replica_states
+        end
+      </prefix>
+    </version>
+	<version min_major='10'>
+	  <postfix fields='#HasDatabaseEncryptionKey#'>
+        drop table #tmp_db_encryption_keys
+      </postfix>
+	</version>
+    <version min_major='11'>
+      <postfix fields='#AvailabilityGroupName#'>
+        drop table #tmp_db_ars
+        drop table #tmp_db_ags        
+      </postfix>
+      <postfix fields='#AvailabilityDatabaseSynchronizationState#'>
+        drop table #tmp_db_hadr_dbrs
+      </postfix>
+      
+    </version>
+  </settings>
+  <properties>    
+  </properties>
+</EnumObject>

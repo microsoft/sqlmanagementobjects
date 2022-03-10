@@ -1,0 +1,27 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpTargetserver' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<property_link table='#tmp_sp_help_targetserver' alias='tsht'/>
+		<prefix>
+create table #tmp_sp_help_targetserver
+(server_id int null, server_name sysname null, location nvarchar(200) null, time_zone_adjustment int null, enlist_date datetime null, last_poll_date datetime null, status int null, unread_instructions int null, local_time datetime null, enlisted_by_nt_user nvarchar(200) null, poll_interval int null)
+insert into #tmp_sp_help_targetserver exec msdb.dbo.sp_help_targetserver
+		</prefix>
+		<postfix>
+drop table #tmp_sp_help_targetserver
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>tsht.server_name</property>
+		<property name='ID' type='int'>tsht.server_id</property>
+		<property name='Location' type='nvarchar' size = '200' access='Read'>tsht.location</property>
+		<property name='TimeZoneAdjustment' type='int' access='Read'>tsht.time_zone_adjustment</property>
+		<property name='EnlistDate' type='datetime' access='Read'>tsht.enlist_date</property>
+		<property name='LastPollDate' type='datetime' access='Read'>tsht.last_poll_date</property>
+		<property name='Status' type='int' access='Read' report_type='Agent.TargetServerStatus'>tsht.status</property>
+		<property name='PollingInterval' type='int' access='Read'>tsht.poll_interval</property>
+		<property name='PendingInstructions' type='int' access='Read'>tsht.unread_instructions</property>
+		<property name='LocalTime' type='datetime' access='Read'>tsht.local_time</property>
+	</properties>
+</EnumObject>

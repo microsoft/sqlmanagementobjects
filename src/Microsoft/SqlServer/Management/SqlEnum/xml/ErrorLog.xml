@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ErrorLog" impl_type="SqlObject" min_major='7'>
+    <settings>
+        <property_link table="#err_log_tmp er" />
+        <version min_major='7' max_major='7'>
+            <prefix>
+                create table #err_log_tmp(ArchiveNo int, CreateDate nvarchar(24))
+            </prefix>
+        </version>
+        <version min_major='8'>
+            <prefix>
+                create table #err_log_tmp(ArchiveNo int, CreateDate nvarchar(44), Size int)
+            </prefix>
+        </version>
+        <prefix>
+            insert #err_log_tmp exec master.dbo.sp_enumerrorlogs
+        </prefix>
+        <postfix>
+            drop table #err_log_tmp
+        </postfix>
+    </settings>
+    <properties>
+        <property name="Urn" type="nvarchar" size="600">
+            <link_multiple no='3' expression="{0} + '/{2}[@ArchiveNo=''' + CAST({1} AS sysname) + ''']'">
+                <link_field type='parent' field="Urn" />
+                <link_field type='local' field="ArchiveNo" />
+                <link_field field="NType" />				
+            </link_multiple>
+        </property>
+    
+        <property name="Name" type="sysname" cast='true'>er.ArchiveNo</property>
+        <property name="ArchiveNo" type="int">er.ArchiveNo</property>
+        <property name="CreateDate" type="datetime">CASE WHEN ISDATE(er.CreateDate) = 1 THEN CONVERT(datetime, er.CreateDate, 101) ELSE NULL END </property>
+        <version min_major='8'>
+            <property name="Size" type="int">er.Size</property>
+        </version>
+    </properties>
+</EnumObject>

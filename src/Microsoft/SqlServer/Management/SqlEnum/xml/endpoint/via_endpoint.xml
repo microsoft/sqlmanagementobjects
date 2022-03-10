@@ -1,0 +1,20 @@
+<?xml version='1.0' ?>
+<EnumObject type='ViaEndpoints' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="ID" local="EndpointID" />
+		</parent_link>
+	
+		<property_link table='sys.via_endpoints' alias='ve'/>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Discriminator' type='nvarchar' size = '128'>ve.discriminator</property>
+		
+		<property name='EndpointID' type='int' hidden='true'>ve.endpoint_id</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when ve.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>

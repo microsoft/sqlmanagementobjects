@@ -1,0 +1,1014 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="SmoCollectionGenCompile" ToolsVersion="4.0">
+<Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MsBuildThisFileDirectory), Directory.Build.props))\Directory.Build.props" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <SmoDirectory>$(SmoSrc)</SmoDirectory>
+    <EventTraceBuildType>SQLSERVER</EventTraceBuildType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SmoCodeGenOutputDir>$(SmoSrc)\Collections</SmoCodeGenOutputDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <SmoCollectionGenCompile Include="Database">
+      <MappedTypeVariable>database</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED /DDATABASE /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Endpoint">
+      <MappedTypeVariable>endpoint</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DPARTIAL_KEYWORD=partial</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Certificate">
+      <MappedTypeVariable>certificate</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ColumnEncryptionKey">
+      <MappedTypeVariable>columnEncryptionKey</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ColumnEncryptionKeyValue">
+      <MappedTypeVariable>columnEncryptionKeyValue</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>int</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\columnencryptionkeyvalue_generic_collection.cs</CollectionTemplate>
+      <Parent>ColumnEncryptionKey</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ColumnMasterKey">
+      <MappedTypeVariable>columnMasterKey</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="FileGroup">
+      <MappedTypeVariable>fileGroup</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="DataFile">
+      <MappedTypeVariable>dataFile</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>FileGroup</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Language">
+      <MappedTypeVariable>language</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_LANGID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServerRole">
+      <MappedTypeVariable>serverRole</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Login">
+      <MappedTypeVariable>login</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Audit">
+      <MappedTypeVariable>audit</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServerAuditSpecification">
+      <MappedTypeVariable>serverAuditSpecification</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="DatabaseAuditSpecification">
+      <MappedTypeVariable>databaseAuditSpecification</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="LinkedServer">
+      <MappedTypeVariable>linkedServer</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="LinkedServerLogin">
+      <MappedTypeVariable>linkedServerLogin</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>LinkedServer</Parent>
+      <RemainingMacros>/DSEALED /DALLOW_EMPTY_NAME_ATTRIBUTE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="User">
+      <MappedTypeVariable>user</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="DatabaseRole">
+      <MappedTypeVariable>databaseRole</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ApplicationRole">
+      <MappedTypeVariable>applicationRole</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Schema">
+      <MappedTypeVariable>schema</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="LogFile">
+      <MappedTypeVariable>logFile</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Index">
+      <MappedTypeVariable>index</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ResumableIndex">
+      <MappedTypeVariable>resumableIndex</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID </RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Statistic">
+      <MappedTypeVariable>statistic</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE /DADD_INTERNAL</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Check">
+      <MappedTypeVariable>check</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ForeignKey">
+      <MappedTypeVariable>foreignKey</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Table</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="EdgeConstraint">
+      <MappedTypeVariable>edgeconstraint</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="EdgeConstraintClause">
+      <MappedTypeVariable>edgeconstraintclause</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExtendedProperty">
+      <MappedTypeVariable>extendedProperty</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="BackupDevice">
+      <MappedTypeVariable>backupDevice</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="PartitionFunction">
+      <MappedTypeVariable>partitionFunction</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="PartitionScheme">
+      <MappedTypeVariable>partitionScheme</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="PhysicalPartition">
+      <MappedTypeVariable>physicalPartition</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <Parent>SqlSmoObject</Parent>
+      <CollectionTemplate>$(SmoDirectory)\numbered_generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DPARTIAL_KEYWORD=partial /DPHYSICAL_PARTITION</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SqlAssembly">
+      <MappedTypeVariable>sqlAssembly</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalLanguage">
+      <MappedTypeVariable>externalLanguage</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalLanguageFile">
+      <MappedTypeVariable>externalLanguageFile</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ExternalLanguage</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalLibrary">
+      <MappedTypeVariable>externalLibrary</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="FullTextCatalog">
+      <MappedTypeVariable>fullTextCatalog</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="FullTextStopList">
+      <MappedTypeVariable>fullTextStopList</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SearchProperty">
+      <MappedTypeVariable>searchProperty</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SearchPropertyList</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DCASE_SENSITIVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SearchPropertyList">
+      <MappedTypeVariable>searchPropertyList</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Database</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="FullTextIndexColumn">
+      <MappedTypeVariable>fullTextIndexColumn</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>FullTextIndex</Parent>
+      <RemainingMacros>/DSEALED /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="DatabaseDdlTrigger">
+      <MappedTypeVariable>databaseDdlTrigger</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Database</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServerDdlTrigger">
+      <MappedTypeVariable>serverDdlTrigger</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Server</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SymmetricKey">
+      <MappedTypeVariable>symmetricKey</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Database</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AsymmetricKey">
+      <MappedTypeVariable>asymmetricKey</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Database</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Credential">
+      <MappedTypeVariable>credential</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Server</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="DatabaseScopedCredential">
+      <MappedTypeVariable>databaseScopedCredential</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Database</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="CryptographicProvider">
+      <MappedTypeVariable>cryptographicProvider</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <Parent>Server</Parent>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="PlanGuide">
+      <MappedTypeVariable>planGuide</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AvailabilityGroup">
+      <MappedTypeVariable>availabilityGroup</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AvailabilityReplica">
+      <MappedTypeVariable>availabilityReplica</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>AvailabilityGroup</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DCUSTOM_COLLATION /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AvailabilityDatabase">
+      <MappedTypeVariable>AvailabilityDatabase</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>AvailabilityGroup</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="DatabaseReplicaState">
+      <MappedTypeVariable>DatabaseReplicaState</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\database_replica_state_generic_collection.cs</CollectionTemplate>
+      <Parent>AvailabilityGroup</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AvailabilityGroupListener">
+      <MappedTypeVariable>AvailabilityGroupListener</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>AvailabilityGroup</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AvailabilityGroupListenerIPAddress">
+      <MappedTypeVariable>AvailabilityGroupListenerIPAddress</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\availability_group_listener_ipaddress_generic_collection.cs</CollectionTemplate>
+      <Parent>AvailabilityGroupListener</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedMessage">
+      <MappedTypeVariable>userDefinedMessage</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>Int32</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\message_generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SoapPayloadMethod">
+      <MappedTypeVariable>soapMethod</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\soapmethod_generic_collection.cs</CollectionTemplate>
+      <Parent>SoapPayload</Parent>
+      <RemainingMacros>/DSEALED /DADD_REMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedFunctionParameter">
+      <MappedTypeVariable>userDefinedFunctionParameter</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>UserDefinedFunction</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="StoredProcedureParameter">
+      <MappedTypeVariable>storedProcedureParameter</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>StoredProcedure</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="NumberedStoredProcedureParameter">
+      <MappedTypeVariable>numberedStoredProcedureParameter</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>NumberedStoredProcedure</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Column">
+      <MappedTypeVariable>column</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="OrderColumn">
+      <MappedTypeVariable>orderColumn</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>UserDefinedFunction</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ForeignKeyColumn">
+      <MappedTypeVariable>foreignKeyColumn</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>ForeignKey</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="IndexedColumn">
+      <MappedTypeVariable>indexedColumn</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>Index</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="IndexedXmlPath">
+      <MappedTypeVariable>indexedXmlPath</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>Index</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="IndexedXmlPathNamespace">
+      <MappedTypeVariable>indexedXmlPathNamespace</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Index</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="StatisticColumn">
+      <MappedTypeVariable>statisticColumn</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>Statistic</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="PartitionFunctionParameter">
+      <MappedTypeVariable>partitionFunctionParameter</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>PartitionFunction</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DNO_STRING_INDEXER /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="PartitionSchemeParameter">
+      <MappedTypeVariable>partitionSchemeParameter</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedAggregateParameter">
+      <MappedTypeVariable>userDefinedAggregateParameter</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>UserDefinedAggregate</Parent>
+      <RemainingMacros>/DADD /DREMOVE /DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedDataType">
+      <MappedTypeVariable>userDefinedDataType</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedTableType">
+      <MappedTypeVariable>userDefinedTableType</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Trigger">
+      <MappedTypeVariable>trigger</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedFunction">
+      <MappedTypeVariable>userDefinedFunction</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Rule">
+      <MappedTypeVariable>rule</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Default">
+      <MappedTypeVariable>def</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="StoredProcedure">
+      <MappedTypeVariable>storedProcedure</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="NumberedStoredProcedure">
+      <MappedTypeVariable>numberedStoredProcedure</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>short</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\numbered_generic_collection.cs</CollectionTemplate>
+      <Parent>StoredProcedure</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Synonym">
+      <MappedTypeVariable>synonym</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SecurityPolicy">
+      <MappedTypeVariable>securityPolicy</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SecurityPredicate">
+      <MappedTypeVariable>securityPredicate</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>int</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\securitypredicate_generic_collection.cs</CollectionTemplate>
+      <Parent>SecurityPolicy</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Sequence">
+      <MappedTypeVariable>sequence</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExtendedStoredProcedure">
+      <MappedTypeVariable>extendedStoredProcedure</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="View">
+      <MappedTypeVariable>view</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Table">
+      <MappedTypeVariable>table</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="WorkloadManagementWorkloadClassifier">
+      <MappedTypeVariable>WorkloadManagementWorkloadClassifier</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedType">
+      <MappedTypeVariable>userDefinedType</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="UserDefinedAggregate">
+      <MappedTypeVariable>userDefinedAggregate</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="XmlSchemaCollection">
+      <MappedTypeVariable>xmlSchemaCollection</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ResourcePool">
+      <MappedTypeVariable>resourcePool</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ResourceGovernor</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalResourcePool">
+      <MappedTypeVariable>externalResourcePool</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ResourceGovernor</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="WorkloadGroup">
+      <MappedTypeVariable>workloadGroup</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ResourcePool</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="OleDbProviderSettings">
+      <MappedTypeVariable>settings</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Settings</Parent>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SystemMessage">
+      <MappedTypeVariable>message</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\message_generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SqlAssemblyFile">
+      <MappedTypeVariable>file</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlAssembly</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SystemDataType">
+      <MappedTypeVariable>dataType</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Server</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="WorkloadManagementWorkloadGroup">
+      <MappedTypeVariable>WorkloadManagementWorkloadGroup</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="MessageType">
+      <MappedTypeVariable>messageType</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED /DCUSTOM_COLLATION</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServiceContract">
+      <MappedTypeVariable>serviceContract</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED /DCUSTOM_COLLATION</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="MessageTypeMapping">
+      <MappedTypeVariable>messageTypeMapping</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceContract</Parent>
+      <RemainingMacros>/DSEALED /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="BrokerService">
+      <MappedTypeVariable>brokerService</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED /DCUSTOM_COLLATION</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="BrokerPriority">
+      <MappedTypeVariable>brokerPriority</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED /DCUSTOM_COLLATION</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServiceContractMapping">
+      <MappedTypeVariable>serviceContractMapping</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>BrokerService</Parent>
+      <RemainingMacros>/DSEALED /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServiceQueue">
+      <MappedTypeVariable>serviceQueue</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schema_generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="RemoteServiceBinding">
+      <MappedTypeVariable>remoteServiceBinding</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ServiceRoute">
+      <MappedTypeVariable>serviceRoute</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Broker</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>ServiceBroker</Parent>
+      <RemainingMacros>/DITEM_BY_ID /DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="JobCategory">
+      <MappedTypeVariable>jobCategory</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="AlertCategory">
+      <MappedTypeVariable>alertCategory</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="OperatorCategory">
+      <MappedTypeVariable>operatorCategory</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DREMOVE</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Operator">
+      <MappedTypeVariable>serverOperator</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DSCRIPT_OBJECTS</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="Alert">
+      <MappedTypeVariable>alert</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID /DSCRIPT_OBJECTS</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="TargetServerGroup">
+      <MappedTypeVariable>targetServerGroup</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="JobSchedule">
+      <MappedTypeVariable>jobSchedule</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\schedule_generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="TargetServer">
+      <MappedTypeVariable>server</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="JobStep">
+      <MappedTypeVariable>jobStep</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\param_generic_collection.cs</CollectionTemplate>
+      <Parent>Job</Parent>
+      <RemainingMacros>/DSEALED /DADD /DREMOVE /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ProxyAccount">
+      <MappedTypeVariable>proxyAccount</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Agent</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>JobServer</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="MailProfile">
+      <MappedTypeVariable>mailProfile</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Mail</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlMail</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="MailAccount">
+      <MappedTypeVariable>mailAccount</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Mail</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlMail</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ConfigurationValue">
+      <MappedTypeVariable>configurationValue</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Mail</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlMail</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="MailServer">
+      <MappedTypeVariable>mailServer</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo.Mail</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>MailAccount</Parent>
+      <RemainingMacros>/DSEALED</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalDataSource">
+      <MappedTypeVariable>externalDataSource</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalFileFormat">
+      <MappedTypeVariable>externalFileFormat</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalStream">
+      <MappedTypeVariable>externalStream</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="ExternalStreamingJob">
+      <MappedTypeVariable>externalStreamingJob</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>Database</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
+  </ItemGroup>
+  <Target Name="SmoCollectionGenCompile" Condition="'@(SmoCollectionGenCompile)'!=''" Inputs="$(MSBuildThisFile);$(SmoDirectory)\generic_collection.cs;$(SmoDirectory)\schema_generic_collection.cs;$(SmoDirectory)\numbered_generic_collection.cs;$(SmoDirectory)\param_generic_collection.cs" Outputs="@(SmoCollectionGenCompile-&gt;'$(SmoCodeGenOutputDir)\Collections\%(Identity)Collection.cs')">
+    <Exec Command="cl.exe /C /EP /DMAPPED_TYPE=%(SmoCollectionGenCompile.Identity) /DMAPPED_TYPE_VAR=%(SmoCollectionGenCompile.MappedTypeVariable) /DNAMESPACE_NAME=%(SmoCollectionGenCompile.Namespace) /DKEY_TYPE=%(SmoCollectionGenCompile.KeyType) %(SmoCollectionGenCompile.RemainingMacros) &quot;%(SmoCollectionGenCompile.CollectionTemplate)&quot; /DPARENT=%(SmoCollectionGenCompile.Parent) &gt; &quot;$(SmoDirectory)\Collections\@(SmoCollectionGenCompile)Collection.cs&quot;" Condition="'$(FASTBUILD)'!='true'" />
+  </Target>
+</Project>

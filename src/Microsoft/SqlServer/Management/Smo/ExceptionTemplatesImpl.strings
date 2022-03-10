@@ -1,0 +1,1324 @@
+# String resource file
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these
+# string resources, including the ability to format in
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+
+# SMO build specific comment
+# after generating the .resx file, run resgen on it and get the .resources file
+# please remember to also check that .resources in, along with the
+# .strings and .cs file
+[strings]
+
+
+InvalidPasswordHash = Invalid value given for password hash. Specify a valid hash value.
+LoginPropertyNotSet = You must set the Login property before creating an user.
+LoginEnable = Enable Login.
+LoginDisable = Disable Login.
+AddCredential = Add Credential
+DropCredential = Drop Credential
+
+; Server Role Exceptions
+EnterServerRoleName = Enter server role name
+ServerRoleOwnerNameEmpty = The ServerRole.Owner property cannot be set to empty or null before calling the Create or Alter method.
+CreateAlterNotSupported = CREATE, ALTER and DROP are not supported for Server Roles on versions earlier than SQL 2012
+
+; Sequence UI Exceptions
+EnterSequenceName = Enter sequence name
+EnterMinValue = The minimum value textbox cannot be empty when minimum value checkbox is selected.
+EnterMaxValue = The maximum value textbox cannot be empty when maximum value checkbox is selected.
+EnterIncrementValue = The increment value textbox cannot be empty.
+EnterStartValue = The restart value textbox cannot be empty when the restart value option is selected.
+InvalidSequenceValue(string propertyName) = You must specify a valid integer value for property {0}.
+
+; Cryptographic Provider Exceptions
+UpgradeDll = Upgrade DLL
+ProviderEnable = Enable Cryptographic Provider
+ProviderDisable = Disable Cryptographic Provider
+SourceTypeShouldBeProvider = Source Type should be 'Provider'
+
+CannotSetPrivilege(privName) = The privilege {0} cannot be set for this type of object.
+
+; thrown when user requests a data only script and there is a cyclical dependency in the tables.
+CyclicalForeignKeys = There is a cyclical foreign key relationship in the database. Cannot generate data-only script.
+
+; message for downlevel creation of users without logins
+UsersWithoutLoginsDownLevel(string targetVersion) = Creating a user without an associated login is not supported in {0}.;
+
+; message for encrypted UDFS
+EncryptedUserDefinedFunctionsDownlevel(string udf, string targetVersion) = {0} is an encrypted User Defined Function.  Encrypted User Defined Functions are not supported in {1}.
+
+; message for encrypted stored procedures
+EncryptedStoredProcedureDownlevel(string sproc, string targetVersion) = {0} is an encrypted Stored Procedure.  Encrypted Stored Procedures are not supported in {1}.
+
+; message for encrypted views
+EncryptedViewsFunctionsDownlevel(string view, string targetVersion) = {0} is an encrypted View.  Encrypted Views are not supported in {1}.
+
+; message for Schemas not supported in prior versions
+SchemaDownlevel(string objectName, string targetVersion) = Error with Schema {0}.  Schemas are not supported in {1}.
+
+; message for User Defined Aggregates not supported in prior versions
+UserDefinedAggregatesDownlevel(string objectName, string targetVersion) = Error with User Defined Aggregate {0}.  User Defined Aggregates are not supported in {1}.
+
+; message for XmlSchemaCollections not supported in prior versions
+XmlSchemaCollectionDownlevel(string objectName, string targetVersion) = Error with Xml Schema Collection {0}.  Xml Schema Collections are not supported in {1}.
+
+; message for Synonyms not supported in prior versions
+SynonymDownlevel(string objectName, string targetVersion) = Error with Synonym {0}.  Synonyms are not supported in {1}.
+
+; message for Sequences not supported in prior versions
+SequenceDownlevel(string objectName, string targetVersion) = Error with Sequence {0}.  Sequences are not supported in {1}.
+
+; message for Security Policies not supported in prior versions
+SecurityPolicyDownlevel(string objectName, string targetVersion) = Error with Security Policy {0}.  Security Policies are not supported in {1}.
+
+; message for External Data Sources not supported in prior versions
+ExternalDataSourceDownlevel(string objectName, string targetVersion) = Error with External Data Source {0}.  External Data Sources are not supported in {1}.
+
+; message for column encryption keys not supported in prior versions
+ColumnEncryptionKeyDownlevel(string objectName, string targetVersion) = Error with Column Encryption Key {0}.  Column Encryption Keys are not supported in {1}.
+
+; message for External File Formats not supported in prior versions
+ExternalFileFormatDownlevel(string objectName, string targetVersion) = Error with External File Format {0}.  External File Formats are not supported in {1}.
+
+; message for column master keys not supported in prior versions
+ColumnMasterKeyDownlevel(string objectName, string targetVersion) = Error with Column Master Key {0}.  Column Master Keys are not supported in {1}.
+
+; message for column master keys not supported in prior versions
+DatabaseScopedCredentialDownlevel(string objectName, string targetVersion) = Error with Database Scoped Credential {0}.  Database Scoped Credentials are not supported in {1}.
+
+; message for User Defined Table Type not supported in prior versions
+UserDefinedTableDownlevel(string objectName, string targetVersion) = Error with User Defined Table Type {0}.  User Defined Table Types are not supported in {1}.
+
+; message for DDL triggers not supported in prior versions
+DdlTriggerDownlevel(string objectName, string targetVersion) = Error with DDL Trigger {0}.  DDL Triggers are not supported in {1}.
+
+; message for CLR UDFs not supported in prior versions
+ClrUserDefinedFunctionDownlevel(string objectName, string targetVersion) = Error with CLR User Defined Function {0}.  CLR User Defined Functions are not supported in {1}.
+
+; message for CLR sprocs not supported in prior versions
+ClrStoredProcedureDownlevel(string objectName, string targetVersion) = Error with CLR Stored Procedure {0}.  CLR Stored Procedure are not supported in {1}.
+
+; message for Assemblies not supported in Shiloh
+AssemblyDownlevel(string objectName, string targetVersion) = Error with Assembly {0}.  Assemblies are not supported in {1}.
+
+; message for no values in the ColumnEncryptionKey
+ColumnEncryptionKeyNoValues(string objectName) = Error creating Column Encryption Key {0}.  Must specify at least one Column Encryption Key value before creation.
+
+; message for no security predicates in the security policy
+SecurityPolicyNoPredicates(string objectName) = Error creating Security Policy {0}.  Must specify at least one security predicate before creation.
+
+; message for when a Table parameter is null
+NullParameterTable = Table cannot be null.
+
+; this exception gets thrown when scripting towards 2000 and there's a constraint other than unique or primary on a computed column
+ComputedColumnDownlevelContraint(string objectName, string targetVersion) = The computed column {0} has a check or foreign key constraint, which is not supported in {1}.
+
+; message for when a ScriptingOptions parameter is null
+NullParameterScriptingOptions = ScriptingOptions cannot be null.
+
+; this exception is thrown by the data scripting functionality if there's an unexpected datatype
+DataScriptingUnsupportedDataTypeException(string tableName, string columnName, string dataType) = Column {1} in table {0} contains a data type {2}, which is not currently supported by data scripting.
+
+; this exception gets thrown when trying to script execution context for stored procedures to target server 2000
+StoredProcedureDownlevelExecutionContext(string objectName, string executionPrincipal, string targetVersion) = The stored procedure {0} contains an execution context {1}, which is not supported in {2}.
+
+; this exception gets thrown when trying to script execution context for functions to target server 2000
+UserDefinedFunctionDownlevelExecutionContext(string objectName, string executionPrincipal, string targetVersion) = The user defined function {0} contains an execution context {1}, which is not supported in {2}.
+
+; this exception gets thrown when trying to script execution context for triggers to target server 2000
+TriggerDownlevelExecutionContext(string objectName, string executionPrincipal, string targetVersion) = The trigger {0} contains an execution context {1}, which is not supported in {2}.
+
+; this exception gets thrown when trying to script a column collation not existent on the target server
+UnsupportedColumnCollation(string columnName, string parentName, string collationName, string targetVersion) = Column {0} in object {1} contains the collation {2}, which is not supported in the target server version, {3}.
+
+; this exception gets thrown when trying to script a database collation not existent on the target server
+UnsupportedDatabaseCollation(string collationName, string targetVersion) = The source database's collation is {0}.  {1}, does not support this collation.
+
+; this exception gets thrown when trying to script out columns with data types not supported in the target version
+UnsupportedColumnType(string parentName, string columnName, string columnDataType, string targetVersion) = Column {1} in object {0} contains type {2}, which is not supported in the target server version, {3}.
+
+; this exception gets thrown when trying to script out columns with data types not supported in the target engine type
+UnsupportedColumnTypeOnEngineType(string parentName, string columnName, string columnDataType, string engineType) = Column {1} in object {0} contains type {2}, which is not supported in the target engine type, {3}.
+
+; this exception gets thrown when the user is requesting a collection that is not availabel on this version of server.
+CollectionNotAvailable(string objectname, string serverversion) = {0} collection is not accessible on server version {1}.
+
+; message for CREATE OR ALTER syntax not supported in prior versions
+CreateOrAlterDownlevel(string objectName, string targetVersion) = CREATE OR ALTER syntax is not supported on {0} in {1}.
+
+CreateOrAlterNotSupported(string objectName) = CREATE OR ALTER is not supported for type {0}.
+
+TriggerNotSupported(string serverversion) = INSTEAD OF triggers are not supported on server version {0}.
+CannotEnableViewTrigger = You cannot set Enabled property while creating a view trigger.
+ReplicationOptionNotSupportedForCloud = {0} option is not supported on Microsoft Azure SQL Database. For generating script, try setting TextMode property as false.
+
+UnknownRecoveryModel(string modelname) = Recovery model {0} is unknown.
+UnknownUserAccess(string modelname) = Unknown user access {0}.
+
+CannotRenameObject(string objectname, string serverversion) = You cannot rename object {0} on server version {1}.
+
+; if the property is missing the script cannot be generated
+PropertyNotSet(string propname, string objtype) = Set property {0} for {1} object to accomplish this action.
+
+ColumnAlreadyHasDefault(string name) = Column {0} already has a default.
+ColumnHasNoDefault(string colname, string defname ) = Column '{0}' does not have a default named '{1}'.
+
+NoSparseOnColumnSet = Column sets cannot be sparse.
+NoSparseOnComputed = Computed columns cannot be sparse.
+NoColumnSetOnComputed = Computed columns cannot be column set.
+
+; Temporal system-time messages
+NoGeneratedAlwaysColumnsOnNonTables = Columns with generated always values can only be defined on tables.
+NoSparseOrColumnSetOnTemporalColumns = Columns belonging to a system-time period cannot be sparse or column-set.
+ComputedTemporalColumns = Columns belonging to a system-time period cannot be computed.
+IdentityTemporalColumns = Columns belonging to a system-time period cannot be identity columns.
+NullableTemporalColumns = Columns belonging to a system-time period cannot be nullable.
+InvalidAlwaysEncryptedPropertyValues = ColumnEncryptionKeyName, EncryptionAlgorithm and EncryptionType must all be set to enable Encryption on the column.
+NoMemoryOptimizedTemporalTables = Memory-optimized tables cannot be system-versioned.
+SystemVersionedTableWithoutPeriod = System-versioned table must have system-versioned period defined.
+HistoryTableWithoutSystemVersioning = History table can only be provided when system-versioning is turned on.
+NoTemporalFileTables = System-versioned temporal tables or tables with defined system-versioning period cannot be file tables.
+NoAddingPeriodOnDroppedTable = Period cannot be defined on tables that are dropped or marked to be dropped.
+CannotHaveMultiplePeriods = Period cannot be defined on a table that already has a period defined.
+NoDroppingPeriodOnDroppedTable = Period cannot be dropped on a non-existing table.
+NoDroppingPeriodOnNotYetCreatedTable = Period cannot be dropped on tables that are already dropped or marked to be dropped.
+CannotDropNonExistingPeriod = Table does not have a period defined.
+MustProvideExistingColumn = An existing table column must be provided.
+PeriodMustHaveDifferentColumns = Starting and ending column for a system-time period cannot be the same.
+PeriodStartColumnMustBeGeneratedAlways = Period start column must have GeneratedAlwaysType property correctly set.
+PeriodEndColumnMustBeGeneratedAlways = Period end column must have GeneratedAlwaysType property correctly set.
+PeriodInvalidDataType = Columns defining system-time period must be of DateTime2 type.
+InvalidPeriodColumnName = Must provide valid, non-empty column name.
+BothHistoryTableNameAndSchemaMustBeProvided = When turning on system versioning, either both history table name and history table schema must be provided or none of them.
+NoHiddenColumnsOnNonGeneratedAlwaysColumns = Only system-time period columns can be declared as hidden.
+InvalidHistoryRetentionPeriodSpecification = History retention period value was not specified correctly. Expected value greater than 0.
+InvalidHistoryRetentionPeriodUnitSpecification = History retention period unit was not specified correctly. Expected value other than UNDEFINED.
+
+; Data Masking messages
+NoDataMaskingOnNonTables = Data Masking can be applied only to table columns.
+InvalidMaskingFunctionFormat = The data masking function provided for column {0} is invalid.
+MaskingFunctionOnWrongType = The data type of column {0} doesn't support data masking function '{1}'.
+NoDataMaskingOnColumnSet = Cannot apply a data masking function on a column set.
+NoDataMaskingOnTemporalColumns = Cannot apply a data masking function on columns with generated always values.
+NoDataMaskingOnComputedColumns = Cannot apply a data masking function on computed columns.
+NoDataMaskingOnFileStreamColumns = Cannot apply a data masking function on columns with the FILESTREAM storage attribute.
+NoDataMaskingOnEncryptedColumns = Cannot apply a data masking function on encrypted columns.
+
+; Data Classification messages
+NoDataClassificationOnNonTables = Data Classification can be applied only to table columns.
+NoDataClassificationOnComputedColumns = Cannot apply a data classification on computed columns.
+
+MismatchingServerName(string srvname, string urnsrvname) = The input Urn belongs to server {1}, instead of server {0}.
+
+MissingBackupDevices = No backup devices are set.
+
+MissingBackupDeviceType = You must specify the type of the backup devices.
+
+MismatchingNumberOfMirrors(int i1, int i2) = There is a mismatch in the number of mirrored devices. Expected {0}, received {1}.
+
+BackupToPipesNotSupported(string serverversion) = Backup to pipe device is not supported on server version {0}.
+PipeDeviceNotSupported = Pipe devices not supported.
+
+; Backup to URL
+BackupToUrlNotSupported(string serverVersion, string supportedVersion) = Backup to URL device is not supported on server version {0}. Backup to URL device can be used on server version {1} or later.
+CredentialNotSupportedError(string credential, string serverVersion, string supportedVersion) = Credential {0} is not supported on server version {1}. Microsoft Azure storage account credentials are supported on server version {2} or later.
+
+; Backup Encryption
+BackupEncryptionNotSupported = Encryption option is not supported on a version earlier than SQL Server 2014.
+
+LoginHasUser( string name, string dbname) = The proposed new database owner {0} is mapped as user {1} in this database.
+LoginHasAlias( string name) = The proposed new database owner {0} already has an alias in this database.
+InvalidLogin(string loginname) = The login '{0}' does not exist on this server.
+
+UnknownShrinkType = Unknown Shrink type.
+InvalidShrinkMethod(string name) = Shrink method {0} is not supported here.
+CannotChangePrimary = The primary file must reside in the PRIMARY filegroup.
+OnlyOnePrimaryFile = The PRIMARY filegroup already has a primary file.
+MustSpecifyGrowth = You must specify Growth if you want to change GrowthType for this object.
+WrongPercentageGrowth = Percentage growth must be a positive integer.
+WrongSize = The size specified represents a value that is out of bounds.
+InvalidSizeFileStream = Size cannot be specified for filestream filegroups.
+InvalidMaxSizeFileStream = Maxsize cannot be specified for filestream filegroups.
+InvalidGrowthFileStream = Growth or growth type cannot be specified for filestream filegroups.
+PrimaryAlreadyDefault = Primary filegroup is already the default filegroup.
+ColumnNotVarbinaryMax = Isfilestream property is supported only on the varbinary(max) data type.
+NotClusteredIndex = The FILESTREAM_ON clause is supported only on a clustered index.
+NotNonClusteredIndex = The filter clause is supported only on a nonclustered index.
+UnsupportedFileGroupType = Unsupported filegroup type.
+
+; thrown when a foreign key or an index references a nonexistent column.
+ObjectRefsNonexCol( string objname, string key, string col )= The {0} '{1}' references nonexistent column '{2}'.
+; thrown when a TVF ORDER hint references a nonexistent column.
+OrderHintRefsNonexCol(string key, string col)= The UserDefinedFunction '{0}' has an ORDER hint that references nonexistent column '{1}'.
+
+;exception thrown when start partition value exceed the end partition value in CopyTo method
+CannotCopyPartition(Int32 startPartition, Int32 endPartition) = Cannot copy partitions while start partition number({0}) exceeds the value of end partition number ({1}).
+PartitionNumberStartOutOfRange(Int32 maxvalue) = Start Partition number should lie between 1 and {0};
+VarDecimalAndDataCompressionConflict = Vardecimal storage format cannot be enabled along with data compression.
+RebuildHeapOnClusteredIndexError = Table with clustered index cannot execute RebuildHeap(). Call Rebuild on the clustered index.
+RebuildHeapError(string msg) = Exception occurred during execution of RebuildHeap process. {0}.
+PartitionSchemeNotAssignedError(string msg) = Object '{0}' does not have a partition scheme. You must specify a partition scheme before you can add a PhysicalPartition object that has a partition number greater than 1.
+; Exception thrown when an object already exists in the collection where we tried to add it.
+CannotAddObject(string typename, string objectName) = {0} '{1}' could not be added to the collection, because it already exists.
+UnknownObjectType(string name) = Unknown object type {0}.
+TooFewFiles = At least one file is needed for Database Attach.
+; thrown when we get a property from the enumerator that we do not have in the property bag.
+UnknownProperty(string name, string typename) = Property {0} does not belong to {1}.
+ObjectNotUnderServer(string name) = object {0} does not live under Server.
+UnknownChild = Child object does not fit with the type of the child collection.
+UnknownChildCollection(string objtypename, string childname) = {0} object does not contain a collection of {1}.
+CantCreateType(string name) = Type {0} could not be created.
+ObjectAlreadyExists(string type, string name) = The {0} '{1}' already exists.
+NoSqlGen(string objname) = No Transact-SQL was generated to create the object '{0}'.
+InvalidType(string typename) = Type {0} is invalid.
+WrongUrn(string objectType, string urn ) = The {0} object cannot be created with Urn='{1}'.
+NoDepForSysObjects(string objUrn) = Scripting system objects with dependencies is not supported when AllowSystemObjects is set to false. Error at Urn ='{0}'.
+UrnMissing(string urn) = Urn '{0}' is missing from the dependencies list.
+InvalidGranteeList = The grantee list is not valid.
+DatabaseAlreadyExists = Cannot attach a database with the same name as an existing database.
+ObjectWithNoChildren(string objectName, string childName) = Cannot create {0} that does not contain at least one {1}.
+ColumnBeforeNotExisting(string colname) = Failed to insert column, because column '{0}' does not exist.
+PropNotModifiable( string propName, string objectType ) = Modifying the {0} property of the {1} object is not allowed. You must drop and recreate the object with the desired property.
+UnsupportedLoginMode(string loginmode) = The login mode {0} is not supported.
+CannotSetDefInitFlds(string typename) = The type {0} cannot have default init fields.
+ReasonTextIsEncrypted = The text is encrypted.
+ReasonPropertyIsNotSupportedOnCurrentServerVersion = Property is not supported on current server version
+ObjectWithMoreChildren(string objectName, string childName) = Cannot create {0} that has more than one {1}.
+WrongHybridIPAddresses(string objectName) = Cannot create {0} that has hybrid IP addresses.
+WrongDHCPv6IPAddress(string objectName) = Cannot create {0} that uses IP v6 for DHCP IP address.
+WrongMultiDHCPIPAddresses(string objectName) = Cannot create {0} that uses more than one DHCP IP addresses.
+GetDHCPAddressFailed(string listenerName, int count) = The listener '{0}' should have exactly one DHCP-leased IP address, but {1} were found.
+CannotAddDHCPIPAddress(string objectName, string propName) = Cannot create {0} when the {1} property is set to true. Set this property to false and try again.
+
+;Exceptions related to Search Property List
+SearchPropertyListNameNotValid(int maxLength) = Property names must contain at least one character and must not exceed {0} characters.
+SearchPropertyNameNotValid(int maxLength) = The 'Property Name' field is empty. Specify a property name of 1 to {0} characters that is unique within the search property list.
+SearchPropertyIntIDNotValid = The 'Property Int ID' field must contain a valid integer from 0 to 2147483647.
+SearchPropertySetGuidNotValid = The 'Property Set GUID' field must contain the globally unique identifier (GUID) of the property set to which the specified property belongs. The format for a GUID is 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
+SearchPropertyDescriptionNotValid(int maxLength) = The 'Property Description' field must not exceed {0} characters.
+SearchPropertyGuidIntIdNotValid = The 'Property Set GUID' and 'Property Int ID' combination must be unique.
+; exception thrown when the Source Database Name parameter is null or Empty in Create method of Search Property List
+NullOrEmptyParameterSourceDatabaseName = The 'Source database' field cannot be null or empty. Specify the name of a database from which you want to copy a search property list.
+; exception thrown when the Source Search Property List Name parameter is null or Empty in Create method of Search Property List
+NullOrEmptyParameterSourceSearchPropertyListName = The 'Source search property list' field cannot be null or empty. Specify the name of the search property list that you want to copy.
+EmptySourceSearchPropertyListName =  The 'Source search property list' field cannot be empty. Specify the name of the search property list that you want to copy.
+SearchPropertyListNameAllWhiteSpaces = The search property list name cannot consist of all whitespace characters.
+
+;Exceptions related to RestorePlan, RestorePlanner, RestoreOptions
+EmptyRestorePlan = Empty restore plan.
+MultipleDatabaseSelectedToRestore = Multiple database selected to be restored.
+ConflictWithNoRecovery = Specifying this option when restoring a backup with the NORECOVERY option is not permitted.
+BackupsOfDifferentDb = Backups selected are from different source database.
+FullBackupShouldBeFirst = Full backup should be restored first.
+BackupsNotInSequence = Backups selected are not in sequence.
+NoFullBackupSelected = No full database backup is selected to be restored.
+WrongDiffbackup = Differential backup restore should happen just after the full database restore with NORECOVERY.
+DiffBackupNotCompatible = Differential backup selected is not compatible with Full backup.
+WrongTLogbackup = T-Log backup selected is not in the correct sequence.
+TailLogBackupDeviceNull = Tail-log backup device is not set.
+OnlyLastRestoreWithNoRecovery = Only the last restore operation in the restore plan can be with recovery.
+UnsupportedServerVersion = This operation is only supported for SQL Server 2005 and later.
+BackupMediaSetNotComplete(string files, int familyCount, int missing ) = Backup mediaset is not complete. Files: {0}. Family count:{1}. Missing family sequence number:{2}
+BackupMediaSetEmpty = Backup mediaset is empty.
+GetMediaSetGuid = Get backup media guid.
+MediaNotPartOfSet = Backup Media not a part of the Backup Media Set.
+UnableToReadDevice(string backupDeviceName) = Unable to read backup device: {0}.
+FileGroupNotSupported = DatabaseRestorePlan class doesn't support File/Filegroup restore.
+InvalidDatabaseState = The state of the database doesn't support Page restore.
+PageRestoreOnlyForFullRecovery = Page restore only possible for database in full recovery model.
+BackupFileAlreadyExists(string backupFile) = Backup file already exits: {0}
+CloseConnectionsFailed = Unable to close existing connections.
+BackupTailLog = Backup: Tail-log
+Restoring(string backupset) = Restoring: {0}
+BackupFileNotFound(string file) = Backup file not found: {0}
+TailLog = Tail-log
+UnableToCreateRestoreSequence = Unable to create restore plan due to break in the LSN chain.
+UnableToCreatePageRestoreSequence = Unable to create Page restore plan due to forked restore path or broken LSN chain.
+UnableToCreatePlanTakeTLogBackup = No backup has been taken after the last Restore operation. Take a Transaction-Log backup to enable Page Restore.
+OperationCancelledByUser = Operation canceled by user.
+CannotRestoreFileBootPage(int fileid, long pageid) = Cannot restore file boot page: [{0},{1}]
+CannotRestoreDatabaseBootPage(int fileid, long pageid) = Cannot restore database boot page: [{0},{1}]
+DuplicateSuspectPage(int fileId, long pageId) = Duplicate page selected: [{0},{1}]
+InvalidSuspectpage = Invalid page
+
+; Exception thrown when a child collection is not found
+InvalidPathChildCollectionNotFound(string child, string parent) = Invalid path: There is no collection of {0} objects that is a child of {1}.
+; Exception thrown when a child singleton is not found
+InvalidPathChildSingletonNotFound(string child, string parent) = Invalid path: There is no singleton child of type {0} that is a child of {1}.
+
+SqlInnerException = An exception occurred while executing a Transact-SQL statement.
+InnerException = An exception occurred in SMO.
+InnerWmiException = An exception occurred in SMO while trying to manage a service.
+UnknownError = Unknown error.
+WMIException(string errorCode) = The call failed with WMI error {0}. Please consult the WMI documentation.
+CallingInitChildLevelWithWrongUrn(string urn) = InitChildLevel has been called with {0}.
+CallingInitQueryUrnsWithWrongUrn(string urn) = InitQueryUrns has been called with a query of '{0}'.
+UnsupportedObjectQueryUrn(string urn) = The SMO object query '{0}' is unsupported. Each level must represent a valid collection or single object.
+UnsupportedBackupDeviceType(string name) = Cannot create device with type {0}.
+UnableToRetrieveBackupHistory=Cannot retrieve backup history.
+UnsupportedVersion(string version) = This method cannot be called on the server version {0}.
+UnsupportedCompatLevelException(long targetLevel, long minLevel)=The object or one of its properties is not supported for the target compatibility level {0}. The minimum supported compatibility level is {1}.
+ObjectDoesNotExist(string type, string name) = The {0} '{1}' does not exist on the server.
+UnsupportedFeature(string type) = {0} is not supported on this edition of SQL Server.
+OneFilePageSupported = You can specify pages for only one file in this operation.
+NoObjectWithoutColumns(string objName) = Cannot create {0} without specifying one or more columns.
+ConflictingScriptingOptions(string opt1, string opt2) = Cannot specify both {0} and {1} as scripting options.
+InvalidScriptingOutput(string opt1, string opt2) = At least one of the properties {0}, or {1} must be specified.
+ScriptDataNotSupportedByThisMethod = This method does not support scripting data.
+ForeignKeyCycleInObjects=There is a cyclical foreign key relationship in the database. Cannot generate data-only script.
+
+
+##################################################################################################
+# General exceptions regarding DatabaseEngineType/ServerVersion/DatabaseEngineEdition supportness
+##################################################################################################
+
+; object-related exceptions
+NotSupportedForCloudVersion(string type, string version) = Object of type '{0}' is not supported on version '{1}' of Microsoft Azure SQL Database.
+NotSupportedForSqlDw(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Data Warehouse Edition.
+NotSupportedForSqlOd(string type) = Object of type '{0}' is not supported on Microsoft Azure Synapse SQL On-Demand Edition.
+NotSupportedForSqlDb(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Database Edition.
+NotSupportedForSqlEdge(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Edge Edition.
+NotSupportedOnStandalone = This object is not supported on Standalone SQL Server.
+NotSupportedOnStandaloneWithDetails(string type) = Object of type '{0}' is not supported on Standalone SQL Server.
+NotSupportedOnCloud = This object is not supported on Microsoft Azure SQL Database.
+NotSupportedOnCloudWithDetails(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Database.
+NotSupportedOnOnDemandWithDetails(string type) = Object of type '{0}' is not supported on Microsoft Azure Synapse SQL On-Demand Edition.
+NotSupportedOnSqlEdge(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Edge Edition.
+InvalidScriptingOptions = The scripting options 'TargetServerVersion|TargetDatabaseEngineType|TargetDatabaseEngineEdition' specified for current object are not valid.
+ScriptingNotSupportedForSqlDw(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Data Warehouse Edition.
+ScriptingNotSupportedForSqlDb(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Database Edition.
+ScriptingNotSupportedOnStandalone(string type) = Scripting object of type '{0}' is not supported while working against Standalone SQL Server.
+ScriptingNotSupportedOnCloud(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Database.
+ScriptingNotSupportedOnEdge(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Edge.
+CreateOrAlterNotSupportedVersion = CREATE OR ALTER syntax is not supported on the specified version of SQL Server.
+
+; property-related exceptions
+SupportedOnlyBelow110 = This method or property is accessible only while working against a version earlier than SQL Server 2012.
+SupportedOnlyBelow100 = This method or property is accessible only while working against a version earlier than SQL Server 2008.
+SupportedOnlyBelow90 = This method or property is accessible only while working against a version earlier than SQL Server 2005.
+SupportedOnlyOn150 = This method or property is accessible only while working against SQL Server 2019.
+SupportedOnlyOn160 = This method or property is accessible only while working against SQL Server 2022.
+SupportedOnlyOn140 = This method or property is accessible only while working against SQL Server 2017 or later.
+SupportedOnlyOn130 = This method or property is accessible only while working against SQL Server 2016 or later.
+SupportedOnlyOn120 = This method or property is accessible only while working against SQL Server 2014 or later.
+SupportedOnlyOn110 = This method or property is accessible only while working against SQL Server 2012 or later.
+SupportedOnlyOn105 = This method or property is accessible only while working against SQL Server 2008 R2 or later.
+SupportedOnlyOn100 = This method or property is accessible only while working against SQL Server 2008 or later.
+SupportedOnlyOn90 = This method or property is accessible only while working against SQL Server 2005 or later.
+SupportedOnlyOn80SP3 = This method or property is accessible only while working against Microsoft SQL Server 2000 Service Pack 3 or later.
+SupportedOnlyOn80 = This method or property is accessible only while working against SQL Server 2000 or later.
+NotSupportedForVersionEarlierThan110 = This method or property is not supported while working against a version earlier than SQL Server 2012.
+NotSupportedForVersionEarlierThan120 = This method or property is not supported while working against a version earlier than SQL Server 2014.
+NotSupportedForVersionEarlierThan130 = This method or property is not supported while working against a version earlier than SQL Server 2016.
+NotSupportedForVersionEarlierThan140 = This method or property is not supported while working against a version earlier than SQL Server 2017.
+NotSupportedForVersionEarlierThan150 = This method or property is not supported while working against a version earlier than SQL Server 2019.
+PropertySupportedOnlyOn110SP1(string propertyName) = The '{0}' property is accessible only while working against SQL Server 2012 Service Pack 1 or later.
+PropertySupportedOnlyOn110(string propertyName) = The '{0}' property is accessible only while working against SQL Server 2012 or later.
+PropertyNotSupportedForCloudVersion(string propertyName, string version) = The '{0}' property is not supported on version '{1}' of Microsoft Azure SQL Database.
+PropertyNotSupportedOnStandalone(string propertyName) = The '{0}' property is not supported on Standalone SQL Server.
+PropertyNotSupportedOnCloud(string propertyName) = The '{0}' property is not supported on Microsoft Azure SQL Database.
+PropertyNotSupportedOnEdge(string propertyName) = The '{0}' property is not supported on Microsoft Azure SQL Edge.
+PropertyNotSupportedWithDetails(string propertyName, string engineType, string version, string engineEdition) = The '{0}' property is not supported on {3} edition database of {1} SQL Server with version {2}.
+PropertyValueSupportedOnlyOn110(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is accessible only while working against SQL Server 2012 or later.
+PropertyValueNotSupportedForSqlDw(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is not supported on Microsoft Azure SQL Data Warehouse Edition.
+PropertyValueNotSupportedForSqlDb(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is not supported on Microsoft Azure SQL Database Edition.
+WrongPropertyValueException(string propertyName, string propertyValue) = The '{0}' property cannot have a value of '{1}' for this version of SQL Server.
+InvalidPropertyValueForVersion(string typeName, string propertyName, string propertyValue, string sqlVersionName) = '{0}'.'{1}': '{2}' is not a valid option for {3}.
+PropertyCannotBeSetForVersion(string propertyName, string objectType , string version) = The '{0}' property cannot be set for the '{1}' object in {2};
+
+#################################################################################
+
+EmptyInputParam(string paramName, string paramKind) = The input parameter {0} must be a non-empty {1} for this operation to succeed.
+MustSpecifyOneParameter = You must specify at least one parameter with a non-empty name for this aggregate function.
+MutuallyExclusiveProperties(string prop1, string prop2) = {0} and {1} cannot both be set at the same time.
+NeedPSParams = PartitionSchemeParameters need to be non-empty when PartitionScheme has been set.
+IndexMustBeClustered(string tableName, string indexName) = {0}.{1} is not a clustered index.
+ParentMustExist(string objectType, string objectName) = Cannot create {0} '{1}' if parent is not yet created.
+ViewCannotHaveKeys = You cannot create a PRIMARY KEY or an UNIQUE KEY on a view.
+InvalidAcctName = The account name is not valid.
+OperationOnlyInPendingState = Cannot perform the operation on this object, because the object is a member of a collection.
+OperationNotInPendingState = Cannot execute this operation for an object that is in Pending state.
+OperationNotInPendingState1(string prop1) = Before executing this operation you need to set {0} for this object.
+OperationNotInPendingState2(string prop1, string prop2) = Before executing this operation you need to set {0} and {1} for this object.
+OperationNotInPendingState3(string prop1, string prop2, string prop3) = Before executing this operation you need to set {0} and {1} and {2} for this object.
+RemoteServerEndpointRequired = RemoteDataArchiveEndpoint has to be set to enable Remote Data Archive for a database.
+DatabaseScopedCredentialsRequired = DatabaseScopedCredential has to be set to enable Remote Data Archive for a database.
+UnsupportedDatabaseScopedConfiguration(string configName) = '{0}' is not a valid Database Scoped Configuration.
+MissingBoundingParameters = You must specify bounding-box parameters for geometry spatial indexes.
+InvalidNonGeometryParameters = You cannot specify bounding-box parameters for geography  spatial indexes.
+UnsupportedNonSpatialParameters = You cannot specify bounding-box parameters, grid levels, or cells for non-spatial indexes.
+NotSpatialIndexOnView = You cannot create a spatial index on a view.
+OneColumnInSpatialIndex = A spatial index can contain only one column.
+NoSpatialIndexUnique = Spatial indexes cannot be unique.
+NoSpatialIndexClustered = Spatial indexes cannot be clustered.
+LowPriorityCannotBeSetForDrop = The clustered index cannot be dropped in low priority when the OnlineIndexOperation property is not set as true.
+SpatialAutoGridDownlevel(string objectName, string targetVersion) = Error with spatial index {0}.  GEOMETRY_AUTO_GRID and GEOGRAPHY_AUTO_GRID are not supported in {1}.
+NoAutoGridWithGrids(string objectName) = Error with spatial index {0}. Specifying GRIDS is not supported with GEOMETRY_AUTO_GRID and GEOGRAPHY_AUTO_GRID.
+OnlyHashIndexIsSupportedInAlter = Only hash indexes on memory optimized tables can be altered.
+NotXmlIndexOnView = An XML index cannot be created on a view.
+OneColumnInXmlIndex = An XML index can have only one column.
+BucketCountForHashIndex = A hash index must specify a bucket count.
+ScriptMemoryOptimizedIndex = An index of a memory optimized table cannot be scripted.
+HashIndexTableDependency = Only memory optimized tables can have hash indexes.
+TableMemoryOptimizedIndexDependency = Only hash or nonclustered indexes can be created on memory optimized tables.
+TableSqlDwIndexRestrictions = Only clustered columnstore, clustered, non-clustered or heap indexes can be created on SQL DW tables.
+TableSqlDwIndexTypeRestrictions(string indexType) = Unexpected index type detected. Only clustered, non-clustered or clustered columnstore index types create be created for SQL DW. The actual index type is {0}.
+UnexpectedIndexTypeDetected(string indexType) = Unexpected index type detected.  Expecting to script a clustered index.  However, the actual index type is {0}.
+NoXmlIndexUnique = An XML index cannot be unique.
+NoXmlIndexClustered = An XML index cannot be clustered.
+UnsupportedNonXmlParameters=Cannot specify ParentXmlIndex or SecondaryXmlIndexType for non-XML indexes.
+CantSetDefaultFalse = The IsDefault property cannot be set to false. Please select another file group and try to make it default.
+TimeoutMustBePositive = A positive value must be supplied for the transaction termination time.
+NoPropertyChangeForDotNet(string propertyName) = The {0} property cannot be changed for .NET run-time routines.
+ClrNotSupported(string propName, string version) = Invalid value for property {0}. .NET run-time routines are not supported on server version {1}.
+InvalidPropertyNumberRange(string propName, string numberMin, string numberMax) = Invalid value for {0} property: the value must be a number between {1} and {2}.
+ChangeTrackingException = Change tracking must be set on before you can set the change tracking properties of a database.
+MissingChangeTrackingParameters = You must specify both the retention period and the retention period units.
+TrackColumnsException = Change tracking must be enabled on a table before you can set track columns.
+InvalidCollation(string name) = Collation '{0}' is not valid.
+UnsupportedCollation(string name, string version) = Collation '{0}' is not supported for {1}.
+ViewColumnsCannotBeModified = View columns cannot be modified or created.
+NeedToPassObject(string objtype) = Transfer cannot process {0}. You need to pass an instance class object.
+InexistentDir(string dir) = The directory '{0}' does not exist.
+CantCreateTempFile(string dir) =Cannot create temporary file in directory '{0}'.
+UnknownFilter(string filter) = Internal error: the filter '{0}' cannot be processed by the prefetch operation.
+SystemMessageReadOnly = The SystemMessage object is read only.
+MessageIDTooSmall(int id) = The user defined messages need to have id's bigger than 50000.
+DataTypeUnsupported(string dt) = DataType instantiation failed: {0} type not supported by the constructor.
+CantSetTypeName(string type) = Cannot set Name property for the {0} type.
+CantSetTypeSchema(string type) = Cannot set Schema property for the {0} type.
+UnknownSqlDataType(string type) = The value does not belong to SqlDataType enumeration.
+NeedExistingObjForDataType(string objName) = DataType instantiation failed: the object {0} does not exist on the server.
+NoPendingObjForDataType(string state) = An object in {0} state cannot be used to create a DataType.
+CantSetContainedDatabaseCatalogCollation = Cannot explicitly set the CatalogCollation property to ContainedDatabaseFixedCollation.
+
+ViewFragInfoNotInV7 = Fragmentation information is not available for views on SQL Server 7.0.
+InvalidOptionForVersion(string method, string optionName, string SqlVersionName) = {0} failed: the {1} option is not available for {2}.
+InvalidParamForVersion(string method, string paramName, string SqlVersionName) = {0} failed: the {1} parameter cannot be specified on {2}.
+UnknownLanguageId(string langid) = {0} is not a valid language id on the server.
+UnknownEnumeration(string type) = Unexpected value for enumeration type {0}.
+UnknownEnumerationWithValue(string type, object value) = Unexpected value {1} for enumeration type {0}.
+MissingConfigVariable(string fnName, string varName) = The function {0} was called without supplying variable {1}.
+DtsNotInstalled = The Integration Services component is not installed or you do not have permission to use it.
+NSNotInstalled = The Notification Services component is not installed or you do not have permissions to use it.
+InvalidNSOperation = The Notification Services operation performed is invalid.
+NSNotConnectedToServer = Unable to perform this operation as the object is not connected to a server.
+;InvalidNSInstanceName = The instance name is not valid. Instance names cannot contain the following characters: open bracket ([), close bracket (]), quotation mark ("), single quote ('), baskslash (\\), forward slash (/).
+;RequiredElementMissing(string elementName) = A required element: {0} is missing.
+InvalidThreadPoolSize = The ThreadPoolSize entry is not valid. It must be a non-negative integer.
+InvalidQuantumLimit = The specified quantum limit is not valid. The quantum limit value must be a non-negative integer.
+InvalidQuantumDuration = The quantum duration specified is not valid. The value must be at least 1 second.
+InvalidThrottle = The specified throttle value is not valid. The value must be a non-negative integer.
+InvalidFailuresBeforeLoggingEvent = The FailuresBeforeLoggingEvent entry is not valid. It must be a non-negative integer.
+InvalidFailuresBeforeAbort = The FailuresBeforeAbort entry is not valid. It must be a non-negative integer.
+InvalidMulticastRecipientLimit = The MulticastRecipientLimit entry is not valid. It must be a non-negative integer.
+InvalidNotificationClassBatchSize = The NotificationBatchSize value is not valid. It must be an non-negative integer.
+ThreadPoolSizeNotValidForEdition (string componentName, int threadPoolSize) = The {0} ThreadPoolSize value must be {1} for the Standard Edition of Notification Services.
+StartTimeGreaterThanADay = The start time for a vacuumer is the time within a day and cannot be greater than 24 hours.
+InvalidPropertySetForExistingObject (string propertyName) = Cannot set property {0} for an existing Notification Service Instance or Application.
+InvalidEncryptArgumentsAndArgumentKey (string EncryptArguments, string ArgumentKey) = Invalid values for properties Instance.{0} and Instance.{1}. If you set Instance.{0} then you must provide a valid Instance.{1}. If you provide an Instance.{1} then you must set Instance.{0}. You must set these properties correctly to encrypt or decrypt argument values.
+InvalidSerializerAdapterFound(string name, string expectedType, string actualType) = Serializer Adapter {0} Exception: Invalid input object type {2}.  The adaptor expects object of type {1}.
+InvalidConversionError(string name, string input, string type) = Serializer adapter {0} Exception: Cannot convert text value {1} to an object of type {2}.
+RequiredChildMissingFromParent(string requiredChildType, string parentName, string parentType) = A required object of type: {0} is missing from parent object: '{1}' (Type: {2}).
+
+
+NoPermissions=No permissions have been specified.
+WrongParent(string objectName)=Parent property of object {0} does not match the collection's parent to which it is added.
+VerifyFailed(string database, string backupType)=Verify failed. Backup information for database '{0}' (type {1}) not found.
+VerifyFailed0(string database)=Verify failed. Backup information for database '{0}' not found.
+PrimaryFgMustHaveFiles=The PRIMARY filegroup must have at least one file.
+NeedToSetParent=You must set Parent property.
+InvalidVersion(string version)=Invalid version: {0}.
+ErrorInCreatingState=You cannot execute this operation since the object has not been created.
+ConflictingSwitches(string prop1, string prop2) = The {0} and {1} properties have conflicting settings.
+BackupFailed=Backup operation failed.
+RestoreFailed=Restore operation failed.
+BadCompatLevel(string level) = {0} database compatibility level is not supported.
+SetPasswordError = SetPassword cannot be used on existing objects. Use ChangePassword to change the password for an existing object.
+PassPhraseAndIdentityNotSpecified=Both pass phrase and identity phrase are not specified.
+PassPhraseNotSpecified=Pass phrase is not specified.
+NotEnoughRights=Could not read metadata, possibly due to insufficient access rights.
+
+SqlDwCreateRequiredParameterMissing=AzureEdition and AzureServiceObjective values must be valid to create a DW database instance.
+
+CannotAlterKeyWithProvider=Keys encrypted with cryptographic providers cannot be altered.
+InvalidAlgorithm(string parent, string argument) = {1} is not a valid algorithm to create the {0}.
+AlterQueryStorePropertyForRestoringDatabase = Unable to modify Query Store properties when database is in restoring state.
+###############################################################################
+# Header printed before scripted objects
+# {0} - object type (e.g. Table, View etc.)
+# {1} - object name (e.g. [dbo].[authors]
+# {2} - timestamp
+IncludeHeader(string objectType, string name, string dateString)=/****** Object:  {0} {1}    Script Date: {2} ******/
+
+
+
+
+
+###############################################################################
+# Internal erorrs
+NoUrnSuffix=Internal SMO error. This object does not have UrnSuffix or it is empty string.
+FullPropertyBag(string propName)=Internal SMO error. OnPropertyMissing(\"{0}\") was called for a full property bag.
+MultipleRowsForUrn(string urnName)=Internal SMO error. SqlSmoObject.ImplInitialize() got multiple rows for urn '{0}'.
+GetParentFailed=Internal SMO error. Trying to get the Parent property through reflection failed.
+ParentNull=Internal SMO error. Parent property is null.
+CouldNotFindKey(string keyName)=Internal SMO error. Could not find key {0}.
+UnsupportedUrnFilter(string attrib, string functionType) = Internal SMO error. During prefetch the filter attribute {0} does not support function type {1}.
+UnsupportedUrnAttrib(string attrib) = Internal SMO error. During prefetch the filter attribute {0} is not supported.
+InvalidFileInformationData=Invalid data returned while querying the file information on server.
+###############################################################################
+
+
+###############################################################################
+# ServiceBroker exceptions
+MappingObjectIdMissing(string typename, int id ) = The {0} with ID={1} does not exist. You cannot create a {0}Mapping.
+EmptyMapping(string parent, string mappingname) = Cannot create a {0} object if the {1}Collection is empty.
+ExecutionContextPrincipalIsNotSpecified = ExecutionContextPrincipal property needs to be set for this activation execution context
+MissingBrokerEndpoint=To configure Service Broker, you must create a Service Broker endpoint by using the CREATE ENDPOINT Transact-SQL statement.
+CannotEnableSoapEndpoints=Enabling all the SOAP endpoints at the same time is not supported. However, you can manually enable a single SOAP endpoint.
+###############################################################################
+
+
+###############################################################################
+; the following error messages are Service call error codes
+; More references on those error messages can be found in WMI documentation
+
+ServiceError0=The request was accepted.
+ServiceError1=The request is not supported.
+ServiceError2=The user did not have the necessary access.
+ServiceError3=The service cannot be stopped because other running services depend on it.
+ServiceError4=The requested control code is not valid, or it is unacceptable to the service.
+ServiceError5=The requested control code cannot be sent to the service because the state of the service (Win32_BaseService:State) is equal to 0, 1, or 2.
+ServiceError6=The service has not been started.
+ServiceError7=The service did not respond to the start request in a timely fashion.
+ServiceError8=Unknown failure when starting the service.
+ServiceError9=The directory path to the service executable was not found.
+ServiceError10=The service is already running.
+ServiceError11=The database to add a new service is locked.
+ServiceError12=A dependency for which this service relies on has been removed from the system.
+ServiceError13=The service failed to find the service needed from a dependent service.
+ServiceError14=The service has been disabled from the system.
+ServiceError15=The service does not have the correct authentication to run on the system.
+ServiceError16=This service is being removed from the system.
+ServiceError17=There is no execution thread for the service.
+ServiceError18=There are circular dependencies when starting the service.
+ServiceError19=There is a service running under the same name.
+ServiceError20=There are invalid characters in the name of the service.
+ServiceError21=Invalid parameters have been passed to the service.
+ServiceError22=The account that this service is to run under, is either invalid or lacks the permissions to run the service.
+ServiceError23=The service exists in the database of services available from the system.
+ServiceError24=The service is currently paused in the system.
+###############################################################################
+
+############################################################
+# Agent specific exceptions
+UnknownCategoryName(string name) = Unknown Category Name {0}.
+UnknownCategoryType(string typename) = Unknown Category Type {0}.
+UnknownOperator(string name) = The operator {0} does not exist.
+############################################################
+
+############################################################
+# UnsupportedFeatureAreas
+UnsupportedFeatureSqlAgent=SQL Server Agent
+UnsupportedFeatureSqlMail=Database Mail
+UnsupportedFeatureServiceBroker=SQL Server Service Broker
+UnsupportedFeatureFullText=Full-text
+UnsupportedFeatureResourceGovernor=Resource Governor
+UnsupportedFeatureSmartAdmin=Smart Admin
+
+############################################################
+# WMI Specific exceptions
+InvalidServerUrn(string serverName) = The input Urn refers to server {0}.
+InvalidUrn(string type) = Urn that starts with {0} is currently not supported.
+WMIProviderNotInstalled(string machineName) = SQL Server WMI provider is not available on {0}.
+PropertyCannotBeChangedAfterConnection(string propertyName) = Property {0} cannot be changed after connection is established.
+CouldNotFindManagementObject(string type, string name) = Could not find management object for {0} {1}.
+############################################################
+
+############################################################
+# Server Events exceptions
+CannotSubscribe = Cannot create an event subscription.
+CannotStartSubscription = Cannot start an event subscription.
+NotSupportedNotification(string className, string eventType) = Property could not be set. The {0} object does not support {1} event notification.
+
+############################################################
+# Registered Server exceptions
+InnerRegSvrException = An exception occurred in the RegisteredServer store while updating it.
+
+# Registered Server Type Name
+SqlServerTypeName = Microsoft SQL Servers
+
+############################################################
+# From this point on, only messages used by the exception classes
+############################################################
+
+MissingObjectExceptionText( string parentName, string objectName, string serverVersion) = The object {0} is missing from parent {1}. Server version is {2}.
+PropertyNotSetExceptionText(string propertyName) = To accomplish this action, set property {0}.
+MissingObjectNameExceptionText(string parentName, string objectType, string objectName) = The {0} object is missing the {1} with the name {2}.
+WrongPropertyValueExceptionText(string propName, string propValue) = Cannot execute this operation while the property {0} is set to '{1}'.
+PropertyTypeMismatchExceptionText(string propname, string received, string expected) = Type mismatch when trying to assign value to property {0}. Received {1} instead of {2}.
+MissingPropertyExceptionText( string propertyName, string serverVersion ) = The property {0} does not exist on server version {1}, or you do not have access to it.
+UnknownPropertyExceptionText( string propertyName) = {0}: unknown property.
+PropertyReadOnlyExceptionText(string name) = Cannot change property {0}. It is read-only.
+InvalidSmoOperationExceptionText(string opName, string state) = You cannot perform operation {0} on an object in state {1}.
+PropertyCannotBeRetrievedExceptionText(string objType, string propname, string objName) = Property {0} is not available for {1} '{2}'. This property may not exist for this object, or may not be retrievable due to insufficient access rights.
+ObjectDroppedExceptionText(string type, string name) = Cannot access properties or methods for the {0} '{1}', because it has been dropped.
+UnsupportedObjectNameExceptionText(string objectType) = Cannot use empty object names for {0}.
+FailedtoInitialize(string urn) = Failed to initialize Urn {0}.
+PropertyMustBeSpecifiedInUrn(string propName, string nodeType)=The input Urn must specify {0} at level {1}.
+InvalidScanType(string scanType) = Error creating Statistic object; {0} is not a valid statistic scan type.
+ColumnsMustBeSpecified = Error creating Statistic object, columns must be specified.
+PasswdModiOnlyForStandardLogin = Password can be modified only for a Standard login.
+DenyLoginModiNotForStandardLogin = DenyWindowsLogin cannot be modified for a Standard login.
+CloudSidNotApplicableOnStandalone = Logins cannot be scripted by using a service security ID (SID) from Microsoft Azure SQL Database to a local instance of SQL Server.
+CannotCreateExtendedPropertyWithoutSchema = Cannot create ExtendedProperty, because schema is not specified on the parent object.
+InvalidSchema = Schema is not valid.
+FailedToChangeSchema = Schema can only be changed for an existing object.
+InvalidUrnServerLevel = Invalid Urn filter on server level: filter must be empty, or server attribute must be equal with the true server name.
+ServerLevelMustBePresent = Server level must be present.
+TempTablesNotSupported(string tableName) = Invalid table name: '{0}'. Temporary tables are not supported.
+PlanGuideNameCannotStartWithHash(string planGuideName) = Invalid plan guide name: '{0}'. A plan guide name cannot start with a number sign (#).
+PropertiesNotValidException(string propNames, string propName, string propValue) = The properties {0} cannot be set when the property {1} is set to {2}.
+TypeSchemaMustBeDbo(string prop, string value) = UserDefinedDataType {0} must be dbo. It is {1}.
+OperationInProgress = An operation is already in progress.
+UnsupportedPermission(string permName) = Unsupported permission {0}.
+InvalidVersionSmoOperation(string version) = Operation is not supported on {0}.
+ContainmentNotSupported(string version) = This operation cannot be performed because contained databases are not supported on server version {0}.
+AweEnabledNotSupported(string version) = This operation cannot be performed because memory management by awe enabled is not supported on server version {0}.
+PasswordError=Password is not supported in this version of SQL Server.
+MediaPasswordError=Media Password is not supported in this version of SQL Server.
+CannotChangePassword = Cannot change password for Windows login.
+CannotChangePasswordForUser = The user has no password, so password cannot be changed.
+PasswordOnlyForDatabaseAuthenticatedNonWindowsUser = A password cannot be provided because the user is not authenticated in the database.
+DefaultLanguageOnlyForDatabaseAuthenticatedUser = Default language cannot be specified because the user is not authenticated in the database.
+CannotCopyPasswordToUser = The user cannot be converted to a contained user because the user is not mapped to a login.
+FollowingPropertiesCanBeSetOnlyWithContainmentEnabled = The following properties cannot be set because the database is not a contained database: {0}, {1}, {2}, {3} and {4}.
+OperationNotSupportedWhenPartOfAUDF = Operation is not supported when part of a UserDefinedFunction.
+FailedToWriteProperty(propName, objectType, objectName, reason) = Writing property {0} of {1} '{2}' is not allowed when {3}.
+ReasonIntextMode = TextMode has been set
+ReasonNotIntextMode = TextMode has not been set
+SyntaxErrorInTextHeader(objectType, objectName) = Syntax error in TextHeader of {0} '{1}'.
+IncorrectTextHeader(objectType, objectName, propNameSmall, propName) = The {2} specified in the TextHeader property of {0} '{1}' must match {3} property.
+ScriptHeaderTypeNotSupported(scriptHeaderType, objectType, objectName) = ScriptHeaderType {0} is not supported for {1} '{2}'.
+CollectionCannotBeModified = Collection cannot be modified when
+KeyOptionsIncorrect = Symmetric key options are incorrect
+PropertyIsInvalidInUrn(string propName, string nodeType)=The input Urn property {0} at level {1} has invalid value.
+TableOrViewParentForUpdateStatistics = Parent of Column must be Table or View in order to call UpdateStatistics
+ReasonObjectAlreadyCreated(string objName)={0} is already created.
+PropertyAvailable = This property is not available on
+CannotReadProperty(string propName) = Cannot read property {0}.
+CannotWriteProperty(string propName) = Cannot write property {0}.
+CannotAccessProperty(string propName) = Cannot access property {0}.
+PropertyNotAvailableToWrite(string propName, string version) = Cannot write property {0}. This property is not available on {1}.
+ServerPropertyMustBeSetForOlap = Server property needs to be set for the OLAP subsystem
+InvalidInstanceName = Server name cannot be split into machine and instance names.
+TransferCtorErr=You must supply an existing Database object.
+UnsupportedVersionException=Either the object or one of its properties is not supported on the target server version.
+UnsupportedEngineTypeException=Either the object or one of its properties is not supported on the target engine type.
+UnsupportedEngineEditionException=Either the object or one of its properties is not supported on the target engine edition.
+CantScriptObject(string urn)=Cannot script the object with Urn='{0}'.
+PropertyNotValidException(string propName1, string propName2, string propValue) = The property {0} cannot be set if the property {1} is set to {2}.
+TargetRecoveryTimeNotNegative = Target Recovery Time cannot be negative.
+InvalidEdgeConstraintParent = Edge constraints are only allowed on edge tables.
+EmptyConstraintName = The constraint name cannot be null or empty.
+InvalidEdgeConstraintDefinition = Edge constraints should have at least one encapsulated clause having from and to sides.
+InvalidEdgeConstraintReferentialAction(string referentialAction) = An invalid referential action for edge constraint was encountered. The value that was received for delete referential action is '{0}'. Edge constraints can only support CASCADE and NO ACTION options on delete.
+
+####################################################################
+; UserDefinedTableType Exceptions
+
+CannotEnableUDTTTrigger = Trigger cannot be enabled for the user-defined table type.
+NotIndexOnUDTT = A nonclustered index on a user-defined disk-based table type must be a primary key or a unique constraint. An index on a user-defined memory optimized table type is required.
+NotXmlIndexOnUDTT = An XML index cannot be created on a user-defined table type.
+NotFullTextIndexOnUDTT = Full-text indexes cannot be created on a user-defined table type.
+UDTTColumnsCannotBeModified = Columns of a user-defined table type cannot be modified.
+UDTTCannotBeModified = User-defined table type cannot be modified.
+UDTTIndexCannotBeModified = User-defined table type index cannot be modified.
+NotFragInfoOnUDTT = Cannot have fragmentation information on a user-defined table type.
+NotStatisticsOnUDTT = Statistic cannot be computed on a user-defined table type.
+NotTriggersOnUDTT = Triggers cannot be created on a user-defined table type.
+NotCheckIndexOnUDTT = Check index cannot be run on a user-defined table type.
+UDTTChecksCannotBeModified = User-defined table type checks cannot be modified.
+OperationNotSupportedWhenPartOfUDTT = This operation is not supported when it is part of a user-defined table type.
+
+####################################################################
+; Audit Exceptions
+AddAuditSpecificationDetail = Add Audit Specification Detail
+RemoveAuditSpecificationDetail = RemoveAuditSpecificationDetail
+
+; Validate Exception Strings
+EnterAuditName = Audit name was not provided
+EnterOwner = Owner was not provided
+EnterFilePath = File path was not provided
+EnterName = Name was not provided
+EnterServerAudit = Server audit was not provided
+EnterStoragePath = Storage path was not provided
+ReserveDiskSpaceNotAllowedWhenMaxFileSizeIsUnlimited = Cannot reserve disk space when maximum file size is unlimited
+####################################################################
+; Database Encryption Key Exceptions
+EnterServerCertificate = Enter server certificate
+EnterServerAsymmetricKey = Enter server asymmetric key
+CertificateNotBackedUp = The certificate '{0}' which is used for encrypting the database encryption key has not been backed up.
+####################################################################
+; This is how to interprest this exception string
+; {0} is an operation name, see below a list of names
+; {1} is an object type, see below object types
+; {2} is an object name
+; E.G.: Create failed for Table 't1'
+FailedOperationExceptionText(string opName, string objType, string objName) = {0} failed for {1} '{2}'.
+FailedOperationExceptionText2(string opName) = {0} failed.
+FailedOperationExceptionText3(string opName, string objType, string objName, string Reason) = {0} failed for {1} '{2}'. Reason: {3}.
+
+; the message below is thrown for collections
+; e.g. Collection lookup failed for LoginCollection of Server '[sf_sql70]'.
+FailedOperationExceptionTextColl(string opName, string coll, string objType, string parent) = {0} failed for {1}  of {2} '{3}'.
+; customized message for script failure
+FailedOperationExceptionTextScript(string objType, string objName) = The {0} '{1}' cannot be scripted as its data is not accessible.
+; failed operation not supported in database temp db
+FailedOperationMessageNotSupportedTempdb=this object does not support this operation for database tempdb
+
+InvalidOperationInDisconnectedMode=This operation cannot be performed in disconnected mode.
+
+####################################################################
+; HADR Exceptions
+CannotCreateAvailabilityGroupWithoutCurrentIntance(string instanceName, string agName)=The current instance '{0}' must be included as an availability replica to create the availability group '{1}'.
+JoinAvailabilityGroupFailed(string replicaName, string agName)=Failed to join the instance '{0}' to the availability group '{1}'.
+ForceFailoverFailed(string serverName, string agName)=Failed to perform a forced failover of the availability group '{1}' to server instance '{0}'.
+ManualFailoverFailed(string serverName, string agName)=Failed to perform a manual failover of the availability group '{1}' to server instance '{0}'.
+DatabaseJoinAvailabilityGroupFailed(string replicaName, string agName, string dbName)=Failed to join the database '{2}' to the availability group '{1}' on the availability replica '{0}'.
+DatabaseJoinAvailabilityGroupInvalidGroupName(string agName, string parentAgName, string dbName)=The availability group name '{0}' does not match the parent availability group name '{1}' for the database '{2}'.
+DatabaseLeaveAvailabilityGroupFailed(string replicaName, string agName, string dbName)=The database '{2}' failed to leave the availability group '{1}' on the availability replica '{0}'.
+SuspendDataMovementFailed(string replicaName, string agName, string dbName)=Failed to suspend data movement in database '{2}', which resides on the availability replica '{0}' in the availability group '{1}'.
+ResumeDataMovementFailed(string replicaName, string agName, string dbName)=Failed to resume data movement in database '{2}', which resides on the availability replica '{0}' in the availability group '{1}'.
+EnumClusterMemberState(string serverName)=Failed to enumerate the cluster members state for the current instance '{0}'.
+EnumReplicaClusterNodes(string serverName)=Failed to enumerate the cluster nodes for the availability group '{0}'.
+EnumClusterSubnets(string serverName) = Failed to enumerate the cluster subnets on the current instance '{0}'.
+RestartListenerFailed(string listenerName, string agName) = Failed to restart listener '{0}' of availability group '{1}'.
+PropertyCannotBeRetrievedFromSecondary(string propname)=Property {0} is not available. This can occur if you attempt to access this property from a secondary replica or resolving replica.
+GrantAGCreateDatabasePrivilegeFailed(string serverName, string agName)=Failed to grant create database privilege. Server: '{0}', Availability group '{1}'.
+RevokeAGCreateDatabasePrivilegeFailed(string serverName, string agName)=Failed to revoke create database privilege. Server: '{0}', Availability group '{1}'.
+ReadOnlyRoutingListContainsEmptyReplicaName=The specified read-only routing list contains empty replica names.
+CannotUpdateBothReadOnlyRoutingLists=ReadOnlyRoutingList and LoadBalancedReadOnlyRoutingList cannot be updated at the same time.
+DistributedAvailabilityGroupTwoReplicasRequired=Two availability groups must be provided when creating distributed availability group.
+DistributedAvailabilityGroupNoReplicatedDatabases=No availability databases should be specified when creating a distributed availability group.
+DistributedAvailabilityGroupFailoverMode=Only manual failover mode is supported when creating a distributed availability group.
+DistributedAvailabilityGroupAvailabilityMode=Only Asynchronous Commit and Synchronous Commit are supported availability modes when creating a distributed availability group.
+DistributedAvailabilityGroupNoOptions=DISTRIBUTED option cannot be combined with any other availability group options when creating a distributed availability group.
+####################################################################
+
+####################################################################
+#       Operation names
+####################################################################
+SetAccount=Set account
+Create=Create
+Alter=Alter
+CreateOrAlter=CreateOrAlter
+Drop=Drop
+Rename=Rename
+Script=Script
+Grant=Grant
+Revoke=Revoke
+Deny=Deny
+GrantWithGrant=GrantWithGrant
+Bind=Bind
+Unbind=Unbind
+AddDefaultConstraint=Add default constraint
+TestMailProfile=Test mail profile
+TestNetSend=Test net send
+SetState=Set state
+DropAndMove=Drop and move
+GetSmoObject=Attempt to retrieve data for object
+AdvancedProperties=Advanced properties
+AddCollection=Add object to collection
+RemoveCollection=Remove object from collection
+This=Indexer
+Abort=Abort
+AddMember=Add member
+DropMember=Drop member
+EnumMembers=Enumerate members
+EnumPermissions=Enumerate permissions
+EnumContainingRoles=Enumerate containing roles
+EnumAgentProxyAccounts=Enumerate agent proxy accounts
+AddMemberServer=Add member server
+EnumMemberServers=Enumerate member servers
+RemoveMemberServer=Remove member server
+ResetOccurrenceCount=Reset occurrence count
+AddNotification=Add notification
+RemoveNotification=Remove notification
+UpdateNotification=Update notification
+EnumNotifications=Enumerate notifications
+ApplyToTargetServer=Apply to target server
+ApplyToTargetServerGroup=Apply to target server group
+EnumAlerts=Enumerate alerts
+EnumHistory=Enumerate history
+EnumJobStepOutputLogs=Enumerate job step output logs
+EnumTargetServers=Enumerate target servers
+EnumJobSteps=Enumerate job steps
+Invoke=Invoke
+PurgeHistory=Purge history
+AddSharedSchedule=Add shared schedule
+RemoveSharedSchedule=Remove shared schedule
+RemoveAllJobSchedules=Remove all job schedules
+RemoveAllJobSteps=Remove all job steps
+RemoveFromTargetServer=Remove from target server
+RemoveFromTargetServerGroup=Remove from target server group
+Start=Start
+Stop=Stop
+SetPassword=Set password
+ChangePassword=Change password
+MakeContained=Make Contained
+EnumDatabaseMappings=Enumerate database mappings
+GetDatabaseUser=Get database user
+AddToRole=Add to role
+AttachDatabase=Attach database
+DetachDatabase=Detach database
+EnumCollations=Enumerate collations
+EnumPerformanceCounters=Enumerate performance counters
+EnumErrorLogs=Enumerate error logs
+EnumDatabaseMirrorWitnessRoles=Enumerate database mirror witness roles
+ReadErrorLog=Read error log
+KillDatabase=Kill database
+KillProcess=Kill process
+GetActiveDBConnectionCount=Get active connection count
+DropAllActiveDBConnections=Drop all active database connections
+EnumDirectories=Enumerate directories
+EnumLocks=Enumerate locks
+AddPrivateKey=Add private key
+ExportCertificate=Export
+ChangePrivateKeyPassword=Change private key password
+RemovePrivateKey=Remove private key
+AddKeyEncryption=Add key encryption
+DropKeyEncryption=Drop key encryption
+SymmetricKeyOpen=Open symmetric key
+SymmetricKeyClose=Close symmetric key
+EnumLogins=Enumerate logins
+EnumWindowsDomainGroups=Enumerate domain groups
+EnumProcesses=Enumerate processes
+EnumStartupProcedures=Enumerate startup procedures
+EnumWindowsUserInfo=Enumerate user information
+EnumWindowsGroupInfo=Enumerate group information
+EnumAvailableMedia=Enumerate available media
+EnumServerAttributes=Enumerate server attributes
+DeleteBackupHistory=Delete backup history
+Refresh=Refresh
+EnumBoundColumns=Enumerate bound columns
+EnumBoundDataTypes=Enumerate bound data types
+CheckAllocations=Check allocations
+CheckCatalog=Check catalog
+CheckIdentityValues=Check identity values
+CheckTables=Check tables
+CheckTable=Check table
+Shrink=Shrink
+RecalculateSpaceUsage=Recalculate space usage
+PrefetchObjects=Prefetch objects
+EnumTransactions=Enumerate transactions
+GetTransactionCount=Get transaction count
+ImportXmlSchema=Import XML schema
+ExtendXmlSchema=Extend XML schema
+RemoveFullTextCatalogs=Remove full-text catalogs
+SetDefaultFullTextCatalog=Set default full-text catalog
+SetDefaultFileGroup=Set default file group
+SetDefaultFileStreamFileGroup=Set default filestream file group
+CheckFileGroup=Check file group
+CheckIndex=Check index
+Checkpoint=Checkpoint
+Cleanup=Cleanup
+CannotReadProp=Cannot read property
+UpdateLanguageResources=Update language resources
+CatalogUpgradeOptions=Catalog upgrade options
+EnumLanguages=Enumerate languages
+EnumSemanticLanguages=Enumerate Semantic language models
+ClearHostLoginAccount=Clear host login account
+SetProxyAccount=Set proxy account
+ClearProxyAccount=Clear proxy account
+SetMsxAccount=Set master server account
+ClearMsxAccount=Clear master server account
+CycleErrorLog=Cycle agent error log
+EnumJobHistory=Enumerate job history
+EnumJobs=Enumerate jobs
+MoreThanOneProxyAccountIsNotSupported=Only one proxy account is supported on this platform
+AddSubSystems=Add subsystems
+DeleteJobStepLogs=Delete job step output logs
+RemoveSubSystems=Remove subsystems
+EnumSubSystems=Enumerate subsystems
+AddMailAccountToProfile=Add MailAccount to MailProfile
+RemoveMailAccountFromProfile=Remove MailAccount from MailProfile
+EnumMailAccountsForProfile=Enumerate MailAccounts associated with MailProfile
+AddPrincipalToMailProfile=Add Principal to MailProfile
+RemovePrincipalFromMailProfile=Remove Principal from MailProfile
+EnumPrincipalsForMailProfile=Enumerate Principals associated with MailProfile
+AddLoginToProxyAccount=Add login to proxy account
+RemoveLoginFromProxyAccount=Remove login from proxy account
+EnumLoginsOfProxyAccount=Enumerate login of proxy account
+AddServerRoleToProxyAccount=Add server role to proxy account
+RemoveServerRoleFromProxyAccount=Remove server role from proxy account
+EnumServerRolesOfProxyAccount=Enumerate server role of proxy account
+AddMSDBRoleToProxyAccount=Add msdb role to proxy account
+RemoveMSDBRoleFromProxyAccount=Remove msdb role from proxy account
+EnumMSDBRolesOfProxyAccount=Enumerate msdb role of proxy account
+MsxDefect=MSX defect
+MsxEnlist=MSX enlist
+PurgeJobHistory=Purge job history
+ReassignJobsByLogin=Reassign jobs by login
+CreateRestorePlan=Create restore plan
+DropJobsByLogin=Drop jobs by login
+StartMonitor=Start monitor
+StopMonitor=Stop monitor
+EnumProxies=Enumerate proxies
+DropJobsByServer=Drop jobs by server
+CompareUrn=Compare Urn objects
+Disable=Disable
+DisableAllIndexes=Disable all indexes
+EnableAllIndexes=Enable all indexes
+DiscoverDependencies=Discover dependencies
+DropBackupHistory=Drop backup history
+ChangeMirroringState=Change mirroring state
+IsMember=Is Member
+Recreate=Recreate
+Enable=Enable
+EnumColumns=Enumerate columns
+EnumForeignKeys=Enumerate foreign keys
+EnumIndexes=Enumerate indexes
+EnumFragmentation=Enumerate fragmentation information
+EnumReferences=Enumerate references
+SetOffline=Set offline
+SetEncryption=Set encryption
+SetOwner=Set owner
+StartPopulation=Start population
+StopPopulation=Stop population
+Rebuild=Rebuild
+Reorganize=Reorganize
+UpdateStatistics=Update statistics
+SetHostLoginAccount=Set host login account
+SetMailServerAccount=Set mail server login account
+SetMailServerPassword=Set mail server login password
+EnumLastStatisticsUpdates=Enumerate last statistics update
+RebuildIndexes=Rebuild indexes
+ResumeIndexes=Resume indexes
+AbortIndexes=Abort Indexes
+PauseIndexes=Pause Indexes
+ReCompileReferences=Recompile references
+TruncateData=Truncate data
+TruncateLog=Truncate Log
+TruncatePartitionsNotSupported = Truncate partitions is not supported on a version earlier than SQL Server 2014.
+SwitchPartition=Switch partition
+MergeHashPartition=Merge hash partition
+MergeRangePartition=Merge range partition
+SplitHashPartition=Split hash partition
+SplitRangePartition=Split range partition
+GetRangeValues=Get range values
+ResetNextUsed=Reset next used filegroup
+GetFileGroups=Get FileGroups
+GetDefaultInitFields=Get default init fields
+SetDefaultInitFields=Set default init fields
+GetPropertyNames=Get property names
+SetParent=SetParent
+InitObject = Initialize object
+SetName=SetName
+SetNamespace=SetNamespace
+SetSchema=SetSchema
+ExecuteNonQuery=ExecuteNonQuery
+SetSnapshotIsolation=Set snapshot isolation
+AlterDatabaseScopedConfiguration=Alter database scoped configuration
+EnumNamespaces=Enumerate namespaces
+EnumTypes=Enumerate types
+AddSchemaDocument=Add schema document
+ScriptTransfer=Script transfer
+SetIdentityPhrase = Set Identity Phrase
+SetEncryptionOptions = Set Encryption Options
+EnumStatistics = Enum statistics
+GetJobByID=Get job by ID
+RemoveJobByID=Remove job by ID
+RemoveJobsByLogin=Remove jobs by login
+EnumCandidateKeys=Enum candidate keys
+ExecuteWithResults=Execute with results
+UpdateIndexStatistics=Update index statistics
+EnumMatchingSPs=Enum matching SPs
+EnumObjects=Enum objects
+ReadBackupHeader=Read backup header
+ReadMediaHeader=Read media header
+DetachedDatabaseInfo=Detached database info
+IsDetachedPrimaryFile=Is detached primaryFile
+IsWindowsGroupMember=Is windows group member
+EnumDetachedDatabaseFiles=Enum detached database files
+EnumDetachedLogFiles=Enum detached log files
+ServerEnumMembers=Enum members
+Contains=Collection lookup
+PingSqlServerVersion = Ping Sql Server version
+SetServiceAccount=Set service account
+ChangeServicePassword=Change service account password
+RecoverMasterKey=Recover
+RegenerateMasterKey=Regenerate
+ImportMasterKey=Import
+ExportMasterKey=Export
+ChangeAcctMasterKey=Change account
+AddEncryptionMasterKey=Add encryption
+DropEncryptionMasterKey=Drop encryption
+Close=Close
+Open=Open
+EnumKeyEncryptions=Enumerate key encryptions
+Compare=Compare
+Insert=Insert
+AddRange=Add range
+SetRange=Set range
+AddDevice=Add device
+SetMirrors= Set Mirrors
+SetDatabase=Set Database
+SqlManagement=SQL Management
+EnumEncryptionAlgorithms=Enumerate Cryptographic Provider Encryption Algorithms
+EnumProviderKeys=Enumerate Cryptographic Provider Keys
+SetIpAddress=Set IPAddress
+SetSubnetIp=Set SubnetIP
+SetSubnetMask=Set SubnetMask
+GetDHCPAddress=Retrieve DHCP IP Address
+GetQueryStoreOptions=Get Query Store Options
+SetQueryStoreOptions=Set Query Store Options
+InvalidQueryStoreOptions=Invalid Query Store Options
+ReauthorizeRemoteDataArchive=Reauthorize Remote Data Archive
+GetRemoteDataArchiveMigrationStatusReports=Get Remote Data Archive Migration Status Reports
+GetRemoteDatabaseMigrationStatistics=Get Remote Database Migration Statistics
+GetRemoteTableMigrationStatistics=Get Remote Table Migration Statistics
+
+####################################################################
+#       Object types
+####################################################################
+Table=Table
+FileTable=FileTable
+View=View
+Server=Server
+Database=Database
+ExtendedProperty=ExtendedProperty
+DatabaseOptions=DatabaseOptions
+Synonym=Synonym
+Sequence=Sequence
+FullTextIndex=FullTextIndex
+FullTextIndexColumn=FullTextIndexColumn
+Check=Check
+ForeignKey=ForeignKey
+ForeignKeyColumn=ForeignKeyColumn
+PartitionSchemeParameter=PartitionSchemeParameter
+PlanGuide=PlanGuide
+Trigger=Trigger
+Index=Index
+BrokerPriority=BrokerPriority
+IndexedColumn=Index
+Statistic=Statistic
+StatisticColumn=
+Column=Column
+DefaultConstraint=DefaultConstraint
+StoredProcedure=StoredProcedure
+StoredProcedureParameter=StoredProcedureParameter
+SqlAssembly=SqlAssembly
+SqlAssemblyFile=SqlAssemblyFile
+UserDefinedType=UserDefinedType
+UserDefinedAggregate=UserDefinedAggregate
+UserDefinedAggregateParameter=UserDefinedAggregateParameter
+FullTextCatalog=FullTextCatalog
+FullTextStopList=FullTextStopList
+SearchPropertyList=SearchPropertyList
+ExtendedStoredProcedure=ExtendedStoredProcedure
+UserDefinedFunction=UserDefinedFunction
+UserDefinedFunctionParameter=UserDefinedFunctionParameter
+User=User
+Schema=Schema
+DatabaseRole=DatabaseRole
+ApplicationRole=ApplicationRole
+LogFile=LogFile
+FileGroup=FileGroup
+DataFile=DataFile
+Default=Default
+Rule=Rule
+UserDefinedDataType=UserDefinedDataType
+UserDefinedTableType=UserDefinedTableType
+PartitionFunction=PartitionFunction
+PartitionScheme=PartitionScheme
+Language=Language
+Login=Login
+ServerRole=ServerRole
+LinkedServer=LinkedServer
+LinkedServerLogin=LinkedServerLogin
+SystemDataType=SystemDataType
+JobServer=JobServer
+Category=Category
+AlertSystem=AlertSystem
+Alert=Alert
+Operator=Operator
+TargetServer=TargetServer
+TargetServerGroup=TargetServerGroup
+Job=Job
+JobStep=JobStep
+JobSchedule=JobSchedule
+Settings=Settings
+Information=Information
+UserOptions=UserOptions
+BackupDevice=BackupDevice
+FullTextService=FullTextService
+ServerActiveDirectory=ServerActiveDirectory
+HttpEndpoint=HttpEndpoint
+SoapConfiguration=SoapConfiguration
+SoapMethod=SoapMethod
+ServerAlias=ServerAlias
+PhysicalPartition=PhysicalPartition
+Audit=Audit
+ServerAuditSpecification=ServerAuditSpecification
+DatabaseAuditSpecification=DatabaseAuditSpecification
+ManagedComputer=ManagedComputer
+Service=Service
+XmlSchemaCollection=XmlSchemaCollection
+DatabaseEncryptionKey = DatabaseEncryptionKey
+Restore=Restore
+RestoreAsync=Asynchronous restore
+EnumAvailableSqlServers=EnumAvailableSQLServers
+GetDataType=Get DataType
+SetDataType=Set DataType
+Backup=Backup
+AvailabilityGroup=Availability Group
+AvailabilityReplica=Availability Replica
+AvailabilityDatabase=Availability Database
+AvailabilityGroupListener=Availability Group Listener
+AvailabilityGroupListenerIPAddress=Availability Group Listener IP Address
+SecurityPolicy=Security Policy
+SecurityPredicate =Security Predicate
+ExternalDataSource=External Data Source
+ExternalFileFormat=External File Format
+ColumnMasterKey=Column Master Key
+Win32Error(string code)= Win32 error, error code: {0}. Please contact your administrator for more information.
+SmoSQLCLRUnAvailable=This functionality is disabled in the SQLCLR. It is recommended that you execute from your client application.
+MoveToPool=Move the workload group to another resource pool.
+ResourcePoolNotExist= Resource pool {0} does not exist.
+CannotMoveToInternalResourcePool=Cannot move workload group {0} to an internal resource pool.
+CannotMoveToSamePool= Cannot move the group to the same pool that it is currently in.
+
+AffinityTypeCannotBeSet=AffinityType is set to Auto, and affinity is set on one or more CPUs. Change AffinityType to Manual, or remove the affinity setting from all CPUs.
+AffinityValueCannotBeSet=NumaNodeAffinity cannot be set to Partial. Change the affinity setting to None or Full.
+NoCPUAffinitized=AffinityType is set to Manual, and affinity is not set on any CPU. Change AffinityType to Auto, or set affinity on one or more CPUs.
+WrongIndexRangeProvidedCPU(int startIndex , int endIndex)=The specified range of CPUs is not valid. The value for startIndex {0} must be less than the value for endIndex {1}.
+WrongIndexRangeProvidedNuma(int startIndex , int endIndex)=The specified range for NumaNode is not valid. The value for startIndex {0} must be less than the value for endIndex {1}.
+HoleInIndexRangeProvidedCPU(int index)=A CPU with the id of {0} does not exist on this system. Use sys.dm_os_schedulers to locate valid CPUs for this system or use SetAffinityToRange(startCpuId, endCpuId, affinityMask, ignoreMissingIds) with ignoreMissingIds set to true.
+HoleInIndexRangeProvidedNumaNode(int index)=A NumaNode with the id if {0} does not exist on this system. Use SetAffinityToRange(startNumaNodeId, endNumaNodeId, affinityMask, ignoreMissingIds) with ignoreMissingIds set to true.
+WrongIndexRangeProvidedScheduler(int startIndex, int endIndex)=The specified range of Schedulers is not valid. The value for startIndex {0} must be less than the value for endIndex {1}.
+ResourceGovernorPoolMissing=The resource governor resource pool information is not complete. This can happen if a pool was created but the resource governor is not reconfigured.
+
+####################################################################
+#       Design Mode exception strings
+####################################################################
+CannotSwitchDesignModeOff=Switching design mode off is not supported.
+ServerVersionNotSpecified=ConnectionContext.ServerVersion property must be specified in Design Mode.
+PropertyNotSetInDesignMode(string name)=Property '{0}' does not have a value. Ensure the property has been set when working with the object in Design Mode.
+PropertyNotAvailableInDesignMode(string name)=Property '{0}' is a readonly property. It is not available in Design Mode.
+OperationNotAvailableInDesignMode=This operation is not available in Design Mode.
+PropertyNotFound(string propertyName, string typeName)=Cannot discover property '{0}' of type '{1}'.
+
+####################################################################
+#       Dependency exeptions -- these will move to SFC (see SfcDependencyDiscovery.cs)
+####################################################################
+OnlyDesignModeSupported=Only Design Mode is supported at this time.
+OnlySmoObjectsSupported=Only SMO objects are supported at this time.
+RootNotFound=Domain root was not found. Object model may not have a Parent property on every object in the hierarchy, or the object did not have a Parent property set.
+UnknownDomain(string name)=Unknown domain: '{0}'.
+
+####################################################################
+; Script Writing Exceptions
+FileWritingException=File writing exception.
+InvalideFileName=Invalid filename.
+FolderPathNotFound=Folder path specified does not exist.
+FilePerObjectUrnMissingName=Cannot create file for unnamed object {0}.
+OrderingCycleDetected=Cyclic dependencies found.
+
+####################################################################
+; EndPoint Exception
+IncorrectEndpointProtocol = Endpoint supports TCP and HTTP protocol only.
+
+####################################################################
+; FileTable Exceptions
+FileTableNotSupportedOnTargetEngine(string targetVersion) = FileTable objects are not supported in {0}.
+FileTableCannotHaveUserColumns = FileTable objects cannot contain user defined columns.
+PropertyOnlySupportedForFileTable(string propName)=Property '{0}' is only supported for a FileTable object.
+TableNotFileTable(string name) = Table '{0}' is not a FileTable
+NamespaceNotEnabled(string name) = FileTable namespace is not enabled for Table '{0}'
+
+####################################################################
+; ExternalTable Exceptions
+TableNotExternalTable(string name) = Table '{0}' is not an External Table
+PropertyOnlySupportedForExternalTable(string propName) = Property '{0}' is only supported for External Table objects.
+ConflictingExternalTableProperties(string propName, string propValue, string confPropName, string confPropValue) = Cannot set the property '{0}' to '{1}' because it conflicts with property '{2}' that is set to '{3}'.
+ExternalTableCannotContainChecks = External Table objects cannot contain check constraints.
+ExternalTableCannotContainForeignKeys = External Table objects cannot contain foreign keys.
+ExternalTableCannotContainPartitionSchemeParameters = External Table objects cannot contain partition scheme parameters.
+ExternalTableCannotContainTriggers = External Table objects cannot contain triggers.
+ExternalTableCannotContainIndexes = External Table objects cannot contain indexes.
+ExternalTableCannotContainPhysicalPartitions = External Table objects cannot contain physical partitions.
+IdentityColumnForExternalTable = External Table objects cannot contain identity columns.
+TruncateOperationNotSupportedOnExternalTables = The truncate operation is not supported on External Tables.
+ChangeTrackingNotSupportedOnExternalTables = The change tracking option is not supported on External Tables.
+ShardingColumnNotSupportedWithNonShardedDistribution(string shardingColPropName, string distributionName) = The '{0}' property cannot be used with '{1}' distribution.
+ShardingColumnNotSpecifiedForShardedDistribution(string shardingColPropName) = The '{0}' property must be assigned a valid value when using 'SHARDED' distribution.
+ShardingColumnNotAddedToTable(string shardingColName) = The column '{0}' used as the sharding key is not part of the table's column collection.
+DependentPropertyMissing(string propName, string dependentPropName) = The '{0}' and '{1}' properties must be used together.
+####################################################################
+#       Index Exceptions
+####################################################################
+ColumnStoreCompressionNotSettable=Cannot set ColumnStore compression.
+NoIndexUnique=Cannot specify the UNIQUE constraint for Spatial, XML, or Columnstore indexes.
+NoIndexIgnoreDupKey=Cannot specify the IGNORE_DUP_KEY option with Spatial, XML, or Columnstore indexes. IGNORE_DUP_KEY only applies to UNIQUE indexes and these index types cannot be UNIQUE.
+NoIndexOptimizeForSequentialKey=Cannot specify the OPTIMIZE_FOR_SEQUENTIAL_KEY option with Spatial, XML, or Columnstore indexes.
+NoIndexClustered=Cannot create a Spatial, XML, or Columnstore index as a clustered index.
+InvaildColumnStoreIndexOption=Cannot use the following options with a Columnstore index: PAD_INDEX ,STATISTICS_NORECOMPUTE ,SORT_IN_TEMPDB ,IGNORE_DUP_KEY ,ONLINE ,FILLFACTOR ,ALLOW_ROW_LOCKS and ALLOW_PAGE_LOCKS.
+IndexOnTableView=Cannot create a nonclustered index on a user defined table type or a table valued function.
+IncludedColumnNotSupported=Cannot define an included column on this index type.
+ConflictingIndexProperties=Cannot set the property '{0}' to '{1}' because the property '{2}' is already set to '{3}'.
+SelectiveXmlIndexDoesNotSupportReorganize=Selective Xml Index cannot be modified.
+MoreThenOneXmlDefaultNamespace=There can not be more than one default namespace on index '{0}'.
+SecondarySelectiveXmlIndexModify=Secondary Selective Xml Index cannot be modified
+UnsupportedPropertyForSXI(string propertyName)=The property '{0}' is not supported for Selective Xml Index.
+InvaildSXIOption=Cannot use the following options with a Selective XML index: ONLINE.
+UnsupportedValueForSXI(string value, string propertyName, string suggestion)=Value '{0}' is not supported for property '{1}' with respect to Selective Xml Index. '{2}'
+InvalidUpgradeToCCIIndexType=Only a Clustered index can be converted to a Clustered Columnstore Index.
+PropertyValidOnlyForColumnStoreIndexes=The '{0}' property is only valid for Columnstore Indexes.
+InvalidCompressionDelayValue=The specified COMPRESSION_DELAY option value '{0}' is invalid. The valid range for disk-based table is between ({1}, {2}) minutes and for memory-optimized table is {4} or between ({3}, {2}) minutes.
+
+#######################################################################
+; Transfer Messages
+ExecutingScript(string statement)=Executing query \"{0}\"
+TransferDataException=An error occurred while transferring data. See the inner exception for details.
+StartingDataTransfer(string tableName)=Begin processing table: {0}
+
+CompletedDataTransfer(string tableName)=Finish processing table: {0}
+ColumnCollationIncompatible=Database contains tables whose columns have a different collation than the database.
+
+#######################################################################
+; External File Format Messages
+ConflictingExternalFileFormatProperties=Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.
+
+#######################################################################
+; External Data Source Messages
+UnsupportedPropertyForAlter=The '{0}' property is not supported for the alter operation.
+UnsupportedResourceManagerLocationProperty=The '{0}' property is not supported for the external data stored in WASB, secure WASB, ASV, or secure ASV.
+UnsupportedParamForDataSourceType= The '{0}' property is not supported for external data sources of type '{1}'.
+AlterNotSupportedForRelationalTypes= Altering an external data source of type '{0}' is not supported.
+
+InvalidIndexSpecifiedForModifyingTextToCreateOrAlter(int index, int startIndex, int endIndex)=The specified index {0} should lie between {1} and {2}.
+InvalidTextForModifyingToCreateOrAlter=The text does not start with 'CREATE'.
+#######################################################################
+; GraphhDB Messages
+ExpectedGraphColumnNotFound=The expected graph column is not found.
+
+#######################################################################
+; DataRetention Messages
+MissingDataRetentionFilterColumn=Data Retention requires one column in the table to be set as a data retention filter column.
+
+#######################################################################
+; ExternalLanguage Messages
+MissingExternalLanguageFileSpec=At least a file spec must be defined for the external language.
+BadPropertiesCombination=Both external language file path and language content bits were updated and have values.

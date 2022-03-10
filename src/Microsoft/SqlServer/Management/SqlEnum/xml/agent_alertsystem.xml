@@ -1,0 +1,125 @@
+<?xml version='1.0' ?>
+<EnumObject type='AlertSystem' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<version min_major = '8'>
+			<prefix fields = '#FailSafeOperator#'>
+				declare @FailSafeOperator nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafeOperator', @param = @FailSafeOperator OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#NotificationMethod#'>
+				declare @NotificationMethod int
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertNotificationMethod', @param = @NotificationMethod OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#ForwardingServer#'>
+				declare @ForwardingServer nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertForwardingServer', @param = @ForwardingServer OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#ForwardingSeverity#'>
+				declare @ForwardingSeverity int
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertForwardingSeverity', @param = @ForwardingSeverity OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#IsForwardedAlways#'>
+				declare @ForwardAlways int
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertForwardAlways', @param = @ForwardAlways OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerToTemplate#'>
+				declare @PagerToTemplate nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerToTemplate', @param = @PagerToTemplate OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerCCTemplate#'>
+				declare @PagerCCTemplate nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerCCTemplate', @param = @PagerCCTemplate OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerSubjectTemplate#'>
+				declare @PagerSubjectTemplate nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerSubjectTemplate', @param = @PagerSubjectTemplate OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerSendSubjectOnly#'>
+				declare @PagerSendSubjectOnly int
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerSendSubjectOnly', @param = @PagerSendSubjectOnly OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#FailSafeEmailAddress#'>
+				declare @FailSafeEmailAddress nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafeEmailAddress', @param = @FailSafeEmailAddress OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#FailSafePagerAddress#'>
+				declare @FailSafePagerAddress nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafePagerAddress', @param = @FailSafePagerAddress OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#FailSafeNetSendAddress#'>
+				declare @FailSafeNetSendAddress nvarchar(255)
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafeNetSendAddress', @param = @FailSafeNetSendAddress OUT, @no_output = N'no_output'
+			</prefix>
+		</version>
+		<version min_major = '7' max_major = '7'>
+			<prefix fields = '#FailSafeOperator#'>
+				declare @FailSafeOperator nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafeOperator', @param = @FailSafeOperator OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#NotificationMethod#'>
+				declare @NotificationMethod int
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertNotificationMethod', @param = @NotificationMethod OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#ForwardingServer#'>
+				declare @ForwardingServer nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertForwardingServer', @param = @ForwardingServer OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#ForwardingSeverity#'>
+				declare @ForwardingSeverity int
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertForwardingSeverity', @param = @ForwardingSeverity OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#IsForwardedAlways#'>
+				declare @ForwardAlways int
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertForwardAlways', @param = @ForwardAlways OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerToTemplate#'>
+				declare @PagerToTemplate nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerToTemplate', @param = @PagerToTemplate OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerCCTemplate#'>
+				declare @PagerCCTemplate nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerCCTemplate', @param = @PagerCCTemplate OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerSubjectTemplate#'>
+				declare @PagerSubjectTemplate nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerSubjectTemplate', @param = @PagerSubjectTemplate OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#PagerSendSubjectOnly#'>
+				declare @PagerSendSubjectOnly int
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertPagerSendSubjectOnly', @param = @PagerSendSubjectOnly OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#FailSafeEmailAddress#'>
+				declare @FailSafeEmailAddress nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafeEmailAddress', @param = @FailSafeEmailAddress OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#FailSafePagerAddress#'>
+				declare @FailSafePagerAddress nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafePagerAddress', @param = @FailSafePagerAddress OUT, @no_output = N'no_output'
+			</prefix>
+			<prefix fields = '#FailSafeNetSendAddress#'>
+				declare @FailSafeNetSendAddress nvarchar(255)
+				exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'AlertFailSafeNetSendAddress', @param = @FailSafeNetSendAddress OUT, @no_output = N'no_output'
+			</prefix>
+		</version>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='1' expression="{0} + '/AlertSystem'">
+				<link_field type='parent' field="Urn" />
+			</link_multiple>
+		</property>
+		<property name='Name' type='sysname'>N'AlertSystem'</property>
+		<property name='FailSafeOperator' type='nvarchar' size='255'>ISNULL(@FailSafeOperator,N'')</property>
+		<property name='NotificationMethod' type='int' report_type='Agent.NotifyMethods'>@NotificationMethod</property>
+		<property name='ForwardingServer' type='nvarchar' size='255'>ISNULL(@ForwardingServer,N'')</property>
+		<property name='ForwardingSeverity' type='int'>@ForwardingSeverity</property>
+		<property name='IsForwardedAlways' type='bit' cast='true'>ISNULL(@ForwardAlways, 0)</property>
+		<property name='PagerToTemplate' type='nvarchar' size='255'>ISNULL(@PagerToTemplate,N'')</property>
+		<property name='PagerCCTemplate' type='nvarchar' size='255'>ISNULL(@PagerCCTemplate,N'')</property>
+		<property name='PagerSubjectTemplate' type='nvarchar' size='255'>ISNULL(@PagerSubjectTemplate,N'')</property>
+		<property name='PagerSendSubjectOnly' type='bit' cast='true'>@PagerSendSubjectOnly</property>
+		<property name='FailSafeEmailAddress' type='nvarchar' size='255'>ISNULL(@FailSafeEmailAddress,N'')</property>
+		<property name='FailSafePagerAddress' type='nvarchar' size='255'>ISNULL(@FailSafePagerAddress,N'')</property>
+		<property name='FailSafeNetSendAddress' type='nvarchar' size='255'>ISNULL(@FailSafeNetSendAddress,N'')</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="SecurityPredicate" impl_type="SqlObject" min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table='sys.security_predicates AS secpreds' />
+    <property_link fields="#TargetObjectName#"
+      left_join="sys.objects AS obj">(obj.object_id = secpreds.target_object_id)</property_link>
+    <property_link fields="#TargetObjectSchema#"
+      left_join="sys.schemas AS sch">(sch.schema_id = obj.schema_id)</property_link>
+  </settings>
+  <properties>
+      <!-- Construct the URN using the SecurityPredicateID as the key identifier -->
+      <property name="Urn" type="nvarchar" size="600">
+        <link_multiple no='3' expression="{0} + '/{2}[@SecurityPredicateID=' + cast({1} AS nvarchar(20)) + ']'">
+          <link_field type='parent' field="Urn" />
+          <link_field type='local' field="SecurityPredicateID" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      <property name="PredicateDefinition" type="nvarchar" size="128">RIGHT(LEFT(predicate_definition, LEN(predicate_definition) -1), LEN(predicate_definition) -2)</property>
+      <property name="SecurityPredicateID" type="int" read_only_after_creation="true">secpreds.security_predicate_id</property>
+      <property name="TargetObjectID" type="int" read_only_after_creation="true">secpreds.target_object_id</property>
+      <property name="TargetObjectName" type="nvarchar" size="128" read_only_after_creation="true">obj.name</property>
+      <property name="TargetObjectSchema" type="nvarchar" size="128" read_only_after_creation="true">sch.name</property>
+      <property name="ParentID" type="int" read_only_after_creation="true" hidden="true">secpreds.object_id</property>
+      <property name="PredicateType" type="int" report_type="SecurityPredicateType" read_only_after_creation="true">secpreds.predicate_type</property>
+      <property name="PredicateOperation" type="int" report_type="SecurityPredicateOperation" read_only_after_creation="true">ISNULL(secpreds.operation, 0)</property>
+    </properties>
+</EnumObject>

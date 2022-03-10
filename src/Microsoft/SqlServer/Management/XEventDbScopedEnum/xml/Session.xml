@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<EnumObject type="Session" impl_type="XEventObject" cloud_min_major='10'>
+  <settings>
+    <property_link table='sys.database_event_sessions' alias='session'/>
+    <property_link fields='#StartTime#IsRunning#' left_join='sys.dm_xe_database_sessions' alias='running'>running.name = session.name</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='ID' type='int'>session.event_session_id</property>
+    <property name='Name' type='sysname'>session.name</property>
+    <property name='IsRunning' type='bit'>(CASE WHEN (running.create_time IS NULL) THEN 0 ELSE 1 END)</property>
+    <property name='EventRetentionMode' type='nchar' size='1'>session.event_retention_mode</property>
+    <property name='MaxDispatchLatency' type='int'>session.max_dispatch_latency</property>
+    <property name='MaxMemory' type='int'>session.max_memory</property>
+    <property name='MaxEventSize' type='int'>session.max_event_size</property>
+    <property name='MemoryPartitionMode' type='nchar' size='1'>session.memory_partition_mode</property>
+    <property name='TrackCausality' type='bit'>session.track_causality</property>
+    <property name='AutoStart' type='bit'>session.startup_state</property>
+    <property name='StartTime' type='datetime'>running.create_time</property>
+  </properties>
+</EnumObject>

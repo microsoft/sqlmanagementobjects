@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<EnumObject type="Trigger" impl_type="SqlObject" min_major='9'>
+	<settings>
+		<property_link table='master.sys.server_triggers AS tr'>tr.parent_class = 100</property_link>
+		<property_link fileds='#ClassName#MethodName#AssemblyName#ExecutionContextLogin#ExecutionContext#' 
+						left_join='master.sys.server_assembly_modules AS mod'>mod.object_id = tr.object_id</property_link>
+		<property_link fields='#ExecutionContext#' 
+						left_join='sys.assembly_modules' alias='am2tr'>am2tr.object_id = tr.object_id</property_link>
+		<property_link fields='#AnsiNullsStatus#QuotedIdentifierStatus#Definition#ExecutionContextLogin#ExecutionContext#IsEncrypted#' 
+						left_join='sys.server_sql_modules' alias='ssmod'>ssmod.object_id = tr.object_id</property_link>
+		<property_link fields='#ExecutionContextLogin#'
+				left_join='sys.server_principals' alias='sprin'>sprin.principal_id = ISNULL(ssmod.execute_as_principal_id,mod.execute_as_principal_id)</property_link>
+		<property_link fields='#AssemblyName#' 
+						left_join='master.sys.assemblies AS asmbl'>asmbl.assembly_id = mod.assembly_id</property_link>
+		<post_process fields='#DdlTriggerEvents#' triggered_fields = "#DdlTriggerEventsInternal#" class_name='Microsoft.SqlServer.Management.Smo.PostProcessServerDdlTriggerEvents'/>
+
+		<post_process fields='#Text#BodyStartIndex#HasColumnSpecification#TableVariableName#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessBodyText'
+						triggered_fields='#Definition#'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<include file='inc_named_object.xml' alias='tr' for="#Name#ID#CreateDate#DateLastModified#"/>
+		<include file='inc_system_object.xml' alias='tr' for="#IsSystemObject#" />
+
+		<property name="IsEnabled" type="bit">~tr.is_disabled</property>
+		<!-- Default to empty string for CLR triggers -->
+		<property name="AssemblyName" type="sysname">CASE WHEN tr.type = N'TR' THEN N'' ELSE asmbl.name END</property>
+		<property name="ClassName" type="sysname">CASE WHEN tr.type = N'TR' THEN N'' ELSE mod.assembly_class END</property>
+		<property name="MethodName" type="sysname">CASE WHEN tr.type = N'TR' THEN N'' ELSE mod.assembly_method END</property>
+
+		<property name="ImplementationType" type="int" report_type="ImplementationType">CASE WHEN tr.type = N'TR' THEN 1 WHEN tr.type = N'TA' THEN 2 ELSE 1 END</property>
+		<property name="AnsiNullsStatus" type="bit" cast="true">ssmod.uses_ansi_nulls</property>
+		<property name="QuotedIdentifierStatus" type="bit" cast="true">ssmod.uses_quoted_identifier</property>
+		<property name="Definition" type="nvarchar" size='max' hidden='true'>ssmod.definition</property>
+		<property name="ExecutionContextLogin" type="sysname">ISNULL(sprin.Name,N'')</property>
+		<property name="ExecutionContext" type="int" report_type="ServerDdlTriggerExecutionContext">CASE WHEN (ssmod.execute_as_principal_id IS NULL AND mod.execute_as_principal_id IS NULL) THEN 1 ELSE 2 END</property>
+		<property name="Text" type="nvarchar" size='max' expensive='true' access="Read">NULL</property>
+		<property name="BodyStartIndex" type="int" expensive='true' access="Read">NULL</property>
+		<property name="IsEncrypted" type="bit" cast='true'>CASE WHEN ssmod.definition IS NULL THEN 1 ELSE 0 END</property>
+		<property name="DdlTriggerEventsInternal" type="nvarchar" size="50" expensive='true' hidden="true"  >
+			<link_multiple no='1' expression="cast(db_id() as varchar(20)) + '_' + cast({0} as varchar(20))">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="DdlTriggerEvents" type="sql_variant" cast="true"  expensive="true" report_type2="Microsoft.SqlServer.Management.Smo.ServerDdlTriggerEventSet">null</property>
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>

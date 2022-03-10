@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<EnumObject type="XmlType" impl_type="SqlObject" min_major='9'>
+	<settings >
+		<parent_link>
+			<link parent="ID" local="NamespaceID" />
+		</parent_link>
+		<property_link table="sys.xml_schema_components AS comp" />
+	</settings>
+	<properties>
+		<include file='inc_urn_collate_default.xml' />
+		<property name="Name" type="sysname">comp.name</property>			
+		<property name="ID" type="int" access='Read'>comp.xml_component_id</property>
+		<property name="NamespaceID" type="int" access='Read'>comp.xml_namespace_id</property>
+		<property name="IsQualified" type="bit" cast='true' access='Read'>comp.is_qualified</property>
+		<property name="XmlTypeKind" type="int" report_type="XmlTypeKind" access='Read'>(case comp.kind
+																		when 'N' then 1 
+																		when 'Z' then 2 
+																		when 'P' then 3 
+																		when 'S' then 4 
+																		when 'L' then 5 
+																		when 'U' then 6 
+																		when 'C' then 7 
+																		when 'K' then 8 
+																		when 'E' then 9 
+																		when 'M' then 10 
+																		when 'W' then 11 
+																		when 'A' then 12 
+																		when 'G' then 13 
+																		when 'V' then 14 
+																		else 1 end) </property>
+		<property name="Derivation" type="int" report_type="XmlTypeDerivation" access='Read'>(case comp.derivation when 'N' then 1 when 'X' then 2 when 'R' then 3 when 'S' then 4 else 1 end)</property>
+		<property name="BaseComponentId" type="int" access='Read'>comp.base_xml_component_id</property>
+		<property name="ScopingComponentId" type="int" access='Read'>comp.scoping_xml_component_id</property>
+		
+		
+	</properties>
+</EnumObject>
+

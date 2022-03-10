@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- This file contains the set of all servers to run tests against. Tests specify the dimensions
+     they support (such as version range), and when running the test it is ran against all servers
+     in this list that match those dimensions.
+
+     You can filter this list at runtime by creating a SqlTestTargetServersFilter environment variable
+     and setting the value to a semicolon-delimited list of names (name attribute below) of each
+     server to be included in the test run. Any servers NOT in this list will be skipped.
+
+     The test will look for this variable starting at the process level, then going up to user and
+     finally machine; using the first value it finds.
+
+     Example value of SqlTestTargetServersFilter:
+
+Sql2012;Sql2017;SQL2017Linux
+    
+    Place the edited copy of this file alongside Microsoft.SqlServer.Test.Smo.dll before using vstest.console or the VS test explorer to run tests.
+
+     -->
+<ConnectionStrings>
+  <!-- AkvAccess specifies the Azure Key Vault where passwords for the connection strings are stored 
+      If AkvAccess is empty, secrets must be set as environment variables, or the passwords must be placed in plain text in this file directly as part of each connection string.
+  -->
+  <AkvAccess>
+  <!-- To enable certificate-based authentication to the AKV, uncomment the next three elements.
+       If no certificate is provided the tests will use  DefaultAzureCredential https://docs.microsoft.com/en-us/dotnet/api/azure.identity.defaultazurecredential?view=azure-dotnet -->
+  <!-- Thumbprint is the thumbprint of the certificate, stored in either the local machine store or the user's cert store
+       AzureApplicationId is the guid of the Azure service principal with access to the AKV
+      AzureTenantId is the Azure tenant id of the service principal
+  <Thumbprint></Thumbprint>
+  <AzureApplicationId></AzureApplicationId>
+  <AzureTenantId></AzureTenantId>
+  -->
+  <!-- VaultName is the name of the AKV (in public Azure)-->
+  <VaultName></VaultName>
+  </AkvAccess>
+
+  <!-- If you don't have access to a SQL instance with the given platform and version/edition, remove the entry from the XML or 
+  remove its name from the SqlTestTargetServersFilter parameter at test run time.
+  Otherwise modify each connection string to use the appropriate server name, user name, and password.
+  Note that many tests require sysadmin access to the server.
+  Connection strings without a User ID connect using Windows authentication.
+  Passwords are resolved 3 ways:
+  1. From the connectionString attribute. You can delete the passwordCredential attribute if you have the password in the connection string.
+  2. From an environment variable of the same name as the passwordCredential attribute
+  3. From an Azure Key Vault secret of the same name as the passwordCredential attribute
+        -->
+  <ConnectionString name="SqlDatabaseEdge"
+                    connectionString="Data Source=<server>;Initial Catalog=master;User ID=<user>;Timeout=300"
+                    databaseenginetype="Standalone"
+                    db_engine_edition="SqlDatabaseEdge"
+                    hostplatform="Linux"
+                    majorversion="15"
+                    passwordCredential='saPassword-SqlEdge'/>
+  <ConnectionString name="Sql2008"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="10"
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sql2008R2"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="10"
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sql2012"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="11"
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sql2014"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="12"
+                    enabled_features='Hekaton, SqlClr'
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sql2016"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="13"
+                    enabled_features='Hekaton, SqlClr'
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sql2016Express"
+                    connectionString="Data Source=<server>\sqlexpress;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="13"
+                    db_engine_edition="Express"/>
+  <ConnectionString name="Sql2017"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="14"
+                    enabled_features='Hekaton, SqlClr'
+                    passwordCredential='saPassword-onpremises'
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sql2017Express"
+                    connectionString="Data Source=<server>\sqlexpress;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="14"
+                    db_engine_edition="Express"/>
+  <ConnectionString name="Sqlv160"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="16"
+                    enabled_features='Hekaton, SqlClr'
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sqlv160Express"
+                    connectionString="Data Source=<server>\sqlexpress;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="16"
+                    db_engine_edition="Express"/>
+  <ConnectionString name="Sqlv150"
+                    connectionString="Data Source=<server>;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="15"
+                    enabled_features='Hekaton, SqlClr'
+                    passwordCredential='saPassword-onpremises'
+                    db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sqlv150Express"
+                    connectionString="Data Source=<server>\sqlexpress;Initial Catalog=master;Integrated Security=True;Timeout=60"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    majorversion="15"
+                    db_engine_edition="Express"/>
+  <ConnectionString name="AzureSterlingV12"
+                    connectionString="Data Source=<server>.DATABASE.WINDOWS.NET;User ID=<UserID>;Timeout=60;Pooling=False"
+                    hostplatform="Windows"
+                    databaseenginetype="SqlAzureDatabase"
+                    majorversion="12"
+                    enabled_features='Hekaton, SqlClr'
+                    passwordCredential='password-sqldb'
+                    db_engine_edition="SqlDatabase"/>
+  <ConnectionString name="AzureSterlingV12_SqlDW"
+                    connectionString="Data Source=<server>.WINDOWS.NET;User ID=<UserID>;Timeout=60"
+                    hostplatform="Windows"
+                    db_engine_edition="SqlDataWarehouse"
+                    majorversion="12"
+                    passwordCredential='password-sqldw'
+                    databaseenginetype="SqlAzureDatabase"/>
+  <ConnectionString name="SqlManagedInstance"
+                    connectionString="Data Source=<server>;Timeout=60;User Id=<UserID>"
+                    hostplatform="Windows"
+                    databaseenginetype="Standalone"
+                    db_engine_edition="SqlManagedInstance"
+                    passwordCredential='password-managedinstance' />
+  <ConnectionString name="SQL2017Linux"
+            connectionString="Data Source=<server>;Initial Catalog=master;User ID=sa;Timeout=60"
+            hostplatform="Linux"
+            databaseenginetype="Standalone"
+            majorversion="14"
+            enabled_features='Hekaton, SqlClr'
+            passwordCredential='saPassword-2017Linux'
+            db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sqlv160Linux"
+            connectionString="Data Source=<server>;Initial Catalog=master;User ID=sa;Timeout=60"
+            hostplatform="Linux"
+            databaseenginetype="Standalone"
+            majorversion="16"
+            enabled_features='Hekaton, SqlClr'
+            passwordCredential='saPassword-2017Linux'
+            db_engine_edition="Enterprise"/>
+  <ConnectionString name="Sqlv150Linux"
+            connectionString="Data Source=<server>;Initial Catalog=master;User ID=sa;Timeout=60"
+            hostplatform="Linux"
+            databaseenginetype="Standalone"
+            majorversion="15"
+            enabled_features='Hekaton, SqlClr'
+            passwordCredential='saPassword-2017Linux'
+            db_engine_edition="Enterprise"/>
+</ConnectionStrings>
+
