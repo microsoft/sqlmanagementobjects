@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<EnumObject type="StoredProcedure" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link table='dbo.sysobjects AS sp'>sp.xtype = &lt;msparam&gt;P&lt;/msparam&gt; OR sp.xtype = &lt;msparam&gt;RF&lt;/msparam&gt;</property_link>
+		</version>
+		<version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link table='sys.all_objects AS sp'>sp.type = &lt;msparam&gt;P&lt;/msparam&gt; OR sp.type = &lt;msparam&gt;RF&lt;/msparam&gt; OR sp.type=&lt;msparam&gt;PC&lt;/msparam&gt;</property_link>
+			<property_link fields='#Startup#' left_join='sys.procedures AS spp'>spp.object_id = sp.object_id</property_link>
+		    <property_link fields='#IsNativelyCompiled#' left_join='sys.all_sql_modules AS sm'>sm.object_id = sp.object_id</property_link>      
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_object.xml' alias='sp' />
+        <include file='inc_system_table_view_sp_udf.xml' alias='sp' for="#IsSystemObject#" />
+		<include file='mixed_module_link.xml' alias='sp' 
+			for='#Recompile#ExecutionContextPrincipal#ExecutionContext#MethodName#ClassName#AssemblyName#AnsiNullsStatus#QuotedIdentifierStatus#IsEncrypted#Text#TextBody#BodyStartIndex#IsSchemaBound#'/>
+		<version min_major='7' max_major='8'>
+			<property name="Startup" type="bit" cast='true' mode="design"> OBJECTPROPERTY(sp.id, N'ExecIsStartup')</property>
+			<property name="ForReplication" type="bit" cast='true' read_only_after_creation="true" mode="deploy">CASE sp.xtype WHEN N'RF' THEN 1 ELSE 0 END</property>
+			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">1</property>
+
+			
+			<!-- extended properties support -->
+			<property name="ObjectTypeName" type="sysname" hidden="true">N'PROCEDURE'</property>
+		</version>
+		
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="Startup" type="bit" cast="true" mode="design">ISNULL(spp.is_auto_executed,0)</property>
+			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">CASE WHEN sp.type = N'P' THEN 1 WHEN sp.type = N'PC' THEN 2 ELSE 1 END</property>
+		</version>
+		<version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="ForReplication" type="bit" cast='true' read_only_after_creation="true" mode="deploy">CASE sp.type WHEN N'RF' THEN 1 ELSE 0 END</property>
+		</version>
+		<version min_major='10' >
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+        
+        <!-- Hekaton properties -->
+		<version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
+		    <property name="IsNativelyCompiled" type="bit" read_only_after_creation="true">ISNULL(sm.uses_native_compilation,0)</property>         
+		</version>
+  </properties>
+</EnumObject>

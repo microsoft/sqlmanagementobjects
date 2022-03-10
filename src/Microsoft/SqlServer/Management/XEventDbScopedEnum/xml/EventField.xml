@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<EnumObject type="EventField" impl_type="XEventObject" cloud_min_major='12'>
+  <settings>
+
+    <!-- Grigoryp 11/10/11 These links use parent alias & fields directly. Proper usage is to use parent_link tag. Leaving as it is for now.  -->
+    <property_link join='sys.dm_xe_object_columns' alias='col'>event.name = col.object_name AND col.column_type = 'customizable'</property_link>
+    <property_link left_join='sys.database_event_session_fields' alias='field'>event.event_session_id = field.event_session_id AND event.event_id = field.object_id AND col.name = field.name</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+      <property name='ID' type='int'>ISNULL(field.object_id, -1)</property>
+      <property name='Name' type='nvarchar' size='60'>col.name</property>
+      <property name='Value' type='sql_variant'>field.value</property>
+      <property name='Description' type='nvarchar' size='512'>col.description</property>
+  </properties>
+</EnumObject>

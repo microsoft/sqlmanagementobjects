@@ -1,0 +1,92 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Configuration">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <ApplicationIcon />
+    <IsPackable>true</IsPackable>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <!-- we use packagereference simply for pulling in dependencies so suppress errors about mismatched platforms -->
+    <RootNamespace>Microsoft.SqlServer.Test.SMO</RootNamespace>
+    <NoWarn>$(NoWarn);NU1603;NU1202</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json"/>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(HadrDataSrc)\Microsoft.SqlServer.Management.HadrData.csproj" />
+    <ProjectReference Include="$(HadrModelSrc)\Microsoft.SqlServer.Management.HadrModel.csproj" />
+    <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />
+    <ProjectReference Include="$(RegisteredServersSrc)\Microsoft.SqlServer.Management.RegisteredServers.csproj" />
+    <ProjectReference Include="$(DmfSrc)\Microsoft.SqlServer.Dmf.csproj" />
+    <ProjectReference Include="$(SqlScriptPublishSrc)\Microsoft.SqlServer.Management.SqlScriptPublish.csproj" />
+    <ProjectReference Include="$(PolicyEnumSrc)\Microsoft.SqlServer.PolicyEnum.csproj" />
+    <ProjectReference Include="$(TestFrameworkSrc)\Microsoft.SqlServer.Test.Manageability.Utils.csproj" />
+    <ProjectReference Include="$(SmoMetadataProviderSrc)\Microsoft.SqlServer.Management.SmoMetadataProvider.csproj" />
+    <ProjectReference Include="$(SqlAssessmentSrc)\Microsoft.SqlServer.Management.Assessment.csproj" />
+    <ProjectReference Include="$(NotebookSrc)\Microsoft.SqlServer.Smo.Notebook.csproj" />
+    <ProjectReference Include="$(XEventSrc)\Microsoft.SqlServer.Management.XEvent.csproj" />
+    <ProjectReference Include="$(XEventDbScopedSrc)\Microsoft.SqlServer.Management.XEventDbScoped.csproj" />
+    <ProjectReference Include="$(XEventDbScopedEnumSrc)\Microsoft.SqlServer.Management.XEventDbScopedEnum.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(XEventEnumSrc)\Microsoft.SqlServer.Management.XEventEnum.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+<!-- BEGIN NOGITHUB-->
+<!-- END NOGITHUB -->
+  <Import Project="$(EnlistmentRoot)\src\TestReferences.proj" />
+  <ItemGroup>
+    <Compile Remove="ScriptingTests\BrokerPriority_SmoTestSuite.cs" />
+    <Compile Remove="ScriptingTests\BrokerService_SmoTestSuite.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BackupRestore\NewerOutOfSequenceSetup.sql">
+      <LogicalName>NewerOutOfSequenceSetup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\NewerOutOfSequencePointInTimePlan.sql">
+      <LogicalName>NewerOutOfSequencePointInTimePlan.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\NewerOutOfSequenceCleanup.sql">
+      <LogicalName>NewerOutOfSequenceCleanup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\OlderOutOfSequenceSetup.sql">
+      <LogicalName>OlderOutOfSequenceSetup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\OlderOutOfSequencePointInTimePlan.sql">
+      <LogicalName>OlderOutOfSequencePointInTimePlan.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\OlderOutOfSequenceCleanup.sql">
+      <LogicalName>OlderOutOfSequenceCleanup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\LongFullBackupSetup.sql">
+      <LogicalName>LongFullBackupSetup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\LongFullBackupPlan.sql">
+      <LogicalName>LongFullBackupPlan.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BackupRestore\LongFullBackupCleanup.sql">
+      <LogicalName>LongFullBackupCleanup.sql</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Label="Resources">
+    <EmbeddedResource Include="ScriptingTests\Scripts\DatabaseEncryptionKey_SmoTestSuite_Sql2016_Setup.sql">
+      <LogicalName>DatabaseEncryptionKey_SmoTestSuite_Sql2016_Setup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScriptingTests\Scripts\ExternalLibrary_SmoTestSuite_Setup.sql">
+      <LogicalName>ExternalLibrary_SmoTestSuite_Setup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScriptingTests\Scripts\SqlAssembly_SmoTestSuite_Sql2016_Setup.sql">
+      <LogicalName>SqlAssembly_SmoTestSuite_Sql2016_Setup.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScriptingTests\Scripts\DependencyOrderScriptingDb.sql">
+      <LogicalName>DependencyOrderScriptingDb.sql</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScriptingTests\Data\qatest\bands.dat" />
+    <EmbeddedResource Include="ScriptingTests\ValidateTableDataRetention_DataRetentionPeriodOption.sql">
+      <LogicalName>DbSetup_SqlDatabaseEdge.sql</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

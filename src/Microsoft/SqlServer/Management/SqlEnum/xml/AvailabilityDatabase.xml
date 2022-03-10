@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<EnumObject type="AvailabilityDatabase" impl_type="SqlObject" min_major='11' >
+  <settings>
+    <parent_link>
+      <link parent='UniqueId' local='ParentID'/>
+    </parent_link>
+    <property_link fields="#ParentID#" table="#tmpardb_availability_replicas" alias="AR" />
+    <property_link join ="#tmpardb_availability_replica_states AS arstates">AR.replica_id = arstates.replica_id AND arstates.is_local = 1</property_link>
+    <property_link join ="#tmpardb_database_replica_cluster_states AS dbcs">arstates.replica_id = dbcs.replica_id</property_link>
+    <property_link fields="#SynchronizationState#IsSuspended#" left_join="#tmpardb_database_replica_states AS dbrs">dbcs.replica_id = dbrs.replica_id AND dbcs.group_database_id = dbrs.group_database_id</property_link>
+
+    <prefix fields="#ParentID#">
+      select replica_id, group_id into #tmpardb_availability_replicas from master.sys.availability_replicas
+    </prefix>
+    <prefix fields="#SynchronizationState#IsSuspended#">
+      select replica_id, group_database_id,synchronization_state, is_suspended into #tmpardb_database_replica_states from master.sys.dm_hadr_database_replica_states
+    </prefix>
+    <prefix>
+      select replica_id, group_database_id, database_name,is_database_joined,is_failover_ready,is_pending_secondary_suspend,recovery_lsn,truncation_lsn into #tmpardb_database_replica_cluster_states from master.sys.dm_hadr_database_replica_cluster_states
+    </prefix>
+    <prefix>
+      select replica_id, is_local into #tmpardb_availability_replica_states from master.sys.dm_hadr_availability_replica_states
+    </prefix>
+
+    <postfix fields="#ParentID#">
+      DROP TABLE #tmpardb_availability_replicas
+    </postfix>
+    <postfix fields="#SynchronizationState#UniqueId#IsSuspended#">
+      DROP TABLE #tmpardb_database_replica_states
+    </postfix>
+    <postfix>
+      DROP TABLE #tmpardb_database_replica_cluster_states
+    </postfix>
+    <postfix>
+      DROP TABLE #tmpardb_availability_replica_states
+    </postfix>
+
+  </settings>
+  <properties>
+    <include file='inc_urn.xml'/>
+    <include file='inc_hadr_policy_health_state.xml'/>
+
+    <version min_major='11'>
+      <property name="ParentID" type="uniqueidentifier" hidden="true">AR.group_id</property>
+      <property name="Name" type="sysname">dbcs.database_name</property>
+      <property name="UniqueId" type="uniqueidentifier" access="Read">dbcs.group_database_id</property>
+      <property name="IsJoined" type="bit" access="Read">ISNULL(dbcs.is_database_joined, 0)</property>
+      <property name="SynchronizationState" type="tinyint" report_type="AvailabilityDatabaseSynchronizationState" access="Read">ISNULL(dbrs.synchronization_state, 0)</property>
+      <property name="IsSuspended" type="bit" access="Read">ISNULL(dbrs.is_suspended, 0)</property>
+      <property name="IsFailoverReady" type="bit" access="Read">ISNULL(dbcs.is_failover_ready, 0)</property>
+      <property name="IsPendingSecondarySuspend" type="bit" access="Read">ISNULL(dbcs.is_pending_secondary_suspend, 0)</property>
+      <property name="RecoveryLSN" type="numeric" size="25" access="Read">dbcs.recovery_lsn</property>
+      <property name="TruncationLSN" type="numeric" size="25" access="Read">dbcs.truncation_lsn</property>
+    </version>
+
+  </properties>
+
+</EnumObject>

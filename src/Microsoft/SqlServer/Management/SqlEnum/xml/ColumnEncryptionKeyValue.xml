@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<EnumObject type="ColumnEncryptionKeyValue" impl_type="SqlObject" min_major='13' cloud_min_major='12'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table='sys.column_encryption_key_values AS cekvals' />
+    <property_link fields="#ColumnEncryptionKeyName#"
+      left_join="sys.column_encryption_keys AS ceks">(ceks.column_encryption_key_id = cekvals.column_encryption_key_id)</property_link>
+    <property_link fields="#ColumnMasterKeyName#"
+      left_join="sys.column_master_keys AS cmks">(cmks.column_master_key_id = cekvals.column_master_key_id)</property_link>
+  </settings>
+  <properties>
+    <!-- Construct the URN using the TargetObjectID as the key identifier -->
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="{0} + '/{2}[@ColumnMasterKeyID=' + cast({1} AS nvarchar(20)) + ']'">
+        <link_field type='parent' field="Urn" />
+        <link_field type='local' field="ColumnMasterKeyName" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+    <property name="ColumnEncryptionKeyName" type="sysname" read_only_after_creation="true">ceks.name</property>
+    <property name="ColumnMasterKeyName" type="sysname" read_only_after_creation="true">cmks.name</property>
+    <property name="ColumnMasterKeyID" type="int" read_only_after_creation="true">cekvals.column_master_key_id</property>
+    <property name="EncryptionAlgorithm" type="nvarchar" size="128" read_only_after_creation="true">cekvals.encryption_algorithm_name</property>
+    <property name="EncryptedValue" type="varbinary" size="8000" read_only_after_creation="true">cekvals.encrypted_value</property>
+    <property name="ParentID" type="int" read_only_after_creation="true" hidden="true">cekvals.column_encryption_key_id</property>
+  </properties>
+</EnumObject>

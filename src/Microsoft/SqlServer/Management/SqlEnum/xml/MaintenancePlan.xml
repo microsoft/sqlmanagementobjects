@@ -1,0 +1,27 @@
+<?xml version='1.0' ?>
+<EnumObject type='MaintenancePlan' impl_type='SqlObject' min_major='9'>
+	<settings>
+		<property_link table='msdb.dbo.sysmaintplan_plans' alias='s'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>s.name</property>
+		<property name='ID' type='uniqueidentifier'>s.id</property>
+		<property name='Description' type='nvarchar' size = '1024'>s.description</property>
+		<property name='CreateDate' type='datetime'>s.create_date</property>
+		<property name='Owner' type='sysname'>s.owner</property>
+		<property name='VersionMajor' type='int'>s.version_major</property>
+		<property name='VersionMinor' type='int'>s.version_minor</property>
+		<property name='VersionBuild' type='int'>s.version_build</property>
+		<property name='VersionComments' type='nvarchar' size = '1024'>s.version_comments</property>
+		<!-- Yukon added the from_msx column in SP2. -->
+		<version  min_major='9' max_major='9' max_minor='0' max_build='2999'>
+			<property name='FromMSX' type='bit'>0</property>
+			<property name='HasTargets' type='bit'>0</property>
+		</version>
+		<version  min_major='9' min_build='3000'>
+			<property name='FromMSX' type='bit'>s.from_msx</property>
+			<property name='HasTargets' type='bit'>s.has_targets</property>
+		</version>
+	</properties>
+</EnumObject>

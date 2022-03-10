@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="SearchPropertyList" impl_type="SqlObject" min_major='11'>
+ 
+  <settings>
+    <property_link table='sys.registered_search_property_lists AS spl' />
+    <property_link fields='#Owner#' join='sys.database_principals AS dp'>spl.principal_id=dp.principal_id</property_link>
+  </settings>
+  
+  <properties>
+    <include file='inc_urn.xml' />
+    
+    <property name="Name" type="sysname" read_only_after_creation="true">spl.name</property>
+    <property name="Owner" type="sysname">dp.name</property>
+    <property name="ID" type="int" access="Read">spl.property_list_id</property>
+    <property name="DateCreated" type="datetime" access="Read">spl.create_date</property>
+    <property name="DateLastModified" type="datetime" access="Read">spl.modify_date</property>
+
+    <!-- enable permissions -->
+    <property name="ExtPropClass" type="int" hidden='true'>31</property>
+    <property name="ExtPropMajorID" type="int" hidden='true'>
+      <link_multiple no='1' expression="{0}">
+        <link_field type='local' field="ID" />
+      </link_multiple>
+    </property>
+    <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    
+    <include file='inc_policy_health_state.xml'/>
+  </properties>
+</EnumObject>

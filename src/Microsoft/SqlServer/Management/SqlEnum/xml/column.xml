@@ -1,0 +1,301 @@
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <version min_major='7' max_major='8'>
+      <property_link table='dbo.syscolumns AS clmns' />
+      <property_link fields='#InPrimaryKey#' left_join='dbo.sysindexes AS ik'>ik.id = clmns.id and 0 != ik.status &amp; 0x0800</property_link>
+      <property_link fields='#InPrimaryKey#' left_join='dbo.sysindexkeys AS cik'>cik.indid = ik.indid and cik.colid = clmns.colid and cik.id = clmns.id</property_link>
+      <property_link fields='#Default#DefaultSchema#' left_join='dbo.sysobjects AS d'>d.id = clmns.cdefault and 0=d.category &amp; 0x0800</property_link>
+      <property_link fields='#Rule#RuleSchema#' left_join='dbo.sysobjects AS r'>r.id = clmns.domain</property_link>
+      <property_link fields='#DefaultConstraintName#' left_join='dbo.sysobjects AS dc'>dc.xtype='D' and dc.name not like N'#%%' and 0!=convert(bit,cstr.category &amp; 0x0800)</property_link>
+      <post_process fields='#ComputedText#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessText' />      
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property_link table='sys.all_columns AS clmns' />
+      <property_link fields='#IdentitySeed#IdentityIncrement#IdentitySeedAsDecimal#IdentityIncrementAsDecimal#NotForReplication#' left_join='sys.identity_columns AS ic'>ic.object_id = clmns.object_id and ic.column_id = clmns.column_id</property_link>
+      <property_link fields='#ComputedText#IsPersisted#' left_join='sys.computed_columns AS cc'>cc.object_id = clmns.object_id and cc.column_id = clmns.column_id</property_link>
+      <property_link fields='#InPrimaryKey#' left_join='sys.indexes AS ik'>ik.object_id = clmns.object_id and 1=ik.is_primary_key</property_link>
+      <property_link fields='#InPrimaryKey#' left_join='sys.index_columns AS cik'>cik.index_id = ik.index_id and cik.column_id = clmns.column_id and cik.object_id = clmns.object_id and 0 = cik.is_included_column</property_link>
+      <property_link fields='#Default#DefaultSchema#' left_join='sys.objects AS d'>d.object_id = clmns.default_object_id</property_link>
+      <property_link fields='#Rule#RuleSchema#' left_join='sys.objects AS r'>r.object_id = clmns.rule_object_id</property_link>
+      <property_link fields='#DefaultConstraintName#' left_join='sys.default_constraints as dc'>clmns.default_object_id = dc.object_id</property_link>      
+    </version>
+    <version min_major='13' cloud_min_major='12'>
+      <property_link fields="#ColumnEncryptionKeyName#" left_join="sys.column_encryption_keys AS ceks">(ceks.column_encryption_key_id = clmns.column_encryption_key_id)</property_link>
+    </version>
+    <version min_major='10' max_major='14'>
+      <property_link fields='#IsClassified#SensitivityLabelName#SensitivityLabelId#SensitivityInformationTypeName#SensitivityInformationTypeId#' left_join='sys.tables t'>t.object_id = clmns.object_id</property_link>
+      <property_link fields='#IsClassified#SensitivityLabelName#SensitivityLabelId#SensitivityInformationTypeName#SensitivityInformationTypeId#' left_join='sys.schemas AS s'>s.schema_id = t.schema_id</property_link>
+      <property_link fields='#IsClassified#SensitivityLabelName#' left_join='sys.extended_properties AS ep1'>clmns.object_id = ep1.major_id AND clmns.column_id = ep1.minor_id and ep1.name = 'sys_sensitivity_label_name'</property_link>
+      <property_link fields='#IsClassified#SensitivityLabelId#' left_join='sys.extended_properties AS ep2'>clmns.object_id = ep2.major_id AND clmns.column_id = ep2.minor_id and ep2.name = 'sys_sensitivity_label_id'</property_link>
+      <property_link fields='#IsClassified#SensitivityInformationTypeName#' left_join='sys.extended_properties AS ep3'>clmns.object_id = ep3.major_id AND clmns.column_id = ep3.minor_id and ep3.name = 'sys_information_type_name'</property_link>
+      <property_link fields='#IsClassified#SensitivityInformationTypeId#' left_join='sys.extended_properties AS ep4'>clmns.object_id = ep4.major_id AND clmns.column_id = ep4.minor_id and ep4.name = 'sys_information_type_id'</property_link>
+    </version>
+    <version min_major='15' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields='#IsClassified#SensitivityLabelId#SensitivityLabelName#SensitivityInformationTypeId#SensitivityInformationTypeName#SensitivityRank#' left_join='sys.sensitivity_classifications AS sc'>sc.major_id = clmns.object_id and sc.minor_id = clmns.column_id</property_link>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property_link fields='#DistributionColumnName#IsDistributedColumn#' left_join="sys.pdw_column_distribution_properties as cdp">cdp.object_id = clmns.object_id and cdp.column_id = clmns.column_id</property_link>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <version min_major='7' max_major='8'>
+      <property name="Name" type="sysname" mode="design">clmns.name</property>
+      <property name="ID" type="int" access="Read" cast='true'>clmns.colid</property>
+      <!-- column specific props-->
+      <property name="Nullable" type="bit" cast='true' mode="design">clmns.isnullable</property>
+      <property name="Computed" type="bit" cast='true' read_only_after_creation="true" mode="design">clmns.iscomputed</property>
+      <property name="InPrimaryKey" type="bit" access='read' cast='true'>ISNULL(cik.colid, 0)</property>
+      <property name="AnsiPaddingStatus" type="bit" cast='true' access='read'>ISNULL(COLUMNPROPERTY(clmns.id, clmns.name, N'UsesAnsiTrim'),0)</property>
+      <property name="RowGuidCol" type="bit" cast='true' mode="design">clmns.colstat &amp; 2</property>
+      <property name="NotForReplication" type="bit" cast='true' read_only_after_creation="true" mode="deploy">clmns.colstat &amp; 8</property>
+      <property name="IsFullTextIndexed" type="bit" cast='true' access='read' >COLUMNPROPERTY(clmns.id, clmns.name, N'IsFulltextIndexed')</property>
+      <property name="ComputedText" type="nvarchar" size='4000' expensive='true' read_only_after_creation="true" mode="design">cast(clmns.id as nvarchar(20)) + '_' + cast(clmns.colid as nvarchar(20)) + '_' + cast(db_id() as nvarchar(20)) + '_0'</property>
+      <property name="Identity" type="bit" cast='true' read_only_after_creation="true" mode="design">COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity')</property>
+      <property name="IsForeignKey" type="bit" cast='true' 
+        access='read' >ISNULL((select top 1 1 from dbo.sysforeignkeys AS colfk where colfk.fkey = clmns.colid and colfk.fkeyid = clmns.id), 0)</property>
+      <version min_major='8' max_major='8'>
+        <property name="Collation" type="sysname" mode="design">ISNULL(clmns.collation, N'')</property>
+        
+        <property name="IdentitySeed" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+        <property name="IdentityIncrement" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+        <property name="IdentitySeedAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+        <property name="IdentityIncrementAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+      </version>
+      <version min_major='7' max_major='7'>
+        <property name="IdentitySeed" type="int" report_type2 = 'System.Int64' cast='true' read_only_after_creation="true" mode="design" expensive="true">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+        <property name="IdentityIncrement" type="int" report_type2 = 'System.Int64' cast='true' read_only_after_creation="true" mode="design" expensive="true">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+        <property name="IdentitySeedAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+        <property name="IdentityIncrementAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
+          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
+            <link_field type='parent' field="FullName" />
+          </link_multiple>
+        </property>
+      </version>
+
+      <!-- default section -->
+      <property name="ColumnDefaultID" type="int" hidden='true'>clmns.cdefault</property>
+      <property name="ParentID" type="int" hidden="true">clmns.id</property>			
+      <property name="Default" type="sysname" read_only_after_creation="true">(case when clmns.cdefault = 0 then N'' else d.name end)</property>
+      <property name="DefaultSchema" type="sysname" read_only_after_creation="true">(case when clmns.cdefault = 0 then N'' else user_name(d.uid) end)</property>
+      <!-- "Default" refers to a default bound by sp_bindefault. "DefaultConstraintName" refers to the name of a modern default constraint.
+        We have this property to enable the DefaultConstraint property to short circuit its value to null during scripting and avoid a SQL query
+      -->
+      <property name="DefaultConstraintName" type="sysname" read_only_after_creation='true'>ISNULL(dc.Name, N'')</property>
+      <!-- rule section -->
+      <property name="Rule" type="sysname" read_only_after_creation="true">(case when clmns.domain = 0 then N'' else r.name end)</property>
+      <property name="RuleSchema" type="sysname" read_only_after_creation="true">(case when clmns.domain = 0 then N'' else user_name(r.uid) end)</property>
+
+      <!-- extended properties support : commented out: sysproperties is not accessible to regular users
+      <property name="ExtPropClass" type="int" hidden='true'>4</property>
+      -->
+      <property name="ObjectTypeName" type="sysname" hidden='true'>N'COLUMN'</property>
+      <include file ="inc_level2SupportProperties.xml"/>
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Name" type="sysname" mode="design">clmns.name</property>
+      <property name="ID" type="int">clmns.column_id</property>
+      <!-- column specific props-->
+      <property name="Nullable" type="bit" mode="design">clmns.is_nullable</property>
+      <property name="Computed" type="bit" read_only_after_creation="true" mode="design">clmns.is_computed</property>
+      <property name="InPrimaryKey" type="bit" access='read' cast='true'>ISNULL(cik.index_column_id, 0)</property>
+      <property name="AnsiPaddingStatus" type="bit" access='read'>clmns.is_ansi_padded</property>
+      <property name="RowGuidCol" type="bit" cast='true' mode="design">clmns.is_rowguidcol</property>
+      
+      <property name="ComputedText" type="nvarchar" size='max' expensive='true' read_only_after_creation="true" mode="design">ISNULL(cc.definition,N'')</property>
+      <property name="IsPersisted" type="bit" cast="true" mode="design">ISNULL(cc.is_persisted, 0)</property>
+      <property name="Collation" type="sysname" mode="design">ISNULL(clmns.collation_name, N'')</property>
+      <property name="IsForeignKey" type="bit" cast='true' 
+        access='read' >ISNULL((select TOP 1 1 from sys.foreign_key_columns AS colfk where colfk.parent_column_id = clmns.column_id and colfk.parent_object_id = clmns.object_id), 0)</property>
+      <!-- identity section -->
+      <property name="Identity" type="bit" read_only_after_creation="true" mode="design">clmns.is_identity</property>
+      <property name="IdentitySeed" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">ISNULL(ic.seed_value,0)</property>
+      <property name="IdentityIncrement" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">ISNULL(ic.increment_value,0)</property>
+      <property name="IdentitySeedAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">ISNULL(ic.seed_value,0)</property>
+      <property name="IdentityIncrementAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">ISNULL(ic.increment_value,0)</property>
+
+      <!-- default section -->
+      <property name="ColumnDefaultID" type="int" hidden='true'>clmns.default_object_id</property>
+      <property name="Default" type="sysname" read_only_after_creation="true">(case when clmns.default_object_id = 0 then N'' when d.parent_object_id > 0 then N'' else d.name end)</property>
+      <property name="DefaultSchema" type="sysname" read_only_after_creation="true">(case when clmns.default_object_id = 0 then N'' when d.parent_object_id > 0 then N'' else schema_name(d.schema_id) end)</property>
+      <property name="DefaultConstraintName" type="sysname" read_only_after_creation='true'>ISNULL(dc.Name, N'')</property>
+      <!-- rule section -->
+      <property name="Rule" type="sysname" read_only_after_creation="true">(case when clmns.rule_object_id = 0 then N'' else r.name end)</property>
+      <property name="RuleSchema" type="sysname" read_only_after_creation="true">(case when clmns.rule_object_id = 0 then N'' else schema_name(r.schema_id) end)</property>
+    </version>
+        <version min_major='9'  cloud_min_major='10'>
+      <property name="IsDeterministic" type="bit" cast='true' access='read'>ISNULL(COLUMNPROPERTY(clmns.object_id, clmns.name, N'IsDeterministic'),0)</property>
+      <property name="IsPrecise" type="bit" cast='true' access='read'>ISNULL(COLUMNPROPERTY(clmns.object_id, clmns.name, N'IsPrecise'),0)</property>
+    </version>
+    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="NotForReplication" type="bit" read_only_after_creation="true" mode="deploy">ISNULL(ic.is_not_for_replication, 0)</property>
+    </version>
+    <version min_major='9' cloud_min_major='10'>
+      <property name="IsFullTextIndexed" type="bit" cast='true' access='read'>COLUMNPROPERTY(clmns.object_id, clmns.name, N'IsFulltextIndexed')</property>
+    </version>
+    <version min_major='11'>
+      <property name="StatisticalSemantics" type="int" cast="true" access="read">COLUMNPROPERTY(clmns.object_id, clmns.name, N'StatisticalSemantics')</property>
+    </version>
+    <version min_major='9' max_major='9'>
+      <!-- extended properties support -->
+      <property name="ExtPropClass" type="int" hidden='true'>1</property>
+      <property name="ParentID" type="int" hidden="true">clmns.object_id</property>
+    </version>
+
+    <version min_major='13' cloud_min_major='12'>
+      <!--TCE specific props-->
+      <property name="EncryptionType" type="int" report_type="ColumnEncryptionType" cast='true' read_only_after_creation="true">clmns.encryption_type</property>
+      <property name="EncryptionAlgorithm" type="sysname" read_only_after_creation="true">clmns.encryption_algorithm_name</property>
+      <property name="ColumnEncryptionKeyID" type="int" read_only_after_creation="true">clmns.column_encryption_key_id</property>
+      <property name="ColumnEncryptionKeyName" type="sysname" read_only_after_creation="true">ceks.name</property>
+    </version>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <!-- extended properties support -->
+      <property name="ExtPropClass" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='parent' field="ExtPropClassforColumn"/>
+        </link_multiple>
+      </property>
+      <property name="ParentID" type="int" hidden="true">clmns.object_id</property>
+    </version>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
+      <!-- column specific props-->
+      <property name="IsFileStream" type="bit" cast='true' read_only_after_creation="true">clmns.is_filestream</property>
+      <property name="IsSparse" type="bit" cast="true" mode="design">clmns.is_sparse</property>
+      <property name="IsColumnSet" type="bit" cast="true" read_only_after_creation="true" mode="design">clmns.is_column_set</property>
+    </version>
+    <include alias = 'clmns' file='inc_type.xml' />
+    
+    <!-- extended properties support -->
+    <version min_major='7' max_major='9'>
+      <property name="ExtPropMajorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='local' field="ParentID" />
+        </link_multiple>
+      </property>
+      <property name="ExtPropMinorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+    </version>
+    
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="ExtPropMajorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='parent' field="ExtPropMajorIDforColumn"/>
+        </link_multiple>
+      </property>
+      <property name="ExtPropMinorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+    </version>
+
+    <!-- permission support-->
+    <property name="ObjectName" type="sysname" hidden='true'>
+      <link_multiple no='1' expression="{0}">
+        <link_field type='parent' field="Name" />
+      </link_multiple>
+    </property>
+    <property name="ObjectSchema" type="sysname" hidden='true'>
+      <link_multiple no='1' expression="{0}">
+        <link_field type='parent' field="Schema" />
+      </link_multiple>
+    </property>
+
+    <!-- temporal support -->
+    <version min_major='13' cloud_min_major='12' >
+      <property name="GeneratedAlwaysType" type="tinyint" report_type="GeneratedAlwaysType">clmns.generated_always_type</property>
+      <property name="IsHidden" type="bit" cast="true" read_only_after_creation="false">clmns.is_hidden</property>
+    </version>
+
+    <!-- data masking support -->
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="IsMasked" type="bit" cast="true" read_only_after_creation="false" mode="design">clmns.is_masked</property>
+      <property name="MaskingFunction" type="nvarchar" size='max' expensive='true' read_only_after_creation="false" mode="design">ISNULL((SELECT ms.masking_function FROM sys.masked_columns ms WHERE ms.object_id = clmns.object_id AND ms.column_id = clmns.column_id), N'')</property>
+    </version>
+
+    <!-- data classification support -->
+    <version min_major='10' max_major='14'>
+      <property name="IsClassified" type="bit" access="read" cast="true" read_only_after_creation="false" mode="design">
+        CASE
+        WHEN ep1.value IS NOT NULL or ep2.value IS NOT NULL or ep3.value IS NOT NULL or ep4.value IS NOT NULL THEN 1
+        ELSE 0
+        END
+      </property>
+      <property name="SensitivityLabelName" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL(ep1.value, N'')</property>
+      <property name="SensitivityLabelId" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL(ep2.value, N'')</property>
+      <property name="SensitivityInformationTypeName" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL(ep3.value, N'')</property>
+      <property name="SensitivityInformationTypeId" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL(ep4.value, N'')</property>
+    </version>
+
+    <version min_major='15' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="IsClassified" type="bit" access="read" cast="true" mode="design">
+        CASE
+        WHEN [sc].[label] IS NOT NULL or [sc].[label_id] IS NOT NULL or [sc].[information_type] IS NOT NULL or [sc].[information_type_id] IS NOT NULL or [sc].[rank] IS NOT NULL THEN 1
+        ELSE 0
+        END
+      </property>
+      <property name="SensitivityLabelName" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL([sc].[label], N'')</property>
+      <property name="SensitivityLabelId" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL([sc].[label_id], N'')</property>
+      <property name="SensitivityInformationTypeName" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL([sc].[information_type], N'')</property>
+      <property name="SensitivityInformationTypeId" type="sysname" expensive="true" read_only_after_creation="false" mode="design">ISNULL([sc].[information_type_id], N'')</property>
+      <property name="SensitivityRank" type="int" report_type="SensitivityRank" expensive="true" read_only_after_creation="false" mode="design">ISNULL([sc].[rank], -1)</property>
+    </version>
+
+    <!-- SQL DW hash distribution column. -->
+    <version datawarehouse_enabled='true'>
+      <property name="DistributionColumnName" type="sysname">
+        CASE
+          WHEN cdp.distribution_ordinal IS NOT NULL AND cdp.distribution_ordinal > 0 THEN ISNULL(clmns.name, N'')
+          ELSE N'0'
+        END
+      </property>
+      <property name="IsDistributedColumn" type="bit" cast="true">
+        CASE
+          WHEN cdp.distribution_ordinal IS NOT NULL AND cdp.distribution_ordinal > 0 THEN N'1'
+          ELSE N''
+        END
+      </property>
+    </version>
+
+    <!--SQL GraphDB properties.-->
+    <version min_major="14" cloud_min_major="12">
+      <property name="GraphType" type="int" report_type="GraphType">ISNULL(clmns.graph_type, 0)</property>
+    </version>
+  </properties>
+</EnumObject>

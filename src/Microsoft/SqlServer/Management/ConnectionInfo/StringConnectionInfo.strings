@@ -1,0 +1,100 @@
+# String resource file
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these
+# string resources, including the ability to format in
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+
+# SMO build specific comment
+# after generating the .resx file, run resgen on it and get the .resources file
+# please remember to also check that .resources in, along with the
+# .strings and .cs file
+[strings]
+ConnectionCannotBeChanged = Connection properties cannot be changed after a connection has been established.
+NotInTransaction = Cannot perform this operation as there is no open transaction.
+ConnectionFailure(server) = Failed to connect to server {0}.
+InvalidPropertyValue(value, property, reason) = Cannot apply value '{0}' to property {1}: {2}.
+InvalidPropertyValueReasonString = Value cannot be null.
+InvalidIntegratedSecureValue(property) = Property {0} is only supported on Windows operating systems.
+InvalidPropertyValueReasonInt(value) = Value cannot be smaller than {0}.
+ExecutionFailure = An exception occurred while executing a Transact-SQL statement or batch.
+PropertyNotSetException(property) = Property {0} was not set.
+CannotSetWhenLoginSecure(property) = Cannot set {0} property because LoginSecure property is set to true.
+PropertyNotAvailable(property) = Property {0} cannot be changed or read after a connection string has been set.
+ConnectToInvalidVersion(string serverVersion)=This SQL Server version ({0}) is not supported.
+ClassDefaulConstructorCannotBeUsed(string className) = {0} class default constructor cannot be used.
+MethodNotSupported(string methodName) = Method {0} is not supported.
+ParseError(int line) = Parse error occurred while looking for GO statement. Line {0}.
+PasswordCouldNotBeChanged= Password could not be changed.
+InvalidLockTimeout(int lockTimeout) = Invalid LockTimeout value: {0}.
+InvalidArgumentCacheCapacity(int capacity) = Cache capacity must be greater than {0}.
+InvalidArgumentCacheNullKey = The cache item returns a null key.
+InvalidArgumentCacheDuplicateKey(object key) = The cache already contains an item with the same key {0}.
+
+#
+# Database Engine Edition Names
+#
+SqlAzureDatabaseEdition = Microsoft Azure SQL Database Edition
+SqlDataWarehouseEdition = Microsoft Azure SQL Data Warehouse Edition
+EnterpriseEdition = Microsoft SQL Server Enterprise Edition
+ExpressEdition = Microsoft SQL Server Express Edition
+PersonalEdition = Microsoft SQL Server Personal Edition
+StandardEdition = Microsoft SQL Server Standard Edition
+StretchEdition = Microsoft SQL Server Stretch Database Edition
+SqlManagedInstanceEdition = Microsoft Azure SQL Database Managed Instance Edition
+SqlOnDemandEdition = Microsoft Azure Synapse SQL Analytics on-demand Edition
+SqlDatabaseEdgeEdition = Microsoft Azure SQL Edge Edition
+
+#
+# Database Engine Type Names
+#
+SqlAzureDatabase = Microsoft Azure SQL Database
+Standalone = Standalone SQL Server
+
+#
+# Trace/Replay objects errors
+#
+CannotCloseTraceController = Failed to close trace controller.
+CannotRetrieveSchemaTable = Failed to retrieve schema table.
+CannotReadNextEvent = Failed to read next event.
+CannotGetColumnName = Failed to retrieve column name.
+CannotGetColumnType = Failed to retrieve column type.
+CannotGetColumnValue = Failed to retrieve column value.
+CannotSetColumnValue = Failed to set column value.
+CannotWriteEvent = Failed to write event.
+CannotCloseWriter = Failed to close writer.
+CannotInitializeAsReader = Failed to initialize object as reader.
+CannotInitializeAsWriter = Failed to initialize object as writer.
+CannotInitializeAsReplayOutputWriter = Failed to initialize object as replay output writer.
+CannotPause = Failed to pause trace.
+CannotStop = Failed to stop trace.
+CannotRestart = Failed to restart trace.
+CannotStartReplay = Failed to start replay.
+CannotPauseReplay = Failed to pause replay.
+CannotStopReplay = Failed to stop replay.
+CannotLoadType(string typeName) = Failed to create an instance of type {0}.
+FailedToGetSQLToolsDirPathFromInstAPI = Failed to get SQL Tools directory path from InstAPI.
+InstAPIIsNotInstalled = InstAPI is required for this type, but it is not installed on this computer.
+CouldNotInstantiateInstAPI = Could not instantiate InstAPI.
+CouldNotLoadMethodInfoFromInstAPI = Could not load MethodInfo from InstAPI.
+CannotTranslateSubclass = Failed to translate subclass value.
+CannotGetOrdinal = Failed to find column ordinal.
+CannotLoadInAppDomain = Initializing Trace or Replay Objects in a non-default AppDomain is not fully supported. Verify that you invoke an instance of Trace or Replay Object from the same domain and that the caller object is not marshaled-by-reference.
+AssemblyLoadFailed(string assemblyName,string originalerror) = Failed to load assembly {0}. Error message: {1}
+SmoSQLCLRUnAvailable=This functionality is disabled in the SQLCLR. It is recommended that you execute from your client application.
+CannotBeSetWhileConnected=ServerVersion cannot be set while connected.
+CannotPerformOperationWhileDisconnected=Operation cannot be performed when the connection is forced to be disconnected.
+CannotSetTrueName=TrueName cannot be set, unless the connection is forced to be disconnected.
+TrueNameMustBeSet=TrueName must be set if the connection is forced to be disconnected.
+
+#Credential manager errors
+UnableToSavePasswordFormat(string userName) = The password for user '{0}' could not be saved to the Windows credential manager.

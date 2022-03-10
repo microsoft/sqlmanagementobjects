@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project >
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+    <PropertyGroup>
+    <TargetFrameworks>$(NetfxVersion);netcoreapp3.1</TargetFrameworks>
+    <!-- the auto generated redirect for newtonsoft breaks the runtime resolver -->
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <!-- Enable QTest after it supports multi targeting -->
+  <PropertyGroup>
+    <EnableQTest>false</EnableQTest>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NewtonSoft.Json" />
+    <Compile Include="$(MSBuildthisfileDirectory)Common\UnitTestBase.cs" />
+  </ItemGroup>
+</Project>

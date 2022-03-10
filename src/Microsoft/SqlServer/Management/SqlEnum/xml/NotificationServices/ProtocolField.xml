@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='ProtocolField' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="NotificationClassProtocolId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="NotificationClassProtocolId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_protocol_field" alias="pf" />
+		<prefix>
+CREATE TABLE #tmp_protocol_field(
+    ProtocolFieldId int,
+    NotificationClassProtocolId int,
+    FieldName nvarchar(255),
+    FieldReference nvarchar(255),
+    SqlExpression nvarchar(4000)
+)
+INSERT #tmp_protocol_field EXEC [SchemaPrefix].NSGetProtocolFields
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_protocol_field
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">pf.FieldName</property>
+        <property name="ID" type="int">pf.ProtocolFieldId</property>
+        <property name="NotificationClassProtocolId" type="int" hidden="true">pf.NotificationClassProtocolId</property>
+        <property name="SqlExpression" type="nvarchar" size="4000">pf.SqlExpression</property>
+        <property name="FieldReference" type="nvarchar" size="255">pf.FieldReference</property>
+    </properties>
+</EnumObject>

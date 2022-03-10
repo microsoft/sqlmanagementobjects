@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExtendedProperty" impl_type="SqlObject" min_major='8' cloud_min_major='12'>
+  <settings>
+    <version min_major='8' max_major='8'>
+      <property_link table='::fn_listextendedproperty (NULL, default, default, default, default, default, default) AS p'/>
+    </version>
+    <version min_major='9' cloud_min_major='12'>
+      <property_link table='sys.extended_properties AS p'>p.major_id=0 AND p.minor_id=0 AND p.class=0</property_link>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="Name" type="sysname">p.name</property>
+    <property name="Value" type='sql_variant' cast='false'>p.value</property>
+  </properties>
+</EnumObject>

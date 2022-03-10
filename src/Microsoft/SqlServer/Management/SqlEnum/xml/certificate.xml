@@ -1,0 +1,40 @@
+<?xml version='1.0' ?>
+<EnumObject type='Certificates' impl_type='SqlObject' min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
+	<settings>
+		<property_link table='sys.certificates' alias='c'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>c.name</property>
+		<property name='ID' type='int'>c.certificate_id</property>
+		<property name='Owner' type='sysname'>user_name(c.principal_id)</property>
+		<property name='PrivateKeyEncryptionType' type='int' report_type = 'PrivateKeyEncryptionType' 
+			access='read'>case c.pvt_key_encryption_type when 'NA' then 0 when 'MK' then 1 when 'PW' then 2 end</property>
+		<property name='Issuer' type='nvarchar' size = '256' access='read'>c.issuer_name</property>
+		<property name='Serial' type='nvarchar' size = '64' access='read'>c.cert_serial_number</property>
+		<property name='Sid' type='varbinary' size = '128' access='read'>c.sid</property>
+		<property name='Subject' type='nvarchar' size = '4000' read_only_after_creation="true">c.subject</property>
+		<property name='ExpirationDate' type='datetime' read_only_after_creation="true">c.expiry_date</property>
+		<property name='StartDate' type='datetime' read_only_after_creation="true">c.start_date</property>
+		<property name='Thumbprint' type='varbinary' size = '32' access='read'>c.thumbprint</property>
+		<property name='ActiveForServiceBrokerDialog' type='bit'>c.is_active_for_begin_dialog</property>		
+
+		<!-- not available
+		<property name='CreateDate' type='datetime'>c.create_date</property>
+		<property name='DateLastModified' type='datetime'>c.modify_date</property>
+		-->
+		
+		<!-- enable permissions -->
+		<property name="ExtPropClass" type="int" hidden='true'>25</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+		<property name='LastBackupDate' type='datetime' access='read'>c.pvt_key_last_backup_date</property>
+    </version>
+  </properties>
+</EnumObject>

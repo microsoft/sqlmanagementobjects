@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='9'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="MajorID" />		
+			<link parent="PermissionClass" local="TrueObjectClass" />
+		</parent_link>
+	</settings>
+	<properties>
+		<include file='inc_perm.xml'  alias='server'/>
+		<property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+		
+	</properties>
+</EnumObject>

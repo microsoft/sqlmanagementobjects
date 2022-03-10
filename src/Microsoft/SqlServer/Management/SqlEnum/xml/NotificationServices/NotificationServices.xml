@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NotificationServices' impl_type='SqlObject' min_major='7' >
+	<settings>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<!--version min_major = '7' max_major = '7'>
+			<property name="Name" type="sysname">@@SERVERNAME</property>
+		</version>
+		<version min_major = '8' max_major = '8'>
+			<property name="Name" type="sysname">serverproperty(N'Servername')</property>
+		</version-->
+		<version min_major = '9'>
+			<property name="Name" type="sysname" access="Read">serverproperty(N'Servername')</property>
+		</version>
+	</properties>
+</EnumObject>

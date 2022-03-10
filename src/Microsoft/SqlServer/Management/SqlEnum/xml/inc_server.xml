@@ -1,0 +1,589 @@
+<?xml version="1.0" ?>
+<EnumObject type="Server" impl_type="Server" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+  <settings>
+    <version min_major='8'>
+      <prefix fields='#MasterDBPath#MasterDBLogPath#ErrorLogPath#RootDirectory#InstallDataDirectory#PerfMonMode#MailProfile#BackupDirectory#AuditLevel#LoginMode#DefaultLog#DefaultFile#NumberOfLogFiles#BrowserStartMode#BrowserServiceAccount#InstallSharedDirectory#TcpEnabled#NamedPipesEnabled#ServiceStartMode#ServiceAccount#ServiceInstanceId#SqlDomainGroup#FilestreamShareName#FilestreamLevel#ErrorLogSizeKb#'>
+        declare @HkeyLocal nvarchar(18)
+        declare @ServicesRegPath nvarchar(34)
+        declare @SqlServiceRegPath sysname
+        declare @BrowserServiceRegPath sysname
+        declare @MSSqlServerRegPath nvarchar(31)
+        declare @InstanceNamesRegPath nvarchar(59)
+        declare @InstanceRegPath sysname
+        declare @SetupRegPath sysname
+        declare @NpRegPath sysname
+        declare @TcpRegPath sysname
+        declare @RegPathParams sysname
+        declare @FilestreamRegPath sysname
+
+        select @HkeyLocal=N'HKEY_LOCAL_MACHINE'
+
+        -- Instance-based paths
+        select @MSSqlServerRegPath=N'SOFTWARE\Microsoft\MSSQLServer'
+        select @InstanceRegPath=@MSSqlServerRegPath + N'\MSSQLServer'
+        select @FilestreamRegPath=@InstanceRegPath + N'\Filestream'
+        select @SetupRegPath=@MSSqlServerRegPath + N'\Setup'
+        select @RegPathParams=@InstanceRegPath+'\Parameters'
+
+        -- Services
+        select @ServicesRegPath=N'SYSTEM\CurrentControlSet\Services'
+        select @SqlServiceRegPath=@ServicesRegPath + N'\MSSQLSERVER'
+        select @BrowserServiceRegPath=@ServicesRegPath + N'\SQLBrowser'
+
+        -- InstanceId setting
+        select @InstanceNamesRegPath=N'SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL'
+
+        -- Network settings
+        select @NpRegPath=@InstanceRegPath + N'\SuperSocketNetLib\Np'
+        select @TcpRegPath=@InstanceRegPath + N'\SuperSocketNetLib\Tcp'
+      </prefix>
+    </version>
+    <version min_major='8' max_major='9'>
+      <prefix fields='#TapeLoadWaitTime#'>
+        declare @SmoTapeLoadWaitTime int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'Tapeloadwaittime', @SmoTapeLoadWaitTime OUTPUT
+      </prefix>
+    </version>
+
+    <version min_major="10">
+      <prefix fields="#SqlDomainGroup#">
+        declare @SqlGroup nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @SetupRegPath, N'SQLGroup', @SqlGroup OUTPUT
+      </prefix>
+    </version>
+    <version min_major="10">
+      <prefix fields="#FilestreamLevel#">
+        declare @FilestreamLevel int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @FilestreamRegPath, N'EnableLevel', @FilestreamLevel OUTPUT
+      </prefix>
+      <prefix fields="#FilestreamShareName#">
+        declare @FilestreamShareName nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @FilestreamRegPath, N'ShareName', @FilestreamShareName OUTPUT
+      </prefix>
+    </version>
+
+    <version min_major='10' min_minor='50'>
+      <prefix fields="#ProcessorUsage#">
+        create table #tempproc(value int)
+        insert #tempproc exec msdb.sys.sp_getProcessorUsage
+      </prefix>
+    </version>
+
+    <!-- Setup Properties-->
+    <version min_major="9">
+      <prefix fields="#ServiceInstanceId#">
+        declare @ServiceInstanceId nvarchar(512)
+        EXEC master.sys.xp_regread @HkeyLocal, @InstanceNamesRegPath, @@SERVICENAME, @ServiceInstanceId OUTPUT
+      </prefix>
+      <prefix fields="#ServiceAccount#">
+        declare @ServiceAccount nvarchar(512)
+        EXEC master.sys.xp_instance_regread @HkeyLocal, @SqlServiceRegPath, N'ObjectName', @ServiceAccount OUTPUT
+      </prefix>
+      <prefix fields="#ServiceStartMode#">
+        declare @ServiceStartMode int
+        EXEC master.sys.xp_instance_regread @HkeyLocal, @SqlServiceRegPath, N'Start', @ServiceStartMode OUTPUT
+      </prefix>
+      <prefix fields="#NamedPipesEnabled#">
+        declare @NamedPipesEnabled int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @NpRegPath, N'Enabled', @NamedPipesEnabled OUTPUT
+      </prefix>
+      <prefix fields="#TcpEnabled#">
+        declare @TcpEnabled int
+        EXEC master.sys.xp_instance_regread @HkeyLocal, @TcpRegPath, N'Enabled', @TcpEnabled OUTPUT
+      </prefix>
+      <prefix fields="#InstallSharedDirectory#">
+        declare @InstallSharedDirectory nvarchar(512)
+        EXEC master.sys.xp_instance_regread @HkeyLocal, @SetupRegPath, N'SQLPath', @InstallSharedDirectory OUTPUT
+      </prefix>
+      <prefix fields="#BrowserServiceAccount#">
+        declare @BrowserServiceAccount nvarchar(512)
+        EXEC master.sys.xp_regread @HkeyLocal, @BrowserServiceRegPath, N'ObjectName', @BrowserServiceAccount OUTPUT
+      </prefix>
+      <prefix fields="#BrowserStartMode#">
+        declare @BrowserStartMode int
+        EXEC master.sys.xp_regread @HkeyLocal, @BrowserServiceRegPath, N'Start', @BrowserStartMode OUTPUT
+      </prefix>
+    </version>
+
+    <!--imported from settings.xml-->
+    <version min_major='8'>
+      <prefix fields="#NumberOfLogFiles#">
+        declare @NumErrorLogs int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'NumErrorLogs', @NumErrorLogs OUTPUT
+      </prefix>
+      <prefix fields="#LoginMode#">
+        declare @SmoLoginMode int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'LoginMode', @SmoLoginMode OUTPUT
+      </prefix>
+      <prefix fields="#AuditLevel#">
+        declare @SmoAuditLevel int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'AuditLevel', @SmoAuditLevel OUTPUT
+      </prefix>
+      <prefix fields="#BackupDirectory#">
+        declare @BackupDirectory nvarchar(512)
+        if 1=isnull(cast(SERVERPROPERTY('IsLocalDB') as bit), 0)
+        select @BackupDirectory=cast(SERVERPROPERTY('instancedefaultdatapath') as nvarchar(512))
+        else
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'BackupDirectory', @BackupDirectory OUTPUT
+      </prefix>
+      <prefix fields="#MailProfile#">
+        declare @SmoMailProfile nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'MailAccountName', @SmoMailProfile OUTPUT
+      </prefix>
+      <prefix fields="#PerfMonMode#">
+        declare @SmoPerfMonMode int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'Performance', @SmoPerfMonMode OUTPUT
+
+        if @SmoPerfMonMode is null
+        begin
+        set @SmoPerfMonMode = 1000
+        end
+      </prefix>
+      <!-- Setup properties -->
+      <prefix fields="#InstallDataDirectory#">
+        declare @InstallSqlDataDir nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @SetupRegPath, N'SQLDataRoot', @InstallSqlDataDir OUTPUT
+      </prefix>
+      <prefix fields="#RootDirectory#">
+        declare @SmoRoot nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @SetupRegPath, N'SQLPath', @SmoRoot OUTPUT
+      </prefix>
+    </version>
+    <version min_major="8" max_major="13">
+      <!--imported from information.xml-->
+      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#ProcessorUsage#">
+        create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
+        insert #SVer exec master.dbo.xp_msver
+      </prefix>
+    </version>
+
+    <version min_major="14" max_major="14">
+      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#ProcessorUsage#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#">
+        create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
+        insert #SVer exec master.dbo.xp_msver
+        insert #SVer select t.*
+        from sys.dm_os_host_info
+        CROSS APPLY (
+        VALUES
+        (1001, 'host_platform', 0, host_platform),
+        (1002, 'host_distribution', 0, host_distribution),
+        (1003, 'host_release', 0, host_release),
+        (1004, 'host_service_pack_level', 0, host_service_pack_level),
+        (1005, 'host_sku', host_sku, '')
+        ) t(id, [name], internal_value, [value])
+      </prefix>
+    </version>
+    <!-- In addition to v14 section, properties specific to Managed Instances are added here.
+         We're detecting Managed Instances by checking if  SERVERPROPERTY('EngineEdition') equals to 8.
+         
+         The following properties are new additons: HardwareGeneration, ServiceTier, ReservedStorageSizeMB and UsedStorageSizeMB
+         The following properties are adjusted to reflect reality for Managed Instances: PhysicalMemory and ProcessorCount.
+    -->
+    <version min_major='15'>
+      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#ProcessorUsage#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#HardwareGeneration#ServiceTier#ReservedStorageSizeMB#UsedStorageSizeMB#">
+          create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
+          insert #SVer exec master.dbo.xp_msver
+          insert #SVer select t.*
+          from sys.dm_os_host_info
+          CROSS APPLY (
+          VALUES
+          (1001, 'host_platform', 0, host_platform),
+          (1002, 'host_distribution', 0, host_distribution),
+          (1003, 'host_release', 0, host_release),
+          (1004, 'host_service_pack_level', 0, host_service_pack_level),
+          (1005, 'host_sku', host_sku, ''),
+          (1006, 'HardwareGeneration', '', ''),
+          (1007, 'ServiceTier', '', ''),
+          (1008, 'ReservedStorageSizeMB', '0', '0'),
+          (1009, 'UsedStorageSizeMB', '0', '0')
+          ) t(id, [name], internal_value, [value])
+        
+          -- Managed Instance-specific properties
+          if (SERVERPROPERTY('EngineEdition') = 8)
+          begin
+          DECLARE @gen4memoryPerCoreMB float = 7168.0
+          DECLARE @gen5memoryPerCoreMB float = 5223.0
+          DECLARE @physicalMemory float
+          DECLARE @virtual_core_count int
+          DECLARE @reservedStorageSize bigint
+          DECLARE @usedStorageSize decimal(18,2)
+          DECLARE @hwGeneration nvarchar(128)
+          DECLARE @serviceTier nvarchar(128)
+          SET @physicalMemory = (SELECT TOP 1 [virtual_core_count] *
+          (
+          CASE WHEN [hardware_generation] = 'Gen4' THEN @gen4memoryPerCoreMB
+          WHEN [hardware_generation] = 'Gen5' THEN @gen5memoryPerCoreMB
+          ELSE 0 END
+          )
+          FROM master.sys.server_resource_stats
+          ORDER BY start_time DESC)
+        
+          IF (@physicalMemory &lt;&gt; 0) 
+          BEGIN
+            UPDATE #SVer SET [Internal_Value] =  @physicalMemory WHERE Name = N'PhysicalMemory'
+            UPDATE #SVer SET [Value] = CONCAT( @physicalMemory, ' (',  @physicalMemory * 1024, ')') WHERE Name = N'PhysicalMemory'
+          END
+          UPDATE #SVer SET [Internal_Value] = (SELECT TOP 1 [virtual_core_count] FROM master.sys.server_resource_stats ORDER BY start_time desc) WHERE Name = N'ProcessorCount'
+          UPDATE #SVer SET [Value] = [Internal_Value] WHERE Name = N'ProcessorCount'
+
+          SELECT TOP 1
+            @hwGeneration = [hardware_generation],
+            @serviceTier =[sku],
+            @virtual_core_count = [virtual_core_count],
+            @reservedStorageSize = [reserved_storage_mb],
+            @usedStorageSize = [storage_space_used_mb]
+          FROM master.sys.server_resource_stats
+          ORDER BY [start_time] DESC
+
+          UPDATE #SVer SET [Value] = @hwGeneration WHERE Name = N'HardwareGeneration'
+          UPDATE #SVer SET [Value] = @serviceTier WHERE Name = N'ServiceTier'
+          UPDATE #SVer SET [Value] = @reservedStorageSize WHERE Name = N'ReservedStorageSizeMB'
+          UPDATE #SVer SET [Value] = @usedStorageSize WHERE Name = N'UsedStorageSizeMB'
+        end
+      </prefix>
+    </version>
+    <version min_major="8" max_major="10" >
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @Arg sysname
+        declare @Param sysname
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+        declare @n int
+
+        select @n=0
+        select @Param='dummy'
+        while(not @Param is null)
+        begin
+        select @Param=null
+        select @Arg='SqlArg'+convert(nvarchar,@n)
+
+        exec master.dbo.xp_instance_regread @HkeyLocal, @RegPathParams, @Arg, @Param OUTPUT
+        if(@Param like '-d%')
+        begin
+        select @Param=substring(@Param, 3, 255)
+        select @MasterPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
+        end
+        else if(@Param like '-l%')
+        begin
+        select @Param=substring(@Param, 3, 255)
+        select @LogPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
+        end
+        else if(@Param like '-e%')
+        begin
+        select @Param=substring(@Param, 3, 255)
+        select @ErrorLogPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
+        end
+
+        select @n=@n+1
+        end
+      </prefix>
+    </version>
+
+    <version min_major="8" max_major="10">
+      <prefix fields="#DefaultFile#">
+        declare @SmoDefaultFile nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'DefaultData', @SmoDefaultFile OUTPUT
+      </prefix>
+      <prefix fields="#DefaultLog#">
+        declare @SmoDefaultLog nvarchar(512)
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'DefaultLog', @SmoDefaultLog OUTPUT
+      </prefix>
+    </version>
+    
+    <version min_major="11">
+      <prefix fields="#ErrorLogSizeKb#">
+        declare @ErrorLogSizeKb int
+        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'ErrorLogSizeInKb', @ErrorLogSizeKb OUTPUT
+      </prefix>
+    </version>
+    <version min_major="11" max_major="13">
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLog nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+
+        select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex('\', reverse(physical_name))) from master.sys.database_files where name=N'master'
+        select @LogPath=substring(physical_name, 1, len(physical_name) - charindex('\', reverse(physical_name))) from master.sys.database_files where name=N'mastlog'
+        select @ErrorLog=cast(SERVERPROPERTY(N'errorlogfilename') as nvarchar(512))
+        select @ErrorLogPath=substring(@ErrorLog, 1, len(@ErrorLog) - charindex('\', reverse(@ErrorLog)))
+      </prefix>
+      <prefix fields="#ClusterName#ClusterQuorumType#ClusterQuorumState#">
+        declare @cluster_name nvarchar(128)
+        declare @quorum_type tinyint
+        declare @quorum_state tinyint
+        BEGIN TRY
+        SELECT @cluster_name = cluster_name,
+        @quorum_type = quorum_type,
+        @quorum_state = quorum_state
+        FROM sys.dm_hadr_cluster
+        END TRY
+        BEGIN CATCH
+        --Querying this DMV using a contained auth connection throws error 15562 (Module is untrusted)
+        --because of lack of trustworthiness by the server. This is expected so we just leave the
+        --values as default
+        IF(ERROR_NUMBER() NOT IN (297,300, 15562))
+        BEGIN
+        THROW
+        END
+        END CATCH
+      </prefix>
+    </version>
+    
+    <version min_major="14" max_major="14">
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLog nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+        declare @Slash varchar = convert(varchar, serverproperty('PathSeparator'))
+        select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where name=N'master'
+        select @LogPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where name=N'mastlog'
+        select @ErrorLog=cast(SERVERPROPERTY(N'errorlogfilename') as nvarchar(512))
+        select @ErrorLogPath=IIF(@ErrorLog IS NULL, N'', substring(@ErrorLog, 1, len(@ErrorLog) - charindex(@Slash, reverse(@ErrorLog))))
+      </prefix>
+      <prefix fields="#ClusterName#ClusterQuorumType#ClusterQuorumState#">
+        declare @cluster_name nvarchar(128)
+        declare @quorum_type tinyint
+        declare @quorum_state tinyint
+        BEGIN TRY
+        SELECT @cluster_name = cluster_name,
+        @quorum_type = quorum_type,
+        @quorum_state = quorum_state
+        FROM sys.dm_hadr_cluster
+        END TRY
+        BEGIN CATCH
+          IF(ERROR_NUMBER() NOT IN (297,300, 15562))
+        BEGIN
+        THROW
+        END
+        END CATCH
+      </prefix>
+    </version>
+
+    <version min_major="15">
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLog nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+        declare @Slash varchar = convert(varchar, serverproperty('PathSeparator'))
+        select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where file_id = 1
+        select @LogPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where file_id = 2
+        select @ErrorLog=cast(SERVERPROPERTY(N'errorlogfilename') as nvarchar(512))
+        select @ErrorLogPath=IIF(@ErrorLog IS NULL, N'', substring(@ErrorLog, 1, len(@ErrorLog) - charindex(@Slash, reverse(@ErrorLog))))
+      </prefix>
+      <prefix fields="#ClusterName#ClusterQuorumType#ClusterQuorumState#">
+        declare @cluster_name nvarchar(128)
+        declare @quorum_type tinyint
+        declare @quorum_state tinyint
+        BEGIN TRY
+        SELECT @cluster_name = cluster_name,
+        @quorum_type = quorum_type,
+        @quorum_state = quorum_state
+        FROM sys.dm_hadr_cluster
+        END TRY
+        BEGIN CATCH
+          IF(ERROR_NUMBER() NOT IN (297,300, 15562))
+        BEGIN
+        THROW
+        END
+        END CATCH
+      </prefix>
+    </version>
+      
+    <version min_major="8" max_major="14" >
+      <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#ProcessorUsage#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#">
+        drop table #SVer
+      </postfix>
+    </version>
+    <version min_major="15" >
+      <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#ProcessorUsage#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#HardwareGeneration#ServiceTier#ReservedStorageSizeMB#UsedStorageSizeMB#">
+        drop table #SVer
+      </postfix>
+      </version>
+    <version min_major="10" min_minor="50" >
+      <postfix fields="#ProcessorUsage#">
+        drop table #tempproc
+      </postfix>
+    </version>
+  </settings>
+
+  <properties>
+    <!--imported from Settings.xml-->
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='2' expression="'{1}[@Name=' + quotename({0},'''') + ']'">
+        <link_field type='local' field="Name" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+    <version min_major="7">
+      <!--imported from Settings.xml-->
+      <property name="AuditLevel" type="int"  report_type='AuditLevel'>@SmoAuditLevel</property>
+      <property name="NumberOfLogFiles" type="int">ISNULL(@NumErrorLogs, -1)</property>
+      <property name="LoginMode" type="int" report_type='ServerLoginMode'>(case when @SmoLoginMode &lt; 3 then @SmoLoginMode else 9 end)</property>
+      <property name="MailProfile" type="nvarchar" size="512">ISNULL(@SmoMailProfile,N'')</property>
+      <property name="BackupDirectory" type="nvarchar" size="512" notusage='filter,order'>@BackupDirectory</property>
+      <property name="PerfMonMode" type="int" report_type='PerfMonMode'>@SmoPerfMonMode</property>
+      <property name="InstallDataDirectory" type="nvarchar" size="512" access="Read">ISNULL(@InstallSqlDataDir,N'')</property>
+      <property name="ServiceName" type="sysname" cast='true' access="Read">@@SERVICENAME</property>
+      <!--imported from information.xml-->
+      <property name="Product" type="nvarchar" size="512" access="Read" expensive='true'>(select Value from #SVer where Name = N'ProductName')</property>
+      <property name="OSVersion" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'WindowsVersion')</property>
+      <property name="Language" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'Language')</property>
+      <property name="Platform" type="nvarchar" size="512" access="Read" expensive='true'>(select Value from #SVer where Name = N'Platform')</property>
+      <property name="PhysicalMemory" type="int" access="Read" expensive='true'>(select Internal_Value from #SVer where Name = N'PhysicalMemory')</property>
+      <property name="Processors" type="int" access="Read" expensive='true'>(select Internal_Value from #SVer where Name = N'ProcessorCount')</property>
+      <property name="ErrorLogPath" type="nvarchar" size="512" access="Read">@ErrorLogPath</property>
+      <property name="RootDirectory" type="nvarchar" size='512' access="Read">@SmoRoot</property>
+    </version>
+    <property name="VersionMajor" type="int" access="Read" expensive='true'>(@@microsoftversion / 0x1000000) &amp; 0xff</property>
+    <property name="VersionMinor" type="int" access="Read" expensive='true'>(@@microsoftversion / 0x10000) &amp; 0xff</property>
+    <property name="BuildNumber" type="int" access="Read" expensive='true'>@@microsoftversion &amp; 0xffff</property>
+    <property name="IsCaseSensitive" type="bit" access="Read" cast='true'>case when 'a' &lt;&gt; 'A' then 1 else 0 end</property>
+    <property name="MaxPrecision" type="tinyint" access="Read">@@MAX_PRECISION</property>
+
+    <version min_major='7' max_major='8'>
+      <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>case when (select password from master.dbo.syslogins where sid = 0x01) is null then 1 else 0 end</property>
+    </version>
+    <version min_major='7' cloud_min_major='12' >
+      <property name="IsFullTextInstalled" type="bit" cast='true' access="Read">FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')</property>
+    </version>
+    <version min_major='8'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="VersionString" type="sysname" access="Read">SERVERPROPERTY(N'ProductVersion')</property>
+      <property name="Edition" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'Edition')</property>
+      <property name="ProductLevel" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'ProductLevel')</property>
+      <property name="ProductUpdateLevel" type="sysname" access="Read" cast='true'>ISNULL(SERVERPROPERTY(N'ProductUpdateLevel'), N'')</property>
+      <property name="IsSingleUser" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsSingleUser')</property>
+      <property name="EngineEdition" type="int" access='Read' cast='true' report_type='Edition'>SERVERPROPERTY('EngineEdition')</property>
+      <property name="Collation" type="sysname" access="Read">convert(sysname, serverproperty(N'collation'))</property>
+    </version>
+    <version min_major='8' max_major='13'>
+      <property name="IsClustered" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsClustered')</property>
+      <property name="NetName" type="sysname" access="Read" cast = 'true'>SERVERPROPERTY(N'MachineName')</property>
+    </version>
+    <version min_major='14'>
+      <!-- Managed Instance specifics - NULLs are returned for all of these properties, unlike other box editions -->
+      <property name="IsClustered" type="bit" access="Read" cast='true'>ISNULL(SERVERPROPERTY('IsClustered'), 0)</property>
+      <property name="NetName" type="sysname" access="Read" cast = 'true'>ISNULL(SERVERPROPERTY(N'MachineName'), N'')</property>
+      <property name="ComputerNamePhysicalNetBIOS" type="sysname" access="Read">ISNULL(SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS'),N'')</property>
+      <property name="ServiceStartMode" type="int" report_type="ServiceStartMode" access="Read">ISNULL(@ServiceStartMode,2)</property>
+      <property name="BrowserStartMode" type="int" report_type="ServiceStartMode" access="Read" expensive="true">ISNULL(@BrowserStartMode,4)</property>
+    </version>
+    <version min_major='7'>
+      <property name="MasterDBLogPath" type="nvarchar" size="512" access="Read">@LogPath</property>
+      <property name="MasterDBPath" type="nvarchar" size="512" access="Read">@MasterPath</property>
+    </version>
+
+    <version min_major='7' max_major='10'>
+      <property name="DefaultFile" type="nvarchar" size="512">ISNULL(@SmoDefaultFile,N'')</property>
+      <property name="DefaultLog" type="nvarchar" size="512">ISNULL(@SmoDefaultLog,N'')</property>
+    </version>
+    <version min_major='11'>
+      <property name="DefaultFile" type="nvarchar" size="512">SERVERPROPERTY('instancedefaultdatapath')</property>
+      <property name="DefaultLog" type="nvarchar" size="512">SERVERPROPERTY('instancedefaultlogpath')</property>
+      <property name="ErrorLogSizeKb" type="int" expensive="true">ISNULL(@ErrorLogSizeKb, 0)</property>
+    </version>
+    <version min_major='8' max_major='9'>
+      <property name="TapeLoadWaitTime" type="int">@SmoTapeLoadWaitTime</property>
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="ResourceVersionString" type="sysname" access="Read">SERVERPROPERTY(N'ResourceVersion')</property>
+      <property name="ResourceLastUpdateDateTime" type="datetime" access="Read">SERVERPROPERTY(N'ResourceLastUpdateDateTime')</property>
+      <property name="CollationID" type="int" access="Read">SERVERPROPERTY(N'CollationID')</property>
+      <property name="ComparisonStyle" type="int" access="Read">SERVERPROPERTY(N'ComparisonStyle')</property>
+      <property name="SqlCharSet" type="int" report_type2="System.Int16" access="Read">SERVERPROPERTY(N'SqlCharSet')</property>
+      <property name="SqlCharSetName" type="sysname" access="Read">SERVERPROPERTY(N'SqlCharSetName')</property>
+      <property name="SqlSortOrder" type="int" report_type2="System.Int16" access="Read">SERVERPROPERTY(N'SqlSortOrder')</property>
+      <property name="SqlSortOrderName" type="sysname" access="Read">SERVERPROPERTY(N'SqlSortOrderName')</property>
+    </version>
+    <version min_major='9'>
+      <property name="BuildClrVersionString" type="sysname" access="Read">SERVERPROPERTY(N'BuildClrVersion')</property>
+      <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>null</property>
+      <!-- Setup Properties -->
+      <property name="ServiceInstanceId" type="sysname" access="Read" expensive="true">ISNULL(@ServiceInstanceId,N'')</property>
+      <property name="ServiceAccount" type="nvarchar" size="512" access="Read">ISNULL(@ServiceAccount,N'')</property>
+      <property name="NamedPipesEnabled" type="bit" cast="true" access="Read">@NamedPipesEnabled</property>
+      <property name="TcpEnabled" type="bit" cast="true" access="Read">@TcpEnabled</property>
+      <property name="InstallSharedDirectory" type="nvarchar" size="512" access="Read">ISNULL(@InstallSharedDirectory,N'')</property>
+      <property name="BrowserServiceAccount" type="nvarchar" size="512" access="Read" expensive="true">ISNULL(@BrowserServiceAccount,N'')</property>
+    </version>
+    <version min_major='9' max_major='13'>
+      <property name="ComputerNamePhysicalNetBIOS" type="sysname" access="Read">SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS')</property>
+      <property name="ServiceStartMode" type="int" report_type="ServiceStartMode" access="Read">@ServiceStartMode</property>
+      <property name="BrowserStartMode" type="int" report_type="ServiceStartMode" access="Read" expensive="true">ISNULL(@BrowserStartMode,4)</property>
+    </version>
+
+    <version min_major = '7' max_major = '7'>
+      <property name="Name" type="sysname" access="Read" cast="true">@@SERVERNAME</property>
+    </version>
+    <version min_major = "10" min_minor="50">
+      <property name="ProcessorUsage" type="int" access="Read" expensive="true">case when OBJECT_ID(N'msdb.sys.sp_getProcessorUsage',  N'P') is not null then (select top 1 value from #tempproc)/(select Internal_Value from #SVer where Name = N'ProcessorCount') else -1 end</property>
+    </version>
+    <version min_major='8' max_major='9'>
+      <property name="Name" type="sysname" cast='true'>serverproperty(N'Servername')</property>
+      <property name="InstanceName" type="sysname" access="Read" cast='true'>ISNULL(serverproperty(N'instancename'),N'')</property>
+      <property name="Status" type="int" report_type="ServerStatus" access="Read" cast='true'>0x0010</property>
+    </version>
+    <version min_major = '10'>
+      <property name="SqlDomainGroup" type="nvarchar" size="128" access="Read">ISNULL(suser_sname(sid_binary(ISNULL(@SqlGroup,N''))),N'')</property>
+      <property name="PolicyHealthState" type="int" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+        <link_multiple no='1' expression="case when 1=msdb.dbo.fn_syspolicy_is_automation_enabled() and exists (select * from msdb.dbo.syspolicy_system_health_state  where target_query_expression_with_id like '{0}%' ) then 1 else 0 end">
+          <link_field field="NType"/>
+        </link_multiple>
+      </property>
+      <property name="PhysicalMemoryUsageInKB" type="bigint" access="Read" expensive="true">(select physical_memory_in_use_kb from sys.dm_os_process_memory)</property>
+    </version>
+    <version min_major = '10'>
+      <property name="FilestreamLevel" type="int" access="Read" report_type="FileStreamEffectiveLevel">@FilestreamLevel</property>
+      <property name="FilestreamShareName" type="nvarchar" size="512" access="Read">ISNULL(@FilestreamShareName,N'')</property>
+      <property name="TapeLoadWaitTime" type="int" access="Read">-1</property>
+    </version>
+
+    <version min_major = '10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='1' expression="'{0}'">
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+    </version>
+
+    <!-- HADR Properties -->
+    <version min_major="11">
+      <property name="IsHadrEnabled" type="bit" cast="true" access="Read">SERVERPROPERTY(N'IsHadrEnabled')</property>
+      <property name="HadrManagerStatus" type="int" report_type="HadrManagerStatus" access="Read">SERVERPROPERTY(N'HADRManagerStatus')</property>
+      <property name="ClusterName" type="nvarchar" size="256" access="Read">ISNULL(@cluster_name, '')</property>
+      <property name="ClusterQuorumType" type="tinyint" access="Read" report_type="ClusterQuorumType">ISNULL(@quorum_type, 4)</property>
+      <property name="ClusterQuorumState" type="tinyint" access="Read" report_type="ClusterQuorumState">ISNULL(@quorum_state, 3)</property>
+      <property name="ServiceAccountSid" type="varbinary" size = "85" read_only_after_creation="true">SUSER_SID(@ServiceAccount, 0)</property>
+    </version>
+
+    <!-- Polybase properties -->
+    <version min_major='13'>
+      <property name="IsPolyBaseInstalled" type="bit" cast='true' access="Read">SERVERPROPERTY('IsPolyBaseInstalled')</property>
+    </version>
+
+    <property name="IsXTPSupported" type="bit" cast="true" access="Read" expensive='true'>ISNULL(SERVERPROPERTY(N'IsXTPSupported'), 0)</property>
+
+    <version min_major="7" max_major="13" cloud_min_major="11" datawarehouse_enabled='true'>
+      <property name="HostPlatform" type="nvarchar" size="512" access="Read">N'Windows'</property>
+    </version>
+
+    <version min_major='14'>
+      <property name="HostPlatform" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_platform')</property>
+      <property name="HostDistribution" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_distribution')</property>
+      <property name="HostRelease" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_release')</property>
+      <property name="HostServicePackLevel" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_service_pack_level')</property>
+      <property name="HostSku" type="int" access="Read" expensive='true'>( select Internal_Value from #SVer where Name =N'host_sku')</property>
+    </version>
+
+    <!-- Managed-instance specific properties -->
+    <version min_major='15'>
+     <property name="HardwareGeneration" type="nvarchar" size="128" access="Read" expensive='true'>( select Value from #SVer where Name = N'HardwareGeneration')</property>
+     <property name="ServiceTier" type="nvarchar" size="128" access="Read" expensive='true'>( select Value from #SVer where Name = N'ServiceTier')</property>
+     <property name="ReservedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'ReservedStorageSizeMB' )</property>
+     <property name="UsedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'UsedStorageSizeMB' )</property>
+    </version>
+  </properties>
+</EnumObject>

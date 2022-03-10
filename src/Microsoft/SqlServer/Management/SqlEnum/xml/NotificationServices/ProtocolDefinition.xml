@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='ProtocolDefinition' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_protocol_definitions" alias="dpd" />
+		<prefix>
+CREATE TABLE #tmp_protocol_definitions(
+    ProtocolName nvarchar(255),
+    ClassName nvarchar(255),
+    AssemblyName nvarchar(260)
+)
+INSERT #tmp_protocol_definitions EXEC [SchemaPrefix].NSGetProtocols 0
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_protocol_definitions
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">dpd.ProtocolName</property>
+        <property name="ClassName" type="nvarchar" size="255">dpd.ClassName</property>
+        <property name="AssemblyName" type="nvarchar" size="260">dpd.AssemblyName</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="Action" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.server_event_session_actions' alias='action'>event.event_session_id = action.event_session_id AND event.event_id = action.event_id</property_link>
+    
+    <!--action share names with other objects in dm_xe_objects, so here we need to add a filter on object_type-->
+    <property_link join='sys.dm_xe_objects' alias='object'>action.name = object.name AND object.object_type='action'</property_link>
+    <property_link join='sys.dm_xe_packages' alias='package'>action.module = package.module_guid AND action.package = package.name AND package.guid = object.package_guid</property_link>
+
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />    
+    <property name='Name' type='nvarchar' size='128'>action.package + '.' + action.name</property>
+    <property name='ModuleID' type='nvarchar' size='128'>action.module</property>
+    <property name='PackageName' type='nvarchar' size='60'>action.package</property>
+    <property name='Description' type='nvarchar' size='512'>object.description</property>
+  </properties>
+</EnumObject>

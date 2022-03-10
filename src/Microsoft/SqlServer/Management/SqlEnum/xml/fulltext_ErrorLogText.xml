@@ -1,0 +1,109 @@
+<?xml version="1.0" ?>
+<EnumObject type="ErrorLogText" impl_type="SqlObject" min_major='7' >
+	<settings>
+		<parent_link>
+			<link parent='ArchiveNo' local='ArchiveNo' />
+			<link parent='CatalogId' local='CatalogId' />
+		</parent_link>
+		<request_parent_select>
+			<field name='ArchiveNo' />
+			<field name='CatalogId' />
+		</request_parent_select>
+		<property_link table="#err_fulltext_text_tmp ert" />
+        <prefix>
+            create table #err_fulltext_text_tmp(Text nvarchar(4000), ArchiveNo int null, ctlgid int null, LogDate datetime null, ProcessInfo nvarchar(100) null)
+        </prefix>
+        <version min_major="7" max_major="8">
+            <prefix>
+                declare @text_offset int
+                declare @process_info_length int
+
+                set @text_offset = 34
+                set @process_info_length = 10
+            </prefix>
+            <prefix>
+                <link_multiple no='1' expression="
+create table #err_fulltext_text_tmp2(id int IDENTITY(0, 1), Text nvarchar(max), ContinuationRow bit, ArchiveNo int null, ctlgid int null)
+declare @ArchiveNo int
+declare @cont_row int
+set @dbid = db_id()
+declare crs cursor  local fast_forward
+	for ( {0} ) 
+for read only 
+open crs 
+fetch crs into @ArchiveNo, @ctlgid
+while @@fetch_status &gt;= 0 
+begin 
+		insert #err_fulltext_text_tmp2 (Text, ContinuationRow) exec master.dbo.xp_readerrorlog @ArchiveNo, 3, @dbid, @ctlgid
+		update #err_fulltext_text_tmp2 set ArchiveNo = @ArchiveNo, ctlgid = @ctlgid where ctlgid is null
+		fetch crs into @ArchiveNo, @ctlgid
+end 
+close crs
+deallocate crs
+
+declare @off int
+select @off = 1
+
+while exists ( select ContinuationRow from #err_fulltext_text_tmp2 where ContinuationRow = 1 )
+begin
+	update #err_fulltext_text_tmp2 set Text = Text + 
+		isnull((select t2.Text from #err_fulltext_text_tmp2 t2 where t2.id = #err_fulltext_text_tmp2.id + @off and t2.ContinuationRow = 1), '') where ContinuationRow = 0
+	delete from #err_fulltext_text_tmp2 where ContinuationRow = 1 and @off &gt;= 
+		id - ( select  max(t2.id) from #err_fulltext_text_tmp2 t2 where t2.ContinuationRow = 0 and t2.id &lt; #err_fulltext_text_tmp2.id)
+	set @off = @off + 1
+end
+	
+insert #err_fulltext_text_tmp 
+	select 
+		Text = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-2][0-9]-[0-3][0-9] [0-6][0-9]:[0-6][0-9]:[0-9][0-9]%'
+				then /*structured row: remove date/spid part */ SUBSTRING(Text, @text_offset, 4000) else /*non structured row*/ Text end,
+		ArchiveNo, 
+		ctlgid, 
+		LogDate = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-2][0-9]-[0-3][0-9] [0-6][0-9]:[0-6][0-9]:[0-9][0-9]%'
+				then /*structured row: get date part */ CONVERT(datetime, LEFT(Text, 23), 121) else /*non structured row*/ null end,
+		ProcessInfo = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-2][0-9]-[0-3][0-9] [0-6][0-9]:[0-6][0-9]:[0-9][0-9]%'
+				then /*structured row: get spid part */ rtrim(SUBSTRING(Text, 24, @process_info_length)) else /*non structured row*/ null end
+	from #err_fulltext_text_tmp2 where ContinuationRow = 0
+    
+drop table #err_fulltext_text_tmp2">
+                    <link_field field="ParentSelect" />
+                </link_multiple>
+            </prefix>
+        </version>
+        <version min_major="9" >
+            <prefix>
+                <link_multiple no='1' expression="
+declare @ArchiveNo int
+declare @cont_row int
+set @dbid = db_id()
+declare crs cursor  local fast_forward
+	for ( {0} ) 
+for read only 
+open crs 
+fetch crs into @ArchiveNo, @ctlgid
+while @@fetch_status &gt;= 0 
+begin 
+		insert #err_fulltext_text_tmp (LogDate, ProcessInfo, Text) exec master.dbo.xp_readerrorlog @ArchiveNo, 3, @dbid, @ctlgid
+		update #err_fulltext_text_tmp set ArchiveNo = @ArchiveNo, ctlgid = @ctlgid where ctlgid is null
+		fetch crs into @ArchiveNo, @ctlgid
+end 
+close crs
+deallocate crs
+">
+                    <link_field field="ParentSelect" />
+                </link_multiple>
+            </prefix>
+        </version>
+        <postfix>
+drop table #err_fulltext_text_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="LogDate" type="datetime">ert.LogDate</property>
+		<property name="ProcessInfo" type="nvarchar" size = '100'>ert.ProcessInfo</property>
+		<property name="Text" type="nvarchar" size='4000'>ert.Text</property>
+		
+		<property name="ArchiveNo" type="int" hidden='true'>ert.ArchiveNo</property>
+		<property name="CatalogId" type="int" hidden='true'>ert.ctlgid</property>		
+	</properties>
+</EnumObject>

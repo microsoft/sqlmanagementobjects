@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<EnumObject type="View" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <settings>
+        <version min_major='7' max_major='8'>
+            <property_link table="dbo.sysobjects AS v">v.type = &lt;msparam&gt;V&lt;/msparam&gt;</property_link>
+            <property_link fields='#HasClusteredIndex#HasPrimaryClusteredIndex#' left_join="dbo.sysindexes AS idx">idx.id = v.id and idx.indid &lt; 2</property_link>
+        </version>
+        <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+            <property_link table="sys.all_views AS v">v.type = &lt;msparam&gt;V&lt;/msparam&gt;</property_link>
+            <property_link fields='#HasClusteredIndex#HasPrimaryClusteredIndex#' left_join="sys.indexes AS idx">idx.object_id = v.object_id and (idx.index_id &lt; &lt;msparam&gt;2&lt;/msparam&gt;)</property_link>
+        </version>
+       <version datawarehouse_enabled='true'>
+         <property_link fields='#DwMaterializedViewDistribution#' left_join="sys.pdw_materialized_view_distribution_properties as tmvp">tmvp.object_id = v.object_id</property_link>
+       </version>
+    </settings>
+    <properties>
+        <include file='inc_object.xml' alias='v' />
+        <include file='inc_system_table_view_sp_udf.xml' alias='v' for="#IsSystemObject#" />
+        <include file='sql_module_link.xml' alias='v' 
+            for='#AnsiNullsStatus#QuotedIdentifierStatus#IsSchemaBound#IsEncrypted#Text#BodyStartIndex#'/>
+        <include file='inc_objprop_table_view.xml' />
+
+        <property name="HasColumnSpecification" type='bit' expensive='true' access='Read' cast='true' usage='request'>0</property>  
+        
+        <version min_major='7' max_major='8'>
+          <property name="HasFullTextCatalog" type="bit" hidden='true' cast='true'>OBJECTPROPERTY(v.id, 'TableFullTextCatalogId')</property>
+          <!-- extended properties support -->
+          <property name="ObjectTypeName" type="sysname" hidden="true">N'VIEW'</property>
+          <property name="HasNonClusteredIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from dbo.sysindexes ind where ind.id = v.id and ind.indid &gt; 1 and 1 != INDEXPROPERTY(ind.id,ind.name,N'IsStatistics') and 1 != INDEXPROPERTY(ind.id,ind.name,N'IsHypothetical')), 0)</property>
+          <property name="HasClusteredIndex" type="bit" access='Read' cast='true'>CASE idx.indid WHEN  1 THEN 1 ELSE 0 END</property>
+          <property name="HasPrimaryClusteredIndex" type="bit" access='Read' cast='true'>case idx.indid WHEN 1 THEN case when (0 != idx.status&amp;0x800) then 1 else 0 end else 0 end</property>
+        </version>  
+        <version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+            <property name="ReturnsViewMetadata" type="bit" mode="design">v.has_opaque_metadata</property>
+            <property name="HasNonClusteredIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.indexes ind where ind.object_id = v.object_id and ind.type &gt; 1 and ind.is_hypothetical = 0 ), 0)</property>
+            <property name="HasClusteredIndex" type="bit" access='Read' cast='true'>CASE idx.index_id WHEN 1 THEN 1 ELSE 0 END</property>
+            <property name="HasPrimaryClusteredIndex" type="bit" access='Read' cast='true'>case idx.index_id when 1 then case when (idx.is_primary_key + 2*idx.is_unique_constraint = 1) then 1 else 0 end else 0 end</property>
+        </version>
+        <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+        <property name="ExtPropClassforColumn" type="int" hidden='true'>1</property>
+        <property name="ExtPropMajorIDforColumn" type="int" hidden='true'>v.object_id</property>
+        </version>
+        <property name="ThreePartName" type="nvarchar" size='600' hidden='true'>
+            <link_multiple no='3' expression="quotename({0}, ']')+'.'+quotename({1}, ']')+'.'+quotename({2}, ']')">
+                <link_field type='parent' field="Name" />
+                <link_field type='local' field="Schema" />
+                <link_field type='local' field="Name" />
+            </link_multiple>
+        </property>
+        <!-- SQL DW materialized view distribution-->
+        <version datawarehouse_enabled='true'>
+          <property name="DwMaterializedViewDistribution" type="tinyint" report_type="DwViewDistributionType">ISNULL(tmvp.distribution_policy, 0)</property>
+        </version>
+        <version min_major='10'>
+            <include file='inc_policy_health_state.xml'/>
+        </version>
+        <version min_major='16' cloud_min_major='12'>
+          <property name="LedgerViewType" type="tinyint" read_only_after_creation="true" cast ="true" report_type="LedgerViewType">ISNULL(v.ledger_view_type, 0)</property>
+        </version> 
+  </properties>
+</EnumObject>

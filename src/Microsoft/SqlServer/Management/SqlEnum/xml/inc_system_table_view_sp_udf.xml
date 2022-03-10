@@ -1,0 +1,39 @@
+<?xml version="1.0"  encoding="us-ascii" ?>
+<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='7'  cloud_min_major='12' datawarehouse_enabled='true'>
+  <settings>
+   </settings>
+  <properties>
+    <version min_major='7' max_major='8'>
+      <property name="IsSystemObject" type="bit" access='Read' cast='true'>
+                CASE WHEN (OBJECTPROPERTY({0}.id, N'IsMSShipped')=1) THEN 1 WHEN 1 = OBJECTPROPERTY({0}.id, N'IsSystemTable') THEN 1 ELSE 0 END
+            </property>
+    </version>
+    <version min_major='9' cloud_min_major='12'>
+      <property name="IsSystemObject" type="bit" access='Read' cast = 'true'>
+ case 
+    when {0}.is_ms_shipped = 1 then 1
+    when (
+        select 
+            major_id 
+        from 
+            sys.extended_properties 
+        where 
+            major_id = {0}.object_id and 
+            minor_id = 0 and 
+            class = 1 and 
+            name = N'microsoft_database_tools_support') 
+        is not null then 1
+    else 0
+end          
+            </property>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property name="IsSystemObject" type="bit" access='Read' cast = 'true'>
+        case
+          when {0}.is_ms_shipped = 1 then 1
+          else 0
+        end
+      </property>
+    </version>
+  </properties>
+</EnumObject>

@@ -1,0 +1,24 @@
+<?xml version='1.0' ?>
+<EnumObject type='backupfile' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent='ID' local='BackupSetId'/>
+		</parent_link>
+		<property_link table='msdb.dbo.backupfile bkpf'/>
+	</settings>
+	<properties>
+		<property name='BackupSetId' type='int' hidden='true'>bkpf.backup_set_id</property>
+		<property name='FirstFamilyNumber' type='tinyint'>bkpf.first_family_number</property>
+		<property name='FirstMediaNumber' type='smallint'>bkpf.first_media_number</property>
+		<property name='FileGroupName' type='nvarchar' size='128'>bkpf.filegroup_name</property>
+		<property name='PageSize' type='int'>bkpf.page_size</property>
+		<property name='FileNumber' type='numeric' size='9'>bkpf.file_number</property>
+		<property name='BackedUpPageCount' type='numeric' size='9'>bkpf.backed_up_page_count</property>
+		<property name='FileType' type='char' size='1'>bkpf.file_type</property>
+		<property name='SourceFileBlockSize' type='numeric' size='9'>bkpf.source_file_block_size</property>
+		<property name='FileSize' type='numeric' size='13'>bkpf.file_size</property>
+		<property name='LogicalName' type='nvarchar' size='128'>bkpf.logical_name</property>
+		<property name='PhysicalDrive' type='varchar' size='260'>bkpf.physical_drive</property>
+		<property name='PhysicalName' type='varchar' size='260'>bkpf.physical_name</property>
+	</properties>
+</EnumObject>

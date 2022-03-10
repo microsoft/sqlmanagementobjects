@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.ServiceBrokerEnum</RootNamespace>
+    <ClsCompliant>true</ClsCompliant>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="xml\BrokerPriority.xml">
+      <LogicalName>BrokerPriority.xml</LogicalName>
+      <Link>xml\BrokerPriority.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\BrokerService.xml">
+      <LogicalName>BrokerService.xml</LogicalName>
+      <Link>xml\BrokerService.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_ext_prop.xml">
+      <LogicalName>inc_ext_prop.xml</LogicalName>
+      <Link>xml\inc_ext_prop.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_policy_health_state.xml">
+      <LogicalName>inc_policy_health_state.xml</LogicalName>
+      <Link>xml\inc_policy_health_state.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_urn.xml">
+      <LogicalName>inc_urn.xml</LogicalName>
+      <Link>xml\inc_urn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_urn_schema.xml">
+      <LogicalName>inc_urn_schema.xml</LogicalName>
+      <Link>xml\inc_urn_schema.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\MessageType.xml">
+      <LogicalName>MessageType.xml</LogicalName>
+      <Link>xml\MessageType.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\MessageTypeMapping.xml">
+      <LogicalName>MessageTypeMapping.xml</LogicalName>
+      <Link>xml\MessageTypeMapping.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\RemoteServiceBinding.xml">
+      <LogicalName>RemoteServiceBinding.xml</LogicalName>
+      <Link>xml\RemoteServiceBinding.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ServiceBroker.xml">
+      <LogicalName>ServiceBroker.xml</LogicalName>
+      <Link>xml\ServiceBroker.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ServiceContract.xml">
+      <LogicalName>ServiceContract.xml</LogicalName>
+      <Link>xml\ServiceContract.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ServiceContractMapping.xml">
+      <LogicalName>ServiceContractMapping.xml</LogicalName>
+      <Link>xml\ServiceContractMapping.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ServiceQueues.xml">
+      <LogicalName>ServiceQueues.xml</LogicalName>
+      <Link>xml\ServiceQueues.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ServiceRoute.xml">
+      <LogicalName>ServiceRoute.xml</LogicalName>
+      <Link>xml\ServiceRoute.xml</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\SqlEnum\Microsoft.SqlServer.SqlEnum.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <PackageReference Include="System.Security.Permissions"  />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,41 @@
+<?xml version='1.0' ?>
+<EnumObject type='sysjobschedules' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link table='msdb.dbo.sysjobschedules sjs' />
+		</version>
+		<version min_major='9'>
+			<property_link table='msdb.dbo.sysschedules sjs' />
+		</version>
+		<post_process fields='#ActiveStartDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDate'
+			triggered_fields='#ActiveStartDateInt#' />
+		<post_process fields='#ActiveEndDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDate'
+			triggered_fields='#ActiveEndDateInt#' />
+		<post_process fields='#ActiveStartTimeOfDay#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateTime'
+			triggered_fields='#ActiveStartTimeOfDayInt#' />
+		<post_process fields='#ActiveEndTimeOfDay#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateTime'
+			triggered_fields='#ActiveEndTimeOfDayInt#' />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>sjs.name</property>
+		<property name='ID' type='int'>sjs.schedule_id</property>
+		<property name='DateCreated' type='datetime' access='Read'>sjs.date_created</property>
+		<property name='IsEnabled' type='bit'>convert(bit,sjs.enabled)</property>
+		<property name='FrequencyTypes' type='int' report_type='Agent.FrequencyTypes'>sjs.freq_type</property>
+		<property name='FrequencyInterval' type='int'>sjs.freq_interval</property>
+		<property name='FrequencySubDayTypes' type='int' report_type='Agent.FrequencySubDayTypes'>sjs.freq_subday_type</property>
+		<property name='FrequencySubDayInterval' type='int'>sjs.freq_subday_interval</property>
+		<property name='FrequencyRelativeIntervals' type='int' report_type="Agent.FrequencyRelativeIntervals">sjs.freq_relative_interval</property>
+		<property name='FrequencyRecurrenceFactor' type='int'>sjs.freq_recurrence_factor</property>
+		<property name='ActiveStartDateInt' type='int' hidden='true'>sjs.active_start_date</property>
+		<property name='ActiveStartDate' type='datetime'>cast(null as datetime)</property>
+		<property name='ActiveStartTimeOfDayInt' type='int' hidden='true'>sjs.active_start_time</property>
+		<property name="ActiveStartTimeOfDay" type="int" report_type2='System.TimeSpan'>0</property>
+		<property name='ActiveEndDateInt' type='int' hidden='true'>sjs.active_end_date</property>
+		<property name='ActiveEndDate' type='datetime'>cast(null as datetime)</property>
+		<property name='ActiveEndTimeOfDayInt' type='int' hidden='true'>sjs.active_end_time</property>
+		<property name="ActiveEndTimeOfDay" type="int" report_type2='System.TimeSpan'>0</property>
+		<property name='JobCount' type='int' expensive='true' access='Read'>(SELECT COUNT(*) FROM msdb.dbo.sysjobschedules as js WHERE (js.schedule_id = sjs.schedule_id))</property>
+	</properties>
+</EnumObject>

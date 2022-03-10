@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_object" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings/>
+	<properties>
+		<include file='inc_urn.xml' />
+		<include alias = 'cstr' file='inc_named_object.xml' for='#Name#ID#CreateDate#DateLastModified#'/>
+		<version min_major='7' max_major='8'>
+			<property name="IsSystemNamed" type="bit" cast='true' access='Read'>cstr.status &amp; 4</property>
+			<property name="IsChecked" type="bit" cast='true' read_only_after_creation="true" mode="design">1 - ISNULL(OBJECTPROPERTY(cstr.id, N'CnstIsNotTrusted'),0)</property>
+			<property name="IsEnabled" type="bit" cast='true' mode="design">1 - ISNULL(OBJECTPROPERTY(cstr.id, N'CnstIsDisabled'),0)</property>
+			<property name="NotForReplication"
+			 type="bit" cast='true' read_only_after_creation="true" mode="deploy">ISNULL(OBJECTPROPERTY(cstr.id, N'CnstIsNotRepl'),0)</property>
+		</version>
+
+		<!-- extended properties support-->		
+		<version min_major='8' max_major='8'>
+			<property name="ObjectTypeName" type="sysname" hidden='true'>N'CONSTRAINT'</property>
+		</version>
+
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="IsSystemNamed" type="bit" cast='true' access='Read'>cstr.is_system_named</property>
+			<property name="IsChecked" type="bit" read_only_after_creation="true" mode="design">~cstr.is_not_trusted</property>
+			<property name="IsEnabled" type="bit" mode="design">~cstr.is_disabled</property>
+		</version>
+		<version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="NotForReplication" type="bit" read_only_after_creation="true" mode="deploy">cstr.is_not_for_replication</property>
+		</version>
+		<property name="ParentNumber" type='smallint' hidden='true'>0</property>		
+	</properties>
+</EnumObject>

@@ -1,0 +1,19 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Import this props file to take dependencies on the proper version of Microsoft.Data.SqlClient and its upstream dependencies -->
+  <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj' and '$(UseMicrosoftData)' == 'true'">
+    <PackageReference Include="Azure.Core" />
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Microsoft.Identity.Client" />
+    <PackageReference Include="System.Buffers" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource"/>
+    <PackageReference Include="System.Memory" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj'  and '$(GacVersion)' != 'true'" >
+    <PackageReference Include="System.ValueTuple" />
+  </ItemGroup>
+  <PropertyGroup>
+     <SqlClientReferenceImported>true</SqlClientReferenceImported>
+  </PropertyGroup>
+</Project>

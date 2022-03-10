@@ -1,0 +1,37 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);netstandard2.0;netcoreapp3.1</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Label="GAC build settings" Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
+      <STracePackageVersion>150.1600.82</STracePackageVersion>
+	  <!--Note that STRACE and $(UseStrace) are currently not defined as they add a dependency to SqlTDiagm for Microsoft.SqlServer.Smo 
+	  which didn't previously exist, and breaks some tests in dsmaindev.
+	  If we can avoid adding that dependency back altogether, it'd be great.
+	  -->
+      <DefineConstants>$(DefineConstants);NATIVEBATCHPARSER</DefineConstants> 
+  </PropertyGroup>
+  <!--
+    Used for projects under this directory which have strings to localize.
+    Enabling localization is done centrally in 'src\Directory.Build.targets' for projects which have strings as .strings file.
+    Some projects have strings as .resx file (without using .strings file), in such a case, localization should be enabled in the project file itself.
+    Refer to the SMO loc wiki or generic MSBuild+Retail loc wiki https://aka.ms/retailloc to understand the meaning of each element.
+  -->
+  <PropertyGroup>
+    <PostBuildLocalization>true</PostBuildLocalization>
+    <!-- This metadata resolves to de;es;fr;it;ja;ko;pt-BR;ru;zh-Hans;zh-Hant. -->
+    <LanguageSet>AzureKatal_Languages</LanguageSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <LocalizeFile Include="$(TargetPath)">
+      <LclFile>$(EnlistmentRoot)\intl\lcl\{Lang}\%(Filename)%(Extension).lcl</LclFile>
+      <LciFile Condition="Exists('$(EnlistmentRoot)\intl\lci\%(Filename)%(Extension).lci')">$(EnlistmentRoot)\intl\lci\%(Filename)%(Extension).lci</LciFile>
+      <LssFiles>$(EnlistmentRoot)\intl\lss\P211SubparserExclusion.lss</LssFiles>
+      <CopyOption>LangIDOnPath</CopyOption>
+      <OutputPath>$(TargetDir)</OutputPath>
+    </LocalizeFile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

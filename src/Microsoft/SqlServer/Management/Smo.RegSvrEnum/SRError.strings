@@ -1,0 +1,68 @@
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in parameters,
+# which are identified with the .NET {x} format (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+
+#
+# LocStudio comments description:
+#
+
+; For localizers and UE (These comments will be seen in LocStudio)
+# For internal use (These comments will not be seen in LocStudio)
+
+# Comments should be added before the string. 
+
+# When the string resource file is complied the tool will read these comments 
+# and push the comment using the <comment> tag into the resx file.  
+# LocStudio parser looks in the resx file for the comment tag to load comments 
+# into the instruction field of the database. 
+# 
+# For LocStudio to parse the comments the resx name must match the .resources 
+# name in the manifest, so if you rename the namespace you need to change the 
+# name of the project as well.  After you have done this you will need to make a 
+# single character change to the string file and save, so that the SR.String cs 
+# file has the correct namespace embedded in it. 
+#
+
+[strings]
+
+# The following three strings are samples. You may delete them
+
+NotSaveRegisteredServers = Could not save Registered Server information.
+RecursiveMove = Cannot move node into one of its children.
+ConnectionInfoTypeIncorrect = ConnectionInfo is an incorrect type. Expecting RegSvrConnectionInfo.
+ServerTypeNotSpecified = @ServerType must be specified.
+ServerTypeFilterInvalid = Invalid @ServerType filter value.
+ServerTypeMustBeGuid = @ServerType must be a GUID value.
+InvalidParentResultType = Internal Enumerator Error: Invalid parent ResultType.
+ArrayDimensionInvalid = Must be only 1 dimension.
+ArraySizeError = Not enough space in the destination array.
+
+
+# This message has two arguments, so it's accessor is a 
+# function rather than a property, SR.FileOpenError( filename, description )
+
+; Error message displayed when the app can't open a file
+PathNotSupported(path) = The path {0} is not supported.
+DirectoryNotFound(directory) = Could not create path/directory: {0}
+AccessDenied(path) = Access denied for file: {0}
+
+ErrCannotHaveSiblingsWithSameName = Cannot have sibling nodes with the same friendly name.
+ErrCannotMoveToSelf = Cannot move node into itself.
+ErrUnableToExport(string fileName) = Unable to export into {0}.
+
+SqlServerTypeNotFound(string typeGuid) = SqlServer Type '{0}' not found.
+PathFilterInvalid(string pathNode) = Node '{0}' in the @Path filter is invalid.
+RegSvrDatafileInvalid(string filePath) = Registered Servers application datafile '{0}' has an incorrect format or is corrupted.
+
+# you may optionally specify a datatype for the arguments
+
+UniqueRegisteredNamePattern(int copyNum, String oldName) = Copy #{0} of {1}
+CryptProtectDataWin32Error(int err) = CryptProtectData: Win32 error:{0}
+CryptUnprotectDataWin32Error(int err) = CryptUnprotectData: Win32 error:{0}

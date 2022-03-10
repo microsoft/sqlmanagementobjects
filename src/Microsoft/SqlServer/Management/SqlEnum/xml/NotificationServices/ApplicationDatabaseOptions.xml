@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+<EnumObject type='AppDatabaseOptions' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table='#tmp_AppDatabaseOptions' alias='ado'/>
+		<prefix>
+CREATE TABLE #tmp_AppDatabaseOptions (
+    SystemName nvarchar(255),
+    DefaultFileGroup nvarchar(128),
+    CollationName nvarchar(255)
+)
+INSERT INTO #tmp_AppDatabaseOptions EXEC [SchemaPrefix].NSGetDatabaseOptions
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_AppDatabaseOptions
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '255'>ado.SystemName</property>
+		<property name='DefaultFileGroup' type='nvarchar' size = '128'>ado.DefaultFileGroup</property>
+		<property name='CollationName' type='nvarchar' size = '255'>ado.CollationName</property>
+	</properties>
+</EnumObject>

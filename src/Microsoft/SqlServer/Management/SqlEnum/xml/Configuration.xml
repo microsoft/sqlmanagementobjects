@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<EnumObject type="Configuration" impl_type="SqlObject" min_major='7'  cloud_min_major='12'>
+  <settings>
+	<version min_major='7' 	max_major = '8'>
+		<property_link table="master.dbo.syscurconfigs" alias ="cfg"/>
+		<property_link join="master.dbo.spt_values" alias ="v">v.type = 'C  ' and not cfg.status is null and v.number = cfg.config	</property_link>
+		<property_link fields="#ConfigValue#" left_join="master.dbo.sysconfigures ucfg">ucfg.config = cfg.config</property_link>
+	</version>
+	<version min_major='9'  cloud_min_major='12'>
+		<property_link table="sys.configurations" alias= "cfg"/>
+	</version>
+</settings>
+
+<properties>
+	<version min_major='7' 	max_major = '8'>
+		<property name="Name" type="nvarchar" size="35" access="Read">v.name</property>
+		<property name="Number" type="int" access="Read">v.number</property>
+		<property name="Minimum" type="int" access="Read">v.low</property>
+		<property name="Maximum" type="int" access="Read">v.high</property>
+		<property name="Dynamic" type="bit" access="Read" cast='true'>cfg.status &amp; 1</property>
+		<property name="Advanced" type="bit" access="Read" cast='true'>cfg.status &amp; 2</property>
+		<property name="ConfigValue" type="int" access="Read">ucfg.value</property>
+		<property name="RunValue" type="int" access="Read">cfg.value</property>
+		<property name="Description" type="nvarchar" size='510' access="Read">cfg.comment</property>
+	</version>
+	<version min_major='9'  cloud_min_major='12'>
+		<property name="Name" type="nvarchar" size="35" access="Read">cfg.name</property>
+		<property name="Number" type="int" access="Read">cfg.configuration_id</property>
+		<property name="Minimum" type="int" access="Read">cfg.minimum</property>
+		<property name="Maximum" type="int" access="Read">cfg.maximum</property>
+		<property name="Dynamic" type="bit" access="Read">cfg.is_dynamic</property>
+		<property name="Advanced" type="bit" access="Read">cfg.is_advanced</property>
+		<property name="ConfigValue" type="int" access="Read">cfg.value</property>
+		<property name="RunValue" type="int" access="Read">cfg.value_in_use</property>
+		<property name="Description" type="nvarchar" size='510' access="Read">cfg.description</property>	
+	</version>
+  </properties>
+</EnumObject>
