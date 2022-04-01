@@ -7024,7 +7024,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal static string FormatSqlVariant(object sqlVariant)
         {
-            if (sqlVariant == null)
+            if (sqlVariant == null || DBNull.Value.Equals(sqlVariant))
             {
                 return "NULL";
             }
