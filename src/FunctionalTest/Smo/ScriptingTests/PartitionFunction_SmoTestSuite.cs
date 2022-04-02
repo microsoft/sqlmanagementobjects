@@ -6,9 +6,9 @@ using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using _SMO = Microsoft.SqlServer.Management.Smo;
-
-
+using Assert = NUnit.Framework.Assert;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -71,10 +71,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             ExecuteFromDbPool(db =>
             {
                 // Create a Partition Function using SMO
-                var partitionFunction = new _SMO.PartitionFunction(db, "PF_NULL_RANGE_TEST");
-                partitionFunction.RangeType = _SMO.RangeType.Left;
+                var partitionFunction = new _SMO.PartitionFunction(db, "PF_NULL_RANGE_TEST")
+                {
+                    RangeType = _SMO.RangeType.Left,
+                    RangeValues = new object[] { DBNull.Value, 10, 100 }
+                };
                 partitionFunction.PartitionFunctionParameters.Add(new _SMO.PartitionFunctionParameter(partitionFunction, _SMO.DataType.Int));
-                partitionFunction.RangeValues = new object[] { DBNull.Value, 10, 100 };
                 partitionFunction.Create();
 
                 var scripter = new _SMO.Scripter(db.Parent);
@@ -82,9 +84,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 scripter.Options.EnforceScriptingOptions = true;
                 scripter.Options.ContinueScriptingOnError = true;
                 var scripts = scripter.EnumScript(partitionFunction).ToArray();
-                Assert.AreEqual(scripts.Length, 1);
-                var result = scripts[0];
-                Assert.IsTrue(result.Contains("VALUES (NULL, 10, 100)"));
+                Assert.That(scripts.Length, Is.EqualTo(1), "Unexpected script count. Expected a single script.");
+                Assert.IsTrue(scripts[0].Contains("VALUES (NULL, 10, 100)"));
             });
         }
 
