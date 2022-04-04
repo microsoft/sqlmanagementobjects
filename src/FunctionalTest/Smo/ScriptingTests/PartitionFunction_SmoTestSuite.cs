@@ -85,7 +85,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 scripter.Options.ContinueScriptingOnError = true;
                 var scripts = scripter.EnumScript(partitionFunction).ToArray();
                 Assert.That(scripts.Length, Is.EqualTo(1), "Unexpected script count. Expected a single script.");
-                Assert.IsTrue(scripts[0].Contains("VALUES (NULL, 10, 100)"));
+                Assert.That(scripts[0], Contains.Substring("VALUES (NULL, 10, 100)"), "Invalid correct script for null ranged function");
             });
         }
 
