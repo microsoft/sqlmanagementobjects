@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft.
 // Licensed under the MIT license.
 
+using System;
+using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using _SMO = Microsoft.SqlServer.Management.Smo;
-
-
+using Assert = NUnit.Framework.Assert;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -58,6 +60,33 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     VerifySmoObjectDropIfExists(pf, database);
                 });
+        }
+
+        /// <summary>
+        /// Tests create script of a partition function handling DBNull range values correctly
+        /// </summary>
+        [TestMethod]
+        public void ScriptCreateWithDbNullRangeCorrectly_PartitionFunction()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                // Create a Partition Function using SMO
+                var partitionFunction = new _SMO.PartitionFunction(db, "PF_NULL_RANGE_TEST")
+                {
+                    RangeType = _SMO.RangeType.Left,
+                    RangeValues = new object[] { DBNull.Value, 10, 100 }
+                };
+                partitionFunction.PartitionFunctionParameters.Add(new _SMO.PartitionFunctionParameter(partitionFunction, _SMO.DataType.Int));
+                partitionFunction.Create();
+
+                var scripter = new _SMO.Scripter(db.Parent);
+                scripter.Options.ScriptForCreateOrAlter = true;
+                scripter.Options.EnforceScriptingOptions = true;
+                scripter.Options.ContinueScriptingOnError = true;
+                var scripts = scripter.EnumScript(partitionFunction).ToArray();
+                Assert.That(scripts.Length, Is.EqualTo(1), "Unexpected script count. Expected a single script.");
+                Assert.That(scripts[0], Contains.Substring("VALUES (NULL, 10, 100)"), "Invalid correct script for null ranged function");
+            });
         }
 
         #endregion
