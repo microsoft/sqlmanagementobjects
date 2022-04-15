@@ -826,7 +826,9 @@ namespace Microsoft.SqlServer.Management.Smo
                             "FunctionType",
                             "IsSchemaBound",
                             "IsNativelyCompiled",
-                            "IsEncrypted"};
+                            "IsEncrypted",
+                            "ReturnsNullOnNullInput",
+                            "InlineType"};
                         List<string> list = GetSupportedScriptFields(typeof(UserDefinedFunction.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
                         list.Add("Text");
                         return list.ToArray();
@@ -847,6 +849,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         "IsSchemaBound",
                         "IsNativelyCompiled",
                         "IsEncrypted",
+                        "InlineType",
                         "AnsiNullsStatus",
                         "TableVariableName",
                         "XmlSchemaNamespace",
