@@ -48,4 +48,4 @@ jobs:
       with: 
         name: test-results-${{ matrix.sqlImage }}
         path: test-results
-      if: ${{ always }}
+      if: ${{ always() }}
