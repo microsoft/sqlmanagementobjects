@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+  <!-- SAPASSWORD has to be set as environment variable in the github action -->
+  <ConnectionString name="localhost"
+            connectionString="Data Source=.;Initial Catalog=master;User ID=sa"
+            databaseenginetype="Standalone"
+            enabled_features='Hekaton, SqlClr'
+            passwordCredential='SAPASSWORD'
+            db_engine_edition="Enterprise"/>
+</ConnectionStrings>
+
