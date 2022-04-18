@@ -7,19 +7,19 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+  # the build isn't quite Linux-ready
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v2
       with:
         global-json-file: global.json
     - run: |
-        outfolder=`pwd`/out 
-        dotnet build dirs.proj -p:baseoutputpath=$outfolder
+        dotnet build dirs.proj
     - uses: actions/upload-artifact@v3
       with: 
         name: tests
-        path: out/Debug/netcoreapp3.1
+        path: target\distrib\Debug\netcoreapp3.1
   test:
     runs-on: ubuntu-latest
     needs: build
