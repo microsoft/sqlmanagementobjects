@@ -818,15 +818,17 @@ namespace Microsoft.SqlServer.Management.Smo
             if (defaultTextMode)
                 {
                        string[] fields = {
-                            "ImplementationType",
-                            "ID",
-                            "IsSystemObject",
-                            "QuotedIdentifierStatus",
-                            "AnsiNullsStatus",
-                            "FunctionType",
-                            "IsSchemaBound",
-                            "IsNativelyCompiled",
-                            "IsEncrypted"};
+                            nameof(AnsiNullsStatus),
+                            nameof(FunctionType),
+                            nameof(ID),
+                            nameof(ImplementationType),
+                            nameof(InlineType),
+                            nameof(IsEncrypted),
+                            nameof(IsNativelyCompiled),
+                            nameof(IsSchemaBound),
+                            nameof(IsSystemObject),
+                            nameof(QuotedIdentifierStatus),
+                            nameof(ReturnsNullOnNullInput)};
                         List<string> list = GetSupportedScriptFields(typeof(UserDefinedFunction.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
                         list.Add("Text");
                         return list.ToArray();
@@ -834,32 +836,33 @@ namespace Microsoft.SqlServer.Management.Smo
                 else
                 {
                     string[] fields = {
-                        "ImplementationType",
-                        "ID",
+                        nameof(AnsiNullsStatus),
+                        nameof(AssemblyName),
+                        nameof(ClassName),
                         "DataTypeSchema",
-                        "SystemType",
+                        nameof(ExecutionContext),
+                        nameof(ExecutionContextPrincipal),
+                        nameof(FunctionType),
+                        nameof(ID),
+                        nameof(ImplementationType),
+                        nameof(InlineType),
+                        nameof(IsEncrypted),
+                        nameof(IsNativelyCompiled),
+                        nameof(IsSchemaBound),
+                        nameof(IsSchemaOwned),
+                        nameof(IsSystemObject),
                         "Length",
+                        nameof(MethodName),
                         "NumericPrecision",
                         "NumericScale",
-                        "IsSystemObject",
-                        "QuotedIdentifierStatus",
-                        "FunctionType",
-                        "IsSchemaBound",
-                        "IsNativelyCompiled",
-                        "IsEncrypted",
-                        "AnsiNullsStatus",
-                        "TableVariableName",
-                        "XmlSchemaNamespace",
-                        "XmlSchemaNamespaceSchema",
+                        nameof(Owner),
+                        nameof(QuotedIdentifierStatus),
+                        nameof(ReturnsNullOnNullInput),
+                        "SystemType",
+                        nameof(TableVariableName),
                         "XmlDocumentConstraint",
-                        "ExecutionContext",
-                        "ExecutionContextPrincipal",
-                        "ReturnsNullOnNullInput",
-                        "AssemblyName",
-                        "MethodName",
-                        "ClassName",
-                        "Owner",
-                        "IsSchemaOwned"};
+                        "XmlSchemaNamespace",
+                        "XmlSchemaNamespaceSchema"};
                         List<string> list = GetSupportedScriptFields(typeof(UserDefinedFunction.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
                         list.Add("Text");
                         list.Add("DataType");
