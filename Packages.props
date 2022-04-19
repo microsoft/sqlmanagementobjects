@@ -12,7 +12,7 @@
         <PackageReference Update="Azure.Identity" Version="1.5.0" />
         <PackageReference Update="Azure.Security.KeyVault.Secrets" Version="4.2.0" />
         <PackageReference Update="Microsoft.Data.SqlClient" Version="$(SqlClientPackageVersion)" />
-        <PackageReference Update="Microsoft.Data.Tools.StringResourceTool" Version="3.0.0" />
+        <PackageReference Update="Microsoft.Data.Tools.StringResourceTool" Version="3.2.0" />
         <PackageReference Update="Microsoft.Identity.Client"                                Version="4.35.0" />
         <PackageReference Update="Microsoft.Identity.Client.Desktop"                        Version="4.35.0" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.7.0" />
