@@ -36,7 +36,7 @@ jobs:
         name: tests
         path: tests
     - name: Copy toolsconnectioninfo
-      run: cp .github/workflows/ToolsConnectionInfo.xml .
+      run: cp .github/workflows/ToolsConnectionInfo.xml ./tests
     - name: Install SQL Server
       run: |
         export SAPASSWORD=$(date +%s|sha256sum|base64|head -c 32)
@@ -44,7 +44,7 @@ jobs:
         docker run -m 2GB -e ACCEPT_EULA=1 -d --name sql -p:1433:1433 -e SA_PASSWORD=$SAPASSWORD mcr.microsoft.com/mssql/server:${{ matrix.sqlImage }}-latest
         sleep 10
     - name: Run tests against Linux SQL
-      run: dotnet test tests/Microsoft.SqlServer.Test.Smo.dll -logger:"trx;LogFilePrefix=SmoTests" --filter TestCategory!=Staging&TestCategory!=Legacy
+      run: dotnet test tests/Microsoft.SqlServer.Test.Smo.dll --logger "trx;LogFilePrefix=SmoTests" --filter "TestCategory!=Staging&TestCategory!=Legacy"
       env: 
         DOTNET_ROLL_FORWARD: LatestMajor
     - name: Upload test results
