@@ -10,6 +10,7 @@
             databaseenginetype="Standalone"
             enabled_features='Hekaton, SqlClr'
             passwordCredential='SAPASSWORD'
+            hostplatform="Linux"
             db_engine_edition="Enterprise"/>
 </ConnectionStrings>
 
