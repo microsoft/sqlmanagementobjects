@@ -159,10 +159,10 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
         private void ScriptCreateAlter(bool isServerScoped, Database db = null)
         {
             store = CreateStore(isServerScoped, db);
-            CreateSession(store, out string name, out Session session);
+            CreateSession(store, out var name, out var session);
 
             // List of Predicate
-            Dictionary<object, string> waitTypeDic = new Dictionary<object, string>()
+            var waitTypeDic = new Dictionary<object, string>()
                 {
                     { "ABR", "'ABR'" },
                     { 388, "388" }
@@ -170,14 +170,14 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
 
             var createSessionOnString = isServerScoped ? "SERVER" : "DATABASE";
 
-            string expectedCreateString = $@"CREATE EVENT SESSION [{name}] ON {createSessionOnString} 
+            var expectedCreateString = $@"CREATE EVENT SESSION [{name}] ON {createSessionOnString} 
 ADD EVENT sqlos.wait_completed(
     WHERE ([wait_type]=({waitTypeDic["ABR"]}))),
 ADD EVENT sqlos.wait_info(
     WHERE ([wait_type]=({waitTypeDic[388]})))
 WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF)
-";
-            string expectedAlterString = $@"ALTER EVENT SESSION [{name}] ON {createSessionOnString} 
+".FixNewLines();
+            var expectedAlterString = $@"ALTER EVENT SESSION [{name}] ON {createSessionOnString} 
 DROP EVENT sqlos.wait_completed, 
 DROP EVENT sqlos.wait_info, 
 DROP EVENT sqlos.wait_info_external
@@ -188,19 +188,19 @@ ADD EVENT sqlos.wait_info(
     WHERE ([wait_type]<>({waitTypeDic[388]}))), 
 ADD EVENT sqlos.wait_info_external(
     WHERE ([wait_type]<>(388)))
-";
+".FixNewLines();
 
             // Creating Event
-            EventInfo eventInfo = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_completed");
-            EventInfo eventInfo1 = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_info");
-            PredOperand operand = new PredOperand(eventInfo.DataEventColumnInfoSet["wait_type"]);
+            var eventInfo = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_completed");
+            var eventInfo1 = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_info");
+            var operand = new PredOperand(eventInfo.DataEventColumnInfoSet["wait_type"]);
 
             NUF.Assert.Multiple(() =>
             {
                 // Adding event into session
-                Event evt = session.AddEvent(eventInfo);
+                var evt = session.AddEvent(eventInfo);
                 evt.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(waitTypeDic.First(x => x.Value == "'ABR'").Key));
-                Event evt1 = session.AddEvent(eventInfo1);
+                var evt1 = session.AddEvent(eventInfo1);
                 evt1.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(waitTypeDic.First(x => x.Value == "388").Key));
                 // Creating session environment 
                 session.Create();
@@ -209,8 +209,8 @@ ADD EVENT sqlos.wait_info_external(
                 //Alter section
                 evt.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.NE, operand, new PredValue(waitTypeDic.FirstOrDefault(x => x.Value == "'ABR'").Key));
                 evt1.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.NE, operand, new PredValue(waitTypeDic.FirstOrDefault(x => x.Value == "388").Key));
-                EventInfo eventInfo2 = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_info_external");
-                Event evt2 = session.AddEvent(eventInfo2);
+                var eventInfo2 = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_info_external");
+                var evt2 = session.AddEvent(eventInfo2);
                 evt2.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.NE, operand, new PredValue(388));
                 session.Alter();
                 NUF.Assert.That(session.ScriptAlter().ToString(), NUF.Is.EqualTo(expectedAlterString), "Generated Alter script is not same as expected string!");
@@ -231,19 +231,19 @@ ADD EVENT sqlos.wait_info_external(
 
             var createSessionOnString = isServerScoped ? "SERVER" : "DATABASE";
 
-            string expectedCreateString = $@"CREATE EVENT SESSION [{name}] ON {createSessionOnString} 
+            var expectedCreateString = $@"CREATE EVENT SESSION [{name}] ON {createSessionOnString} 
 ADD EVENT sqlos.wait_completed(
     WHERE ([wait_type]='BROKER_START' AND [wait_type]=(388))),
 ADD EVENT sqlos.wait_info(
     WHERE ([wait_type]='ASSEMBLY_LOAD'))
 WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF)
-";
+".FixNewLines();
 
             connection.ExecuteScalar(expectedCreateString);
 
             store.Refresh();
 
-            Session session = store.Sessions[name];
+            var session = store.Sessions[name];
             NUF.Assert.Multiple(() =>
             {
                 NUF.Assert.That(store.Sessions[name].Events["sqlos.wait_completed"].PredicateExpression, NUF.Is.EqualTo("([wait_type]='BROKER_START' AND [wait_type]=(388))"), "Generated PredExpression is not same as expected PredExpression!");
@@ -256,23 +256,23 @@ WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPAT
         private void ScriptAlterPredicates(bool isServerScoped, Database db = null)
         {
             store = CreateStore(isServerScoped, db);
-            CreateSession(store, out string name, out Session session);
+            CreateSession(store, out var name, out var session);
 
-            List<Object> predlst = new List<object>() { 450, 1385, "ACTIVE_RG_LIST" };
+            var predlst = new List<object>() { 450, 1385, "ACTIVE_RG_LIST" };
 
             // Creating Event
-            EventInfo eventInfo = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_completed");
-            PredOperand operand = new PredOperand(eventInfo.DataEventColumnInfoSet["wait_type"]);
+            var eventInfo = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_completed");
+            var operand = new PredOperand(eventInfo.DataEventColumnInfoSet["wait_type"]);
 
             // Adding event into session
-            Event evt = session.AddEvent(eventInfo);
+            var evt = session.AddEvent(eventInfo);
 
             // Creating Predicate expression
-            PredCompareExpr pred1 = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(predlst[0]));
-            PredCompareExpr pred2 = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(predlst[1]));
-            PredCompareExpr pred3 = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(predlst[2]));
+            var pred1 = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(predlst[0]));
+            var pred2 = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(predlst[1]));
+            var pred3 = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(predlst[2]));
 
-            PredLogicalExpr predIntermediate = new PredLogicalExpr(PredLogicalExpr.LogicalOperatorType.Or, pred1, pred2);
+            var predIntermediate = new PredLogicalExpr(PredLogicalExpr.LogicalOperatorType.Or, pred1, pred2);
             evt.Predicate = new PredLogicalExpr(PredLogicalExpr.LogicalOperatorType.Or, predIntermediate, pred3);
 
             // Creating session environment 
@@ -280,12 +280,12 @@ WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPAT
 
             var createSessionOnString = isServerScoped ? "SERVER" : "DATABASE";
 
-            string expectedCreateString = $@"ALTER EVENT SESSION [{session.Name}] ON {createSessionOnString} 
+            var expectedCreateString = $@"ALTER EVENT SESSION [{session.Name}] ON {createSessionOnString} 
 DROP EVENT sqlos.wait_completed
 ALTER EVENT SESSION [{session.Name}] ON {createSessionOnString} 
 ADD EVENT sqlos.wait_completed(
     WHERE ((([wait_type]=(450)) OR ([wait_type]=(1385))) OR ([wait_type]=('ACTIVE_RG_LIST'))))
-";
+".FixNewLines();
             NUF.Assert.That(session.ScriptAlter().ToString(), NUF.Is.EqualTo(expectedCreateString), "Generated Alter script is not same as expected string!");
 
             session.Drop();
@@ -294,16 +294,16 @@ ADD EVENT sqlos.wait_completed(
         private void ScriptAlterEventWithNewLine(bool isServerScoped, Database db = null)
         {
             store = CreateStore(isServerScoped, db);
-            CreateSession(store, out string name, out Session session);
+            CreateSession(store, out var name, out var session);
 
             session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.rpc_starting"));
 
             var createSessionOnString = isServerScoped ? "SERVER" : "DATABASE";
 
-            string expectedAlterString = $@"ALTER EVENT SESSION [{name}] ON {createSessionOnString} 
+            var expectedAlterString = $@"ALTER EVENT SESSION [{name}] ON {createSessionOnString} 
 ADD EVENT sqlos.wait_completed, 
 ADD EVENT sqlserver.sp_statement_starting
-";
+".FixNewLines();
 
             // Creating session environment 
             session.Create();

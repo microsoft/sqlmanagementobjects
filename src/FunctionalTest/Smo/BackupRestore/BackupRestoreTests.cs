@@ -133,7 +133,7 @@ namespace Microsoft.SqlServer.Test.SMO.BackupRestore
                     string expectedScript;
                     using (StreamReader reader = new StreamReader(asm.GetManifestResourceStream(expectedPlanFilename)))
                     {
-                        expectedScript = reader.ReadToEnd();
+                        expectedScript = reader.ReadToEnd().FixNewLines();
                     }
                     Assert.That(actualScript, Is.EqualTo(expectedScript), $"Restore plan should match expected plan");
                 }
