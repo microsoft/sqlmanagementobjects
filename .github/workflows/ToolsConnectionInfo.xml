@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<ConnectionStrings>
   <!-- SAPASSWORD has to be set as environment variable in the github action -->
   <ConnectionString name="localhost"
             connectionString="Data Source=.;Initial Catalog=master;User ID=sa"
