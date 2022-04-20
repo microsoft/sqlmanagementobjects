@@ -662,7 +662,7 @@
     >
       <PropertyGroup>
         <CodeGenCmd Condition="'$(TargetGroup)' == 'netfx'">"$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.exe"</CodeGenCmd>
-        <CodeGenCmd Condition="'$(CodeGenCmd)' == ''">dotnet "$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.dll"</CodeGenCmd>
+        <CodeGenCmd Condition="'$(CodeGenCmd)' == ''">dotnet --roll-forward LatestMajor "$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.dll"</CodeGenCmd>
       </PropertyGroup>
       <Message Importance="high" Text="$(CodeGenCmd)  &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" />
       <Exec Command="$(CodeGenCmd) &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" /> 
