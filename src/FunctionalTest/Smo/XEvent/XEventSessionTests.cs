@@ -76,9 +76,12 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
 
         // On prem test cases.
 
+        // This test fails on Linux because the event collection order is different than on Windows.
+        // Marked as Legacy until we can fix the test.
         [TestMethod]
         [SqlTestArea(SqlTestArea.ExtendedEvents)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, Edition = DatabaseEngineEdition.Enterprise, MinMajor = 15)]
+        [TestCategory("Legacy")]
         public void OnpremScriptCreateAlter()
         {
             ExecuteTest(() =>
