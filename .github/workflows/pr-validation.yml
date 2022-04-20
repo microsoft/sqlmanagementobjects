@@ -16,6 +16,8 @@ jobs:
         global-json-file: global.json
     - run: |
         dotnet build dirs.proj
+      env:
+        DOTNET_ROLL_FORWARD: LatestMajor
     - uses: actions/upload-artifact@v3
       with: 
         name: tests
@@ -43,6 +45,8 @@ jobs:
         sleep 10
     - name: Run tests against Linux SQL
       run: dotnet test tests/Microsoft.SqlServer.Test.Smo.dll -logger:"trx;LogFilePrefix=SmoTests" --filter TestCategory!=Staging&TestCategory!=Legacy
+      env: 
+        DOTNET_ROLL_FORWARD: LatestMajor
     - name: Upload test results
       uses: actions/upload-artifact@v3
       with: 
