@@ -73,7 +73,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// </summary>
         protected virtual void Init ()
         {
-            Data.Add ("HelpLink.ProdVer", ProdVer);
+            Data["HelpLink.ProdVer"] = ProdVer;
         }
 
         private static readonly string prodVer = ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true)[0]).Version;
@@ -162,6 +162,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
     /// Exception thrown when upgrading from SqlServer2005
     /// </summary>
     [Serializable]
+    // VBUMP Remove this in V17
     public class InvalidSqlServer2005StoreFormatException : RegisteredServerException
     {
         /// <summary>
@@ -171,7 +172,6 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         public InvalidSqlServer2005StoreFormatException()
             : base()
         {
-            Init();
         }
 
         /// <summary>
@@ -181,7 +181,6 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         public InvalidSqlServer2005StoreFormatException(string message)
             : base(message)
         {
-            Init();
         }
 
         /// <summary>
@@ -192,7 +191,6 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             :
             base(message, innerException)
         {
-            Init();
         }
 
         /// <summary>

@@ -912,162 +912,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             );
         }
 
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        public void VerifyCreateAppendOnlyLedgerTable()
-        {
-            ExecuteFromDbPool(
-               db =>
-               {
-                   string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
-                   _SMO.Table t = new _SMO.Table(db, ledgerTableName);
-                   _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                   t.Columns.Add(c1);
-                   t.IsSystemVersioned = false;
-                   t.IsLedger = true;
-                   t.LedgerType = LedgerTableType.AppendOnlyLedgerTable;
-                   t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
-                   t.LedgerViewTransactionIdColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewTransactionIdColumnName");
-                   t.LedgerViewSequenceNumberColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewSequenceNumberColumnName");
-                   t.LedgerViewOperationTypeColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeColumnName");
-                   t.LedgerViewOperationTypeDescColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeDescColumnName");
-                   t.Create();
-                   t.Refresh();
-                   _NU.Assert.IsFalse(t.IsSystemVersioned, "APPEND ONLY LEDGER_TABLE should not be marked as system versioned");
-                   ValidateScriptAppendOnlyLedgerTable(t.Script());
-               }
-            );
-        }
-
-        /// <summary>
-        /// Helper for validating Append Only ledger table scripting.
-        /// </summary>
-        /// <param name="stringCollection">The string collection</param>
-        private void ValidateScriptAppendOnlyLedgerTable(StringCollection generatedScript)
-        {
-            string LedgerClause = "LEDGER = ON";
-            string AppendOnlyClause = "APPEND_ONLY";
-            // first 2 paramaters of the generated script contain "SET ANSI_NULLS ON" "SET QUOTED_IDENTIFIER ON", the third parameter contains the table script
-            //
-            _NU.Assert.That(generatedScript[2], _NU.Does.Contain(LedgerClause),  "Did not find expected scripted settings LEDGER = ON");
-            _NU.Assert.That(generatedScript[2], _NU.Does.Contain(AppendOnlyClause), "APPEND_ONLY tag is expected as it is APPEND_ONLY_LEDGER_TABLE");
-        }
-
-        [SqlRequiredFeature(SqlFeature.AzureLedger)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        public void VerifyCreateTemporalLedgerTable()
-        {
-            var consistencyCheckValues = new List<bool>() { true, false };
-            var isPeriodStartColumnHidden = new List<bool>() { true, false };
-            var isPeriodEndColumnHidden = new List<bool>() { true, false };
-            var isAppendOnlyLedger = new List<bool>() { true, false };
-            var rand = new Random();
-
-            ExecuteFromDbPool(
-                db =>
-                {
-                    foreach (bool withConsistencyCheck in consistencyCheckValues)
-                    {
-                        foreach (bool startColHidden in isPeriodStartColumnHidden)
-                        {
-                            foreach (bool endColHidden in isPeriodEndColumnHidden)
-                            {
-                                foreach (bool appendOnlyLedger in isAppendOnlyLedger)
-                                {
-                                    string primaryKeyName = SmoObjectHelpers.GenerateUniqueObjectName("pk_ledger_table");
-                                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
-                                    string historyTableName = SmoObjectHelpers.GenerateUniqueObjectName("history_table");
-                                    _SMO.Table t = new _SMO.Table(db, ledgerTableName);
-                                    _SMO.Table t_history = new _SMO.Table(db, historyTableName);
-
-                                    _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                                    t.Columns.Add(c1);
-
-                                    // LEDGER = ON cannot be specified with PERIOD FOR SYSTEM_TIME and APPEND_ONLY = ON
-                                    // APPEND_ONLY = ON cannot be specified with generated always end columns
-                                    //
-                                    if (!appendOnlyLedger)
-                                    { 
-                                        _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5)) { Nullable = false, IsHidden = startColHidden, GeneratedAlwaysType = _SMO.GeneratedAlwaysType.AsRowStart };
-                                        _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5)) { Nullable = false, IsHidden = endColHidden, GeneratedAlwaysType = _SMO.GeneratedAlwaysType.AsRowEnd };
-                                        t.Columns.Add(c2);
-                                        t.Columns.Add(c3);
-                                        t.AddPeriodForSystemTime(periodStartColumn : c2.Name, periodEndColumn : c3.Name, addPeriod : true);
-                                        // TransactionStart & SequenceStart are NOT Null columns
-                                        // TransactionEnd & SequenceEnd can be NULL
-                                        //
-                                        _SMO.Column c4 = new _SMO.Column(t, "TransactionStart", _SMO.DataType.BigInt) { Nullable = false, GeneratedAlwaysType = _SMO.GeneratedAlwaysType.AsTransactionIdStart };
-                                        _SMO.Column c5 = new _SMO.Column(t, "TransactionEnd", _SMO.DataType.BigInt) { Nullable = true, GeneratedAlwaysType = _SMO.GeneratedAlwaysType.AsTransactionIdEnd };
-                                        _SMO.Column c6 = new _SMO.Column(t, "SequenceStart", _SMO.DataType.BigInt) { Nullable = false, GeneratedAlwaysType = _SMO.GeneratedAlwaysType.AsSequenceNumberStart };
-                                        _SMO.Column c7 = new _SMO.Column(t, "SequenceEnd", _SMO.DataType.BigInt) { Nullable = true, GeneratedAlwaysType = _SMO.GeneratedAlwaysType.AsSequenceNumberEnd };
-                                        t.Columns.Add(c4);
-                                        t.Columns.Add(c5);
-                                        t.Columns.Add(c6);
-                                        t.Columns.Add(c7);
-
-                                        
-                                        t.IsSystemVersioned = true;
-                                    }
-                                    else
-                                    {
-                                        // Append only ledger table have systerm versioning turned off, they are non temporal tables
-                                        //
-                                        t.IsSystemVersioned = false;
-                                        t.LedgerType = LedgerTableType.AppendOnlyLedgerTable;
-                                    }
-
-                                    _SMO.Column c1_hist = new _SMO.Column( t_history, "c1", _SMO.DataType.Int) { Nullable = false };
-                                    _SMO.Column c2_hist = new _SMO.Column(t_history, "SysStart", _SMO.DataType.DateTime2(5)) { Nullable = false };
-                                    _SMO.Column c3_hist = new _SMO.Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5)) { Nullable = false };
-                                    t_history.Columns.Add(c1_hist);
-                                    t_history.Columns.Add(c2_hist);
-                                    t_history.Columns.Add(c3_hist);
-
-                                    _SMO.Index index = new _SMO.Index(t, primaryKeyName);
-                                    index.IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey;
-
-                                    index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
-                                    t.Indexes.Add(index);
-                                    t.DataConsistencyCheck = withConsistencyCheck;
-                                    t.IsLedger = true;
-                                    t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
-                                    t.LedgerViewTransactionIdColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewTransactionIdColumnName");
-                                    t.LedgerViewSequenceNumberColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewSequenceNumberColumnName");
-                                    t.LedgerViewOperationTypeColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeColumnName");
-                                    t.LedgerViewOperationTypeDescColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeDescColumnName");
-
-                                    t.Create();
-                                    t.Refresh();
-
-                                    // Default history table can't be given for ledger, we need to determine which one got auto-created
-                                    //
-                                    db.Tables.Refresh();
-                                    t_history = db.Tables[t.HistoryTableName, t.HistoryTableSchema];
-
-                                    // validate metadata stuff is propagated to SMO correctly
-                                    // we don't need to call the below function for append only ledger as it checks
-                                    // 1] system versioning is turned on
-                                    // 2] check for time period columns
-                                    // 3] generated always ledger view columns
-                                    //
-                                    if (!appendOnlyLedger)
-                                    {
-                                        ValidateSystemVersionedTables(current: t, history: t_history, startColumnIsHidden: startColHidden, endColumnIsHidden: endColHidden, CheckforLedgerColumns: appendOnlyLedger);
-                                    }
-                                    else
-                                    {
-                                        _NU.Assert.That(t.LedgerType, _NU.Is.EqualTo(_SMO.LedgerTableType.AppendOnlyLedgerTable), "Invalid temporal type property");
-                                    }
-
-                                    t.Drop();
-                                }
-                            }
-                        }
-                    }
-                }
-            );
-        }
-
         /// <summary>
         /// Check if system-versioned temporal table can be memory-optimized as well
         /// </summary>
@@ -1720,6 +1564,359 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     }
                  );
                 });
+        }
+
+        #endregion
+
+        #region Ledger Tests
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerExpectedFailures()
+        {
+            ExecuteFromDbPool(
+                db =>
+                {
+                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
+                    var t = new Table(db, ledgerTableName);
+                    t.Columns.Add(new Column(t, "c1", DataType.Int));
+
+                    // try to create ledger table without LedgerType defined
+                    t.IsLedger = true;
+                    Assert.Throws<FailedOperationException>(t.Create, "LedgerType not set, ledger creation should fail.");
+
+                    // try with system versioned property set as well
+                    t.IsSystemVersioned = true;
+                    Assert.Throws<FailedOperationException>(t.Create, "LedgerType not set, ledger creation should fail.");
+
+                    // try creating a ledger table with a custom view name but no schema defined
+                    t.LedgerType = LedgerTableType.UpdatableLedgerTable;
+                    t.LedgerViewName = "test_view_name";
+                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view name is specified, so too must be the ledger view schema");
+
+                    // try creating a ledger table with a custom view schema but no view name defined
+                    t.LedgerViewName = string.Empty;
+                    t.LedgerViewSchema = "test_schema";
+                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view schema is specified, so too must be the ledger view name");
+
+                    // try creating a ledger table with a custom view column name but the view itself not named
+                    t.LedgerViewSchema = string.Empty;
+                    t.LedgerViewOperationTypeColumnName = "col_name";
+                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view name is not specified, neither can the ledger view column names be");
+                }
+            );
+        }
+
+        [DataTestMethod]
+        [DataRow(false, false, false, false, false)]    // append-only, no optional definitions
+        [DataRow(false, false, true, false, false)]     // append-only, define view
+        [DataRow(false, false, true, false, true)]      // append-only, define view with different schema
+        [DataRow(false, false, true, true, false)]      // append-only, define view with view columns
+        [DataRow(false, false, true, true, true)]       // append-only, define view with view columns and different schema
+        [DataRow(true, false, false, false, false)]     // updatable, no optional definitions
+        [DataRow(true, false, true, false, false)]      // updatable, define view
+        [DataRow(true, false, true, false, true)]       // updatable, define view with different schema
+        [DataRow(true, false, true, true, false)]       // updatable, define view with view columns
+        [DataRow(true, false, true, true, true)]        // updatable, define view with view columns and different schema
+        [DataRow(true, true, false, false, false)]      // updatable, define history table
+        [DataRow(true, true, false, false, true)]       // updatable, define history table with different schema
+        [DataRow(true, true, true, true, true)]         // updatable, define history table and view with view columns and different schema
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_LedgerTableScripting(bool systemVersioned, bool defineHistoryTable, bool defineLedgerView, bool defineLedgerViewColumns, bool differentSchema)
+        {
+            ExecuteFromDbPool(
+                db =>
+                {
+                    var s = new Schema(db, SmoObjectHelpers.GenerateUniqueObjectName("ledger_schema"));
+                    s.Create();
+
+                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
+                    var t = new Table(db, ledgerTableName);
+
+                    t.Columns.Add(new Column(t, "c1", DataType.Char(10)));
+
+                    t.IsLedger = true;
+                    t.IsSystemVersioned = systemVersioned;
+                    t.LedgerType = systemVersioned ? LedgerTableType.UpdatableLedgerTable : LedgerTableType.AppendOnlyLedgerTable;
+                    
+                    if (defineHistoryTable)
+                    {
+                        t.HistoryTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_history");
+                        t.HistoryTableSchema = differentSchema ? s.Name : t.Schema;
+                    }
+
+                    if (defineLedgerView)
+                    {
+                        t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
+                        t.LedgerViewSchema = differentSchema ? s.Name : t.Schema;
+                    }
+
+                    if (defineLedgerViewColumns && defineLedgerView)
+                    {
+                        t.LedgerViewTransactionIdColumnName = "trans_id_col_name";
+                        t.LedgerViewSequenceNumberColumnName = "seq_num_col_name";
+                        t.LedgerViewOperationTypeColumnName = "op_type_col_name";
+                        t.LedgerViewOperationTypeDescColumnName = "op_type_desc_col_name";
+                    }
+
+                    // create the table
+                    t.Create();
+
+                    var t_fields = new string[] {
+                        nameof(Table.LedgerType),
+                        nameof(Table.LedgerViewName),
+                        nameof(Table.LedgerViewSchema),
+                        nameof(Table.IsDroppedLedgerTable),
+                        nameof(Table.LedgerViewTransactionIdColumnName),
+                        nameof(Table.LedgerViewSequenceNumberColumnName),
+                        nameof(Table.LedgerViewOperationTypeColumnName),
+                        nameof(Table.LedgerViewOperationTypeDescColumnName),
+                        nameof(Table.HistoryTableName),
+                        nameof(Table.HistoryTableSchema)};
+                    db.Tables.ClearAndInitialize("", t_fields);
+
+                    var tab = db.Tables[ledgerTableName];
+                    var view = db.Views[tab.LedgerViewName, tab.LedgerViewSchema];
+
+                    // Set the expected script based on the inputs
+                    var systemVersionedScript =
+                        systemVersioned
+                        ? $"SYSTEM_VERSIONING = ON (HISTORY_TABLE = [{SqlSmoObject.EscapeString(tab.HistoryTableSchema, ']')}].[{SqlSmoObject.EscapeString(tab.HistoryTableName, ']')}]), {Environment.NewLine}"
+                        : string.Empty;
+
+                    var appendOnlyScript = !systemVersioned ? $"APPEND_ONLY = ON, " : string.Empty;
+
+                    // set generated always columns for the table
+                    var generatedAlwaysColumns = string.Empty;
+                    if (systemVersioned)
+                    {
+                        // add all 4 expected generated always columns for updatable
+                        generatedAlwaysColumns =
+                            $"\t[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,{Environment.NewLine}" +
+                            $"\t[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,{Environment.NewLine}" +
+                            $"\t[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,{Environment.NewLine}" +
+                            $"\t[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL{Environment.NewLine}";
+                    } else
+                    {
+                        // add the 2 start generated always columns for append-only
+                        generatedAlwaysColumns =
+                            $"\t[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,{Environment.NewLine}" +
+                            $"\t[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL{Environment.NewLine}";
+                    }
+
+                    var expectedScript = new string[]
+                    {
+                        "SET ANSI_NULLS ON",
+                        "SET QUOTED_IDENTIFIER ON",
+                        $"CREATE TABLE [{tab.Schema}].[{SqlSmoObject.EscapeString(tab.Name, ']')}]({Environment.NewLine}" +
+                        $"\t[c1] [char](10) COLLATE {db.Collation} NULL,{Environment.NewLine}" +
+                        generatedAlwaysColumns +
+                        $") ON [PRIMARY]{Environment.NewLine}WITH{Environment.NewLine}({Environment.NewLine}" +
+                        systemVersionedScript +
+                        $"LEDGER = ON ({appendOnlyScript}LEDGER_VIEW = [{SqlSmoObject.EscapeString(tab.LedgerViewSchema, ']')}].[{SqlSmoObject.EscapeString(tab.LedgerViewName, ']')}] (" +
+                        $"TRANSACTION_ID_COLUMN_NAME = [{tab.LedgerViewTransactionIdColumnName}], " +
+                        $"SEQUENCE_NUMBER_COLUMN_NAME = [{tab.LedgerViewSequenceNumberColumnName}], " + 
+                        $"OPERATION_TYPE_COLUMN_NAME = [{tab.LedgerViewOperationTypeColumnName}], " +
+                        $"OPERATION_TYPE_DESC_COLUMN_NAME = [{tab.LedgerViewOperationTypeDescColumnName}]" +
+                        $")){Environment.NewLine}){Environment.NewLine}"
+                    };
+                    var generatedScript = tab.Script();
+                    Assert.That(expectedScript, _NU.Is.EqualTo(generatedScript));
+                }
+            );
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerAppendOnly()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: false, temporal: false);
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerAppendOnlyWithOptionalColumnsDefined()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: false, temporal: false, defineOptionalColumns: true);
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerSystemVersioned()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: false);
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerSystemVersionedWithOptionalColumnsDefined()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: false, defineOptionalColumns: true);
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerTemporal()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true);
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoTable_CreateLedgerTemporalWithOptionalColumnsDefined()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true, defineOptionalColumns: true);
+        }
+
+        private void CreateAndVerifyLedgerTable(bool systemVersioned, bool temporal, bool defineOptionalColumns = false)
+        {
+            ExecuteFromDbPool(
+                db =>
+                {
+                    Assert.That(temporal && !systemVersioned, Is.False, "temporal and append only are incompatible ledger types");
+
+                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
+                    var t = new Table(db, ledgerTableName);
+
+                    var c1 = new Column(t, "c1", DataType.Int);
+                    t.Columns.Add(c1);
+
+                    // generated always columns that exist no matter what type of ledger table you have
+                    if (defineOptionalColumns)
+                    {
+                        var c2 = new Column(t, "TransactionStart", DataType.BigInt) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsTransactionIdStart };
+                        var c3 = new Column(t, "SequenceStart", DataType.BigInt) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsSequenceNumberStart };
+                        t.Columns.Add(c2);
+                        t.Columns.Add(c3);
+                    }
+
+                    // LEDGER = ON cannot be specified with PERIOD FOR SYSTEM_TIME and APPEND_ONLY = ON
+                    // APPEND_ONLY = ON cannot be specified with generated always end columns
+                    //
+                    if (systemVersioned)
+                    {
+                        // System-versioned ledger tables can either be temporal or not. The difference in definition
+                        // is whether a period for system time and the SysStart and SysEnd columns are defined
+                        //
+                        if (temporal)
+                        {
+                            var c4 = new Column(t, "SysStart", DataType.DateTime2(5)) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsRowStart };
+                            var c5 = new Column(t, "SysEnd", DataType.DateTime2(5)) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsRowEnd };
+                            t.Columns.Add(c4);
+                            t.Columns.Add(c5);
+                            t.AddPeriodForSystemTime(periodStartColumn: c4.Name, periodEndColumn: c5.Name, addPeriod: true);
+
+                            string primaryKeyName = SmoObjectHelpers.GenerateUniqueObjectName("pk_ledger_table");
+                            var index = new _SMO.Index(t, primaryKeyName) { IndexKeyType = IndexKeyType.DriPrimaryKey };
+                            index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
+                            t.Indexes.Add(index);
+                            t.DataConsistencyCheck = true;
+                        }
+
+                        // TransactionStart & SequenceStart are NOT Null columns
+                        // TransactionEnd & SequenceEnd can be NULL
+                        //
+                        if (defineOptionalColumns)
+                        {
+                            var c6 = new Column(t, "TransactionEnd", DataType.BigInt) { Nullable = true, GeneratedAlwaysType = GeneratedAlwaysType.AsTransactionIdEnd };
+                            var c7 = new Column(t, "SequenceEnd", DataType.BigInt) { Nullable = true, GeneratedAlwaysType = GeneratedAlwaysType.AsSequenceNumberEnd };
+                            t.Columns.Add(c6);
+                            t.Columns.Add(c7);
+                        }
+
+                        t.IsSystemVersioned = true;
+                        t.LedgerType = LedgerTableType.UpdatableLedgerTable;
+                    }
+                    else
+                    {
+                        // Append-only ledger tables have system versioning turned off
+                        //
+                        t.IsSystemVersioned = false;
+                        t.LedgerType = LedgerTableType.AppendOnlyLedgerTable;
+                    }
+
+                    t.IsLedger = true;
+                    t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
+                    t.LedgerViewSchema = t.Schema;
+                    if (defineOptionalColumns)
+                    {
+                        t.LedgerViewTransactionIdColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewTransactionIdColumnName");
+                        t.LedgerViewSequenceNumberColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewSequenceNumberColumnName");
+                        t.LedgerViewOperationTypeColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeColumnName");
+                        t.LedgerViewOperationTypeDescColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeDescColumnName");
+                    }
+
+                    t.Create();
+
+                    var t_fields = new string[] {
+                        nameof(Table.LedgerType),
+                        nameof(Table.LedgerViewName),
+                        nameof(Table.LedgerViewSchema),
+                        nameof(Table.IsDroppedLedgerTable),
+                        nameof(Table.LedgerViewTransactionIdColumnName),
+                        nameof(Table.LedgerViewSequenceNumberColumnName),
+                        nameof(Table.LedgerViewOperationTypeColumnName),
+                        nameof(Table.LedgerViewOperationTypeDescColumnName) };
+                    db.Tables.ClearAndInitialize("", t_fields);
+
+                    var v_fields = new string[] { nameof(View.LedgerViewType), nameof(View.IsDroppedLedgerView) };
+                    db.Views.ClearAndInitialize("", v_fields);
+
+                    var tab = db.Tables[ledgerTableName];
+
+                    // Default history table can't be given for ledger, we need to determine which one got auto-created
+                    //
+                    var t_history = db.Tables[tab.HistoryTableName, tab.HistoryTableSchema];
+                    var l_view = db.Views[tab.LedgerViewName, tab.LedgerViewSchema];
+
+                    int l_view_id = l_view.ID;
+                    int table_id = t.ID;
+
+                    // Validate metadata stuff is propagated to SMO correctly
+                    // if the optional columns aren't defined, they are defaulted to hidden, which is checked as well
+                    //
+                    ValidateLedgerTables(current: tab, history: t_history, ledger_view: l_view, systemVersioned, temporal, !defineOptionalColumns);
+
+                    ValidateLedgerScriptProperties(tab.Script(), systemVersioned, temporal);
+
+                    t.Drop();
+                    db.Tables.ClearAndInitialize("", t_fields);
+                    db.Views.ClearAndInitialize("", v_fields);
+
+                    // get the dropped ledger table
+                    var dropped_ledger = db.Tables.ItemById(table_id);
+                    Assert.That(dropped_ledger.IsDroppedLedgerTable, Is.True, "Table should be marked as a dropped ledger table");
+                    Assert.That(dropped_ledger.Name, Does.Contain("MSSQL_DroppedLedgerTable"), "Table name should have been updated to include dropped identifier");
+
+                    // get the dropped ledger view
+                    var dropped_ledger_view = db.Views.ItemById(l_view_id);
+                    Assert.That(dropped_ledger_view.IsDroppedLedgerView, Is.True, "View should be marked as a dropped ledger view");
+                    Assert.That(dropped_ledger_view.Name, Does.Contain("MSSQL_DroppedLedgerView"), "View name should have been updated to include dropped identifier");
+
+                    // get the dropped ledger history table
+                    if (systemVersioned)
+                    {
+                        var dropped_history = db.Tables.ItemById(dropped_ledger.HistoryTableID);
+                        Assert.That(dropped_history.Name, Does.Contain("MSSQL_DroppedLedgerHistory"), "History table name should have been updated to include dropped identifier");
+                    }
+                }
+            );
         }
 
         #endregion
@@ -3642,130 +3839,222 @@ AS EDGE ON [PRIMARY]";
         /// 6. ID of a history table must match the 'HistoryTableID' property of a current table
         /// 7. Current table must have one and only one column that has property GeneratedAlwaysType = AsRowStart
         /// 8. Current table must have one and only one column that has property GeneratedAlwaysType = AsRowEnd
-        /// 9. Current table must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdStart
-        /// 10. Current table must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdEnd
-        /// 11. Current table must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberStart
-        /// 12. Current table must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberEnd
-        /// 13. 'Start column' name must match 'SystemTimePeriodStartColumn' property of a current table
-        /// 14. 'End column' name must match 'SystemTimePeriodEndColumn' property of a current table
-        /// 16. if CheckforLedgerColumns = true, we check for transaction and Sequence columns to be present in the table
+        /// 9. 'Start column' name must match 'SystemTimePeriodStartColumn' property of a current table
+        /// 10. 'End column' name must match 'SystemTimePeriodEndColumn' property of a current table
         /// </summary>
-        private void ValidateSystemVersionedTables(_SMO.Table current, _SMO.Table history, bool startColumnIsHidden = false, bool endColumnIsHidden = false, bool CheckforLedgerColumns = false, 
-                                                    bool trxStartColumnIsHidden = false, bool trxEndColumnIsHidden = false, bool seqStartColumnIsHidden = false, bool seqEndColumnIsHidden = false)
+        private void ValidateSystemVersionedTables(Table current, Table history, bool startColumnIsHidden = false, bool endColumnIsHidden = false, bool isLedger = false)
         {
-            _NU.Assert.IsTrue(current.HasSystemTimePeriod, "Table should have a period defined.");
-            _NU.Assert.IsTrue(current.IsSystemVersioned, "Table should be a system-versioned table.");
-            _UT.Assert.AreEqual<string>(history.Name, current.HistoryTableName, "Invalid history table name");
-            _UT.Assert.AreEqual<string>(history.Schema, current.HistoryTableSchema, "Invalid history table schema");
-            _UT.Assert.AreEqual<_SMO.TableTemporalType>(_SMO.TableTemporalType.SystemVersioned, current.TemporalType, "Invalid temporal type property");
-            _UT.Assert.AreEqual<int>(history.ID, current.HistoryTableID, "Invalid history table ID.");
+            Assert.IsTrue(current.HasSystemTimePeriod, "Table should have a period defined.");
+            Assert.IsTrue(current.IsSystemVersioned, "Table should be a system-versioned table.");
+            Assert.AreEqual(history.Name, current.HistoryTableName, "Invalid history table name");
+            Assert.AreEqual(history.Schema, current.HistoryTableSchema, "Invalid history table schema");
+            Assert.AreEqual(TableTemporalType.SystemVersioned, current.TemporalType, "Invalid temporal type property");
+            Assert.AreEqual(history.ID, current.HistoryTableID, "Invalid history table ID.");
 
             // count generated always columns
             _SMO.Column sysStart = null;
             _SMO.Column sysEnd = null;
-            _SMO.Column trxStart = null;
-            _SMO.Column trxEnd = null;
-            _SMO.Column seqStart = null;
-            _SMO.Column seqEnd = null;
 
             Assert.Multiple(() =>
             {
-                foreach (_SMO.Column c in current.Columns)
+                foreach (Column c in current.Columns)
                 {
-                    if (c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.AsRowStart)
+                    if (c.GeneratedAlwaysType == GeneratedAlwaysType.AsRowStart)
                     {
                         if (sysStart != null)
                         {
-                            _NU.Assert.Fail(String.Format("More than one column marked as 'AsRowStart' ({0} and {1})", sysStart.Name, c.Name));
+                            Assert.Fail($"More than one column marked as 'AsRowStart' ({sysStart.Name} and {c.Name})");
                         }
                         else
                         {
                             sysStart = c;
-                            _NU.Assert.That(startColumnIsHidden, _NU.Is.EqualTo(c.IsHidden), $"Invalid value of HIDDEN flag : {c.InternalName}, {startColumnIsHidden}");
+                            Assert.AreEqual(c.IsHidden, startColumnIsHidden, $"Invalid value of HIDDEN flag : {c.InternalName}, {startColumnIsHidden}");
                         }
                     }
-                    else if (c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.AsRowEnd)
+                    else if (c.GeneratedAlwaysType == GeneratedAlwaysType.AsRowEnd)
                     {
                         if (sysEnd != null)
                         {
-                            _NU.Assert.Fail(String.Format("More than one column marked as 'AsRowEnd' ({0} and {1})", sysEnd.Name, c.Name));
+                            Assert.Fail($"More than one column marked as 'AsRowEnd' ({sysEnd.Name} and {c.Name})");
                         }
                         else
                         {
                             sysEnd = c;
-                            _NU.Assert.That(endColumnIsHidden, _NU.Is.EqualTo(c.IsHidden), $"Invalid value of HIDDEN flag: {c.InternalName}, {endColumnIsHidden}");
+                            Assert.AreEqual(c.IsHidden, endColumnIsHidden, $"Invalid value of HIDDEN flag: {c.InternalName}, {endColumnIsHidden}");
                         }
                     }
-                    else if (c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.AsTransactionIdStart)
+                    else if (!isLedger)
                     {
-                        if (trxStart != null)
-                        {
-                            _NU.Assert.Fail($"More than one column marked as 'AsTransactionIdStart' ({trxStart.Name} and {c.Name})");
-                        }
-                        else
-                        {
-                            trxStart = c;
-                            _NU.Assert.That(trxStartColumnIsHidden, _NU.Is.EqualTo(c.IsHidden), $"Invalid value of HIDDEN flag: {c.InternalName}, {trxStartColumnIsHidden}");
-                        }
-                    }
-                    else if (c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.AsTransactionIdEnd)
-                    {
-                        if (trxEnd != null)
-                        {
-                            _NU.Assert.Fail($"More than one column marked as 'AsTransactionIdEnd' ({trxEnd.Name} and {c.Name})");
-                        }
-                        else
-                        {
-                            trxEnd = c;
-                            _NU.Assert.That(trxEndColumnIsHidden, _NU.Is.EqualTo(c.IsHidden), $"Invalid value of HIDDEN flag: {c.InternalName}, {trxEndColumnIsHidden}");
-                        }
-                    }
-                    else if (c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.AsSequenceNumberStart)
-                    {
-                        if (seqStart != null)
-                        {
-                            _NU.Assert.Fail($"More than one column marked as 'AsSequenceNumberStart' ({seqStart.Name} and {c.Name})");
-                        }
-                        else
-                        {
-                            seqStart = c;
-                            _NU.Assert.That(seqStartColumnIsHidden, _NU.Is.EqualTo(c.IsHidden), $"Invalid value of HIDDEN flag: {c.InternalName}, {seqStartColumnIsHidden}");
-                        }
-                    }
-                    else if (c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.AsSequenceNumberEnd)
-                    {
-                        if (seqEnd != null)
-                        {
-                            _NU.Assert.Fail($"More than one column marked as 'AsSequenceNumberEnd' ({seqEnd.Name} and {c.Name})");
-                        }
-                        else
-                        {
-                            seqEnd = c;
-                            _NU.Assert.That(seqEndColumnIsHidden, _NU.Is.EqualTo(c.IsHidden), $"Invalid value of HIDDEN flag: {c.InternalName}, {seqEndColumnIsHidden}");
-                        }
-                    }
-                    else
-                    {
-                        // Only period columns can be hidden
-                        _NU.Assert.IsFalse(c.IsHidden, "Only PERIOD columns can be hidden");
+                        // Only period columns can be hidden (unless the table is also ledger)
+                        Assert.IsFalse(c.IsHidden, "Only PERIOD columns can be hidden");
                     }
                 }
             });
 
-            if ( sysStart == null || sysEnd == null )
-                _NU.Assert.Fail("Expected to find both start and end columns for period.");
+            Assert.NotNull(sysStart, "Expected to find start column for period.");
+            Assert.NotNull(sysEnd, "Expected to find end column for period.");
 
-            if ( CheckforLedgerColumns )
+            Assert.AreEqual(sysStart.Name, current.SystemTimePeriodStartColumn, "Unexpected start column");
+            Assert.AreEqual(sysEnd.Name, current.SystemTimePeriodEndColumn, "Unexpected start column");
+        }
+
+        /// <summary>
+        /// This method validates that metadata retrieved by SMO about ledger tables is correct. The following is checked:
+        /// 
+        ///  1. Ledger view properties match ledger table view properties
+        ///  2. History table properties match Ledger table properties
+        ///  3. Ledger Table Type property matches with the table definition
+        ///  4. Ledger History Table Type property is LedgerHistoryTable
+        ///  5. Append only ledger tables do not have a history table
+        ///  6. If the ledger table is also temporal, verifies the temporal properties in ValidateSystemVersionedTables
+        ///  7. All ledger tables must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdStart
+        ///  8. Updatable ledger tables must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdEnd
+        ///  9. All ledger tables must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberStart
+        /// 10. Updatable ledger tables must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberEnd
+        /// 11. All ledger tables have at least one user-defined column
+        /// </summary>
+        /// <param name="current">the current ledger table to be verified</param>
+        /// <param name="history">the history table for the ledger table to be verified (can be null)</param>
+        /// <param name="ledger_view">the view for the ledger table to be verified.</param>
+        /// <param name="systemVersioned">whether the table is system-versioned or append-only</param>
+        /// <param name="temporal">whether the table is temporal or not</param>
+        /// <param name="genAlwaysHidden">whether the generated always columns are hidden</param>
+        private void ValidateLedgerTables(Table current, Table history, View ledger_view, bool systemVersioned, bool temporal, bool genAlwaysHidden)
+        {
+
+            // Validate ledger view properties
+            Assert.AreEqual(current.LedgerViewName, ledger_view.Name, "Invalid ledger view name");
+            Assert.AreEqual(LedgerViewType.LedgerView, ledger_view.LedgerViewType, "Ledger view is not marked as ledger");
+
+            if (systemVersioned)
             {
-                if ( trxStart == null || trxEnd == null )
-                    _NU.Assert.Fail("Expected to find both trxStart and trxEnd columns.");
-
-                if ( seqStart == null || seqEnd == null )
-                    _NU.Assert.Fail("Expected to find both seqStart and seqEnd columns");
+                _UT.Assert.AreEqual(history.Name, current.HistoryTableName, "Invalid history table name");
+                _UT.Assert.AreEqual(history.Schema, current.HistoryTableSchema, "Invalid history table schema");
+                _UT.Assert.AreEqual(history.ID, current.HistoryTableID, "Invalid history table ID");
+                _UT.Assert.AreEqual(LedgerTableType.UpdatableLedgerTable, current.LedgerType, "Invalid ledger table type property");
+                _UT.Assert.AreEqual(LedgerTableType.HistoryTable, history.LedgerType, "Invalid ledger history table type property");
+            }
+            else
+            {
+                Assert.That(history, Is.Null, "Append-only ledger tables do not have a history table");
+                Assert.AreEqual(current.HistoryTableID, 0, "Append-only ledger tables do not have a history table");
+                Assert.AreEqual(LedgerTableType.AppendOnlyLedgerTable, current.LedgerType, "Invalid ledger table type property");
             }
 
-            _NU.Assert.That(sysStart.Name, _NU.Is.EqualTo(current.SystemTimePeriodStartColumn), "Unexpected start column");
-            _NU.Assert.That(sysEnd.Name, _NU.Is.EqualTo(current.SystemTimePeriodEndColumn), "Unexpected end column");
+            if (temporal)
+            {
+                ValidateSystemVersionedTables(current, history, isLedger: true);
+                _UT.Assert.AreEqual(TableTemporalType.SystemVersioned, current.TemporalType, "Invalid temporal type property");
+                _UT.Assert.AreEqual(TableTemporalType.HistoryTable, history.TemporalType, "Invalid temporal history table type property");
+            }
+
+            Column trxStart = null;
+            Column trxEnd = null;
+            Column seqStart = null;
+            Column seqEnd = null;
+            Column userCol = null;
+
+            // Validate columns
+            Assert.Multiple(() =>
+            {
+                // columns collection needs to be reinitialized to include generated always columns that weren't explicitly defined
+                // in table creation
+                current.Columns.ClearAndInitialize("", null);
+
+                foreach (Column c in current.Columns)
+                {
+                    switch (c.GeneratedAlwaysType)
+                    {
+                        case GeneratedAlwaysType.AsTransactionIdStart:
+                            Assert.That(trxStart, Is.Null, $"More than one column marked as 'AsTransactionIdStart'");
+                            trxStart = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsTransactionIdStart' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsTransactionIdEnd:
+                            Assert.That(trxEnd, Is.Null, $"More than one column marked as 'AsTransactionIdEnd'");
+                            trxEnd = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsTransactionIdEnd' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsSequenceNumberStart:
+                            Assert.That(seqStart, Is.Null, $"More than one column marked as 'AsSequenceNumberStart'");
+                            seqStart = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsSequenceNumberStart' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsSequenceNumberEnd:
+                            Assert.That(seqEnd, Is.Null, $"More than one column marked as 'AsSequenceNumberEnd'");
+                            seqEnd = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsSequenceNumberEnd' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsRowStart:
+                        case GeneratedAlwaysType.AsRowEnd:
+                            Assert.That(temporal, Is.True, "Only temporal ledger tables have 'AsRowStart' and 'AsRowEnd' columns");
+                            break;
+                        case GeneratedAlwaysType.None:
+                            // assert there's at least one user column
+                            userCol = c;
+                            break;
+                    }
+                }
+            });
+
+            Assert.That(userCol, Is.Not.Null, "Ledger table must have at least one user column defined");
+            Assert.That(trxStart, Is.Not.Null, "Ledger table must have a transaction start column");
+            Assert.That(seqStart, Is.Not.Null, "Ledger table must have a sequence number start column");
+
+            // System versioned ledger tables
+            if (systemVersioned)
+            {
+                Assert.That(trxEnd, Is.Not.Null, "Expected to find end transaction id column in system-versioned ledger table.");
+                Assert.That(seqEnd, Is.Not.Null, "Expected to find end sequence number column in system-versioned ledger table.");
+            }
+        }
+
+        /// <summary>
+        /// Helper for validating ledger table scripting.
+        /// </summary>
+        /// <param name="generatedScript">The script generated for the table</param>
+        /// <param name="systemVersioned">Whether the table is system-versioned or append only</param>
+        /// <param name="temporal">Whether the table is temporal or not</param>
+        private void ValidateLedgerScriptProperties(StringCollection generatedScript, bool systemVersioned, bool temporal)
+        {
+            // ledger specific
+            string LedgerClause = "LEDGER = ON";
+            string LedgerViewClause = "LEDGER_VIEW";
+
+            // append only specific
+            string AppendOnlyClause = "APPEND_ONLY";
+
+            // system versioned specific
+            string SystemVersionedClause = "SYSTEM_VERSIONING";
+            string HistoryTableClause = "HISTORY_TABLE";
+
+            // temporal specific
+            string TemporalPeriodClause = "PERIOD FOR SYSTEM_TIME";
+
+            // first 2 paramaters of the generated script contain "SET ANSI_NULLS ON" "SET QUOTED_IDENTIFIER ON", the third parameter contains the table script
+            //
+            Assert.That(generatedScript[2], Does.Contain(LedgerClause), "Did not find expected scripted setting LEDGER = ON");
+            Assert.That(generatedScript[2], Does.Contain(LedgerViewClause), "Did not find expected scripted setting LEDGER_VIEW");
+            
+            if (systemVersioned)
+            {
+                Assert.That(generatedScript[2], Does.Contain(SystemVersionedClause), "SYSTEM_VERSIONING tag is expected in a system versioned ledger table");
+                Assert.That(generatedScript[2], Does.Contain(HistoryTableClause), "HISTORY_TABLE tag is expected in a system versioned ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(AppendOnlyClause), "APPEND_ONLY tag is NOT expected in a system versioned ledger table");
+            }
+            else
+            {
+                Assert.That(generatedScript[2], Does.Contain(AppendOnlyClause), "APPEND_ONLY tag is expected in an append only ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(SystemVersionedClause), "SYSTEM_VERSIONING tag is NOT expected in an append only ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(TemporalPeriodClause), "PERIOD FOR SYSTEM_TIMNE tag is NOT expected in an append only ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(HistoryTableClause), "HISTORY_TABLE tag is NOT expected in an append only ledger table");
+            }
+            if (temporal)
+            {
+                Assert.That(generatedScript[2], Does.Contain(SystemVersionedClause), $"{SystemVersionedClause} SYSTEM_VERSIONING tag is expected in a temporal ledger table");
+                Assert.That(generatedScript[2], Does.Contain(TemporalPeriodClause), "PERIOD FOR SYSTEM_TIME tag is expected in a temporal ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(AppendOnlyClause), "APPEND_ONLY tag is NOT expected in a temporal ledger table");
+            }
         }
 
         private void VerifyTemporalHiddenColumnsInternal(_SMO.Database database)

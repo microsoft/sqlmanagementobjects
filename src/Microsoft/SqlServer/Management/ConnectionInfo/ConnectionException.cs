@@ -1,40 +1,42 @@
 // Copyright (c) Microsoft.
 // Licensed under the MIT license.
+using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.SqlServer.Management.Common
 {
-    using System;
-    using System.Runtime.Serialization;
 
     /// <summary>
-    /// TBD
+    /// ConnectionException is the base class for most ConnectionInfo exceptions
     /// </summary>
     [Serializable]
+    // VBUMP For V17 replace SystemException with SqlServerManagementException. SystemException is reserved for .Net Framework.
     public class ConnectionException : SystemException
     {
+        
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionException(String message, Exception innerException) : base(message, innerException)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         protected ConnectionException(SerializationInfo info, StreamingContext context): base(info, context)
         {
@@ -42,27 +44,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class ConnectionCannotBeChangedException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionCannotBeChangedException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionCannotBeChangedException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionCannotBeChangedException(String message, Exception innerException) : base(message, innerException)
         {
@@ -74,27 +76,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class InvalidPropertyValueException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public InvalidPropertyValueException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public InvalidPropertyValueException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public InvalidPropertyValueException(String message, Exception innerException) : base(message, innerException)
         {
@@ -107,27 +109,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class ConnectionFailureException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionFailureException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionFailureException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ConnectionFailureException(String message, Exception innerException) : base(message, innerException)
         {
@@ -140,27 +142,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class ExecutionFailureException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ExecutionFailureException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ExecutionFailureException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ExecutionFailureException(String message, Exception innerException) : base(message, innerException)
         {
@@ -173,27 +175,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class NotInTransactionException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public NotInTransactionException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public NotInTransactionException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public NotInTransactionException(String message, Exception innerException) : base(message, innerException)
         {
@@ -206,27 +208,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class InvalidArgumentException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public InvalidArgumentException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public InvalidArgumentException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public InvalidArgumentException(String message, Exception innerException) : base(message, innerException)
         {
@@ -238,27 +240,27 @@ namespace Microsoft.SqlServer.Management.Common
         }
     }
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class PropertyNotSetException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public PropertyNotSetException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public PropertyNotSetException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public PropertyNotSetException(String message, Exception innerException) : base(message, innerException)
         {
@@ -271,27 +273,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class PropertyNotAvailableException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public PropertyNotAvailableException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public PropertyNotAvailableException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public PropertyNotAvailableException(String message, Exception innerException) : base(message, innerException)
         {
@@ -308,27 +310,27 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// TBD
+    ///
     /// </summary>
     [Serializable]
     public sealed class ChangePasswordFailureException : ConnectionException
     {
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ChangePasswordFailureException()
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ChangePasswordFailureException(String message) : base(message)
         {
         }
 
         /// <summary>
-        /// TBD
+        ///
         /// </summary>
         public ChangePasswordFailureException(String message, Exception innerException) : base(message, innerException)
         {

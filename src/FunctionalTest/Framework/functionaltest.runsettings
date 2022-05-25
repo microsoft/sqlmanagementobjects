@@ -9,19 +9,19 @@
       <DataCollector friendlyName="Code Coverage" uri="datacollector://Microsoft/CodeCoverage/2.0" assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
         <Configuration>
           <CodeCoverage>
-<!--
+            <!--
 Additional paths to search for .pdb (symbol) files. Symbols must be found for modules to be instrumented.
 If .pdb files are in the same folder as the .dll or .exe files, they are automatically found. Otherwise, specify them here.
 Note that searching for symbols increases code coverage runtime. So keep this small and local.
 -->
-<!--
+            <!--
             <SymbolSearchPaths>
                    <Path>C:\Users\User\Documents\Visual Studio 2012\Projects\ProjectX\bin\Debug</Path>
                    <Path>\\mybuildshare\builds\ProjectX</Path>
             </SymbolSearchPaths>
 -->
 
-<!--
+            <!--
 About include/exclude lists:
 Empty "Include" clauses imply all; empty "Exclude" clauses imply none.
 Each element in the list is a regular expression (ECMAScript syntax). See https://docs.microsoft.com/visualstudio/ide/using-regular-expressions-in-visual-studio.
@@ -45,7 +45,6 @@ Included items must then not match any entries in the exclude list to remain inc
               </Exclude>
             </ModulePaths>
 
-    
             <!-- Match attributes on any code element: -->
             <Attributes>
               <Exclude>
@@ -55,6 +54,7 @@ Included items must then not match any entries in the exclude list to remain inc
                 <Attribute>^System\.Runtime\.CompilerServices.CompilerGeneratedAttribute$</Attribute>
                 <Attribute>^System\.CodeDom\.Compiler.GeneratedCodeAttribute$</Attribute>
                 <Attribute>^System\.Diagnostics\.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>
+                <Attribute>^System\.ObsoleteAttribute</Attribute>
               </Exclude>
             </Attributes>
 
@@ -70,14 +70,16 @@ Included items must then not match any entries in the exclude list to remain inc
             </Sources>
 
             <Functions>
-            <!-- We are expressly ignoring hard-to-reach special cases and code specific to Design Mode -->
+              <!-- We are expressly ignoring hard-to-reach special cases and code specific to Design Mode -->
               <Exclude>
                 <Function>.*DesignMode.*</Function>
                 <Function>.*DoDatabaseSpecialCase\(.*</Function>
+                <Function>.*FilterException</Function>
                 <Function>.*GenerateStretchHeapWithClause.*</Function>
                 <Function>.*GetPropertyDefaultValue\(.*</Function>
                 <Function>.*InitFromSqlServer2005Store.*</Function>
                 <Function>.*InvalidSqlServer2005StoreFormatException.*</Function>
+                <Function>Microsoft\.SqlServer\.Diagnostics\..*</Function>
                 <Function>Microsoft\.SqlServer\.Management\.RegisteredServers.\RegisteredServersStore\.AddGroupMember.*</Function>
                 <Function>Microsoft\.SqlServer\.Management\.Sdk\.Sfc\.SfcSerializer.*</Function>
                 <Function>Microsoft\.SqlServer\.Management\.Smo\.AvailableSQLServers.*</Function>
@@ -97,10 +99,12 @@ Included items must then not match any entries in the exclude list to remain inc
                 <Function>.*ScriptAlterLess9.*</Function>
                 <Function>.*ScriptDbProps70Comp.*</Function>
                 <Function>.*ScriptCreateLess9.*</Function>
+                <Function>.*SetHostLoginAccount</Function>
+                <Function>.*TestMailProfile</Function>
                 <Function>.*TestNetSend</Function>
                 <Function>.*ThrowIfBelowVersion80SP3.*</Function>
                 <Function>.*ThrowIfAboveVersion80.*</Function>
-                <Function>.*ThrowIfAboveVersion100.*</Function>                
+                <Function>.*ThrowIfAboveVersion100.*</Function>
                 <Function>.*ThrowIfSourceOrDestBelowVersion80.*</Function>
                 <Function>.*ThrowIfSourceOrDestBelowVersion90.*</Function>
                 <Function>.*ThrowIfSourceOrDestBelowVersion100.*</Function>

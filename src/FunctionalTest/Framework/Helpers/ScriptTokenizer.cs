@@ -23,8 +23,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         //Regex to match the SecretStore tokens. A SecretStore token is in the form
         //$(SecretStore:<SecretName>)
         //Where <SecretName> is the secret name, minus the common prefix
-        //So a token like this $(SecretStore:SmoBaselineVerification_WasbKey/Secret) would
-        //retrieve the value for a secret with the full name of SSMS_TEST_SECRET_PREFIX + SmoBaselineVerification_WasbKey/Secret
+        //So a token like this $(SecretStore:SmoBaselineVerification_SqlToolsWasbKey/Secret) would
+        //retrieve the value for a secret with the full name of SSMS_TEST_SECRET_PREFIX + SmoBaselineVerification_SqlToolsWasbKey/Secret
         private static readonly Regex SecretStoreRegex = new Regex(@"(\$\(SecretStore:(?<SecretName>.*?)\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
@@ -76,11 +76,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         public const string TOKEN_ClusteredIndexName = "$(ClusteredIndexName)";
         // Edge constraint name
         public const string TOKEN_EdgeConstraintName = "$(EdgeConstraintName)";
-        // Sql MI file paths (uri) must be tokenized
+        // Sql file paths (uri) must be tokenized
         private const string TOKEN_MasterDBPath = "$(MasterDBPath)";
         private const string TOKEN_MasterDBLogPath = "$(MasterDBLogPath)";
         private const string TOKEN_PrimaryFilePath = "$(PrimaryFilePath)";
         private const string TOKEN_LogFileName = "$(LogFileName)";
+        private const string TOKEN_InstallDataDirectory = "$(InstallDataDirectory)";
 
         // The default backup directory.
         // Example of values:
@@ -224,13 +225,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                         str = str.Replace(dataFile.FileName, $"$({ dataFile.Name }_FileName)");
                     }
                 }
-                // PrimaryFilePath must be probed last because it's contained in almost all of the other paths (except for backup dir)
-                str = str
-                    .Replace(svr.MasterDBPath, TOKEN_MasterDBPath)
-                    .Replace(svr.MasterDBLogPath, TOKEN_MasterDBLogPath)
-                    .Replace(svr.BackupDirectory, TOKEN_BackupDirectory)
-                    .Replace(database.LogFiles[0].FileName, TOKEN_LogFileName)
-                    .Replace(database.PrimaryFilePath, TOKEN_PrimaryFilePath);
             }
 
             //Azure doesn't expose the data file paths
@@ -270,6 +264,15 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     str = str.Replace(errorLogPath, TOKEN_ErrorLogPath, StringComparison.CurrentCultureIgnoreCase);
                     str = str.Replace(escapedErrorLogPath, TOKEN_SingleQuoteEscapedErrorLogPath, StringComparison.CurrentCultureIgnoreCase);
                 }
+
+                // InstallDataDirectory must be probed last because it's contained in almost all of the other paths (except for backup dir)
+                str = str
+                    .Replace(svr.MasterDBPath, TOKEN_MasterDBPath)
+                    .Replace(svr.MasterDBLogPath, TOKEN_MasterDBLogPath)
+                    .Replace(database.LogFiles[0].FileName, TOKEN_LogFileName)
+                    .Replace(database.PrimaryFilePath, TOKEN_PrimaryFilePath)
+                    .Replace(svr.InstallDataDirectory, TOKEN_InstallDataDirectory);
+
             }
 
             //A workaround needed to keep testing Database.baseline.xml for SqlOnDemand
@@ -376,35 +379,35 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     }
                 }
 
-                // PrimaryFilePath must be probed last because it's contained in almost all of the other paths (except for backup dir)
-                ret = ret
-                    .Replace(TOKEN_MasterDBPath, svr.MasterDBPath)
-                    .Replace(TOKEN_MasterDBLogPath, svr.MasterDBLogPath)
-                    .Replace(TOKEN_BackupDirectory, svr.BackupDirectory)
-                    .Replace(TOKEN_LogFileName, database.LogFiles[0].FileName)
-                    .Replace(TOKEN_PrimaryFilePath, database.PrimaryFilePath);
+                
             }
 
-            var defaultDataPath = string.Empty;
-            var backupDirectory = string.Empty;
-            var errorLogPath = string.Empty;
 
             if (svr.ServerType != DatabaseEngineType.SqlAzureDatabase)
             {
                 //Azure doesn't have this property, so we'll just leave it as an empty string
-                defaultDataPath = string.IsNullOrEmpty(svr.Settings.DefaultFile) ? svr.MasterDBPath : svr.Settings.DefaultFile;
+                var defaultDataPath = string.IsNullOrEmpty(svr.Settings.DefaultFile) ? svr.MasterDBPath : svr.Settings.DefaultFile;
                 //MasterDbPath doesn't have trailing slash so add it if it doesn't exist
                 defaultDataPath += defaultDataPath.EndsWith(@"\") ? "" : @"\";
 
-                backupDirectory = string.IsNullOrEmpty(svr.Settings.BackupDirectory) ? svr.BackupDirectory : svr.Settings.BackupDirectory;
+                var backupDirectory = string.IsNullOrEmpty(svr.Settings.BackupDirectory) ? svr.BackupDirectory : svr.Settings.BackupDirectory;
 
-                errorLogPath = svr.ErrorLogPath;
+                var errorLogPath = svr.ErrorLogPath;
+
+                ret = ret.Replace(TOKEN_DefaultDataPath, defaultDataPath, StringComparison.CurrentCultureIgnoreCase);
+                ret = ret.Replace(TOKEN_BackupDirectory, backupDirectory, StringComparison.CurrentCultureIgnoreCase);
+                ret = ret.Replace(TOKEN_SingleQuoteEscapedBackupDirectory, backupDirectory, StringComparison.CurrentCultureIgnoreCase);
+                ret = ret.Replace(TOKEN_ErrorLogPath, errorLogPath, StringComparison.CurrentCultureIgnoreCase);
+                ret = ret.Replace(TOKEN_SingleQuoteEscapedErrorLogPath, errorLogPath, StringComparison.CurrentCultureIgnoreCase);
+
+                // InstallDataDirectory must be probed last because it's contained in almost all of the other paths (except for backup dir)
+                ret = ret
+                    .Replace(TOKEN_MasterDBPath, svr.MasterDBPath)
+                    .Replace(TOKEN_MasterDBLogPath, svr.MasterDBLogPath)
+                    .Replace(TOKEN_LogFileName, database.LogFiles[0].FileName)
+                    .Replace(TOKEN_PrimaryFilePath, database.PrimaryFilePath)
+                    .Replace(TOKEN_InstallDataDirectory, svr.InstallDataDirectory);
             }
-            ret = ret.Replace(TOKEN_DefaultDataPath, defaultDataPath, StringComparison.CurrentCultureIgnoreCase);
-            ret = ret.Replace(TOKEN_BackupDirectory, backupDirectory, StringComparison.CurrentCultureIgnoreCase);
-            ret = ret.Replace(TOKEN_SingleQuoteEscapedBackupDirectory, backupDirectory, StringComparison.CurrentCultureIgnoreCase);
-            ret = ret.Replace(TOKEN_ErrorLogPath, errorLogPath, StringComparison.CurrentCultureIgnoreCase);
-            ret = ret.Replace(TOKEN_SingleQuoteEscapedErrorLogPath, errorLogPath, StringComparison.CurrentCultureIgnoreCase);
 
             //Replace all of the secret store tokens with their retrieved values
             //Note we prefix the secret name with a common test prefix before retrieving it

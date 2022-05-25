@@ -220,7 +220,7 @@
     </version>
 
     <version cloud_min_major='12'>
-      <post_process fields = '#Size#'
+      <post_process fields = '#Size#IsLedger#'
                     class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
                     triggered_fields='#DatabaseName7#'/>
     </version>
@@ -437,6 +437,11 @@
     <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="AutoCreateIncrementalStatisticsEnabled" type="bit" mode="deploy">dtb.is_auto_create_stats_incremental_on</property>
     </version>
+
+    <version min_major='16' cloud_min_major='12'>
+      <property name="IsLedger" type="bit" cast='true' read_only_after_creation="true">dtb.is_ledger_on</property>
+    </version>
+    
     <!-- DATABASEPROPERTY obtained properties -->
     <version min_major='8' max_major='8'>
       <property name="IsFullTextEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsFulltextEnabled')</property>

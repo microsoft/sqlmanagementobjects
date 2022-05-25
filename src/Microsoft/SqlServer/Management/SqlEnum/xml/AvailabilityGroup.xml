@@ -78,11 +78,16 @@
     </version>
     
     <version min_major="7" max_major='14'>
-      <property name="IsManagedInstanceLink" type="bit" access="Read" cast="true" expensive="true">0</property>
+      <property name="IsManagedInstanceLink" type="bit" access="Read" cast="true" expensive="false">0</property>
     </version>
     
     <version min_major='15'>
       <property name="IsManagedInstanceLink" type="bit" access="Read" cast="true" expensive="true">ISNULL(MIL.is_managed_instance_link, 0) &amp; ISNULL(AG.is_distributed, 0)</property>
     </version>
+
+    <version min_major='16'>
+      <property name="IsContained" type="bit" cast="true" read_only_after_creation="true" expensive="false">ISNULL(AG.is_contained, 0)</property>
+    </version>
+
   </properties>
 </EnumObject>

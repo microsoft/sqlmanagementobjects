@@ -467,6 +467,114 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
         #endregion Scripting Tests
 
+        #region Contained AG Tests
+        // DEVNOTE(MatteoT): 4/17/2022 I am intentionally tagging these tests with
+        //   [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
+        // for 2 reasons:
+        //  1) we don't have a nice standalone box, so this is always trouble to run locally (at least for me)
+        //  2) I am not sure there's a whole lot of value running the test for both Linux and Windows: they are equivalent in this case.
+
+        /// <summary>
+        /// Only captures the T-SQL scripts, doesn't execute them.
+        /// </summary>
+        /// <remarks>Contained AG is new in SQL 2022</remarks>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 11, MaxMajor = 15, Edition = DatabaseEngineEdition.Enterprise)]
+        [UnsupportedDatabaseEngineType(DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
+        public void AvailabilityGroup_Neither_Contained_Nor_Reuse_System_Databases_Are_Scripted_For_Servers_That_Dont_Support_Contained_AGs()
+        {
+            this.ExecuteTest(server =>
+            {
+                {
+                    foreach (var reusesdbs in new[] { (bool?)null, true, false })
+                    {
+                        var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                        if (reusesdbs.HasValue)
+                        {
+                            ag.ReuseSystemDatabases = reusesdbs.Value;
+                        }
+
+                        var createScript = TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create);
+
+                        Assert.That(createScript,
+                            Does.Not.Contain("CONTAINED").IgnoreCase,
+                            $"CONTAINED should not appear in script for legacy versions of SQL Server (ReuseSystemDatabases={reusesdbs}");
+
+                        Assert.That(createScript,
+                            Does.Not.Contain("REUSE_SYSTEM_DATABASES").IgnoreCase,
+                            $"REUSE_SYSTEM_DATABASES should not appear in script for legacy versions of SQL Server (ReuseSystemDatabases={reusesdbs}");
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// Only captures the T-SQL scripts, doesn't execute them.
+        /// </summary>
+        /// <remarks>Contained AG is new in SQL 2022</remarks>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16, Edition = DatabaseEngineEdition.Enterprise)]
+        [UnsupportedDatabaseEngineType(DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
+        public void AvailabilityGroup_Contained_And_Reuse_System_Databases_Are_Scripted_Currectly_For_Servers_That_Support_Contained_AGs()
+        {
+            this.ExecuteTest(server =>
+            {
+                {
+                    foreach (var contained in new[] { (bool?)null, true, false })
+                    {
+                        foreach (var reusesdbs in new[] { (bool?)null, true, false })
+                        {
+                            var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                            if (contained.HasValue)
+                            {
+                                ag.IsContained = contained.Value;
+                            }
+
+                            if (reusesdbs.HasValue)
+                            {
+                                ag.ReuseSystemDatabases = reusesdbs.Value;
+                            }
+
+                            var createScript = TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create);
+
+                            if (!contained.GetValueOrDefault())
+                            {
+                                Assert.That(createScript,
+                                    Does.Not.Contain("CONTAINED").IgnoreCase,
+                                    $"CONTAINED should not be scriped (IsContained={contained}, ReuseSystemDatabases={reusesdbs}");
+
+                                // Regardless of the value we set it to, the propery is ignored because the AG is not contained
+                                Assert.That(createScript,
+                                    Does.Not.Contain("REUSE_SYSTEM_DATABASES").IgnoreCase,
+                                    $"REUSE_SYSTEM_DATABASES should not be scripted (IsContained={contained}, ReuseSystemDatabases={reusesdbs}");
+                            }
+                            else
+                            {
+                                Assert.That(createScript,
+                                    Does.Contain("CONTAINED").IgnoreCase,
+                                    $"CONTAINED should appear in script for SQL 2022 or higher (IsContained={contained}, ReuseSystemDatabases={reusesdbs})");
+
+                                var scripted_or_not = reusesdbs.GetValueOrDefault() ? "scripted " : "not scripted ";
+
+                                Assert.That(createScript,
+                                    !reusesdbs.GetValueOrDefault()
+                                    ? Does.Not.Contain("REUSE_SYSTEM_DATABASES").IgnoreCase
+                                    : Does.Contain("REUSE_SYSTEM_DATABASES").IgnoreCase,
+                                    $"REUSE_SYSTEM_DATABASES was {scripted_or_not} (IsContained={contained}, ReuseSystemDatabases={reusesdbs}");
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        #endregion Contained AG Test
+
+
         /// <summary>
         /// Verify that SMO object is dropped.
         /// <param name="obj">Smo object.</param>

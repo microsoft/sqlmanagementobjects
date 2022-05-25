@@ -205,6 +205,11 @@ NoHiddenColumnsOnNonGeneratedAlwaysColumns = Only system-time period columns can
 InvalidHistoryRetentionPeriodSpecification = History retention period value was not specified correctly. Expected value greater than 0.
 InvalidHistoryRetentionPeriodUnitSpecification = History retention period unit was not specified correctly. Expected value other than UNDEFINED.
 
+; Ledger messages
+LedgerTypeMustBeProvided = Ledger tables cannot be defined without the LedgerTableType being defined as AppendOnlyLedgerTable or UpdatableLedgerTable.
+BothLedgerViewNameAndSchemaMustBeProvided = When defining ledger view, either both the view name and view schema must be provided or neither of them.
+CannotProvideLedgerViewColumnNamesWithoutLedgerViewNameAndSchema = Ledger view schema and view name must be provided in order to specify ledger view column names.
+
 ; Data Masking messages
 NoDataMaskingOnNonTables = Data Masking can be applied only to table columns.
 InvalidMaskingFunctionFormat = The data masking function provided for column {0} is invalid.

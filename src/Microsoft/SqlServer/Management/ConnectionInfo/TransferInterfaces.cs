@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Runtime.Serialization;
 
+// VBUMP: For v17 remove unused interfaces like ITransferMetadataProvider and move the rest to Smo.Extended
 namespace Microsoft.SqlServer.Management.Common
 {
     /// <summary>

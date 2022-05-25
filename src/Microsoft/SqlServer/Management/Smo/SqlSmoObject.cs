@@ -4262,7 +4262,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 yield return nameof(Index.SpatialIndexType);
                 yield return nameof(Index.IsSpatialIndex);
                 yield return nameof(Server.Configuration.ContainmentEnabled);
-
             }
             if ((sp != null && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand) || this.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {
@@ -4289,6 +4288,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 yield return nameof(Database.HasMemoryOptimizedObjects);
                 yield return nameof(Database.HonorBrokerPriority);
                 yield return nameof(Database.IsFullTextEnabled);
+                yield return nameof(Database.IsLedger);
                 yield return nameof(Database.IsParameterizationForced);
                 yield return nameof(Database.IsReadCommittedSnapshotOn);
                 yield return nameof(Database.IsSqlDw);
@@ -4317,6 +4317,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 yield return nameof(Database.Trustworthy);
                 yield return nameof(Database.UserAccess);
                 yield return nameof(Table.IndexSpaceUsed);
+                yield return nameof(Column.IsDroppedLedgerColumn);
+                yield return nameof(Table.LedgerType);
+                yield return nameof(Table.IsDroppedLedgerTable);
+                yield return nameof(Table.LedgerViewName);
+                yield return nameof(Table.LedgerViewOperationTypeColumnName);
+                yield return nameof(Table.LedgerViewSchema);
+                yield return nameof(Table.LedgerViewSequenceNumberColumnName);
+                yield return nameof(Table.LedgerViewTransactionIdColumnName);
+                yield return nameof(View.LedgerViewType);
+                yield return nameof(View.IsDroppedLedgerView);
                 // Used by SqlManagerUI to disable GUI elements named differently than corresponding properties
                 yield return "AllowSnapshotIsolation";
                 yield return "Automatic";
@@ -4337,8 +4347,19 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if ((sp != null && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance) || this.DatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
             {
+                yield return nameof(Database.IsLedger);
                 yield return nameof(Database.RemoteDataArchiveEnabled);
                 yield return nameof(DataFile.VolumeFreeSpace);
+                yield return nameof(Column.IsDroppedLedgerColumn);
+                yield return nameof(Table.LedgerType);
+                yield return nameof(Table.IsDroppedLedgerTable);
+                yield return nameof(Table.LedgerViewName);
+                yield return nameof(Table.LedgerViewOperationTypeColumnName);
+                yield return nameof(Table.LedgerViewSchema);
+                yield return nameof(Table.LedgerViewSequenceNumberColumnName);
+                yield return nameof(Table.LedgerViewTransactionIdColumnName);
+                yield return nameof(View.LedgerViewType);
+                yield return nameof(View.IsDroppedLedgerView);
             }
         }
 

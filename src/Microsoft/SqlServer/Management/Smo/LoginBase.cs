@@ -1072,9 +1072,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     // its password to something else
                     // the password gets generated on the client side
                     StringBuilder pwdGenScript = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-                    SecurityUtils.ScriptRandomPwd(pwdGenScript);
+                    SecurityUtils.ScriptPlaceholderPwd(pwdGenScript);
                     statement.Insert(0, pwdGenScript.ToString());
-                    statement.Append(", @passwd = @randomPwd");
+                    statement.Append(", @passwd = @placeholderPwd");
                     chgcount++;
                 }
                 else

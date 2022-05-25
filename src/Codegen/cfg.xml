@@ -322,6 +322,7 @@
       <property name="TwoDigitYearCutoff" generate="true" is_intrinsic="false" />
       <property name="TargetRecoveryTime" generate="true" is_intrinsic="false" />
       <property name="DelayedDurability" generate="true" is_intrinsic="false" />
+      <property name="IsLedger" generate="true" is_intrinsic="false"/>
 
       <!-- Halligan (Stretch DB) properties -->
       <property name="RemoteDataArchiveEnabled" generate="true" is_intrinsic="false" />
@@ -888,7 +889,9 @@
       <property name="HistoryRetentionPeriodUnit" generate="true" is_intrinsic="false"/>
       <!-- Ledger properties -->
       <property name="IsLedger" generate="true" is_intrinsic="false"/>
-	  <property name="LedgerType" generate="true" is_intrinsic="false"/>
+      <property name="IsDroppedLedgerTable" generate="true" is_intrinsic="false"/>
+      <property name="LedgerType" generate="true" is_intrinsic="false"/>
+      <property name="LedgerViewSchema" generate="true" is_intrinsic="false"/>
       <property name="LedgerViewName" generate="true" is_intrinsic="false"/>
       <property name="LedgerViewTransactionIdColumnName" generate="true" is_intrinsic="false"/>
       <property name="LedgerViewSequenceNumberColumnName" generate="true" is_intrinsic="false"/>
@@ -959,6 +962,7 @@
       <property name="IsFullTextIndexed" generate="true" is_intrinsic="false" />
       <property name="StatisticalSemantics" generate="true" is_intrinsic="false" />
       <property name="IsDeterministic" generate="true" is_intrinsic="false" />
+      <property name="IsDroppedLedgerColumn" generate="true" is_intrinsic="false" />
       <property name="IsPrecise" generate="true" is_intrinsic="false" />
       <property name="IsPersisted" generate="true" is_intrinsic="true" />
       <property name="Length" generate="false" is_intrinsic="true" />
@@ -1560,6 +1564,7 @@
       <property name="HasNonClusteredIndex" generate="true" is_intrinsic="false" />
       <property name="DwMaterializedViewDistribution" generate="true" is_intrinsic="false" />
       <property name="LedgerViewType" generate="true" is_intrinsic="false" />
+      <property name="IsDroppedLedgerView" generate="true" is_intrinsic="false" />
     </object>
     <object class_name="ExtendedProperty" collection_name="ExtendedProperties" urn="Server[@Name='']/Database/Table/ExtendedProperty" possible_parents="Database;SqlAssembly;UserDefinedAggregate;UserDefinedAggregateParameter;UserDefinedType;PlanGuide;User;Schema;DatabaseRole;ApplicationRole;Table;Column;Trigger;Check;Index;ForeignKey;Default;Rule;Synonym;Sequence;StoredProcedure;StoredProcedureParameter;NumberedStoredProcedureParameter;ExtendedStoredProcedure;UserDefinedDataType;UserDefinedTableType;UserDefinedFunction;UserDefinedFunctionParameter;View;XmlSchemaCollection;PartitionFunction;PartitionScheme;DatabaseDdlTrigger;SecurityPolicy" parent_type="SqlSmoObject">
       <property name="Value" generate="false" is_intrinsic="true" />
@@ -1965,6 +1970,7 @@
       <property name="ClusterType" generate="true" />
       <property name="RequiredSynchronizedSecondariesToCommit" generate="true" />
       <property name="IsManagedInstanceLink" generate="true" default="false" />
+      <property name="IsContained" generate="true" default="false"/>
     </object>
 
     <object class_name="AvailabilityReplica" collection_name="AvailabilityReplicas" urn="Server[@Name='']/AvailabilityGroup/AvailabilityReplica" parent_type="AvailabilityGroup" >

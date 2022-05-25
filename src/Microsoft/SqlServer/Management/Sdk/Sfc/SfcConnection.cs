@@ -59,7 +59,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         private SfcConnectionContextMode mode= SfcConnectionContextMode.Offline;
 
         /// <summary>
-        /// Construct the context for tracking and transitioning between offlinf, online and batch update modes.
+        /// Construct the context for tracking and transitioning between offline, online and batch update modes.
         /// </summary>
         /// <param name="domain">The domain instance for this context. 
         /// If null, then the mode is fixed as Offline and cannot be changed, otherwise it is initialized to Online.</param>
@@ -95,7 +95,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     return;
                 }
 
-                // $TODO$: Remove this conditional once we support batch update modes in CTP6.
                 if (value != SfcConnectionContextMode.TransactedBatch && value != SfcConnectionContextMode.NonTransactedBatch)
                 {
                     switch (mode)

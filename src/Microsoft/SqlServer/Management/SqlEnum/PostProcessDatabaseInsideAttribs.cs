@@ -276,6 +276,10 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 sb.AddProperty("QueryOptimizerHotfixesForSecondary", "(select ISNULL(value_for_secondary, 2) from sys.database_scoped_configurations as dsc where dsc.name = 'QUERY_OPTIMIZER_HOTFIXES')");
             }
+            if (GetIsFieldHit("IsLedger"))
+            {
+                sb.AddProperty("IsLedger", "(select is_ledger_on from sys.databases WHERE name=N'{0}')");
+            }
 
             AddDbChaining(sb);
 
@@ -439,7 +443,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     case "HasFileInCloud":
                         data = Convert.ToBoolean((this.rowResults[0]["HasFileInCloud"]));
                         break;
-
+                    // Property indicates whether database has any Isledger ON in cloud path
+                    case "IsLedger":
+                        data = Convert.ToBoolean((this.rowResults[0]["IsLedger"]));
+                        break;
                     //when modify check table.xml IndexSpaceUsed and index.xml IndexSpaceUsed for consistency
                     case "IndexSpaceUsage":
                         if (sv.Major < 9)
@@ -616,7 +623,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //configuration_id 124:  default language
                 //configuration_id 1126: default full-text language
                 //configuration_id 1127: two digit year cutoff
-                //configuration_id 1555: transform noise words                
+                //configuration_id 1555: transform noise words
                 string query = @"select 
 case 
     when cfg.configuration_id = 124 -- configuration id for default language

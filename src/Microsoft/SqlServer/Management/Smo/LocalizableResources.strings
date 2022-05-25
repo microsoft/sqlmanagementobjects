@@ -317,6 +317,9 @@ Database_IsDbSecurityAdminDesc=Specifies whether the current user is a member of
 Database_IsFullTextEnabledName=Is Full-Text Enabled
 Database_IsFullTextEnabledDesc=Specifies whether the database is enabled for full-text search.
 
+Database_IsLedgerName=Ledger
+Database_IsLedgerDesc=Gets or Sets whether Ledger is enabled at the database level.
+
 Database_IsMailHostName=Is Mail Host
 Database_IsMailHostDesc=Specifies whether the database is configured as a mail host.
 
@@ -801,6 +804,9 @@ View_HasUpdateTriggerDesc=Gets the Boolean property value that specifies whether
 
 View_IDName=ID
 View_IDDesc=Gets the ID value that uniquely identifies the view.
+
+View_IsDroppedLedgerViewName=Is Dropped Ledger View
+View_IsDroppedLedgerViewDesc=Gets the Boolean property that specifies whether the view is a dropped ledger view.
 
 View_IsEncryptedName=Is Encrypted
 View_IsEncryptedDesc=Gets or sets the Boolean property that specifies whether the view is encrypted.
@@ -2210,6 +2216,9 @@ Table_IDDesc=Gets the ID value that uniquely identifies the table.
 Table_IndexSpaceUsedName=Index Space Used Name=
 Table_IndexSpaceUsedDesc=Gets the space used by the index, in kilobytes.
 
+Table_IsDroppedLedgerTableName=Is Dropped Ledger Table
+Table_IsDroppedLedgerTableDesc=Gets the Boolean property value that specifies whether the table is a dropped ledger table.
+
 Table_IsIndexableName=Is Indexable
 Table_IsIndexableDesc=Gets the Boolean property value that specifies whether an index can be placed on the table.
 
@@ -2341,6 +2350,9 @@ Table_LedgerViewTransactionIdColumnNameDesc=The name of ledger view  transaction
 
 Table_LedgerViewNameName=Ledger View Name
 Table_LedgerViewNameDesc=The name of ledger view
+
+Table_LedgerViewSchemaName=Ledger View Schema
+Table_LedgerViewSchemaDesc=The schema of ledger view
 
 Table_SystemTimePeriodEndColumnName=System Time Period End Column
 Table_SystemTimePeriodEndColumnDesc=The name of end time column for SYSTEM_TIME period in a system-versioned Temporal table.
@@ -3932,14 +3944,17 @@ AvailabilityGroup_DatabaseHealthTriggerDesc=Gets or sets a boolean value indicat
 AvailabilityGroup_DtcSupportEnabledName=DTC Support Enabled
 AvailabilityGroup_DtcSupportEnabledDesc=Gets or sets a boolean value indicating whether per-database DTC support is enabled.
 
-AvailabilityGroup_IsDistributedAvailabilityGroupName=Distributed Availability Group
-AvailabilityGroup_IsDistributedAvailabilityGroupDesc=Gets or sets a boolean value indicating whether this is distributed Availability Group.
+AvailabilityGroup_IsDistributedAvailabilityGroupName=Is Distributed Availability Group
+AvailabilityGroup_IsDistributedAvailabilityGroupDesc=Gets or sets a boolean value indicating whether this is Distributed Availability Group.
 
-AvailabilityGroup_IsManagedInstanceLinkName=Managed Instance Link
-AvailabilityGroup_IsManagedInstanceLinkDesc=Gets a boolean value indicating whether this is Managed Instance Link.
+AvailabilityGroup_IsManagedInstanceLinkName=Is Managed Instance Link
+AvailabilityGroup_IsManagedInstanceLinkDesc=Gets a boolean value indicating whether this is a Managed Instance Link.
 
 AvailabilityGroup_RequiredSynchronizedSecondariesToCommitName=Required Synchronized Secondaries to Commit
 AvailabilityGroup_RequiredSynchronizedSecondariesToCommitDesc=The minimum number of synchronous secondary replicas required to commit before the primary commits a transaction.
+
+AvailabilityGroup_IsContainedName=Is Contained
+AvailabilityGroup_IsContainedDesc=Gets or set a Boolean property value that specifies whether this is a Contained Availability Group.
 
 ######## End AvailabilityGroup
 

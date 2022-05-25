@@ -158,7 +158,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // add code that will generate the random password
             if (!sp.ScriptForCreateDrop)
             {
-                SecurityUtils.ScriptRandomPwd(sb);
+                SecurityUtils.ScriptPlaceholderPwd(sb);
             }
 
             //if 7.0, 8.0
@@ -177,7 +177,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (!sp.ScriptForCreateDrop)
                 {
-                    sb.Append(", @password = @randomPwd");
+                    sb.Append(", @password = @placeholderPwd");
                 }
                 else
                 {
@@ -230,7 +230,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 else
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture,
-                                    "select @statement = N'{0}' + N'PASSWORD = N' + QUOTENAME(@randomPwd,'''')",
+                                    "select @statement = N'{0}' + N'PASSWORD = N' + QUOTENAME(@placeholderPwd,'''')",
                                     SqlString(roleStmt.ToString()));
                     sb.Append(Globals.newline);
                     sb.Append("EXEC dbo.sp_executesql @statement");

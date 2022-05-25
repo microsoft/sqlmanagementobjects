@@ -59,48 +59,39 @@
       </property_link>
     </version>
     <version min_major='16' cloud_min_major='12'>
-      <property_link fields='#IsLedger#LedgerViewName#LedgerType#IsSystemVersioned' left_join="#tmp_ledger_details AS ledgertbl">ledgertbl.table_object_id = tbl.object_id</property_link>
-      <property_link fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName' left_join="#tmp_ledger_view_column_names AS ledgerviewcoltbl">ledgerviewcoltbl.table_object_id = tbl.object_id</property_link>
+      <property_link fields='#LedgerViewName#LedgerViewSchema#' left_join="#tmp_ledger_details AS ledgertbl">ledgertbl.table_object_id = tbl.object_id</property_link>
+      <property_link fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#' left_join="#tmp_ledger_view_column_names AS ledgerviewcoltbl">ledgerviewcoltbl.table_object_id = tbl.object_id</property_link>
     </version>
     <version min_major='16' cloud_min_major='12'>
-      <prefix fields="#IsLedger#LedgerViewName#LedgerType#IsSystemVersioned">
+      <prefix fields="#LedgerViewName#LedgerViewSchema#">
         CREATE TABLE #tmp_ledger_details
-        (table_object_id int not null, ledger_view_object_id int null, ledger_view_name sysname null, ledger_type int null, is_system_versioned bit null)
-        IF EXISTS(SELECT 1 FROM sys.all_columns WHERE Name = N'is_dropped_ledger_table' AND object_id = Object_ID(N'sys.tables'))
-        EXECUTE(
-        N'INSERT INTO #tmp_ledger_details
-        SELECT t.object_id, v.object_id, v.name, t.ledger_type,
-        CASE when (t.temporal_type = 2) OR (t.ledger_type = 2) then 1 else 0 end AS is_system_versioned
-        from sys.tables as t LEFT JOIN sys.views as v ON v.object_id=t.ledger_view_id')
-        ELSE
-        EXECUTE(
-        N'INSERT INTO #tmp_ledger_details
-        SELECT t.object_id, null AS object_id, null AS name, null AS ledger_type,
-        CASE when (t.temporal_type = 2) then 1 else 0 end AS is_system_versioned
-        from sys.tables as t')
+        (table_object_id int not null, ledger_view_name sysname null, ledger_view_schema_name sysname null)
+        INSERT INTO #tmp_ledger_details
+        SELECT t.object_id, v.name, s.name
+        from sys.tables as t
+        INNER JOIN sys.views as v ON v.object_id = t.ledger_view_id
+        INNER JOIN sys.schemas as s ON s.schema_id = v.schema_id
       </prefix>
-      <prefix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName'>
+      <prefix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#'>
         CREATE TABLE #tmp_ledger_view_column_names
         (table_object_id int not null, ledger_transaction_id_column_name sysname null, ledger_sequence_number_column_name sysname null, ledger_operation_type_column_name sysname null, ledger_operation_type_desc_column_name sysname null)
-        IF EXISTS(SELECT 1 FROM sys.all_columns WHERE Name = N'is_dropped_ledger_table' AND object_id = Object_ID(N'sys.tables'))
-        EXECUTE(
-          N'INSERT INTO #tmp_ledger_view_column_names
-          SELECT
-            t_obj_id,
-            [ledger_transaction_id_column_name] = MAX(CASE WHEN ledger_view_column_type = 1 THEN c_name ELSE NULL END),
-            [ledger_sequence_number_column_name] =MAX(CASE WHEN ledger_view_column_type = 2 THEN c_name ELSE NULL END),
-            [ledger_operation_type_column_name] = MAX(CASE WHEN ledger_view_column_type = 3 THEN c_name ELSE NULL END),
-            [ledger_operation_type_desc_column_name] = MAX(CASE WHEN ledger_view_column_type = 4 THEN c_name ELSE NULL END)
-          FROM
+        INSERT INTO #tmp_ledger_view_column_names
+        SELECT
+          t_obj_id,
+          [ledger_transaction_id_column_name] = MAX(CASE WHEN ledger_view_column_type = 1 THEN c_name ELSE NULL END),
+          [ledger_sequence_number_column_name] =MAX(CASE WHEN ledger_view_column_type = 2 THEN c_name ELSE NULL END),
+          [ledger_operation_type_column_name] = MAX(CASE WHEN ledger_view_column_type = 3 THEN c_name ELSE NULL END),
+          [ledger_operation_type_desc_column_name] = MAX(CASE WHEN ledger_view_column_type = 4 THEN c_name ELSE NULL END)
+        FROM
+        (
+          SELECT t.object_id as t_obj_id, a.name as c_name, a.ledger_view_column_type FROM sys.tables as t
+          CROSS APPLY
           (
-            SELECT t.object_id as t_obj_id, a.name as c_name, a.ledger_view_column_type FROM sys.tables as t
-            CROSS APPLY
-            (
-              SELECT name, ledger_view_column_type  FROM sys.columns as c
-              WHERE c.object_id = t.ledger_view_id and t.ledger_view_id!=0 and c.ledger_view_column_type!=0 and t.is_dropped_ledger_table=0 
-            ) a
-          ) as x
-          GROUP BY x.t_obj_id')
+            SELECT name, ledger_view_column_type  FROM sys.columns as c
+            WHERE c.object_id = t.ledger_view_id and t.ledger_view_id!=0 and c.ledger_view_column_type!=0 and t.is_dropped_ledger_table=0
+          ) a
+        ) as x
+        GROUP BY x.t_obj_id
       </prefix>
     </version>
     <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
@@ -173,16 +164,16 @@
         drop table #external_data
       </postfix>
     </version>
-    <version cloud_min_major='15'>
-      <postfix>
+    <version min_major='15'>
+      <postfix fields='#DataRetentionPeriod#DataRetentionPeriodUnit#DataRetentionEnabled#DataRetentionFilterColumnName#'>
         drop table #temp_data_retention_table_property
       </postfix>
     </version>
     <version min_major='16' cloud_min_major='12'>
-      <postfix fields='#IsLedger#LedgerViewName#LedgerType#IsSystemVersioned'>
+      <postfix fields='#LedgerViewName#LedgerViewSchema#'>
         DROP TABLE #tmp_ledger_details
       </postfix>
-      <postfix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName'>
+      <postfix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#'>
         DROP TABLE #tmp_ledger_view_column_names
       </postfix>
     </version>
@@ -251,7 +242,8 @@
       <property name="HasFullTextCatalog" type="bit" hidden='true' cast='true'>OBJECTPROPERTY(tbl.id, 'TableFullTextCatalogId')</property>
       <!-- used for link with PartitionSchemeParameter, inc_storage -->
       <property name="IndexID" type="int" hidden='true'>idx.indid</property>
-      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >0</property>
+      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true">0</property>
+      <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
     </version>
     <version min_major='7' max_major='7'>
       <property name="RowCount" type="int" report_type2 = 'System.Int64' access='Read' cast='true'>idx.rows</property>
@@ -296,6 +288,7 @@
     </version>
     <version min_major='9' max_major='15'>
       <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >0</property>
+      <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
     </version>
 
     <version min_major='9' max_major='11'>
@@ -444,15 +437,17 @@
     </version>
 
     <version min_major='16' cloud_min_major='12'>
-      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >case when ledgertbl.ledger_view_object_id IS NULL then 0 else 1 end</property>
-      <property name="LedgerType" type="int" cast="true" read_only_after_creation="true" report_type="LedgerTableType" >ISNULL(ledgertbl.ledger_type, 0)</property>
-      <property name="LedgerViewName" type="sysname" read_only_after_creation="true" >ISNULL(ledgertbl.ledger_view_name, N'')</property>
-      <property name="LedgerViewTransactionIdColumnName" type="sysname" read_only_after_creation="true">ISNULL(ledgerviewcoltbl.ledger_transaction_id_column_name, N'')</property>
-      <property name="LedgerViewSequenceNumberColumnName" type="sysname" read_only_after_creation="true">ISNULL(ledgerviewcoltbl.ledger_sequence_number_column_name, N'')</property>
-      <property name="LedgerViewOperationTypeColumnName" type="sysname" read_only_after_creation="true">ISNULL(ledgerviewcoltbl.ledger_operation_type_column_name, N'')</property>
-      <property name="LedgerViewOperationTypeDescColumnName" type="sysname" read_only_after_creation="true">ISNULL(ledgerviewcoltbl.ledger_operation_type_desc_column_name, N'')</property>
+      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true">CASE tbl.ledger_type WHEN 2 THEN 1 WHEN 3 THEN 1 ELSE 0 END</property>
+      <property name="LedgerType" type="int" cast="true" read_only_after_creation="true" report_type="LedgerTableType">ISNULL(tbl.ledger_type, 0)</property>
+      <property name="LedgerViewName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgertbl.ledger_view_name, N'')</property>
+      <property name="LedgerViewSchema" type="sysname" cast="true" read_only_after_creation="true" expensive="true">ISNULL(ledgertbl.ledger_view_schema_name, N'')</property>
+      <property name="IsDroppedLedgerTable" type="bit" cast="true" access="Read">ISNULL(tbl.is_dropped_ledger_table, 0)</property>
+      <property name="LedgerViewTransactionIdColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_transaction_id_column_name, N'')</property>
+      <property name="LedgerViewSequenceNumberColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_sequence_number_column_name, N'')</property>
+      <property name="LedgerViewOperationTypeColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_operation_type_column_name, N'')</property>
+      <property name="LedgerViewOperationTypeDescColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_operation_type_desc_column_name, N'')</property>
       <!-- System Versioned Property -->
-      <property name="IsSystemVersioned" type="bit" cast="true" read_only_after_creation="true">CASE ledgertbl.is_system_versioned WHEN 1 THEN 1 ELSE 0 END</property>
+      <property name="IsSystemVersioned" type="bit" cast="true" read_only_after_creation="true">CASE WHEN (tbl.temporal_type = 2) OR (tbl.ledger_type = 2) THEN 1 ELSE 0 END</property>
     </version>
 
     <version min_major='11'>
@@ -482,7 +477,6 @@
 
     <version min_major='13' cloud_min_major='12'>
       <!-- Temporal Properties -->
-
       <property name="HistoryTableName" type="sysname" cast="true" read_only_after_creation="false">ISNULL(historyTable.name, N'')</property>
       <property name="HistoryTableSchema" type="sysname" cast="true" read_only_after_creation="false">ISNULL(SCHEMA_NAME(historyTable.schema_id), N'')</property>
       <property name="HistoryTableID" type="int" cast="true" read_only_after_creation="false" access="read">ISNULL(historyTable.object_id, 0)</property>
@@ -576,6 +570,7 @@
     <version datawarehouse_enabled='true'>
       <property name="DwTableDistribution" type="tinyint" report_type="DwTableDistributionType">ISNULL(tdp.distribution_policy, 0)</property>
       <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >0</property>
+      <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
     </version>
 
     <!--SQL GraphDB properties.-->

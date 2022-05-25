@@ -243,6 +243,14 @@
       <property name="IsHidden" type="bit" cast="true" read_only_after_creation="false">clmns.is_hidden</property>
     </version>
 
+    <!-- ledger support -->
+    <version min_major='7' max_major='15' datawarehouse_enabled='true'>
+      <property name="IsDroppedLedgerColumn" type="bit" access="read" cast="true">0</property>
+    </version>
+    <version min_major='16' cloud_min_major='12'>
+      <property name="IsDroppedLedgerColumn" type="bit" access="read" cast="true">clmns.is_dropped_ledger_column</property>
+    </version>
+
     <!-- data masking support -->
     <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="IsMasked" type="bit" cast="true" read_only_after_creation="false" mode="design">clmns.is_masked</property>

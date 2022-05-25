@@ -246,7 +246,7 @@ namespace Microsoft.SqlServer.Management.Facets
         /// <param name="name"></param>
         /// <returns></returns>
 #if APTCA_ENABLED
-        [System.Security.Permissions.PermissionSet(SecurityAction.Assert, Unrestricted=true)]
+        [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Assert, Unrestricted=true)]
 #endif
         public object GetPropertyValue(string name)
         {
@@ -914,7 +914,7 @@ namespace Microsoft.SqlServer.Management.Facets
         /// <exception cref="NullFacetException">facet is not registered</exception>
         /// <exception cref="MissingTypeFacetAssociationException">target is not associated with facet</exception>
 #if APTCA_ENABLED
-        [System.Security.Permissions.PermissionSet(SecurityAction.Assert, Unrestricted=true)]
+        [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Assert, Unrestricted=true)]
 #endif
         [STraceConfigurationAttribute(SkipAutoTrace = true)]
         internal static FacetEvaluationContext GetAdapterObject(object target, Type facet)

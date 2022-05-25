@@ -205,7 +205,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Job ItemById(System.Guid id)
+        public Job ItemById(Guid id)
         {
             IEnumerator ie = GetEnumerator();
             while (ie.MoveNext())
@@ -985,9 +985,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             }
         }
 
-        internal System.Guid JobIDInternal
+        internal Guid JobIDInternal
         {
-            get { return (System.Guid)Properties["JobID"].Value; }
+            get { return (Guid)Properties["JobID"].Value; }
         }
 
         internal string JobIdOrJobNameParameter()
@@ -1718,46 +1718,55 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             string[] fields = {   
                          "JobID" };
-            List<string> list = GetSupportedScriptFields(typeof(Job.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
+            List<string> list = GetSupportedScriptFields(typeof(PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
             return list.ToArray();
         }
     }
 
+    /// <summary>
+    /// Settings to control enumeration of agent job history for various JobServer methods
+    /// </summary>
     public sealed class JobHistoryFilter
     {
-        private System.Guid jobID = Guid.Empty;
-        public System.Guid JobID
+        private Guid jobID = Guid.Empty;
+        /// <summary>
+        /// Limits the history search to a specific job ID
+        /// </summary>
+        public Guid JobID
         {
             get { return jobID; }
             set { jobID = value; }
         }
 
-        private string jobName = null;
+        /// <summary>
+        /// Limits the history search to a specific job name
+        /// </summary>
         public string JobName
         {
-            get { return jobName; }
-            set { jobName = value; }
+            get;
+            set;
         }
 
-        private int minimumRetries = 0;
+        /// <summary>
+        /// When set to a value greater than 0, limits the search to jobs that that performed at least the given number of retries
+        /// </summary>
         public int MinimumRetries
         {
-            get { return minimumRetries; }
-            set { minimumRetries = value; }
+            get;
+            set;
         }
 
-        private int minimumRunDuration = 0;
         public int MinimumRunDuration
         {
-            get { return minimumRunDuration; }
-            set { minimumRunDuration = value; }
+            get; 
+            set; 
         }
 
-        private bool oldestFirst = false;
+        [Obsolete]
         public bool OldestFirst
         {
-            get { return oldestFirst; }
-            set { oldestFirst = value; }
+            get;
+            set;
         }
 
         private CompletionResult outcomeTypes;
@@ -1852,7 +1861,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 builder.AppendFormat(SmoApplication.DefaultCulture, "@JobID='{0}'", jobID.ToString("D", SmoApplication.DefaultCulture));
             }
 
-            if (null != jobName && jobName.Length > 0)
+            if (!string.IsNullOrEmpty(JobName))
             {
                 if (count++ > 0)
                 {
@@ -1863,10 +1872,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     builder.Append("[");
                 }
 
-                builder.AppendFormat(SmoApplication.DefaultCulture, "@JobName='{0}'", Urn.EscapeString(jobName));
+                builder.AppendFormat(SmoApplication.DefaultCulture, "@JobName='{0}'", Urn.EscapeString(JobName));
             }
 
-            if (minimumRetries > 0)
+            if (MinimumRetries > 0)
             {
                 if (count++ > 0)
                 {
@@ -1877,10 +1886,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     builder.Append("[");
                 }
 
-                builder.AppendFormat(SmoApplication.DefaultCulture, "@RetriesAttempted > {0}", minimumRetries);
+                builder.AppendFormat(SmoApplication.DefaultCulture, "@RetriesAttempted > {0}", MinimumRetries);
             }
 
-            if (minimumRunDuration > 0)
+            if (MinimumRunDuration > 0)
             {
                 if (count++ > 0)
                 {
@@ -1891,7 +1900,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     builder.Append("[");
                 }
 
-                builder.AppendFormat(SmoApplication.DefaultCulture, "@RunDuration > {0}", minimumRunDuration);
+                builder.AppendFormat(SmoApplication.DefaultCulture, "@RunDuration > {0}", MinimumRunDuration);
             }
 
             if (outcomeDirty)
@@ -1987,13 +1996,13 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             else
             {
                 // if JobID was not specified we try to filter by name
-                if (null != jobName && jobName.Length > 0)
+                if (!string.IsNullOrEmpty(JobName))
                 {
                     if (0 < filter.Length)
                     {
                         filter += ",";
                     }
-                    filter += String.Format(SmoApplication.DefaultCulture, " @job_name='{0}'", SqlSmoObject.SqlString(jobName));
+                    filter += String.Format(SmoApplication.DefaultCulture, " @job_name='{0}'", SqlSmoObject.SqlString(JobName));
                 }
             }
 

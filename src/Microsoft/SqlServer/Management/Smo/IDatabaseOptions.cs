@@ -135,6 +135,10 @@ namespace Microsoft.SqlServer.Management.Smo
         [DisplayDescriptionKey("Database_IDDesc")]
         Int32 ID { get; }
 
+        [DisplayNameKey("Database_IsLedgerName")]
+        [DisplayDescriptionKey("Database_IsLedgerDesc")]
+        Boolean IsLedger { get; set; }
+
         [DisplayNameKey("Database_IsParameterizationForcedName")]
         [DisplayDescriptionKey("Database_IsParameterizationForcedDesc")]
         Boolean IsParameterizationForced { get; set; }

@@ -544,15 +544,29 @@ end;";
             }
         }
 
-        void InternalConnectImpl()
+        private void InternalConnectImpl()
         {
             SqlConnection sqlConnection = this.SqlConnectionObject;
             lock (this.connectionLock)
             {
                 if (!this.IsConnectionOpen(sqlConnection))
                 {
-                    //proceed with connection
-                    sqlConnection.Open();
+                    var retryCount = 2;
+                    while (true)
+                    {
+                        //proceed with connection
+                        try
+                        {
+                            sqlConnection.Open();
+                            return;
+                        }
+                        catch (SqlException e) when (e.Number == 42109 && retryCount > 0)
+                        {   
+                            // Handle Serverless wakeup with a retry
+                            retryCount--;
+                        }
+                    }
+                    
                 }
             }
 

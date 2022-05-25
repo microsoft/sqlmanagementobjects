@@ -304,14 +304,11 @@ END");
                 var index = new _SMO.Index(view, "i1") { IsClustered = true, IsUnique = true };
                 index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
                 index.Create();
-                db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
                 Assert.Multiple(() =>
                 {
-                    db.UpdateIndexStatistics();
-                    var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                    var commands = db.ExecutionManager.RecordQueryText(db.UpdateIndexStatistics, alsoExecute: true).Cast<string>();
                     Assert.That(commands, Has.Member($"UPDATE STATISTICS [dbo].{table.Name.SqlBracketQuoteString()}"), "UpdateIndexStatistics should include table t1");
                     Assert.That(commands, Has.Member($"UPDATE STATISTICS [dbo].{view.Name.SqlBracketQuoteString()}"), "UpdateIndexStatistics should include view v1");
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
                     PrefetchAllChildTypes(db);
                     GetArchiveReports(db);
                     if (db.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase && db.DatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
@@ -321,7 +318,6 @@ END");
                         CheckAllocationsAllRepairTypes(db);
                     }
                 });
-
             });
         }
 
@@ -333,21 +329,14 @@ END");
             {
                 var table = db.CreateTable("t1", new ColumnProperties("c1", DataType.Int));
                 table.InsertDataToTable(100);
-                db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
                 Assert.Multiple(() =>
                 {
-                    db.Shrink(101, ShrinkMethod.Default);
-                    var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                    var commands = db.ExecutionManager.RecordQueryText(() => db.Shrink(101, ShrinkMethod.Default), alsoExecute: true).Cast<string>();
                     Assert.That(commands, Has.Member($"DBCC SHRINKDATABASE(N{db.Name.SqlSingleQuoteString()}, 100 )"), "shrink 101 default");
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.Shrink(0, ShrinkMethod.NoTruncate);
-                    commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                    commands = db.ExecutionManager.RecordQueryText(() => db.Shrink(0, ShrinkMethod.NoTruncate), alsoExecute: true).Cast<string>();
                     Assert.That(commands, Has.Member($"DBCC SHRINKDATABASE(N{db.Name.SqlSingleQuoteString()}, NOTRUNCATE)"), "shrink 0 notruncate");
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.Shrink(0, ShrinkMethod.TruncateOnly);
-                    commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                    commands = db.ExecutionManager.RecordQueryText(() => db.Shrink(0, ShrinkMethod.TruncateOnly), alsoExecute: true).Cast<string>();
                     Assert.That(commands, Has.Member($"DBCC SHRINKDATABASE(N{db.Name.SqlSingleQuoteString()}, TRUNCATEONLY)"), "shrink 0 truncateonly");
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
                     Assert.Throws<FailedOperationException>(() => db.Shrink(0, ShrinkMethod.EmptyFile));
                 });
             });
@@ -409,22 +398,23 @@ END");
         {
             if (db.IsSupportedProperty(nameof(db.RemoteDataArchiveEnabled)))
             {
-                var statusReports =
+
+                IEnumerable<RemoteDataArchiveMigrationStatusReport> statusReports = Enumerable.Empty<RemoteDataArchiveMigrationStatusReport>();
+                var commands = db.ExecutionManager.RecordQueryText(() => statusReports =
                     db.GetRemoteDataArchiveMigrationStatusReports(
-                        DateTime.UtcNow.Subtract(TimeSpan.FromDays(1)), 2).ToList();
+                        DateTime.UtcNow.Subtract(TimeSpan.FromDays(1)), 2).ToList(), alsoExecute: true).Cast<string>();
+
                 Assert.That(statusReports, Is.Empty, "GetRemoteDataArchiveMigrationStatusReports should return empty list for non-archived DB");
-                var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
                 var select = commands.Single(c => c.Contains("INNER JOIN"));
                 Assert.That(select, Contains.Substring("SELECT\nTOP (2) dbs.name as database_name,"), "GetRemoteDataArchiveMigrationStatusReports should select 2 rows");
                 Assert.That(select, Contains.Substring("FROM\nsys.dm_db_rda_migration_status rdams"), "GetRemoteDataArchiveMigrationStatusReports should query ys.dm_db_rda_migration_status");
-                db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
             }
         }
 
         private static void CheckTablesDataOnlyAllRepairTypes(_SMO.Database db)
         {
-            var messages = db.CheckTablesDataOnly().Cast<string>().ToList();
-            var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            IEnumerable<string> messages = Enumerable.Empty<string>();
+            var commands = db.ExecutionManager.RecordQueryText(() => messages = db.CheckTablesDataOnly().Cast<string>().ToList(), alsoExecute: true).Cast<string>();
             Assert.That(messages.Take(2),
                 Is.EqualTo(new object[]
                 {
@@ -433,12 +423,12 @@ END");
                 }), "CheckTablesDataOnly() messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, NOINDEX)" }),
                 "CheckTablesDataOnly");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTablesDataOnly(RepairOptions.AllErrorMessages |
+            commands = db.ExecutionManager.RecordQueryText(() => 
+                messages = db.CheckTablesDataOnly(RepairOptions.AllErrorMessages |
                                               RepairOptions.ExtendedLogicalChecks |
                                               RepairOptions.NoInformationMessages | RepairOptions.TableLock |
-                                              RepairOptions.EstimateOnly).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>().ToList();
+                                              RepairOptions.EstimateOnly).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages.Count,
                 Is.AtMost(1),
                 "CheckTablesDataOnly(<all repair options>) messages.Count");
@@ -447,21 +437,20 @@ END");
                 {
                     $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, NOINDEX) WITH  ALL_ERRORMSGS , EXTENDED_LOGICAL_CHECKS , NO_INFOMSGS , TABLOCK , ESTIMATEONLY  "
                 }), "CheckTablesDataOnly(<all repair options>)");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTablesDataOnly(RepairStructure.None).Cast<string>().ToList();
-            ;
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>().ToList();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckTablesDataOnly(RepairStructure.None).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages, Is.Empty, "CheckTablesDataOnly(RepairOptions.None) messages");
             Assert.That(commands,
                 Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, NOINDEX) WITH NO_INFOMSGS" }),
                 "CheckTablesDataOnly(RepairOptions.None)");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
             if (db.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || db.Parent.VersionMajor > 12)
             {
-                messages = db.CheckTablesDataOnly(RepairOptions.None, RepairStructure.None, maxDOP: 2)
+                commands = db.ExecutionManager.RecordQueryText(() =>
+                    messages = db.CheckTablesDataOnly(RepairOptions.None, RepairStructure.None, maxDOP: 2)
+                        .Cast<string>().ToList(), alsoExecute: true)
                     .Cast<string>().ToList();
-                ;
-                commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>().ToList();
+
                 Assert.That(messages.Take(2),
                     Is.EqualTo(new object[]
                     {
@@ -478,56 +467,56 @@ END");
                     () => db.CheckTablesDataOnly(RepairOptions.None, RepairStructure.None, maxDOP: 2),
                     "CheckTablesDataOnly(maxDop:2) pre-sql2016");
             }
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
         }
 
         private static void CheckTablesAllRepairTypes(_SMO.Database db)
         {
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            var messages = db.CheckTables(RepairType.None).Cast<string>().ToList();
-            var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            var messages = Enumerable.Empty<string>();
+            var commands = db.ExecutionManager.RecordQueryText(() =>
+                 messages = db.CheckTables(RepairType.None).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages, Is.Empty, "CheckTables(RepairType.None) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()})  WITH NO_INFOMSGS" }),
                 "CheckTables(RepairType.None");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTables(RepairType.Rebuild).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckTables(RepairType.Rebuild).Cast<string>().ToList(), alsoExecute: true)
+            .Cast<string>().ToList();
             Assert.That(messages, Is.Empty, "CheckTables(RepairType.Rebuild) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_REBUILD)  WITH NO_INFOMSGS" }),
                 "CheckTables(RepairType.Rebuild");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTables(RepairType.Fast).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckTables(RepairType.Fast).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages, Is.Empty, "CheckTables(RepairType.Fast) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_FAST)  WITH NO_INFOMSGS" }),
                 "CheckTables(RepairType.Fast");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTables(RepairType.AllowDataLoss).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() => 
+                messages = db.CheckTables(RepairType.AllowDataLoss).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages, Is.Empty, "CheckTables(RepairType.AllowDataLoss) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_ALLOW_DATA_LOSS)  WITH NO_INFOMSGS" }),
                 "CheckTables(RepairType.AllowDataLoss");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() => 
+                messages = db.CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages.Take(1), Is.EqualTo(new object[]
             {
                 $"DBCC results for '{db.Name}'."
             }), "CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_ALLOW_DATA_LOSS)  WITH  DATA_PURITY  " }),
                 "CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() => 
+                messages = db.CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>().ToList();
             Assert.That(messages, Has.Member("DBCC execution completed. If DBCC printed error messages, contact your system administrator."), "CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_ALLOW_DATA_LOSS)  WITH  ESTIMATEONLY  " }),
                 "CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
             if (db.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || db.Parent.VersionMajor > 12)
             {
-                messages = db.CheckTables(RepairType.None, RepairOptions.None,
-                    RepairStructure.PhysicalOnly, maxDOP: 2).Cast<string>().ToList();
-                commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                commands = db.ExecutionManager.RecordQueryText( () => 
+                    messages = db.CheckTables(RepairType.None, RepairOptions.None,
+                                              RepairStructure.PhysicalOnly, maxDOP: 2).Cast<string>().ToList(), alsoExecute: true)
+                    .Cast<string>().ToList();
                 Assert.That(messages.Take(1), Is.EqualTo(new object[]
                     {
                         $"DBCC results for '{db.Name}'."
@@ -549,44 +538,187 @@ END");
 
         private static void CheckAllocationsAllRepairTypes(Database db)
         {
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            var messages = db.CheckAllocations(RepairType.None).Cast<string>().ToList();
-            var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            var messages = Enumerable.Empty<string>();
+            var commands = db.ExecutionManager.RecordQueryText(() => 
+                messages = db.CheckAllocations(RepairType.None).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>();
             Assert.That(messages, Is.Empty, "CheckAllocations(RepairType.None) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKALLOC(N{db.Name.SqlSingleQuoteString()})  WITH NO_INFOMSGS" }),
                 "CheckAllocations(RepairType.None)");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckAllocations(RepairType.Rebuild).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckAllocations(RepairType.Rebuild).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>();
             Assert.That(messages, Is.Empty, "CheckAllocations(RepairType.Rebuild) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKALLOC(N{db.Name.SqlSingleQuoteString()}, REPAIR_REBUILD)  WITH NO_INFOMSGS" }),
                 "CheckAllocations(RepairType.Rebuild");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckAllocations(RepairType.Fast).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckAllocations(RepairType.Fast).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>();
             Assert.That(messages, Is.Empty, "CheckAllocations(RepairType.Fast) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKALLOC(N{db.Name.SqlSingleQuoteString()}, REPAIR_FAST)  WITH NO_INFOMSGS" }),
                 "CheckAllocations(RepairType.Fast");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckAllocations(RepairType.AllowDataLoss).Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckAllocations(RepairType.AllowDataLoss).Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>();
             Assert.That(messages, Is.Empty, "CheckAllocations(RepairType.AllowDataLoss) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKALLOC(N{db.Name.SqlSingleQuoteString()}, REPAIR_ALLOW_DATA_LOSS)  WITH NO_INFOMSGS" }),
                 "CheckAllocations(RepairType.AllowDataLoss");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckAllocationsDataOnly().Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckAllocationsDataOnly().Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>();
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKALLOC(N{db.Name.SqlSingleQuoteString()}, NOINDEX)" }),
                 "CheckAllocationsDataOnly");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-            messages = db.CheckCatalog().Cast<string>().ToList();
-            commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+            commands = db.ExecutionManager.RecordQueryText(() =>
+                messages = db.CheckCatalog().Cast<string>().ToList(), alsoExecute: true)
+                .Cast<string>();
             Assert.That(messages, Is.EqualTo(new[] { "DBCC execution completed. If DBCC printed error messages, contact your system administrator." }), "CheckCatalog messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKCATALOG({db.Name.SqlBracketQuoteString()})" }),
                 "CheckCatalog");
-            db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
         }
 
+        /// <summary>
+        /// Basic coverage for enabling, monitoring, disabling stretch database
+        /// Marked as Legacy to avoid runs during PR verification
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Legacy")]
+        [SupportedServerVersionRange(MinMajor = 13, Edition = DatabaseEngineEdition.Enterprise, HostPlatform = HostPlatformNames.Windows)]
+        public void Database_remote_data_archive_can_be_configured_and_monitored()
+        {
+            var azureServerConnection = Manageability.Utils.ConnectionHelpers.GetMatchingConnections(d => d.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase)
+                .FirstOrDefault();
+            azureServerConnection = azureServerConnection ??
+                    $"Data Source=ssmsv12tests.database.windows.net;User ID=cloudSa;Password={Manageability.Utils.ConnectionHelpers.GetAzureKeyVaultHelper().GetDecryptedSecret("cloudsaPassword-ssmsv12Tests")}";
+
+            ExecuteWithDbDrop(db =>
+            {
+                try
+                {
+                    // make sure stretch is enabled and the remote query timeout is big enough to wait for an Azure stretch db create
+                    db.Parent.ConnectionContext.ExecuteNonQuery(
+                        new System.Collections.Specialized.StringCollection
+                            {"exec sp_configure 'remote data archive', '1'", "reconfigure", "EXEC sys.sp_configure N'remote query timeout (s)', N'900'", "RECONFIGURE WITH OVERRIDE"});
+                    var azureConnString = new SqlConnectionStringBuilder(azureServerConnection);
+                    db.ExecuteNonQuery(
+                        $"CREATE MASTER KEY ENCRYPTION BY PASSWORD = '{SqlTestRandom.GeneratePassword()}'");
+                    var credential = new _SMO.DatabaseScopedCredential(db, "stretchCred");
+                    credential.Create(azureConnString.UserID, azureConnString.Password);
+                    var stretchTable = db.CreateTable("remoteTable").InsertDataToTable(10);
+                    db.RemoteDataArchiveEnabled = true;
+                    db.RemoteDataArchiveEndpoint = azureConnString.DataSource;
+                    db.RemoteDataArchiveCredential = credential.Name;
+                    db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
+                    Assert.Multiple(() =>
+                    {
+                        Assert.DoesNotThrow(db.Alter, "Database.Alter to enable remote archive");
+                        var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                        Assert.That(commands,
+                            Has.Member(
+                                $"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET REMOTE_DATA_ARCHIVE = ON (SERVER = N'{azureConnString.DataSource}', CREDENTIAL = [stretchCred])"),
+                            "Alter script to enable stretch");
+                    });
+                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
+                    Assert.Multiple(() =>
+                    {
+                        // reauth fails because the db is already authorized but we are just testing the tsql generation
+                        Assert.Throws<_SMO.FailedOperationException>(() => db.ReauthorizeRemoteDataArchiveConnection("stretchCred", withCopy: false));
+                        var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                        Assert.That(commands,
+                            Has.Member($"EXEC sp_rda_reauthorize_db @credential = N'stretchCred', @with_copy = 0"),
+                            "ReauthorizeRemoteDataArchiveConnection script");
+                    });
+                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
+                    var utcStart = DateTime.UtcNow;
+                    Assert.Multiple(() =>
+                    {
+                        stretchTable.RemoteDataArchiveEnabled = true;
+                        stretchTable.RemoteDataArchiveDataMigrationState =
+                            RemoteDataArchiveMigrationState.Outbound;
+                        Assert.DoesNotThrow(stretchTable.Alter, "Table.Alter to enable Outbound stretch");
+                        var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
+                        Assert.That(commands,
+                            Has.Member(
+                                $"ALTER TABLE [dbo].{stretchTable.Name.SqlBracketQuoteString()} SET(REMOTE_DATA_ARCHIVE = ON (MIGRATION_STATE = OUTBOUND))"),
+                            "Table.Alter script to enable Outbound stretch");
+                    });
+                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
+                    Trace.TraceInformation("Sleeping stretch test 5 seconds to allow table to migrate");
+                    Thread.Sleep(5000);
+                    var migrationReports =
+                        db.GetRemoteDataArchiveMigrationStatusReports(utcStart, 10, stretchTable.Name).ToList();
+                    if (migrationReports.Any())
+                    {
+                        Assert.Multiple(() =>
+                        {
+                            Assert.That(migrationReports,
+                                Has.All.Property(nameof(RemoteDataArchiveMigrationStatusReport.DatabaseName))
+                                    .EqualTo(db.Name),
+                                "Report.DatabaseName");
+                            Assert.That(migrationReports,
+                                Has.All.Property(nameof(RemoteDataArchiveMigrationStatusReport.TableName))
+                                    .EqualTo(stretchTable.Name),
+                                "Report.TableName");
+                            Assert.That(migrationReports,
+                                Has.All.Property(nameof(RemoteDataArchiveMigrationStatusReport.Details)).Empty,
+                                "Report.Details");
+                        });
+                    }
+
+                    _SMO.RemoteDatabaseMigrationStatistics migrationStatistics = null;
+                    Assert.Multiple(() =>
+                    {
+                        Assert.DoesNotThrow(() => stretchTable.GetRemoteTableMigrationStatistics(), "GetRemoteTableMigrationStatistics does not throw");
+                        Assert.DoesNotThrow(() => migrationStatistics = db.GetRemoteDatabaseMigrationStatistics(),
+                            "GetRemoteDatabaseMigrationStatistics");
+                        Assert.That(migrationStatistics, Is.Not.Null,
+                            "GetRemoteDatabaseMigrationStatistics should return a value");
+                    });
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(migrationStatistics.RemoteDatabaseSizeInMB, Is.GreaterThan((double)0.0));
+                        stretchTable.RemoteDataArchiveDataMigrationState =
+                            RemoteDataArchiveMigrationState.Disabled;
+                        Assert.DoesNotThrow(stretchTable.Alter, "Alter table to disable table migration");
+                        stretchTable.RemoteDataArchiveEnabled = false;
+                        Assert.DoesNotThrow(stretchTable.Alter, "Alter table to disable stretch");
+                        db.RemoteDataArchiveEnabled = false;
+                        Assert.DoesNotThrow(db.Alter, "Database.Alter to disable stretch");
+                    });
+                }
+                finally
+                {
+                    // make sure we clean up both locally and in Azure
+                    if (db.RemoteDataArchiveEnabled)
+                    {
+                        db.RemoteDataArchiveEnabled = false;
+                        try
+                        {
+                            db.Alter();
+                        } catch { }
+                    }
+
+                    try
+                    {
+                        using (var sqlConnection = new SqlConnection(azureServerConnection))
+                        {
+                            var server = new _SMO.Server(new ServerConnection(sqlConnection));
+                            server.Databases.ClearAndInitialize($"[like(@Name, 'RDA{Urn.EscapeString(db.Name)}%')]",
+                                new string[] { });
+                            var database = server.Databases.Cast<_SMO.Database>()
+                                .FirstOrDefault();
+                            if (database != null)
+                            {
+                                server.DropKillDatabaseNoThrow(database.Name);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceWarning($"Unable to delete remote database for {db.Name}: {e}");
+                    }
+                }
+            });
+        }
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
@@ -821,26 +953,17 @@ END");
             this.ExecuteTest(
                  server =>
                  {
-                     try
+                     //Adding parameters to create Hyperscale db
+                     Database db = new Database(server, "HyperscaleDB1", DatabaseEngineEdition.SqlDatabase)
                      {
-                         //Adding parameters to create Hyperscale db
-                         Database db = new Database(server, "HyperscaleDB1", DatabaseEngineEdition.SqlDatabase)
-                         {
-                             AzureEdition = SqlTestBase.AzureDatabaseEdition.Hyperscale.ToString(),
-                             AzureServiceObjective = "HS_Gen5_4",
-                             MaxSizeInBytes = 1073741824,
-                             ReadOnly = false
-                         };
-                         server.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.CaptureSql;
-                         db.Create();
-                         var commands = server.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
-                         string expected = $"CREATE DATABASE [HyperscaleDB1]  (EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_4', MAXSIZE = 1 GB);{Environment.NewLine}";
-                         Assert.That(commands, Has.Exactly(1).AtLeast(expected), "Invalid Query to Create Hyperscale database");
-                     }
-                     finally
-                     {
-                         server.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteSql;
-                     }
+                         AzureEdition = SqlTestBase.AzureDatabaseEdition.Hyperscale.ToString(),
+                         AzureServiceObjective = "HS_Gen5_4",
+                         MaxSizeInBytes = 1073741824,
+                         ReadOnly = false
+                     };
+                     var commands = server.ExecutionManager.RecordQueryText(db.Create).Cast<string>();
+                     string expected = $"CREATE DATABASE [HyperscaleDB1]  (EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_4', MAXSIZE = 1 GB);{Environment.NewLine}";
+                     Assert.That(commands, Has.Exactly(1).AtLeast(expected), "Invalid Query to Create Hyperscale database");
                  });
         }
 
@@ -889,7 +1012,7 @@ END");
             {
                 script = db.Script();
                 var commands = script;
-                string expected = $"CREATE DATABASE {db.FullQualifiedName} COLLATE SQL_Latin1_General_CP1_CS_AS  (EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_2') WITH CATALOG_COLLATION = DATABASE_DEFAULT;{Environment.NewLine}";
+                string expected = $"CREATE DATABASE {db.FullQualifiedName} COLLATE SQL_Latin1_General_CP1_CS_AS  (EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_2') WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF;{Environment.NewLine}";
                 Assert.That(commands, Has.Exactly(1).EqualTo(expected), "Invalid Query to Create Hyperscale database");
             });
 
@@ -957,38 +1080,18 @@ END");
         {
             ExecuteFromDbPool(db =>
             {
-                db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.CaptureSql;
-                try
-                {
-                    db.ChangeMirroringState(MirroringOption.Off);
-                    var script = db.ExecutionManager.ConnectionContext.CapturedSql.Text.ToSingleString();
-                    Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER OFF{Environment.NewLine}"));
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.ChangeMirroringState(MirroringOption.Suspend);
-                    script = db.ExecutionManager.ConnectionContext.CapturedSql.Text.ToSingleString();
-                    Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER SUSPEND{Environment.NewLine}"));
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.ChangeMirroringState(MirroringOption.Resume);
-                    script = db.ExecutionManager.ConnectionContext.CapturedSql.Text.ToSingleString();
-                    Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER RESUME{Environment.NewLine}"));
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.ChangeMirroringState(MirroringOption.RemoveWitness);
-                    script = db.ExecutionManager.ConnectionContext.CapturedSql.Text.ToSingleString();
-                    Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET WITNESS OFF{Environment.NewLine}"));
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.ChangeMirroringState(MirroringOption.Failover);
-                    script = db.ExecutionManager.ConnectionContext.CapturedSql.Text.ToSingleString();
-                    Assert.That(script, Is.EqualTo($"USE [master];ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER FAILOVER{Environment.NewLine}"));
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.ChangeMirroringState(MirroringOption.ForceFailoverAndAllowDataLoss);
-                    script = db.ExecutionManager.ConnectionContext.CapturedSql.Text.ToSingleString();
-                    Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER FORCE_SERVICE_ALLOW_DATA_LOSS {Environment.NewLine}"));
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                }
-                finally
-                {
-                    db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteSql;
-                }
+                var script = db.ExecutionManager.RecordQueryText(() => db.ChangeMirroringState(MirroringOption.Off)).ToSingleString();
+                Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER OFF{Environment.NewLine}"));
+                script = db.ExecutionManager.RecordQueryText(() => db.ChangeMirroringState(MirroringOption.Suspend)).ToSingleString();
+                Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER SUSPEND{Environment.NewLine}"));
+                script = db.ExecutionManager.RecordQueryText(() => db.ChangeMirroringState(MirroringOption.Resume)).ToSingleString();
+                Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER RESUME{Environment.NewLine}"));
+                script = db.ExecutionManager.RecordQueryText(() => db.ChangeMirroringState(MirroringOption.RemoveWitness)).ToSingleString();
+                Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET WITNESS OFF{Environment.NewLine}"));
+                script = db.ExecutionManager.RecordQueryText(() => db.ChangeMirroringState(MirroringOption.Failover)).ToSingleString();
+                Assert.That(script, Is.EqualTo($"USE [master];ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER FAILOVER{Environment.NewLine}"));
+                script = db.ExecutionManager.RecordQueryText(() => db.ChangeMirroringState(MirroringOption.ForceFailoverAndAllowDataLoss)).ToSingleString();
+                Assert.That(script, Is.EqualTo($"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET PARTNER FORCE_SERVICE_ALLOW_DATA_LOSS {Environment.NewLine}"));
             });
         }
 
@@ -1034,18 +1137,8 @@ END");
                 // 1. Set trace flag 3502 on and look for error log entries
                 // 2. Create an XEvent session to monitor for checkpoint_starting events on the current database
                 // We'll keep it simple and just look for the USING statement in the outgoing query
-                db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
-                try
-                {
-                    db.Checkpoint();
-                    var queries = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>().ToArray();
-                    Assert.That(queries, Is.EqualTo(expected), "Checkpoint TSQL");
-                }
-                finally
-                {
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteSql;
-                }
+                var queries = db.ExecutionManager.RecordQueryText(db.Checkpoint, alsoExecute: true).Cast<string>().ToArray();
+                Assert.That(queries, Is.EqualTo(expected), "Checkpoint TSQL");
             });
         }
 

@@ -194,6 +194,56 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
+        /// <summary>
+        /// Verifies that dropped columns on ledger tables are not scripted.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        public void DroppedLedgerColumn_is_not_scripted()
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    // create the table
+                    var tableName = $"table{Guid.NewGuid()}";
+                    var table = new Table(database, tableName);
+                    table.Columns.Add(new Column(table, "kcol1") { DataType = DataType.Int });
+                    table.Columns.Add(new Column(table, "kcol2") { DataType = DataType.Int });
+                    table.IsSystemVersioned = false;
+                    table.IsLedger = true;
+                    table.LedgerType = LedgerTableType.AppendOnlyLedgerTable;
+                    table.Create();
+                    database.Refresh();
+                    table = database.Tables[tableName];
+
+                    // drop a ledger column
+                    table.Columns["kcol2"].Drop();
+
+                    table.Refresh();
+                    table.Columns.Refresh();
+                    Column droppedColumn = null;
+                    
+                    foreach (Column col in table.Columns)
+                    {
+                        if (col.Name.Contains("MSSQL_Dropped"))
+                        {
+                            droppedColumn = col;
+                            continue;
+                        }
+                    }
+
+                    // Verify dropped column property
+                    Assert.That(droppedColumn.DroppedLedgerColumn(), Is.True, "Column is not marked as a Dropped Ledger Column");
+
+                    // Verify create script does not include the dropped column
+                    var scripter = new Scripter(database.Parent);
+                    var script = scripter.Script(table);
+                    Assert.That(script, !Has.Member($@"kcol2".FixNewLines()), "Incorrect generated script");
+                });
+        }
+
         #endregion // Scripting Tests
 
         #region bind tests

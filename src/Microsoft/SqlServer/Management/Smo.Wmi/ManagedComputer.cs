@@ -287,8 +287,16 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
             {
                 m_ManagementScope.Path = path;
                 m_ManagementScope.Connect();
-                // Double-check that provider exists.
-                new ManagementObject(m_ManagementScope, new ManagementPath("Win32Provider.Name=\"MSSQL_ManagementProvider\""), new ObjectGetOptions());
+
+                // Runs a dummy query (and ideally quick!) to check whether the SQL WMI Provider exists or not
+                //
+                // Note: we do this because a simple check like
+                //   new ManagementObject(m_ManagementScope, new ManagementPath("Win32Provider.Name=\"MSSQL_ManagementProvider\""), new ObjectGetOptions());
+                // may be be inconclusive due to a bug in SQL Setup (2019 and earlier), where the WMI Provider is not property uninstalled when SQL was installed.
+                using (var mos = new ManagementObjectSearcher(m_ManagementScope, new ObjectQuery("SELECT SQLServiceType FROM SqlService WHERE SQLServiceType = 0")))
+                {
+                    _ = mos.Get().Count;
+                }
             }
             catch (ManagementException managementException)
             {

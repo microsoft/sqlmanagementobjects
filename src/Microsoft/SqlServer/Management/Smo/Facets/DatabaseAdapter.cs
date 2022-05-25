@@ -89,6 +89,11 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Returns true if the database has Ledger ON.
+        /// </summary>
+        public bool IsLedger => this.Database.DatabaseOptions.IsLedger;
+
+        /// <summary>
         /// Returns true if the database has auto-close set to ON.
         /// </summary>
         public bool AutoClose

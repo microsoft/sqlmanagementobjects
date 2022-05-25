@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using System.Threading;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -264,7 +265,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     }
                 }
             });
-        }        
+        }
 
         #endregion //Property Tests
 
@@ -338,7 +339,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             }
                             else
                             {
-                                db.CompatibilityLevel = (_SMO.CompatibilityLevel) cl;
+                                db.CompatibilityLevel = (_SMO.CompatibilityLevel)cl;
                                 TraceHelper.TraceInformation(
                                     "Created db object '{0}' with compatLevel = '{1}'{2}.",
                                     dbName,
@@ -396,7 +397,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                                 if (isCreated)
                                 {
 
-                                    Assert.That(db.CompatibilityLevel, Is.EqualTo((_SMO.CompatibilityLevel) clExpected),
+                                    Assert.That(db.CompatibilityLevel, Is.EqualTo((_SMO.CompatibilityLevel)clExpected),
                                         "Created database has wrong compat level");
                                     db.Parent.DropKillDatabaseNoThrow(db.Name);
                                 }
@@ -472,7 +473,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         db.IsVarDecimalStorageFormatEnabled = !db.IsVarDecimalStorageFormatEnabled;
 
                         // By default, this property is not scripted, so we explicitly ask for it...
-                        var scriptingOptions = new _SMO.ScriptingOptions() {NoVardecimal = false};
+                        var scriptingOptions = new _SMO.ScriptingOptions() { NoVardecimal = false };
 
                         // The key element here is that the 1st argument of the SP is escaped properly...
                         // Alternatively, instead of inspecting the generated script, we could have
@@ -556,7 +557,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     try
                     {
                         serverConnection = new ServerConnection(
-                            database.Parent.Name, dboLogin.Name, password) {NonPooledConnection = true};
+                            database.Parent.Name, dboLogin.Name, password) { NonPooledConnection = true };
                         database.SetOwner(dboLogin.Name);
                         var server = new _SMO.Server(serverConnection);
                         var testDatabase = server.Databases[database.Name];
@@ -587,7 +588,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
-        private static readonly string[] onOffPrimary = new String[] {"ON", "OFF", "PRIMARY"};
+        private static readonly string[] onOffPrimary = new String[] { "ON", "OFF", "PRIMARY" };
 
         private static readonly string[] earlySqlPropertyNames =
         {
@@ -614,13 +615,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Currently disabled for 150+ because the new configs don't follow the "ON" and "OFF" value convention
         /// </summary>
         [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor=14)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor = 14)]
         public void DatabaseScopedConfiguration_VerifyConfigurationOptions_CanBeReadAndModified()
         {
             this.ExecuteWithDbDrop(
                 database =>
                 {
-                    Assert.That(database.DatabaseScopedConfigurations.Count, Is.GreaterThanOrEqualTo (4),
+                    Assert.That(database.DatabaseScopedConfigurations.Count, Is.GreaterThanOrEqualTo(4),
                         "The database scoped configurations at least have 4 existed options.");
 
                     // Normal case. Verify the alter operation of database scoped configurations could be executed as expected.
@@ -987,7 +988,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     //
                     if (database.DatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
                     {
-                         Assert.That(database.HasMemoryOptimizedObjects, Is.False, "The database shouldn't have any memory optimized objects");
+                        Assert.That(database.HasMemoryOptimizedObjects, Is.False, "The database shouldn't have any memory optimized objects");
                     }
                 });
         }
@@ -1038,7 +1039,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     database.CreateUser(GenerateUniqueSmoObjectName("user"), login.Name);
                     try
                     {
-                        database.SetOwner(login.Name, dropExistingUser:true);
+                        database.SetOwner(login.Name, dropExistingUser: true);
                         database.Refresh();
                         Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database was not changed to '{0}' after calling SetOwner");
                     }
@@ -1091,7 +1092,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition=DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         public void Database_DBComparerTest()
         {
@@ -1104,15 +1105,15 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     // Only test the explicit Catalog_Collation peroperty on supported versions.
                     //
-                    if ((server.DatabaseEngineType.Equals (DatabaseEngineType.Standalone) && server.VersionMajor >= 15) ||
-                        server.DatabaseEngineType.Equals (DatabaseEngineType.SqlAzureDatabase))
+                    if ((server.DatabaseEngineType.Equals(DatabaseEngineType.Standalone) && server.VersionMajor >= 15) ||
+                        server.DatabaseEngineType.Equals(DatabaseEngineType.SqlAzureDatabase))
                     {
                         TestDBComparer(server, CatalogCollationType.SQLLatin1GeneralCP1CIAS);
                     }
 
                     // Contained DB is only supported in standalone. Except from SqlDatabaseEdge
                     //
-                    if (server.DatabaseEngineType.Equals (DatabaseEngineType.Standalone) && server.VersionMajor >= 11 && !server.DatabaseEngineEdition.Equals(DatabaseEngineEdition.SqlDatabaseEdge))
+                    if (server.DatabaseEngineType.Equals(DatabaseEngineType.Standalone) && server.VersionMajor >= 11 && !server.DatabaseEngineEdition.Equals(DatabaseEngineEdition.SqlDatabaseEdge))
                     {
                         // Enabled Containment if necessary.
                         //
@@ -1261,9 +1262,81 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 table.Create();
                 var index = table.Indexes[0];
                 var dt = db.EnumCandidateKeys();
-                var rows = dt.Rows.Cast<DataRow>().Select(r => (string)r["Table_Name"]+r["Name"]);
+                var rows = dt.Rows.Cast<DataRow>().Select(r => (string)r["Table_Name"] + r["Name"]);
                 Assert.That(rows, Has.One.EqualTo(table.Name + index.Name), "EnumCandidateKeys should include primary key index");
             });
+        }
+
+        /// <summary>
+        /// Method to test Creating a new DB when Ledger = True.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        public void Database_IsLedger_On()
+        {
+            this.ExecuteTest(
+                  server =>
+                  {
+                      var dbName = GenerateUniqueSmoObjectName("ledgerDB");
+                      try
+                      {
+                          // Adding parameters to create Ledger Db
+                          Database db = new Database(server, dbName, DatabaseEngineEdition.SqlDatabase)
+                          {
+                              IsLedger = true
+                          };
+
+                          // Creating database and making it sleep for 15s to retrieve the ledger property
+                          // Clears old objects and initializes the collection
+                          db.Create();
+                          Thread.Sleep(15000);
+                          server.Databases.ClearAndInitialize($"[@Name='{Microsoft.SqlServer.Management.Sdk.Sfc.Urn.EscapeString(dbName)}']", new[] { nameof(Database.IsLedger) });
+                          var isLedgerDb = server.Databases[dbName].IsLedger;
+                          Assert.That(isLedgerDb, Is.True, "IsLedger");
+                      }
+                      finally
+                      {
+                          server.DropKillDatabaseNoThrow(dbName);
+                      }
+                  });
+        }
+
+        /// <summary>
+        /// Method to test Creating a new DB when Ledger = OFF.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        public void Database_IsLedger_OFF()
+        {
+            this.ExecuteTest(
+                  server =>
+                  {
+                      var dbName = GenerateUniqueSmoObjectName("ledgerDB");
+                      try
+                      {
+                          // Adding parameters to create Ledger Db
+                          Database db = new Database(server, dbName, DatabaseEngineEdition.SqlDatabase)
+                          {
+                              IsLedger = false
+                          };
+
+                          // Creating database and making it sleep for 15s to retrieve the ledger property
+                          // Clears old objects and initializes the collection
+                          db.Create();
+                          Thread.Sleep(15000);
+                          server.Databases.ClearAndInitialize($"[@Name='{Microsoft.SqlServer.Management.Sdk.Sfc.Urn.EscapeString(dbName)}']", new[] { nameof(Database.IsLedger) });
+                          var isLedgerDb = server.Databases[dbName].IsLedger;
+                          Assert.That(isLedgerDb, Is.False, "IsLedger");
+                      }
+                      finally
+                      {
+                          server.DropKillDatabaseNoThrow(dbName);
+                      }
+                  });
         }
         #endregion //Functionality Tests
 

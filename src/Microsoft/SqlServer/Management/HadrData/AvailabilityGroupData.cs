@@ -34,6 +34,7 @@ namespace Microsoft.SqlServer.Management.HadrData
             this.AvailabilityGroupReplicas = null;
             this.PerformDataSynchronization = DataSynchronizationOption.Full;
             this.RequiredSynchronizedSecondariesToCommit = 0;
+            this.IsContained = false;
         }
 
         /// <summary>
@@ -213,6 +214,30 @@ namespace Microsoft.SqlServer.Management.HadrData
         /// Gets or sets a flag indicating whether per-database DTC support is enabled.
         /// </summary>
         public bool IsDtcSupportEnabled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a flag indicating whether this is a Contained AG or not.
+        /// </summary>
+        public bool IsContained
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a flag indicating whether the Contained AG should be
+        /// created by reusing the system databases or not.
+        /// </summary>
+        /// <remarks>
+        /// This property is read/write, however keep in mind that the corresponding
+        /// propery on the AvailabilityGroup SMO object is write-only, because the
+        /// value cannot be fetched from SQL Server once the AG has been created.
+        /// </remarks>
+        public bool ReuseSystemDatabases
         {
             get;
             set;

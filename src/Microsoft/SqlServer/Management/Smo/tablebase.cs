@@ -618,6 +618,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
+            // do not script a dropped ledger table
+            if (GetPropValueOptional<bool>(nameof(IsDroppedLedgerTable), false))
+            {
+                return;
+            }
+
             //create intermediate string collection
             StringCollection scqueries = new StringCollection();
 
@@ -772,43 +778,43 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.AppendFormat(SmoApplication.DefaultCulture, "CREATE EXTERNAL TABLE {0}", sFullTableName);
                 }
 
-                // check if the table is a SQL DW table
-                bool isSqlDw = this.CheckIsSqlDwTable();
-
                 // check if table is memory optimized
-                bool isMemoryOptimized = this.CheckIsMemoryOptimizedTable();
+                var isMemoryOptimized = CheckIsMemoryOptimizedTable();
 
-                Boolean isSysVersioned = false;
-                if (IsSupportedProperty("IsSystemVersioned", sp))
+                var isSysVersioned = false;
+                if (IsSupportedProperty(nameof(IsSystemVersioned), sp))
                 {
-                    isSysVersioned = this.GetPropValueOptional("IsSystemVersioned", false);
+                    isSysVersioned = GetPropValueOptional(nameof(IsSystemVersioned), false);
                 }
 
-                string histTableName = String.Empty;
-                if (IsSupportedProperty("HistoryTableName", sp))
+                var histTableName = string.Empty;
+                if (IsSupportedProperty(nameof(HistoryTableName), sp))
                 {
-                    histTableName = this.GetPropValueOptional<string>("HistoryTableName", String.Empty);
+                    histTableName = GetPropValueOptional(nameof(HistoryTableName), string.Empty);
                 }
 
-                string histTableSchema = String.Empty;
-                if (IsSupportedProperty("HistoryTableSchema", sp))
+                var histTableSchema = string.Empty;
+                if (IsSupportedProperty(nameof(HistoryTableSchema), sp))
                 {
-                    histTableSchema = this.GetPropValueOptional<string>("HistoryTableSchema", String.Empty);
+                    histTableSchema = GetPropValueOptional(nameof(HistoryTableSchema), string.Empty);
                 }
 
                 // history table can't be provided if system versioning is off
                 if (!isSysVersioned && !IsSupportedProperty(nameof(LedgerType)))
                 {
-                    if (!String.IsNullOrEmpty(histTableName) && !String.IsNullOrEmpty(histTableName.Trim()))
+                    if (!string.IsNullOrEmpty(histTableName) && !string.IsNullOrEmpty(histTableName.Trim()))
                     {
                         throw new SmoException(ExceptionTemplates.HistoryTableWithoutSystemVersioning);
                     }
 
-                    if (!String.IsNullOrEmpty(histTableSchema) && !String.IsNullOrEmpty(histTableSchema.Trim()))
+                    if (!string.IsNullOrEmpty(histTableSchema) && !string.IsNullOrEmpty(histTableSchema.Trim()))
                     {
                         throw new SmoException(ExceptionTemplates.HistoryTableWithoutSystemVersioning);
                     }
                 }
+
+                // check if the table is a SQL DW table
+                var isSqlDw = CheckIsSqlDwTable();
 
                 // for [Memory-Optimized|External|SQL DW] tables skip the file table checks
                 Boolean isFileTable = false;
@@ -1752,7 +1758,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Append temporal system-versioning WITH clause:
             // Sample script:
             // SYSTEM_VERSIONING = ON (HISTORY_TABLE = [SCHEMA].[TABLE], DATA_CONSISTENCY_CHECK = ON))
-            string sysVersioningClause = GenerateSystemVersioningWithClauseContent(sp);
+            var sysVersioningClause = GenerateSystemVersioningWithClauseContent(sp);
 
             if (!string.IsNullOrEmpty(sysVersioningClause))
             {
@@ -1761,12 +1767,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     withOptions.Append(Globals.commaspace);
                     withOptions.Append(Globals.newline);
                 }
-                withOptions.AppendFormat(SmoApplication.DefaultCulture, sysVersioningClause);
+                withOptions.Append(sysVersioningClause);
             }
 
             if (IsSupportedProperty(nameof(LedgerType), sp))
             {
-                string ledgerOptionClause = GenerateLedgerOptionsWithClauseContent(sp);
+                var ledgerOptionClause = GenerateLedgerOptionsWithClauseContent(sp);
                 if (!string.IsNullOrEmpty(ledgerOptionClause))
                 {
                     if (withOptions.Length != 0)
@@ -1804,177 +1810,193 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         private string GenerateSystemVersioningWithClauseContent(ScriptingPreferences sp)
         {
-            StringBuilder withOptions = new StringBuilder();
-
-            if (IsSupportedProperty("IsSystemVersioned", sp))
+            // If system versioning isn't supported or isn't set to true on the table, return empty string
+            //
+            if (!IsSupportedProperty(nameof(IsSystemVersioned), sp) || !GetPropValueOptional(nameof(IsSystemVersioned), false))
             {
-                bool isSysVersioned = this.GetPropValueOptional("IsSystemVersioned", false);
-
-                if (isSysVersioned)
-                {
-                    withOptions.AppendFormat(SmoApplication.DefaultCulture, "SYSTEM_VERSIONING = ON");
-
-                    string historyTableName = this.GetPropValueOptional<string>("HistoryTableName", String.Empty);
-                    string historyTableSchema = this.GetPropValueOptional<string>("HistoryTableSchema", String.Empty);
-
-                    if (String.IsNullOrEmpty(historyTableName) != String.IsNullOrEmpty(historyTableSchema))
-                    {
-                        // Both schema and table name must be provided OR none
-                        //
-                        throw new SmoException(ExceptionTemplates.BothHistoryTableNameAndSchemaMustBeProvided);
-                    }
-
-                    string historyTableNameClause = String.Empty;
-                    string dataConsistencyCheckClause = String.Empty;
-                    string retentionClause = String.Empty;
-
-                    if (!String.IsNullOrEmpty(historyTableName) && !String.IsNullOrEmpty(historyTableSchema))
-                    {
-                        historyTableNameClause = String.Format(
-                            SmoApplication.DefaultCulture, "HISTORY_TABLE = {0}.{1}",
-                            MakeSqlBraket(historyTableSchema),
-                            MakeSqlBraket(historyTableName));
-                    }
-
-                    if (!m_DataConsistencyCheckForSystemVersionedTable)
-                    {
-                        dataConsistencyCheckClause = "DATA_CONSISTENCY_CHECK = OFF";
-                    }
-
-                    // Append history retention option
-                    //
-                    if (this.IsSupportedProperty("HistoryRetentionPeriod"))
-                    {
-                        int historyRetentionPeriod = this.GetPropValueOptional<int>("HistoryRetentionPeriod", -1);
-                        TemporalHistoryRetentionPeriodUnit historyRetentionPeriodUnit = this.GetPropValueOptional<TemporalHistoryRetentionPeriodUnit>("HistoryRetentionPeriodUnit", TemporalHistoryRetentionPeriodUnit.Undefined);
-
-                        if (historyRetentionPeriod > 0 &&
-                                historyRetentionPeriodUnit != TemporalHistoryRetentionPeriodUnit.Undefined &&
-                                historyRetentionPeriodUnit != TemporalHistoryRetentionPeriodUnit.Infinite)
-                        {
-                            TemporalHistoryRetentionPeriodUnitTypeConverter converter = new TemporalHistoryRetentionPeriodUnitTypeConverter();
-                            string unit = converter.ConvertToInvariantString(historyRetentionPeriodUnit);
-
-                            retentionClause = String.Format(
-                                SmoApplication.DefaultCulture, "HISTORY_RETENTION_PERIOD = {0} {1}",
-                                historyRetentionPeriod,
-                                unit);
-                        }
-                    }
-
-                    // Check if we have any of the options set. If not, skip this altogether
-                    //
-                    bool hasHistoryTableClause = !String.IsNullOrEmpty(historyTableNameClause);
-                    bool hasDataConsistencyClause = !String.IsNullOrEmpty(dataConsistencyCheckClause);
-                    bool hasRetentionClause = !String.IsNullOrEmpty(retentionClause);
-
-                    if (hasHistoryTableClause || hasDataConsistencyClause || hasRetentionClause)
-                    {
-                        withOptions.Append(" ( ");
-
-                        // Add HISTORY_TABLE = a.b
-                        //
-                        if (hasHistoryTableClause)
-                        {
-                            withOptions.AppendFormat(SmoApplication.DefaultCulture, "{0}", historyTableNameClause);
-
-                            if (hasDataConsistencyClause || hasRetentionClause)
-                            {
-                                withOptions.Append(" , ");
-                            }
-                        }
-
-                        if (hasDataConsistencyClause)
-                        {
-                            withOptions.AppendFormat(SmoApplication.DefaultCulture, "{0}", dataConsistencyCheckClause);
-
-                            if (hasRetentionClause)
-                            {
-                                withOptions.Append(" , ");
-                            }
-                        }
-
-                        if (hasRetentionClause)
-                        {
-                            withOptions.AppendFormat(SmoApplication.DefaultCulture, "{0}", retentionClause);
-                        }
-
-                        withOptions.Append(" )");
-                    }
-                }                
+                return string.Empty;
             }
 
-            return withOptions.ToString();
+            var systemVersioningOptionBuilder = new ScriptStringBuilder("SYSTEM_VERSIONING = ON");
+
+            var historyTableName = GetPropValueOptional(nameof(HistoryTableName), string.Empty);
+            var historyTableSchema = GetPropValueOptional(nameof(HistoryTableSchema), string.Empty);
+
+            if (string.IsNullOrEmpty(historyTableName) != string.IsNullOrEmpty(historyTableSchema))
+            {
+                // Both schema and table name must be provided OR none
+                //
+                throw new SmoException(ExceptionTemplates.BothHistoryTableNameAndSchemaMustBeProvided);
+            }
+
+            // Set history table name option, if provided
+            //
+            if (!string.IsNullOrEmpty(historyTableName))
+            {
+                systemVersioningOptionBuilder.SetParameter(
+                    "HISTORY_TABLE",
+                    string.Format("{0}.{1}", MakeSqlBraket(historyTableSchema), MakeSqlBraket(historyTableName)),
+                    ParameterValueFormat.NotString);
+            }
+
+            // Append data consistency check
+            //
+            if (!m_DataConsistencyCheckForSystemVersionedTable)
+            {
+                systemVersioningOptionBuilder.SetParameter("DATA_CONSISTENCY_CHECK", "OFF", ParameterValueFormat.NotString);
+            }
+
+            // Append history retention option
+            //
+            if (IsSupportedProperty(nameof(HistoryRetentionPeriod)))
+            {
+                var historyRetentionPeriod = GetPropValueOptional(nameof(HistoryRetentionPeriod), -1);
+                var historyRetentionPeriodUnit = GetPropValueOptional(nameof(HistoryRetentionPeriodUnit), TemporalHistoryRetentionPeriodUnit.Undefined);
+
+                if (historyRetentionPeriod > 0 &&
+                    historyRetentionPeriodUnit != TemporalHistoryRetentionPeriodUnit.Undefined &&
+                    historyRetentionPeriodUnit != TemporalHistoryRetentionPeriodUnit.Infinite)
+                {
+                    var converter = new TemporalHistoryRetentionPeriodUnitTypeConverter();
+                    var unit = converter.ConvertToInvariantString(historyRetentionPeriodUnit);
+
+                    systemVersioningOptionBuilder.SetParameter(
+                        "HISTORY_RETENTION_PERIOD",
+                        string.Format("{0} {1}", historyRetentionPeriod, unit),
+                        ParameterValueFormat.NotString);
+                }
+            }
+            return new StringBuilder().Append(systemVersioningOptionBuilder.ToString(scriptSemiColon: false)).ToString();
         }
 
         /// <summary>
-        // Script system-versioning clause content for temporal tables (used within WITH statement)
-        // Looks like this: SYSTEM_VERSIONING = ON (HISTORY_TABLE = [SCHEMA].[TABLE], DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 4 WEEK)
+        /// Script Ledger option clause content for ledger tables (used within WITH statement)
+        /// Here's the syntax that gets scripted:
+        ///
+        /// <table_option>::=
+        ///     [ LEDGER = ON [ ( <ledger_option> [,...n ] ) ]
+        ///     | OFF 
+        ///     ]
+        ///
+        /// <ledger_option>::= 
+        /// {
+        ///     [ LEDGER_VIEW = schema_name.ledger_view_name  [ ( <ledger_view_option> [,...n ] ) ]
+        ///     [ APPEND_ONLY = ON | OFF ]
+        /// }
+        /// 
+        /// <ledger_view_option>::= 
+        /// {
+        ///     [ TRANSACTION_ID_COLUMN_NAME = transaction_id_column_name ]
+        ///     [ SEQUENCE_NUMBER_COLUMN_NAME = sequence_number_column_name ]
+        ///     [ OPERATION_TYPE_COLUMN_NAME = operation_type_id column_name ]
+        ///     [ OPERATION_TYPE_DESC_COLUMN_NAME = operation_type_desc_column_name ]
+        /// }
+        /// 
+        /// Examples:
+        /// LEDGER = ON
+        /// 
+        /// LEDGER = ON (APPEND_ONLY = ON)
+        /// 
+        /// LEDGER = ON (LEDGER_VIEW = [SCHEMA].[VIEW])
+        ///
+        /// LEDGER = ON (LEDGER_VIEW = [SCHEMA].[VIEW] (TRANSACTION_ID_COLUMN_NAME = [user_defined_name]))
+        ///
+        /// LEDGER = ON (
+        ///     APPEND_ONLY = ON,
+        ///     LEDGER_VIEW = [SCHEMA].[VIEW] (
+        ///         TRANSACTION_ID_COLUMN_NAME = [user_defined_name],
+        ///         SEQUENCE_NUMBER_COLUMN_NAME = [user_defined_name],
+        ///         OPERATION_TYPE_COLUMN_NAME = [user_defined_name],
+        ///         OPERATION_TYPE_DESC_COLUMN_NAME = [user_defined_name]
+        ///     )
+        /// )
         /// </summary>
+        /// <param name="sp">Scripting Preferences</param>
         private string GenerateLedgerOptionsWithClauseContent(ScriptingPreferences sp)
         {
-            StringBuilder withOptions = new StringBuilder();
-
-            bool isLedger = this.GetPropValueOptional(nameof(IsLedger), false);
-            if (isLedger)
+            // if the table isn't ledger, skip
+            if (!GetPropValueOptional(nameof(IsLedger), false))
             {
-                string ledgerViewTransactionIdColumnName = this.GetPropValueOptional<string>(nameof(LedgerViewTransactionIdColumnName), String.Empty);
-                string ledgerViewSequenceNumberColumnName = this.GetPropValueOptional<string>(nameof(LedgerViewSequenceNumberColumnName), String.Empty);
-                string ledgerViewOperationTypeColumnName = this.GetPropValueOptional<string>(nameof(LedgerViewOperationTypeColumnName), String.Empty);
-                string ledgerViewOperationTypeDescColumnName = this.GetPropValueOptional<string>(nameof(LedgerViewOperationTypeDescColumnName), String.Empty);
-                bool hasCustomLedgerViewTransactionIdColumnName = !String.Equals(ledgerViewTransactionIdColumnName, "ledger_transaction_id");
-                bool hasCustomLedgerViewSequenceNumberColumnName = !String.Equals(ledgerViewSequenceNumberColumnName, "ledger_sequence_number");
-                bool hasCustomLedgerViewOperationTypeColumnName = !String.Equals(ledgerViewOperationTypeColumnName, "ledger_operation_type");
-                bool hasCustomLedgerViewOperationTypeDescColumnName = !String.Equals(ledgerViewOperationTypeDescColumnName, "ledger_operation_type_desc");
+                return string.Empty;
+            }
 
-                string ledgerViewName = this.GetPropValueOptional<string>(nameof(LedgerViewName), String.Empty);
-                string ledgerViewClause = $"LEDGER_VIEW = {MakeSqlBraket(this.Schema)}.{MakeSqlBraket(ledgerViewName)}";
+            var ledgerOptionBuilder = new ScriptStringBuilder("LEDGER = ON");
 
-                //Get ledger view custom column name options if any specified by customer
+            // check ledger type
+            var ledgerType = GetPropValueOptional(nameof(LedgerType), LedgerTableType.None);
+            switch(ledgerType)
+            {
+                case LedgerTableType.None:
+                    throw new SmoException(ExceptionTemplates.LedgerTypeMustBeProvided);
+                case LedgerTableType.AppendOnlyLedgerTable:
+                    ledgerOptionBuilder.SetParameter("APPEND_ONLY", "ON", ParameterValueFormat.NotString);
+                    break;
+            }
+
+            var ledgerViewSchema = GetPropValueOptional(nameof(LedgerViewSchema), string.Empty);
+            var ledgerViewName = GetPropValueOptional(nameof(LedgerViewName), string.Empty);
+
+            if (string.IsNullOrEmpty(ledgerViewSchema) != string.IsNullOrEmpty(ledgerViewName))
+            {
+                // Both schema and view name must be provided OR neither
                 //
-                var ledgerViewParemeterList = new List<IScriptStringBuilderParameter>();
-                if (hasCustomLedgerViewTransactionIdColumnName || hasCustomLedgerViewSequenceNumberColumnName || hasCustomLedgerViewOperationTypeColumnName || hasCustomLedgerViewOperationTypeDescColumnName)
+                throw new SmoException(ExceptionTemplates.BothLedgerViewNameAndSchemaMustBeProvided);
+            }
+
+            //Get ledger view column name options
+            //
+            var ledgerViewTransactionIdColumnName = GetPropValueOptional(nameof(LedgerViewTransactionIdColumnName), string.Empty);
+            var ledgerViewSequenceNumberColumnName = GetPropValueOptional(nameof(LedgerViewSequenceNumberColumnName), string.Empty);
+            var ledgerViewOperationTypeColumnName = GetPropValueOptional(nameof(LedgerViewOperationTypeColumnName), string.Empty);
+            var ledgerViewOperationTypeDescColumnName = GetPropValueOptional(nameof(LedgerViewOperationTypeDescColumnName), string.Empty);
+
+            // script ledger view properties, if they are provided
+            //
+            if (!string.IsNullOrEmpty(ledgerViewName))
+            {
+                var ledgerViewParameterList = new List<IScriptStringBuilderParameter>();
+
+                if (!string.IsNullOrEmpty(ledgerViewTransactionIdColumnName))
                 {
-                    if (hasCustomLedgerViewTransactionIdColumnName)
-                    {
-                        ledgerViewParemeterList.Add(new ScriptStringBuilderParameter("TRANSACTION_ID_COLUMN_NAME", MakeSqlBraket(ledgerViewTransactionIdColumnName), ParameterValueFormat.NotString));
-                    }
-
-                    if (hasCustomLedgerViewSequenceNumberColumnName)
-                    {
-                        ledgerViewParemeterList.Add(new ScriptStringBuilderParameter("SEQUENCE_NUMBER_COLUMN_NAME", MakeSqlBraket(LedgerViewSequenceNumberColumnName), ParameterValueFormat.NotString));
-                    }
-
-                    if (hasCustomLedgerViewOperationTypeColumnName)
-                    {
-                        ledgerViewParemeterList.Add(new ScriptStringBuilderParameter("OPERATION_TYPE_COLUMN_NAME", MakeSqlBraket(LedgerViewOperationTypeColumnName), ParameterValueFormat.NotString));
-                    }
-
-                    if (hasCustomLedgerViewOperationTypeDescColumnName)
-                    {
-                        ledgerViewParemeterList.Add(new ScriptStringBuilderParameter("OPERATION_TYPE_DESC_COLUMN_NAME", MakeSqlBraket(LedgerViewOperationTypeDescColumnName), ParameterValueFormat.NotString));
-                    }
+                    ledgerViewParameterList.Add(new ScriptStringBuilderParameter("TRANSACTION_ID_COLUMN_NAME", MakeSqlBraket(ledgerViewTransactionIdColumnName), ParameterValueFormat.NotString));
+                }
+                if (!string.IsNullOrEmpty(ledgerViewSequenceNumberColumnName))
+                {
+                    ledgerViewParameterList.Add(new ScriptStringBuilderParameter("SEQUENCE_NUMBER_COLUMN_NAME", MakeSqlBraket(ledgerViewSequenceNumberColumnName), ParameterValueFormat.NotString));
+                }
+                if (!string.IsNullOrEmpty(ledgerViewOperationTypeColumnName))
+                {
+                    ledgerViewParameterList.Add(new ScriptStringBuilderParameter("OPERATION_TYPE_COLUMN_NAME", MakeSqlBraket(ledgerViewOperationTypeColumnName), ParameterValueFormat.NotString));
+                }
+                if (!string.IsNullOrEmpty(ledgerViewOperationTypeDescColumnName))
+                {
+                    ledgerViewParameterList.Add(new ScriptStringBuilderParameter("OPERATION_TYPE_DESC_COLUMN_NAME", MakeSqlBraket(ledgerViewOperationTypeDescColumnName), ParameterValueFormat.NotString));
                 }
 
-                Property ledgerTypeProperty = this.GetPropertyOptional("LedgerType");
-                LedgerTableType ledgerType = ledgerTypeProperty.IsNull ? LedgerTableType.None : (LedgerTableType)ledgerTypeProperty.Value;
-                var ledgerOptionBuilder = new ScriptStringBuilder("LEDGER = ON");
-                if (ledgerViewParemeterList.Any())
+                if (ledgerViewParameterList.Any())
                 {
-                    ledgerOptionBuilder.SetParameter(ledgerViewClause, ledgerViewParemeterList);
+                    var ledgerViewClause = $"LEDGER_VIEW = {MakeSqlBraket(ledgerViewSchema)}.{MakeSqlBraket(ledgerViewName)}";
+                    ledgerOptionBuilder.SetParameter(ledgerViewClause, ledgerViewParameterList);
                 }
                 else
                 {
-                    ledgerOptionBuilder.SetParameter("LEDGER_VIEW", ledgerViewName, ParameterValueFormat.NotString);
+                    ledgerOptionBuilder.SetParameter(
+                        "LEDGER_VIEW",
+                        string.Format("{0}.{1}", MakeSqlBraket(ledgerViewSchema), MakeSqlBraket(ledgerViewName)),
+                        ParameterValueFormat.NotString);
                 }
-
-                if (ledgerType == LedgerTableType.AppendOnlyLedgerTable)
-                {
-                    ledgerOptionBuilder.SetParameter("APPEND_ONLY", "ON", ParameterValueFormat.NotString);
-                }
-                withOptions.Append(ledgerOptionBuilder.ToString(scriptSemiColon: false));
             }
-            return withOptions.ToString();
+            else if (!string.IsNullOrEmpty(ledgerViewTransactionIdColumnName) ||
+                     !string.IsNullOrEmpty(ledgerViewSequenceNumberColumnName) ||
+                     !string.IsNullOrEmpty(ledgerViewOperationTypeColumnName) ||
+                     !string.IsNullOrEmpty(ledgerViewOperationTypeDescColumnName))
+            {
+                // Ledger view name and view schema haven't been provided, check if ledger view column names are given and
+                // throw an error if so
+                throw new SmoException(ExceptionTemplates.CannotProvideLedgerViewColumnNamesWithoutLedgerViewNameAndSchema);
+            }
+
+            return new StringBuilder().Append(ledgerOptionBuilder.ToString(scriptSemiColon: false)).ToString();
         }
 
         /// <summary>
@@ -2780,6 +2802,13 @@ namespace Microsoft.SqlServer.Management.Smo
                     continue;
                 }
 
+                // Do not script dropped ledger columns.
+                // These columns are hidden and "dropped", and should not be displayed.
+                if (column.DroppedLedgerColumn())
+                {
+                    continue;
+                }
+
                 // prepare to script column only if in direct execution mode or not explicitly directed to ignore it
                 if (sp.ScriptForCreateDrop || !column.IgnoreForScripting)
                 {
@@ -3407,7 +3436,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // Script for WITH SYSTEM VERSIONING ON/OFF
-            if (IsSupportedProperty("IsSystemVersioned", sp))
+            if (IsSupportedProperty(nameof(IsSystemVersioned), sp))
             {
                 ScriptSystemVersioning(alterQuery, sp);
             }
@@ -4486,9 +4515,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 nameof(Table.HistoryRetentionPeriod),
                 nameof(Table.HistoryRetentionPeriodUnit),
                 nameof(Table.HistoryTableID),
-                "HistoryTableName",
-                "HistoryTableSchema",
+                nameof(Table.HistoryTableName),
+                nameof(Table.HistoryTableSchema),
                 "ID",
+                nameof(Table.IsDroppedLedgerTable),
                 "IsEdge",
                 "IsExternal",
                 "IsFileTable",
@@ -4497,11 +4527,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 "IsNode",
                 "IsSchemaOwned",
                 "IsSystemObject",
-                "IsSystemVersioned",
+                nameof(Table.IsSystemVersioned),
                 "IsPartitioned",
                 "IsVarDecimalStorageFormatEnabled",
                 nameof(Table.LedgerType),
                 nameof(Table.LedgerViewName),
+                nameof(Table.LedgerViewSchema),
                 nameof(Table.LedgerViewTransactionIdColumnName),
                 nameof(Table.LedgerViewSequenceNumberColumnName),
                 nameof(Table.LedgerViewOperationTypeColumnName),
@@ -4726,9 +4757,9 @@ namespace Microsoft.SqlServer.Management.Smo
         //
         private void ScriptSystemVersioning(StringCollection query, ScriptingPreferences sp)
         {
-            Property systemVersioning = this.Properties.Get("IsSystemVersioned");
-            Property historyTableNameProperty = this.Properties.Get("HistoryTableName");
-            Property historyTableSchemaProperty = this.Properties.Get("HistoryTableSchema");
+            var systemVersioning = Properties.Get(nameof(IsSystemVersioned));
+            var historyTableNameProperty = Properties.Get(nameof(HistoryTableName));
+            var historyTableSchemaProperty = Properties.Get(nameof(HistoryTableSchema));
 
             // These are only available on Sterling
             //
@@ -4737,10 +4768,10 @@ namespace Microsoft.SqlServer.Management.Smo
             bool retentionPeriodPropertyDirty = false;
             bool retentionUnitPropertyDirty = false;
 
-            if (this.IsSupportedProperty("HistoryRetentionPeriod") && this.IsSupportedProperty("HistoryRetentionPeriodUnit"))
+            if (IsSupportedProperty(nameof(HistoryRetentionPeriod)))
             {
-                retentionPeriodProperty = this.Properties.Get("HistoryRetentionPeriod");
-                retentionUnitProperty = this.Properties.Get("HistoryRetentionPeriodUnit");
+                retentionPeriodProperty = Properties.Get(nameof(HistoryRetentionPeriod));
+                retentionUnitProperty = Properties.Get(nameof(HistoryRetentionPeriodUnit));
 
                 retentionPeriodPropertyDirty = retentionPeriodProperty.Dirty;
                 retentionUnitPropertyDirty = retentionUnitProperty.Dirty;

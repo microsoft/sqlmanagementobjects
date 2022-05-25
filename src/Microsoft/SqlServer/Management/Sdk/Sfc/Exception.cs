@@ -15,9 +15,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
     /// <summary>
     /// This is the base class for all SFC exceptions. Never throw this exception directly.
-    ///
-    /// TODO: Left the Serializable flag in and the FxCop directives. We need to apply these
-    /// to all other exception classes (next improvement).
     /// </summary>
     [Serializable]
     public class SfcException : SqlServerManagementException
@@ -140,18 +137,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     /// This exception gets thrown when trying to set a readonly property
     /// </summary>
     [Serializable]
-
+    // VBUMP Remove from V17, it appears to be unused. SMO has its own PropertyReadOnlyException.
     public sealed class SfcPropertyReadOnlyException : SfcException
     {
         string propertyName = null;
         
-        public SfcPropertyReadOnlyException() : base() 
+        public SfcPropertyReadOnlyException() : this(string.Empty, null)
         {
-            this.propertyName = string.Empty;
-            Init();
         }
 
-        public SfcPropertyReadOnlyException(string propertyName) : base() 
+        public SfcPropertyReadOnlyException(string propertyName) : this(propertyName, null)
+        {
+        }
+
+        internal SfcPropertyReadOnlyException(string propertyName, Exception innerException) : base(string.Empty, innerException)
         {
             this.propertyName = propertyName;
             Init();
@@ -200,18 +199,19 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     {
         string propertyName = null;
         
-        public SfcPropertyNotSetException() : base() 
+        public SfcPropertyNotSetException() : this(string.Empty, null)
         {
-            this.propertyName = string.Empty;
-            Init();
         }
 
-        public SfcPropertyNotSetException(string propertyName) : base() 
+        public SfcPropertyNotSetException(string propertyName) : this(propertyName, null) 
+        {            
+        }
+
+        internal SfcPropertyNotSetException(string propertyName, Exception innerException) : base(string.Empty, innerException)
         {
             this.propertyName = propertyName;
             Init();
         }
-
         private SfcPropertyNotSetException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -992,7 +992,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     }
 
     /// <summary>
-    /// This exception gets thrown when an invlaid connection context mode change is attempted.
+    /// This exception gets thrown when an invalid connection context mode change is attempted.
     /// </summary>
     [Serializable]
 
@@ -1002,24 +1002,31 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         private string toMode = null;
 
         public SfcInvalidConnectionContextModeChangeException()
-            : base()
+            : this(string.Empty)
         {
-            this.fromMode = string.Empty;
-            this.toMode = string.Empty;
+            
         }
 
         public SfcInvalidConnectionContextModeChangeException(string fromMode, string toMode)
-            : base()
+            : this(fromMode, toMode, null)
+        {
+        }
+
+        public SfcInvalidConnectionContextModeChangeException(string fromMode, string toMode, Exception innerException)
+            : this(SfcStrings.SfcInvalidConnectionContextModeChange(fromMode, toMode), innerException)
         {
             this.fromMode = fromMode;
             this.toMode = toMode;
         }
 
-        public SfcInvalidConnectionContextModeChangeException(string fromMode, string toMode, Exception innerException)
-            : base(SfcStrings.SfcInvalidConnectionContextModeChange(fromMode, toMode), innerException)
+        internal SfcInvalidConnectionContextModeChangeException(string message, Exception innerException) : base(message, innerException)
         {
-            this.fromMode = fromMode;
-            this.toMode = toMode;
+        }
+
+        internal SfcInvalidConnectionContextModeChangeException(string message) : base(message, null)
+        {
+            this.fromMode = string.Empty;
+            this.toMode = string.Empty;
         }
 
         private SfcInvalidConnectionContextModeChangeException(SerializationInfo info, StreamingContext context)

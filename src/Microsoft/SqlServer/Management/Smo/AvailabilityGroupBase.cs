@@ -12,7 +12,6 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
-
 namespace Microsoft.SqlServer.Management.Smo
 {
     /// <summary>
@@ -30,15 +29,19 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// If true, the contained AG will be created reusing any (existing) replicated
+        /// system databases (myAG_contained_master and myAG_contained_msdb, if the AG name is "myAG").
+        /// </summary>
+        /// <remarks>
+        /// This property is only used during the AG creation. If 'IsContained' is set to
+        /// false, then it is ignored.
+        /// </remarks>
+        public bool ReuseSystemDatabases { private get; set; }
+
+        /// <summary>
         /// returns the name of the type in the urn expression
         /// </summary>
-        public static string UrnSuffix
-        {
-            get 
-            {
-                return "AvailabilityGroup";
-            }
-        }
+        public static string UrnSuffix => nameof(AvailabilityGroup);
 
         #region Collections
 
@@ -534,7 +537,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             //Script Availability group options
             //Since there are no required options, this section is conditional on any option explicitly set before creation
-            string groupOptions = this.ScriptCreateGroupOptions(sp.TargetServerVersionInternal);
+            string groupOptions = this.ScriptCreateGroupOptions(sp.TargetServerVersionInternal, propName => IsSupportedProperty(propName));
+
             if (!string.IsNullOrEmpty(groupOptions))
             {
                 script.Append(Globals.With + Globals.space + Globals.LParen + groupOptions + Globals.RParen + Globals.newline);
@@ -564,7 +568,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //         SEEDING_MODE = AUTOMATIC
                 //      )
 
-                bool firstReplica = true;
+                var firstReplica = true;
                 script.Append(AvailabilityGroup.AvailabilityGroupOn + Globals.newline+ Globals.tab);
 
                 foreach (AvailabilityReplica ar in this.AvailabilityReplicas)
@@ -643,11 +647,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 script.Append(sp.NewLine);
             }
 
-            string createScript = script.ToString();
+            var createScript = script.ToString();
             query.Add(createScript);
             tc.TraceInformation("Generated create script: " + createScript);
-
-            return;
         }
 
         /// <summary>
@@ -689,27 +691,20 @@ namespace Microsoft.SqlServer.Management.Smo
             ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
-            IEnumerable<string> propertyNames;
-            if (IsSupportedProperty("BasicAvailabilityGroup") && BasicAvailabilityGroup)
-            {
-                propertyNames = BasicAlterableGroupPropertyNames;
-            }
-            else
-            {
-                propertyNames = AlterableGroupPropertyNames.Where(kvp => kvp.Key <= sp.TargetServerVersionInternal).SelectMany(kvp => kvp.Value);
-            }
+            var propertyNames =
+                IsSupportedProperty("BasicAvailabilityGroup") && BasicAvailabilityGroup
+                ? BasicAlterableGroupPropertyNames
+                : AlterableGroupPropertyNames.Where(propertyName => IsSupportedProperty(propertyName));
 
-            foreach (string propertyName in propertyNames)
+            foreach (var propertyName in propertyNames)
             {
-                string optionScript = this.ScriptAlterOneOption(propertyName, sp);
+                var optionScript = ScriptAlterOneOption(propertyName, sp);
 
                 if (!string.IsNullOrEmpty(optionScript))
                 {
                     alterQuery.Add(optionScript);
-                }                
+                }
             }
-
-            return;
         }
 
         /// <summary>
@@ -756,8 +751,6 @@ namespace Microsoft.SqlServer.Management.Smo
             string dropScript = script.ToString(); 
             dropQuery.Add(dropScript);
             tc.TraceInformation("Generated drop script: " + dropScript);
-
-            return;
         }
 
         /// <summary>
@@ -819,6 +812,8 @@ namespace Microsoft.SqlServer.Management.Smo
         internal static readonly string RoleScript = "ROLE";
         internal static readonly string DistributedScript = "DISTRIBUTED";
         internal static readonly string AvailabilityGroupOn = "AVAILABILITY GROUP ON";
+        internal static readonly string ContainedScript = "CONTAINED";
+        internal static readonly string ReuseSystemDatabasesScript = "REUSE_SYSTEM_DATABASES";
 
         //Property names
         internal const string AutomatedBackupPreferencePropertyName = "AutomatedBackupPreference";
@@ -830,6 +825,8 @@ namespace Microsoft.SqlServer.Management.Smo
         internal const string ClusterTypePropertyName = "ClusterType";
         internal const string RequiredSynchronizedSecondariesToCommitPropertyName = "RequiredSynchronizedSecondariesToCommit";
         internal const string DistributedPropertyName = nameof(IsDistributedAvailabilityGroup);
+        internal const string IsContainedPropertyName = nameof(IsContained);
+
 
         //Automated backup preference scripts
         internal static readonly string PrimaryScript = "PRIMARY";
@@ -841,27 +838,41 @@ namespace Microsoft.SqlServer.Management.Smo
         internal static readonly string WsfcScript = "WSFC";
         internal static readonly string ExternalScript = "EXTERNAL";
 
-        internal static readonly Dictionary<SqlServerVersionInternal, string[]> CreatableGroupPropertyNames = new Dictionary<SqlServerVersionInternal, string[]>()
+        /// <summary>
+        /// The collection of properties that may be scripted a part of the group option when creating an AG.
+        /// </summary>
+        /// <remarks>
+        /// Before using property in this, you should always call the IsSupportedProperty().
+        /// In other words, it is safe to keep adding to this list.
+        /// </remarks>
+        internal static readonly string[] CreatableGroupPropertyNames = 
         {
-            { SqlServerVersionInternal.Version120, new string[] {
-                AutomatedBackupPreferencePropertyName,
-                FailureConditionLevelPropertyName,
-                HealthCheckTimeoutPropertyName,
-            } },
+            // SQL 2014+
+            AutomatedBackupPreferencePropertyName,
+            FailureConditionLevelPropertyName,
+            HealthCheckTimeoutPropertyName,
 
-            { SqlServerVersionInternal.Version130, new string[] {
-                BasicAvailabilityGroupPropertyName,
-                DatabaseHealthTriggerPropertyName,
-                DtcSupportEnabledPropertyName,
-                DistributedPropertyName,
-            } },
+            // SQL 2016+
+            BasicAvailabilityGroupPropertyName,
+            DatabaseHealthTriggerPropertyName,
+            DtcSupportEnabledPropertyName,
+            DistributedPropertyName,
 
-            { SqlServerVersionInternal.Version140, new string[] {
-                ClusterTypePropertyName,
-                RequiredSynchronizedSecondariesToCommitPropertyName,
-            } },
+            // SQL 2017+
+            ClusterTypePropertyName,
+            RequiredSynchronizedSecondariesToCommitPropertyName,
+
+            // SQL 2022+
+            IsContainedPropertyName
         };
 
+        /// <summary>
+        /// The collection of properties that may be scripted a part of the group option when altering a BASIC AG.
+        /// </summary>
+        /// <remarks>
+        /// Currently, there is no need to check for IsSupportedProperty() before using it, since it is
+        /// implied by the fact BasicAvailabilityGroup is uspported.
+        /// </remarks>
         internal static readonly string[] BasicAlterableGroupPropertyNames =
         {
             DatabaseHealthTriggerPropertyName,
@@ -870,22 +881,26 @@ namespace Microsoft.SqlServer.Management.Smo
             DtcSupportEnabledPropertyName
         };
 
-        internal static readonly Dictionary<SqlServerVersionInternal, string[]> AlterableGroupPropertyNames = new Dictionary<SqlServerVersionInternal, string[]>()
+        /// <summary>
+        /// The collection of properties that may be scripted a part of the group option when altering an AG.
+        /// </summary>
+        /// <remarks>
+        /// Before using property in this, you should always call the IsSupportedProperty().
+        /// In other words, it is safe to keep adding to this list.
+        /// </remarks>
+        internal static readonly string[] AlterableGroupPropertyNames = 
         {
-            { SqlServerVersionInternal.Version120, new string[] {
-                AutomatedBackupPreferencePropertyName,
-                FailureConditionLevelPropertyName,
-                HealthCheckTimeoutPropertyName
-            } },
+            // SQL 2014+
+            AutomatedBackupPreferencePropertyName,
+            FailureConditionLevelPropertyName,
+            HealthCheckTimeoutPropertyName,
 
-            { SqlServerVersionInternal.Version130, new string[] {
-                DatabaseHealthTriggerPropertyName,
-                DtcSupportEnabledPropertyName
-            } },
+            // SQL 2016+
+            DatabaseHealthTriggerPropertyName,
+            DtcSupportEnabledPropertyName,
 
-            { SqlServerVersionInternal.Version140, new string[] {
-                RequiredSynchronizedSecondariesToCommitPropertyName,
-            } },
+            // SQL 2017+
+            RequiredSynchronizedSecondariesToCommitPropertyName
         };
 
         internal static string GetAvailabilityGroupClusterType(AvailabilityGroupClusterType availabilityGroupClusterType)
@@ -957,8 +972,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private string ScriptGroupOption(bool scriptAll, string propertyName, SqlServerVersionInternal targetServerVersion)
         {
-            StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            Property prop = GetPropertyOptional(propertyName);
+            var script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            var prop = GetPropertyOptional(propertyName);
 
             if (!prop.IsNull && (scriptAll || IsDirty(propertyName)))
             {
@@ -966,7 +981,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     case AutomatedBackupPreferencePropertyName:
                         script.Append(AutomatedBackupPreferenceScript + Globals.space + Globals.EqualSign + Globals.space);
-                        script.Append(this.GetAutomatedBackupPreferenceScript(this.GetEffectiveAutomatedBackupPreference(targetServerVersion)));
+                        script.Append(GetAutomatedBackupPreferenceScript(GetEffectiveAutomatedBackupPreference(targetServerVersion)));
                         break;
 
                     case BasicAvailabilityGroupPropertyName:
@@ -978,30 +993,30 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     case DatabaseHealthTriggerPropertyName:
                         script.Append(DatabaseHealthTriggerScript + Globals.space + Globals.EqualSign + Globals.space);
-                        script.Append(this.DatabaseHealthTrigger ? "ON" : "OFF");
+                        script.Append(DatabaseHealthTrigger ? "ON" : "OFF");
                         break;
 
                     case DtcSupportEnabledPropertyName:
                         script.Append(DtcSupportEnabledScript + Globals.space + Globals.EqualSign + Globals.space);
-                        script.Append(this.DtcSupportEnabled ? DtcSupportEnabledOnScript : DtcSupportEnabledOffScript);
+                        script.Append(DtcSupportEnabled ? DtcSupportEnabledOnScript : DtcSupportEnabledOffScript);
                         break;
 
                     case FailureConditionLevelPropertyName:
                         script.Append(FailureConditionLevelScript + Globals.space + Globals.EqualSign + Globals.space);
-                        script.Append((int)this.FailureConditionLevel);
+                        script.Append((int)FailureConditionLevel);
                         break;
 
                     case HealthCheckTimeoutPropertyName:
                         script.Append(HealthCheckTimeoutScript + Globals.space + Globals.EqualSign + Globals.space);
-                        script.Append(this.HealthCheckTimeout);
+                        script.Append(HealthCheckTimeout);
                         break;
 
                     case ClusterTypePropertyName:
                         // WSFC is the default when CLUSTER_TYPE is not specified, so don't emit it if ClusterType is Wsfc.
-                        if (this.ClusterType != AvailabilityGroupClusterType.Wsfc)
+                        if (ClusterType != AvailabilityGroupClusterType.Wsfc)
                         {
                             script.Append(ClusterTypeScript + Globals.space + Globals.EqualSign + Globals.space);
-                            script.Append(GetAvailabilityGroupClusterType(this.ClusterType));
+                            script.Append(GetAvailabilityGroupClusterType(ClusterType));
                         }
                         break;
 
@@ -1009,8 +1024,21 @@ namespace Microsoft.SqlServer.Management.Smo
                         script.Append(RequiredSynchronizedSecondariesToCommitScript + Globals.space + Globals.EqualSign + Globals.space);
                         script.Append(this.RequiredSynchronizedSecondariesToCommit);
                         break;
+
+                    case IsContainedPropertyName:
+                        if (IsContained)
+                        {
+                            script.Append(ContainedScript);
+                            // Note: there is an implicit assumption that ReuseSystemDatabases is supported when IsContained is.
+                            if (ReuseSystemDatabases)
+                            {
+                                script.Append(Globals.comma + Globals.space + ReuseSystemDatabasesScript);
+                            }
+                        }
+                        break;
+
                     case DistributedPropertyName: 
-                         if (this.IsDistributedAvailabilityGroup)
+                         if (IsDistributedAvailabilityGroup)
                          {
                              script.Append(DistributedScript);
                          }
@@ -1023,44 +1051,34 @@ namespace Microsoft.SqlServer.Management.Smo
             return script.ToString();
         }
 
-        private string ScriptCreateGroupOptions(SqlServerVersionInternal targetVersion)
-        {
-            StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            bool firstOption = true;
 
-            foreach (var propertyName in CreatableGroupPropertyNames.Where(kvp => kvp.Key <= targetVersion).SelectMany(kvp => kvp.Value))
-            {
-                string groupOption = this.ScriptGroupOption(true, propertyName, targetVersion);
-
-                if (!string.IsNullOrEmpty(groupOption))
-                {
-                    if (firstOption)
-                    {
-                        firstOption = false;
-                    }
-                    else
-                    {
-                        script.Append(Globals.comma + Globals.newline);
-                    }
-
-                    script.Append(groupOption);
-                }
-            }
-
-            return script.ToString();
-        }
+        /// <summary>
+        /// Script out the group options based on the target version and whether the property is supported or not
+        /// The list of possible property to be scripted is in CreatableGroupPropertyNames.
+        /// </summary>
+        /// <param name="targetVersion">The version of SQL against which we are scripting the properties</param>
+        /// <param name="isValidGroupOptionProperty">A function that checks whether the property is supposed to be scripted or not.</param>
+        /// <returns>A properly formatted string with the T-SQL to use to specify the AG options (may be empty, if nothing is to be scripted)</returns>
+        private string ScriptCreateGroupOptions(SqlServerVersionInternal targetVersion, Func<string, bool> isValidGroupOptionProperty) =>
+            string.Join(
+                Globals.comma + Globals.newline,
+                from propertyName in CreatableGroupPropertyNames
+                where isValidGroupOptionProperty(propertyName)
+                let groupOption = ScriptGroupOption(scriptAll: true, propertyName: propertyName, targetServerVersion: targetVersion)
+                where !string.IsNullOrEmpty(groupOption)
+                select groupOption);
 
         private string ScriptAlterOneOption(string propertyName, ScriptingPreferences sp)
         {
-            string groupOptionScript = this.ScriptGroupOption(false, propertyName, sp.TargetServerVersionInternal);
+            var groupOptionScript = this.ScriptGroupOption(scriptAll: false, propertyName:  propertyName, targetServerVersion: sp.TargetServerVersionInternal);
 
             if (string.IsNullOrEmpty(groupOptionScript))
             {
                 return null;
             }
 
-            StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            this.ScriptIncludeHeaders(script, sp, UrnSuffix);
+            var script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            ScriptIncludeHeaders(script, sp, UrnSuffix);
 
             if (sp.IncludeScripts.ExistenceCheck)
             {

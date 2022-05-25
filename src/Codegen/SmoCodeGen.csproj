@@ -37,7 +37,7 @@
     <Compile Include="$(ConnectionInfoSrc)\SqlContext.cs" />
     <Compile Include="$(ConnectionInfoSrc)\SqlDirectConnection.cs" />
     <Compile Include="$(ConnectionInfoSrc)\SqlOlapConnectionInfoBase.cs" />
-    <Compile Include="$(ConnectionInfoSrc)\SqlServerMgmtEx.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlServerManagementException.cs" />
     <Compile Include="$(ConnectionInfoSrc)\StatementCapture.cs" />
     <Compile Include="$(ConnectionInfoSrc)\StatementEvent.cs" />
     <Compile Include="$(SfcSrc)\Enumerator\AstNode.cs" />

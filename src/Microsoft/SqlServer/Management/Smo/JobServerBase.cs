@@ -12,7 +12,6 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo.Agent
 {
     public partial class JobServer : SqlSmoObject, Cmn.IAlterable, IScriptable
@@ -63,7 +62,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// The GetJobByID method returns a SQL-DMO Job object referencing the SQL Server Agent job identified by the specified job identifier.
         /// </summary>
-        /// <param name="jobID"></param>
+        /// <param name="jobId"></param>
         /// <returns></returns>
         public Job GetJobByID(Guid jobId)
         {
@@ -89,7 +88,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// The RemoveJobByID method drops the SQLServerAgent job identified and removes the referencing Job object from the Jobs collection.
         /// </summary>
-        /// <param name="jobID"></param>
+        /// <param name="jobId"></param>
         /// <returns></returns>
         public void RemoveJobByID(Guid jobId)
         {
@@ -116,17 +115,17 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// The RemoveJobsByLogin method drops all SQLServerAgent jobs owned by the login identified and removes the referencing Job objects from the Jobs collection.
         /// </summary>
-        /// <param name="jobID"></param>
+        /// <param name="login"></param>
         /// <returns></returns>
         public void RemoveJobsByLogin(string login)
         {
             if( null == login )
             {
-                throw new ArgumentNullException("login");
+                throw new ArgumentNullException(nameof(login));
             }
             try
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.Append("EXEC msdb.dbo.sp_manage_jobs_by_login @action = N'DELETE', @current_owner_login_name = ");
                 sb.Append(SqlSmoObject.MakeSqlString(login));
 
@@ -160,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             get 
             {
-                return "JobServer";
+                return nameof(JobServer);
             }
         }
 
@@ -181,10 +180,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         private void ScriptProperties(StringCollection queries, ScriptingPreferences sp )
         {
-            StringBuilder statement = new StringBuilder( Globals.INIT_BUFFER_SIZE );
+            var statement = new StringBuilder( Globals.INIT_BUFFER_SIZE );
             statement.Append("EXEC msdb.dbo.sp_set_sqlagent_properties ");
 
-            int count = 0;
+            var count = 0;
             GetBoolParameter( statement, sp, "SqlServerRestart", "@sqlserver_restart={0}", ref count);
             GetBoolParameter(statement, sp, "SqlAgentRestart", "@monitor_autostart={0}", ref count);
             GetBoolParameter(statement, sp, "SqlAgentAutoStart", "@auto_start={0}", ref count);
@@ -223,7 +222,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             else
             {
                 // if yukon to pre-SQL 11 then use xp_regwrite calls
-                Property prop = Properties.Get("AgentMailType");
+                var prop = Properties.Get("AgentMailType");
                 if ((null != prop.Value) && (prop.Dirty || !sp.ScriptForAlter))
                 {
                     queries.Add(string.Format(SmoApplication.DefaultCulture,
@@ -263,13 +262,13 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         // because JobServer object does not have such a property
         protected override bool ImplInitialize(string[] fields, OrderBy[] orderby)
         {
-            string[] newFields = fields;
-            OrderBy[] newOrderBy = orderby;
+            var newFields = fields;
+            var newOrderBy = orderby;
 
-            bool foundName = false;
+            var foundName = false;
             if( null != fields )
             {
-                foreach (string s in fields)
+                foreach (var s in fields)
                 {
                     if (s == "Name")
                     {
@@ -281,8 +280,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 if( foundName && 1 < fields.Length )
                 {
                     newFields = new string[fields.Length - 1];
-                    int count = 0;
-                    foreach (string s in fields)
+                    var count = 0;
+                    foreach (var s in fields)
                     {
                         if (s != "Name")
                         {
@@ -295,7 +294,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             foundName = false;
             if( null != orderby )
             {
-                foreach (OrderBy ob in orderby)
+                foreach (var ob in orderby)
                 {
                     if (ob.Field == "Name")
                     {
@@ -306,8 +305,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 if( foundName && 1 < orderby.Length )
                 {
                     newOrderBy = new OrderBy[orderby.Length - 1];
-                    int count = 0;
-                    foreach (OrderBy ob in orderby)
+                    var count = 0;
+                    foreach (var ob in orderby)
                     {
                         if (ob.Field != "Name")
                         {
@@ -334,8 +333,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     profileName = "Outlook"; // default profile name
                 }
 
-                this.ExecutionManager.ExecuteNonQuery( 
-                                                      String.Format(SmoApplication.DefaultCulture, "EXECUTE master.dbo.xp_sqlagent_notify N'N',null,null,null,N'M',N'{0}' ",SqlString(profileName)));
+                this.ExecutionManager.ExecuteNonQuery(
+                                                      string.Format(SmoApplication.DefaultCulture, "EXECUTE master.dbo.xp_sqlagent_notify N'N',null,null,null,N'M',N'{0}' ",SqlString(profileName)));
             }
             catch(Exception e)
             {
@@ -348,17 +347,17 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// Tests the net send. 
         /// </summary>
+        [Obsolete]
         public void TestNetSend()
         {
             try
             {
-                ThrowIfBelowVersion90();
-                string NetSendRecipient = Properties["NetSendRecipient"].Value as string;
+                var NetSendRecipient = Properties["NetSendRecipient"].Value as string;
                 if (0 == NetSendRecipient.Length) 
                 {
                     throw new PropertyNotSetException("NetSendRecipient");
                 }
-                this.ExecutionManager.ExecuteNonQuery(String.Format(SmoApplication.DefaultCulture, "EXECUTE master.dbo.xp_sqlagent_notify N'N',null,null,null,N'N',N'{0}' ",SqlString(NetSendRecipient)));
+                this.ExecutionManager.ExecuteNonQuery(string.Format(SmoApplication.DefaultCulture, "EXECUTE master.dbo.xp_sqlagent_notify N'N',null,null,null,N'N',N'{0}' ",SqlString(NetSendRecipient)));
             }
             catch (Exception e)
             {
@@ -388,25 +387,26 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// Sets the SQL Server Account and Password that is used to login to SQL Server.
         /// </summary>
-        public void SetHostLoginAccount(System.String loginName, System.String password)
+        [Obsolete]
+        public void SetHostLoginAccount(string loginName, string password)
         {
             // Shiloh only feature
             // check to see if server version is Yukon - throw exception if so
             ThrowIfAboveVersion80();
- 
+            if (null == loginName)
+            {
+                throw new ArgumentNullException(nameof(loginName));
+            }
+
+            if (null == password)
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
             try
             {
-                if( null == loginName )
-                {
-                    throw new ArgumentNullException("loginName");
-                }
 
-                if ( null == password )
-                {
-                    throw new ArgumentNullException("password");
-                }
 
-                StringBuilder stmt = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+                var stmt = new StringBuilder(Globals.INIT_BUFFER_SIZE);
                 
                 stmt.Append( "declare @arg varbinary(512)");
                 stmt.Append(Globals.newline);
@@ -435,6 +435,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// Clears the SQL Server account and use integrated security to login to SQL Server.
         /// </summary>
+        [Obsolete]
         public void ClearHostLoginAccount()
         {
             try
@@ -443,7 +444,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 if (!this.ExecutionManager.Recording)
                 {
                     // update the property in tha bag
-                    Properties.Get("HostLoginName").SetValue(String.Empty);
+                    Properties.Get("HostLoginName").SetValue(string.Empty);
                 }
             }
             catch(Exception e)
@@ -457,7 +458,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <summary>
         /// Sets the master server account. This is available only for SQL Server 2000.
         /// </summary>
-        public void SetMsxAccount(System.String account, string password)
+        [Obsolete]
+        public void SetMsxAccount(string account, string password)
         {
             try
             {
@@ -476,8 +478,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("password"));
                 }
 
-                StringBuilder domainName = new StringBuilder();
-                StringBuilder userName = new StringBuilder();
+                var domainName = new StringBuilder();
+                var userName = new StringBuilder();
                 ParseAccountName( account, domainName, userName );
                 this.ExecutionManager.ExecuteNonQuery( string.Format(
                                                                      SmoApplication.DefaultCulture, 
@@ -495,19 +497,17 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         }
 
         /// <summary>
-        /// Sets the master server account credential name that is used to store the MSX account information. This is available only for SQL Server 2005.
+        /// Sets the master server account credential name that is used to store the MSX account information using sp_msx_set_account.
         /// </summary>
         /// <param name="credentialName"></param>
-        public void SetMsxAccount(System.String credentialName)
+        public void SetMsxAccount(string credentialName)
         {
+            if (null == credentialName)
+            {
+                throw new ArgumentNullException(nameof(credentialName));
+            }
             try
             {
-                ThrowIfBelowVersion90();
-                if (null == credentialName)
-                {
-                    throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("credentialName"));
-                }
-
                 this.ExecutionManager.ExecuteNonQuery(string.Format(
                                                                     SmoApplication.DefaultCulture,
                                                                     "EXEC msdb.dbo.sp_msx_set_account @credential_name = {0}", MakeSqlString(credentialName)));
@@ -521,22 +521,14 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         }
 
         /// <summary>
-        /// Clears the master server account ands use integrated security 
-        /// to login to the master server. 
+        /// Clears the master server account and use integrated security 
+        /// to login to the master server using sp_msx_set_account. 
         /// </summary>
         public void ClearMsxAccount()
         {
             try
             {
-                if (this.ServerVersion.Major >= 9)
-                {
-                    this.ExecutionManager.ExecuteNonQuery("EXEC msdb.dbo.sp_msx_set_account");
-                }
-                else
-                {
-                    ThrowIfBelowVersion80SP3();
-                    this.ExecutionManager.ExecuteNonQuery("EXEC master.dbo.xp_sqlagent_msx_account N'DEL'");
-                }
+                this.ExecutionManager.ExecuteNonQuery("EXEC msdb.dbo.sp_msx_set_account");
             }
             catch(Exception e)
             {
@@ -548,7 +540,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         private void ParseAccountName(string accountName, StringBuilder domainName, StringBuilder userName)
         {
-            string[] res = accountName.Split(new char[] {'\\'});
+            var res = accountName.Split(new char[] {'\\'});
             if( res.Length == 2 )
             {
                 domainName.Append(res[0]);
@@ -571,7 +563,6 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                ThrowIfBelowVersion90();
                 this.ExecutionManager.ExecuteNonQuery("EXEC msdb.dbo.sp_cycle_agent_errorlog");
             }
             catch(Exception e)
@@ -590,7 +581,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                Request req = new Request(this.Urn.Value + "/ErrorLog");
+                var req = new Request(this.Urn.Value + "/ErrorLog");
                 return this.ExecutionManager.GetEnumeratorData(req);
             }
             catch(Exception e)
@@ -626,7 +617,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                Request req = new Request(string.Format(SmoApplication.DefaultCulture,  "{0}/ErrorLog[@ArchiveNo='{1}']/LogEntry", this.Urn, logNumber ));
+                var req = new Request(string.Format(SmoApplication.DefaultCulture,  "{0}/ErrorLog[@ArchiveNo='{1}']/LogEntry", this.Urn, logNumber ));
                 return this.ExecutionManager.GetEnumeratorData(req);
             }
             catch(Exception e)
@@ -774,7 +765,6 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 {
                     jobs = new JobCollection( this );
                 }
-
                 return jobs;
             }
         }
@@ -815,7 +805,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         }
 
         [SfcProperty(SfcPropertyFlags.Standalone)]
-        public System.Boolean SysAdminOnly
+        public bool SysAdminOnly
         {
             get
             {
@@ -823,7 +813,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 {
                     throw new PropertyCannotBeRetrievedException("SysAdminOnly", this, ExceptionTemplates.ReasonPropertyIsNotSupportedOnCurrentServerVersion);
                 }
-                return (System.Boolean)this.Properties.GetValueWithNullReplacement("SysAdminOnly");
+                return (bool)this.Properties.GetValueWithNullReplacement("SysAdminOnly");
             }
         }
 
@@ -892,13 +882,12 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <returns></returns>
         public DataTable EnumJobHistory(JobHistoryFilter filter )
         {
+            if (null == filter)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
             try
             {
-                if( null == filter )
-                {
-                    throw new ArgumentNullException("filter");
-                }
-
                 return this.ExecutionManager.GetEnumeratorData( filter.GetEnumRequest(this) );
             }
             catch(Exception e)
@@ -914,7 +903,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             try
             {
                 CheckObjectState(true);
-                Request req = new Request(this.Urn + "/Job/History");
+                var req = new Request(this.Urn + "/Job/History");
                 return this.ExecutionManager.GetEnumeratorData( req );
             }
             catch(Exception e)
@@ -937,7 +926,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             DataTable jobsTable = null;
             if( null == filter )
             {
-                throw new ArgumentNullException("filter");
+                throw new ArgumentNullException(nameof(filter));
             }
 
             try
@@ -980,11 +969,11 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             // filtering to fix the bug# 98285 - JobServer.EnumJobs does not allow JobFilter on CurrentExecutionStatus
             if (filter.currentExecutionStatusDirty)
             {
-                List<DataRow> dropList = new List<DataRow>();
+                var dropList = new List<DataRow>();
 
                 foreach (DataRow dr in jobsTable.Rows)
                 {
-                    Job j = this.Jobs.ItemById((Guid)dr["JobID"]);
+                    var j = this.Jobs.ItemById((Guid)dr["JobID"]);
                     if (null != j)
                     {
                         if (j.CurrentRunStatus != filter.CurrentExecutionStatus)
@@ -995,7 +984,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 }
 
                 // remove all the rows that don't match the executionstatus
-                foreach (DataRow dr in dropList)
+                foreach (var dr in dropList)
                 {
                     jobsTable.Rows.Remove(dr);
                 }
@@ -1015,11 +1004,11 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             // this property is not supported for filtering through SMO enumerator. 
             if (filter.jobTypeDirty)
             {
-                List<DataRow> dropList = new List<DataRow>();
+                var dropList = new List<DataRow>();
 
                 foreach (DataRow dr in jobsTable.Rows)
                 {
-                    Job j = this.Jobs.ItemById((Guid)dr["JobID"]);
+                    var j = this.Jobs.ItemById((Guid)dr["JobID"]);
                     if (null != j)
                     {
                         if (j.JobType != filter.JobType)
@@ -1030,7 +1019,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 }
 
                 // remove all the rows that don't match the job type
-                foreach (DataRow dr in dropList)
+                foreach (var dr in dropList)
                 {
                     jobsTable.Rows.Remove(dr);
                 }
@@ -1050,12 +1039,12 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             // we'll scan the result table and look for steps
             if (filter.stepSubsystemDirty)
             {
-                List<DataRow> dropList = new List<DataRow>();
+                var dropList = new List<DataRow>();
 
                 foreach (DataRow dr in jobsTable.Rows)
                 {
-                    Job j = this.Jobs.ItemById((Guid)dr["JobID"]);
-                    bool hasStep = false;
+                    var j = this.Jobs.ItemById((Guid)dr["JobID"]);
+                    var hasStep = false;
                     if (null != j)
                     {
                         foreach (JobStep step in j.JobSteps)
@@ -1074,7 +1063,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 }
 
                 // remove all the rows that don't have that step
-                foreach (DataRow dr in dropList)
+                foreach (var dr in dropList)
                 {
                     jobsTable.Rows.Remove(dr);
                 }
@@ -1086,7 +1075,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                Request req = new Request(this.Urn + "/Job");
+                var req = new Request(this.Urn + "/Job");
                 return this.ExecutionManager.GetEnumeratorData( req );
             }
             catch(Exception e)
@@ -1106,8 +1095,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                StringCollection queries = new StringCollection();
-                queries.Add( "EXEC msdb.dbo.sp_enum_sqlagent_subsystems" );
+                var queries = new StringCollection
+                {
+                    "EXEC msdb.dbo.sp_enum_sqlagent_subsystems"
+                };
                 return this.ExecutionManager.ExecuteWithResults( queries ).Tables[0];
             }
             catch(Exception e)
@@ -1126,8 +1117,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                StringCollection queries = new StringCollection();
-                queries.Add( "EXEC msdb.dbo.sp_msx_defect" );
+                var queries = new StringCollection
+                {
+                    "EXEC msdb.dbo.sp_msx_defect"
+                };
                 this.ExecutionManager.ExecuteNonQuery( queries );
             }
             catch(Exception e)
@@ -1146,9 +1139,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                StringCollection queries = new StringCollection();
-                string paramStr = forceDefection ? "1" : "0";
-                string query = "EXEC msdb.dbo.sp_msx_defect @forced_defection = " + paramStr;
+                var queries = new StringCollection();
+                var paramStr = forceDefection ? "1" : "0";
+                var query = "EXEC msdb.dbo.sp_msx_defect @forced_defection = " + paramStr;
                 queries.Add(query);
 
                 this.ExecutionManager.ExecuteNonQuery(queries);
@@ -1171,21 +1164,22 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// location. Used for user assistance only.</param>
         public void MsxEnlist(string masterServer , string location )
         {
+            if (null == masterServer)
+            {
+                throw new ArgumentNullException(nameof(masterServer));
+            }
+
+            if (null == location)
+            {
+                throw new ArgumentNullException(nameof(location));
+            }
             try
             {
-                if( null == masterServer )
+                var queries = new StringCollection
                 {
-                    throw new ArgumentNullException("masterServer");
-                }
-
-                if ( null == location )
-                {
-                    throw new ArgumentNullException("location");
-                }
-
-                StringCollection queries = new StringCollection();
-                queries.Add( string.Format(SmoApplication.DefaultCulture,  "EXEC msdb.dbo.sp_msx_enlist @msx_server_name = N'{0}', @location = N'{1}'", 
-                                           SqlString( masterServer ), SqlString(location) ));
+                    string.Format(SmoApplication.DefaultCulture, "EXEC msdb.dbo.sp_msx_enlist @msx_server_name = N'{0}', @location = N'{1}'",
+                                           SqlString(masterServer), SqlString(location))
+                };
 
                 this.ExecutionManager.ExecuteNonQuery( queries );
             }
@@ -1211,11 +1205,13 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             {
                 if( null == filter )
                 {
-                    throw new ArgumentNullException("filter");
+                    throw new ArgumentNullException(nameof(filter));
                 }
 
-                StringCollection queries = new StringCollection();
-                queries.Add( "EXEC msdb.dbo.sp_purge_jobhistory " + filter.GetPurgeFilter());
+                var queries = new StringCollection
+                {
+                    "EXEC msdb.dbo.sp_purge_jobhistory " + filter.GetPurgeFilter()
+                };
 
                 this.ExecutionManager.ExecuteNonQuery( queries );
             }
@@ -1237,21 +1233,24 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// creation rights. The login specified will receive ownership.</param>
         public void ReassignJobsByLogin( string oldLogin, string newLogin )
         {
+            if (null == oldLogin)
+            {
+                throw new ArgumentNullException(nameof(oldLogin));
+            }
+
+            if (null == newLogin)
+            {
+                throw new ArgumentNullException(nameof(newLogin));
+            }
+
             try
             {
-                if( null == oldLogin )
-                {
-                    throw new ArgumentNullException("oldLogin");
-                }
 
-                if ( null == newLogin )
+                var queries = new StringCollection
                 {
-                    throw new ArgumentNullException("newLogin");
-                }
-
-                StringCollection queries = new StringCollection();
-                queries.Add( string.Format(SmoApplication.DefaultCulture,  "EXEC msdb.dbo.sp_manage_jobs_by_login @action = N'REASSIGN', @current_owner_login_name = N'{0}', @new_owner_login_name = N'{1}'", 
-                                           SqlString( oldLogin ), SqlString(newLogin) ));
+                    string.Format(SmoApplication.DefaultCulture, "EXEC msdb.dbo.sp_manage_jobs_by_login @action = N'REASSIGN', @current_owner_login_name = N'{0}', @new_owner_login_name = N'{1}'",
+                                           SqlString(oldLogin), SqlString(newLogin))
+                };
 
                 this.ExecutionManager.ExecuteNonQuery( queries );
             }
@@ -1268,10 +1267,11 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// Job object from the Jobs collection.
         /// </summary>
         /// <param name="jobid"></param>
+        [Obsolete("Use RemoveJobByID")]
         public void DropJobByID( Guid jobid )
         {
             Job job;
-            for( int i=0; i<Jobs.Count; i++ )
+            for( var i=0; i<Jobs.Count; i++ )
             {
                 job = Jobs[i];
                 if( jobid == job.JobID )
@@ -1289,34 +1289,20 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <param name="login"></param>
         public void DropJobsByLogin( string login )
         {
+            if (null == login)
+            {
+                throw new ArgumentNullException(nameof(login));
+            }
             try
             {
-                if( null == login )
+                var queries = new StringCollection
                 {
-                    throw new ArgumentNullException("login");
-                }
+                    string.Format(SmoApplication.DefaultCulture, "EXEC msdb.dbo.sp_manage_jobs_by_login @action = N'DELETE', @current_owner_login_name = N'{0}'",
+                SqlString(login))
+                };
 
-                /* 
-                 * TODO: switch to this high performing method of deleting jobs once Refresh()
-                 * method is implemented on Jobs collection
-                 *
-                 StringCollection queries = new StringCollection();
-                 queries.Add( string.Format(SmoApplication.DefaultCulture,  "EXEC msdb.dbo.sp_manage_jobs_by_login @action = N'DELETE', @current_owner_login_name = N'{0}'", 
-                 SqlString( login )));
-
-                 this.ExecutionManager.ExecuteNonQuery( queries );
-                */
-
-                Job job;
-                for( int i=0; i<Jobs.Count; i++ )
-                {
-                    job = Jobs[i];
-                    if( login == job.OwnerLoginName )
-                    {
-                        job.Drop();
-                        i--; // all jobs in the collection are now shifted by one, step back
-                    }
-                }
+                this.ExecutionManager.ExecuteNonQuery( queries );
+                jobs.Refresh();
             }
             catch(Exception e)
             {
@@ -1332,18 +1318,19 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <param name="serverName"></param>
         public void DropJobsByServer( string serverName )
         {
+            if (null == serverName)
+            {
+                throw new ArgumentNullException(nameof(serverName));
+            }
+
             try
             {
-                if( null == serverName )
-                {
-                    throw new ArgumentNullException("serverName");
-                }
 
                 Job job;
-                for( int i=0; i<Jobs.Count; i++ )
+                for( var i=0; i<Jobs.Count; i++ )
                 {
                     job = Jobs[i];
-                    if( 0 == String.Compare(serverName,job.OriginatingServer,StringComparison.OrdinalIgnoreCase) )
+                    if( 0 == string.Compare(serverName,job.OriginatingServer,StringComparison.OrdinalIgnoreCase) )
                     {
                         job.Drop();
                         i--; // all jobs in the collection are now shifted by one, step back
@@ -1362,20 +1349,16 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// The StartMonitor method begins monitoring of the local SQLServerAgent 
         /// service by an instance of SQL Server.
         /// </summary>
-        /// <param name="netSendAddress"></param>
+        /// <param name="netSendAddress">Not used</param>
         /// <param name="restartAttempts"></param>
-        public void StartMonitor( string netSendAddress, Int32 restartAttempts)
+        public void StartMonitor( string netSendAddress, int restartAttempts)
         {
             try
             {
-                if( null == netSendAddress )
+                var queries = new StringCollection
                 {
-                    throw new ArgumentNullException("netSendAddress");
-                }
-
-                StringCollection queries = new StringCollection();
-                queries.Add( string.Format(SmoApplication.DefaultCulture,  "EXEC master.dbo.xp_sqlagent_monitor N'START', N'{0}', {1}", 
-                                           SqlString( netSendAddress), restartAttempts ));
+                    string.Format(SmoApplication.DefaultCulture, $"EXEC master.dbo.xp_sqlagent_monitor N'START', N'', {restartAttempts}")
+                };
 
                 this.ExecutionManager.ExecuteNonQuery( queries );
             }
@@ -1395,8 +1378,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                StringCollection queries = new StringCollection();
-                queries.Add( "EXEC master.dbo.xp_sqlagent_monitor N'STOP'"  );
+                var queries = new StringCollection
+                {
+                    "EXEC master.dbo.xp_sqlagent_monitor N'STOP'"
+                };
 
                 this.ExecutionManager.ExecuteNonQuery( queries );
             }
@@ -1410,8 +1395,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         
         internal DataTable EnumPerfInfoInternal(string objectName, string counterName, string instanceName)
         {
-            StringBuilder sb = new StringBuilder();
-            bool bFilterAdded = false;
+            var sb = new StringBuilder();
+            var bFilterAdded = false;
             if( null != objectName )
             {
                 sb.AppendFormat(CultureInfo.InvariantCulture, "@ObjectName = '{0}'", Urn.EscapeString(objectName));
@@ -1433,10 +1418,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     sb.Append(" and ");
                 }
                 sb.AppendFormat(CultureInfo.InvariantCulture, "@InstanceName = '{0}'", Urn.EscapeString(instanceName));
-                bFilterAdded = true;
             }
 
-            StringBuilder sbUrn = new StringBuilder();
+            var sbUrn = new StringBuilder();
             sbUrn.Append(this.Urn.Value);
             sbUrn.Append("/PerfInfo");
             if( sb.Length > 0 )
@@ -1445,10 +1429,14 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 sbUrn.Append(sb.ToString());
                 sbUrn.Append("]");
             }
-            Request req = new Request(sbUrn.ToString());
+            var req = new Request(sbUrn.ToString());
             return this.ExecutionManager.GetEnumeratorData(req);
         }
 
+        /// <summary>
+        /// Returns a listing of all performance counters for SQL Agent
+        /// </summary>
+        /// <returns>A DataTable with columns named "ObjectName", "CounterName", "InstanceName" </returns>
         public DataTable EnumPerformanceCounters()
         {
             try
@@ -1462,17 +1450,21 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 throw new FailedOperationException(ExceptionTemplates.EnumPerformanceCounters, this, e);
             }
 
-        }       
+        }
+
+        /// <summary>
+        /// Returns a listing of performance counters with the given object name
+        /// </summary>
+        /// <returns>A DataTable with columns named "ObjectName", "CounterName", "InstanceName" </returns>
 
         public DataTable EnumPerformanceCounters(string objectName)
         {
+            if (null == objectName)
+            {
+                throw new ArgumentNullException(nameof(objectName));
+            }
             try
             {
-                if( null == objectName )
-                {
-                    throw new ArgumentNullException("objectName ");
-                }
-
                 return EnumPerfInfoInternal(objectName, null, null);
             }
             catch(Exception e)
@@ -1482,22 +1474,26 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 throw new FailedOperationException(ExceptionTemplates.EnumPerformanceCounters, this, e);
             }
                 
-        }       
+        }
 
+        /// <summary>
+        /// Returns a listing of performance counter instances for the given object name and counter name
+        /// </summary>
+        /// <returns>A DataTable with columns named "ObjectName", "CounterName", "InstanceName" </returns>
         public DataTable EnumPerformanceCounters(string objectName, string counterName)
         {
+            if (null == objectName)
+            {
+                throw new ArgumentNullException(nameof(objectName));
+            }
+
+            if (null == counterName)
+            {
+                throw new ArgumentNullException(nameof(counterName));
+            }
+
             try
             {
-                if( null == objectName )
-                {
-                    throw new ArgumentNullException("objectName ");
-                }
-
-                if ( null == counterName )
-                {
-                    throw new ArgumentNullException("objectName ");
-                }
-
                 return EnumPerfInfoInternal(objectName, counterName, null);
             }
             catch(Exception e)
@@ -1511,23 +1507,23 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         public DataTable EnumPerformanceCounters(string objectName, string counterName, string instanceName)
         {
+            if (null == objectName)
+            {
+                throw new ArgumentNullException(nameof(objectName));
+            }
+
+            if (null == counterName)
+            {
+                throw new ArgumentNullException(nameof(counterName));
+            }
+
+            if (null == instanceName)
+            {
+                throw new ArgumentNullException(nameof(instanceName));
+            }
+
             try
             {
-                if( null == objectName )
-                {
-                    throw new ArgumentNullException("objectName ");
-                }
-
-                if ( null == counterName )
-                {
-                    throw new ArgumentNullException("objectName ");
-                }
-
-                if ( null == instanceName )
-                {
-                    throw new ArgumentNullException("objectName ");
-                }
-
                 return EnumPerfInfoInternal(objectName, counterName, instanceName);
             }
             catch(Exception e)
@@ -1550,9 +1546,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             SetServerObject( parentColl.ParentInstance.GetServerObject());
 
             // set the comparer used by the collections
-            if( ParentColl.ParentInstance is JobServer )
+            if (ParentColl.ParentInstance is JobServer server)
             {
-                m_comparer = ((JobServer)(ParentColl.ParentInstance)).Parent.StringComparer;
+                m_comparer = server.Parent.StringComparer;
             }
             else
             {
@@ -1566,7 +1562,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        internal AgentObjectBase(String name)
+        internal AgentObjectBase(string name)
             :     base()
         {
             this.Name = name;
@@ -1578,8 +1574,6 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             return "msdb";
         }
-        
-        
     }
 
 
@@ -1589,7 +1583,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
     /// </summary>
     public sealed class JobFilter
     {
-        string category = null;
+        private string category = null;
         public string Category 
         {
             get { return category; }
@@ -1665,9 +1659,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <returns></returns>
         internal Request GetEnumRequest( JobServer jobServer )
         {
-            Request req = new Request();
+            var req = new Request();
             
-            StringBuilder builder = new StringBuilder( Globals.INIT_BUFFER_SIZE );
+            var builder = new StringBuilder( Globals.INIT_BUFFER_SIZE );
 
             builder.Append( jobServer.Urn);
             builder.AppendFormat(SmoApplication.DefaultCulture,  "/Job" );
@@ -1680,7 +1674,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         private void GetRequestFilter(StringBuilder builder )
         {
-            int count = 0;
+            var count = 0;
             
             if( category != null )
             {

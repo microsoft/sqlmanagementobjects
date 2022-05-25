@@ -30,7 +30,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
         /// </summary>
         private readonly Type[] expectedTypesWithoutPropertyMetadataProvider =
         {
-            typeof (SqlSmoObject),
+            typeof(SqlSmoObject),
             typeof(NamedSmoObject),
             typeof(AgentObjectBase),
             typeof(CategoryBase),
@@ -72,6 +72,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     "BasicAvailabilityGroup",
                     "DatabaseHealthTrigger",
                     "DtcSupportEnabled",
+                    nameof(AvailabilityGroup.IsContained), // New in SQL 2022; decided not to expose it for downlevel versions of SQL.
                     "IsDistributedAvailabilityGroup",
                 }
             },
@@ -141,6 +142,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     "IsDatabaseSnapshot",
                     "IsDatabaseSnapshotBase",
                     "IsDbManager",
+                    nameof(Database.IsLedger),
                     "IsLoginManager",
                     "IsMailHost",
                     "IsManagementDataWarehouse",

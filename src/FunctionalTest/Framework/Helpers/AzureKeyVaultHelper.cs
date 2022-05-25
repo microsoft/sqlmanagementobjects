@@ -38,6 +38,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         private static readonly object syncObj = new object();
         public static readonly string SSMS_TEST_SECRET_PREFIX = "SQLA-SSMS-Test-";
 
+        private SecretClient secretClient = null;
+
         /// <summary>
         /// Constructs a new AzureKeyVaultHelper that relies on an instance of Azure.Identity.DefaultAzureCredential to access the given vault.
         /// </summary>
@@ -73,22 +75,25 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             }
             if (string.IsNullOrEmpty(secret))
             {
-                Azure.Core.TokenCredential credential = new DefaultAzureCredential();
-                foreach (var thumbprint in CertificateThumbprints ?? Enumerable.Empty<string>())
+                // It's ok if multiple threads race to construct this secretClient instance
+                if (secretClient == null)
                 {
-                    var certificate = FindCertificate(thumbprint);
-                    if (certificate != null)
+                    Azure.Core.TokenCredential credential = new DefaultAzureCredential();
+                    foreach (var thumbprint in CertificateThumbprints ?? Enumerable.Empty<string>())
                     {
-                        credential = new ClientCertificateCredential(AzureTenantId, AzureApplicationId, certificate);
+                        var certificate = FindCertificate(thumbprint);
+                        if (certificate != null)
+                        {
+                            credential = new ClientCertificateCredential(AzureTenantId, AzureApplicationId, certificate);
+                        }
+                        break;
                     }
-                    break;
+                    secretClient = new SecretClient(new Uri($"https://{KeyVaultName}.vault.azure.net"), credential);
                 }
-
                 var secretIdentifier = $"https://{KeyVaultName}.vault.azure.net/secrets/{lookupName}";
                 TraceHelper.TraceInformation("Secret {0} not set as environment variable. Looking in AKV for {1}.", secretName, secretIdentifier);
                 try
                 {
-                    var secretClient = new SecretClient(new Uri($"https://{KeyVaultName}.vault.azure.net"), credential);
                     secret = secretClient.GetSecret(lookupName).Value.Value;
                 }
                 catch (Exception e)

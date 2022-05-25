@@ -215,6 +215,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         if (se != null && (se.Number == 40892 || se.Number == 4060 ||
                            (this.State == SqlSmoState.Existing && (se.Number == 916 || se.Number == 18456 || se.Number == 110003))))
                         {
+                            // Pass args as params since cfe may contain {#} in it which will cause formatting to fail if inserted directly
+                            Diagnostics.TraceHelper.Trace("Database SMO Object", "Failed to connect for edition fetch, defaulting to Unknown edition. State: {0} PropertyBagState: {1} {2}", State, propertyBagState, cfe);
                             // - 916 is "Cannot open database <...> requested by the login.. The login failed....
                             // - 18456 is Login failed for user <...>
                             // - 4060 is "Database not accessible" error. It might still be in sys.databases but being deleted.
@@ -505,8 +507,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
             }
+
             if (!databaseIsView)
             {
+                // Used in scripting ledger option to see if we need to append a comma or add "WITH"  
+                var hasCatalogCollation = false;
+
                 // on 7.0 server we do not script collation , and ScriptCreateForCloud handles collation for azure
                 if (!isAzureDb && sp.IncludeScripts.Collation && this.ServerVersion.Major > 7 &&
                     ((int) SqlServerVersionInternal.Version80 <= (int) sp.TargetServerVersionInternal))
@@ -546,6 +552,21 @@ namespace Microsoft.SqlServer.Management.Smo
                         sbStatement.Append(Globals.newline);
                         sbStatement.Append(" WITH CATALOG_COLLATION = ");
                         sbStatement.Append(catalogCollationString);
+                        hasCatalogCollation = true;
+                    }
+
+                    // Appending Ledger Property only if Ledger is supported and Value is set.
+                    if (IsSupportedProperty(nameof(IsLedger), sp))
+                    {
+                        var isLedger = this.GetPropertyOptional(nameof(IsLedger));
+
+                        // Only script the property if the value is set by the application
+                        if (isLedger != null && isLedger.Value != null)
+                        {
+                            // Ledger property - Appending Ledger = ON to the Statement
+                            sbStatement.Append(hasCatalogCollation ? ", " : $"{Globals.newline} WITH ");
+                            sbStatement.AppendFormat("LEDGER = {0}", (bool)isLedger.Value ? "ON" : "OFF");
+                        }
                     }
                 }
             }
@@ -865,6 +886,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 var isMaxSizeApplicable = expectAzureProperties ? this.GetPropertyOptional("IsMaxSizeApplicable").Value : null;
                 var azureEdition = expectAzureProperties ? this.GetPropertyOptional("AzureEdition").Value : null;
                 var slo = expectAzureProperties ? this.GetPropertyOptional("AzureServiceObjective").Value : null;
+                var isLedger = IsSupportedProperty(nameof(IsLedger), sp) ? this.GetPropertyOptional(nameof(IsLedger)) : null;
                 var collation = this.GetPropertyOptional("Collation");
                 var catalogCollationType = IsSupportedProperty("CatalogCollation", sp) ? this.GetPropertyOptional("CatalogCollation") :  null;
                 if (isSqlDw.Value != null && (bool)isSqlDw.Value)
@@ -920,6 +942,14 @@ namespace Microsoft.SqlServer.Management.Smo
                     TypeConverter catalogCollationTypeConverter = SmoManagementUtil.GetTypeConverter(typeof(CatalogCollationType));
                     string catalogCollationString = catalogCollationTypeConverter.ConvertToInvariantString(catalogCollationType.Value);
                     sbStatement.AppendFormat(" WITH CATALOG_COLLATION = {0}", catalogCollationString);
+                }
+
+                // Ledger Changes appending Ledger = ON / OFF
+                // Scripting only if the value is Set.
+                if (isLedger != null && isLedger.Value != null)
+                {
+                    sbStatement.Append(hasCatalogCollation ? ", " : " WITH ");
+                    sbStatement.AppendFormat("LEDGER = {0}", (bool)isLedger.Value ? "ON" : "OFF");
                 }
 
                 sbStatement.AppendFormat(";{0}", sp.NewLine);
@@ -5979,6 +6009,7 @@ SortedList list = new SortedList();
                 nameof(ContainmentType),
                 nameof(DatabaseSnapshotBaseName),
                 nameof(DefaultSchema),
+                nameof(IsLedger),
                 nameof(PersistentVersionStoreFileGroup)
             };
             List<string> list = GetSupportedScriptFields(typeof(Database.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);

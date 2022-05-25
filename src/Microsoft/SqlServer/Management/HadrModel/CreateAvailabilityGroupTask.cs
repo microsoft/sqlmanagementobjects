@@ -58,10 +58,13 @@ namespace Microsoft.SqlServer.Management.HadrModel
                                     string.Format(Resource.CreatingAvailabilityGroup,this.availabilityGroupData.GroupName),
                                     TaskEventStatus.Running));
 
-            SMO.AvailabilityGroup availabilityGroup =
+            SMO.AvailabilityGroup availabilityGroup = 
                 new SMO.AvailabilityGroup(
                     this.availabilityGroupData.PrimaryServer,
-                    this.availabilityGroupData.GroupName);
+                    this.availabilityGroupData.GroupName)
+                { 
+                    ReuseSystemDatabases = this.availabilityGroupData.ReuseSystemDatabases
+                };
 
             availabilityGroup.AutomatedBackupPreference = this.availabilityGroupData.BackupPreference;
 
@@ -79,14 +82,19 @@ namespace Microsoft.SqlServer.Management.HadrModel
                 availabilityGroup.RequiredSynchronizedSecondariesToCommit = this.availabilityGroupData.RequiredSynchronizedSecondariesToCommit;
             }
 
-            foreach (PrimaryDatabaseData db in this.availabilityGroupData.NewAvailabilityDatabases)
+            if (availabilityGroup.IsSupportedProperty(nameof(availabilityGroup.IsContained)))
+            {
+                availabilityGroup.IsContained = this.availabilityGroupData.IsContained;
+            }
+
+            foreach (var db in this.availabilityGroupData.NewAvailabilityDatabases)
             {
                 availabilityGroup.AvailabilityDatabases.Add(new SMO.AvailabilityDatabase(availabilityGroup, db.Name));
             }
 
-            foreach (AvailabilityGroupReplica replica in this.availabilityGroupData.AvailabilityGroupReplicas)
+            foreach (var replica in this.availabilityGroupData.AvailabilityGroupReplicas)
             {
-                SMO.AvailabilityReplica availabilityReplica = new SMO.AvailabilityReplica(availabilityGroup, replica.AvailabilityGroupReplicaData.ReplicaName);
+                var availabilityReplica = new SMO.AvailabilityReplica(availabilityGroup, replica.AvailabilityGroupReplicaData.ReplicaName);
                 availabilityReplica.EndpointUrl = replica.AvailabilityGroupReplicaData.EndpointUrl;
                 availabilityReplica.FailoverMode = replica.AvailabilityGroupReplicaData.GetFailoverMode(this.availabilityGroupData.ClusterType);
                 availabilityReplica.AvailabilityMode = replica.AvailabilityGroupReplicaData.AvailabilityMode;

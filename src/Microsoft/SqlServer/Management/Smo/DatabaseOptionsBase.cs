@@ -515,6 +515,15 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        [SfcProperty(SfcPropertyFlags.Standalone)]
+        public System.Boolean IsLedger
+        {
+            get
+            {
+                return (System.Boolean)this.Parent.Properties.GetValueWithNullReplacement(nameof(IsLedger));
+            }
+        }
+
         internal class OptionTerminationStatement
         {
             TimeSpan m_time;

@@ -41,7 +41,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         //                            Is it needed at all? Always?
         public void VerifyPositiveExternalDataSourceCreateAlterDropPolybase()
         {
-            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"hdfs://10.10.10.10:1100", @"wasbs://commondatabases@sqlfunctionaltest.blob.core.windows.net/", @"wasbs://commondatabases2@sqlfunctionaltest.blob.core.windows.net/" };
+            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"hdfs://10.10.10.10:1100", @"wasbs://commondatabases@sqltoolstestsstorage.blob.core.windows.net/", @"wasbs://commondatabases2@sqltoolstestsstorage.blob.core.windows.net/" };
             string[] externalDataSourceResourceManagerLocations = { @"10.10.10.10:1010", @"10.10.10.10:1111" }; // test-only value for the resource manager location; the create/drop DDLs don't connect to in
             string[] externalDataSourceCredentials = { "cred1", "cred]1" };
             string[] externalDataSourceNames = { "eds1", "eds[]1", "eds'1", "eds--1" };
@@ -87,7 +87,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteWithDbDrop("ExternalDataSourceSmo_",
                 database =>
                 {
-                    string[] externalDataSourceLocations = { "abc.xyz.com", "external-server-name", "one's computer", "wasbs://commondatabases2@sqlfunctionaltest.blob.core.windows.net/" };
+                    string[] externalDataSourceLocations = { "abc.xyz.com", "external-server-name", "one's computer", "wasbs://commondatabases2@sqltoolstestsstorage.blob.core.windows.net/" };
                     string[] externalDataSourceCredentials = { "cred1", "cred[]1", "cred'1" };
                     string[] externalDataSourceDatabaseNames = { "database1", "database'1", "database]" };
                     string[] externalDataSourceShardMapNames = { "shardmap1", " shard map '1" };
@@ -123,7 +123,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         //    this.ExecuteWithDbDrop("ExternalDataSourceSmo_",
         //        database =>
         //        {
-        //            string[] externalDataSourceLocations = { "sqlserver://127.0.0.1", "wasbs://commondatabases2@sqlfunctionaltest.blob.core.windows.net/" };
+        //            string[] externalDataSourceLocations = { "sqlserver://127.0.0.1", "wasbs://commondatabases2@sqltoolstestsstorage.blob.core.windows.net/" };
         //            string[] externalDataSourceCredentials = { "cred1", "cred[]1" };
         //            string[] externalDataSourceDatabaseNames = { "database'1", "database]" };
         //            string[] externalDataSourceNames = { "eds[]1", "--eds'1", };
@@ -616,7 +616,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         public void VerifyNegativeExternalDataSourceCreateAlterDropPolybase()
         {
 
-            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"wasbs://commondatabases@sqlfunctionaltest.blob.core.windows.net/" };
+            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"wasbs://commondatabases@sqltoolstestsstorage.blob.core.windows.net/" };
             string[] externalDataSourceResourceManagerLocations = { @"10.10.10.10:1010", @"10.10.10.10:1111" };
             
             this.ExecuteWithDbDrop(this.TestContext.TestName,

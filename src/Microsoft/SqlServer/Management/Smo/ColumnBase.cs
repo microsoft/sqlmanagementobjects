@@ -370,6 +370,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
+            // Do not script dropped ledger columns.
+            // These columns are hidden and "dropped", and should not be displayed.
+            if (DroppedLedgerColumn())
+            {
+                return;
+            }
+
             sb.AppendFormat(SmoApplication.DefaultCulture, "{0} ", colScriptName);
 
             bool isSparse = false;
@@ -389,37 +396,37 @@ namespace Microsoft.SqlServer.Management.Smo
             bool isExternalTable = this.CheckIsExternalTableColumn(sp);
 
             bool isParentTable = this.Parent is Table;
-            bool isTemporalColumn = false;
-            bool isTemporalHiddenColumn = false;
+            bool isGeneratedAlwaysColumn = false;
+            bool isHiddenColumn = false;
             bool isNullableledgerColumn = false;
 
-            GeneratedAlwaysType temporalGeneratedAlwaysType = GeneratedAlwaysType.None;
+            GeneratedAlwaysType generatedAlwaysType = GeneratedAlwaysType.None;
 
-            if (IsSupportedProperty("GeneratedAlwaysType", sp))
+            if (IsSupportedProperty(nameof(GeneratedAlwaysType), sp))
             {
-                object value = this.GetPropValueOptional("GeneratedAlwaysType");
+                object value = this.GetPropValueOptional(nameof(GeneratedAlwaysType));
                 if (value != null)
                 {
-                    temporalGeneratedAlwaysType = (GeneratedAlwaysType)value;
+                    generatedAlwaysType = (GeneratedAlwaysType)value;
                 }
 
-                isTemporalColumn = temporalGeneratedAlwaysType != Smo.GeneratedAlwaysType.None;
+                isGeneratedAlwaysColumn = generatedAlwaysType != Smo.GeneratedAlwaysType.None;
 
-                if (isTemporalColumn && !isParentTable)
+                if (isGeneratedAlwaysColumn && !isParentTable)
                 {
                     throw new WrongPropertyValueException(ExceptionTemplates.NoGeneratedAlwaysColumnsOnNonTables);
                 }
-                isNullableledgerColumn = temporalGeneratedAlwaysType != Smo.GeneratedAlwaysType.AsTransactionIdEnd || temporalGeneratedAlwaysType != Smo.GeneratedAlwaysType.AsSequenceNumberEnd;
+                isNullableledgerColumn = generatedAlwaysType != Smo.GeneratedAlwaysType.AsTransactionIdEnd || generatedAlwaysType != Smo.GeneratedAlwaysType.AsSequenceNumberEnd;
             }
 
-            if (IsSupportedProperty("IsHidden", sp))
+            if (IsSupportedProperty(nameof(IsHidden), sp))
             {
-                if (null != Properties.Get("IsHidden").Value)
+                if (null != Properties.Get(nameof(IsHidden)).Value)
                 {
-                    isTemporalHiddenColumn = (bool)Properties.Get("IsHidden").Value;
+                    isHiddenColumn = (bool)Properties.Get(nameof(IsHidden)).Value;
                 }
 
-                if (isTemporalHiddenColumn && !isTemporalColumn)
+                if (isHiddenColumn && !isGeneratedAlwaysColumn)
                 {
                     throw new WrongPropertyValueException(ExceptionTemplates.NoHiddenColumnsOnNonGeneratedAlwaysColumns);
                 }
@@ -467,7 +474,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if ((isSparse || isColumnSet) && isTemporalColumn)
+            if ((isSparse || isColumnSet) && isGeneratedAlwaysColumn)
             {
                 throw new WrongPropertyValueException(ExceptionTemplates.NoSparseOrColumnSetOnTemporalColumns);
             }
@@ -475,7 +482,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 throw new WrongPropertyValueException(ExceptionTemplates.NoDataMaskingOnColumnSet);
             }
-            if (isTemporalColumn && isMaskedColumn)
+            if (isGeneratedAlwaysColumn && isMaskedColumn)
             {
                 throw new WrongPropertyValueException(ExceptionTemplates.NoDataMaskingOnTemporalColumns);
             }
@@ -494,7 +501,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         throw new WrongPropertyValueException(ExceptionTemplates.NoColumnSetOnComputed);
                     }
-                    if (isTemporalColumn)
+                    if (isGeneratedAlwaysColumn)
                     {
                         throw new WrongPropertyValueException(ExceptionTemplates.ComputedTemporalColumns);
                     }
@@ -605,7 +612,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     throw new SmoException(ExceptionTemplates.IdentityColumnForExternalTable);
                 }
 
-                if (isTemporalColumn)
+                if (isGeneratedAlwaysColumn)
                 {
                     throw new SmoException(ExceptionTemplates.IdentityTemporalColumns);
                 }
@@ -639,46 +646,46 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            switch (temporalGeneratedAlwaysType)
+            switch (generatedAlwaysType)
             {
                 case GeneratedAlwaysType.AsRowStart:
                     sb.Append(" GENERATED ALWAYS AS ROW START");
-                    if (isTemporalHiddenColumn)
+                    if (isHiddenColumn)
                     {
                         sb.Append(" HIDDEN");
                     }
                     break;
                 case GeneratedAlwaysType.AsRowEnd:
                     sb.Append(" GENERATED ALWAYS AS ROW END");
-                    if (isTemporalHiddenColumn)
+                    if (isHiddenColumn)
                     {
                         sb.Append(" HIDDEN");
                     }
                     break;
                 case GeneratedAlwaysType.AsTransactionIdStart:
                     sb.Append(" GENERATED ALWAYS AS transaction_id START");
-                    if (isTemporalHiddenColumn)
+                    if (isHiddenColumn)
                     {
                         sb.Append(" HIDDEN");
                     }
                     break;
                 case GeneratedAlwaysType.AsTransactionIdEnd:
                     sb.Append(" GENERATED ALWAYS AS transaction_id END");
-                    if (isTemporalHiddenColumn)
+                    if (isHiddenColumn)
                     {
                         sb.Append(" HIDDEN");
                     }
                     break;
                 case GeneratedAlwaysType.AsSequenceNumberStart:
                     sb.Append(" GENERATED ALWAYS AS sequence_number START");
-                    if (isTemporalHiddenColumn)
+                    if (isHiddenColumn)
                     {
                         sb.Append(" HIDDEN");
                     }
                     break;
                 case GeneratedAlwaysType.AsSequenceNumberEnd:
                     sb.Append(" GENERATED ALWAYS AS sequence_number END");
-                    if (isTemporalHiddenColumn)
+                    if (isHiddenColumn)
                     {
                         sb.Append(" HIDDEN");
                     }
@@ -752,7 +759,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 else
                 {
                     // only NOT NULL columns are supported
-                    if (isTemporalColumn && !isNullableledgerColumn)
+                    if (isGeneratedAlwaysColumn && !isNullableledgerColumn)
                     {
                         throw new SmoException(ExceptionTemplates.NullableTemporalColumns);
                     }
@@ -763,7 +770,7 @@ namespace Microsoft.SqlServer.Management.Smo
             else
             {
                 // only NOT NULL columns are supported
-                if (isTemporalColumn && !isNullableledgerColumn)
+                if (isGeneratedAlwaysColumn && !isNullableledgerColumn)
                 {
                     throw new SmoException(ExceptionTemplates.NullableTemporalColumns);
                 }
@@ -1177,7 +1184,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             bool isColumnSet = false;
-            bool isTemporalColumn = false;
+            bool isGeneratedAlwaysColumn = false;
             bool isComputedColumn = false;
             bool isFileStreamColumn = false;
             bool isEncryptedColumn = false;
@@ -1203,7 +1210,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 object value = this.GetPropValueOptional("GeneratedAlwaysType");
                 if (value != null)
                 {
-                    isTemporalColumn = (GeneratedAlwaysType)value != Smo.GeneratedAlwaysType.None;
+                    isGeneratedAlwaysColumn = (GeneratedAlwaysType)value != Smo.GeneratedAlwaysType.None;
                 }
             }
 
@@ -1256,7 +1263,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             {
                                 throw new WrongPropertyValueException(ExceptionTemplates.NoDataMaskingOnColumnSet);
                             }
-                            if (isTemporalColumn)
+                            if (isGeneratedAlwaysColumn)
                             {
                                 throw new WrongPropertyValueException(ExceptionTemplates.NoDataMaskingOnTemporalColumns);
                             }
@@ -2109,12 +2116,13 @@ namespace Microsoft.SqlServer.Management.Smo
                         nameof(IsClassified),
                         nameof(IsColumnSet),
                         nameof(IsDistributedColumn),
-                        nameof(IsFileStream),                        
+                        nameof(IsDroppedLedgerColumn),
+                        nameof(IsFileStream),
                         nameof(IsForeignKey),
                         nameof(IsHidden),
                         nameof(IsMasked),
                         nameof(IsPersisted),
-                        nameof(IsSparse),                        
+                        nameof(IsSparse),
                         "Length",
                         nameof(MaskingFunction),
                         nameof(NotForReplication),
@@ -2256,6 +2264,17 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// This method determines if this column is a dropped ledger column. Dropped
+        /// ledger columns are not exposed in select * queries and are not included in
+        /// table script generation.
+        /// </summary>
+        /// <returns>True if the column is a dropped ledger column, False otherwise.</returns>
+        internal bool DroppedLedgerColumn()
+        {
+            return GetPropValueOptional<bool>(nameof(IsDroppedLedgerColumn), false);
         }
     }
 }

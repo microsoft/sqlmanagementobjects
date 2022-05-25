@@ -16,22 +16,22 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Scripts Random password for Shiloh and earlier in Login and for all version in ApplicationRoles.
         /// </summary>
         /// <param name="pwdGenScript"></param>
-        public static void ScriptRandomPwd(StringBuilder pwdGenScript)
+        public static void ScriptPlaceholderPwd(StringBuilder pwdGenScript)
         {
             // this is what we are generating
             //                  /* To avoid disclosure of passwords, the password is generated in script. */
             //                  declare @idx as int
-            //                  declare @randomPwd as nvarchar(64)
+            //                  declare @placeholderPwd as nvarchar(64)
             //                  declare @rnd as float
             //                  select @idx = 0
-            //                  select @randomPwd = ''
+            //                  select @placeholderPwd = ''
             //                  select @rnd = rand((@@CPU_BUSY % 100) +
             //                      ((@@IDLE % 100) * 100) +
             //                      (DATEPART(ss, GETDATE()) * 10000) +
             //                      ((cast(DATEPART(ms, GETDATE()) as int) % 100) * 1000000))
             //                  while @idx < 64
             //                  begin
-            //                      select @randomPwd = @randomPwd + char((cast((@rnd * 83) as int) + 43))
+            //                      select @placeholderPwd = @placeholderPwd + char((cast((@rnd * 83) as int) + 43))
             //                      select @idx = @idx + 1
             //                      select @rnd = rand()
             //                  end
@@ -42,13 +42,13 @@ namespace Microsoft.SqlServer.Management.Smo
             pwdGenScript.Append("declare @idx as int");
             pwdGenScript.Append(Globals.newline);
             pwdGenScript.AppendFormat(SmoApplication.DefaultCulture,
-                                      "declare @randomPwd as nvarchar({0})", pwdLength);
+                                      "declare @placeholderPwd as nvarchar({0})", pwdLength);
             pwdGenScript.Append(Globals.newline);
             pwdGenScript.Append("declare @rnd as float");
             pwdGenScript.Append(Globals.newline);
             pwdGenScript.Append("select @idx = 0");
             pwdGenScript.Append(Globals.newline);
-            pwdGenScript.Append("select @randomPwd = N''");
+            pwdGenScript.Append("select @placeholderPwd = N''");
             pwdGenScript.Append(Globals.newline);
             pwdGenScript.Append("select @rnd = rand((@@CPU_BUSY % 100) + ((@@IDLE % 100) * 100) + ");
             pwdGenScript.Append(Globals.newline);
@@ -59,7 +59,7 @@ namespace Microsoft.SqlServer.Management.Smo
             pwdGenScript.Append(Globals.newline);
             pwdGenScript.Append("begin");
             pwdGenScript.Append(Globals.newline);
-            pwdGenScript.Append("   select @randomPwd = @randomPwd + char((cast((@rnd * 83) as int) + 43))");
+            pwdGenScript.Append("   select @placeholderPwd = @placeholderPwd + char((cast((@rnd * 83) as int) + 43))");
             pwdGenScript.Append(Globals.newline);
             pwdGenScript.Append("   select @idx = @idx + 1");
             pwdGenScript.Append(Globals.newline);

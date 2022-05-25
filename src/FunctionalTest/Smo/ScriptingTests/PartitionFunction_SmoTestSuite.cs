@@ -15,9 +15,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
     /// <summary>
     /// Test suite for testing PartitionFunction properties and scripting
     /// </summary>
-    //##[TestSuite(LabRunCategory.Gql, FeatureCoverage.Manageability)]
     [TestClass]
-    [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+    [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
     public class PartitionFunction_SmoTestSuite : SmoObjectTestBase
     {
         #region Scripting Tests
@@ -68,7 +67,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         public void ScriptCreateWithDbNullRangeCorrectly_PartitionFunction()
         {
-            ExecuteFromDbPool(db =>
+            ExecuteWithDbDrop(db =>
             {
                 // Create a Partition Function using SMO
                 var partitionFunction = new _SMO.PartitionFunction(db, "PF_NULL_RANGE_TEST")

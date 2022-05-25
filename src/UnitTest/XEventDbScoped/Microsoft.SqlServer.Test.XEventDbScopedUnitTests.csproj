@@ -7,6 +7,8 @@
   </PropertyGroup>
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
   <ItemGroup>
+    <ProjectReference Include="$(DmfSrc)\Microsoft.SqlServer.Dmf.csproj" />
+    <ProjectReference Include="$(RegisteredServersSrc)\Microsoft.SqlServer.Management.RegisteredServers.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(XEventDbScopedSrc)\Microsoft.SqlServer.Management.XEventDbScoped.csproj" />
