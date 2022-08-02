@@ -16,7 +16,7 @@
         <PackageReference Update="Microsoft.Identity.Client"                                Version="4.35.0" />
         <PackageReference Update="Microsoft.Identity.Client.Desktop"                        Version="4.35.0" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-        <PackageReference Update="Microsoft.SqlServer.Assessment" Version="1.0.*" />
+        <PackageReference Update="Microsoft.SqlServer.Assessment" Version="1.1.9" />
         <PackageReference Update="Microsoft.SqlServer.Management.SqlParser" Version="$(SqlParserPackageVersion)" />
         <PackageReference Update="Moq" Version="4.16.1" />
         <PackageReference Update="MSTest.TestAdapter" Version="2.0.0" />
