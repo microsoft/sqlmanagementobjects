@@ -29,7 +29,6 @@ doskey smoenum=pushd %BASEDIR%src\Microsoft\SqlServer\Management\SqlEnum\$*
 doskey clean=powershell.exe -ExecutionPolicy Unrestricted -File "%BASEDIR%init.ps1" -Clean
 doskey tst=pushd %BASEDIR%src\FunctionalTest\Smo\$*
 
-
 REM == Common test command:
 doskey rtests=pushd %BASEDIR%target\distrib\debug\net462$Tvstest.console.exe microsoft.sqlserver.test.smo.dll /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
 doskey netcoretests=pushd %BASEDIR%target\distrib\debug\netcoreapp3.1$Tvstest.console.exe microsoft.sqlserver.test.smo.dll /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*

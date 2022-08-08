@@ -39,7 +39,8 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
                     ScriptDatabaseEngineEdition.SqlServerExpressEdition,
                     ScriptDatabaseEngineEdition.SqlServerStretchEdition,
                     ScriptDatabaseEngineEdition.SqlServerManagedInstanceEdition,
-                    ScriptDatabaseEngineEdition.SqlDatabaseEdgeEdition
+                    ScriptDatabaseEngineEdition.SqlDatabaseEdgeEdition,
+                    ScriptDatabaseEngineEdition.SqlAzureArcManagedInstanceEdition
                 }), "Allowed edition values for SingleInstance type");
             scriptOptions.TargetDatabaseEngineType = SqlScriptOptions.ScriptDatabaseEngineType.SqlAzure;
             editionAllowedValues = engineEditionProperty.Converter.GetStandardValues(context)

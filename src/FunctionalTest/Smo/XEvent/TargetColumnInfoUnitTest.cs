@@ -115,7 +115,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
         public void TestTargetColumnInfoSet()
         {
             var columns = store.EventFileTargetInfo.TargetColumnInfoSet.OfType<TargetColumnInfo>().Select(c => c.Name);
-            Assert.That(columns, Is.EquivalentTo(new string[] { "external_telemetry_query", "filename", "increment", "is_indexed_file_target", "lazy_create_blob", "max_file_size", "max_rollover_files", "metadatafile"}), 
+            Assert.That(columns, Is.EquivalentTo(new string[] { "add_app_name, external_telemetry_query", "filename", "increment", "is_indexed_file_target", "lazy_create_blob", "max_file_size", "max_rollover_files", "metadatafile"}), 
                 "Unexpected columns for file target");
         }
     }

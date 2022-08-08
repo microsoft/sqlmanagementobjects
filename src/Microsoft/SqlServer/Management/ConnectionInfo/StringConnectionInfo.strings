@@ -53,6 +53,7 @@ StretchEdition = Microsoft SQL Server Stretch Database Edition
 SqlManagedInstanceEdition = Microsoft Azure SQL Database Managed Instance Edition
 SqlOnDemandEdition = Microsoft Azure Synapse SQL Analytics on-demand Edition
 SqlDatabaseEdgeEdition = Microsoft Azure SQL Edge Edition
+SqlAzureArcManagedInstanceEdition = Microsoft Azure Arc SQL Managed Instance Edition
 
 #
 # Database Engine Type Names

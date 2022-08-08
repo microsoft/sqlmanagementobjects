@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Database" impl_type="Database" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Database" impl_type="Database" min_major='7'  cloud_min_major='12' datawarehouse_enabled='true'>
   <settings>
     <version min_major ='10'>
       <include file='inc_hadr_setting.xml' />
@@ -29,7 +29,7 @@
     </version>
 
     
-    <version cloud_min_major='10' datawarehouse_enabled='true'>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
       <property_link table="sys.databases AS dtb"/>
     </version>
 
@@ -47,7 +47,7 @@
     <!-- SLO information in sys.database_service_objectives -->
 
     <version cloud_min_major='12'>
-      <property_link fields='#IsSqlDwEdition#' left_join="#dso dso">dso.database_id = dtb.database_id</property_link>
+      <property_link fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#' left_join="#dso dso">dso.database_id = dtb.database_id</property_link>
     </version>
 
     <version min_major='9'>
@@ -88,24 +88,26 @@
     </version>
     <!-- Prefix and post fix fields will be defined after all the table and field links are defined-->
     <version cloud_min_major='12'>
-      <!-- sys.database_service_objectives may fail sometimes and raise an exception. We just assume non-DW in that case.-->
-      <prefix fields='#IsSqlDwEdition#'>
-        create table #dso (database_id int primary key, isDw bit)
+      <!-- sys.database_service_objectives may fail sometimes and raise an exception. We only return master in that case.
+      When the query is run in a user database, sys.database_service_objectives doesn't return a row for master.
+      -->
+      <prefix fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#'>
+        create table #dso (database_id int primary key, azureEdition sysname null, engineEdition int)
+        if serverproperty('EngineEdition') = 11
+        BEGIN
+          insert into #dso select database_id, NULL, 11 from sys.databases
+        END
+        ELSE
         BEGIN TRY
-            insert into #dso select database_id, CAST(
-            case
-            when Edition = 'DataWarehouse' then cast(1 as bit)
-            else cast(0 as bit)
-            end
-            AS bit) from sys.database_service_objectives
+          exec sp_executesql N'
+          insert into #dso select database_id, edition,
+          case when edition = ''DataWarehouse'' then 6 else 5 end
+          from sys.database_service_objectives'
         END TRY
         BEGIN CATCH
-            insert into #dso select database_id, cast(0 as bit) from sys.databases
+          insert into #dso select database_id, N'', case when [name] = 'master' then 5 else 0 end from sys.databases
         END CATCH
       </prefix>
-      <postfix fields='#IsSqlDwEdition#'>
-        drop table #dso
-      </postfix>
     </version>
 
     <version min_major='15' >
@@ -154,6 +156,11 @@
       </postfix>
     </version>
 
+    <version cloud_min_major='12'>
+      <postfix fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#'>
+        drop table #dso
+      </postfix>
+    </version>    
     <version min_major='7' max_major='8'>
       <post_process fields = '#IsDbDenyDatawriter#IsDbDenyDatareader#IsDbDdlAdmin#IsDbSecurityAdmin#IsDbOwner#IsDbDatawriter#IsDbDatareader#IsDbBackupOperator#IsDbAccessAdmin#SpaceAvailable#Size#DataSpaceUsage#IndexSpaceUsage#UserName#DboLogin#DefaultSchema#PrimaryFilePath#DefaultFileGroup#'
           class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
@@ -201,7 +208,7 @@
                     triggered_fields='#DatabaseName4#'/>
     </version>
 
-    <version cloud_min_major='10' datawarehouse_enabled='true'>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
       <post_process fields = '#IsDbDenyDatawriter#IsDbDenyDatareader#IsDbDdlAdmin#IsDbSecurityAdmin#IsDbOwner#IsDbDatawriter#IsDbDatareader#IsDbBackupOperator#IsDbAccessAdmin#UserName#DefaultFileGroup#'
         class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
         triggered_fields='#DatabaseName#'/>
@@ -224,7 +231,10 @@
                     class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
                     triggered_fields='#DatabaseName7#'/>
     </version>
-
+    <version cloud_min_major='12' >
+      <!-- Ignore entries without a SLO. Either sys.database_service_objectives failed or the database didn't have an entry. -->
+      <special_query fields='#RealEngineEdition#'>dso.engineEdition != 0</special_query>
+    </version>
   </settings>
   <properties>
     <include file='inc_urn.xml'/>
@@ -251,7 +261,7 @@
       <property name="AutoShrink" type="bit" cast='true' mode="deploy">dtb.status &amp; &lt;msparam&gt;4194304&lt;/msparam&gt;</property>
     </version>
 
-    <version cloud_min_major='10' datawarehouse_enabled='true'>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
       <!--IsSystemObject check by name + if it is distributor-->
       <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when dtb.name in ('master') then 1 else dtb.is_distributor end</property>
       <property name="DefaultSchema" type="sysname" expensive='true'>(select schema_name())</property>
@@ -263,10 +273,14 @@
       <property name="IsUpdateable" type="bit" access="Read" cast='true'>( case dtb.is_read_only when 1 then 0 else 1 end)</property>
     </version>
 
+    <!-- These properties are available from both logical master and user database -->
     <version cloud_min_major = '12'>
-      <property name="IsSqlDwEdition" type="bit" access="read" cast="true">ISNULL(dso.isDw, 0)</property>
+      <property name="IsSqlDwEdition" type="bit" access="read" cast="true">case when isnull(dso.engineEdition, 0) = 6 then 1 else 0 end</property>
+      <property name="AzureEdition" type="nvarchar" cast='true'>ISNULL(dso.azureEdition, N'')</property>
+      <property name='RealEngineEdition' type='int' access='read'>case when dtb.name = 'master' then ISNULL(dso.engineEdition, 5) else ISNULL(dso.engineEdition, 0) end</property>
     </version>
-    <version cloud_min_major='12'>
+
+    <version cloud_min_major = '12'>
       <property name="DefaultFullTextCatalog" type="sysname" expensive='true'>ISNULL((select top 1 ftc.name from sys.fulltext_catalogs as ftc where ftc.is_default=1),N'')</property>
     </version>
 
@@ -304,7 +318,7 @@
       <property name='IsMirroringEnabled' type='bit' cast='true' access='Read' expensive="true">0</property>
     </version>
     <!-- Azure DB doesn't support recovery models or local cursors default-->
-    <version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='9'   cloud_min_major='12' datawarehouse_enabled='true'>
       <!--Adding options property here. Earlier use to in databaseoptions.xml-->
       <property name="AnsiNullDefault" type="bit" mode="design">dtb.is_ansi_null_default_on</property>
       <property name="AnsiNullsEnabled" type="bit" mode="design">dtb.is_ansi_nulls_on</property>
@@ -333,7 +347,7 @@
       <property name="CompatibilityLevel" type="tinyint" report_type="CompatibilityLevel" expensive='true' mode="design">dtb.compatibility_level</property>
       <property name="IsReadCommittedSnapshotOn" type="bit" mode="deploy">dtb.is_read_committed_snapshot_on</property>
     </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
       <!--database view-->
       <property name="IsDatabaseSnapshot" type="bit" cast='true' access='Read'>isnull(dtb.source_database_id, 0)</property>
       <property name="IsDatabaseSnapshotBase" type="bit" cast='true' access='Read' expensive='true'>(select count(1) from sys.databases dtbmir where dtbmir.source_database_id = dtb.database_id)</property>
@@ -439,7 +453,7 @@
     </version>
 
     <version min_major='16' cloud_min_major='12'>
-      <property name="IsLedger" type="bit" cast='true' read_only_after_creation="true">dtb.is_ledger_on</property>
+      <property name="IsLedger" type="bit" cast='true' read_only_after_creation="true">ISNULL(dtb.is_ledger_on, 0)</property>
     </version>
     
     <!-- DATABASEPROPERTY obtained properties -->
@@ -531,8 +545,8 @@
 
     </version>
 
-    <version cloud_min_major='10' datawarehouse_enabled='true'>
-      <property name="AzureEdition" type="nvarchar" cast='true'>DATABASEPROPERTYEX(dtb.name, 'Edition')</property>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      
       <!-- Size should be returned in MB -->
       <property name="Size" type="float" access="Read">CONVERT(float, DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes')) / 1024.0 / 1024.0</property>
       <!-- MaxSize may be settable on Azure -->
@@ -540,12 +554,13 @@
       <!-- IsMaxSizeApplicable is to check if MaxSize is required/applicable in scripts -->
       <property name="IsMaxSizeApplicable" type="bit" access="Read" cast='true'>(CASE WHEN 0 > CONVERT(float, DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes')) THEN 0 ELSE 1 END)</property>
     </version>
-    <version cloud_min_major='10'>
+    <version cloud_min_major='12'>
       <property name="SpaceAvailable" type="float" access="Read" cast='true' expensive='true'>(SELECT IIF(databasepropertyex(dtb.name,'Edition') = 'Hyperscale', 0, (SELECT ((CAST(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes') AS float) / 1024.0) - (SUM(reserved_page_count)*8.0 )) / 1024.0 FROM sys.dm_db_partition_stats)))</property>
     </version>
 
     <version datawarehouse_enabled='true'>
       <property name="SpaceAvailable" type="float" access="Read" cast='true' expensive='true'>0</property>
+      <property name="AzureEdition" type="nvarchar" cast='true'>N'DataWarehouse'</property>
     </version>
 
     <version cloud_min_major='12' datawarehouse_enabled='true'>
@@ -556,7 +571,7 @@
       <property name="CaseSensitive" type="bit" access="Read" cast='true' expensive='true'>CHARINDEX(N'_CS_', CAST(DATABASEPROPERTYEX(dtb.name, 'Collation') AS nvarchar(255)))</property>
     </version>
 
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="CaseSensitive" type="bit" access="Read" cast='true' expensive='true'>
         case when CHARINDEX(N'_CS_', dtb.collation_name) > 0 then 1
         when CHARINDEX(N'_BIN', dtb.collation_name) > 0 then 1
@@ -622,7 +637,7 @@
     </version>
 
     <!--common in all versions -->
-    <version min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='7'  cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="DatabaseName" type="sysname" hidden='true'>dtb.name</property>
       <property name="IsDbAccessAdmin" type="bit" access="Read" cast='true' expensive='true'>0</property>
       <property name="IsDbBackupOperator" type="bit" access="Read" cast='true' expensive='true'>0</property>

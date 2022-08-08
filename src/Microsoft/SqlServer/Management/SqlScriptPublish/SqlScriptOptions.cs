@@ -78,7 +78,9 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             [DisplayNameKey("SqlServerOnDemandEdition")]
             SqlServerOnDemandEdition,
             [DisplayNameKey("SqlDatabaseEdgeEdition")]
-            SqlDatabaseEdgeEdition
+            SqlDatabaseEdgeEdition,
+            [DisplayNameKey("SqlAzureArcManagedInstanceEdition")]
+            SqlAzureArcManagedInstanceEdition,
 
            /*
             * NOTE: If you're adding new value here,
@@ -328,6 +330,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                         values.Remove(ScriptDatabaseEngineEdition.SqlDatabaseEdgeEdition);
                         values.Remove(ScriptDatabaseEngineEdition.SqlAzureDatabaseEdition);
                         values.Remove(ScriptDatabaseEngineEdition.SqlServerOnDemandEdition);
+                        values.Remove(ScriptDatabaseEngineEdition.SqlAzureArcManagedInstanceEdition);
                     }
                     else
                     {
@@ -340,6 +343,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                         values.Remove(ScriptDatabaseEngineEdition.SqlServerManagedInstanceEdition);
                         values.Remove(ScriptDatabaseEngineEdition.SqlDatabaseEdgeEdition);
                         values.Remove(ScriptDatabaseEngineEdition.SqlDatawarehouseEdition);
+                        values.Remove(ScriptDatabaseEngineEdition.SqlAzureArcManagedInstanceEdition);
                     }
                 }
                 else

@@ -1,7 +1,15 @@
-
 # Introduction
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
+
+## 161.47027.0
+
+- Fix distribution columns on scripting for taking into consideration more than one distribution column
+- Add new EXTGOV_OPERATION_GROUP audit action type
+- Force [quoted identifier on](https://github.com/microsoft/sqlmanagementobjects/issues/96) for table scripts
+- Fix EnumObjects sort by Schema
+- Add new enumeration values for SQL Server 2022 permissions
+- Script FIRST_ROW support for serverless Synapse
 
 ## 161.47021.0
 
@@ -24,10 +32,10 @@ This file will log substantial changes made to SMO between public releases to nu
 - Add `LoginType` property to `ILoginOptions` interface.
 - `Login.PasswordPolicyEnforced` now returns `false` for Windows logins instead of throwing an exception
 - Remove net461 binaries from nuget packages
-- Added Scripting Support for Ledger tables for SQL 2022+
+- Added Scripting Support for Ledger tables for Sql 2022+
 - Change the `Size` property on `Server/Drive` objects to `System.Int64`. These objects don't have a C# wrapper class so it's not breaking any compilation.
-- Add support for SQL Server version 16
-- Add new permissions for SQL 2019+ to SMO enumerations
+- Add support for Sql Server version 16
+- Add new permissions for Sql 2019+ to SMO enumerations
 - Added External Stream object and External Streaming Jobs object for scripting
 - Add support for XML compression
 
@@ -43,7 +51,7 @@ This file will log substantial changes made to SMO between public releases to nu
 ## 161.46437.65
 
 - Update Microsoft.Data.SqlClient dependency to version 3.0.0
-- Added Scripting Support for Ledger table in Azure SQLDB
+- Added Scripting Support for Ledger table in Azure Sql db
 - Change `Server.MasterDBPath` and `Server.MasterDBLogPath` properties to use `file_id` instead of `name` from `sys.database_files`
 - Enable Index creation for memory optimized tables in Azure
 - Fix Server/Logins to show external Logins for Azure SQLDB as they are now supported
@@ -122,7 +130,65 @@ This file will log substantial changes made to SMO between public releases to nu
 - Enabled Server.EnumServerAttributes API on Azure SQL Database
 - Enabled Lock enumeration APIs on Azure SQL Database
 - Deleted the Database.CheckIdentityValues API
-- Added new property "RequestMaximumMemoryGrantPercentageAsDouble" in WorkloadGroup to accept decimal values in Resource Governor (SQL 2019+).
-- Changed the netfx binaries in Microsoft.SqlServer.SqlManagementObjects package to use Microsoft.Data.SqlClient
-- Added a new package, Microsoft.SqlServer.SqlManagementObjects.SSMS, which only has netfx binaries and that uses System.Data.SqlClient
+- Added new property "RequestMaximumMemoryGrantPercentageAsDouble" in WorkloadGroup to accept decimal values in Resource Governor (SQL2019 and above).
+- Fixed a scripting issue with statistics on filtered indexes where the filter from the index would be scripted with the UPDATE STATISTICS TSQL.
+- Enabled Security Policy and Security Predicate objects on Azure SQL DataWarehouse
 
+## 160.2004021.0
+
+- First non-preview 160 release, aligned with [SQL Server Management Studio](https://aka.ms/ssmsfullsetup) 18.5
+- Script extended properties for Azure SQL Database objects
+- Enable Jupyter Notebook output for SqlScriptPublishModel. SSMS 18.5 can output a Notebook for Azure Data Studio in Generate Scripts now.
+- Fix issue where Table.EnableAllIndexes(Recreate) did nothing
+- Fix Database.EnumObjectPermissions usage in NetStandard binaries
+- Remove FORCE ORDER hint from table enumeration that was causing major performance issues
+- Fix Transfer with PrefetchAllObjects == false for pre-Sql 2014 versions so it doesn't throw an exception
+- Extend value range for platform, name, and engineEdition JSON properties of SQL Assessment targets with arrays of strings:
+
+    ```JSON
+        "target": {
+            "platform": ["Windows", "Linux"],
+            "name": ["master", "temp"]
+        }
+    ```
+
+- Add 13 new [SQL Assessment rules](https://github.com/microsoft/sql-server-samples/blob/master/samples/manage/sql-assessment-api/release-notes.md)
+- Fix help link in XTPHashAvgChainBuckets SQL Assessment rule
+- Units for threshold parameter of FullBackup SQL Assessment rule changed from hours to days
+
+## 160.201141.0-preview
+
+- Remove unneeded "using" TSQL statements from Database.CheckTables method implementations
+- Enable ColumnMasterKey properties Signature and AllowEnclaveComputations for Azure SQL DB
+- Fix Database.EncryptionEnabled and Database.DatabaseEncryptionKey behavior during Database.Alter(). Now, this code will correctly create a new key using the server certificate named MyCertificate:
+
+    ```C#
+        db.EncryptionEnabled = true;
+        db.DatabaseEncryptionKey.EncryptorName = "MyCertificate";
+        db.DatabaseEncryptionKey.EncryptionAlgorithm = DatabaseEncryptionAlgorithm.Aes256;
+        db.DatabaseEncryptionKey.EncryptionType = DatabaseEncryptionType.ServerCertificate;
+        db.Alter()
+    ```
+
+- Fixed the "like" and "contains" URN filter functions to work with parameters containing single quotes. These operators can be used to optimally initialize collections:
+
+    ```C#
+    // populate the collection with databases that have Name starting with "RDA"
+    var server = Server(new ServerConnection(sqlConnection));
+    server.Databases.ClearAndInitialize("[like(@Name, 'RDA%')]", new string[] { });
+    ```
+
+- Make Table.Location property optional for creating or scripting external tables.
+- Enable scripting of ANSI_PADDING settings for Azure SQL Database tables.
+- Remove obsolete types ServerActiveDirectory and DatabaseActiveDirectory
+- Added BLOB_STORAGE scripting support for external data sources
+- Fixed [error scripting external tables](https://feedback.azure.com/forums/908035-sql-server/suggestions/38267746-cannot-script-external-table-in-ssms-18-2) for Azure SQL Database
+- Replace Microsoft.SqlServer.Management.SqlParser.dll with a dependency to its Nuget package
+
+## 160.1911221.0-preview
+
+- Increase major version from 15 to 16
+- Remove dependency on native batch parser from NetFx components
+- Change NetStandard client driver to Microsoft.Data.SqlClient
+- Add distribution property for DW materialized views
+- Script FILLFACTOR for indexes on Azure SQL Database

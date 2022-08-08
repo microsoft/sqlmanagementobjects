@@ -433,7 +433,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                     UNION ALL SELECT name FROM (VALUES ('SELECT'),('UPDATE'),('INSERT'),('DELETE'),('EXECUTE'),('RECEIVE'),('REFERENCES')) actions(name)";
 
                 var dbAuditList = ServerContext.ConnectionContext.ExecuteWithResults(query).Tables[0].Rows.Cast<DataRow>().Select(row => row["name"].ToString());
-
+                System.Diagnostics.Trace.TraceInformation("Missing audit action types: {0}", string.Join(",", dbAuditList.Except(enumAttributeNames)));
                 // enumAttributeNames is a superset of dbAuditList.
                 Assert.That(enumAttributeNames, Is.SupersetOf(dbAuditList), @"Some types are missing in AuditActionType enum.
                     Please, update enum AuditActionType in /src/Microsoft/SqlServer/Management/SqlEnum/enumstructs.cs");

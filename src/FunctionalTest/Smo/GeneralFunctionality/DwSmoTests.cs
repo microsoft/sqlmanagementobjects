@@ -65,7 +65,6 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                     }
                     
                 });
-                Assert.That(databases.FirstOrDefault(d => d.EndsWith("Unknown")), Is.Not.Null, "Expected at least one Unknown engine edition. Make sure the test server has a paused DW instance. " + String.Join(",", databases));
             });
         }
     }

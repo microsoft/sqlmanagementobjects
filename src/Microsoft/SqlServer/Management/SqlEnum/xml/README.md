@@ -128,3 +128,8 @@ Post Processing is for doing additional calculations on the returned data. This 
 - class_name: The name of the class that handles the post-processing. Should extend [PostProcess](../PostProcess.cs)
 - fields: The list of fields which will cause the post-processing to happen
 - triggered_fields: The list of fields that are needed to compute the value for the field requested by the user
+
+### special_query
+
+This tag has 2 specialized uses and one standard behavior. Originally it was a special case for [table.xml](table.xml), to add a filter to hide temp tables when enumerating tables in tempdb, and to enable adding a query hint for optimizing the overall tables query. 
+Now it also acts as similarly to `post_process` by being a general purpose conditioned sql tag with a `fields` attribute and a body which is added to the `WHERE` clause of the query with an `AND` condition.

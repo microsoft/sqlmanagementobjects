@@ -18,6 +18,9 @@ namespace Microsoft.SqlServer.Management.Smo
 #endif
     using Microsoft.SqlServer.Management.Sdk.Sfc;
     using Microsoft.SqlServer.Management.Smo.SqlEnum;
+    using System.Collections.Generic;
+    using System.Text;
+
     /// <summary>
     ///base class for parsing a xml configuration file</summary>
     [ComVisible(false)]
@@ -305,23 +308,23 @@ namespace Microsoft.SqlServer.Management.Smo
         ///read a 'fields' entry ( list of fields separated by '#' )</summary>
         static protected StringCollection GetFields(string fields)
         {
-            String fieldName = String.Empty;
-            StringCollection col = new StringCollection();
+            var fieldName = new StringBuilder();
+            var col = new StringCollection();
 
             if( null != fields )
             {
-                foreach(char c in fields)
+                foreach(var c in fields)
                 {
                     if( '#' == c )
                     {
                         if( 0 < fieldName.Length )
                         {
-                            col.Add(fieldName);
+                            col.Add(fieldName.ToString());
                         }
-                        fieldName = String.Empty;
+                        fieldName = new StringBuilder();
                         continue;
                     }
-                    fieldName += c;
+                    fieldName.Append(c);
                 }
             }
             return col;
@@ -329,7 +332,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         ///reads the text of the current element if available
-        ///it assumes the curent element is empty or has inside it either a text node or
+        ///it assumes the current element is empty or has inside it either a text node or
         ///an element node. probably a link_multiple.</summary>
         protected string GetTextOfElement()
         {
@@ -349,7 +352,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //we found text
                 if( XmlNodeType.Text == this.Reader.NodeType )
                 {
-                    //so get it's value
+                    //so get its value
                     return this.Reader.Value;
                 }
             }
@@ -1759,7 +1762,7 @@ namespace Microsoft.SqlServer.Management.Smo
     /// <summary>
     ///class to read a special query</summary>
     [ComVisible(false)]
-    internal class XmlReadSpecialQuery : XmlRead
+    internal class XmlReadSpecialQuery : XmlReadConditionedStatement
     {
         /// <summary>
         ///initialize with reader</summary>
@@ -1774,12 +1777,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return this.Reader["database"];   }
         }
 
-        /// <summary>
-        ///get attribute - query</summary>
-        public String Query
-        {
-            get { return this.Reader["query"];  }
-        }
 
         /// <summary>
         /// Used to get attribute 'query hint'
@@ -1792,6 +1789,11 @@ namespace Microsoft.SqlServer.Management.Smo
         public string Hint
         {
             get { return this.Reader["hint"]; }
+        }
+
+        public override bool Next()
+        {
+            return Next("special_query");
         }
     }
 }

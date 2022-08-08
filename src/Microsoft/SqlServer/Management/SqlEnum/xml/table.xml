@@ -184,7 +184,7 @@
                     triggered_fields='#DatabaseName#SchemaName#TableName#'/>
     </version>
     <version cloud_min_major='12' datawarehouse_enabled='true' min_major='7'>
-      <special_query database = 'tempdb' query = "tbl.name not like '#%'" hint=""/>
+      <special_query database = 'tempdb' hint="">tbl.name not like '#%'</special_query>
     </version>
   </settings>
   <properties>
@@ -265,7 +265,7 @@
       <property name="HasXmlData" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.all_columns as clmns join sys.types as usrt on usrt.user_type_id = clmns.user_type_id where clmns.object_id = tbl.object_id and usrt.name = N'xml'), 0)</property>
       <property name="HasSpatialData" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.all_columns as clmns join sys.types as usrt on usrt.user_type_id = clmns.user_type_id where clmns.object_id = tbl.object_id and usrt.name in (N'geometry', N'geography')), 0)</property>
       <property name="AnsiNullsStatus" type="bit" read_only_after_creation="true" mode="design">tbl.uses_ansi_nulls</property>
-      <property name="QuotedIdentifierStatus" type="bit" cast='true' read_only_after_creation="true" mode="design">ISNULL(OBJECTPROPERTY(tbl.object_id,N'IsQuotedIdentOn'),0)</property>
+      <property name="QuotedIdentifierStatus" type="bit" cast='true' read_only_after_creation="true" mode="design">ISNULL(OBJECTPROPERTY(tbl.object_id,N'IsQuotedIdentOn'),1)</property>
       <property name="FakeSystemTable" type="bit" cast='true' access='Read'>0</property>
       <!-- used for link with PartitionSchemeParameter, inc_storage -->
       <property name="IndexID" type="int" hidden='true'>idx.index_id</property>

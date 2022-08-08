@@ -27,9 +27,9 @@ using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 namespace Microsoft.SqlServer.Management.Smo
 {
     [Facets.EvaluationMode(Dmf.AutomatedPolicyEvaluationMode.CheckOnSchedule)]
-    [Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet]
-    public partial class Database : ScriptNameObjectBase, Cmn.ICreatable, Cmn.IAlterable, Cmn.IDroppable, Cmn.IDropIfExists,
-    Cmn.ISafeRenamable, IExtendedProperties, IScriptable, IDatabaseOptions
+    [PhysicalFacet]
+    public partial class Database : ScriptNameObjectBase, ICreatable, IAlterable, IDroppable, IDropIfExists,
+    ISafeRenamable, IExtendedProperties, IScriptable, IDatabaseOptions
     {
         internal Database(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)
@@ -419,7 +419,9 @@ namespace Microsoft.SqlServer.Management.Smo
             var emptyFileGroups = new StringCollection();
             var isAzureDb = Cmn.DatabaseEngineType.SqlAzureDatabase == sp.TargetDatabaseEngineType;
             var bSuppressDirtyCheck = sp.SuppressDirtyCheck;
-            var targetEditionIsManagedServer = !isAzureDb && sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlManagedInstance;
+            var targetEditionIsManagedServer = !isAzureDb && 
+                (sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlManagedInstance || 
+                 sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlAzureArcManagedInstance);
 
             if (IsSupportedProperty("DatabaseSnapshotBaseName"))
             {
@@ -1102,8 +1104,9 @@ namespace Microsoft.SqlServer.Management.Smo
             Property propCompat = Properties.Get("CompatibilityLevel");
             if (null != propCompat.Value && (propCompat.Dirty || !sp.ScriptForAlter))
             {
-                bool isTargetSqlAzureOrMI = (sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase) ||
-                    (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance);
+                bool isTargetSqlAzureOrMIOrMIAA = (sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase) ||
+                    (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance) ||
+                    (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlAzureArcManagedInstance);
 
                 bool isVersion160WithCompatLevelLessThan160 =
                     (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version160) &&
@@ -1156,11 +1159,11 @@ namespace Microsoft.SqlServer.Management.Smo
                     isVersion140WithCompatLevelLessThan140 ||
                     isVersion150WithCompatLevelLessThan150 ||
                     isVersion160WithCompatLevelLessThan160 ||
-                    isTargetSqlAzureOrMI;
+                    isTargetSqlAzureOrMIOrMIAA;
 
                 //script only if compatibility level is less than the target server
                 // on Alter() we just script it and let the server fail if it is not correct
-                if (IsSupportedProperty("CompatibilityLevel", sp) && (sp.ScriptForAlter || isVersionWithLowerCompatLevel || isVersion80Or90WithLowerCompatLevel || isTargetSqlAzureOrMI))
+                if (IsSupportedProperty("CompatibilityLevel", sp) && (sp.ScriptForAlter || isVersionWithLowerCompatLevel || isVersion80Or90WithLowerCompatLevel))
                 {
                     CompatibilityLevel upgradedCompatLevel = UpgradeCompatibilityValueIfRequired(sp, (CompatibilityLevel)propCompat.Value);
                     if (isVersionWithLowerCompatLevel)
@@ -1863,7 +1866,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //If containment supported on source database, check the version and enginetype of target.
             if (this.IsSupportedProperty("ContainmentType"))
             {
-                ContainmentType cType = this.GetPropValueOptional<ContainmentType>("ContainmentType", ContainmentType.None);
+                ContainmentType cType = this.GetPropValueOptional("ContainmentType", ContainmentType.None);
 
                 if (cType == ContainmentType.None)
                 {
@@ -2529,11 +2532,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Gets or sets the MD Catalog Collation type.  Only valid during creation, and we cannot specify ContainedDatabaseCollation explicitly
         /// </summary>
         [SfcProperty(SfcPropertyFlags.ReadOnlyAfterCreation | SfcPropertyFlags.SqlAzureDatabase)]
-        public Microsoft.SqlServer.Management.Smo.CatalogCollationType CatalogCollation
+        public CatalogCollationType CatalogCollation
         {
             get
             {
-                return (Microsoft.SqlServer.Management.Smo.CatalogCollationType)this.Properties.GetValueWithNullReplacement("CatalogCollation");
+                return (CatalogCollationType)this.Properties.GetValueWithNullReplacement("CatalogCollation");
             }
             set
             {
@@ -5809,7 +5812,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// The ListObjects method returns a SQLObjectList object that enumerates the system and user-defined objects defining the database referenced.
+        /// The EnumObjects method returns a DataTable that enumerates the system and user-defined objects defining the database referenced.
         /// </summary>
         /// <param name="types"></param>
         /// <param name="order"></param>
@@ -5931,10 +5934,10 @@ SortedList list = new SortedList();
                 finalQuery.Append(" ORDER BY ");
                 switch (order)
                 {
-                    case SortOrder.Name: finalQuery.Append("Name"); break;
-                    case SortOrder.Schema: finalQuery.Append("Schema"); break;
-                    case SortOrder.Type: finalQuery.Append("DatabaseObjectTypes"); break;
-                    default: finalQuery.Append("Urn"); break;
+                    case SortOrder.Name: finalQuery.Append("[Name]"); break;
+                    case SortOrder.Schema: finalQuery.Append("[Schema]"); break;
+                    case SortOrder.Type: finalQuery.Append("[DatabaseObjectTypes]"); break;
+                    default: finalQuery.Append("[Urn]"); break;
                 }
 
                 finalQuery.Append("\ndrop table #t");
@@ -5996,9 +5999,9 @@ SortedList list = new SortedList();
         /// If true this means only header and body are needed, otherwise all properties</param>
         /// <returns></returns>
         internal static string[] GetScriptFields(Type parentType,
-            Cmn.ServerVersion version,
-            Cmn.DatabaseEngineType databaseEngineType,
-            Cmn.DatabaseEngineEdition databaseEngineEdition,
+            ServerVersion version,
+            DatabaseEngineType databaseEngineType,
+            DatabaseEngineEdition databaseEngineEdition,
             bool defaultTextMode)
         {
             string[] fields =
@@ -6012,12 +6015,12 @@ SortedList list = new SortedList();
                 nameof(IsLedger),
                 nameof(PersistentVersionStoreFileGroup)
             };
-            List<string> list = GetSupportedScriptFields(typeof(Database.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
+            List<string> list = GetSupportedScriptFields(typeof(PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
             return list.ToArray();
         }
 
-        internal static string[] GetScriptFields2(Type parentType, Cmn.ServerVersion version,
-            Cmn.DatabaseEngineType databaseEngineType, Cmn.DatabaseEngineEdition databaseEngineEdition,
+        internal static string[] GetScriptFields2(Type parentType, ServerVersion version,
+            DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition,
             bool defaultTextMode, ScriptingPreferences sp)
         {
             string[] fields =
@@ -6026,7 +6029,7 @@ SortedList list = new SortedList();
                 "IsMirroringEnabled",
                 "IsVarDecimalStorageFormatEnabled",
             };
-            List<string> list = GetSupportedScriptFields(typeof(Database.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
+            List<string> list = GetSupportedScriptFields(typeof(PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
             return list.ToArray();
         }
 
@@ -6039,9 +6042,9 @@ SortedList list = new SortedList();
             {
                 // vardecimal is supported in SQL Server 2005, SP2 and later, for Enterprise Edition only.
                 // vardecimal will be replaced by a different compression feature in Katmai
-                System.Version yukonSp2 = new System.Version(9, 0, 3003);
+                Version yukonSp2 = new Version(9, 0, 3003);
 
-                System.Version thisversion = new System.Version(
+                Version thisversion = new Version(
                         this.Parent.ConnectionContext.ServerVersion.Major,
                         this.Parent.ConnectionContext.ServerVersion.Minor,
                         this.Parent.ConnectionContext.ServerVersion.BuildNumber);
@@ -6056,6 +6059,7 @@ SortedList list = new SortedList();
                 return (thisversion > yukonSp2) &&
                     (this.Parent.Information.EngineEdition == Edition.EnterpriseOrDeveloper ||
                      this.Parent.Information.EngineEdition == Edition.SqlManagedInstance ||
+                     this.Parent.Information.EngineEdition == Edition.SqlAzureArcManagedInstance ||
                      this.Parent.Information.EngineEdition == Edition.SqlDatabaseEdge);
             }
         }
@@ -6386,7 +6390,9 @@ SortedList list = new SortedList();
         }
         private void ScriptDbOptionsProps(StringCollection query, ScriptingPreferences sp, bool isAzureDb)
         {
-            var targetEditionIsManagedServer = sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlManagedInstance;
+            var targetEditionIsManagedServer = 
+                ((sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlManagedInstance) ||
+                 (sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlAzureArcManagedInstance));
 
             ScriptAlterPropBool("AnsiNullDefault", "ANSI_NULL_DEFAULT", sp, query);
             ScriptAlterPropBool("AnsiNullsEnabled", "ANSI_NULLS", sp, query);
@@ -6546,7 +6552,7 @@ SortedList list = new SortedList();
 
             if (this.IsSupportedProperty("ContainmentType", sp) && !targetEditionIsManagedServer)
             {
-                ContainmentType cType = this.GetPropValueOptional<ContainmentType>("ContainmentType", ContainmentType.None);
+                ContainmentType cType = this.GetPropValueOptional("ContainmentType", ContainmentType.None);
                 if (cType != ContainmentType.None)
                 {
                     this.AddDefaultLanguageOption("DefaultFullTextLanguageName", "DefaultFullTextLanguageLcid",
@@ -6737,7 +6743,8 @@ SortedList list = new SortedList();
 
             if (IsSupportedProperty(nameof(ReadOnly)) && IsSupportedProperty(nameof(ReadOnly), sp) &&
                 sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse &&
-                sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
+                sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance &&
+                sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlAzureArcManagedInstance)
             {
                 // Specify READONLY or READWRITE based on the readonlyMode passed in, ignoring alters for dirty-only, etc.
                 ScriptAlterPropBool("ReadOnly", "", sp, query, readonlyMode ? "READ_ONLY" : "READ_WRITE");
@@ -6775,7 +6782,7 @@ SortedList list = new SortedList();
         {
             if (this.IsSupportedProperty("ContainmentType", sp))
             {
-                ContainmentType cType = this.GetPropValueOptional<ContainmentType>("ContainmentType", ContainmentType.None);
+                ContainmentType cType = this.GetPropValueOptional("ContainmentType", ContainmentType.None);
                 switch (cType)
                 {
                     case ContainmentType.None:
@@ -7070,6 +7077,32 @@ SortedList list = new SortedList();
         public void CleanupPersistentVersionStore()
         {
             ExecuteNonQuery($"exec sys.sp_persistent_version_cleanup {MakeSqlBraket(Name)}");
+        }
+
+        /// <summary>
+        /// Populates the object's property bag from the current row of the DataReader
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="skipIfDirty">If true do not initialize the property if it has
+        /// been changed by the user</param>
+        /// <param name="startColIdx">Index of the first column</param>
+        /// <param name="endColIdx">Index of the last column. If -1 then go to the end.</param>
+        internal override void AddObjectPropsFromDataReader(IDataReader reader, bool skipIfDirty,
+            int startColIdx, int endColIdx)
+        {
+            // We need the DatabaseEngineEdition for initializing the properties list for a Database, but this
+            // can cause problems on Azure servers since getting the EngineEdition requires logging into the 
+            // database itself which is something we want to avoid for serverless databases or inaccessible
+            // databases. So to avoid that we prepopulate the edition by checking if it's DW beforehand (which
+            // doesn't require connecting to the database to retrieve)
+            if (m_edition == null && this.Parent.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
+            {
+                if (reader.GetSchemaTable().Rows.Cast<DataRow>().FirstOrDefault(r=> (string)r["ColumnName"] == "RealEngineEdition") != null)
+                {
+                    this.m_edition = (DatabaseEngineEdition)reader["RealEngineEdition"];
+                }
+            }
+            base.AddObjectPropsFromDataReader(reader, skipIfDirty, startColIdx, endColIdx);
         }
     }
 }

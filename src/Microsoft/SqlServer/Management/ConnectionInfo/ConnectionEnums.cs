@@ -119,6 +119,10 @@ namespace Microsoft.SqlServer.Management.Common
         [CommonDisplayNameKey("SqlDatabaseEdgeEdition")]
         SqlDatabaseEdge = 0x000009,
 
+        ///The server is an Azure Arc Managed SQL Instance Edition
+        [CommonDisplayNameKey("SqlAzureArcManagedInstanceEdition")]
+        SqlAzureArcManagedInstance = 0x00000A,
+
         ///The server is Sql SqlOnDemand
         [CommonDisplayNameKey("SqlOnDemandEdition")]
         SqlOnDemand = 0x00000B,
@@ -373,6 +377,7 @@ namespace Microsoft.SqlServer.Management.Common
                     yield return DatabaseEngineEdition.Standard;
                     yield return DatabaseEngineEdition.SqlStretchDatabase;
                     yield return DatabaseEngineEdition.SqlManagedInstance;
+                    yield return DatabaseEngineEdition.SqlAzureArcManagedInstance;
                     yield return DatabaseEngineEdition.SqlDatabaseEdge;
                     break;
                 default:
