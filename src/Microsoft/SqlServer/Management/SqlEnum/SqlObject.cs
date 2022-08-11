@@ -176,10 +176,20 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     xrobr.Close();
                 }
-                XmlReadSpecialQuery xrsq = xrs.SpecialQuery;
+                var xrsq = xrs.SpecialQuery;
                 if (null != xrsq)
                 {
-                    this.AddSpecialQuery(xrsq.Database, xrsq.Query);
+                    // Preserve original behavior - database-specific where clause
+                    var database = xrsq.Database;
+                    if (!string.IsNullOrEmpty(database))
+                    {
+                        this.AddSpecialQuery(xrsq.Database, xrsq.Sql);
+                    }
+                    else
+                    // Where clause based on Fields
+                    {
+                        SqlConditionedStatementWhereClause.AddAll(ConditionedSqlList, xrsq);
+                    }
                     this.AddQueryHint(xrsq.Hint);
                     xrsq.Close();
                 }

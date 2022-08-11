@@ -1764,7 +1764,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// been changed by the user</param>
         /// <param name="startColIdx">Index of the first column</param>
         /// <param name="endColIdx">Index of the last column. If -1 then go to the end.</param>
-        internal void AddObjectPropsFromDataReader(System.Data.IDataReader reader, bool skipIfDirty,
+        internal virtual void AddObjectPropsFromDataReader(System.Data.IDataReader reader, bool skipIfDirty,
             int startColIdx, int endColIdx)
         {
             var schemaTable = reader.GetSchemaTable();
@@ -4262,6 +4262,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 yield return nameof(Index.SpatialIndexType);
                 yield return nameof(Index.IsSpatialIndex);
                 yield return nameof(Server.Configuration.ContainmentEnabled);
+            }
+            if (((sp != null && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand) || this.DatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand) &&
+                ((sp != null && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse) || this.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse))
+            {
+                yield return nameof(ExternalFileFormat.FirstRow);
             }
             if ((sp != null && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand) || this.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {

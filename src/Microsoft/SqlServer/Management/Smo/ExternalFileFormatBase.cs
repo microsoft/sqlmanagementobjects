@@ -164,7 +164,7 @@ namespace Microsoft.SqlServer.Management.Smo
             this.ThrowIfNotSupported(typeof(ExternalFileFormat), sp);
             
             /* CREATE EXTERNAL FILE FORMAT external_file_format_name WITH
-             * (FORMAT_TYPE = { DELIMITEDTEXT | RCFILE | ORC | PARQUET | JSON }
+             * (FORMAT_TYPE = { DELIMITEDTEXT | RCFILE | ORC | PARQUET | JSON | DELTA }
              *  ,[SERDE_METHOD = 'Serialization/Deserialization method']
              *  ,[FORMAT_OPTIONS (<format_options> [ ,...n ] )]
              *  ,[DATA_COMPRESSION = 'data_compression_method']
@@ -219,9 +219,6 @@ namespace Microsoft.SqlServer.Management.Smo
             sb.Append(Globals.LParen);
             sb.AppendFormat(SmoApplication.DefaultCulture, "FORMAT_TYPE = {0}", typeConverter.ConvertToInvariantString(externalFileFormatType));
 
-            // check for conflicting properties
-            CheckConflictingProperties(sp);
-
             // add any optional properties if they are set
             ProcessOptionalProperties(externalFileFormatType, sb, sp);
 
@@ -257,122 +254,6 @@ namespace Microsoft.SqlServer.Management.Smo
             fileFormatOptions.AppendFormat(SmoApplication.DefaultCulture, sqlString, propertyValue);
         }
 
-        /// <summary>
-        /// Checks for conflicting properties for the specified external file format type.
-        /// If a conflicting configuration is detected, throws an exception.
-        /// </summary>
-        private void CheckConflictingProperties(ScriptingPreferences sp)
-        {
-            const string FormatTypePropertyName = "FormatType";
-            const string SerDeMethodPropertyName = "SerDeMethod";
-            const string FieldTerminatorPropertyName = "FieldTerminator";
-            const string StringDelimiterPropertyName = "StringDelimiter";
-            const string DateFormatPropertyName = "DateFormat";
-            const string UseTypeDefaultPropertyName = "UseTypeDefault";
-
-            // confirm that for each of the file format types,
-            // correct optional properties are specified, if any
-            // ensure that the format type property has a value
-            if (IsSupportedProperty(FormatTypePropertyName, sp))
-            {
-                Property formatTypeProp = this.GetPropertyOptional(FormatTypePropertyName);
-                if (!formatTypeProp.IsNull)
-                {
-                    Property prop = null;
-
-                    // if the format type is either delimited text, orc, parquet, or json then the serde method property is not supported
-                    if ((ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.DelimitedText ||
-                        (ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.Orc ||
-                        (ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.Parquet ||
-                        (ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.JSON)
-                    {
-                        // check the serde method property
-                        // if it is specified and not a default, throw an exception
-                        if (IsSupportedProperty(SerDeMethodPropertyName, sp))
-                        {
-                            prop = this.GetPropertyOptional(SerDeMethodPropertyName);
-                            if (!prop.IsNull)
-                            {
-                                // if the property is set to something other than its default value, throw an exception
-                                if (!IsPropertyDefaultValue<string>(prop, (string)prop.Value, new List<string> { null, string.Empty }))
-                                {
-                                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingExternalFileFormatProperties, prop.Name, prop.Value.ToString(), formatTypeProp.Value.ToString()));
-                                }
-                            }
-                        }
-                    }
-
-                    // if the format type is rcfile, orc, parquet or json then the format options properties are not supported
-                    if ((ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.RcFile ||
-                        (ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.Orc ||
-                        (ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.Parquet ||
-                        (ExternalFileFormatType)formatTypeProp.Value == ExternalFileFormatType.JSON)
-                    {
-                        // check the format options properties
-                        // if any of them are specified, throw an exception
-                        if (IsSupportedProperty(FieldTerminatorPropertyName, sp))
-                        {
-                            prop = this.GetPropertyOptional(FieldTerminatorPropertyName);
-                            if (!prop.IsNull)
-                            {
-                                if (!IsPropertyDefaultValue<string>(prop, (string)prop.Value, new List<string> { null, string.Empty }))
-                                {
-                                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingExternalFileFormatProperties, prop.Name, prop.Value.ToString(), formatTypeProp.Value.ToString()));
-                                }
-                            }
-                        }
-
-                        if (IsSupportedProperty(StringDelimiterPropertyName, sp))
-                        {
-                            prop = this.GetPropertyOptional(StringDelimiterPropertyName);
-                            if (!prop.IsNull)
-                            {
-                                if (!IsPropertyDefaultValue<string>(prop, (string)prop.Value, new List<string> { null, string.Empty }))
-                                {
-                                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingExternalFileFormatProperties, prop.Name, prop.Value.ToString(), formatTypeProp.Value.ToString()));
-                                }
-                            }
-                        }
-
-                        if (IsSupportedProperty(DateFormatPropertyName, sp))
-                        {
-                            prop = this.GetPropertyOptional(DateFormatPropertyName);
-                            if (!prop.IsNull)
-                            {
-                                if (!IsPropertyDefaultValue<string>(prop, (string)prop.Value, new List<string> { null, string.Empty }))
-                                {
-                                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingExternalFileFormatProperties, prop.Name, prop.Value.ToString(), formatTypeProp.Value.ToString()));
-                                }
-                            }
-                        }
-
-                        if (IsSupportedProperty(UseTypeDefaultPropertyName, sp))
-                        {
-                            prop = this.GetPropertyOptional(UseTypeDefaultPropertyName);
-                            if (!prop.IsNull)
-                            {
-                                if (!IsPropertyDefaultValue<bool>(prop, (bool)prop.Value, new List<bool> { false }))
-                                {
-                                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingExternalFileFormatProperties, prop.Name, prop.Value.ToString(), formatTypeProp.Value.ToString()));
-                                }
-                            }
-                        }
-
-                        if (IsSupportedProperty(FirstRowName, sp))
-                        {
-                            prop = this.GetPropertyOptional(FirstRowName);
-                            if (!prop.IsNull)
-                            {
-                                if (!IsPropertyDefaultValue<int>(prop, (int)prop.Value, new List<int> { 0 }))
-                                {
-                                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingExternalFileFormatProperties, prop.Name, prop.Value.ToString(), formatTypeProp.Value.ToString()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Check the specified property if it has the default value.
@@ -409,41 +290,18 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp">The scripting preferences.</param>
         private void ProcessOptionalProperties(ExternalFileFormatType externalFileFormatType, StringBuilder script, ScriptingPreferences sp)
         {
-            // check the optional properties are supported by the specified format type
-            switch (externalFileFormatType)
-            {
-                case ExternalFileFormatType.DelimitedText:
-                    ValidateDelimitedTextProperties(script, sp);
-                    break;
-                case ExternalFileFormatType.JSON:
-                case ExternalFileFormatType.Orc:
-                case ExternalFileFormatType.Parquet:
-                    ValidateOrcOrParquetProperties(script, sp);
-                    break;
-                case ExternalFileFormatType.RcFile:
-                    ValidateRcFileProperties(script, sp);
-                    break;
-                default:
-                    // if the format type set to any other value throw an exception
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(externalFileFormatType.ToString()));    
-            }
-        }
-        
-        /// <summary>
-        /// Validates optional properties for the DelimtedText file format
-        /// and adds them to the T-SQL script.
-        /// </summary>
-        /// <param name="script">The external file format T-SQL script.</param>
-        /// <param name="sp">The scripting preferences.</param>
-        private void ValidateDelimitedTextProperties(StringBuilder script, ScriptingPreferences sp)
-        {
-            const string UseTypeDefaultPropertyName = "UseTypeDefault";
-
             // check for the DelimitedText supported optional properties - FormatOptions and DataCompression
             // check for any format options optinal parameters - FieldTerminator, StringDelimiter, DateFormat and UseTypeDefault
             // if any are found, add them to the T-SQL script
             StringBuilder formatOptions = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             List<string> defaultValues = new List<string> { null, string.Empty };
+
+            const string UseTypeDefaultPropertyName = "UseTypeDefault";
+
+
+            // check if the serde method property was set
+            // if yes, add it to the script
+            ValidateOptionalProperty("SerDeMethod", "SERDE_METHOD = {0}", defaultValues, script, sp);
 
             // validate and process the field terminator file format option
             ValidateOptionalProperty("FieldTerminator", "FIELD_TERMINATOR = {0}", defaultValues, formatOptions, sp);
@@ -455,23 +313,31 @@ namespace Microsoft.SqlServer.Management.Smo
             ValidateOptionalProperty("DateFormat", "DATE_FORMAT = {0}", defaultValues, formatOptions, sp);
 
             // validate and process the first row optional file format property
-            ValidateOptionalProperty(FirstRowName, "FIRST_ROW = {0}", new List<int> { 1 }, formatOptions, sp, quotePropertyValue: false);
+            // for delimited text default value is 1, and for the rest the default value is 0.
+            if (externalFileFormatType == ExternalFileFormatType.DelimitedText)
+            {
+                ValidateOptionalProperty(FirstRowName, "FIRST_ROW = {0}", new List<int> { 1 }, formatOptions, sp, quotePropertyValue: false);
+            } else
+            {
+                ValidateOptionalProperty(FirstRowName, "FIRST_ROW = {0}", new List<int> { 0 }, formatOptions, sp, quotePropertyValue: false);
+            }
 
             // validate and process the use type default file format option
             if (IsSupportedProperty(UseTypeDefaultPropertyName, sp))
             {
-                if (!this.GetPropertyOptional(UseTypeDefaultPropertyName).IsNull)
+                var prop = this.GetPropertyOptional(UseTypeDefaultPropertyName);
+                // property is ignored if it's null or has default value
+                if(!prop.IsNull && (externalFileFormatType == ExternalFileFormatType.DelimitedText || !IsPropertyDefaultValue<bool>(prop, (bool)prop.Value, new List<bool> { false })))
                 {
                     bool externalFileFormatUseTypeDefault = (bool)this.GetPropValueOptional(UseTypeDefaultPropertyName);
-                
                     if (formatOptions.Length > 0)
                     {
                         formatOptions.Append(", ");
                     }
-
-                    formatOptions.AppendFormat(SmoApplication.DefaultCulture, "USE_TYPE_DEFAULT = {0}", externalFileFormatUseTypeDefault); 
+                    formatOptions.AppendFormat(SmoApplication.DefaultCulture, "USE_TYPE_DEFAULT = {0}", externalFileFormatUseTypeDefault);
                 }
             }
+                
 
             // if any format options were specified, add the FORMAT_OPTIONS and enclose them in the parenthesis
             string fileFormatOptions = formatOptions.ToString();
@@ -515,12 +381,12 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Validates optional properties for the Orc or Parquet file format
+        /// Validates optional properties for the JSON, Orc, Parquet or Delta file format
         /// and adds them to the T-SQL script.
         /// </summary>
         /// <param name="script">The external file format T-SQL script.</param>
         /// <param name="sp">The scripting preferences.</param>
-        private void ValidateOrcOrParquetProperties(StringBuilder script, ScriptingPreferences sp)
+        private void ValidateOrcParquetJsonOrDeltaProperties(StringBuilder script, ScriptingPreferences sp)
         {
             List<string> defaultValues = new List<string> { null, string.Empty };
 

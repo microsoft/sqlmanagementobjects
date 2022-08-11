@@ -244,7 +244,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
                 Assert.IsNotNull(target.TargetFields);
                 //package0.event_file has 5 customizable fields
                 //filename is set to "file" in this session
-                Assert.That(target.TargetFields.Count, Is.EqualTo(8), "TestTargetGetTargetFields event_file TargetFields.Count" ); // metadatafile is removed
+                Assert.That(target.TargetFields.Count, Is.EqualTo(9), "TestTargetGetTargetFields event_file TargetFields.Count" ); 
                 Assert.AreEqual("https://account.blob.core.windows.net/container/filename.xel", target.TargetFields["filename"].Value);
 
                 //other fields are all in default value

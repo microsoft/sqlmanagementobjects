@@ -1644,7 +1644,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     /// <summary>
     ///class to read a special query</summary>
     [ComVisible(false)]
-    public class XmlReadSpecialQuery : XmlRead
+    public class XmlReadSpecialQuery : XmlReadConditionedStatement
     {
         /// <summary>   
         ///initialize with reader</summary>
@@ -1661,9 +1661,13 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         /// <summary>
         ///get attribute - query</summary>
-        public String Query
+        public string Query
         {
-            get { return this.Reader["query"];  }
+            get { return Sql;  }
+        }
+        public override bool Next()
+        {
+            return Next("special_query");
         }
     }
 }

@@ -143,16 +143,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 try
                 {
                     var pwd = SqlTestRandom.GeneratePassword();
-                    _SMO.Login login = null;
+                    Login login = null;
+                    User user = null;
                     SqlConnection sqlConn = null;
                     try
                     {
                         // Here we creata a login/user...
                         login = master.Parent.CreateLogin(GenerateUniqueSmoObjectName("login_low_priv", maxLength: 128),
                             _SMO.LoginType.SqlLogin, pwd);
-                        var user = master.CreateUser(login.Name, login.Name);
+                        user = master.CreateUser(login.Name, login.Name);
 
-                        // ... and we grant it limite permissions (certainly a lot less than "cloudsa").
+                        // ... and we grant it limited permissions (certainly a lot less than "cloudsa").
                         // Note: the "dbmanager" role seems to only exist in SQL Azure, so for this reason
                         // this test is restricted to that EngineType.
                         master.ExecutionManager.ExecuteNonQuery(
@@ -175,12 +176,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             sqlConn.Open();
                             var dbScopedConn = new ServerConnection(sqlConn);
                             var server = new _SMO.Server(dbScopedConn);
-
-                            // Before the fix, trying to do this would cause an exception.
-                            Assert.DoesNotThrow(() =>
-                            {
-                                var dbee = server.Databases.Count;
-                            }, "Unexpected exception.");
+                            server.SetDefaultInitFields(typeof(Database), nameof(Database.AzureEdition));
+                            Assert.That(server.Databases.Cast<Database>().Select(d => d.DatabaseEngineEdition), Has.None.EqualTo(DatabaseEngineEdition.Unknown), "Low privileged user should get DatabaseEngineEdition of all databases");
+                            Assert.That(server.Databases.Cast<Database>().Where(d => d.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase).Select(d => d.AzureEdition), Has.None.EqualTo(""), "Low privileged user should get AzureEdition of all Azure DB databases");
+                            Assert.Throws<ConnectionFailureException>(() => { var x = server.Databases[db.Name].Size; }, "Accessing other properties of inaccessible Database should throw");
                         }
                     }
                     finally
@@ -195,7 +194,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             master.ExecutionManager.ExecuteNonQuery(
                                 string.Format("ALTER ROLE dbmanager DROP member {0}",
                                     SmoObjectHelpers.SqlBracketQuoteString(login.Name)));
-
+                            user?.Drop();
                             login.Drop();
                         }
                     }

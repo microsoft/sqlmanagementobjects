@@ -3,7 +3,6 @@
 
 using System;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -18,10 +17,10 @@ using Assert = NUnit.Framework.Assert;
 namespace Microsoft.SqlServer.Test.SMO.Agent
 {
     [TestClass]
-    [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
     public class JobServerTests : SqlTestBase
     {
         [TestMethod]
+        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
         public void JobServer_PurgeJobHistory_generates_correct_query()
         {
             ExecuteTest(() =>
@@ -49,6 +48,7 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
 
         [TestMethod]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
+        [SupportedServerVersionRange(MinMajor = 16, Edition = DatabaseEngineEdition.Enterprise)]
         public void JobServer_EnumPerformanceCounters_returns_agent_counters()
         {
             ExecuteTest(() =>
@@ -70,6 +70,7 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
         }
 
         [TestMethod]
+        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
         public void JobServer_Msx_methods_generate_correct_queries()
         {
             ExecuteTest(() =>
@@ -92,6 +93,8 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
         }
 
         [TestMethod]
+        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
+
         public void JobServer_ErrorLog_methods_generate_correct_queries()
         {
             ExecuteTest(() =>
@@ -135,7 +138,9 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
             job.Refresh();
             return job;
         }
+
         [TestMethod]
+        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
         public void JobServer_Job_methods()
         {
             ExecuteTest(() =>
@@ -180,6 +185,7 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
         }
 
         [TestMethod]
+        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
         public void JobServer_miscellaneous_methods_generate_correct_queries()
         {
             ExecuteTest(() =>

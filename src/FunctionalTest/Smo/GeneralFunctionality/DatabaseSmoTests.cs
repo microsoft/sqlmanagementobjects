@@ -119,19 +119,31 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                    };
 
                    syn.Create();
+                   var script = database.ExecutionManager.RecordQueryText(() =>
+                   {
+                       // Now, we retrieve the same object we just created by calling EnumObjects()
+                       var objs = database.EnumObjects(DatabaseObjectTypes.Synonym, _SMO.SortOrder.Schema);
+                       var synobj = objs.Rows.Cast<System.Data.DataRow>().Where(r => (string)r["Name"] == expectedSynName).Single();
 
-                   // Now, we retrieve the same object we just created by calling EnumObjects()
-                   var objs = database.EnumObjects(DatabaseObjectTypes.Synonym);
-                   var synobj = objs.Rows.Cast<System.Data.DataRow>().Where(r => (string)r["Name"] == expectedSynName).Single();
+                       // The original bug was that Schema was coming back as blank, because there was an assumption
+                       // that synonyms did not have a schema (which was incorrect)
+                       Assert.That(synobj["Schema"], Is.EqualTo(expectedSynSchema), "Unexpected value for Schema");
 
-                   // The original bug was that Schema was coming back as blank, because there was an assumption
-                   // that synonyms did not have a schema (which was incorrect)
-                   Assert.That(synobj["Schema"], Is.EqualTo(expectedSynSchema), "Unexpected value for Schema");
-
-                   // While we are at it, let's also check the other properties...
-                   Assert.That(synobj["DatabaseObjectTypes"], Is.EqualTo("Synonym"), "Unexpected value for DatabaseObjectTypes");
-                   Assert.That(synobj["Name"], Is.EqualTo(expectedSynName), "Unexpected value for Name");
-                   Assert.That(synobj["Urn"], Is.EqualTo(syn.Urn.ToString()), "Unexpected value for Urn");
+                       // While we are at it, let's also check the other properties...
+                       Assert.That(synobj["DatabaseObjectTypes"], Is.EqualTo("Synonym"), "Unexpected value for DatabaseObjectTypes");
+                       Assert.That(synobj["Name"], Is.EqualTo(expectedSynName), "Unexpected value for Name");
+                       Assert.That(synobj["Urn"], Is.EqualTo(syn.Urn.ToString()), "Unexpected value for Urn");
+                   }, alsoExecute: true);
+                   Assert.That(script.ToSingleString(), Contains.Substring("ORDER BY [Schema]"), "EnumObjects (SortOrder.Schema)");
+                   if (database.DatabaseEngineType == DatabaseEngineType.Standalone)
+                   {
+                       script = database.ExecutionManager.RecordQueryText(() => database.EnumObjects(), alsoExecute: true);
+                       Assert.That(script.ToSingleString(), Contains.Substring("ORDER BY [DatabaseObjectTypes]"), "EnumObjects()");
+                   }
+                   script = database.ExecutionManager.RecordQueryText(() => database.EnumObjects(DatabaseObjectTypes.Table, _SMO.SortOrder.Name), alsoExecute: true);
+                   Assert.That(script.ToSingleString(), Contains.Substring("ORDER BY [Name]"), "EnumObjects()");
+                   script = database.ExecutionManager.RecordQueryText(() => database.EnumObjects(DatabaseObjectTypes.View, _SMO.SortOrder.Urn), alsoExecute: true);
+                   Assert.That(script.ToSingleString(), Contains.Substring("ORDER BY [Urn]"), "EnumObjects()");
                });
         }
 

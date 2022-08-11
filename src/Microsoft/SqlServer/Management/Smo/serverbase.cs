@@ -3089,8 +3089,6 @@ namespace Microsoft.SqlServer.Management.Smo
             // but we need them at runtime when we initialize the object, and we'd
             // rather have them in the collection for performance consideration
 
-            // TODO: FIX_IN_KATMAI: Why does Server need to know about all of its children? Delegate the call to the child.
-
             if (typeObject.IsSubclassOf(typeof(ScriptSchemaObjectBase)))
             {
                 fields.Add("Schema");
@@ -3130,6 +3128,17 @@ namespace Microsoft.SqlServer.Management.Smo
                 fields.Add("Name");
                 fields.Add("CategoryID");
                 fields.Add("JobID");
+            }
+            else if (typeObject == typeof(Database))
+            {
+                fields.Add(nameof(Database.Name));
+                // If we are connected to an OnDemand or DataWarehouse instance through the ServerConnection
+                // the Database can only be the same edition as the ServerConnection.
+                // If we are connected to logical master then Database can have a different edition, so
+                // add RealEngineEdition to the query so we get the edition from sys.database_service_objectives
+                if (DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase) {
+                    fields.Add("RealEngineEdition");
+                }
             }
             else if (typeObject.IsSubclassOf(typeof(NamedSmoObject)))
             {

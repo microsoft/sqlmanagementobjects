@@ -419,12 +419,14 @@ namespace Microsoft.SqlServer.Management.Smo
         SqlManagedInstance = 0x000008,
         ///The server is a SQL Edge Instance
         SqlDatabaseEdge = 0x000009,
+        ///The server is an Azure Arc Managed SQL Instance
+        SqlAzureArcManagedInstance = 0x00000A,
         ///The server is SQL SqlOnDemand
         SqlOnDemand = 0x00000B,
         /*
          * NOTE: If you're adding new value here,
          * please update as well ScriptDatabaseEngineEdition enum
-         * in Sql\ssms\extensions\synthesis\NextGenDPW\SqlScriptPublishModel\SqlScriptOptions.cs
+         * in src\Microsoft\SqlServer\Management\SqlScriptPublish\SqlScriptOptions.cs
          */
     }
 

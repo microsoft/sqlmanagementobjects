@@ -40,13 +40,58 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// server have the same values for their properties/scripts as expected.
         /// </summary>
         [VSTest.TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor =15)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor = 15)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestArea(SqlTestArea.Polybase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         public void VerifyPositiveExternalFileFormatCreateDrop_2016AndAfterOnPrem()
         {
             VerifyPositiveExternalFileFormatCreateDrop();
+        }
+
+        /// <summary>
+        /// Verifies that SQL database objects created using SMO from a SQL On Demand
+        /// server have the same values for their properties/scripts as expected.
+        /// </summary>
+        [VSTest.DataTestMethod]
+        // positive unit tests for the DELIMITEDTEXT file format type
+        // supported DDL options are: (1) no optional properties; (2) any of the format properties (field terminator, string delimiter and use type default;
+        // NOTE: The serde method is not supported with the format type being DELIMITEDTEXT.
+        // 1. no optional properties
+        // 2. any of the format options
+        // 3. data compression
+        // 4. format options and data compression
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "", "", "", null, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "|", "", "", null, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "", "#", "", null, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "", "", "", false, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "", "", "", true, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "", "", "", null, "", 41)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "", "", "", null, "", 1)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.DelimitedText, "", "|", "#", "", false, "", 41)]
+        // positive unit tests for PARQUET file format type
+        // supported DDL options are: (1) no optional properties; (2) data compression property
+        // NOTE: The serde method and the format options are not supported with the format type being PARQUET.
+        // 1. no optional properties
+        // 2. data compression
+        [VSTest.DataRow("eff1", ExternalFileFormatType.Parquet, "", "", "", "", null, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.Parquet, "", "", "", "", null, "org.apache.hadoop.io.compress.GzipCodec", null)]
+        // positive unit tests for DELTA file format type
+        // supported DDL options are: (1) no optional properties; (2) data compression property
+        // NOTE: The serde method and the format options are not supported with the format type being DELTA.
+        // 1. no optional properties
+        // 2. data compression
+        [VSTest.DataRow("eff1", ExternalFileFormatType.Delta, "", "", "", "", null, "", null)]
+        [VSTest.DataRow("eff1", ExternalFileFormatType.Delta, "", "", "", "", null, "org.apache.hadoop.io.compress.GzipCodec", null)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlOnDemand)]
+        public void VerifyPositiveExternalFileFormatCreateDrop_SqlOnDemand(string name, ExternalFileFormatType type, string serDeMethod, string stringTerminator, string stringDelimiter, string dateFormat, bool? useTypeDefaultOption, string dataCompression, int? firstRow)
+        {
+            this.ExecuteWithDbDrop(
+                database =>
+                {
+                    VerifyPositiveExternalFileFormatCreateDropHelper(database, name, type, serDeMethod, stringTerminator, stringDelimiter, dateFormat, useTypeDefaultOption, dataCompression, firstRow);
+                }
+            );
         }
 
         /// Tests creating, dropping and scripting of the external file format objects via SMO.
@@ -130,6 +175,22 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[3], ExternalFileFormatType.RcFile, ExternalFileFormatSerdeMethod, string.Empty, string.Empty, string.Empty, null, dataCompression[0]);
                 },
                 azureDatabaseEdition);
+        }
+
+        private void VerifyPositiveDeltaExternalFileFormatCreateDrop(string externalFileFormatName, string dataCompression)
+        {
+            this.ExecuteWithDbDrop(
+                 database =>
+                 {
+                     // positive unit tests for DELTA file format type
+                     // supported DDL options are: (1) no optional properties;
+                     // NOTE: The serde method and the format options are not supported with the format type being DELTA.
+                     // 1. no optional properties
+                     // 2. data compression
+                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatName, ExternalFileFormatType.Delta, string.Empty, string.Empty, string.Empty, string.Empty, null, dataCompression);
+                 },
+                 AzureDatabaseEdition.NotApplicable
+            );
         }
 
         /// <summary>
@@ -284,7 +345,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             scriptTemplate.Append(string.Format(ExternalFileFormatScriptCreateTemplate, fullyFormatedNameForScripting, this.GetSqlKeywordForFileFormatType(externalFileFormat.FormatType)));
 
             // process optional parameters for each file format type and add them to the T-SQL script
-            ProcessOptionalProperties(externalFileFormat, scriptTemplate, db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse);
+            ProcessOptionalProperties(externalFileFormat, scriptTemplate, db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand);
             TraceHelper.TraceInformation(createExternalFileFormatScripts);
             TraceHelper.TraceInformation(scriptTemplate.ToString());
             Assert.That(createExternalFileFormatScripts, Does.Contain(scriptTemplate.ToString()));
@@ -474,12 +535,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             string errorMessage = string.Empty;
 
             var ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create, "verify the external file format was not created due to unset FormatType");
-            var innerEx = ex.GetBaseException();
-            Assert.Multiple(() =>
-            {
-                Assert.That(innerEx, Is.InstanceOf<ArgumentNullException>(), "innermost exception");
-                Assert.That(innerEx.Message, Does.Contain(nameof(externalFileFormat.FormatType)), "innermost exception message");
-            });
 
             //
             // Step 2. Create external file format with conflicting properties - format type is DelimitedText and SerDeMethod.
@@ -487,24 +542,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FormatType = externalFileFormatType;
             externalFileFormat.SerDeMethod = externalFileFormatSerDeMethod;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "SerDeMethod", externalFileFormat.SerDeMethod, externalFileFormat.FormatType.ToString());
-                
-                externalFileFormat.Create(); 
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create); 
 
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
 
             //
             // Step 3. Create external file format with conflicting properties - format type is RcFile and FieldTerminator.
@@ -512,24 +551,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FormatType = ExternalFileFormatType.RcFile;
             externalFileFormat.FieldTerminator = externalFileFormatFieldTerminator;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "FieldTerminator", externalFileFormat.FieldTerminator, externalFileFormat.FormatType.ToString());
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
 
             //
             // Step 4. Create external file format with conflicting properties - format type is RcFile and StringDelimiter.
@@ -538,24 +561,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FieldTerminator = string.Empty;
             externalFileFormat.StringDelimiter = externalFileFormatStringDelimiter;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "StringDelimiter", externalFileFormat.StringDelimiter, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 5. Create external file format with conflicting properties - format type is RcFile and DateFormat.
@@ -565,24 +571,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.StringDelimiter = string.Empty;
             externalFileFormat.DateFormat = externalFileFormatDateFormat;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "DateFormat", externalFileFormat.DateFormat, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 6. Create external file format with conflicting properties - format type is RcFile and UseTypeDefault.
@@ -593,26 +582,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.DateFormat = string.Empty;
             externalFileFormat.UseTypeDefault = true;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "UseTypeDefault", externalFileFormat.UseTypeDefault.ToString(), externalFileFormat.FormatType.ToString());
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
-
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {
                 //
                 // Step 7. Create external file format with conflicting properties - format type is RcFile and FirstRow.
@@ -624,24 +596,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 externalFileFormat.UseTypeDefault = false;
                 externalFileFormat.FirstRow = 10;
 
-                // verify the external file format was not created
-                try
-                {
-                    // attempt to create an external file format
-                    errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "FirstRow", externalFileFormat.FirstRow, externalFileFormat.FormatType.ToString());
-
-                    externalFileFormat.Create();
-
-                    // validate expected exception and error message
-                    Assert.Fail(errorMessage, externalFileFormat.Name);
-                }
-                catch (SmoException e)
-                {
-                    if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                    {
-                        throw;
-                    }
-                }
+                Assert.Throws<FailedOperationException>(externalFileFormat.Create);
             }
 
             //
@@ -650,24 +605,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FormatType = ExternalFileFormatType.Orc;
             externalFileFormat.SerDeMethod = externalFileFormatSerDeMethod;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "SerDeMethod", externalFileFormat.SerDeMethod, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 9. Create external file format with conflicting properties - format type is Orc and FieldTerminator.
@@ -676,24 +614,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.SerDeMethod = string.Empty;
             externalFileFormat.FieldTerminator = externalFileFormatFieldTerminator;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "FieldTerminator", externalFileFormat.FieldTerminator, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 10. Create external file format with conflicting properties - format type is Orc and StringDelimiter.
@@ -703,24 +624,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FieldTerminator = string.Empty;
             externalFileFormat.StringDelimiter = externalFileFormatStringDelimiter;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "StringDelimiter", externalFileFormat.StringDelimiter, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 11. Create external file format with conflicting properties - format type is Orc and DateFormat.
@@ -731,24 +635,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.StringDelimiter = string.Empty;
             externalFileFormat.DateFormat = externalFileFormatDateFormat;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "DateFormat", externalFileFormat.DateFormat, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 12. Create external file format with conflicting properties - format type is Orc and UseTypeDefault.
@@ -760,26 +647,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.DateFormat = string.Empty;
             externalFileFormat.UseTypeDefault = true;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "UseTypeDefault", externalFileFormat.UseTypeDefault, externalFileFormat.FormatType.ToString());
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
-
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {
                 //
                 // Step 13. Create external file format with conflicting properties - format type is Orc and FirstRow.
@@ -792,24 +662,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 externalFileFormat.UseTypeDefault = false;
                 externalFileFormat.FirstRow = 10;
 
-                // verify the external file format was not created
-                try
-                {
-                    // attempt to create an external file format
-                    errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "FirstRow", externalFileFormat.FirstRow, externalFileFormat.FormatType.ToString());
-
-                    externalFileFormat.Create();
-
-                    // validate expected exception and error message
-                    Assert.Fail(errorMessage, externalFileFormat.Name);
-                }
-                catch (SmoException e)
-                {
-                    if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                    {
-                        throw;
-                    }
-                }
+                Assert.Throws<FailedOperationException>(externalFileFormat.Create);
             }
 
             //
@@ -818,24 +671,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FormatType = ExternalFileFormatType.Parquet;
             externalFileFormat.SerDeMethod = externalFileFormatSerDeMethod;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "SerDeMethod", externalFileFormat.SerDeMethod, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 15. Create external file format with conflicting properties - format type is Parquet and FieldTerminator.
@@ -844,24 +680,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.SerDeMethod = string.Empty;
             externalFileFormat.FieldTerminator = externalFileFormatFieldTerminator;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "FieldTerminator", externalFileFormat.FieldTerminator, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 16. Create external file format with conflicting properties - format type is Parquet and StringDelimiter.
@@ -871,24 +690,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.FieldTerminator = string.Empty;
             externalFileFormat.StringDelimiter = externalFileFormatStringDelimiter;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "StringDelimiter", externalFileFormat.StringDelimiter, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 17. Create external file format with conflicting properties - format type Parquet and DateFormat.
@@ -899,24 +701,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.StringDelimiter = string.Empty;
             externalFileFormat.DateFormat = externalFileFormatDateFormat;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "DateFormat", externalFileFormat.DateFormat, externalFileFormat.FormatType.ToString());
-
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
             //
             // Step 18. Create external file format with conflicting properties - format type is Parquet and UseTypeDefault.
@@ -928,26 +713,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             externalFileFormat.DateFormat = string.Empty;
             externalFileFormat.UseTypeDefault = true;
 
-            // verify the external file format was not created
-            try
-            {
-                // attempt to create an external file format
-                errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "UseTypeDefault", externalFileFormat.UseTypeDefault, externalFileFormat.FormatType.ToString());
+            Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-                externalFileFormat.Create();
-
-                // validate expected exception and error message
-                Assert.Fail(errorMessage, externalFileFormat.Name);
-            }
-            catch (SmoException e)
-            {
-                if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                {
-                    throw;
-                }
-            }
-
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {
                 //
                 // Step 19. Create external file format with conflicting properties - format type is Parquet and FirstRow.
@@ -961,24 +729,137 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 externalFileFormat.FirstRow = 10;
 
                 // verify the external file format was not created
-                try
-                {
-                    // attempt to create an external file format
-                    errorMessage = string.Format("Cannot set the property '{0}' to '{1}' because the property '{0}' is not supported for external file format type '{2}'.", "FirstRow", externalFileFormat.FirstRow, externalFileFormat.FormatType.ToString());
-
-                    externalFileFormat.Create();
-
-                    // validate expected exception and error message
-                    Assert.Fail(errorMessage, externalFileFormat.Name);
-                }
-                catch (SmoException e)
-                {
-                    if (!ExceptionHelpers.IsExpectedException(e, errorMessage))
-                    {
-                        throw;
-                    }
-                }
+                errorMessage = $"Cannot set the property 'FirstRow' to '{externalFileFormat.FirstRow}' because the property 'FirstRow' is not supported for external file format type '{externalFileFormat.FormatType.ToString()}'.";
+                
+                // attempt to create an external file format
+                Assert.Throws<FailedOperationException>(externalFileFormat.Create);
             }
+        }
+
+        /// <summary>
+        /// Tests negative scenarios for serverless database objects created using SMO from a SQL On Prem
+        /// server.
+        /// </summary>
+        [VSTest.TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlOnDemand)]
+        public void VerifyNegativeExternalFileFormatCreateDrop_SqlOnDemand()
+        {
+            VerifyNegativeDeltaExternalFileFormatCreateDrop();
+            VerifyNegativeExternalFileFormatCreateDrop();
+        }
+
+        /// Tests creating, dropping and scripting of the Delta external file format objects via SMO.
+        /// Negative test steps:
+        /// 1. Create external file format with no required properties.
+        /// 2. Create external file format with conflicting properties - format type is Delta and SerDeMethod.
+        /// 3. Create external file format with conflicting properties - format type is Delta and FieldTerminator.
+        /// 4. Create external file format with conflicting properties - format type is Delta and StringDelimiter.
+        /// 5. Create external file format with conflicting properties - format type Delta and DateFormat.
+        /// 6. Create external file format with conflicting properties - format type is Delta and UseTypeDefault.
+        /// 7. Create external file format with conflicting properties - format type is Delta and FirstRow.
+        private void VerifyNegativeDeltaExternalFileFormatCreateDrop()
+        {
+            // const definitions
+            const string ExternalFileFormatSerdeMethod = @"org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe";
+            const string FieldTerminator = "|";
+            const string StringDelimiter = "#";
+            const string DateFormat = "MM-dd-yyyy";
+
+            string externalFileFormatName = "eff1";
+
+            this.ExecuteWithDbDrop(
+                database =>
+                {
+                    // negative unit tests for the DELTA file format type
+                    // unsupported DDL options are: serde method, 
+                    VerifyNegativeDeltaExternalFileFormatCreateDropHelper(database, externalFileFormatName, ExternalFileFormatSerdeMethod, FieldTerminator, StringDelimiter, DateFormat);
+                },
+                AzureDatabaseEdition.NotApplicable);
+        }
+
+        /// <summary>
+        /// Executes negative tests for the create delta external file format object.
+        /// </summary>
+        /// <param name="db">The database name.</param>
+        /// <param name="externalFileFormatName">The external file format name.</param>
+        /// <param name="externalFileFormatSerDeMethod">The external file format serialize/deserialize method property value.</param>
+        /// <param name="externalFileFormatFieldTerminator">The external file format field terminator property value.</param>
+        /// <param name="externalFileFormatStringDelimiter">The external file format string delimiter property value.</param>
+        /// <param name="externalFileFormatDateFormat">The external file format date format property value.</param>
+        private void VerifyNegativeDeltaExternalFileFormatCreateDropHelper(Database db,
+            string externalFileFormatName,
+            string externalFileFormatSerDeMethod,
+            string externalFileFormatFieldTerminator,
+            string externalFileFormatStringDelimiter,
+            string externalFileFormatDateFormat)
+        {
+
+            const string ExternalFileFormatTestName = "Delta External File Format Testing";
+
+            //
+            // Step 1. Create external file format with no required properties.
+            //
+            TraceHelper.TraceInformation("Step 1: {0} - Creating external file format {1} with no required properties.", ExternalFileFormatTestName, externalFileFormatName);
+            ExternalFileFormat externalFileFormat = new ExternalFileFormat(db, externalFileFormatName);
+
+            string errorMessage = string.Empty;
+
+            var ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create, "verify the external file format was not created due to unset FormatType");
+
+            //
+            // Step 2. Create external file format with conflicting properties - format type is Delta and SerDeMethod.
+            //
+            externalFileFormat.FormatType = ExternalFileFormatType.Delta;
+            externalFileFormat.SerDeMethod = externalFileFormatSerDeMethod;
+
+            // attempt to create an external file format
+            ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create);
+            
+            //
+            // Step 3. Create external file format with conflicting properties - format type is Delta and FieldTerminator.
+            //
+            externalFileFormat.FormatType = ExternalFileFormatType.Delta;
+            externalFileFormat.SerDeMethod = string.Empty;
+            externalFileFormat.FieldTerminator = externalFileFormatFieldTerminator;
+
+            // attempt to create an external file format
+            ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create);
+
+            //
+            // Step 4. Create external file format with conflicting properties - format type is Delta and StringDelimiter.
+            //
+            externalFileFormat.FormatType = ExternalFileFormatType.Delta;
+            externalFileFormat.SerDeMethod = string.Empty;
+            externalFileFormat.FieldTerminator = string.Empty;
+            externalFileFormat.StringDelimiter = externalFileFormatStringDelimiter;
+
+            // attempt to create an external file format
+            ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create);
+
+            //
+            // Step 5. Create external file format with conflicting properties - format type Delta and DateFormat.
+            //
+            externalFileFormat.FormatType = ExternalFileFormatType.Delta;
+            externalFileFormat.SerDeMethod = string.Empty;
+            externalFileFormat.FieldTerminator = string.Empty;
+            externalFileFormat.StringDelimiter = string.Empty;
+            externalFileFormat.DateFormat = externalFileFormatDateFormat;
+
+            // attempt to create an external file format
+            ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create);
+
+            //
+            // Step 6. Create external file format with conflicting properties - format type is Delta and UseTypeDefault.
+            //
+            externalFileFormat.FormatType = ExternalFileFormatType.Delta;
+            externalFileFormat.SerDeMethod = string.Empty;
+            externalFileFormat.FieldTerminator = string.Empty;
+            externalFileFormat.StringDelimiter = string.Empty;
+            externalFileFormat.DateFormat = string.Empty;
+            externalFileFormat.UseTypeDefault = true;
+
+            // attempt to create an external file format
+            ex = Assert.Throws<FailedOperationException>(externalFileFormat.Create);
         }
 
         /// <summary>
@@ -987,17 +868,18 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         /// <param name="externalFileFormat"></param>
         /// <param name="script"></param>
-        /// /// <param name="isSqlDw">True if SQL DW DB.</param>
-        private void ProcessOptionalProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDw)
+        /// /// <param name="isSqlDwOrServerless">True if SQL DW or Serverless DB.</param>
+        private void ProcessOptionalProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDwOrServerless)
         {
             switch (externalFileFormat.FormatType)
             {
                 case ExternalFileFormatType.DelimitedText:
-                    ValidateDelimitedTextProperties(externalFileFormat, script, isSqlDw);
+                    ValidateDelimitedTextProperties(externalFileFormat, script, isSqlDwOrServerless);
                     break;
                 case ExternalFileFormatType.Orc:
                 case ExternalFileFormatType.Parquet:
-                    ValidateOrcOrParquetProperties(externalFileFormat, script);
+                case ExternalFileFormatType.Delta:
+                    ValidateOrcParquetOrDeltaProperties(externalFileFormat, script);
                     break;
                 case ExternalFileFormatType.RcFile:
                     ValidateRcFileProperties(externalFileFormat, script);
@@ -1014,18 +896,18 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         /// <param name="externalFileFormat">External file format.</param>
         /// <param name="script">The external file format T-SQL script.</param>
-        /// <param name="isSqlDw">True if SQL DW DB.</param>
-        private void ValidateDelimitedTextProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDw)
+        /// <param name="isSqlDwOrServerless">True if SQL DW or Serverless DB.</param>
+        private void ValidateDelimitedTextProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDwOrServerless)
         {
             // check for optional properties
             StringBuilder formatOptions = new StringBuilder();
 
             // if format options optional properties are specified, they need to be enclosed in FORMAT_OPTIONS()
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.FieldTerminator, "FIELD_TERMINATOR = N'{0}'", formatOptions);
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.StringDelimiter, "STRING_DELIMITER = N'{0}'", formatOptions);
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.DateFormat, "DATE_FORMAT = N'{0}'", formatOptions);
+            VerifyOptionalFormatParameters(externalFileFormat.FieldTerminator, "FIELD_TERMINATOR = N'{0}'", formatOptions);
+            VerifyOptionalFormatParameters(externalFileFormat.StringDelimiter, "STRING_DELIMITER = N'{0}'", formatOptions);
+            VerifyOptionalFormatParameters(externalFileFormat.DateFormat, "DATE_FORMAT = N'{0}'", formatOptions);
 
-            if (isSqlDw && externalFileFormat.FirstRow > 1)
+            if (isSqlDwOrServerless && externalFileFormat.FirstRow > 1)
             {
                 if (formatOptions.Length > 0)
                 {
@@ -1048,7 +930,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 script.Append(string.Format(", FORMAT_OPTIONS ({0})", fileFormatOptions));
             }
 
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.DataCompression, "DATA_COMPRESSION = N'{0}'", script);
+            VerifyOptionalFormatParameters(externalFileFormat.DataCompression, "DATA_COMPRESSION = N'{0}'", script);
         }
 
         /// <summary>
@@ -1057,10 +939,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         /// <param name="externalFileFormat">External file format.</param>
         /// <param name="script">The external file format T-SQL script.</param>
-        private void ValidateOrcOrParquetProperties(ExternalFileFormat externalFileFormat, StringBuilder script)
+        private void ValidateOrcParquetOrDeltaProperties(ExternalFileFormat externalFileFormat, StringBuilder script)
         {
             // check for optional properties
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.DataCompression, "DATA_COMPRESSION = N'{0}'", script);
+            VerifyOptionalFormatParameters(externalFileFormat.DataCompression, "DATA_COMPRESSION = N'{0}'", script);
         }
 
         /// <summary>
@@ -1072,20 +954,19 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         private void ValidateRcFileProperties(ExternalFileFormat externalFileFormat, StringBuilder script)
         {
             // check for optional properties
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.SerDeMethod, "SERDE_METHOD = N'{0}'", script);
+            VerifyOptionalFormatParameters(externalFileFormat.SerDeMethod, "SERDE_METHOD = N'{0}'", script);
 
-            VerifyOptionalFormatParameters(externalFileFormat, externalFileFormat.DataCompression, "DATA_COMPRESSION = N'{0}'", script);
+            VerifyOptionalFormatParameters(externalFileFormat.DataCompression, "DATA_COMPRESSION = N'{0}'", script);
         }
 
         /// <summary>
         /// Verifies format options optional properties and adds a comma to the generated script
         /// when more than one optional format properties exist.
         /// </summary>
-        /// <param name="externalFileFormat">External file format.</param>
         /// <param name="propertyValue">The format options property value.</param>
         /// <param name="sqlScript">The T-SQL script to add to the format options script.</param>
         /// <param name="formatOptions">The T-SQL format options script.</param>
-        private void VerifyOptionalFormatParameters(ExternalFileFormat externalFileFormat, string propertyValue, string sqlScript, StringBuilder formatOptions)
+        private void VerifyOptionalFormatParameters(string propertyValue, string sqlScript, StringBuilder formatOptions)
         {
             if (!string.IsNullOrEmpty(propertyValue))
             {
@@ -1114,6 +995,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     return "PARQUET";
                 case ExternalFileFormatType.RcFile:
                     return "RCFILE";
+                case ExternalFileFormatType.Delta:
+                    return "DELTA";
                 default:
                     Assert.AreEqual(ExternalFileFormatType.DelimitedText, fileFormatType);
                     return "DELIMITEDTEXT";

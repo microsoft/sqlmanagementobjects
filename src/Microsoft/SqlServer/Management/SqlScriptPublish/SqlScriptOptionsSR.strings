@@ -235,6 +235,7 @@ StretchEdition = Microsoft SQL Server Stretch Database Edition
 SqlServerManagedInstanceEdition = Microsoft Azure SQL Database Managed Instance Edition
 SqlServerOnDemandEdition = Microsoft Azure SQL OnDemand Edition
 SqlDatabaseEdgeEdition = Microsoft Azure SQL Edge Edition
+SqlAzureArcManagedInstanceEdition = Microsoft Azure Arc SQL Managed Instance Edition
 
 IncludeUnsupportedStatements = Include unsupported statements
 IncludeUnsupportedStatementsDescription = Include statements in the script that are not supported on the specified SQL Server database engine type.

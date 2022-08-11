@@ -297,6 +297,50 @@ namespace Microsoft.SqlServer.Management.Smo
         [PermissionType("EAEE")]
         [PermissionName("EXECUTE ANY EXTERNAL ENDPOINT")]
         ExecuteAnyExternalEndpoint = 93,
+        [PermissionType("CRDS")]
+        [PermissionName("CREATE ANY DATABASE EVENT SESSION")]
+        CreateAnyDatabaseEventSession = 94,
+        [PermissionType("DRDS")]
+        [PermissionName("DROP ANY DATABASE EVENT SESSION")]
+        DropAnyDatabaseEventSession = 95,
+        [PermissionType("LDSO")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION OPTION")]
+        AlterAnyDatabaseEventSessionOption = 96,
+        [PermissionType("LDAE")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION ADD EVENT")]
+        AlterAnyDatabaseEventSessionAddEvent = 97,
+        [PermissionType("LDDE")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION DROP EVENT")]
+        AlterAnyDatabaseEventSessionDropEvent = 98,
+
+        [PermissionType("EDES")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION ENABLE")]
+        AlterAnyDatabaseEventSessionEnable = 99,
+
+        [PermissionType("DDES")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION DISABLE")]
+        AlterAnyDatabaseEventSessionDisable = 100,
+
+        [PermissionType("LDAT")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION ADD TARGET")]
+        AlterAnyDatabaseEventSessionAddTarget = 101,
+
+        [PermissionType("LDDT")]
+        [PermissionName("ALTER ANY DATABASE EVENT SESSION DROP TARGET")]
+        AlterAnyDatabaseEventSessionDropTarget = 102,
+
+        [PermissionType("VWP")]
+        [PermissionName("VIEW PERFORMANCE DEFINITION")]
+        ViewPerformanceDefinition = 103,
+
+        [PermissionType("VDSA")]
+        [PermissionName("VIEW DATABASE SECURITY AUDIT")]
+        ViewDatabaseSecurityAudit = 104,
+
+        [PermissionType("ALC")]
+        [PermissionName("ALTER LEDGER CONFIGURATION")]
+        AlterLedgerConfiguration = 105,
+
     }
 
     ///<summary>enum containing all possible ObjectPermissions</summary>
@@ -485,7 +529,56 @@ namespace Microsoft.SqlServer.Management.Smo
         ViewServerPerformanceState = 39,
         [PermissionType("VACD")]
         [PermissionName("VIEW ANY CRYPTOGRAPHICALLY SECURED DEFINITION")]
-        ViewAnyCryptographicallySecuredDefinition = 40
+        ViewAnyCryptographicallySecuredDefinition = 40,
+        
+        [PermissionType("VAP")]
+        [PermissionName("VIEW ANY PERFORMANCE DEFINITION")]
+        ViewAnyPerformanceDefinition = 41,
+
+        [PermissionType("CRES")]
+        [PermissionName("CREATE ANY EVENT SESSION")]
+        CreateAnyEventSession = 42,
+
+        [PermissionType("DRES")]
+        [PermissionName("DROP ANY EVENT SESSION")]
+        DropAnyEventSession = 43,
+
+        [PermissionType("LESO")]
+        [PermissionName("ALTER ANY EVENT SESSION OPTION")]
+        AlterAnyEventSessionOption = 44,
+
+        [PermissionType("LSAE")]
+        [PermissionName("ALTER ANY EVENT SESSION ADD EVENT")]
+        AlterAnyEventSessionAddEvent = 45,
+
+        [PermissionType("LSDE")]
+        [PermissionName("ALTER ANY EVENT SESSION DROP EVENT")]
+        AlterAnyEventSessionDropEvent = 46,
+
+        [PermissionType("EES")]
+        [PermissionName("ALTER ANY EVENT SESSION ENABLE")]
+        AlterAnyEventSessionEnable = 47,
+
+        [PermissionType("DES")]
+        [PermissionName("ALTER ANY EVENT SESSION DISABLE")]
+        AlterAnyEventSessionDisable = 48,
+
+        [PermissionType("LSAT")]
+        [PermissionName("ALTER ANY EVENT SESSION ADD TARGET")]
+        AlterAnyEventSessionAddTarget = 49,
+
+        [PermissionType("LSDT")]
+        [PermissionName("ALTER ANY EVENT SESSION DROP TARGET")]
+        AlterAnyEventSessionDropTarget = 50,
+
+        [PermissionType("VEL")]
+        [PermissionName("VIEW ANY ERROR LOG")]
+        ViewAnyErrorLog = 51,
+
+        [PermissionType("VSSA")]
+        [PermissionName("VIEW SERVER SECURITY AUDIT")]
+        ViewServerSecurityAudit = 52,
+
     }
 
     ///<summary>encapsulates functions that translate from sql codes into enum used to represent the permissions</summary>

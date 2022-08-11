@@ -178,4 +178,3 @@ Sql2012;Sql2017;SQL2017Linux
             passwordCredential='saPassword-2017Linux'
             db_engine_edition="Enterprise"/>
 </ConnectionStrings>
-

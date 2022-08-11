@@ -642,7 +642,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 bool fAnsiNullsExists = false;
-                bool fQuotedIdentifierExists = false;
                 bool ansiPaddingStatus = false;
 
                 if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
@@ -676,14 +675,10 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Length = 0;
                     }
 
-                    fQuotedIdentifierExists = (null != Properties.Get("QuotedIdentifierStatus").Value);
-                    if (fQuotedIdentifierExists)
-                    {
-                        sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.SET_QUOTED_IDENTIFIER,
-                                (bool)Properties["QuotedIdentifierStatus"].Value ? Globals.On : Globals.Off);
-                        scqueries.Add(sb.ToString());
-                        sb.Length = 0;
-                    }
+                    // QUOTED_IDENTIFIER in Tables metadata is always ON
+                    sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.SET_QUOTED_IDENTIFIER, Globals.On);
+                    scqueries.Add(sb.ToString());
+                    sb.Length = 0;
                 }
 
                 // set the ANSI_PADDING only if the table creation script
@@ -2301,22 +2296,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         case DwTableDistributionType.Hash:
 
-                            // get the distribution column name
-                            var distributionColumnNameList = new List<string>();
-
-                            foreach (Column col in this.Columns)
-                            {
-                                if (col.GetPropValueOptional(IsDistributedColumnPropertyName, false))
-                                {
-                                    distributionColumnNameList.Add(col.GetPropValueOptional(DistributionColumnNamePropertyName, string.Empty));
-                                    break;
-                                }
-                            }
-
-                            string distributionColumnNames = string.Join(",", distributionColumnNameList.Select(x => MakeSqlBraket(x)));
-                            string distributionWithDistributionColName = string.Format("{0} ( {1} )",
-                                typeConverter.ConvertToInvariantString(distribution),
-                                distributionColumnNames);
+                            // get the distribution column names
+                            var distributionColumnNames = string.Join(",", Columns.Cast<Column>()
+                                .Where(col => col.GetPropValueOptional(IsDistributedColumnPropertyName, false))
+                                .Select(col => MakeSqlBraket(col.GetPropValueOptional(DistributionColumnNamePropertyName, string.Empty))));
+                               
+                            var distributionWithDistributionColName = $"{typeConverter.ConvertToInvariantString(distribution)} ( {distributionColumnNames} )";
 
                             this.AddPropertyToScript(distributionWithDistributionColName, "DISTRIBUTION = {0}", script);
                             break;
@@ -4546,7 +4531,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 "RejectSampleValue",
                 "RejectType",
                 "RejectValue",
-                "QuotedIdentifierStatus",
                 "RemoteObjectName",
                 "RemoteSchemaName",
                 "ShardingColumnName",

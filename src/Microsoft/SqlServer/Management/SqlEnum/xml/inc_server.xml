@@ -385,7 +385,7 @@
         FROM sys.dm_hadr_cluster
         END TRY
         BEGIN CATCH
-          IF(ERROR_NUMBER() NOT IN (297,300, 15562))
+          IF(ERROR_NUMBER() NOT IN (297,300, 15562, 371))
         BEGIN
         THROW
         END

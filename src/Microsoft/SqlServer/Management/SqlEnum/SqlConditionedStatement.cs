@@ -135,4 +135,29 @@ namespace Microsoft.SqlServer.Management.Smo
             sb.AddCondition(this.GetLocalSql(obj));
         }
     }
+
+    internal class SqlConditionedStatementWhereClause : SqlConditionedStatement
+    {
+        public SqlConditionedStatementWhereClause(XmlReadSpecialQuery xrcs) : base(xrcs)
+        {
+        }
+
+        public static void AddAll(ConditionedSqlList list, XmlReadSpecialQuery xrcs)
+        {
+            if (null != xrcs)
+            {
+                do
+                {
+                    list.Add(new SqlConditionedStatementWhereClause(xrcs));
+                }
+                while (xrcs.Next());
+            }
+        }
+        /// <summary>
+        ///add hit for field</summary>
+        public override void AddHit(string field, SqlObjectBase obj, StatementBuilder sb)
+        {
+            sb.AddWhere(this.GetLocalSql(obj));
+        }
+    }
 }

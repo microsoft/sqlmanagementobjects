@@ -339,12 +339,18 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         [TsqlSyntaxString("PARQUET")]
         Parquet = 3,
-
+        
         /// <summary>
         /// JSON file format. 
         /// </summary>
         [TsqlSyntaxString("JSON")]
-        JSON = 4
+        JSON = 4,
+        
+        /// <summary>
+        /// DELTA file format. 
+        /// </summary>
+        [TsqlSyntaxString("DELTA")]
+        Delta = 5
     }
 
     /// <summary>
@@ -3123,6 +3129,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         [TsqlSyntaxString("SENSITIVE_BATCH_COMPLETED_GROUP")]
         SensitiveBatchCompletedGroup,
+        /// <summary>
+        /// EXTGOV_OPERATION_GROUP
+        /// </summary>
+        [TsqlSyntaxString("EXTGOV_OPERATION_GROUP")]
+        ExternalGovernanceOperationGroup,
     }
 
     /// <summary>

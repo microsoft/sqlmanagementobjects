@@ -173,6 +173,7 @@
       <property name="AutoCreateIncrementalStatisticsEnabled" generate="true" is_intrinsic="false" />
       <property name="AutoUpdateStatisticsEnabled" generate="true" is_intrinsic="false" />
       <property name="AzureEdition" generate="true" is_intrinsic="false" />
+      <property name="RealEngineEdition" generate="false" is_intrinsic="false" />
       <property name="AzureServiceObjective" generate="true" is_intrinsic="false" />
       <property name="CaseSensitive" generate="true" is_intrinsic="false" />
       <!-- Change Tracking Properties for the database-->
