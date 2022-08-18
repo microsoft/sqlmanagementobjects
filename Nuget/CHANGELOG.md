@@ -2,6 +2,15 @@
 
 This file will log substantial changes made to SMO between public releases to nuget.org.
 
+## 170.7.0-preview
+
+- Add SmoMetadataProvider preview package
+
+## 170.5.0-preview
+
+- Upgrade Microsoft.Data.SqlClient to version 5.0
+- Upgrade build tools to VS2022
+
 ## 161.47027.0
 
 - Fix distribution columns on scripting for taking into consideration more than one distribution column
