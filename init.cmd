@@ -44,12 +44,14 @@ echo    slngen src\FunctionalTest\Smo\Microsoft.SqlServer.Test.Smo.csproj
 echo    REM == Then use "Test | Configure Run Settings | Select Solution Wide Runsettings File"
 echo    REM == and point it to one of the .runsettings under %BASEDIR%src\FunctionalTest\Framework
 echo    REM == Select "Test | Test Explorer" and you are ready to run tests!
+
+echo    To run tests (alias: rtests):
 echo    pushd %BASEDIR%target\distrib\debug\net462
 echo    REM == If you want to trim down the list of servers, use something like this:
 echo    REM == SET SqlTestTargetServersFilter=Sql2017;Sqlv150
 echo    REM == See %BASEDIR%src\FunctionalTest\Framework\ConnectionInfo.xml 
 echo    REM == for all the friendly names available.
-echo    REM == You'll need to edit connection strings in src/functionaltest/framework/toolsconnectioninfo.xml.
+echo    REM == You'll need to edit connection strings in src/functionaltest/smo/toolsconnectioninfo.xml and copy the file to the same directory as the tests DLL
 echo    vstest.console.exe microsoft.sqlserver.test.smo.dll /TestCaseFilter:"(TestCategory != Staging)" /logger:trx /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings
 echo.
 echo To run tests for netcore (alias: netcoretests)
