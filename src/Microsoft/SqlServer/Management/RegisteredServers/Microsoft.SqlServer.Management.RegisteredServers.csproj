@@ -38,6 +38,4 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="System.Security.Permissions" />
   </ItemGroup>
-<!-- BEGIN NOGITHUB -->
-<!-- END NOGITHUB -->
 </Project>

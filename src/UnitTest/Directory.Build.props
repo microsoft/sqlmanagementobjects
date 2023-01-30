@@ -6,10 +6,6 @@
     <TargetFrameworks>$(NetfxVersion);netcoreapp3.1</TargetFrameworks>
     <!-- the auto generated redirect for newtonsoft breaks the runtime resolver -->
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <!-- Each unit test builds to its own folder to avoid a race condition in the build
-      See https://github.com/microsoft/vstest/issues/3266
-     -->
-    <OutputPath>$(OutputPath)\$(MSBuildProjectName)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NewtonSoft.Json" />

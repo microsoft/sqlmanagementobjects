@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System.Collections.Specialized;
@@ -61,7 +61,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
-            #endregion // Scripting Tests
+        #endregion // Scripting Tests
 
         #region Statistics Properties
 
@@ -90,6 +90,62 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                    //Removed the hard-coded Use statement from statistic.EnumStatistics() to support for Azure.
                    //Verifying if DBCC SHOW_STATISTICS query is executed on the current context DB.
                    Assert.That(statistic.GetContextDB().Name, Does.Match(database.Name));
+               });
+        }
+
+        /// <summary>
+        /// Tests use of the AUTO_DROP statistics property
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(MinMajor = 16)]
+        public void Verify_Statistics_AutoDropped()
+        {
+            this.ExecuteWithDbDrop(
+               database =>
+               {
+                   var columns = new ColumnProperties[3];
+                   columns[0] = new ColumnProperties("Col1");
+                   columns[1] = new ColumnProperties("Col2");
+                   columns[2] = new ColumnProperties("Col3");
+                   var table = database.CreateTable(this.TestContext.TestName, columns);
+
+                   var statistic1 = new _SMO.Statistic(table, GenerateSmoObjectName("statistics_" + this.TestContext.TestName + "1"));
+                   var statcol1 = new _SMO.StatisticColumn(statistic1, table.Columns[1].Name);
+                   statistic1.StatisticColumns.Add(statcol1);
+
+                   var statistic2 = new _SMO.Statistic(table, GenerateSmoObjectName("statistics_" + this.TestContext.TestName + "2"));
+                   var statcol2 = new _SMO.StatisticColumn(statistic2, table.Columns[2].Name);
+                   statistic2.StatisticColumns.Add(statcol2);
+                   statistic2.IsAutoDropped = true;
+
+                   statistic1.Create();
+                   statistic2.Create();
+                   table.Statistics.ClearAndInitialize("", new string[] { });
+
+                   Assert.That(table.Statistics[0].Script()[0].Contains("AUTO_DROP = OFF"), "AUTO_DROP should be OFF by default");
+                   Assert.That(table.Statistics[1].Script()[0].Contains("AUTO_DROP = ON"), "Script should include statistic created with AUTO_DROP = ON");
+
+                   table.Columns[2].Drop();
+                   Assert.That(table.Columns.Count == 2, "Column should have dropped");
+
+                   Assert.Throws<_SMO.FailedOperationException>(table.Columns[1].Drop, "Dropping column with statistic with AUTO_DROP = OFF should fail");
+
+                   statistic1.IsAutoDropped = true;
+                   statistic1.Update();
+                   table.Statistics.ClearAndInitialize("", new string[] { });
+
+                   Assert.That(table.Statistics[0].Script()[0].Contains("AUTO_DROP = ON"), "Script should include statistic created with AUTO_DROP = ON after Update");
+
+                   try
+                   {
+                       table.Columns[1].Drop();
+                   }
+                   catch
+                   {
+                       Assert.Fail("Column drop should not throw exception when statistic is updated with AUTO_DROP = ON");
+                   }
+
+                   Assert.That(table.Columns.Count == 1, "Column should have dropped");
                });
         }
 
@@ -156,8 +212,4 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
         #endregion //Statistics Properties
     }
-
-
-
 }
-

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 namespace Microsoft.SqlServer.Management.Common
@@ -21,19 +21,57 @@ namespace Microsoft.SqlServer.Management.Common
     {
         public static readonly NetworkProtocol DefaultNetworkProtocol = NetworkProtocol.NotSpecified;
 
+        // AuthenticationMethod enum names must match SqlAuthenticationMethod enum names
         /// <summary>
         /// The Authentication Method used to log in
         /// </summary>
         public enum AuthenticationMethod
         {
+            /// <summary>
+            /// NotSpecified implies the real authentication type is inferred from other connection string parameters
+            /// </summary>
             NotSpecified = 0,
+            /// <summary>
+            /// User id and password are used for SQL login authentication
+            /// </summary>
             SqlPassword = 1,
+            /// <summary>
+            /// User id is an Azure AD principal
+            /// </summary>
             ActiveDirectoryPassword = 2,
+            /// <summary>
+            /// The current AD or Kerberos principal credentials are used to connect
+            /// </summary>
             ActiveDirectoryIntegrated =  3,
             //skipping 4 as that maps to Microsoft.SqlServer.Management.UI.ConnectionDlg.SqlServerType.ActiveDirectoryUniversalAuthenticationType (in SqlServerType.cs).
             //This was a bug in SSDT where we were using this enum to set the UIConnectionInfo.AuthenticationType (which is an int, so it stored the int value)
             //and when it went through UIConnectionInfoUtil.GetCoreConnectionInfo, it was set to "4" which made it go down the UniversalAuth code path
-            ActiveDirectoryInteractive = 5
+            /// <summary>
+            /// Uses an interactive UI flow to acquire a token to authenticate. User id is optional.
+            /// </summary>
+            ActiveDirectoryInteractive = 5,
+            /// <summary>
+            /// Prompt the user to acquire a token from an external device
+            /// </summary>
+            ActiveDirectoryDeviceCodeFlow = 6,
+            /// <summary>
+            /// Use system assigned or user assigned managed identity to acquire a token.
+            /// </summary>
+            ActiveDirectoryManagedIdentity = 7,
+            /// <summary>
+            /// Alias for ActiveDirectoryManagedIdentity
+            /// </summary>
+            ActiveDirectoryMSI = ActiveDirectoryManagedIdentity,
+            /// <summary>
+            /// User id is the client id of an Azure service principal, and password is the client secret.
+            /// </summary>
+            ActiveDirectoryServicePrincipal = 8,
+            /// <summary>
+            /// Attempts multiple non-interactive authentication methods tried
+            /// sequentially to acquire an access token. This method does not fallback to the
+            /// Active Directory Interactive authentication method.
+            /// </summary>
+            ActiveDirectoryDefault = 9
         }
 		
         private StringBuilder m_sbApplicationName           = null;
@@ -70,10 +108,6 @@ namespace Microsoft.SqlServer.Management.Common
         /// <returns>SqlConnectionInfo.AuthenticationMethod</returns>
         public static AuthenticationMethod GetAuthenticationMethod(SqlConnectionStringBuilder connectionStringBuilder)
         {
-            if (!IsAuthenticationKeywordSupported())
-            {
-                return AuthenticationMethod.NotSpecified;
-            }
             
             object value = connectionStringBuilder.Authentication;
 
@@ -81,31 +115,12 @@ namespace Microsoft.SqlServer.Management.Common
             {
                 return AuthenticationMethod.NotSpecified;
             }
-            string strVal = value.ToString();
-            // SqlConnectionInfo.AuthenticationMethod is a different object than SqlConnectionStringBuilder.SqlAuthenticationMethod.
-            // However, we make SqlConnectionInfo.AuthenticationMethod to have same string value as SqlConnectionStringBuilder.SqlAuthenticationMethod.
-            // And the mapping is one-to-one.
-            if (strVal == AuthenticationMethod.ActiveDirectoryIntegrated.ToString())
+            var strVal = value.ToString();
+            if (Enum.TryParse<AuthenticationMethod>(strVal, out var val))
             {
-                return AuthenticationMethod.ActiveDirectoryIntegrated;
+                return val;
             }
-            else if (strVal == AuthenticationMethod.ActiveDirectoryPassword.ToString())
-            {
-                return AuthenticationMethod.ActiveDirectoryPassword;
-            }
-            else if (strVal == AuthenticationMethod.SqlPassword.ToString())
-            {
-                return AuthenticationMethod.SqlPassword;
-            }
-            else if (strVal == AuthenticationMethod.ActiveDirectoryInteractive.ToString())
-            {
-                return AuthenticationMethod.ActiveDirectoryInteractive;
-            }
-            else if (strVal == AuthenticationMethod.NotSpecified.ToString())
-            {
-                return AuthenticationMethod.NotSpecified;
-            }
-            Trace.Assert(false, "Unknown Authentication Method: {0}", strVal);
+     
             return AuthenticationMethod.NotSpecified;
         }
 
@@ -175,6 +190,7 @@ namespace Microsoft.SqlServer.Management.Common
             this.EncryptConnection = serverConnection.EncryptConnection;
             this.additionalParameters = serverConnection.AdditionalParameters;
             this.AccessToken = serverConnection.AccessToken;
+            trustServerCertificate = serverConnection.TrustServerCertificate;
         }
 
         public string ApplicationName

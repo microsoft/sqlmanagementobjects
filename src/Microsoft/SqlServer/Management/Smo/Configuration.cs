@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -443,7 +443,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
     /// <summary>
     /// This public property gets or sets the default backup compression value and returns
-    /// a ConfigProperty object representing ‘backup compression default’ server configuration.
+    /// a ConfigProperty object representing ï¿½backup compression defaultï¿½ server configuration.
     /// </summary>
     public ConfigProperty DefaultBackupCompression
     {

@@ -33,6 +33,4 @@
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\Src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
   </ItemGroup>
-<!-- BEGIN NOGITHUB -->
-<!-- END NOGITHUB -->
 </Project>

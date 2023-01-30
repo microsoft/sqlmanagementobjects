@@ -1,15 +1,23 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
+#if MICROSOFTDATA
+using Microsoft.Data.SqlClient;
+#else
+using System.Data.SqlClient;
+#endif
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Test.Manageability.Utils;
+using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
@@ -146,24 +154,34 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
 
         [TestMethod]
-        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Enterprise)]
-        [SupportedServerVersionRange(Edition = Management.Common.DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         public void Server_KillAllProcesses_succeeds()
         {
             ExecuteFromDbPool((db) =>
             {
                 var sqlConnectionDb = ServerContext.ConnectionContext.GetDatabaseConnection(db.Name, poolConnection: false);
                 var spid = sqlConnectionDb.ProcessID;
-                ServerContext.ExecutionManager.ConnectionContext.SqlExecutionModes = Management.Common.SqlExecutionModes.ExecuteAndCaptureSql;
+                Assert.That(spid, Is.Not.Zero, "database connection isn't open");
+                var executingSpid = db.ExecutionManager.ConnectionContext.ProcessID;
+                Assert.That(executingSpid, Is.Not.Zero, "connection isn't open");
+                db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
                 try
                 {
-                    Assert.DoesNotThrow(() => ServerContext.KillAllProcesses(db.Name));
-                    var scriptLines = ServerContext.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>().ToList();
-                    Assert.That(scriptLines, Has.Member($"KILL {spid}"), "KillAllProcesses should kill open connection");
+                    // For Azure the call has to be on a connection directly to the user database
+                    new Management.Smo.Server(db.ExecutionManager.ConnectionContext).KillAllProcesses(db.Name);
+                    var scriptLines = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>().ToList();
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(scriptLines, Has.Member($"BEGIN TRY KILL {spid} END TRY BEGIN CATCH PRINT '{spid} is not active or could not be killed' END CATCH"), "KillAllProcesses should kill open connection");
+                        Assert.That(scriptLines, Has.No.Member($"BEGIN TRY KILL {executingSpid} END TRY BEGIN CATCH PRINT '{executingSpid} is not active or could not be killed' END CATCH"), "KillAllProcesses should not kill connection making the call");
+                    });
                 }
                 finally
                 {
-                    ServerContext.ExecutionManager.ConnectionContext.SqlExecutionModes = Management.Common.SqlExecutionModes.ExecuteSql;
+                    db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteSql;
                     sqlConnectionDb.Disconnect();
                 }
             });
@@ -489,6 +507,131 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 Assert.That(actual.Select(a => a.Name), Is.EqualTo(expected.Select(a => a.Name)), "Drive names");
                 Assert.That(actual.Select(a => a.Size), Is.EqualTo(expected.Select(a => a.Size)), "Drive sizes");
             });
+        }
+
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        public void Server_SetDefaultInitFields_allows_unsupported_properties()
+        {
+            ExecuteWithDbDrop(db =>
+            {
+                db.CreateTable("t1");
+                var properties = new string[] { nameof(Table.Name), nameof(Table.LedgerType), nameof(Table.DwTableDistribution), nameof(Table.DataRetentionEnabled), "SomeFakeProperty" };
+                ServerContext.SetDefaultInitFields(typeof(Table), properties);
+                db.Tables.ClearAndInitialize("", Enumerable.Empty<string>());
+                var missingProperties = new MissingProperties();
+                SqlSmoObject.PropertyMissing += missingProperties.OnPropertyMissing;
+                try
+                {
+                    Trace.TraceInformation($"Number of tables: {db.Tables.Count}");
+                    foreach (Table table in db.Tables) 
+                    {
+                        Trace.TraceInformation(table.Name);
+                        if (table.IsSupportedProperty(nameof(Table.LedgerType)))
+                        {
+                            Trace.TraceInformation($"LedgerType: {table.LedgerType}");
+                        }
+                        if (table.IsSupportedProperty(nameof(Table.DwTableDistribution)))
+                        {
+                            Trace.TraceInformation($"DwTableDistribution : {table.DwTableDistribution}");
+                        }
+                        if (table.IsSupportedProperty(nameof(Table.DataRetentionEnabled)))
+                        {
+                            Trace.TraceInformation($"DataRetentionEnabled: {table.DataRetentionEnabled}");
+                        }
+                    }
+                }
+                finally
+                {
+                    SqlSmoObject.PropertyMissing -= missingProperties.OnPropertyMissing;
+                    ServerContext.SetDefaultInitFields(allFields:false);
+                }
+                Assert.That(missingProperties.Properties, Is.Empty, "Properties should have been fetched in the initial query");
+            });
+        }
+
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        public void Server_SetDefaultInitFields_allfields_avoids_missing_property_events()
+        {
+            ExecuteWithDbDrop(db =>
+            {
+                db.Parent.SetDefaultInitFields(true);
+                var t = db.CreateTable("t1");
+                var missingProperties = new MissingProperties();
+                SqlSmoObject.PropertyMissing += missingProperties.OnPropertyMissing;
+                db.Tables.ClearAndInitialize(null, Enumerable.Empty<string>());
+                try
+                {
+                    foreach (var table in db.Tables.Cast<Table>())
+                    {
+                        if (table.IsSupportedProperty(nameof(table.DwTableDistribution)))
+                        {
+                            Trace.TraceInformation($"DwTableDistribution {table.DwTableDistribution}");
+                        }
+                        if (table.IsSupportedProperty(nameof(table.LedgerType)))
+                        {
+                            Trace.TraceInformation($"LedgerType {table.LedgerType}");
+                        }
+                        if (table.IsSupportedProperty(nameof(table.DataRetentionPeriod)))
+                        {
+                            Trace.TraceInformation($"DataRetentionPeriod {table.DataRetentionPeriod}");
+                        }
+                        Trace.TraceInformation($"TextFileGroup {table.TextFileGroup}");
+                        if (t.Name == table.Name)
+                        {
+                            t = table;
+                        }
+                    }
+                    foreach (var col in t.Columns.Cast<Column>())
+                    {
+                        Trace.TraceInformation($"Default {col.Default}");
+                        if (col.IsSupportedProperty(nameof(col.DistributionColumnName)))
+                        {
+                            Trace.TraceInformation($"DistributionColumnName {col.DistributionColumnName}");
+                        }
+                        if (col.IsSupportedProperty(nameof(col.IsFullTextIndexed)))
+                        {
+                            Trace.TraceInformation($"IsFullTextIndexed {col.IsFullTextIndexed}");
+                        }
+                    }
+                    Assert.That(missingProperties.Properties, Is.Empty, "All fields should have been fetched when populating collections");
+                }
+                finally
+                {
+                    SqlSmoObject.PropertyMissing -= missingProperties.OnPropertyMissing;
+                    ServerContext.SetDefaultInitFields(allFields: false);
+                }
+
+            });
+        }
+
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        public void Server_GetSmoObject_succeeds_if_Databases_collection_is_empty()
+        {
+            ExecuteWithDbDrop(db => 
+            {
+                var table = db.CreateTable("table");
+                using (var sqlConnection = new SqlConnection(this.SqlConnectionStringBuilder.ConnectionString))
+                {
+                    var server = new Management.Smo.Server(new ServerConnection(sqlConnection));
+                    var foundTable = (Table)server.GetSmoObject(table.Urn);
+                    Assert.That(foundTable.Name, Is.EqualTo(table.Name), $"Didn't find the table with urn {table.Urn}");
+                }
+            });
+        }
+        class MissingProperties
+        {
+            public readonly IList<string> Properties = new List<string>();
+            private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
+            public void OnPropertyMissing(object sender, PropertyMissingEventArgs args)
+            {
+                if (Thread.CurrentThread.ManagedThreadId == threadId)
+                {
+                    Properties.Add($"{args.TypeName}.{args.PropertyName}");
+                }
+            }
         }
     }
 }

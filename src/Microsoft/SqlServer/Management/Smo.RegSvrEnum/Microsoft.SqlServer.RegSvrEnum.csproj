@@ -12,6 +12,4 @@
     <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
   </ItemGroup>
-<!-- BEGIN NOGITHUB -->
-<!-- END NOGITHUB -->
 </Project>

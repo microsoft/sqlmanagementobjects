@@ -1,5 +1,6 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
 using Microsoft.SqlServer.Management.XEvent;
 using Microsoft.SqlServer.Management.XEventDbScoped;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

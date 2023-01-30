@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -153,6 +153,11 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
             }
         }
 
+        /// <summary>
+        /// Validates whether a given permission is a legitimate permission in the ObjectPermissionSet.
+        /// The list of valid permissions should align with the permissions defined in the ObjectPermission
+        /// class.
+        /// </summary>
         private static bool ContainsPermissionType(Smo.ObjectPermissionSet permissionSet, DatabasePermissionType permissionType)
         {
             Debug.Assert(permissionSet != null, "SmoMetadataProvider Assert", "permissionSet != null");
@@ -162,6 +167,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.Alter: return permissionSet.Alter;
                 case DatabasePermissionType.Connect: return permissionSet.Connect;
                 case DatabasePermissionType.Control: return permissionSet.Control;
+                case DatabasePermissionType.CreateSequence: return permissionSet.CreateSequence;
                 case DatabasePermissionType.Delete: return permissionSet.Delete;
                 case DatabasePermissionType.Execute: return permissionSet.Execute;
                 case DatabasePermissionType.Impersonate: return permissionSet.Impersonate;
@@ -171,94 +177,68 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.Select: return permissionSet.Select;
                 case DatabasePermissionType.Send: return permissionSet.Send;
                 case DatabasePermissionType.TakeOwnership: return permissionSet.TakeOwnership;
+                case DatabasePermissionType.Unmask: return permissionSet.Unmask;
                 case DatabasePermissionType.Update: return permissionSet.Update;
                 case DatabasePermissionType.ViewChangeTracking: return permissionSet.ViewChangeTracking;
                 case DatabasePermissionType.ViewDefinition: return permissionSet.ViewDefinition;
-
-                case DatabasePermissionType.AlterAnyApplicationRole:
-                case DatabasePermissionType.AlterAnyAssembly:
-                case DatabasePermissionType.AlterAnyAsymmetricKey:
-                case DatabasePermissionType.AlterAnyCertificate:
-                case DatabasePermissionType.AlterAnyContract:
-                case DatabasePermissionType.AlterAnyDatabaseAudit:
-                case DatabasePermissionType.AlterAnyDatabaseDdlTrigger:
-                case DatabasePermissionType.AlterAnyDatabaseEventNotification:
-                case DatabasePermissionType.AlterAnyDataspace:
-                case DatabasePermissionType.AlterAnyFulltextCatalog:
-                case DatabasePermissionType.AlterAnyMessageType:
-                case DatabasePermissionType.AlterAnyRemoteServiceBinding:
-                case DatabasePermissionType.AlterAnyRole:
-                case DatabasePermissionType.AlterAnyRoute:
-                case DatabasePermissionType.AlterAnySchema:
-                case DatabasePermissionType.AlterAnyService:
-                case DatabasePermissionType.AlterAnySymmetricKey:
-                case DatabasePermissionType.AlterAnyUser:
-                case DatabasePermissionType.Authenticate:
-                case DatabasePermissionType.BackupDatabase:
-                case DatabasePermissionType.BackupLog:
-                case DatabasePermissionType.Checkpoint:
-                case DatabasePermissionType.ConnectReplication:
-                case DatabasePermissionType.CreateAggregate:
-                case DatabasePermissionType.CreateAssembly:
-                case DatabasePermissionType.CreateAsymmetricKey:
-                case DatabasePermissionType.CreateCertificate:
-                case DatabasePermissionType.CreateContract:
-                case DatabasePermissionType.CreateDatabase:
-                case DatabasePermissionType.CreateDatabaseDdlEventNotification:
-                case DatabasePermissionType.CreateDefault:
-                case DatabasePermissionType.CreateFulltextCatalog:
-                case DatabasePermissionType.CreateFunction:
-                case DatabasePermissionType.CreateMessageType:
-                case DatabasePermissionType.CreateProcedure:
-                case DatabasePermissionType.CreateQueue:
-                case DatabasePermissionType.CreateRemoteServiceBinding:
-                case DatabasePermissionType.CreateRole:
-                case DatabasePermissionType.CreateRoute:
-                case DatabasePermissionType.CreateRule:
-                case DatabasePermissionType.CreateSchema:
-                case DatabasePermissionType.CreateService:
-                case DatabasePermissionType.CreateSymmetricKey:
-                case DatabasePermissionType.CreateSynonym:
-                case DatabasePermissionType.CreateTable:
-                case DatabasePermissionType.CreateType:
-                case DatabasePermissionType.CreateView:
-                case DatabasePermissionType.CreateXmlSchemaCollection:
-                case DatabasePermissionType.Showplan:
-                case DatabasePermissionType.SubscribeQueryNotifications:
-                case DatabasePermissionType.ViewDatabaseState:
-                    return false;
-
                 default:
-                    Debug.Fail("SmoMetadataProvider Assert", "Unexpected permissionType: " + permissionType);
                     return false;
             }
         }
 
+        /// <summary>
+        /// Validates whether a given permission is a legitimate permission in the DatabasePermissionSet.
+        /// The list of valid permissions should align with the permissions defined in the DatabasePermission
+        /// class.
+        /// </summary>
         private static bool ContainsPermissionType(Smo.DatabasePermissionSet permissionSet, DatabasePermissionType permissionType)
         {
             Debug.Assert(permissionSet != null, "SmoMetadataProvider Assert", "permissionSet != null");
 
             switch (permissionType)
             {
+                case DatabasePermissionType.AdministerDatabaseBulkOperations: return permissionSet.AdministerDatabaseBulkOperations;
                 case DatabasePermissionType.Alter: return permissionSet.Alter;
                 case DatabasePermissionType.AlterAnyApplicationRole: return permissionSet.AlterAnyApplicationRole;
                 case DatabasePermissionType.AlterAnyAssembly: return permissionSet.AlterAnyAssembly;
                 case DatabasePermissionType.AlterAnyAsymmetricKey: return permissionSet.AlterAnyAsymmetricKey;
                 case DatabasePermissionType.AlterAnyCertificate: return permissionSet.AlterAnyCertificate;
+                case DatabasePermissionType.AlterAnyColumnEncryptionKey: return permissionSet.AlterAnyColumnEncryptionKey;
+                case DatabasePermissionType.AlterAnyColumnMasterKey: return permissionSet.AlterAnyColumnMasterKey;
                 case DatabasePermissionType.AlterAnyContract: return permissionSet.AlterAnyContract;
                 case DatabasePermissionType.AlterAnyDatabaseAudit: return permissionSet.AlterAnyDatabaseAudit;
                 case DatabasePermissionType.AlterAnyDatabaseDdlTrigger: return permissionSet.AlterAnyDatabaseDdlTrigger;
                 case DatabasePermissionType.AlterAnyDatabaseEventNotification: return permissionSet.AlterAnyDatabaseEventNotification;
+                case DatabasePermissionType.AlterAnyDatabaseEventSession: return permissionSet.AlterAnyDatabaseEventSession;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionAddEvent: return permissionSet.AlterAnyDatabaseEventSessionAddEvent;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionAddTarget: return permissionSet.AlterAnyDatabaseEventSessionAddTarget;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionDisable: return permissionSet.AlterAnyDatabaseEventSessionDisable;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionDropEvent: return permissionSet.AlterAnyDatabaseEventSessionDropEvent;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionDropTarget: return permissionSet.AlterAnyDatabaseEventSessionDropTarget;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionEnable: return permissionSet.AlterAnyDatabaseEventSessionEnable;
+                case DatabasePermissionType.AlterAnyDatabaseEventSessionOption: return permissionSet.AlterAnyDatabaseEventSessionOption;
+                case DatabasePermissionType.AlterAnyDatabaseScopedConfiguration: return permissionSet.AlterAnyDatabaseScopedConfiguration;
                 case DatabasePermissionType.AlterAnyDataspace: return permissionSet.AlterAnyDataspace;
+                case DatabasePermissionType.AlterAnyExternalDataSource: return permissionSet.AlterAnyExternalDataSource;
+                case DatabasePermissionType.AlterAnyExternalFileFormat: return permissionSet.AlterAnyExternalFileFormat;
+                case DatabasePermissionType.AlterAnyExternalJob: return permissionSet.AlterAnyExternalJob;
+                case DatabasePermissionType.AlterAnyExternalLanguage: return permissionSet.AlterAnyExternalLanguage;
+                case DatabasePermissionType.AlterAnyExternalLibrary: return permissionSet.AlterAnyExternalLibrary;
+                case DatabasePermissionType.AlterAnyExternalStream: return permissionSet.AlterAnyExternalStream;
                 case DatabasePermissionType.AlterAnyFulltextCatalog: return permissionSet.AlterAnyFulltextCatalog;
+                case DatabasePermissionType.AlterAnyMask: return permissionSet.AlterAnyMask;
                 case DatabasePermissionType.AlterAnyMessageType: return permissionSet.AlterAnyMessageType;
                 case DatabasePermissionType.AlterAnyRemoteServiceBinding: return permissionSet.AlterAnyRemoteServiceBinding;
                 case DatabasePermissionType.AlterAnyRole: return permissionSet.AlterAnyRole;
                 case DatabasePermissionType.AlterAnyRoute: return permissionSet.AlterAnyRoute;
                 case DatabasePermissionType.AlterAnySchema: return permissionSet.AlterAnySchema;
+                case DatabasePermissionType.AlterAnySecurityPolicy: return permissionSet.AlterAnySecurityPolicy;
+                case DatabasePermissionType.AlterAnySensitivityClassification: return permissionSet.AlterAnySensitivityClassification;
                 case DatabasePermissionType.AlterAnyService: return permissionSet.AlterAnyService;
                 case DatabasePermissionType.AlterAnySymmetricKey: return permissionSet.AlterAnySymmetricKey;
                 case DatabasePermissionType.AlterAnyUser: return permissionSet.AlterAnyUser;
+                case DatabasePermissionType.AlterLedger: return permissionSet.AlterLedger;
+                case DatabasePermissionType.AlterLedgerConfiguration: return permissionSet.AlterLedgerConfiguration;
                 case DatabasePermissionType.Authenticate: return permissionSet.Authenticate;
                 case DatabasePermissionType.BackupDatabase: return permissionSet.BackupDatabase;
                 case DatabasePermissionType.BackupLog: return permissionSet.BackupLog;
@@ -267,6 +247,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.ConnectReplication: return permissionSet.ConnectReplication;
                 case DatabasePermissionType.Control: return permissionSet.Control;
                 case DatabasePermissionType.CreateAggregate: return permissionSet.CreateAggregate;
+                case DatabasePermissionType.CreateAnyDatabaseEventSession: return permissionSet.CreateAnyDatabaseEventSession;
                 case DatabasePermissionType.CreateAssembly: return permissionSet.CreateAssembly;
                 case DatabasePermissionType.CreateAsymmetricKey: return permissionSet.CreateAsymmetricKey;
                 case DatabasePermissionType.CreateCertificate: return permissionSet.CreateCertificate;
@@ -274,6 +255,8 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.CreateDatabase: return permissionSet.CreateDatabase;
                 case DatabasePermissionType.CreateDatabaseDdlEventNotification: return permissionSet.CreateDatabaseDdlEventNotification;
                 case DatabasePermissionType.CreateDefault: return permissionSet.CreateDefault;
+                case DatabasePermissionType.CreateExternalLanguage: return permissionSet.CreateExternalLanguage;
+                case DatabasePermissionType.CreateExternalLibrary: return permissionSet.CreateExternalLibrary;
                 case DatabasePermissionType.CreateFulltextCatalog: return permissionSet.CreateFulltextCatalog;
                 case DatabasePermissionType.CreateFunction: return permissionSet.CreateFunction;
                 case DatabasePermissionType.CreateMessageType: return permissionSet.CreateMessageType;
@@ -289,28 +272,38 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.CreateSynonym: return permissionSet.CreateSynonym;
                 case DatabasePermissionType.CreateTable: return permissionSet.CreateTable;
                 case DatabasePermissionType.CreateType: return permissionSet.CreateType;
+                case DatabasePermissionType.CreateUser: return permissionSet.CreateUser;
                 case DatabasePermissionType.CreateView: return permissionSet.CreateView;
                 case DatabasePermissionType.CreateXmlSchemaCollection: return permissionSet.CreateXmlSchemaCollection;
                 case DatabasePermissionType.Delete: return permissionSet.Delete;
+                case DatabasePermissionType.DropAnyDatabaseEventSession: return permissionSet.DropAnyDatabaseEventSession;
+                case DatabasePermissionType.EnableLedger: return permissionSet.EnableLedger;
                 case DatabasePermissionType.Execute: return permissionSet.Execute;
+                case DatabasePermissionType.ExecuteAnyExternalEndpoint: return permissionSet.ExecuteAnyExternalEndpoint;
+                case DatabasePermissionType.ExecuteAnyExternalScript: return permissionSet.ExecuteAnyExternalScript;
                 case DatabasePermissionType.Insert: return permissionSet.Insert;
+                case DatabasePermissionType.KillDatabaseConnection: return permissionSet.KillDatabaseConnection;
                 case DatabasePermissionType.References: return permissionSet.References;
                 case DatabasePermissionType.Select: return permissionSet.Select;
                 case DatabasePermissionType.Showplan: return permissionSet.Showplan;
                 case DatabasePermissionType.SubscribeQueryNotifications: return permissionSet.SubscribeQueryNotifications;
                 case DatabasePermissionType.TakeOwnership: return permissionSet.TakeOwnership;
+                case DatabasePermissionType.Unmask: return permissionSet.Unmask;
                 case DatabasePermissionType.Update: return permissionSet.Update;
+                case DatabasePermissionType.ViewAnyColumnEncryptionKeyDefinition: return permissionSet.ViewAnyColumnEncryptionKeyDefinition;
+                case DatabasePermissionType.ViewAnyColumnMasterKeyDefinition: return permissionSet.ViewAnyColumnMasterKeyDefinition;
+                case DatabasePermissionType.ViewAnySensitivityClassification: return permissionSet.ViewAnySensitivityClassification;
+                case DatabasePermissionType.ViewCryptographicallySecuredDefinition: return permissionSet.ViewCryptographicallySecuredDefinition;
+                case DatabasePermissionType.ViewDatabasePerformanceState: return permissionSet.ViewDatabasePerformanceState;
+                case DatabasePermissionType.ViewDatabaseSecurityAudit: return permissionSet.ViewDatabaseSecurityAudit;
+                case DatabasePermissionType.ViewDatabaseSecurityState: return permissionSet.ViewDatabaseSecurityState;
                 case DatabasePermissionType.ViewDatabaseState: return permissionSet.ViewDatabaseState;
                 case DatabasePermissionType.ViewDefinition: return permissionSet.ViewDefinition;
-
-                case DatabasePermissionType.Impersonate:
-                case DatabasePermissionType.Receive:
-                case DatabasePermissionType.Send:
-                case DatabasePermissionType.ViewChangeTracking:
-                    return false;
+                case DatabasePermissionType.ViewLedgerContent: return permissionSet.ViewLedgerContent;
+                case DatabasePermissionType.ViewPerformanceDefinition: return permissionSet.ViewPerformanceDefinition;
+                case DatabasePermissionType.ViewSecurityDefinition: return permissionSet.ViewSecurityDefinition;
 
                 default:
-                    Debug.Fail("SmoMetadataProvider Assert", "Unexpected permissionType: " + permissionType);
                     return false;
             }
         }

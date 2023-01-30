@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587

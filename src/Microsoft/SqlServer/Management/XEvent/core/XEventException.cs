@@ -1,5 +1,6 @@
-﻿// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;

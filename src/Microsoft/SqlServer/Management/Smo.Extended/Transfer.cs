@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -528,6 +528,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (this.compensationScript != null && this.compensationScript.Count > 0)
                     {
+                        // Make sure the original connection is closed so it doesn't interfere with the compensation
+                        destinationConnection.Close();
                         using (var compensationDestinationConnection = (SqlConnection)((ICloneable)destinationConnection).Clone())
                         {
                             compensationDestinationConnection.Open();

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -458,8 +458,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (!sp.OldOptions.DdlHeaderOnly && !sp.OldOptions.DdlBodyOnly && sp.IncludeScripts.ExistenceCheck)
             {
-                // VSTS #904569 - keep the ‘if exists’ logic as is in Denali; and only for SP creation, create
-                // an empty SP using dynamic t-sql inside “if not exists” condition, then alter the SP with the actual body.
+                // VSTS #904569 - keep the ï¿½if existsï¿½ logic as is in Denali; and only for SP creation, create
+                // an empty SP using dynamic t-sql inside ï¿½if not existsï¿½ condition, then alter the SP with the actual body.
                 if (IsCreate(scriptHeaderType))
                 {
                     // VSTS #904569, Script Empty Header

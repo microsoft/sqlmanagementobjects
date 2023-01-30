@@ -43,10 +43,7 @@ echo To open solution with SMO (code+test):
 echo    slngen src\FunctionalTest\Smo\Microsoft.SqlServer.Test.Smo.csproj
 echo    REM == Then use "Test | Configure Run Settings | Select Solution Wide Runsettings File"
 echo    REM == and point it to one of the .runsettings under %BASEDIR%src\FunctionalTest\Framework
-echo    REM == You'll need to edit connection strings in src/functionaltest/framework/toolsconnectioninfo.xml.
 echo    REM == Select "Test | Test Explorer" and you are ready to run tests!
-echo.
-echo To run tests (alias: rtests):
 echo    pushd %BASEDIR%target\distrib\debug\net462
 echo    REM == If you want to trim down the list of servers, use something like this:
 echo    REM == SET SqlTestTargetServersFilter=Sql2017;Sqlv150

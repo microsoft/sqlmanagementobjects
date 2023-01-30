@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -57,14 +57,16 @@ namespace Microsoft.SqlServer.Management.Smo
             return permissionLeft | permissionRight;
         }
 
+        // Add new database permissions here, in alphabetical order
+
+        public static DatabasePermission AdministerDatabaseBulkOperations
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AdministerDatabaseBulkOperations); }
+        }
+
         public static DatabasePermission Alter
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.Alter); }
-        }
-
-        public static DatabasePermission AlterAnyAsymmetricKey
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyAsymmetricKey); }
         }
 
         public static DatabasePermission AlterAnyApplicationRole
@@ -77,9 +79,29 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyAssembly); }
         }
 
+        public static DatabasePermission AlterAnyAsymmetricKey
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyAsymmetricKey); }
+        }
+
         public static DatabasePermission AlterAnyCertificate
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyCertificate); }
+        }
+
+        public static DatabasePermission AlterAnyColumnEncryptionKey
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyColumnEncryptionKey); }
+        }
+
+        public static DatabasePermission AlterAnyColumnMasterKey
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyColumnMasterKey); }
+        }
+
+        public static DatabasePermission AlterAnyContract
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyContract); }
         }
 
         public static DatabasePermission AlterAnyDatabaseAudit
@@ -87,14 +109,64 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseAudit); }
         }
 
-        public static DatabasePermission AlterAnyDataspace
+        public static DatabasePermission AlterAnyDatabaseDdlTrigger
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDataspace); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseDdlTrigger); }
         }
 
         public static DatabasePermission AlterAnyDatabaseEventNotification
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventNotification); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSession
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSession); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionAddEvent
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionAddEvent); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionAddTarget
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionAddTarget); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionDisable
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDisable); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionDropEvent
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDropEvent); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionDropTarget
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDropTarget); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionEnable
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionEnable); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseEventSessionOption
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseEventSessionOption); }
+        }
+
+        public static DatabasePermission AlterAnyDatabaseScopedConfiguration
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseScopedConfiguration); }
+        }
+
+        public static DatabasePermission AlterAnyDataspace
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDataspace); }
         }
 
         public static DatabasePermission AlterAnyExternalDataSource
@@ -105,6 +177,26 @@ namespace Microsoft.SqlServer.Management.Smo
         public static DatabasePermission AlterAnyExternalFileFormat
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalFileFormat); }
+        }
+
+        public static DatabasePermission AlterAnyExternalJob
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalJob); }
+        }
+
+        public static DatabasePermission AlterAnyExternalLanguage
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalLanguage); }
+        }
+
+        public static DatabasePermission AlterAnyExternalLibrary
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalLibrary); }
+        }
+
+        public static DatabasePermission AlterAnyExternalStream
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalStream); }
         }
 
         public static DatabasePermission AlterAnyFulltextCatalog
@@ -122,6 +214,11 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyMessageType); }
         }
 
+        public static DatabasePermission AlterAnyRemoteServiceBinding
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyRemoteServiceBinding); }
+        }
+
         public static DatabasePermission AlterAnyRole
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyRole); }
@@ -130,21 +227,6 @@ namespace Microsoft.SqlServer.Management.Smo
         public static DatabasePermission AlterAnyRoute
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyRoute); }
-        }
-
-        public static DatabasePermission AlterAnyRemoteServiceBinding
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyRemoteServiceBinding); }
-        }
-
-        public static DatabasePermission AlterAnyContract
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyContract); }
-        }
-
-        public static DatabasePermission AlterAnySymmetricKey
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnySymmetricKey); }
         }
 
         public static DatabasePermission AlterAnySchema
@@ -157,19 +239,34 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnySecurityPolicy); }
         }
 
+        public static DatabasePermission AlterAnySensitivityClassification
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnySensitivityClassification); }
+        }
+
         public static DatabasePermission AlterAnyService
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyService); }
         }
 
-        public static DatabasePermission AlterAnyDatabaseDdlTrigger
+        public static DatabasePermission AlterAnySymmetricKey
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyDatabaseDdlTrigger); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnySymmetricKey); }
         }
 
         public static DatabasePermission AlterAnyUser
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyUser); }
+        }
+
+        public static DatabasePermission AlterLedger
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterLedger); }
+        }
+
+        public static DatabasePermission AlterLedgerConfiguration
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterLedgerConfiguration); }
         }
 
         public static DatabasePermission Authenticate
@@ -187,9 +284,9 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.BackupLog); }
         }
 
-        public static DatabasePermission Control
+        public static DatabasePermission Checkpoint
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.Control); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.Checkpoint); }
         }
 
         public static DatabasePermission Connect
@@ -202,9 +299,9 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.ConnectReplication); }
         }
 
-        public static DatabasePermission Checkpoint
+        public static DatabasePermission Control
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.Checkpoint); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.Control); }
         }
 
         public static DatabasePermission CreateAggregate
@@ -212,9 +309,9 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateAggregate); }
         }
 
-        public static DatabasePermission CreateAsymmetricKey
+        public static DatabasePermission CreateAnyDatabaseEventSession
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateAsymmetricKey); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateAnyDatabaseEventSession); }
         }
 
         public static DatabasePermission CreateAssembly
@@ -222,9 +319,19 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateAssembly); }
         }
 
+        public static DatabasePermission CreateAsymmetricKey
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateAsymmetricKey); }
+        }
+
         public static DatabasePermission CreateCertificate
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateCertificate); }
+        }
+
+        public static DatabasePermission CreateContract
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateContract); }
         }
 
         public static DatabasePermission CreateDatabase
@@ -232,24 +339,34 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateDatabase); }
         }
 
-        public static DatabasePermission CreateDefault
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateDefault); }
-        }
-
         public static DatabasePermission CreateDatabaseDdlEventNotification
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateDatabaseDdlEventNotification); }
         }
 
-        public static DatabasePermission CreateFunction
+        public static DatabasePermission CreateDefault
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateFunction); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateDefault); }
+        }
+
+        public static DatabasePermission CreateExternalLanguage
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateExternalLanguage); }
+        }
+
+        public static DatabasePermission CreateExternalLibrary
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateExternalLibrary); }
         }
 
         public static DatabasePermission CreateFulltextCatalog
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateFulltextCatalog); }
+        }
+
+        public static DatabasePermission CreateFunction
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateFunction); }
         }
 
         public static DatabasePermission CreateMessageType
@@ -267,6 +384,11 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateQueue); }
         }
 
+        public static DatabasePermission CreateRemoteServiceBinding
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateRemoteServiceBinding); }
+        }
+
         public static DatabasePermission CreateRole
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateRole); }
@@ -282,14 +404,14 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateRule); }
         }
 
-        public static DatabasePermission CreateRemoteServiceBinding
+        public static DatabasePermission CreateSchema
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateRemoteServiceBinding); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateSchema); }
         }
 
-        public static DatabasePermission CreateContract
+        public static DatabasePermission CreateService
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateContract); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateService); }
         }
 
         public static DatabasePermission CreateSymmetricKey
@@ -297,19 +419,9 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateSymmetricKey); }
         }
 
-        public static DatabasePermission CreateSchema
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateSchema); }
-        }
-
         public static DatabasePermission CreateSynonym
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateSynonym); }
-        }      
-
-        public static DatabasePermission CreateService
-        {
-            get { return new DatabasePermission(DatabasePermissionSetValue.CreateService); }
         }
 
         public static DatabasePermission CreateTable
@@ -320,6 +432,11 @@ namespace Microsoft.SqlServer.Management.Smo
         public static DatabasePermission CreateType
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateType); }
+        }
+
+        public static DatabasePermission CreateUser
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateUser); }
         }
 
         public static DatabasePermission CreateView
@@ -337,14 +454,44 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.Delete); }
         }
 
+        public static DatabasePermission DropAnyDatabaseEventSession
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.DropAnyDatabaseEventSession); }
+        }
+
+        public static DatabasePermission EnableLedger
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.EnableLedger); }
+        }
+
         public static DatabasePermission Execute
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.Execute); }
         }
 
+        public static DatabasePermission ExecuteAnyExternalEndpoint
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ExecuteAnyExternalEndpoint); }
+        }
+
+        public static DatabasePermission ExecuteAnyExternalScript
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ExecuteAnyExternalScript); }
+        }
+
         public static DatabasePermission Insert
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.Insert); }
+        }
+
+        public static DatabasePermission KillDatabaseConnection
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.KillDatabaseConnection); }
+        }
+
+        public static DatabasePermission OwnershipChaining
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.OwnershipChaining); }
         }
 
         public static DatabasePermission References
@@ -392,9 +539,29 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.ViewAnyColumnMasterKeyDefinition); }
         }
 
-        public static DatabasePermission ViewDefinition
+        public static DatabasePermission ViewAnySensitivityClassification
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.ViewDefinition); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewAnySensitivityClassification); }
+        }
+
+        public static DatabasePermission ViewCryptographicallySecuredDefinition
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewCryptographicallySecuredDefinition); }
+        }
+
+        public static DatabasePermission ViewDatabasePerformanceState
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewDatabasePerformanceState); }
+        }
+
+        public static DatabasePermission ViewDatabaseSecurityAudit
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewDatabaseSecurityAudit); }
+        }
+
+        public static DatabasePermission ViewDatabaseSecurityState
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewDatabaseSecurityState); }
         }
 
         public static DatabasePermission ViewDatabaseState
@@ -402,14 +569,24 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.ViewDatabaseState); }
         }
 
-        public static DatabasePermission AlterAnySensitivityClassification
+        public static DatabasePermission ViewDefinition
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnySensitivityClassification); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewDefinition); }
         }
 
-        public static DatabasePermission ViewAnySensitivityClassification
+        public static DatabasePermission ViewLedgerContent
         {
-            get { return new DatabasePermission(DatabasePermissionSetValue.ViewAnySensitivityClassification); }
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewLedgerContent); }
+        }
+
+        public static DatabasePermission ViewPerformanceDefinition
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewPerformanceDefinition); }
+        }
+
+        public static DatabasePermission ViewSecurityDefinition
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.ViewSecurityDefinition); }
         }
 
         public override int GetHashCode()
@@ -532,16 +709,18 @@ namespace Microsoft.SqlServer.Management.Smo
             return PermissionDecode.PermissionCodeToPermissionType<DatabasePermissionSetValue>(permissionCode);
         }
 
+        /// Add getters/setters for new database permission set values here, in alphabetical order
+
+        public bool AdministerDatabaseBulkOperations
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AdministerDatabaseBulkOperations]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AdministerDatabaseBulkOperations] = value; }
+        }
+
         public bool Alter
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.Alter]; }
             set { this.Storage[(int)DatabasePermissionSetValue.Alter] = value; }
-        }
-
-        public bool AlterAnyAsymmetricKey
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyAsymmetricKey]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyAsymmetricKey] = value; }
         }
 
         public bool AlterAnyApplicationRole
@@ -556,10 +735,34 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyAssembly] = value; }
         }
 
+        public bool AlterAnyAsymmetricKey
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyAsymmetricKey]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyAsymmetricKey] = value; }
+        }
+
         public bool AlterAnyCertificate
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyCertificate]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyCertificate] = value; }
+        }
+
+        public bool AlterAnyColumnEncryptionKey
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyColumnEncryptionKey]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyColumnEncryptionKey] = value; }
+        }
+
+        public bool AlterAnyColumnMasterKey
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyColumnMasterKey]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyColumnMasterKey] = value; }
+        }
+
+        public bool AlterAnyContract
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyContract]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyContract] = value; }
         }
 
         public bool AlterAnyDatabaseAudit
@@ -568,16 +771,76 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseAudit] = value; }
         }
 
-        public bool AlterAnyDataspace
+        public bool AlterAnyDatabaseDdlTrigger
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDataspace]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDataspace] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseDdlTrigger]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseDdlTrigger] = value; }
         }
 
         public bool AlterAnyDatabaseEventNotification
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventNotification]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventNotification] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSession
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSession]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSession] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionAddEvent
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionAddEvent]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionAddEvent] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionAddTarget
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionAddTarget]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionAddTarget] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionDisable
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDisable]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDisable] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionDropEvent
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDropEvent]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDropEvent] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionDropTarget
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDropTarget]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionDropTarget] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionEnable
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionEnable]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionEnable] = value; }
+        }
+
+        public bool AlterAnyDatabaseEventSessionOption
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionOption]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseEventSessionOption] = value; }
+        }
+
+        public bool AlterAnyDatabaseScopedConfiguration
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseScopedConfiguration]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseScopedConfiguration] = value; }
+        }
+
+        public bool AlterAnyDataspace
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDataspace]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDataspace] = value; }
         }
 
         public bool AlterAnyExternalDataSource
@@ -590,6 +853,30 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalFileFormat]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalFileFormat] = value; }
+        }
+
+        public bool AlterAnyExternalJob
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalJob]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalJob] = value; }
+        }
+
+        public bool AlterAnyExternalLanguage
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalLanguage]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalLanguage] = value; }
+        }
+
+        public bool AlterAnyExternalLibrary
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalLibrary]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalLibrary] = value; }
+        }
+
+        public bool AlterAnyExternalStream
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalStream]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalStream] = value; }
         }
 
         public bool AlterAnyFulltextCatalog
@@ -610,6 +897,12 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyMessageType] = value; }
         }
 
+        public bool AlterAnyRemoteServiceBinding
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyRemoteServiceBinding]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyRemoteServiceBinding] = value; }
+        }
+
         public bool AlterAnyRole
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyRole]; }
@@ -620,24 +913,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyRoute]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyRoute] = value; }
-        }
-
-        public bool AlterAnyRemoteServiceBinding
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyRemoteServiceBinding]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyRemoteServiceBinding] = value; }
-        }
-
-        public bool AlterAnyContract
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyContract]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyContract] = value; }
-        }
-
-        public bool AlterAnySymmetricKey
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnySymmetricKey]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnySymmetricKey] = value; }
         }
 
         public bool AlterAnySchema
@@ -652,22 +927,40 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnySecurityPolicy] = value; }
         }
 
+        public bool AlterAnySensitivityClassification
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnySensitivityClassification]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnySensitivityClassification] = value; }
+        }
+
         public bool AlterAnyService
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyService]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyService] = value; }
         }
 
-        public bool AlterAnyDatabaseDdlTrigger
+        public bool AlterAnySymmetricKey
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseDdlTrigger]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyDatabaseDdlTrigger] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnySymmetricKey]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnySymmetricKey] = value; }
         }
 
         public bool AlterAnyUser
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyUser]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyUser] = value; }
+        }
+
+        public bool AlterLedger
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterLedger]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterLedger] = value; }
+        }
+
+        public bool AlterLedgerConfiguration
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterLedgerConfiguration]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterLedgerConfiguration] = value; }
         }
 
         public bool Authenticate
@@ -688,10 +981,10 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.BackupLog] = value; }
         }
 
-        public bool Control
+        public bool Checkpoint
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.Control]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.Control] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.Checkpoint]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.Checkpoint] = value; }
         }
 
         public bool Connect
@@ -706,10 +999,10 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.ConnectReplication] = value; }
         }
 
-        public bool Checkpoint
+        public bool Control
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.Checkpoint]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.Checkpoint] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.Control]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.Control] = value; }
         }
 
         public bool CreateAggregate
@@ -718,10 +1011,10 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.CreateAggregate] = value; }
         }
 
-        public bool CreateAsymmetricKey
+        public bool CreateAnyDatabaseEventSession
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateAsymmetricKey]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateAsymmetricKey] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateAnyDatabaseEventSession]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateAnyDatabaseEventSession] = value; }
         }
 
         public bool CreateAssembly
@@ -730,10 +1023,22 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.CreateAssembly] = value; }
         }
 
+        public bool CreateAsymmetricKey
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateAsymmetricKey]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateAsymmetricKey] = value; }
+        }
+
         public bool CreateCertificate
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateCertificate]; }
             set { this.Storage[(int)DatabasePermissionSetValue.CreateCertificate] = value; }
+        }
+
+        public bool CreateContract
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateContract]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateContract] = value; }
         }
 
         public bool CreateDatabase
@@ -742,28 +1047,40 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.CreateDatabase] = value; }
         }
 
-        public bool CreateDefault
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateDefault]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateDefault] = value; }
-        }
-
         public bool CreateDatabaseDdlEventNotification
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateDatabaseDdlEventNotification]; }
             set { this.Storage[(int)DatabasePermissionSetValue.CreateDatabaseDdlEventNotification] = value; }
         }
 
-        public bool CreateFunction
+        public bool CreateDefault
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateFunction]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateFunction] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateDefault]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateDefault] = value; }
+        }
+
+        public bool CreateExternalLanguage
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateExternalLanguage]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateExternalLanguage] = value; }
+        }
+
+        public bool CreateExternalLibrary
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateExternalLibrary]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateExternalLibrary] = value; }
         }
 
         public bool CreateFulltextCatalog
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateFulltextCatalog]; }
             set { this.Storage[(int)DatabasePermissionSetValue.CreateFulltextCatalog] = value; }
+        }
+
+        public bool CreateFunction
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateFunction]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateFunction] = value; }
         }
 
         public bool CreateMessageType
@@ -784,6 +1101,12 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.CreateQueue] = value; }
         }
 
+        public bool CreateRemoteServiceBinding
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateRemoteServiceBinding]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateRemoteServiceBinding] = value; }
+        }
+
         public bool CreateRole
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateRole]; }
@@ -802,16 +1125,16 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.CreateRule] = value; }
         }
 
-        public bool CreateRemoteServiceBinding
+        public bool CreateSchema
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateRemoteServiceBinding]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateRemoteServiceBinding] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateSchema]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateSchema] = value; }
         }
 
-        public bool CreateContract
+        public bool CreateService
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateContract]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateContract] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateService]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateService] = value; }
         }
 
         public bool CreateSymmetricKey
@@ -820,23 +1143,10 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.CreateSymmetricKey] = value; }
         }
 
-        public bool CreateSchema
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateSchema]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateSchema] = value; }
-        }
-
         public bool CreateSynonym
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateSynonym]; }
             set { this.Storage[(int)DatabasePermissionSetValue.CreateSynonym] = value; }
-        }
-       
-
-        public bool CreateService
-        {
-            get { return this.Storage[(int)DatabasePermissionSetValue.CreateService]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.CreateService] = value; }
         }
 
         public bool CreateTable
@@ -849,6 +1159,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateType]; }
             set { this.Storage[(int)DatabasePermissionSetValue.CreateType] = value; }
+        }
+
+        public bool CreateUser
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateUser]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateUser] = value; }
         }
 
         public bool CreateView
@@ -869,16 +1185,52 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.Delete] = value; }
         }
 
+        public bool DropAnyDatabaseEventSession
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.DropAnyDatabaseEventSession]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.DropAnyDatabaseEventSession] = value; }
+        }
+
+        public bool EnableLedger
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.EnableLedger]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.EnableLedger] = value; }
+        }
+
         public bool Execute
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.Execute]; }
             set { this.Storage[(int)DatabasePermissionSetValue.Execute] = value; }
         }
 
+        public bool ExecuteAnyExternalEndpoint
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ExecuteAnyExternalEndpoint]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ExecuteAnyExternalEndpoint] = value; }
+        }
+
+        public bool ExecuteAnyExternalScript
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ExecuteAnyExternalScript]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ExecuteAnyExternalScript] = value; }
+        }
+
         public bool Insert
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.Insert]; }
             set { this.Storage[(int)DatabasePermissionSetValue.Insert] = value; }
+        }
+
+        public bool KillDatabaseConnection
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.KillDatabaseConnection]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.KillDatabaseConnection] = value; }
+        }
+
+        public bool OwnershipChaining
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.OwnershipChaining]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.OwnershipChaining] = value; }
         }
 
         public bool References
@@ -923,10 +1275,46 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.Update] = value; }
         }
 
-        public bool ViewDefinition
+        public bool ViewAnyColumnEncryptionKeyDefinition
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.ViewDefinition]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.ViewDefinition] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewAnyColumnEncryptionKeyDefinition]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewAnyColumnEncryptionKeyDefinition] = value; }
+        }
+
+        public bool ViewAnyColumnMasterKeyDefinition
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewAnyColumnMasterKeyDefinition]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewAnyColumnMasterKeyDefinition] = value; }
+        }
+
+        public bool ViewAnySensitivityClassification
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewAnySensitivityClassification]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewAnySensitivityClassification] = value; }
+        }
+
+        public bool ViewCryptographicallySecuredDefinition
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewCryptographicallySecuredDefinition]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewCryptographicallySecuredDefinition] = value; }
+        }
+
+        public bool ViewDatabasePerformanceState
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewDatabasePerformanceState]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewDatabasePerformanceState] = value; }
+        }
+
+        public bool ViewDatabaseSecurityAudit
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewDatabaseSecurityAudit]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewDatabaseSecurityAudit] = value; }
+        }
+
+        public bool ViewDatabaseSecurityState
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewDatabaseSecurityState]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewDatabaseSecurityState] = value; }
         }
 
         public bool ViewDatabaseState
@@ -935,16 +1323,28 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.ViewDatabaseState] = value; }
         }
 
-        public bool AlterAnySensitivityClassification
+        public bool ViewDefinition
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnySensitivityClassification]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnySensitivityClassification] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewDefinition]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewDefinition] = value; }
         }
 
-        public bool ViewAnySensitivityClassification
+        public bool ViewLedgerContent
         {
-            get { return this.Storage[(int)DatabasePermissionSetValue.ViewAnySensitivityClassification]; }
-            set { this.Storage[(int)DatabasePermissionSetValue.ViewAnySensitivityClassification] = value; }
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewLedgerContent]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewLedgerContent] = value; }
+        }
+
+        public bool ViewPerformanceDefinition
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewPerformanceDefinition]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewPerformanceDefinition] = value; }
+        }
+
+        public bool ViewSecurityDefinition
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.ViewSecurityDefinition]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.ViewSecurityDefinition] = value; }
         }
 
         public override int GetHashCode()
@@ -976,6 +1376,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
     }
 
+    /// <summary>
+    /// Object permissions are permissions for any object within a database,
+    /// including tables, views, schemas, certificates, etc.
+    /// </summary>
     public sealed class ObjectPermission
     {
         private ObjectPermissionSetValue m_value;
@@ -1025,9 +1429,16 @@ namespace Microsoft.SqlServer.Management.Smo
             return permissionLeft | permissionRight;
         }
 
+        /// Add new object permissions here, in alphabetical order
+
         public static ObjectPermission Alter
         {
             get { return new ObjectPermission(ObjectPermissionSetValue.Alter); }
+        }
+
+        public static ObjectPermission Connect
+        {
+            get { return new ObjectPermission(ObjectPermissionSetValue.Connect); }
         }
 
         public static ObjectPermission Control
@@ -1035,9 +1446,9 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new ObjectPermission(ObjectPermissionSetValue.Control); }
         }
 
-        public static ObjectPermission Connect
+        public static ObjectPermission CreateSequence
         {
-            get { return new ObjectPermission(ObjectPermissionSetValue.Connect); }
+            get { return new ObjectPermission(ObjectPermissionSetValue.CreateSequence); }
         }
 
         public static ObjectPermission Delete
@@ -1048,6 +1459,11 @@ namespace Microsoft.SqlServer.Management.Smo
         public static ObjectPermission Execute
         {
             get { return new ObjectPermission(ObjectPermissionSetValue.Execute); }
+        }
+
+        public static ObjectPermission ExecuteExternalScript
+        {
+            get { return new ObjectPermission(ObjectPermissionSetValue.ExecuteExternalScript); }
         }
 
         public static ObjectPermission Impersonate
@@ -1085,22 +1501,24 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new ObjectPermission(ObjectPermissionSetValue.TakeOwnership); }
         }
 
+        public static ObjectPermission Unmask
+        {
+            get { return new ObjectPermission(ObjectPermissionSetValue.Unmask); }
+        }
+
         public static ObjectPermission Update
         {
             get { return new ObjectPermission(ObjectPermissionSetValue.Update); }
         }
 
-        public static ObjectPermission ViewDefinition
-        {
-            get { return new ObjectPermission(ObjectPermissionSetValue.ViewDefinition); }
-        }
         public static ObjectPermission ViewChangeTracking
         {
             get { return new ObjectPermission(ObjectPermissionSetValue.ViewChangeTracking); }
         }
-        public static ObjectPermission CreateSequence
+
+        public static ObjectPermission ViewDefinition
         {
-            get { return new ObjectPermission(ObjectPermissionSetValue.CreateSequence); }
+            get { return new ObjectPermission(ObjectPermissionSetValue.ViewDefinition); }
         }
 
         public override int GetHashCode()
@@ -1219,6 +1637,8 @@ namespace Microsoft.SqlServer.Management.Smo
             return PermissionDecode.PermissionCodeToPermissionType<ObjectPermissionSetValue>(permissionCode);
         }
 
+        /// Add getters/setters for new object permission set values here, in alphabetical order
+
         public bool Alter
         {
             get { return this.Storage[(int)ObjectPermissionSetValue.Alter]; }
@@ -1247,6 +1667,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)ObjectPermissionSetValue.Execute]; }
             set { this.Storage[(int)ObjectPermissionSetValue.Execute] = value; }
+        }
+
+        public bool ExecuteExternalScript
+        {
+            get { return this.Storage[(int)ObjectPermissionSetValue.ExecuteExternalScript]; }
+            set { this.Storage[(int)ObjectPermissionSetValue.ExecuteExternalScript] = value; }
         }
 
         public bool Impersonate
@@ -1289,6 +1715,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)ObjectPermissionSetValue.TakeOwnership]; }
             set { this.Storage[(int)ObjectPermissionSetValue.TakeOwnership] = value; }
+        }
+
+        public bool Unmask
+        {
+            get { return this.Storage[(int)ObjectPermissionSetValue.Unmask]; }
+            set { this.Storage[(int)ObjectPermissionSetValue.Unmask] = value; }
         }
 
         public bool Update
@@ -1391,6 +1823,8 @@ namespace Microsoft.SqlServer.Management.Smo
             return permissionLeft | permissionRight;
         }
 
+        // Add new server permissions here, in alphabetical order
+
         public static ServerPermission AdministerBulkOperations
         {
             get { return new ServerPermission(ServerPermissionSetValue.AdministerBulkOperations); }
@@ -1424,6 +1858,41 @@ namespace Microsoft.SqlServer.Management.Smo
         public static ServerPermission AlterAnyEndpoint
         {
             get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEndpoint); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionAddEvent
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionAddEvent); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionAddTarget
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionAddTarget); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionDisable
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionDisable); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionDropEvent
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionDropEvent); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionDropTarget
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionDropTarget); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionEnable
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionEnable); }
+        }
+
+        public static ServerPermission AlterAnyEventSessionOption
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.AlterAnyEventSessionOption); }
         }
 
         public static ServerPermission AlterAnyLogin
@@ -1476,6 +1945,11 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new ServerPermission(ServerPermissionSetValue.CreateAnyDatabase); }
         }
 
+        public static ServerPermission CreateAnyEventSession
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.CreateAnyEventSession); }
+        }
+
         public static ServerPermission CreateDdlEventNotification
         {
             get { return new ServerPermission(ServerPermissionSetValue.CreateDdlEventNotification); }
@@ -1486,14 +1960,29 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new ServerPermission(ServerPermissionSetValue.CreateEndpoint); }
         }
 
+        public static ServerPermission CreateLogin
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.CreateLogin); }
+        }
+
         public static ServerPermission CreateTraceEventNotification
         {
             get { return new ServerPermission(ServerPermissionSetValue.CreateTraceEventNotification); }
         }
 
+        public static ServerPermission DropAnyEventSession
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.DropAnyEventSession); }
+        }
+
         public static ServerPermission Shutdown
         {
             get { return new ServerPermission(ServerPermissionSetValue.Shutdown); }
+        }
+
+        public static ServerPermission ViewAnyCryptographicallySecuredDefinition
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewAnyCryptographicallySecuredDefinition); }
         }
 
         public static ServerPermission ViewAnyDefinition
@@ -1504,6 +1993,36 @@ namespace Microsoft.SqlServer.Management.Smo
         public static ServerPermission ViewAnyDatabase
         {
             get { return new ServerPermission(ServerPermissionSetValue.ViewAnyDatabase); }
+        }
+
+        public static ServerPermission ViewAnyErrorLog
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewAnyErrorLog); }
+        }
+
+        public static ServerPermission ViewAnyPerformanceDefinition
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewAnyPerformanceDefinition); }
+        }
+
+        public static ServerPermission ViewAnySecurityDefinition
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewAnySecurityDefinition); }
+        }
+
+        public static ServerPermission ViewServerPerformanceState
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewServerPerformanceState); }
+        }
+
+        public static ServerPermission ViewServerSecurityAudit
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewServerSecurityAudit); }
+        }
+
+        public static ServerPermission ViewServerSecurityState
+        {
+            get { return new ServerPermission(ServerPermissionSetValue.ViewServerSecurityState); }
         }
 
         public static ServerPermission ViewServerState
@@ -1675,6 +2194,8 @@ namespace Microsoft.SqlServer.Management.Smo
             return PermissionDecode.PermissionCodeToPermissionType<ServerPermissionSetValue>(permissionCode);
         }
 
+        /// Add getters/setters for new server permission set values here, in alphabetical order
+
         public bool AdministerBulkOperations
         {
             get { return this.Storage[(int)ServerPermissionSetValue.AdministerBulkOperations]; }
@@ -1715,6 +2236,48 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEndpoint]; }
             set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEndpoint] = value; }
+        }
+
+        public bool AlterAnyEventSessionAddEvent
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionAddEvent]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionAddEvent] = value; }
+        }
+
+        public bool AlterAnyEventSessionAddTarget
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionAddTarget]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionAddTarget] = value; }
+        }
+
+        public bool AlterAnyEventSessionDisable
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionDisable]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionDisable] = value; }
+        }
+
+        public bool AlterAnyEventSessionDropEvent
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionDropEvent]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionDropEvent] = value; }
+        }
+
+        public bool AlterAnyEventSessionDropTarget
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionDropTarget]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionDropTarget] = value; }
+        }
+
+        public bool AlterAnyEventSessionEnable
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionEnable]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionEnable] = value; }
+        }
+
+        public bool AlterAnyEventSessionOption
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionOption]; }
+            set { this.Storage[(int)ServerPermissionSetValue.AlterAnyEventSessionOption] = value; }
         }
 
         public bool AlterAnyLogin
@@ -1777,6 +2340,12 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)ServerPermissionSetValue.CreateAnyDatabase] = value; }
         }
 
+        public bool CreateAnyEventSession
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.CreateAnyEventSession]; }
+            set { this.Storage[(int)ServerPermissionSetValue.CreateAnyEventSession] = value; }
+        }
+
         public bool CreateDdlEventNotification
         {
             get { return this.Storage[(int)ServerPermissionSetValue.CreateDdlEventNotification]; }
@@ -1789,16 +2358,34 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)ServerPermissionSetValue.CreateEndpoint] = value; }
         }
 
+        public bool CreateLogin
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.CreateLogin]; }
+            set { this.Storage[(int)ServerPermissionSetValue.CreateLogin] = value; }
+        }
+
         public bool CreateTraceEventNotification
         {
             get { return this.Storage[(int)ServerPermissionSetValue.CreateTraceEventNotification]; }
             set { this.Storage[(int)ServerPermissionSetValue.CreateTraceEventNotification] = value; }
         }
 
+        public bool DropAnyEventSession
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.DropAnyEventSession]; }
+            set { this.Storage[(int)ServerPermissionSetValue.DropAnyEventSession] = value; }
+        }
+
         public bool Shutdown
         {
             get { return this.Storage[(int)ServerPermissionSetValue.Shutdown]; }
             set { this.Storage[(int)ServerPermissionSetValue.Shutdown] = value; }
+        }
+
+        public bool ViewAnyCryptographicallySecuredDefinition
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewAnyCryptographicallySecuredDefinition]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewAnyCryptographicallySecuredDefinition] = value; }
         }
 
         public bool ViewAnyDefinition
@@ -1811,6 +2398,42 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)ServerPermissionSetValue.ViewAnyDatabase]; }
             set { this.Storage[(int)ServerPermissionSetValue.ViewAnyDatabase] = value; }
+        }
+
+        public bool ViewAnyErrorLog
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewAnyErrorLog]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewAnyErrorLog] = value; }
+        }
+
+        public bool ViewAnyPerformanceDefinition
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewAnyPerformanceDefinition]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewAnyPerformanceDefinition] = value; }
+        }
+
+        public bool ViewAnySecurityDefinition
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewAnySecurityDefinition]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewAnySecurityDefinition] = value; }
+        }
+
+        public bool ViewServerPerformanceState
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewServerPerformanceState]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewServerPerformanceState] = value; }
+        }
+
+        public bool ViewServerSecurityAudit
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewServerSecurityAudit]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewServerSecurityAudit] = value; }
+        }
+
+        public bool ViewServerSecurityState
+        {
+            get { return this.Storage[(int)ServerPermissionSetValue.ViewServerSecurityState]; }
+            set { this.Storage[(int)ServerPermissionSetValue.ViewServerSecurityState] = value; }
         }
 
         public bool ViewServerState

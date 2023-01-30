@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -4060,19 +4060,20 @@ namespace Microsoft.SqlServer.Management.Smo
             // If no ParentType was found just use the current type. This should only be needed for relative Urns
             parentType = parentType ?? this.GetType();
 
+            string[] defaultFields;
+            if (forScripting)
+            {
+                defaultFields = GetServerObject().GetScriptInitFieldsInternal(childType, parentType, sp, edition);
+            }
+            else
+            {
+                defaultFields = GetServerObject().GetDefaultInitFieldsInternal(childType, edition);
+            }
             // Use the default init fields for the leaf type if none given
             if (levelQuery.Fields == null || levelQuery.Fields.Length == 0)
             {
-                if (forScripting)
-                {
-                    levelQuery.Fields = GetServerObject().GetScriptInitFieldsInternal(childType, parentType, sp, edition);
-                }
-                else
-                {
-                    levelQuery.Fields = GetServerObject().GetDefaultInitFieldsInternal(childType, edition);
-                }
+                levelQuery.Fields = defaultFields;
             }
-
             // Make sure the key field(s) are included and are first in the list
             // We have to use the check for ID,Name being the key since GetFieldNames would only list the Name.
             // And we must have ID back in the query or risk yet another avenue to overlap the DataReader when it come time to need it.
@@ -4176,10 +4177,10 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // do this special case for initializing Database with default init fields
-            List<string> urnList = new List<string>();
-            if (IsDatabaseSpecialCase(forScripting, parsedUrn, levelQuery.Fields))
+            var urnList = new List<string>();
+            if (IsDatabaseSpecialCase(forScripting, parsedUrn, levelQuery.Fields, defaultFields))
             {
-                DoDatabaseSpecialCase(levelQuery, levelFilter, forScripting, urnList, startLeafIdx);
+                DoDatabaseSpecialCase(levelQuery, levelFilter, forScripting, urnList, startLeafIdx, defaultFields);
             }
             else
             {
@@ -4241,130 +4242,168 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp">Scripting preferences to get server info from. If null, it will default to server info of the current object.</param>
         /// <returns></returns>
         public IEnumerable<string> GetDisabledProperties(ScriptingPreferences sp = null)
+        {            
+            return GetDisabledProperties(GetType(), sp == null ? DatabaseEngineEdition : sp.TargetDatabaseEngineEdition);
+        }
+
+        internal static IEnumerable<string> GetDisabledProperties(Type type, DatabaseEngineEdition databaseEngineEdition)
         {
-            if ((sp != null && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDatabaseEdge) || this.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabaseEdge)
+            switch (type.Name)
             {
-                // Disabled in all edition except edge
-                //
-                yield return nameof(Database.DataRetentionEnabled);
-                yield return nameof(Table.DataRetentionEnabled);
-                yield return nameof(Table.DataRetentionPeriod);
-                yield return nameof(Table.DataRetentionPeriodUnit);
-                yield return nameof(Table.DataRetentionFilterColumnName);
-            }
-            if ((sp != null && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlDatabaseEdge) || this.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabaseEdge)
-            {
-                // Disabled in Edge only
-                //
+                case nameof(Database):
+                    {
+                        if (databaseEngineEdition != DatabaseEngineEdition.SqlDatabaseEdge)
+                        {
+                            yield return nameof(Database.DataRetentionEnabled);
+                        }
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+                        {
+                            yield return nameof(Database.AutoClose);
+                            yield return nameof(Database.AutoCreateIncrementalStatisticsEnabled);
+                            yield return nameof(Database.AutoCreateStatisticsEnabled);
+                            yield return nameof(Database.AutoShrink);
+                            yield return nameof(Database.AutoUpdateStatisticsAsync);
+                            yield return nameof(Database.AutoUpdateStatisticsEnabled);
+                            yield return nameof(Database.BrokerEnabled);
+                            yield return nameof(Database.CatalogCollation);
+                            yield return nameof(Database.CloseCursorsOnCommitEnabled);
+                            yield return nameof(Database.CompatibilityLevel);
+                            yield return nameof(Database.ContainmentType);
+                            yield return nameof(Database.DatabaseOwnershipChaining);
+                            yield return nameof(Database.DatabaseScopedConfigurations);
+                            yield return nameof(Database.DatabaseScopedCredentials);
+                            yield return nameof(Database.DateCorrelationOptimization);
+                            yield return nameof(Database.DelayedDurability);
+                            yield return nameof(Database.EncryptionEnabled);
+                            yield return nameof(Database.FileGroups);
+                            yield return nameof(Database.FilestreamDirectoryName);
+                            yield return nameof(Database.FilestreamNonTransactedAccess);
+                            yield return nameof(Database.HasMemoryOptimizedObjects);
+                            yield return nameof(Database.HonorBrokerPriority);
+                            yield return nameof(Database.IsFullTextEnabled);
+                            yield return nameof(Database.IsLedger);
+                            yield return nameof(Database.IsParameterizationForced);
+                            yield return nameof(Database.IsReadCommittedSnapshotOn);
+                            yield return nameof(Database.IsSqlDw);
+                            yield return nameof(Database.IsSqlDwEdition);
+                            yield return nameof(Database.IsVarDecimalStorageFormatEnabled);
+                            yield return nameof(Database.IsVarDecimalStorageFormatSupported);
+                            yield return nameof(Database.LegacyCardinalityEstimation);
+                            yield return nameof(Database.LegacyCardinalityEstimationForSecondary);
+                            yield return nameof(Database.LocalCursorsDefault);
+                            yield return nameof(Database.MaxDop);
+                            yield return nameof(Database.MaxDopForSecondary);
+                            yield return nameof(Database.MemoryAllocatedToMemoryOptimizedObjectsInKB);
+                            yield return nameof(Database.MemoryUsedByMemoryOptimizedObjectsInKB);
+                            yield return nameof(Database.PageVerify);
+                            yield return nameof(Database.ParameterSniffing);
+                            yield return nameof(Database.ParameterSniffingForSecondary);
+                            yield return nameof(Database.QueryOptimizerHotfixes);
+                            yield return nameof(Database.QueryOptimizerHotfixesForSecondary);
+                            yield return nameof(Database.ReadOnly);
+                            yield return nameof(Database.RecoveryModel);
+                            yield return nameof(Database.RecursiveTriggersEnabled);
+                            yield return nameof(Database.ServiceBroker);
+                            yield return nameof(Database.ServiceBrokerGuid);
+                            yield return nameof(Database.SnapshotIsolationState);
+                            yield return nameof(Database.TargetRecoveryTime);
+                            yield return nameof(Database.Trustworthy);
+                            yield return nameof(Database.UserAccess);
+                            // Used by SqlManagerUI to disable GUI elements named differently than corresponding properties
+                            yield return "AllowSnapshotIsolation";
+                            yield return "Automatic";
+                            yield return "ContainedDatabases";
+                            yield return "Cursor";
+                            yield return "DBChaining";
+                            yield return "DatabaseState";
+                            yield return "FileStream";
+                            yield return "Parameterization";
+                            yield return "RestrictAccess";
+                            yield return "ServiceBrokerGUID";
+                            yield return "VarDecimalEnabled";
+                        }
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+                        {
+                            yield return nameof(Database.IsLedger);
+                            yield return nameof(Database.RemoteDataArchiveEnabled);
+                        }
+                    }
+                    break;
+                case nameof(Table):
+                    {
+                        if (databaseEngineEdition != DatabaseEngineEdition.SqlDatabaseEdge)
+                        {
+                            yield return nameof(Table.DataRetentionEnabled);
+                            yield return nameof(Table.DataRetentionPeriod);
+                            yield return nameof(Table.DataRetentionPeriodUnit);
+                            yield return nameof(Table.DataRetentionFilterColumnName);
+                        }
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+                        {
+                            yield return nameof(Table.IndexSpaceUsed);
+                            yield return nameof(Table.IsDroppedLedgerTable);
+                            yield return nameof(Table.LedgerType);
+                            yield return nameof(Table.LedgerViewName);
+                            yield return nameof(Table.LedgerViewOperationTypeColumnName);
+                            yield return nameof(Table.LedgerViewSchema);
+                            yield return nameof(Table.LedgerViewSequenceNumberColumnName);
+                            yield return nameof(Table.LedgerViewTransactionIdColumnName);                
+                        }
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+                        {
+                            yield return nameof(Table.IsDroppedLedgerTable);
+                            yield return nameof(Table.LedgerType);
+                            yield return nameof(Table.LedgerViewName);
+                            yield return nameof(Table.LedgerViewOperationTypeColumnName);
+                            yield return nameof(Table.LedgerViewSchema);
+                            yield return nameof(Table.LedgerViewSequenceNumberColumnName);
+                            yield return nameof(Table.LedgerViewTransactionIdColumnName);                
+                        }
+                    }
+                    break;
+                case nameof(Index):
+                    {
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlDatabaseEdge)
+                        {
+                            yield return nameof(Index.SpatialIndexType);
+                            yield return nameof(Index.IsSpatialIndex);
+                        }
+                    }
+                    break;
+                case nameof(Audit):
+                    {
+                        if (databaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
+                        {
+                            yield return nameof(Audit.IsOperator);
+                        }
+                    }
+                    break;
+                case nameof(DataFile):
+                    {
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+                        {
 
-                // Disabled because it uses clr in engine and edge does not use CLR
-                //
-                yield return nameof(Index.SpatialIndexType);
-                yield return nameof(Index.IsSpatialIndex);
-                yield return nameof(Server.Configuration.ContainmentEnabled);
-            }
-            if (((sp != null && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand) || this.DatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand) &&
-                ((sp != null && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse) || this.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse))
-            {
-                yield return nameof(ExternalFileFormat.FirstRow);
-            }
-            if ((sp != null && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand) || this.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
-            {
-                yield return nameof(Database.AutoClose);
-                yield return nameof(Database.AutoCreateIncrementalStatisticsEnabled);
-                yield return nameof(Database.AutoCreateStatisticsEnabled);
-                yield return nameof(Database.AutoShrink);
-                yield return nameof(Database.AutoUpdateStatisticsAsync);
-                yield return nameof(Database.AutoUpdateStatisticsEnabled);
-                yield return nameof(Database.BrokerEnabled);
-                yield return nameof(Database.CatalogCollation);
-                yield return nameof(Database.CloseCursorsOnCommitEnabled);
-                yield return nameof(Database.CompatibilityLevel);
-                yield return nameof(Database.ContainmentType);
-                yield return nameof(Database.DatabaseOwnershipChaining);
-                yield return nameof(Database.DatabaseScopedConfigurations);
-                yield return nameof(Database.DatabaseScopedCredentials);
-                yield return nameof(Database.DateCorrelationOptimization);
-                yield return nameof(Database.DelayedDurability);
-                yield return nameof(Database.EncryptionEnabled);
-                yield return nameof(Database.FileGroups);
-                yield return nameof(Database.FilestreamDirectoryName);
-                yield return nameof(Database.FilestreamNonTransactedAccess);
-                yield return nameof(Database.HasMemoryOptimizedObjects);
-                yield return nameof(Database.HonorBrokerPriority);
-                yield return nameof(Database.IsFullTextEnabled);
-                yield return nameof(Database.IsLedger);
-                yield return nameof(Database.IsParameterizationForced);
-                yield return nameof(Database.IsReadCommittedSnapshotOn);
-                yield return nameof(Database.IsSqlDw);
-                yield return nameof(Database.IsSqlDwEdition);
-                yield return nameof(Database.IsVarDecimalStorageFormatEnabled);
-                yield return nameof(Database.IsVarDecimalStorageFormatSupported);
-                yield return nameof(Database.LegacyCardinalityEstimation);
-                yield return nameof(Database.LegacyCardinalityEstimationForSecondary);
-                yield return nameof(Database.LocalCursorsDefault);
-                yield return nameof(Database.MaxDop);
-                yield return nameof(Database.MaxDopForSecondary);
-                yield return nameof(Database.MemoryAllocatedToMemoryOptimizedObjectsInKB);
-                yield return nameof(Database.MemoryUsedByMemoryOptimizedObjectsInKB);
-                yield return nameof(Database.PageVerify);
-                yield return nameof(Database.ParameterSniffing);
-                yield return nameof(Database.ParameterSniffingForSecondary);
-                yield return nameof(Database.QueryOptimizerHotfixes);
-                yield return nameof(Database.QueryOptimizerHotfixesForSecondary);
-                yield return nameof(Database.ReadOnly);
-                yield return nameof(Database.RecoveryModel);
-                yield return nameof(Database.RecursiveTriggersEnabled);
-                yield return nameof(Database.ServiceBroker);
-                yield return nameof(Database.ServiceBrokerGuid);
-                yield return nameof(Database.SnapshotIsolationState);
-                yield return nameof(Database.TargetRecoveryTime);
-                yield return nameof(Database.Trustworthy);
-                yield return nameof(Database.UserAccess);
-                yield return nameof(Table.IndexSpaceUsed);
-                yield return nameof(Column.IsDroppedLedgerColumn);
-                yield return nameof(Table.LedgerType);
-                yield return nameof(Table.IsDroppedLedgerTable);
-                yield return nameof(Table.LedgerViewName);
-                yield return nameof(Table.LedgerViewOperationTypeColumnName);
-                yield return nameof(Table.LedgerViewSchema);
-                yield return nameof(Table.LedgerViewSequenceNumberColumnName);
-                yield return nameof(Table.LedgerViewTransactionIdColumnName);
-                yield return nameof(View.LedgerViewType);
-                yield return nameof(View.IsDroppedLedgerView);
-                // Used by SqlManagerUI to disable GUI elements named differently than corresponding properties
-                yield return "AllowSnapshotIsolation";
-                yield return "Automatic";
-                yield return "ContainedDatabases";
-                yield return "Cursor";
-                yield return "DBChaining";
-                yield return "DatabaseState";
-                yield return "FileStream";
-                yield return "Parameterization";
-                yield return "RestrictAccess";
-                yield return "ServiceBrokerGUID";
-                yield return "VarDecimalEnabled";
-            }
+                            yield return nameof(DataFile.VolumeFreeSpace);
+                        }
+                    }
+                    break;
+                case nameof(Configuration):
+                    {
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlDatabaseEdge)
+                        {
+                            yield return nameof(Server.Configuration.ContainmentEnabled);
 
-            if ((sp != null && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance) || this.DatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
-            {
-                yield return nameof(Audit.IsOperator);
-            }
-            if ((sp != null && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance) || this.DatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
-            {
-                yield return nameof(Database.IsLedger);
-                yield return nameof(Database.RemoteDataArchiveEnabled);
-                yield return nameof(DataFile.VolumeFreeSpace);
-                yield return nameof(Column.IsDroppedLedgerColumn);
-                yield return nameof(Table.LedgerType);
-                yield return nameof(Table.IsDroppedLedgerTable);
-                yield return nameof(Table.LedgerViewName);
-                yield return nameof(Table.LedgerViewOperationTypeColumnName);
-                yield return nameof(Table.LedgerViewSchema);
-                yield return nameof(Table.LedgerViewSequenceNumberColumnName);
-                yield return nameof(Table.LedgerViewTransactionIdColumnName);
-                yield return nameof(View.LedgerViewType);
-                yield return nameof(View.IsDroppedLedgerView);
+                        }
+                    }
+                    break;
+                case nameof(ExternalFileFormat):
+                    {
+                        if (databaseEngineEdition != DatabaseEngineEdition.SqlOnDemand && databaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+                        {
+                            yield return nameof(ExternalFileFormat.FirstRow);
+                        }
+                    }
+                    break;
             }
         }
 
@@ -4589,19 +4628,14 @@ namespace Microsoft.SqlServer.Management.Smo
             // If no ParentType was found just use the current type. This should only be needed for relative Urns
             parentType = parentType ?? this.GetType();
 
+            var defaultFields = forScripting
+                ? GetServerObject()
+                    .GetScriptInitFieldsInternal(childType, parentType, sp, DatabaseEngineEdition)
+                : GetServerObject()
+                    .GetDefaultInitFieldsInternal(childType, DatabaseEngineEdition);
             // if the initialization is done with the goal of scripting the object, the bring the
             // fields required for scripting, otherwise get the default init fields
-            if (forScripting)
-            {
-                levelQuery.Fields = GetServerObject()
-                    .GetScriptInitFieldsInternal(childType, parentType, sp,
-                        this.DatabaseEngineEdition);
-            }
-            else
-            {
-                levelQuery.Fields = GetServerObject()
-                    .GetDefaultInitFieldsInternal(childType, this.DatabaseEngineEdition);
-            }
+            levelQuery.Fields = defaultFields;
             if (extraFields != null && extraFields.Count() > 0)
             {
                 levelQuery.Fields = levelQuery.Fields.Union(extraFields).ToArray();
@@ -4612,9 +4646,9 @@ namespace Microsoft.SqlServer.Management.Smo
             levelQuery.OrderByList = GetOrderByList(childType);
 
             // do this special case for initializing Database with default init fields
-            if (IsDatabaseSpecialCase(forScripting, parsedUrn, levelQuery.Fields))
+            if (IsDatabaseSpecialCase(forScripting, parsedUrn, levelQuery.Fields, defaultFields))
             {
-                DoDatabaseSpecialCase(levelQuery, levelFilter, forScripting, null, 0);
+                DoDatabaseSpecialCase(levelQuery, levelFilter, forScripting, null, 0, defaultFields);
             }
             else
             {
@@ -4623,7 +4657,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //So StringComparer must be Initialized before executing the query.
                 InitializeStringComparer();
                 // execute the query
-                using (System.Data.IDataReader reader = this.ExecutionManager.GetEnumeratorDataReader(levelQuery))
+                using (var reader = ExecutionManager.GetEnumeratorDataReader(levelQuery))
                 {
                     // init all child objects from the query results
                     InitObjectsFromEnumResults(levelFilter, reader, forScripting, null, 0, false);
@@ -4647,34 +4681,41 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        bool IsDatabaseSpecialCase(bool forScripting, XPathExpression parsedUrn, string[] fields)
+        /// <summary>
+        /// When enumerating Database instances, we can't successfully fetch extra properties for unavailable databases.
+        /// When clients ask for "Status" in the property list explicitly, we will proactively exclude databases with a non-1 
+        /// status from full property population when such extra properties are requested.
+        /// </summary>
+        /// <param name="forScripting"></param>
+        /// <param name="parsedUrn"></param>
+        /// <param name="fields"></param>
+        /// <param name="defaultFields"></param>
+        /// <returns></returns>
+        private bool IsDatabaseSpecialCase(bool forScripting, XPathExpression parsedUrn, string[] fields, IList<string> defaultFields)
         {
-            if (!forScripting && parsedUrn[parsedUrn.Length - 1].Name == "Database")
+            if (!forScripting && parsedUrn[parsedUrn.Length - 1].Name == Database.UrnSuffix)
             {
-                foreach (string s in fields)
+                var extraFields = fields.Except(defaultFields).ToList();
+                if (extraFields.Count > 1 && extraFields.Contains(nameof(Database.Status)))
                 {
-                    if (s == "Status")
-                    {
-                        return true;
-            }
+                    return true;
                 }
             }
-
             return false;
         }
 
-        void DoDatabaseSpecialCase(Request levelQuery, Urn levelFilter, bool forScripting, List<string> urnList, int startLeafIdx)
+        private void DoDatabaseSpecialCase(Request levelQuery, Urn levelFilter, bool forScripting, List<string> urnList, int startLeafIdx, IList<string> defaultFields)
         {
-            string[] origFields = levelQuery.Fields;
+            var origFields = levelQuery.Fields;
 
             // first query for Name and Status
-            levelQuery.Fields = new string[] { "Name", "Status" };
+            levelQuery.Fields = defaultFields.Union(new[] { nameof(Database.Status) }).ToArray();
 
             // execute the query
-            using (System.Data.IDataReader statusReader = this.ExecutionManager.GetEnumeratorDataReader(levelQuery))
+            using (var statusReader = ExecutionManager.GetEnumeratorDataReader(levelQuery))
             {
                 // init all child objects from the query results
-                InitObjectsFromEnumResults(levelFilter, statusReader, forScripting, null, 0, (urnList != null));
+                InitObjectsFromEnumResults(levelFilter, statusReader, forScripting, null, 0, urnList != null);
             }
 
             // make sure all the child collections have the proper retrieved status
@@ -6898,6 +6939,9 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
             {
                 return LocalizableResources.EngineCloud;
+            } else if (sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+            {
+                return LocalizableResources.EngineCloudMI;
             }
             switch (sp.TargetServerVersion)
             {

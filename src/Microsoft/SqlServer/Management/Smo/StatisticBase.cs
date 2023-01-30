@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -58,20 +58,20 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-		private StatisticColumnCollection m_StatisticColumn;
-        [SfcObject( SfcContainerRelationship.ChildContainer, SfcContainerCardinality.OneToAny, typeof(StatisticColumn))]
-		public StatisticColumnCollection StatisticColumns
-		{
-			get 
-			{
-				CheckObjectState();
-				if( null == m_StatisticColumn )
-				{
-					m_StatisticColumn = new StatisticColumnCollection(this);
-				}
-				return m_StatisticColumn;
-			}
-		}
+        private StatisticColumnCollection m_StatisticColumn;
+        [SfcObject(SfcContainerRelationship.ChildContainer, SfcContainerCardinality.OneToAny, typeof(StatisticColumn))]
+        public StatisticColumnCollection StatisticColumns
+        {
+            get
+            {
+                CheckObjectState();
+                if (null == m_StatisticColumn)
+                {
+                    m_StatisticColumn = new StatisticColumnCollection(this);
+                }
+                return m_StatisticColumn;
+            }
+        }
 
         protected override void MarkDropped()
         {
@@ -295,16 +295,19 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
+                var clauses = new StringCollection();
+
                 // go through only if we have the stream
                 if (null != stData)
                 {
-                    sb.Append(" WITH STATS_STREAM = 0x");
+                    StringBuilder ss = new StringBuilder();
+                    ss.Append("STATS_STREAM = 0x");
 
                     foreach (byte b in (byte[])stData)
                     {
-                        sb.Append(b.ToString("X2", SmoApplication.DefaultCulture));
+                        ss.Append(b.ToString("X2", SmoApplication.DefaultCulture));
                     }
-
+                    clauses.Add(ss.ToString());
                     // PAGECOUNT and ROWCOUNT are not supported on memory optimized tables
                     // and NORECOMPUTE is a required option for memory optimized tables.
                     // For more about statistics on memory optimized tables, refer to
@@ -321,23 +324,32 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     if (isMemoryOptimized)
                     {
-                        sb.Append(", NORECOMPUTE");
+                        clauses.Add("NORECOMPUTE");
                     }
                     else
                     {
                         // add row and page count
                         if (null != rowCount && !(rowCount is DBNull))
                         {
-                            sb.Append(", ROWCOUNT = ");
-                            sb.Append(Convert.ToInt64(rowCount, SmoApplication.DefaultCulture).ToString(SmoApplication.DefaultCulture));
+                            clauses.Add("ROWCOUNT = " + Convert.ToInt64(rowCount, SmoApplication.DefaultCulture).ToString(SmoApplication.DefaultCulture));
                         }
 
                         if (null != pageCount && !(pageCount is DBNull))
                         {
-                            sb.Append(", PAGECOUNT = ");
-                            sb.Append(Convert.ToInt64(pageCount, SmoApplication.DefaultCulture).ToString(SmoApplication.DefaultCulture));
+                            clauses.Add("PAGECOUNT = " + Convert.ToInt64(pageCount, SmoApplication.DefaultCulture).ToString(SmoApplication.DefaultCulture));
                         }
                     }
+                }
+                if (IsSupportedProperty(nameof(IsAutoDropped), sp))
+                {
+                    clauses.Add("AUTO_DROP = " + (GetPropValueOptional(nameof(IsAutoDropped), false) ? "ON" : "OFF"));
+                }
+
+                if(clauses.Count > 0)
+                {
+                    var arr = new string[clauses.Count];
+                    clauses.CopyTo(arr, 0);
+                    sb.Append(" WITH " + String.Join(Globals.comma, arr));
                 }
             }
             else
@@ -349,7 +361,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private static string replaceOR(Match m)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(SmoApplication.DefaultCulture,"([{0}] IN (",m.Groups["column"].Captures[0].Value);
+            sb.AppendFormat(SmoApplication.DefaultCulture, "([{0}] IN (", m.Groups["column"].Captures[0].Value);
 
             //Retreiving values 
             for (int i = 0; i < m.Groups["value"].Captures.Count; i++)
@@ -540,33 +552,51 @@ namespace Microsoft.SqlServer.Management.Smo
             base.MarkForDropImpl(dropOnAlter);
         }
 
+        /// <summary>
+        /// Updates the statistic
+        /// </summary>
         public void Update()
         {
             ScriptingPreferences spnew = new ScriptingPreferences();
             this.ExecutionManager.ExecuteNonQuery(UpdateStatistics(GetDatabaseName(), GetTableName(), FormatFullNameForScripting(spnew),
-                m_ScanType, StatisticsTarget.All, GetNoRecompute(), m_sampleValue));
+                m_ScanType, StatisticsTarget.All, GetNoRecompute(), IsSupportedProperty(nameof(IsAutoDropped)), GetAutoDrop(), m_sampleValue));
         }
 
+        /// <summary>
+        /// Updates the statistic
+        /// <param name="scanType">determines the type of scan (FullScan, Percent Sample, Rows Sample, Resample)</param>
+        /// </summary>
         public void Update(StatisticsScanType scanType)
         {
             ScriptingPreferences spnew = new ScriptingPreferences();
             this.ExecutionManager.ExecuteNonQuery(UpdateStatistics(GetDatabaseName(), GetTableName(), FormatFullNameForScripting(spnew),
-                scanType, StatisticsTarget.All, GetNoRecompute(), m_sampleValue));
+                scanType, StatisticsTarget.All, GetNoRecompute(), IsSupportedProperty(nameof(IsAutoDropped)), GetAutoDrop(), m_sampleValue));
         }
 
+        /// <summary>
+        /// Updates the statistic
+        /// <param name="scanType">determines the type of scan (FullScan, Percent Sample, Rows Sample, Resample)</param>
+        /// <param name="sampleValue">determines percent or rows to sample</param>
+        /// </summary>
         public void Update(StatisticsScanType scanType, System.Int32 sampleValue)
         {
             ScriptingPreferences spnew = new ScriptingPreferences();
             this.ExecutionManager.ExecuteNonQuery(UpdateStatistics(GetDatabaseName(), GetTableName(), FormatFullNameForScripting(spnew),
-                scanType, StatisticsTarget.All, GetNoRecompute(), sampleValue));
+                scanType, StatisticsTarget.All, GetNoRecompute(), IsSupportedProperty(nameof(IsAutoDropped)), GetAutoDrop(), sampleValue));
         }
 
+        /// <summary>
+        /// Updates the statistic
+        /// <param name="scanType">determines the type of scan (FullScan, Percent Sample, Rows Sample, Resample)</param>
+        /// <param name="sampleValue">determines percent or rows to sample</param>
+        /// <param name="recompute">determines whether automatic statistics update is enabled</param>
+        /// </summary>
         public void Update(StatisticsScanType scanType, System.Int32 sampleValue, System.Boolean recompute)
         {
             ScriptingPreferences spnew = new ScriptingPreferences();
             // NOTE: The input parameter is true if they WANT to recompute. The UpdateStatistics function wants to know if the opposite is true.
             this.ExecutionManager.ExecuteNonQuery(UpdateStatistics(GetDatabaseName(), GetTableName(), FormatFullNameForScripting(spnew),
-                scanType, StatisticsTarget.All, !recompute, sampleValue));
+                scanType, StatisticsTarget.All, !recompute, IsSupportedProperty(nameof(IsAutoDropped)), GetAutoDrop(), sampleValue));
         }
 
         private String GetTableName()
@@ -601,6 +631,11 @@ namespace Microsoft.SqlServer.Management.Smo
             return bNoRecompute;
         }
 
+        private bool GetAutoDrop()
+        {
+            return GetPropValueIfSupported(nameof(IsAutoDropped), false);
+        }
+
         private void GetDDLBody(StringBuilder sb, ScriptingPreferences sp, bool creating)
         {
             if (creating && StatisticsScanType.Resample == m_ScanType)
@@ -608,7 +643,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new SmoException(ExceptionTemplates.InvalidScanType(StatisticsScanType.Resample.ToString()));
             }
 
-            UpdateStatisticsBody(sb, sp, m_ScanType, StatisticsTarget.All, GetNoRecompute(), m_sampleValue);
+            UpdateStatisticsBody(sb, sp, m_ScanType, StatisticsTarget.All, GetNoRecompute(), IsSupportedProperty(nameof(IsAutoDropped), sp), GetAutoDrop(), m_sampleValue);
         }
 
         public StringCollection Script()
@@ -622,8 +657,38 @@ namespace Microsoft.SqlServer.Management.Smo
             return ScriptImpl(scriptingOptions);
         }
 
+        /// <summary>
+        /// Returns a string collection for either Updating or Creating a 
+        /// statistic. Assumes that AUTO_DROP does not need to be updated.
+        /// <param name="dbName">name of database</param>
+        /// <param name="tableName">name of table</param>
+        /// <param name="statisticName">name of statistic</param>
+        /// <param name="scanType">determines the type of scan (FullScan, Percent Sample, Rows Sample, Resample)</param>
+        /// <param name="affectType">determines which statistics to target (stats for columns, or stats for indexes)</param>
+        /// <param name="bIsNorecompute">determines whether to include NORECOMPUTE in the result string</param>
+        /// <param name="sampleValue">determines percent or rows to sample</param>
+        /// </summary>
         internal static StringCollection UpdateStatistics(string dbName, string tableName, string statisticName
-                , StatisticsScanType scanType, StatisticsTarget affectType, bool bIsNorecompute, int sampleValue)
+                    , StatisticsScanType scanType, StatisticsTarget affectType, bool bIsNorecompute, int sampleValue)
+        {
+            return UpdateStatistics(dbName, tableName, statisticName, scanType, affectType, 
+                bIsNorecompute, bUpdateAutoDrop: false, bIsAutoDropped: false, sampleValue);
+        }
+
+        /// <summary>
+        /// Returns a string collection for either Updating or Creating a statistic
+        /// <param name="dbName">name of database</param>
+        /// <param name="tableName">name of table</param>
+        /// <param name="statisticName">name of statistic</param>
+        /// <param name="scanType">determines the type of scan (FullScan, Percent Sample, Rows Sample, Resample)</param>
+        /// <param name="affectType">determines which statistics to target (stats for columns, or stats for indexes)</param>
+        /// <param name="bIsNorecompute">determines whether to include NORECOMPUTE in the result string</param>
+        /// <param name="bUpdateAutoDrop">determines whether AUTO_DROP should be set</param>
+        /// <param name="bIsAutoDropped">determines the value that AUTO_DROP should be set to</param>
+        /// <param name="sampleValue">determines percent or rows to sample</param>
+        /// </summary>
+        internal static StringCollection UpdateStatistics(string dbName, string tableName, string statisticName
+                , StatisticsScanType scanType, StatisticsTarget affectType, bool bIsNorecompute, bool bUpdateAutoDrop, bool bIsAutoDropped, int sampleValue)
         {
             StringCollection queries = new StringCollection();
             queries.Add(string.Format(SmoApplication.DefaultCulture, "use {0}", dbName));
@@ -633,15 +698,26 @@ namespace Microsoft.SqlServer.Management.Smo
             ScriptingPreferences sonew = new ScriptingPreferences();
             sb.AppendFormat(SmoApplication.DefaultCulture, "UPDATE STATISTICS {0} {1}", tableName, statisticName);
 
-            UpdateStatisticsBody(sb, sonew, scanType, affectType, bIsNorecompute, sampleValue);
+            UpdateStatisticsBody(sb, sonew, scanType, affectType, bIsNorecompute, bUpdateAutoDrop, bIsAutoDropped, sampleValue);
 
             queries.Add(sb.ToString());
 
             return queries;
         }
 
+        /// <summary>
+        /// Builds the string for either Updating or Creating a statistic
+        /// <param name="sb">string builder for results</param>
+        /// <param name="sp">preferences for script formatting</param>
+        /// <param name="scanType">determines the type of scan (FullScan, Percent Sample, Rows Sample, Resample)</param>
+        /// <param name="affectType">determines which statistics to target (stats for columns, or stats for indexes)</param>
+        /// <param name="bIsNorecompute">determines whether to include NORECOMPUTE in the result string</param>
+        /// <param name="bUpdateAutoDrop">determines whether AUTO_DROP should be set</param>
+        /// <param name="bIsAutoDropped">determines the value that AUTO_DROP should be set to</param>
+        /// <param name="sampleValue">determines percent or rows to sample</param>
+        /// </summary>
         private static void UpdateStatisticsBody(StringBuilder sb, ScriptingPreferences sp, StatisticsScanType scanType,
-            StatisticsTarget affectType, bool bIsNorecompute, int sampleValue)
+            StatisticsTarget affectType, bool bIsNorecompute, bool bUpdateAutoDrop, bool bIsAutoDropped, int sampleValue)
         {
             StringCollection clauses = new StringCollection();
             switch (scanType)
@@ -675,16 +751,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 clauses.Add("NORECOMPUTE");
             }
 
-            for (int i = 0; i < clauses.Count; i++)
+            if (bUpdateAutoDrop)
             {
-                if (i == 0)
-                {
-                    sb.AppendFormat(SmoApplication.DefaultCulture, "{0}WITH{1}{2}", sp.NewLine, Globals.space, clauses[i]);
-                }
-                else
-                {
-                    sb.AppendFormat(SmoApplication.DefaultCulture, "{0}{1}", Globals.comma, clauses[i]);
-                }
+                clauses.Add("AUTO_DROP = " + (bIsAutoDropped ? "ON" : "OFF"));
+            }
+
+            if (clauses.Count > 0)
+            {
+                var arr = new String[clauses.Count];
+                clauses.CopyTo(arr, 0);
+                sb.AppendFormat(SmoApplication.DefaultCulture, "{0}WITH{1}{2}", sp.NewLine, Globals.space, String.Join(Globals.comma, arr));
             }
         }
 
@@ -709,6 +785,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         "NoAutomaticRecomputation",
                     "FilterDefinition",
                     "IsAutoCreated",
+                    nameof(IsAutoDropped),
                     "IsFromIndexCreation",
                               "IsTemporary"};
             List<string> list = GetSupportedScriptFields(typeof(Statistic.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);

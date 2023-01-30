@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
 namespace Microsoft.SqlServer.Management.Smo
 {
     /// <summary>

@@ -35,8 +35,6 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
-<!-- BEGIN NOGITHUB-->
-<!-- END NOGITHUB -->
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj" />
   <ItemGroup>
     <Compile Remove="ScriptingTests\BrokerPriority_SmoTestSuite.cs" />

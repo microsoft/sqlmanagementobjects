@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -65,7 +65,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
 
         public IMetadataObject TargetObject
         {
-            get 
+            get
             {
                 if (!this.targetObjectSet)
                 {
@@ -73,7 +73,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                     this.targetObjectSet = true;
                 }
 
-                return this.targetObject; 
+                return this.targetObject;
             }
         }
 
@@ -124,11 +124,11 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                     return database.Schemas[this.permissionInfo.ObjectName];
 
                 case Smo.ObjectClass.UserDefinedType:
-                    return 
+                    return
                         (IMetadataObject)database.Schemas[this.permissionInfo.ObjectSchema].UserDefinedDataTypes[this.permissionInfo.ObjectName] ??
                         (IMetadataObject)database.Schemas[this.permissionInfo.ObjectSchema].UserDefinedTableTypes[this.permissionInfo.ObjectName] ??
                         (IMetadataObject)database.Schemas[this.permissionInfo.ObjectSchema].UserDefinedClrTypes[this.permissionInfo.ObjectName];
-                                    
+
                 case Smo.ObjectClass.Certificate:
                     return database.Certificates[this.permissionInfo.ObjectName];
 

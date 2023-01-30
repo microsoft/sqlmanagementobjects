@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -22,10 +22,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             do
             {
-                // Grigoryp 11/16/11 adding DatabaseXEStore here
-                // This is really bad, but I have no other choice at the moment.
-                // This urn-parsing mechanism should be replaced with generic solution not tied to any particular domain.
-                // Enumerator has to be domain-agnostic.
                 if (urn.Type == "Database" || urn.Type == "DatabaseXEStore")
                 {
                     return urn.GetAttribute("Name");
@@ -55,20 +51,14 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                  *        A more generic solutions to handle Urns like 
                  *              Server[@Name='foo']/Database/Table - all tables in all databases
                  *              Server[@Name='foo']/Database[@IsSystemObject=true()]/View - all views in system databases.
-                 *        is being tracked in VSTS: 341169
+                 *        would be useful.
                  * 
                  */
 
-            ServerConnection serverConnection = GetServerConnection(connectionInfo);
-            bool isUpdated = false;
+            var serverConnection = GetServerConnection(connectionInfo);
+            var isUpdated = false;
 
-            // DW Gen3 does not need a new connection when changing databases.
-            // DW Gen2 is SqlDataWarehouse edition with major version of 10.
-            // DW Gen3 is SqlDataWarehouse edition with major version of 12.
-            if (serverConnection != null &&
-                serverConnection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
-                !(serverConnection.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse &&
-                serverConnection.ProductVersion.Major >= 12))
+            if (serverConnection != null && serverConnection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
             {
                 string dbName = urn.GetSqlDatabaseName();
                 if (dbName != null)

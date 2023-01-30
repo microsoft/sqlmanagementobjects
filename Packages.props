@@ -8,20 +8,21 @@
       <DotNetPackagesVersion>4.7.0</DotNetPackagesVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Update="Azure.Core" Version="1.20.0" />
-        <PackageReference Update="Azure.Identity" Version="1.5.0" />
-        <PackageReference Update="Azure.Security.KeyVault.Secrets" Version="4.2.0" />
-        <PackageReference Update="Microsoft.Data.SqlClient" Version="$(SqlClientPackageVersion)" />
+        <PackageReference Update="Azure.Core" Version="1.24.0" />
+        <PackageReference Update="Azure.Identity" Version="1.6.0" />
+        <PackageReference Update="Azure.Security.KeyVault.Secrets" Version="4.4.0" />
+        <!-- MDS 4+ has breaking changes SMO can't run with -->
+        <PackageReference Update="Microsoft.Data.SqlClient" Version="[$(SqlClientPackageVersion),4)" />
         <PackageReference Update="Microsoft.Data.Tools.StringResourceTool" Version="3.2.0" />
-        <PackageReference Update="Microsoft.Identity.Client"                                Version="4.35.0" />
-        <PackageReference Update="Microsoft.Identity.Client.Desktop"                        Version="4.35.0" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-        <PackageReference Update="Microsoft.SqlServer.Assessment" Version="1.0.*" />
+        <PackageReference Update="Microsoft.Identity.Client"                                Version="4.39.0" />
+        <PackageReference Update="Microsoft.Identity.Client.Desktop"                        Version="4.39.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+        <PackageReference Update="Microsoft.SqlServer.Assessment" Version="1.1.9" />
         <PackageReference Update="Microsoft.SqlServer.Management.SqlParser" Version="$(SqlParserPackageVersion)" />
         <PackageReference Update="Moq" Version="4.16.1" />
-        <PackageReference Update="MSTest.TestAdapter" Version="2.0.0" />
-        <PackageReference Update="MSTest.TestFramework" Version="2.0.0" />
-        <PackageReference Update="NewtonSoft.Json" Version="11.0.1" />
+        <PackageReference Update="MSTest.TestAdapter" Version="2.2.10" />
+        <PackageReference Update="MSTest.TestFramework" Version="2.2.10" />
+        <PackageReference Update="NewtonSoft.Json" Version="13.0.1" />
         <PackageReference Update="NUnit" Version="3.11.0" />
         <PackageReference Update="System.Buffers"                                           Version="4.5.1" />
         <PackageReference Update="System.Data.OleDb" Version="$(DotNetPackagesVersion)" />
@@ -39,7 +40,5 @@
         <!-- GlobalPackageReference packages are installed and processed by msbuild but are not referenced by the C# compiler -->
         <GlobalPackageReference Include="StrawberryPerl" Version="5.28.0.1" GeneratePathProperty="true" />
     </ItemGroup>
-<!-- BEGIN NOGITHUB -->
-<!-- END NOGITHUB -->
 
 </Project>

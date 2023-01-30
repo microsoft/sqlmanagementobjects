@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -4499,38 +4499,60 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         Weekly = 8
     }
 
-    ///
+    /// <summary>
+    /// Represents current_execution_status values from sp_help_job result
+    /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
     [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.JobExecutionStatusConverter))]
     public enum JobExecutionStatus
     {
-        ///    
+        /// <summary>
+        /// Executing
+        /// </summary>
         [LocDisplayName("Executing")]
         Executing = 1,
 
-        ///
+        /// <summary>
+        /// Waiting for thread
+        /// </summary>
         [LocDisplayName("WaitingForWorkerThread")]
         WaitingForWorkerThread = 2,
 
-        ///
+        /// <summary>
+        /// Between retries
+        /// </summary>
         [LocDisplayName("BetweenRetries")]
         BetweenRetries = 3,
 
-        ///
+        /// <summary>
+        /// Idle
+        /// </summary>
         [LocDisplayName("Idle")]
         Idle = 4,
 
-        ///
+        /// <summary>
+        /// Suspended
+        /// </summary>
         [LocDisplayName("Suspended")]
         Suspended = 5,
 
-        ///
+        /// <summary>
+        /// Obsolete
+        /// </summary>
         [LocDisplayName("WaitingForStepToFinish")]
         WaitingForStepToFinish = 6,
 
-        ///
+        /// <summary>
+        /// Performing completion action
+        /// </summary>
         [LocDisplayName("PerformingCompletionAction")]
-        PerformingCompletionAction = 7
+        PerformingCompletionAction = 7,
+
+        /// <summary>
+        /// Queued
+        /// </summary>
+        [LocDisplayName("Queued")]
+        Queued = 8
     }
 
     ///

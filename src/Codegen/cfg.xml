@@ -1180,6 +1180,7 @@
       <property name="FileGroup" generate="true" is_intrinsic="false" />
       <property name="ID" generate="true" is_intrinsic="false" />
       <property name="IsAutoCreated" generate="true" is_intrinsic="true" />
+      <property name="IsAutoDropped" generate="true" is_intrinsic="false" />
       <property name="IsFromIndexCreation" generate="true" is_intrinsic="true" />
       <property name="IsTemporary" generate="true" is_intrinsic="true" />
       <property name="LastUpdated" generate="true" is_intrinsic="false" />

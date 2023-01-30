@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 
@@ -29,6 +29,7 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
+using System.Linq.Expressions;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -100,9 +101,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.serverConnection = m_ExecutionManager.ConnectionContext;
             }
 
-            // make sure the init fields hashtable is big enough
-            hashInitFields = new Hashtable(257);
-            collInitFields = new Hashtable(257);
             SetState(SqlSmoState.Existing);
             objectInSpace = false;
             SetObjectKey(new SimpleObjectKey(this.Name));
@@ -235,18 +233,18 @@ namespace Microsoft.SqlServer.Management.Smo
             // treat special server names : ".", "", "(locall)"
             if (name == "." || name == "(local)" || name == "localhost" || name.Length == 0)
             {
-                return (System.Environment.MachineName);
+                return System.Environment.MachineName;
             }
 
             // named instances on the above exceptions
             if (name.StartsWith(".\\", StringComparison.Ordinal))
             {
-                return (name.Replace(".", System.Environment.MachineName));
+                return name.Replace(".", System.Environment.MachineName);
             }
 
             if (name.StartsWith("(local)\\", StringComparison.Ordinal))
             {
-                return (name.Replace("(local)", System.Environment.MachineName));
+                return name.Replace("(local)", System.Environment.MachineName);
             }
 
             return name;
@@ -293,7 +291,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //Latin1 this is a collation hardcoded for some of the metadata
             //columns make it a special case
             //excluding SQL_Latin1_General_CP1254 as its lcid is 1055 instead of 1033
-            if (collationName.Contains("Latin1") && !(collationName.Contains("SQL_Latin1_General_CP1254")))
+            if (collationName.Contains("Latin1") && !collationName.Contains("SQL_Latin1_General_CP1254"))
             {
                 return 1033;
             }
@@ -536,121 +534,121 @@ namespace Microsoft.SqlServer.Management.Smo
             */
             if (nodeType == JobServer.UrnSuffix)
             {
-                return (((Server)parentNode).JobServer);
+                return ((Server)parentNode).JobServer;
             }
 
             if (nodeType == AlertSystem.UrnSuffix)
             {
-                return (((JobServer)parentNode).AlertSystem);
+                return ((JobServer)parentNode).AlertSystem;
             }
 
             if (nodeType == UserOptions.UrnSuffix)
             {
-                return (((Server)parentNode).UserOptions);
+                return ((Server)parentNode).UserOptions;
             }
 
             if (nodeType == Information.UrnSuffix)
             {
-                return (((Server)parentNode).Information);
+                return ((Server)parentNode).Information;
             }
 
             if (nodeType == Settings.UrnSuffix)
             {
-                return (((Server)parentNode).Settings);
+                return ((Server)parentNode).Settings;
             }
 
             if (nodeType == FullTextIndex.UrnSuffix)
             {
-                return (((TableViewBase)parentNode).FullTextIndex);
+                return ((TableViewBase)parentNode).FullTextIndex;
             }
 
             if (nodeType == DefaultConstraint.UrnSuffix &&
                     parentNode is Microsoft.SqlServer.Management.Smo.Column)
             {
-                return (((Column)parentNode).DefaultConstraint);
+                return ((Column)parentNode).DefaultConstraint;
             }
 
             if (nodeType == DatabaseOptions.UrnSuffix)
             {
-                return (((Database)parentNode).DatabaseOptions);
+                return ((Database)parentNode).DatabaseOptions;
             }
 
             if (nodeType == SqlMail.UrnSuffix)
             {
-                return (((Server)parentNode).Mail);
+                return ((Server)parentNode).Mail;
             }
 
             if (nodeType == SoapPayload.UrnSuffix)
             {
-                return (((Endpoint)parentNode).Payload.Soap);
+                return ((Endpoint)parentNode).Payload.Soap;
             }
 
             if (nodeType == DatabaseMirroringPayload.UrnSuffix)
             {
-                return (((Endpoint)parentNode).Payload.DatabaseMirroring);
+                return ((Endpoint)parentNode).Payload.DatabaseMirroring;
             }
 
             if (nodeType == ServiceBrokerPayload.UrnSuffix &&
                     parentNode is Microsoft.SqlServer.Management.Smo.Endpoint)
             {
-                return (((Endpoint)parentNode).Payload.ServiceBroker);
+                return ((Endpoint)parentNode).Payload.ServiceBroker;
             }
 
             if (nodeType == HttpProtocol.UrnSuffix)
             {
-                return (((Endpoint)parentNode).Protocol.Http);
+                return ((Endpoint)parentNode).Protocol.Http;
             }
 
             if (nodeType == TcpProtocol.UrnSuffix)
             {
-                return (((Endpoint)parentNode).Protocol.Tcp);
+                return ((Endpoint)parentNode).Protocol.Tcp;
             }
 
             if (nodeType == ServiceBroker.UrnSuffix)
             {
-                return (((Database)parentNode).ServiceBroker);
+                return ((Database)parentNode).ServiceBroker;
             }
 
             if (nodeType == DatabaseEncryptionKey.UrnSuffix)
             {
-                return (((Database)parentNode).DatabaseEncryptionKey);
+                return ((Database)parentNode).DatabaseEncryptionKey;
             }
 
             if (nodeType == ServiceMasterKey.UrnSuffix &&
                     parentNode is Microsoft.SqlServer.Management.Smo.Server)
             {
-                return (((Server)parentNode).ServiceMasterKey);
+                return ((Server)parentNode).ServiceMasterKey;
             }
 
             if (nodeType == MasterKey.UrnSuffix &&
                     parentNode is Microsoft.SqlServer.Management.Smo.Database)
             {
-                return (((Database)parentNode).MasterKey);
+                return ((Database)parentNode).MasterKey;
             }
 
             if (nodeType == ResourceGovernor.UrnSuffix)
             {
-                return (((Server)parentNode).ResourceGovernor);
+                return ((Server)parentNode).ResourceGovernor;
             }
 
             if (nodeType == ServerProxyAccount.UrnSuffix)
             {
-                return (((Server)parentNode).ProxyAccount);
+                return ((Server)parentNode).ProxyAccount;
             }
 
             if (nodeType == SmartAdmin.UrnSuffix)
             {
-                return (((Server)parentNode).SmartAdmin);
+                return ((Server)parentNode).SmartAdmin;
             }
 
             if (nodeType == FullTextService.UrnSuffix)
             {
-                return (((Server)parentNode).FullTextService);
+                return ((Server)parentNode).FullTextService;
             }
 
             if (nodeType == QueryStoreOptions.UrnSuffix)
             {
-                return (((Database) parentNode).QueryStoreOptions);
+                return ((Database) parentNode).QueryStoreOptions;
             }
 
             // retrieve the child collection
@@ -1122,7 +1120,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (xp1.Length != xp2.Length)
             {
-                return (xp1.Length - xp2.Length);
+                return xp1.Length - xp2.Length;
             }
 
             // if the urn is actually an empty string
@@ -2112,59 +2110,54 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="databaseName"></param>
         public void KillAllProcesses(string databaseName)
         {
-            ThrowIfCloud();
 
+            if (null == databaseName)
+            {
+                throw new ArgumentNullException("databaseName");
+            }
             try
             {
-                if (null == databaseName)
-                {
-                    throw new ArgumentNullException("databaseName");
-                }
-
-                if (this.ConnectionContext.SqlExecutionModes == Microsoft.SqlServer.Management.Common.SqlExecutionModes.CaptureSql)
+                if (ConnectionContext.SqlExecutionModes == SqlExecutionModes.CaptureSql)
                 {
                     return;
                 }
 
-                // move into master, so that we don't need to kill the current connection
-                // in case it was in the target database
-                this.ExecutionManager.ExecuteNonQuery(Scripts.USEMASTER);
-
                 // enumerate all processes in the database
-
                 DataTable spids = null;
                 string spidColumn = null;
-                if (this.ServerVersion.Major == 8)
+                if (ServerVersion.Major == 8)
                 {
-                    spids = this.ExecutionManager.ExecuteWithResults(string.Format(SmoApplication.DefaultCulture,
+                    spids = ExecutionManager.ExecuteWithResults(string.Format(SmoApplication.DefaultCulture,
                         "SELECT DISTINCT req_spid FROM master.dbo.syslockinfo WHERE rsc_type = 2 AND rsc_dbid = db_id('{0}') AND req_spid > 50",
                         SqlString(databaseName))).Tables[0];
                     spidColumn = "req_spid";
                 }
                 else
                 {
-                    //SPID < 50 are server processes so can't be killed
-                    spids = this.ExecutionManager.ExecuteWithResults(string.Format(SmoApplication.DefaultCulture,
-                        "SELECT DISTINCT request_session_id FROM master.sys.dm_tran_locks WHERE resource_type = 'DATABASE' AND resource_database_id = db_id(N'{0}') and request_session_id > 50",
-                        SqlString(databaseName))).Tables[0];
+                    spids = ExecutionManager.ExecuteWithResults(string.Format(SmoApplication.DefaultCulture,
+                    "SELECT DISTINCT dtl.request_session_id FROM sys.dm_tran_locks dtl left join sys.dm_exec_sessions des on dtl.request_session_id = des.session_id WHERE dtl.resource_type = 'DATABASE' AND dtl.resource_database_id = db_id(N'{0}') and dtl.request_session_id != @@spid",
+                    SqlString(databaseName))).Tables[0];
                     spidColumn = "request_session_id";
                 }
 
                 Diagnostics.TraceHelper.Assert(null != spids, "null == spids");
                 Diagnostics.TraceHelper.Assert(null != spidColumn, "null == spidColumn");
 
-                StringCollection col = new StringCollection();
-                col.Add(Scripts.USEMASTER);
+                var col = new StringCollection();
+                if (DatabaseEngineType == DatabaseEngineType.Standalone)
+                {
+                    _ = col.Add(Scripts.USEMASTER);
+                }
 
                 // iterate through the process list, build the statement to kill
                 // all user processes
                 foreach (DataRow row in spids.Rows)
                 {
-                    col.Add(string.Format(SmoApplication.DefaultCulture,
-                                    "KILL {0}", Convert.ToInt32(row[spidColumn], SmoApplication.DefaultCulture)));
+                    var spid = Convert.ToInt32(row[spidColumn], SmoApplication.DefaultCulture);
+                    _ = col.Add($"BEGIN TRY KILL {spid} END TRY BEGIN CATCH PRINT '{spid} is not active or could not be killed' END CATCH");
                 }
 
-                this.ExecutionManager.ExecuteNonQuery(col);
+                ExecutionManager.ExecuteNonQuery(col);
             }
             catch (Exception e)
             {
@@ -2172,7 +2165,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 throw new FailedOperationException(ExceptionTemplates.DropAllActiveDBConnections, this, e);
             }
-
         }
 
         public DataTable EnumDirectories(String path)
@@ -2727,17 +2719,14 @@ namespace Microsoft.SqlServer.Management.Smo
             return propagateInfo.ToArray();
         }
 
-        Hashtable hashInitFields;
-        internal Hashtable HashInitFields
+        /// <summary>
+        ///  Contains the list of initialization fields for each SqlSmoObject type
+        ///  The order of fields in the list must be maintained, as required fields are always first.
+        /// </summary>
+        private IDictionary<Type, IList<string>> TypeInitFields
         {
-            get { return hashInitFields; }
-        }
-
-        Hashtable collInitFields;
-        internal Hashtable CollInitFields
-        {
-            get { return collInitFields; }
-        }
+            get;
+        } = new Dictionary<Type, IList<string>>();
 
         /// <summary>
         /// returns a clone of the default init fields. This function will be deprecated. Please use the overload function.
@@ -2797,7 +2786,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="typeObject">Type of the object</param>
         /// <param name="fields">List of the fields</param>
-        /// <param name="databaseEngineEdition">Database edition of the object. This is required as a Database and it children can have different properties based on the databaseEngineEdition</param>
+        /// <param name="databaseEngineEdition">This value is ignored by the method. Field names not relevant for the active Database will be filtered from the query.</param>
         public void SetDefaultInitFields(Type typeObject, StringCollection fields, DatabaseEngineEdition databaseEngineEdition)
         {
             // validate input parameters
@@ -2817,63 +2806,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new FailedOperationException(ExceptionTemplates.CannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
             }
 
-            Hashtable newHash = new Hashtable();
-            HashInitFields[typeObject] = newHash;
-
-            StringCollection newFields = CreateInitFieldsColl(typeObject);
-            CollInitFields[typeObject] = newFields;
-
-            foreach (string s in newFields)
-            {
-                newHash[s] = s;
-            }
-
-            foreach (string s in fields)
-            {
-
-                // DataType gets expanded automatically to those fields
-                if (s == "DataType")
-                {
-                    newHash["DataType"] = "DataType";
-                    newHash["SystemType"] = "SystemType";
-                    newHash["Length"] = "Length";
-                    newHash["NumericPrecision"] = "NumericPrecision";
-                    newHash["NumericScale"] = "NumericScale";
-                    //Task 11813773: Excluding below Xml fields as these are not supported for SqlDataWarehouse. This prevents unknown property error when the typeObject is StoredProcedureParameter.
-                    if (this.ServerVersion.Major > 8 && databaseEngineEdition != Cmn.DatabaseEngineEdition.SqlDataWarehouse)
-                    {
-                        newHash["XmlSchemaNamespace"] = "XmlSchemaNamespace";
-                        newHash["XmlSchemaNamespaceSchema"] = "XmlSchemaNamespaceSchema";
-                        newHash["XmlDocumentConstraint"] = "XmlDocumentConstraint";
-                    }
-                    newHash["DataTypeSchema"] = "DataTypeSchema";
-
-                    newFields.Add("DataType");
-                    newFields.Add("SystemType");
-                    newFields.Add("Length");
-                    newFields.Add("NumericPrecision");
-                    newFields.Add("NumericScale");
-                    if (this.ServerVersion.Major > 8 && databaseEngineEdition != Cmn.DatabaseEngineEdition.SqlDataWarehouse)
-                    {
-                        newFields.Add("XmlSchemaNamespace");
-                        newFields.Add("XmlSchemaNamespaceSchema");
-                        newFields.Add("XmlDocumentConstraint");
-                    }
-                    newFields.Add("DataTypeSchema");
-                }
-
-                // make sure the strings don't appear more than once here
-                if (newHash.ContainsKey(s))
-                {
-                    continue;
-                }
-
-                // better to hold the same string as value, so we avoid creating
-                // another object here
-                newHash[s] = s;
-
-                newFields.Add(s);
-            }
+            var initFields = CreateInitFieldsColl(typeObject).ToList();
+            initFields.AddRange(fields.Cast<string>().Where(f => !initFields.Contains(f)));
+            TypeInitFields[typeObject] = initFields;
         }
 
         /// <summary>
@@ -2899,7 +2834,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new FailedOperationException(ExceptionTemplates.SetDefaultInitFields, this, new ArgumentNullException("fields"));
             }
 
-            StringCollection fieldColl = new StringCollection();
+            var fieldColl = new StringCollection();
             fieldColl.AddRange(fields);
             SetDefaultInitFields(typeObject, fieldColl, databaseEngineEdition);
         }
@@ -3003,7 +2938,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // make sure we clean the hashtable containing properties
             // that have been set so far, either by the user or have been accumulating
-            CollInitFields.Clear();
+            TypeInitFields.Clear();
 
             this.useAllFieldsForInit = allFields;
         }
@@ -3016,170 +2951,155 @@ namespace Microsoft.SqlServer.Management.Smo
                 return true;
             }
 
-            Hashtable existingFields = HashInitFields[typeObject] as Hashtable;
-            if (null != existingFields)
-            {
-                return existingFields.Contains(fieldName);
-            }
-            else
-            {
-                return false;
-            }
+            var existingFields = TypeInitFields.ContainsKey(typeObject) ? TypeInitFields[typeObject] : null;
+            return existingFields?.Contains(fieldName) ?? false;
         }
 
         internal string[] GetDefaultInitFieldsInternal(Type typeObject, DatabaseEngineEdition databaseEngineEdition)
         {
             // Has the existing fields already been inited
-            StringCollection existingFields = CollInitFields[typeObject] as StringCollection;
-            if (null == existingFields)
+            var requiredFields = CreateInitFieldsColl(typeObject);
+            IList<string> existingFields;
+            if (!(TypeInitFields.TryGetValue(typeObject, out existingFields)))
             {
-                // No, get the init fields
-                existingFields = CreateInitFieldsColl(typeObject);
-
+                var fields = CreateInitFieldsColl(typeObject).ToList();
                 // Should we init with all fields
                 if (useAllFieldsForInit)
                 {
-                    // Yes, create a hash table to keep out dupes
-                    Hashtable fieldsHashTable = new Hashtable();
-
-                    // Now put in the init fields
-                    // Note: We don't need to catch ArgumentException because
-                    //       these are guaranteed to be unique
-                    foreach (string s in existingFields)
+                    // If we are possibly connected to a logical master in Azure, combine DB and DW properties for "all"
+                    if (DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase)
                     {
-                        fieldsHashTable.Add(s, null);
+                        var dbProperties = GetPropertyNames(typeObject, DatabaseEngineEdition.SqlDatabase).Cast<string>();
+                        var dwProperties = GetPropertyNames(typeObject, DatabaseEngineEdition.SqlDataWarehouse).Cast<string>();
+                        fields.AddRange(dbProperties.Union(dwProperties).Where(f => !fields.Contains(f)));
                     }
-
-                    // Put all the property names in checking for dupes
-                    foreach (string s in GetPropertyNames(typeObject, databaseEngineEdition))
+                    else
                     {
-                        try
-                        {
-                            // Add the string to the hash table
-                            // Note: This throws ArgumentException on a dupe so
-                            //       it won't be added to the existingFields when
-                            //       a dupe is encountered
-                            fieldsHashTable.Add(s, null);
-
-                            // Put the string into the existing fields
-                            existingFields.Add(s);
-                        }
-                        catch (ArgumentException)
-                        {
-                            // This is a dupe and that is ok as we just won't
-                            // add it to the list
-                        }
+                        fields.AddRange(GetPropertyNames(typeObject, databaseEngineEdition).Cast<string>().Where(f => !fields.Contains(f)));
                     }
+                    TypeInitFields[typeObject] = fields;
                 }
-                CollInitFields[typeObject] = existingFields;
+                existingFields = fields;
             }
-
-            string[] fields = new string[existingFields.Count];
-            existingFields.CopyTo(fields, 0);
-
-            return fields;
+            // The caller may have used SetDefaultInitFields with properties not available in the current DatabaseEngineEdition.
+            // Filter those out.
+            // The order of the required fields must be preserved.
+            // Note that some required fields like Name and Schema are not included in IsSupportedProperty
+            return existingFields.Where(f => requiredFields.Contains(f) || IsSupportedProperty(typeObject, f, databaseEngineEdition)).ToArray();
         }
 
-        private StringCollection CreateInitFieldsColl(Type typeObject)
+        private IEnumerable<string> CreateInitFieldsColl(Type typeObject)
         {
-            StringCollection fields = new StringCollection();
-
             // add fields that are mandatory
             // we will strip those fields when the user is requesting them
             // but we need them at runtime when we initialize the object, and we'd
             // rather have them in the collection for performance consideration
-
+            // Note that some common property names like ID are not defined in the base class
+            // as they have to be codegen'd for the concrete classes.
+            // Some fields don't have C# wrapper properties.
+            
             if (typeObject.IsSubclassOf(typeof(ScriptSchemaObjectBase)))
             {
-                fields.Add("Schema");
-                fields.Add("Name");
+                yield return nameof(ScriptSchemaObjectBase.Schema);
+                yield return nameof(ScriptSchemaObjectBase.Name);
 
                 if (typeObject.IsSubclassOf(typeof(TableViewBase)))
                 {
-                    fields.Add("ID");
+                    yield return nameof(Table.ID);
                 }
             }
             else if (typeObject == typeof(NumberedStoredProcedure))
             {
-                fields.Add("Number");
+                yield return nameof(NumberedStoredProcedure.Number);
             }
             else if (SqlSmoObject.IsOrderedByID(typeObject))
             {
-                fields.Add("ID");
-                fields.Add("Name");
+                yield return "ID";
+                yield return "Name";
             }
             else if (typeObject.IsSubclassOf(typeof(MessageObjectBase)))
             {
-                fields.Add("ID");
-                fields.Add("Language");
+                yield return "ID";
+                yield return "Language";
             }
             else if (typeObject.IsSubclassOf(typeof(SoapMethodObject)))
             {
-                fields.Add("Namespace");
-                fields.Add("Name");
+                yield return "Namespace";
+                yield return "Name";
             }
             else if (typeObject.IsSubclassOf(typeof(ScheduleBase)))
             {
-                fields.Add("Name");
-                fields.Add("ID");
+                yield return "Name";
+                yield return "ID";
             }
             else if (typeObject == typeof(Job))
             {
-                fields.Add("Name");
-                fields.Add("CategoryID");
-                fields.Add("JobID");
+                yield return nameof(Job.Name);
+                yield return nameof(Job.CategoryID);
+                yield return nameof(Job.JobID);
             }
             else if (typeObject == typeof(Database))
             {
-                fields.Add(nameof(Database.Name));
+                yield return nameof(Database.Name);
                 // If we are connected to an OnDemand or DataWarehouse instance through the ServerConnection
                 // the Database can only be the same edition as the ServerConnection.
                 // If we are connected to logical master then Database can have a different edition, so
                 // add RealEngineEdition to the query so we get the edition from sys.database_service_objectives
                 if (DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase) {
-                    fields.Add("RealEngineEdition");
+                    yield return "RealEngineEdition";
                 }
             }
             else if (typeObject.IsSubclassOf(typeof(NamedSmoObject)))
             {
-                fields.Add("Name");
+                yield return nameof(NamedSmoObject.Name);
             }
             else if (typeObject == typeof(PhysicalPartition))
             {
-                fields.Add("PartitionNumber");
+                yield return nameof(PhysicalPartition.PartitionNumber);
             }
             else if (typeObject == typeof(DatabaseReplicaState))
             {
-                fields.Add("AvailabilityReplicaServerName");
-                fields.Add("AvailabilityDatabaseName");
+                yield return nameof(DatabaseReplicaState.AvailabilityReplicaServerName);
+                yield return nameof(DatabaseReplicaState.AvailabilityDatabaseName);
             }
             else if (typeObject == typeof(AvailabilityGroupListenerIPAddress))
             {
-                fields.Add("IPAddress");
-                fields.Add("SubnetMask");
-                fields.Add("SubnetIP");
+                yield return nameof(AvailabilityGroupListenerIPAddress.IPAddress);
+                yield return nameof(AvailabilityGroupListenerIPAddress.SubnetMask);
+                yield return nameof(AvailabilityGroupListenerIPAddress.SubnetIP);
             }
             else if (typeObject == typeof(SecurityPredicate))
             {
-                fields.Add("SecurityPredicateID");
+                yield return nameof(SecurityPredicate.SecurityPredicateID);
             }
             else if (typeObject == typeof(ColumnEncryptionKeyValue))
             {
-                fields.Add("ColumnMasterKeyID");
+                yield return nameof(ColumnEncryptionKeyValue.ColumnMasterKeyID);
             }
             if (typeObject == typeof(Column))
             {
-                fields.Add("DefaultConstraintName");
+                yield return nameof(Column.DefaultConstraintName);
             }
             if (typeObject == typeof (DefaultConstraint))
             {
-                fields.Add("IsFileTableDefined");
+                yield return nameof(DefaultConstraint.IsFileTableDefined);
             }
             if (typeObject == typeof(Information))
             {
-                fields.Add("Edition");
+                yield return nameof(Information.Edition);
             }
-            return fields;
+            if (typeObject == typeof(DataType))
+            {
+                yield return "DataType";
+                yield return "SystemType";
+                yield return "Length";
+                yield return nameof(DataType.NumericPrecision);
+                yield return nameof(DataType.NumericScale);
+                yield return "XmlSchemaNamespace";
+                yield return "XmlSchemaNamespaceSchema";
+                yield return nameof(DataType.XmlDocumentConstraint);
+                yield return "DataTypeSchema";
+            }
         }
 
         private Hashtable objectMetadataHash = new Hashtable();
@@ -3195,11 +3115,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Put types in this list if they don't have Name/Schema/ID properties
         /// </summary>
-        static HashSet<string> typesToIgnore = new HashSet<string>
+        private static readonly HashSet<string> typesToIgnore = new HashSet<string>
         {
-            "NumberedStoredProcedure",
-            "QueryStoreOptions",
-             nameof(ColumnEncryptionKeyValue)
+            nameof(NumberedStoredProcedure),
+            nameof(QueryStoreOptions),
+            nameof(ColumnEncryptionKeyValue),
         };
         private static string[] AddNecessaryFields(Type childType, string[] res2)
         {
@@ -4000,6 +3920,66 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 return m_OleDbProviderSettings;
             }
+        }
+
+        /// <summary>
+        /// Returns true if the given property name is valid for the object of Type type for the Server's version and edition.
+        /// </summary>
+        /// <param name="type">A type that is assignable to SqlSmoObject</param>
+        /// <param name="propertyName"></param>
+        /// <param name="databaseEngineEdition">Specific database edition to check for property supported. If Unknown or not specified, the check will use the edition of the master database.</param>
+        /// <returns>true if the property can be requested, false otherwise</returns>
+        /// <exception cref="ArgumentException">When type is not a SqlSmoObject or if the SqlSmoObject does not have property visibility based on the Server version</exception>
+        public bool IsSupportedProperty(Type type, string propertyName, DatabaseEngineEdition databaseEngineEdition = DatabaseEngineEdition.Unknown)
+        {
+            databaseEngineEdition = databaseEngineEdition != DatabaseEngineEdition.Unknown ? databaseEngineEdition : DatabaseEngineEdition;
+            return !SqlSmoObject.GetDisabledProperties(type, databaseEngineEdition).Contains(propertyName) 
+                && SqlPropertyMetadataProvider.CheckPropertyValid(MetadataProviderLookup.GetPropertyMetadataProviderType(type), propertyName, ServerVersion, DatabaseEngineType, databaseEngineEdition);
+        }
+
+
+        /// <summary>
+        /// Returns true if the given property name is valid for the object of Type T for the Server's version and edition.
+        /// </summary>
+        /// <typeparam name="T">The derived type of SqlSmoObject for which to check</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="databaseEngineEdition">Specific database edition to check for property supported. If Unknown or not specified, the check will use the edition of the master database.</param>
+        /// <returns>true if the property can be requested, false otherwise</returns>
+        /// <exception cref="ArgumentException">When the SqlSmoObject does not have property visibility based on the Server version</exception>
+        public bool IsSupportedProperty<T>(string propertyName, DatabaseEngineEdition databaseEngineEdition = DatabaseEngineEdition.Unknown) where T : SqlSmoObject
+        {
+            return IsSupportedProperty(typeof(T), propertyName, databaseEngineEdition);
+        }
+
+        /// <summary>
+        /// Returns true if the expression identifies a valid SqlSmoObject property for the current Server version and edition
+        /// </summary>
+        /// <typeparam name="T">The derived type of SqlSmoObject for which to check</typeparam>
+        /// <param name="expression">A LINQ expression that references a property of the object of type T. The name of the referenced property in the expression is used for the lookup.</param>
+        /// <param name="databaseEngineEdition"></param>
+        /// <returns>true if the property can be requested, false otherwise</returns>
+        /// <exception cref="ArgumentException">When the SqlSmoObject does not have property visibility based on the Server version</exception>
+        /// <example>server.IsSupportedProperty&lt;Table&gt;(t =&gt; t.LedgerType)</example>
+        public bool IsSupportedProperty<T>(Expression<Func<T, object>> expression, DatabaseEngineEdition databaseEngineEdition = DatabaseEngineEdition.Unknown)
+        {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+            if (expression.Body is MemberExpression memberExpression)
+            {
+                return IsSupportedProperty(memberExpression.Member.DeclaringType, memberExpression.Member.Name, databaseEngineEdition);
+            }
+            // when the return type of the expression is a value type, it contains a call to Convert, resulting in boxing, so we get a UnaryExpression instead
+            if (expression.Body is UnaryExpression unaryExpression)
+            {
+                memberExpression = unaryExpression.Operand as MemberExpression;
+                if (memberExpression != null)
+                {
+                    return IsSupportedProperty(memberExpression.Member.DeclaringType, memberExpression.Member.Name);
+                }
+            }
+            throw new ArgumentException(ExceptionTemplates.InvalidPropertyExpression(expression.ToString()));
         }
 
 #region ISfcHasConnection Members

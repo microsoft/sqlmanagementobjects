@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -12,6 +12,10 @@ namespace Microsoft.SqlServer.Management.Smo
     ///<summary>
     /// Enum containing all possible DatabasePermissions
     /// use sys.fn_builtin_permissions to see the latest values on new versions of SQL
+    ///
+    /// IMPORTANT: When adding enums here, you must also update permissionOptions.cs with the getters and setters for the permission objects.
+    /// The ContainsPermissionType methods in DatabasePrincipal.cs must also be updated when adding database and object permissions.
+    /// The DatabasePermissionType enum used in those functions are derived from SqlParser.
     ///</summary>
     public enum DatabasePermissionSetValue
     {
@@ -395,9 +399,9 @@ namespace Microsoft.SqlServer.Management.Smo
         [PermissionType("CRSO")]
         [PermissionName("CREATE SEQUENCE")]
         CreateSequence = 15,
-        [PermissionType("EXES")] 
+        [PermissionType("EXES")]
         [PermissionName("EXECUTE EXTERNAL SCRIPT")]
-        ExecuteExternalScript = 16, 
+        ExecuteExternalScript = 16,
         [PermissionType("UMSK")]
         [PermissionName("UNMASK")]
         Unmask = 17
@@ -530,7 +534,6 @@ namespace Microsoft.SqlServer.Management.Smo
         [PermissionType("VACD")]
         [PermissionName("VIEW ANY CRYPTOGRAPHICALLY SECURED DEFINITION")]
         ViewAnyCryptographicallySecuredDefinition = 40,
-        
         [PermissionType("VAP")]
         [PermissionName("VIEW ANY PERFORMANCE DEFINITION")]
         ViewAnyPerformanceDefinition = 41,
@@ -588,7 +591,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Used to cache the Permission Type -> enum values mappings. We're only caching this mapping because this one
         /// requires iterating through all of the values of the specified enum type and so can get expensive with all
         /// the reflection lookups. The other methods in this class work on a single instance of an enum value so the
-        /// cost is much smaller and not worth the overhead of the caching. 
+        /// cost is much smaller and not worth the overhead of the caching.
         /// </summary>
         private static IDictionary<string, object> permissionTypeToEnumMapping = new Dictionary<string, object>();
 
@@ -596,7 +599,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// into the corresponding <see cref="DatabasePermissionSetValue"/></summary>
         internal static T ToPermissionSetValueEnum<T>(string permissionType) where T : struct, IConvertible
         {
-            //We need a unique key (just the permission type name isn't unique) but Tuple isn't currently in the 
+            //We need a unique key (just the permission type name isn't unique) but Tuple isn't currently in the
             //framework version we're built against so just convert to string representation
             string key = permissionType + typeof (T);
             if (permissionTypeToEnumMapping.ContainsKey(key))

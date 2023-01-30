@@ -1,10 +1,11 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using Microsoft.SqlServer.Management.Common;
 
@@ -858,5 +859,46 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return m_versions; }
         }
+    }
+
+    internal static class MetadataProviderLookup
+    {
+        private static readonly Dictionary<Type, Type> providerLookup = new Dictionary<Type, Type>();
+        static MetadataProviderLookup()
+        {
+            var smoAssembly = Assembly.GetExecutingAssembly();
+            UpdateProviderLookup(smoAssembly);
+        }
+
+        private static void UpdateProviderLookup(Assembly assembly)
+        {
+            // There's no lock because it's ok for threads to race here. The static constructor covers the vast majority of types anyway.
+            foreach (var providerType in assembly.GetTypes().Where(t => typeof(SqlPropertyMetadataProvider).IsAssignableFrom(t)))
+            {
+                if (typeof(SqlSmoObject).IsAssignableFrom(providerType.DeclaringType))
+                {
+                    providerLookup[providerType.DeclaringType] = providerType;
+                }
+            }
+        }
+
+        public static Type GetPropertyMetadataProviderType<T>() where T: SqlSmoObject
+        {
+            return GetPropertyMetadataProviderType(typeof(T));
+        }
+
+        public static Type GetPropertyMetadataProviderType(Type t)
+        {
+            if (!providerLookup.ContainsKey(t))
+            {
+                UpdateProviderLookup(t.Assembly);
+            }
+            if (providerLookup.ContainsKey(t))
+            {
+                return providerLookup[t];
+            }
+            throw new ArgumentException(ExceptionTemplates.InvalidTypeForMetadataProvider(t.Name));
+        }
+
     }
 }

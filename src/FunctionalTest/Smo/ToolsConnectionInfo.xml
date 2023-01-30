@@ -177,4 +177,12 @@ Sql2012;Sql2017;SQL2017Linux
             enabled_features='Hekaton, SqlClr'
             passwordCredential='saPassword-2017Linux'
             db_engine_edition="Enterprise"/>
+  <ConnectionString name="SqlAzureArcManagedInstance"
+            connectionString="Data Source=<server>;Initial Catalog=master;User ID=sa;Timeout=60"
+            hostplatform="Linux"
+            databaseenginetype="Standalone"
+            majorversion="16"
+            db_engine_edition="SqlAzureArcManagedInstance"
+            passwordCredential='saPassword-SqlMiaa' />
 </ConnectionStrings>
+
