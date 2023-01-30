@@ -452,6 +452,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                 {
                     "HasFilter",
                     "IsAutoCreated",
+                    nameof(Statistic.IsAutoDropped),
                     "IsFromIndexCreation",
                     "IsTemporary",
                     "NoAutomaticRecomputation",
@@ -911,10 +912,10 @@ then add the property to the expectedBooleanPropertiesWithoutValuesForSomeVersio
         {
             var now = DateTimeOffset.UtcNow;
             var guid = Guid.NewGuid();
-            var tuples = new (object variant, string text)[] { 
-                ((Int32)(-11), "-11"), 
-                ((byte)2, "0x02"), 
-                ((decimal)10.1, "10.1"),  
+            var tuples = new (object variant, string text)[] {
+                ((Int32)(-11), "-11"),
+                ((byte)2, "0x02"),
+                ((decimal)10.1, "10.1"),
                 ("a 'string", "N'a ''string'"),
                 ((Int16)128, "128"),
                 ((Int64)999999999, "999999999"),
@@ -939,6 +940,18 @@ then add the property to the expectedBooleanPropertiesWithoutValuesForSomeVersio
                     Assert.That(SqlSmoObject.FormatSqlVariant(tuple.variant), Is.EqualTo(tuple.text), $"Incorrect SqlVariant string for type {tuple.variant.GetType()}");
                 }
             });
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void SqlSmoObject_metadataprovider_found_by_MetadataProviderLookup()
+        {
+            foreach (var objectType in typeof(SqlSmoObject).Assembly.GetTypes().Where(t => typeof(SqlSmoObject).IsAssignableFrom(t)).Except(expectedTypesWithoutPropertyMetadataProvider))
+            {
+                var metadataProviderType = MetadataProviderLookup.GetPropertyMetadataProviderType(objectType);
+                var propertyMetadataProviderType = objectType.GetNestedType("PropertyMetadataProvider", BindingFlags.NonPublic);
+                Assert.That(metadataProviderType, Is.EqualTo(propertyMetadataProviderType), $"Incorrect metadata provider from lookup for {objectType}");
+            }
         }
     }
 

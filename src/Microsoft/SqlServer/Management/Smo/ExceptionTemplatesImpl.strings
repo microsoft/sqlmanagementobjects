@@ -27,7 +27,8 @@ LoginEnable = Enable Login.
 LoginDisable = Disable Login.
 AddCredential = Add Credential
 DropCredential = Drop Credential
-
+InvalidTypeForMetadataProvider(string typeName) = '{0}' is not a Type that has a metadata provider.
+InvalidPropertyExpression(string expression) = Expression '{0}' does not specify a property.
 ; Server Role Exceptions
 EnterServerRoleName = Enter server role name
 ServerRoleOwnerNameEmpty = The ServerRole.Owner property cannot be set to empty or null before calling the Create or Alter method.
@@ -212,8 +213,6 @@ CannotProvideLedgerViewColumnNamesWithoutLedgerViewNameAndSchema = Ledger view s
 
 ; Data Masking messages
 NoDataMaskingOnNonTables = Data Masking can be applied only to table columns.
-InvalidMaskingFunctionFormat = The data masking function provided for column {0} is invalid.
-MaskingFunctionOnWrongType = The data type of column {0} doesn't support data masking function '{1}'.
 NoDataMaskingOnColumnSet = Cannot apply a data masking function on a column set.
 NoDataMaskingOnTemporalColumns = Cannot apply a data masking function on columns with generated always values.
 NoDataMaskingOnComputedColumns = Cannot apply a data masking function on computed columns.
@@ -390,8 +389,8 @@ ForeignKeyCycleInObjects=There is a cyclical foreign key relationship in the dat
 
 ; object-related exceptions
 NotSupportedForCloudVersion(string type, string version) = Object of type '{0}' is not supported on version '{1}' of Microsoft Azure SQL Database.
-NotSupportedForSqlDw(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Data Warehouse Edition.
-NotSupportedForSqlOd(string type) = Object of type '{0}' is not supported on Microsoft Azure Synapse SQL On-Demand Edition.
+NotSupportedForSqlDw(string type) = Object of type '{0}' is not supported on Microsoft Azure Synapse Analytics dedicated SQL pools Edition.
+NotSupportedForSqlOd(string type) = Object of type '{0}' is not supported on Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition.
 NotSupportedForSqlDb(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Database Edition.
 NotSupportedForSqlEdge(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Edge Edition.
 NotSupportedOnStandalone = This object is not supported on Standalone SQL Server.
@@ -401,7 +400,7 @@ NotSupportedOnCloudWithDetails(string type) = Object of type '{0}' is not suppor
 NotSupportedOnOnDemandWithDetails(string type) = Object of type '{0}' is not supported on Microsoft Azure Synapse SQL On-Demand Edition.
 NotSupportedOnSqlEdge(string type) = Object of type '{0}' is not supported on Microsoft Azure SQL Edge Edition.
 InvalidScriptingOptions = The scripting options 'TargetServerVersion|TargetDatabaseEngineType|TargetDatabaseEngineEdition' specified for current object are not valid.
-ScriptingNotSupportedForSqlDw(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Data Warehouse Edition.
+ScriptingNotSupportedForSqlDw(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure Synapse Analytics dedicated SQL pools Edition.
 ScriptingNotSupportedForSqlDb(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Database Edition.
 ScriptingNotSupportedOnStandalone(string type) = Scripting object of type '{0}' is not supported while working against Standalone SQL Server.
 ScriptingNotSupportedOnCloud(string type) = Scripting object of type '{0}' is not supported while working against Microsoft Azure SQL Database.
@@ -436,7 +435,7 @@ PropertyNotSupportedOnCloud(string propertyName) = The '{0}' property is not sup
 PropertyNotSupportedOnEdge(string propertyName) = The '{0}' property is not supported on Microsoft Azure SQL Edge.
 PropertyNotSupportedWithDetails(string propertyName, string engineType, string version, string engineEdition) = The '{0}' property is not supported on {3} edition database of {1} SQL Server with version {2}.
 PropertyValueSupportedOnlyOn110(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is accessible only while working against SQL Server 2012 or later.
-PropertyValueNotSupportedForSqlDw(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is not supported on Microsoft Azure SQL Data Warehouse Edition.
+PropertyValueNotSupportedForSqlDw(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is not supported on Microsoft Azure Synapse Analytics dedicated SQL pools Edition.
 PropertyValueNotSupportedForSqlDb(string propertyName, string propertyValue) = The '{0}' property with value '{1}' is not supported on Microsoft Azure SQL Database Edition.
 WrongPropertyValueException(string propertyName, string propertyValue) = The '{0}' property cannot have a value of '{1}' for this version of SQL Server.
 InvalidPropertyValueForVersion(string typeName, string propertyName, string propertyValue, string sqlVersionName) = '{0}'.'{1}': '{2}' is not a valid option for {3}.

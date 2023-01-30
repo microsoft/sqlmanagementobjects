@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -342,13 +342,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 // Bug 446932: make sure a user mapped to a login that is a certificate or key still
                 // considers itself a "Login" for scripting purposes here, since the "FOR CERTIFICATE" or "FOR ASYMMETRIC KEY"
                 // clauses would be invalid and cause a throw
+                var loginName = (string)this.GetPropValueOptional(nameof(Login), String.Empty);
                 if (type == UserType.Certificate || type == UserType.AsymmetricKey)
                 {
-                    if (IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType))
-                    {
-                        throw new UnsupportedVersionException(ExceptionTemplates.InvalidPropertyValueForVersion(this.GetType().Name, "UserType", this.UserType.ToString(), LocalizableResources.EngineCloud));
-                    }
-                    string loginName = (string)this.GetPropValueOptional("Login",String.Empty);
 
                     if (loginName != null && loginName.Length > 0)
                     {
@@ -359,9 +355,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                // External user should only available in azure db with version greater than or equal to 12
-                if (type == UserType.External && (!IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType)
-                    || 12 > this.ServerVersion.Major))
+                // External user scripting should be blocked below Sql 160 standalone database version
+                if (type == UserType.External && sp.TargetServerVersion < SqlServerVersion.Version160 
+                    && sp.TargetDatabaseEngineType == Cmn.DatabaseEngineType.Standalone
+                    && sp.TargetDatabaseEngineEdition != Cmn.DatabaseEngineEdition.SqlManagedInstance)
                 {
                     throw new UnsupportedVersionException(
                         ExceptionTemplates.InvalidPropertyValueForVersion(
@@ -396,8 +393,16 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
 
                     case UserType.External:
-                        propertyName = null;
-                        optionName = " EXTERNAL PROVIDER";
+                        if (!string.IsNullOrEmpty(loginName))
+                        {
+                            propertyName = "Login";
+                            optionName = "LOGIN";
+                        }
+                        else
+                        {
+                            propertyName = null;
+                            optionName = " EXTERNAL PROVIDER";
+                        }
                         break;
 
                     default:
@@ -418,7 +423,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append(optionName);
                     }
                 }
-                else if (type == UserType.External)
+                else if (type == UserType.External && string.IsNullOrEmpty(loginName))
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture,
                     " FROM {0} ",
@@ -1361,15 +1366,17 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             string[] fields =
             {
-                "AuthenticationType",
+                nameof(AsymmetricKey),
+                nameof(AuthenticationType),
+                nameof(Certificate),
                 "DefaultLanguageLcid",
                 "DefaultLanguageName",
-                "DefaultSchema",
-                "ID",
-                "IsSystemObject",
-                "Login",
-                "LoginType",
-                "UserType",
+                nameof(DefaultSchema),
+                nameof(ID),
+                nameof(IsSystemObject),
+                nameof(Login),
+                nameof(LoginType),
+                nameof(UserType),
             };
 
             List<string> list = GetSupportedScriptFields(typeof(User.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);

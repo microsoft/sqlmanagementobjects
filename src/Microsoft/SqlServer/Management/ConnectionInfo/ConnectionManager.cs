@@ -1,6 +1,5 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 
 using System.Reflection;
 using System.Security.Principal;
@@ -248,12 +247,25 @@ namespace Microsoft.SqlServer.Management.Common
             }
         }
 
+        
         /// <summary>
         /// Gets the ProductVersion server property of this connection
         /// </summary>
         public Version ProductVersion
         {
-            get { return GetServerInformation().ProductVersion; }
+            get { return m_productVersionOverride ?? GetServerInformation().ProductVersion; }
+            set
+            {
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_productVersionOverride != value)
+                {
+                    m_productVersionOverride = value;
+                    m_serverInformation = null;
+                }
+            }
         }
         ///<summary>
         /// Returns the database engine type of SQL Server.
@@ -262,7 +274,19 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public DatabaseEngineType DatabaseEngineType
         {
-            get { return GetServerInformation().DatabaseEngineType; }
+            get { return m_databaseEngineTypeOverride ?? GetServerInformation().DatabaseEngineType; }
+            set
+            { 
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_databaseEngineTypeOverride != value)
+                {
+                    m_databaseEngineTypeOverride = value;
+                    m_serverInformation = null;
+                }
+            }
         }
         
         /// <summary>
@@ -270,7 +294,19 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public DatabaseEngineEdition DatabaseEngineEdition
         {
-            get { return GetServerInformation().DatabaseEngineEdition; }
+            get { return m_databaseEngineEditionOverride ?? GetServerInformation().DatabaseEngineEdition; }
+            set
+            {
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_databaseEngineEditionOverride != value)
+                {
+                    m_databaseEngineEditionOverride = value;
+                    m_serverInformation = null;
+                }
+            }
         }
 
         /// <summary>
@@ -335,9 +371,10 @@ namespace Microsoft.SqlServer.Management.Common
                 if (!IsForceDisconnected)
                 {
                     PoolConnect();
-                    var sqlConnection = this.SqlConnectionObject;
+                    var sqlConnection = SqlConnectionObject;
                     try
                     {
+                        Debug.WriteLine($"ConnectionManager.GetServerInformation for <{sqlConnection.ConnectionString}>");
                         System.Threading.Monitor.Enter(sqlConnection);
                         var dataAdapter = new SqlDataAdapter();
                         try
@@ -948,6 +985,10 @@ end;";
         /// This allows users to add a event hook to trace T-SQL statements.
         /// </summary>
         private StatementEventHandler statementEventHandler;
+        private Version m_productVersionOverride;
+        private DatabaseEngineType? m_databaseEngineTypeOverride;
+        private DatabaseEngineEdition? m_databaseEngineEditionOverride;
+
         public event StatementEventHandler StatementExecuted
         {
             add

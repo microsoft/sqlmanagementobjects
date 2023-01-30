@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -116,59 +116,26 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        /// <summary>
+        /// Returns the ExecutionManager instance for running queries to gather information
+        /// about the database.
+        /// </summary>
         public override ExecutionManager ExecutionManager
         {
             get
             {
-                // Gen3 supports use database so return the server's execution manager if the database is requested.
-                // DW Gen2 is SqlDataWarehouse edition with major version of 10.
-                // DW Gen3 is SqlDataWarehouse edition with major version of 12.
-                bool isGen3DatabaseEdition = this.ServerEngineEdition == DatabaseEngineEdition.SqlDataWarehouse &&
-                    this.ServerProductVersion.Major >= 12;
-                if (this.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && !isGen3DatabaseEdition)
+                
+                if (this.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                 {
-                    return this.DatabaseExecutionManager;
+                    return DatabaseExecutionManager;
                 }
                 return base.ExecutionManager;
             }
         }
-
-        private Version ServerProductVersion
-        {
-            get
-            {
-                Server server = this.GetServerObject();
-                if (server != null)
-                {
-                    // handles the cloud DB case too (using Server's Execution Manager).
-                    return server.ExecutionManager.GetProductVersion();
-                }
-                else
-                {
-                    // when we don't have a server connected, return an empty version.
-                    return new Version();
-                }
-            }
-        }
-
-        private DatabaseEngineEdition ServerEngineEdition
-        {
-            get
-            {
-                Server server = this.GetServerObject();
-                if (server != null)
-                {
-                    // handles the cloud DB case too (using Server's Execution Manager).
-                    return server.ExecutionManager.GetDatabaseEngineEdition();
-                }
-                else
-                {
-                    // when we don't have a server connected, return an unknown version.
-                    return DatabaseEngineEdition.Unknown;
-                }
-            }
-        }
-
+        
+        /// <summary>
+        /// Returns the DatabaseEngineType of the database instance
+        /// </summary>
         public override DatabaseEngineType DatabaseEngineType
         {
             get
@@ -7095,12 +7062,17 @@ SortedList list = new SortedList();
             // database itself which is something we want to avoid for serverless databases or inaccessible
             // databases. So to avoid that we prepopulate the edition by checking if it's DW beforehand (which
             // doesn't require connecting to the database to retrieve)
-            if (m_edition == null && this.Parent.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
+            if (m_edition == null && Parent.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
             {
                 if (reader.GetSchemaTable().Rows.Cast<DataRow>().FirstOrDefault(r=> (string)r["ColumnName"] == "RealEngineEdition") != null)
                 {
-                    this.m_edition = (DatabaseEngineEdition)reader["RealEngineEdition"];
+
+                    m_edition = (DatabaseEngineEdition)reader["RealEngineEdition"];
                 }
+#if DEBUG
+                var name = (string)reader["Name"];
+                TraceHelper.Trace("SMO", "Database: {0} Edition: {1} ", name, m_edition?.ToString() ?? "<NULL>");
+#endif
             }
             base.AddObjectPropsFromDataReader(reader, skipIfDirty, startColIdx, endColIdx);
         }

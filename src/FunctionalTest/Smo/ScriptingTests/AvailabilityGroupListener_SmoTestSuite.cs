@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 #if false //Commented out temporarily for moving to SSMS_Main as this will take significant rework to be usable in the new branch

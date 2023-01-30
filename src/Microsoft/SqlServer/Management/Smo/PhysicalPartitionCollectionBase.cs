@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -231,23 +231,30 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal bool IsXmlCompressionCodeRequired(bool isOnAlter)
         {
+            
             foreach (PhysicalPartition p in this)
             {
                 if(!p.IsSupportedProperty(nameof(p.XmlCompression)))
                 {
                     return false;
                 }
-
-                else if (XmlCompressionType.On == p.XmlCompression)
+                // If it's asked by alter method then have to generate in any case.
+                // This behavior is added for xml compression to keep the behavior identical
+                // with data_compression.
+                if (isOnAlter)
+                {
+                    return true;
+                }
+                var prop = (p.State == SqlSmoState.Creating) ? 
+                    p.Properties.Get(nameof(p.XmlCompression)) : 
+                    p.Properties[nameof(p.XmlCompression)];
+                if (null != prop.Value && (prop.Dirty || (XmlCompressionType)prop.Value == XmlCompressionType.On))
                 {
                     return true;
                 }
             }
 
-            // If it's asked by alter method then have to generate in any case.
-            // This behavior is added for xml compression to keep the behavior identical
-            // with data_compression.
-            return isOnAlter;
+            return false;
         }
 
         /// <summary>

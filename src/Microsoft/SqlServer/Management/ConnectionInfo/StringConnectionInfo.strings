@@ -44,14 +44,14 @@ InvalidArgumentCacheDuplicateKey(object key) = The cache already contains an ite
 # Database Engine Edition Names
 #
 SqlAzureDatabaseEdition = Microsoft Azure SQL Database Edition
-SqlDataWarehouseEdition = Microsoft Azure SQL Data Warehouse Edition
+SqlDataWarehouseEdition = Microsoft Azure Synapse Analytics dedicated SQL pools Edition
 EnterpriseEdition = Microsoft SQL Server Enterprise Edition
 ExpressEdition = Microsoft SQL Server Express Edition
 PersonalEdition = Microsoft SQL Server Personal Edition
 StandardEdition = Microsoft SQL Server Standard Edition
 StretchEdition = Microsoft SQL Server Stretch Database Edition
 SqlManagedInstanceEdition = Microsoft Azure SQL Database Managed Instance Edition
-SqlOnDemandEdition = Microsoft Azure Synapse SQL Analytics on-demand Edition
+SqlOnDemandEdition = Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition
 SqlDatabaseEdgeEdition = Microsoft Azure SQL Edge Edition
 SqlAzureArcManagedInstanceEdition = Microsoft Azure Arc SQL Managed Instance Edition
 

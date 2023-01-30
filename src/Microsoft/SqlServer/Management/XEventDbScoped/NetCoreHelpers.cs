@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 //Helper Class to decide appropriate methods to call between .net and .netcore frameworks

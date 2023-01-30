@@ -32,18 +32,32 @@ Included items must then not match any entries in the exclude list to remain inc
             <!-- Match assembly file paths: -->
             <ModulePaths>
               <Include>
+                <ModulePath>.*Microsoft\.Data\.Tools\.Sql\.BatchParser\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.ConnectionInfo\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Dmf\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Dmf\.Common\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.HadrData\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.HadrModel\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.PolicyEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.RegisteredServers\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.Sdk\.Sfc\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Smo\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.SmoExtended\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Smo\.Notebook\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.RegSvrEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.SmoMetadataProvider\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.Assessment\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.SqlEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.SqlScriptPublish\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEvent\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEventDbScoped\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEventDbScopedEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEventEnum\.dll$</ModulePath>
               </Include>
               <Exclude>
-                <ModulePath>.*Microsoft\.SqlServer\.Test\..*</ModulePath>
-                <!-- sqlparser code coverage is measured in its own branch tests -->
-                <ModulePath>.*Microsoft\.SqlServer\.Management\.SqlParser\.dll</ModulePath>
-                <ModulePath>.*Microsoft\.SqlServer\.RegSvrEnum\.dll</ModulePath>
-                <!-- Utility doesn't ship in the nuget package -->
-                <ModulePath>.*Microsoft\.SqlServer\.Management\.Utility\.dll</ModulePath>
-                <ModulePath>.*NUnit.*</ModulePath>
-                <ModulePath>.*moq.*</ModulePath>
               </Exclude>
             </ModulePaths>
+
 
             <!-- Match attributes on any code element: -->
             <Attributes>
@@ -73,7 +87,6 @@ Included items must then not match any entries in the exclude list to remain inc
               <!-- We are expressly ignoring hard-to-reach special cases and code specific to Design Mode -->
               <Exclude>
                 <Function>.*DesignMode.*</Function>
-                <Function>.*DoDatabaseSpecialCase\(.*</Function>
                 <Function>.*FilterException</Function>
                 <Function>.*GenerateStretchHeapWithClause.*</Function>
                 <Function>.*GetPropertyDefaultValue\(.*</Function>

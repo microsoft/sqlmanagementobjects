@@ -72,6 +72,7 @@ Suspended = Suspended
 WaitingForStepToFinish = Waiting for step to finish
 PerformingCompletionAction = Performing completion action
 Unknown = Unknown
+Queued = Queued
 
 ;ContainmentType
 ctNone = None

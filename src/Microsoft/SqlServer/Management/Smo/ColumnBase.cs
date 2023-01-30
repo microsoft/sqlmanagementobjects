@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -1327,23 +1327,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             string maskingFunction = null;
 
-            object maskingFunctionObj = GetPropValueOptional("MaskingFunction");
+            var maskingFunctionObj = GetPropValueOptional(nameof(MaskingFunction));
             if (isMaskedColumn && (null != maskingFunctionObj))
             {
-                bool isValidFunction = false;
-                bool isValidOnDataType = false;
                 maskingFunction = (string)maskingFunctionObj;
-                ValidateMaskingFunctionsFormat(maskingFunction, DataType, out isValidFunction, out isValidOnDataType);
-                if (!isValidFunction)
-                {
-                    string errorMessage = String.Format(ExceptionTemplates.InvalidMaskingFunctionFormat, FullQualifiedName);
-                    throw new WrongPropertyValueException(errorMessage);
-                }
-                if (!isValidOnDataType)
-                {
-                    string errorMessage = String.Format(ExceptionTemplates.MaskingFunctionOnWrongType, FullQualifiedName, maskingFunction);
-                    throw new WrongPropertyValueException(errorMessage);
-                }
+                // We no longer validate masking functions on the client. 
+                // When SQL Server adds new ones we don't want to have to update SMO to support them.
             }
             return maskingFunction;
         }
@@ -2174,46 +2163,7 @@ namespace Microsoft.SqlServer.Management.Smo
             return isExternal;
         }
 
-        #region Data Masking Validation
-        internal class MaskingFunctionValidation
-        {
-            public string Pattern { get; set; }
-            public bool IsValidForNumeric { get; set; }
-            public bool IsValidForString { get; set; }
-            public bool IsValidForOther { get; set; }
-        }
-
-        private static MaskingFunctionValidation[] MaskingFunctionsValidationTable =
-        {
-            new MaskingFunctionValidation() { Pattern = @"^default\(\s*\)$",                                  IsValidForNumeric = true,  IsValidForString = true,  IsValidForOther = true },
-            new MaskingFunctionValidation() { Pattern = @"^email\(\s*\)$",                                    IsValidForNumeric = false, IsValidForString = true,  IsValidForOther = false },
-            new MaskingFunctionValidation() { Pattern = @"^partial\(\s*\d+\s*,\s*""[^""]*""\s*,\s*\d+\s*\)$", IsValidForNumeric = false, IsValidForString = true,  IsValidForOther = false },
-            new MaskingFunctionValidation() { Pattern = @"^random\(\s*-?\d+.?\d*\s*,\s*-?\d+.?\d*\s*\)$",     IsValidForNumeric = true,  IsValidForString = false, IsValidForOther = false },
-        };
-
-        private static void ValidateMaskingFunctionsFormat(string maskingFunction, DataType dataType, out bool isValidFunction, out bool isValidOnDataType)
-        {
-            isValidFunction = false;
-            isValidOnDataType = false;
-
-            foreach (MaskingFunctionValidation function in MaskingFunctionsValidationTable)
-            {
-                if (Regex.Match(maskingFunction, function.Pattern, RegexOptions.IgnoreCase).Success)
-                {
-                    isValidFunction = true;
-                    if ((dataType.IsNumericType && function.IsValidForNumeric) ||
-                        (dataType.IsStringType && function.IsValidForString) ||
-                        function.IsValidForOther ||
-                        (dataType.SqlDataType == SqlDataType.UserDefinedDataType))        // It is not sure which kind of type lies underneath the User Defined
-                    {                                                                      // We will allow it and let the server throw exception if it is incorrect type
-                        isValidOnDataType = true;
-                    }
-                    return;
-                }
-            }
-        }
-        #endregion
-
+        
         /// <summary>
         /// This method determines if this column is a graph computed column. Graph computed
         /// columns are exposed in select * queries and have graph type identifiers

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 namespace Microsoft.SqlServer.Management.Common
@@ -248,6 +248,9 @@ namespace Microsoft.SqlServer.Management.Common
             this.m_LoginSecure = connectionStringBuilder.IntegratedSecurity;
             this.m_Login = connectionStringBuilder.UserID;
             this.m_Password = EncryptionUtility.EncryptString(connectionStringBuilder.Password);
+            TrustServerCertificate = connectionStringBuilder.TrustServerCertificate;
+            shouldEncryptConnection = connectionStringBuilder.Encrypt;
+            // Assigning ConnectionString must be the last line of this method
             this.ConnectionString = connectionStringBuilder.ConnectionString;
         }
 
@@ -905,6 +908,58 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         /// <summary>
+        /// Returns true if the current values for LoginSecure and Authentication use the Login property
+        /// </summary>
+        public bool AcceptsLogin
+        {
+            get
+            {
+                if (LoginSecure)
+                {
+                    return false;
+                }
+                switch (Authentication)
+                {
+                    case SqlConnectionInfo.AuthenticationMethod.SqlPassword:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryDefault:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryPassword:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryManagedIdentity:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryInteractive:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryServicePrincipal:
+                    case SqlConnectionInfo.AuthenticationMethod.NotSpecified:
+                        return true;
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryDeviceCodeFlow:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryIntegrated:
+                        return false;
+                }
+                Debug.Assert(false, $"Unknown Authentication method {Authentication}");
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the current values for LoginSecure and Authentication require a Login property to be set
+        /// </summary>
+        public bool RequiresLogin
+        {
+            get
+            {
+                switch (Authentication)
+                {
+                    case SqlConnectionInfo.AuthenticationMethod.SqlPassword:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryPassword:
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryServicePrincipal:
+#if !MICROSOFTDATA
+                    case SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryInteractive:
+#endif
+                        return true;
+                    case SqlConnectionInfo.AuthenticationMethod.NotSpecified:
+                        return AccessToken == null && !LoginSecure;
+                }
+                return false;
+            }
+        }
+        /// <summary>
         /// whether "encrypt=true" is specified in the connection string
         /// </summary>
         /// <value></value>
@@ -988,7 +1043,7 @@ namespace Microsoft.SqlServer.Management.Common
             if (!IsValidString(str, checkEmpty))
             {
                 throw new InvalidPropertyValueException(
-                    StringConnectionInfo.InvalidPropertyValue("null", propertyName, StringConnectionInfo.InvalidPropertyValueReasonString));
+                    StringConnectionInfo.InvalidPropertyValue(str ?? "null", propertyName, StringConnectionInfo.InvalidPropertyValueReasonString));
             }
         }
 
@@ -1103,23 +1158,29 @@ namespace Microsoft.SqlServer.Management.Common
                 {
                     sbConnectionString.IntegratedSecurity = true;
                 }
-                else if (this.Authentication == SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryInteractive)
+                else if (AcceptsLogin)
                 {
-                    //UserID property is only required for System.Data.SqlClient connection string and not for Microsoft.Data.SqlClient
-#if !MICROSOFTDATA
-                    sbConnectionString.UserID = ThrowIfPropertyNotSet("Login", this.Login);
-#else
-                    if (!string.IsNullOrEmpty(this.Login))
+                    if (RequiresLogin)
                     {
-                        sbConnectionString.UserID = this.Login;
+                        sbConnectionString.UserID = ThrowIfPropertyNotSet(nameof(Login), Login);
+                        if (Authentication != SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryInteractive || !string.IsNullOrEmpty(Password))
+                        {
+                            sbConnectionString.Password = ThrowIfPropertyNotSet(nameof(Password), Password, checkEmpty: false);
+                        }
                     }
-#endif
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(Login))
+                        {
+                            sbConnectionString.UserID = Login;
+                        }
+                        if (!string.IsNullOrEmpty(Password))
+                        {
+                            sbConnectionString.Password = Password;
+                        }
+                    }
                 }
-                else if (this.Authentication != SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryIntegrated && this.AccessToken == null)
-                {
-                    sbConnectionString.UserID = ThrowIfPropertyNotSet("Login", this.Login);
-                    sbConnectionString.Password = ThrowIfPropertyNotSet("Password", this.Password, false);
-                }
+
                 if (this.ConnectTimeout != ConnectionTimeout_Default)
                 {
                     sbConnectionString.ConnectTimeout = this.ConnectTimeout;
@@ -1179,7 +1240,7 @@ namespace Microsoft.SqlServer.Management.Common
 
                 sbConnectionString.TrustServerCertificate = this.TrustServerCertificate;
 
-                if (this.AccessToken == null && SqlConnectionInfo.IsAuthenticationKeywordSupported() && this.Authentication != SqlConnectionInfo.AuthenticationMethod.NotSpecified)
+                if (this.AccessToken == null && this.Authentication != SqlConnectionInfo.AuthenticationMethod.NotSpecified)
                 {
                     SetAuthentication(sbConnectionString);
                 }
@@ -1193,7 +1254,7 @@ namespace Microsoft.SqlServer.Management.Common
 
                 stringToReturn = sbConnectionString.ToString();
 
-                // Append the additional paraneters to exisiting connection string
+                // Append the additional parameters to existing connection string
                 if (!String.IsNullOrEmpty(additionalParameters))
                 {
                     stringToReturn += ";" + additionalParameters;

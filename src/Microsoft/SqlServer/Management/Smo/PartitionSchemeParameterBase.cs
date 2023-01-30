@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
 using System.Collections.Specialized;
 using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;

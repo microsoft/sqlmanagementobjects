@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 #if MICROSOFTDATA
@@ -99,6 +99,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         ///
         /// </summary>
         [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 11)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
         public void EnumObjects_Sets_Synonym_Schema_And_Other_Properties()
         {
@@ -588,149 +590,6 @@ END");
                 "CheckCatalog");
         }
 
-        /// <summary>
-        /// Basic coverage for enabling, monitoring, disabling stretch database
-        /// Marked as Legacy to avoid runs during PR verification
-        /// </summary>
-        [TestMethod]
-        [TestCategory("Legacy")]
-        [SupportedServerVersionRange(MinMajor = 13, Edition = DatabaseEngineEdition.Enterprise, HostPlatform = HostPlatformNames.Windows)]
-        public void Database_remote_data_archive_can_be_configured_and_monitored()
-        {
-            var azureServerConnection = Manageability.Utils.ConnectionHelpers.GetMatchingConnections(d => d.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase)
-                .FirstOrDefault();
-            azureServerConnection = azureServerConnection ??
-                    $"Data Source=ssmsv12tests.database.windows.net;User ID=cloudSa;Password={Manageability.Utils.ConnectionHelpers.GetAzureKeyVaultHelper().GetDecryptedSecret("cloudsaPassword-ssmsv12Tests")}";
-
-            ExecuteWithDbDrop(db =>
-            {
-                try
-                {
-                    // make sure stretch is enabled and the remote query timeout is big enough to wait for an Azure stretch db create
-                    db.Parent.ConnectionContext.ExecuteNonQuery(
-                        new System.Collections.Specialized.StringCollection
-                            {"exec sp_configure 'remote data archive', '1'", "reconfigure", "EXEC sys.sp_configure N'remote query timeout (s)', N'900'", "RECONFIGURE WITH OVERRIDE"});
-                    var azureConnString = new SqlConnectionStringBuilder(azureServerConnection);
-                    db.ExecuteNonQuery(
-                        $"CREATE MASTER KEY ENCRYPTION BY PASSWORD = '{SqlTestRandom.GeneratePassword()}'");
-                    var credential = new _SMO.DatabaseScopedCredential(db, "stretchCred");
-                    credential.Create(azureConnString.UserID, azureConnString.Password);
-                    var stretchTable = db.CreateTable("remoteTable").InsertDataToTable(10);
-                    db.RemoteDataArchiveEnabled = true;
-                    db.RemoteDataArchiveEndpoint = azureConnString.DataSource;
-                    db.RemoteDataArchiveCredential = credential.Name;
-                    db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
-                    Assert.Multiple(() =>
-                    {
-                        Assert.DoesNotThrow(db.Alter, "Database.Alter to enable remote archive");
-                        var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
-                        Assert.That(commands,
-                            Has.Member(
-                                $"ALTER DATABASE {db.Name.SqlBracketQuoteString()} SET REMOTE_DATA_ARCHIVE = ON (SERVER = N'{azureConnString.DataSource}', CREDENTIAL = [stretchCred])"),
-                            "Alter script to enable stretch");
-                    });
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    Assert.Multiple(() =>
-                    {
-                        // reauth fails because the db is already authorized but we are just testing the tsql generation
-                        Assert.Throws<_SMO.FailedOperationException>(() => db.ReauthorizeRemoteDataArchiveConnection("stretchCred", withCopy: false));
-                        var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
-                        Assert.That(commands,
-                            Has.Member($"EXEC sp_rda_reauthorize_db @credential = N'stretchCred', @with_copy = 0"),
-                            "ReauthorizeRemoteDataArchiveConnection script");
-                    });
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    var utcStart = DateTime.UtcNow;
-                    Assert.Multiple(() =>
-                    {
-                        stretchTable.RemoteDataArchiveEnabled = true;
-                        stretchTable.RemoteDataArchiveDataMigrationState =
-                            RemoteDataArchiveMigrationState.Outbound;
-                        Assert.DoesNotThrow(stretchTable.Alter, "Table.Alter to enable Outbound stretch");
-                        var commands = db.ExecutionManager.ConnectionContext.CapturedSql.Text.Cast<string>();
-                        Assert.That(commands,
-                            Has.Member(
-                                $"ALTER TABLE [dbo].{stretchTable.Name.SqlBracketQuoteString()} SET(REMOTE_DATA_ARCHIVE = ON (MIGRATION_STATE = OUTBOUND))"),
-                            "Table.Alter script to enable Outbound stretch");
-                    });
-                    db.ExecutionManager.ConnectionContext.CapturedSql.Clear();
-                    Trace.TraceInformation("Sleeping stretch test 5 seconds to allow table to migrate");
-                    Thread.Sleep(5000);
-                    var migrationReports =
-                        db.GetRemoteDataArchiveMigrationStatusReports(utcStart, 10, stretchTable.Name).ToList();
-                    if (migrationReports.Any())
-                    {
-                        Assert.Multiple(() =>
-                        {
-                            Assert.That(migrationReports,
-                                Has.All.Property(nameof(RemoteDataArchiveMigrationStatusReport.DatabaseName))
-                                    .EqualTo(db.Name),
-                                "Report.DatabaseName");
-                            Assert.That(migrationReports,
-                                Has.All.Property(nameof(RemoteDataArchiveMigrationStatusReport.TableName))
-                                    .EqualTo(stretchTable.Name),
-                                "Report.TableName");
-                            Assert.That(migrationReports,
-                                Has.All.Property(nameof(RemoteDataArchiveMigrationStatusReport.Details)).Empty,
-                                "Report.Details");
-                        });
-                    }
-
-                    _SMO.RemoteDatabaseMigrationStatistics migrationStatistics = null;
-                    Assert.Multiple(() =>
-                    {
-                        Assert.DoesNotThrow(() => stretchTable.GetRemoteTableMigrationStatistics(), "GetRemoteTableMigrationStatistics does not throw");
-                        Assert.DoesNotThrow(() => migrationStatistics = db.GetRemoteDatabaseMigrationStatistics(),
-                            "GetRemoteDatabaseMigrationStatistics");
-                        Assert.That(migrationStatistics, Is.Not.Null,
-                            "GetRemoteDatabaseMigrationStatistics should return a value");
-                    });
-                    Assert.Multiple(() =>
-                    {
-                        Assert.That(migrationStatistics.RemoteDatabaseSizeInMB, Is.GreaterThan((double)0.0));
-                        stretchTable.RemoteDataArchiveDataMigrationState =
-                            RemoteDataArchiveMigrationState.Disabled;
-                        Assert.DoesNotThrow(stretchTable.Alter, "Alter table to disable table migration");
-                        stretchTable.RemoteDataArchiveEnabled = false;
-                        Assert.DoesNotThrow(stretchTable.Alter, "Alter table to disable stretch");
-                        db.RemoteDataArchiveEnabled = false;
-                        Assert.DoesNotThrow(db.Alter, "Database.Alter to disable stretch");
-                    });
-                }
-                finally
-                {
-                    // make sure we clean up both locally and in Azure
-                    if (db.RemoteDataArchiveEnabled)
-                    {
-                        db.RemoteDataArchiveEnabled = false;
-                        try
-                        {
-                            db.Alter();
-                        } catch { }
-                    }
-
-                    try
-                    {
-                        using (var sqlConnection = new SqlConnection(azureServerConnection))
-                        {
-                            var server = new _SMO.Server(new ServerConnection(sqlConnection));
-                            server.Databases.ClearAndInitialize($"[like(@Name, 'RDA{Urn.EscapeString(db.Name)}%')]",
-                                new string[] { });
-                            var database = server.Databases.Cast<_SMO.Database>()
-                                .FirstOrDefault();
-                            if (database != null)
-                            {
-                                server.DropKillDatabaseNoThrow(database.Name);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.TraceWarning($"Unable to delete remote database for {db.Name}: {e}");
-                    }
-                }
-            });
-        }
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
@@ -1178,5 +1037,49 @@ END");
                 }
             });
         }
+
+#if MICROSOFTDATA
+        [TestMethod]
+        [SupportedServerVersionRange(Edition=DatabaseEngineEdition.SqlDatabase)]
+        public void Database_enumerating_databases_does_not_login_to_each_database()
+        {
+            ExecuteTest(() =>
+            {
+                // Get the server's DatabaseEngineType first so that query doesn't get made during the collection enumeration
+                Manageability.Utils.Helpers.TraceHelper.TraceInformation($"Main connection engine type: {ServerContext.DatabaseEngineType}");
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                {
+                    eventRecorder.Start();
+                    ServerContext.Databases.ClearAndInitialize("[@IsSystemObject = false()]", new[] {nameof(Database.Status)});
+                    eventRecorder.Stop();
+                    var messages = eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
+                    Assert.That(messages, Has.None.Contains("sc.TdsParser.SendPreLoginHandshake"), "No logins should have occurred - Status only");
+                    Assert.That(messages, Has.None.Contains("SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,"), "No query for DatabaseEngineEdition should have been made - Status only");
+                }
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                {
+                    eventRecorder.Start();
+                    ServerContext.Databases.ClearAndInitialize(string.Empty, Enumerable.Empty<string>());
+                    eventRecorder.Stop();
+                    var messages = eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
+                    Assert.That(messages, Has.None.Contains("sc.TdsParser.SendPreLoginHandshake"), "No logins should have occurred - No properties");
+                    Assert.That(messages, Has.None.Contains("SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,"), "No query for DatabaseEngineEdition should have been made - No properties");
+                    Assert.That(ServerContext.Databases.Cast<Database>().Select( d=> d.Name), Has.Member("master"), "Should have at least master");
+                }
+                // Querying for Status and other properties goes through a different path. Don't use any PostProcess properties for the test, as they require a login to the user db.
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                {
+                    eventRecorder.Start();
+                    ServerContext.Databases.ClearAndInitialize("[@IsSystemObject = false()]", new[] { nameof(Database.Status), nameof(Database.ChangeTrackingEnabled) });
+                    eventRecorder.Stop();
+                    var messages = eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
+                    Assert.That(messages, Has.None.Contains("sc.TdsParser.SendPreLoginHandshake"), "No logins should have occurred - Status and other properties");
+                    Assert.That(messages, Has.None.Contains("SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,"), "No query for DatabaseEngineEdition should have been made - Status and other properties");
+                }
+            });
+        }
+
+#endif
     }
+
 }

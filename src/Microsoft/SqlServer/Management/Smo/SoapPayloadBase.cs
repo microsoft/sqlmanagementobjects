@@ -1,4 +1,6 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 using System;
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;

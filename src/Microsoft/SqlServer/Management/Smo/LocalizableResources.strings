@@ -22,8 +22,9 @@ ServerSQL14 = SQL Server 2014
 ServerSQL15 = SQL Server 2016
 ServerSQL2017 = SQL Server 2017
 ServerSQLv150 = SQL Server 2019
-ServerSQLv160 = SQL Server v160
+ServerSQLv160 = SQL Server 2022
 EngineCloud = Microsoft Azure SQL Database
+EngineCloudMI = Microsoft Azure SQL Managed Instance
 EngineSingleton = SQL Server
 EngineDatawarehouse = Azure Synapse Analytics Database
 
@@ -3432,6 +3433,9 @@ Statistic_HasFilterDesc=Gets the Boolean property that specifies if the statisti
 
 Statistic_IsAutoCreatedName=Is Auto Created
 Statistic_IsAutoCreatedDesc=Gets the Boolean property value that specifies whether the Statistic counter is automatically created.
+
+Statistic_IsAutoDroppedName=Is Auto Dropped
+Statistic_IsAutoDroppedDesc=Gets the Boolean property value that specifies whether the Statistic counter will be automatically dropped.
 
 Statistic_IsFromIndexCreationName=Is From Index Creation
 Statistic_IsFromIndexCreationDesc=Gets the Boolean property value that specifies whether the statistic counter was generated from the creation of an index.

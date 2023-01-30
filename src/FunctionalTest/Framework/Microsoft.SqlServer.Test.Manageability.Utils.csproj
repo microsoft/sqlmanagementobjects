@@ -18,6 +18,7 @@
     <ProjectReference Include="$(RegisteredServersSrc)\Microsoft.SqlServer.Management.RegisteredServers.csproj" />
     <ProjectReference Include="$(DmfSrc)\Microsoft.SqlServer.Dmf.csproj" />
     <ProjectReference Include="$(SqlScriptPublishSrc)\Microsoft.SqlServer.Management.SqlScriptPublish.csproj" />
+    <PackageReference Condition="'$(SqlClientReferenceImported)'!='true' or '$(UseMicrosoftData)' != 'true'" Include="Azure.Identity" />
   </ItemGroup>
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj" />
   <ItemGroup>

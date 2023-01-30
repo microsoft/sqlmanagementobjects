@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 namespace Microsoft.SqlServer.Management.Smo
@@ -14,6 +14,7 @@ namespace Microsoft.SqlServer.Management.Smo
         string uSid;
         bool firstTime = true;
         string str;
+        string query;
         PostProcessUser()
         {
         }
@@ -68,7 +69,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 return string.Empty;
             }
 
-			string query = string.Format(CultureInfo.InvariantCulture, "Select name from sys.sql_logins WITH (NOLOCK) where sid={0}", uSid);
+            query =
+                uSid.EndsWith("AADE")
+                ? string.Format(CultureInfo.InvariantCulture, "Select name from sys.server_principals WITH (NOLOCK) where sid={0}", uSid.Substring(0, uSid.Length - 4))
+                : string.Format(CultureInfo.InvariantCulture, "Select name from sys.sql_logins WITH (NOLOCK) where sid={0}", uSid);
+
             StringCollection sc = new StringCollection();
             sc.Add(query);
             DataTable dt;

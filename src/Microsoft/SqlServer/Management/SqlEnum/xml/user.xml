@@ -92,8 +92,9 @@
       <property name="UserType" type="int" report_type="UserType" read_only_after_creation="true" mode="design">
         CASE
         WHEN N'C' = u.type THEN 1
-        WHEN N'K' = u.type THEN 2        
+        WHEN N'K' = u.type THEN 2
         WHEN N'S' = u.type AND SUSER_SNAME(u.sid) is null AND u.authentication_type != 2 THEN 3
+        WHEN N'E' = u.type or N'X' = u.type THEN 4
         ELSE 0 END
       </property>
     </version>

@@ -1,79 +1,82 @@
 ﻿<?xml version="1.0" ?>
 <EnumObject type="Index" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
- <settings>
-  <parent_link>
-   <link parent="ID" local="ParentID" />
-  </parent_link>
-  <version min_major='7' max_major='8'>
-   <property_link table="dbo.sysindexes st">
-    (st.indid &lt;&gt; 0 and st.indid &lt;&gt; 255) and 0 = OBJECTPROPERTY(st.id,N'IsMSShipped')
-   </property_link>
-  </version>
-  <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
-   <property_link table="sys.stats st" />
-  
-  </version>    
-   <version min_major='9' cloud_min_major='10'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <version min_major='7' max_major='8'>
+      <property_link table="dbo.sysindexes st">
+        (st.indid &lt;&gt; 0 and st.indid &lt;&gt; 255) and 0 = OBJECTPROPERTY(st.id,N'IsMSShipped')
+      </property_link>
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property_link table="sys.stats st" />
+
+    </version>
+    <version min_major='9' cloud_min_major='10'>
       <post_process fields='#Stream#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessStatisticStream'
     triggered_fields='#StatisticName#ParentFullName#'/>
-   </version>
- </settings>
- <properties>
-  <include file='inc_urn.xml' />
-  <property name="Name" type="sysname">st.name</property>
-  <version min_major='7' max_major='8'>
-   <property name="ID" type="int" cast='true'>st.indid</property>
-   <property name="NoAutomaticRecomputation" type="bit" cast='true'>case when (st.status &amp; 16777216) &lt;&gt; 0 then 1 else 0 end</property>
-   <property name="LastUpdated" type="datetime" access='Read'>STATS_DATE(st.id, st.indid)</property>  
-   <property name="IsFromIndexCreation" type="bit" access='Read' cast='true'>1 - INDEXPROPERTY(st.id,st.name,N'IsStatistics')</property>
-   <property name="IsAutoCreated" type="bit" access='Read' cast='true'>INDEXPROPERTY(st.id,st.name,N'IsAutoStatistics')</property>
-   <property name="FileGroup" type="sysname">''</property>   
-   <property name="ParentID" type="int" hidden = 'true'>st.id</property>    
-   <!-- extended properties support -->
-   <property name="ExtPropClass" type="int" hidden='true'>6</property>
-  </version>
-  <version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
-   <property name="ID" type="int">st.stats_id</property>
-   <property name="NoAutomaticRecomputation" type="bit">st.no_recompute</property>
-   <property name="LastUpdated" type="datetime" access='Read'>STATS_DATE(st.object_id, st.stats_id)</property>
-   <property name="IsFromIndexCreation" type="bit" access='Read' cast='true'>1 - INDEXPROPERTY(st.object_id,st.name,N'IsStatistics')</property>
-   <property name="IsAutoCreated" type="bit" access='Read'>st.auto_created</property>
-   <property name="FileGroup" type="sysname">''</property>
-   <property name="ParentID" type="int" hidden='true'>st.object_id</property>
-   
-   <!-- DBCC SHOW_STATISTICS support -->
-   <property name="ParentFullName" type="nvarchar" size='600' hidden='true'>
-    <link_multiple no='1' expression="{0}">
-     <link_field type='parent' field="ThreePartName" />
-    </link_multiple>
-   </property>
-      
-   <property name="StatisticName" type="sysname" hidden='true'>st.name</property>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="Name" type="sysname">st.name</property>
+    <version min_major='7' max_major='8'>
+      <property name="ID" type="int" cast='true'>st.indid</property>
+      <property name="NoAutomaticRecomputation" type="bit" cast='true'>case when (st.status &amp; 16777216) &lt;&gt; 0 then 1 else 0 end</property>
+      <property name="LastUpdated" type="datetime" access='Read'>STATS_DATE(st.id, st.indid)</property>
+      <property name="IsFromIndexCreation" type="bit" access='Read' cast='true'>1 - INDEXPROPERTY(st.id,st.name,N'IsStatistics')</property>
+      <property name="IsAutoCreated" type="bit" access='Read' cast='true'>INDEXPROPERTY(st.id,st.name,N'IsAutoStatistics')</property>
+      <property name="FileGroup" type="sysname">''</property>
+      <property name="ParentID" type="int" hidden = 'true'>st.id</property>
+      <!-- extended properties support -->
+      <property name="ExtPropClass" type="int" hidden='true'>6</property>
+    </version>
+    <version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="ID" type="int">st.stats_id</property>
+      <property name="NoAutomaticRecomputation" type="bit">st.no_recompute</property>
+      <property name="LastUpdated" type="datetime" access='Read'>STATS_DATE(st.object_id, st.stats_id)</property>
+      <property name="IsFromIndexCreation" type="bit" access='Read' cast='true'>1 - INDEXPROPERTY(st.object_id,st.name,N'IsStatistics')</property>
+      <property name="IsAutoCreated" type="bit" access='Read'>st.auto_created</property>
+      <property name="FileGroup" type="sysname">''</property>
+      <property name="ParentID" type="int" hidden='true'>st.object_id</property>
+
+      <!-- DBCC SHOW_STATISTICS support -->
+      <property name="ParentFullName" type="nvarchar" size='600' hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='parent' field="ThreePartName" />
+        </link_multiple>
+      </property>
+
+      <property name="StatisticName" type="sysname" hidden='true'>st.name</property>
       <!-- extended properties support -->
       <property name="ExtPropClass" type="int" hidden='true'>7</property>
-  </version>
+    </version>
+    <version min_major='16' cloud_min_major='12'>
+      <property name="IsAutoDropped" type="bit">st.auto_drop</property>
+    </version>
     <version min_major='9' cloud_min_major='10'>
       <property name="Stream" type="varbinary" expensive='true' access='Read'>null</property>
     </version>
     <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
-   <property name="HasFilter" type="bit" access='Read'>st.has_filter</property>
-   <property name="FilterDefinition" type="nvarchar" size='max'>ISNULL(st.filter_definition ,N'')</property>
-  </version>
+      <property name="HasFilter" type="bit" access='Read'>st.has_filter</property>
+      <property name="FilterDefinition" type="nvarchar" size='max'>ISNULL(st.filter_definition ,N'')</property>
+    </version>
     <version min_major='11'>
       <property name="IsTemporary" type="bit" access='Read'>st.is_temporary</property>
     </version>
-  <!-- extended properties support -->
-  <property name="ExtPropMajorID" type="int" hidden='true'>
-   <link_multiple no='1' expression="{0}">
-    <link_field type='local' field="ParentID" />
-   </link_multiple>
-  </property>
-  <property name="ExtPropMinorID" type="int" hidden='true'>
-   <link_multiple no='1' expression="{0}">
-    <link_field type='local' field="ID" />
-   </link_multiple>
-  </property>
-  <version min_major='10'>
+    <!-- extended properties support -->
+    <property name="ExtPropMajorID" type="int" hidden='true'>
+      <link_multiple no='1' expression="{0}">
+        <link_field type='local' field="ParentID" />
+      </link_multiple>
+    </property>
+    <property name="ExtPropMinorID" type="int" hidden='true'>
+      <link_multiple no='1' expression="{0}">
+        <link_field type='local' field="ID" />
+      </link_multiple>
+    </property>
+    <version min_major='10'>
 
       <include file='inc_policy_health_state.xml'/>
     </version>

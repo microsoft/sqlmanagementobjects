@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -11,6 +11,7 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using XmlTextReader = System.Xml.XmlTextReader;
+using System.Linq;
 #if !STRACE
 using STrace = System.Diagnostics.Trace;
 #endif
@@ -38,7 +39,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// This is useful in cases where UI should show a user dialog and continue
         ///   with the rest of the code past the exception.
         /// </summary>
-        public delegate bool ExceptionDelegate(Object obj);
+        public delegate bool ExceptionDelegate(object obj);
 
         /// <summary>
         /// Delegate member to hold the list of delegate handlers
@@ -55,7 +56,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             // Pretend we have an xml storage file so that we're
             // considered IsLocal right away.
-            localXmlStorageFile = String.Empty;
+            localXmlStorageFile = string.Empty;
         }
 
         /// <summary>
@@ -81,13 +82,13 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 lock (lockObject)
                 {
-                    if (null == RegisteredServersStore.localFileStore)
+                    if (null == localFileStore)
                     {
-                        RegisteredServersStore.localFileStore = RegisteredServersStore.InitializeLocalRegisteredServersStore(null);
+                        localFileStore = InitializeLocalRegisteredServersStore(null);
                     }
                 }
 
-                return RegisteredServersStore.localFileStore;
+                return localFileStore;
             }
         }
 
@@ -104,13 +105,13 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             lock (lockObject)
             {
-                RegisteredServersStore.localFileStore = null;
+                localFileStore = null;
 
             }
 
-            if (RegisteredServersStore.LocalFileStoreReloaded != null)
+            if (LocalFileStoreReloaded != null)
             {
-                RegisteredServersStore.LocalFileStoreReloaded(null, EventArgs.Empty);
+                LocalFileStoreReloaded(null, EventArgs.Empty);
             }
         }
 
@@ -128,7 +129,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// <returns></returns>
         public static RegisteredServersStore InitializeLocalRegisteredServersStore(string registeredServersXmlFile)
         {
-            string localXmlStorageFile = registeredServersXmlFile ?? GetLocalXmlFilePath();
+            var localXmlStorageFile = registeredServersXmlFile ?? GetLocalXmlFilePath();
 
             // If the LocalXmlFile does not exist, and we are asked to use the default SSMS file, we try to see if an older file
             // (from a previous version of SSMS) exists on the machine for this user.
@@ -139,7 +140,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             }
 
             // init the store from the file
-            RegisteredServersStore root = InitChildObjects(localXmlStorageFile);
+            var root = InitChildObjects(localXmlStorageFile);
 
             // cache the file name so we know we're dealing with a local store
             root.localXmlStorageFile = localXmlStorageFile;
@@ -148,7 +149,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         }
 
         /// <summary>
-        /// Migrate the RegServer Store file from older versions of SSMS (17.x and earlier)
+        /// Migrate the RegServer Store file from older versions of SSMS (18.x and earlier)
         /// - Try to deserialize older files that may be on the machine (e.g. installed by older versions of SSMS)
         /// - If the deserialization succeeds, then copy that file to the current location
         /// Note: starting with SSMS 18.0, the location is not versioned anymore.
@@ -156,13 +157,14 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// <param name="pathToMigratedLocalXmlFile"></param>
         private static void MigrateLocalXmlFileFromLegacySSMS(string pathToMigratedLocalXmlFile)
         {
-            RegisteredServersStore registeredServersStore;
-            Exception exception;
-
-            foreach (var ver in new[] { 140, 130, 120, 110, 100 })
+            var possiblePaths = legacyFileNames.Select(p => Path.Combine(GetSettingsDir(savePathSuffix), p)).Where(path => File.Exists(path)).ToList();
+            possiblePaths.AddRange(from ver in new[] { 140, 130, 120, 110, 100 }
+                                   let possiblePath = Path.Combine(GetSettingsDir(string.Format(savePathLegacySuffixFormat, ver)), "RegSrvr.xml")
+                                   where File.Exists(possiblePath)
+                                   select possiblePath);
+            foreach (var possiblePath in possiblePaths)
             {
-                var possiblePath = Path.Combine(GetSettingsDir(string.Format(savePathLegacySuffixFormat, ver)), regSqlServerFileName);
-                if (TryDeserializeLocalXmlFile(possiblePath, out registeredServersStore, out exception))
+                if (TryDeserializeLocalXmlFile(possiblePath, out var _, out var _))
                 {
                     try
                     {
@@ -177,7 +179,6 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                         // Swallow the exception and stop trying:
                         // we had a good file, but for some reason we were not able to copy it over.
                     }
-
                     break;
                 }
             }
@@ -197,9 +198,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
             if (File.Exists(pathToLocalXmlFile))
             {
-                using (XmlTextReader reader = new XmlTextReader(pathToLocalXmlFile) { DtdProcessing = DtdProcessing.Prohibit })
+                using (var reader = new XmlTextReader(pathToLocalXmlFile) { DtdProcessing = DtdProcessing.Prohibit })
                 {
-                    SfcSerializer sfcSerializer = new SfcSerializer();
+                    var sfcSerializer = new SfcSerializer();
 
                     try
                     {
@@ -235,10 +236,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 // If an exception happened while trying to deserialize the file, allow the Delegates to handle it first.
                 if (e != null)
                 {
-                    RegisteredServerException regSvrException = new RegisteredServerException(RegSvrStrings.FailedToDeserialize, e);
+                    var regSvrException = new RegisteredServerException(RegSvrStrings.FailedToDeserialize, e);
 
-                    if ((null == RegisteredServersStore.ExceptionDelegates)
-                       || (!RegisteredServersStore.ExceptionDelegates(regSvrException)))
+                    if ((null == ExceptionDelegates)
+                       || (!ExceptionDelegates(regSvrException)))
                     {
                         // If any of the delegates returned false, just throw the exception
                         throw regSvrException;
@@ -273,7 +274,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     throw new RegisteredServerException(RegSvrStrings.LocalStoreOnly);
                 }
 
-                using (XmlReader reader = XmlReader.Create(downlevelFile))
+                using (var reader = XmlReader.Create(downlevelFile))
                 {
                     InitFromSqlServer2005Store(reader);
                     Serialize();
@@ -294,7 +295,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// <param name="reader"></param>
         private void InitFromSqlServer2005Store(XmlReader reader)
         {
-            XmlDocument doc = new XmlDocument();
+            var doc = new XmlDocument();
             doc.Load(reader);
 
             // do some validation on the root of the store
@@ -309,7 +310,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 throw new InvalidSqlServer2005StoreFormatException(RegSvrStrings.InvalidSqlServer2005FileFormat(doc.LastChild.Name));
             }
 
-            XmlNode storeRoot = doc.FirstChild.NextSibling;
+            var storeRoot = doc.FirstChild.NextSibling;
             if (storeRoot.NodeType != XmlNodeType.Element ||
                 storeRoot.Name != "RegisteredServers")
             {
@@ -325,7 +326,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     throw new InvalidSqlServer2005StoreFormatException(RegSvrStrings.InvalidSqlServer2005FileFormat(serverType.Name));
                 }
 
-                string serverTypeGuid = ReadXmlAttribute(serverType, "id", true) as string;
+                var serverTypeGuid = ReadXmlAttribute(serverType, "id", true) as string;
 
                 ServerGroup sg = null;
                 switch (serverTypeGuid)
@@ -383,17 +384,17 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             // do the recusrive descent
             if (member.Name == "Group")
             {
-                string serverGroupName = ReadXmlAttribute(member, "name", true) as string;
+                var serverGroupName = ReadXmlAttribute(member, "name", true) as string;
 
-                bool newGroup = false;
-                ServerGroup sg = group.ServerGroups[serverGroupName];
+                var newGroup = false;
+                var sg = group.ServerGroups[serverGroupName];
                 if (null == sg)
                 {
                     newGroup = true;
                     sg = new ServerGroup(group, serverGroupName);
                 }
 
-                string groupDescription = ReadXmlAttribute(member, "description", false) as string;
+                var groupDescription = ReadXmlAttribute(member, "description", false) as string;
                 if (null != groupDescription)
                 {
                     sg.Description = groupDescription;
@@ -419,17 +420,17 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 // this is a server, we need to process it 
                 STrace.Assert(member.Name == "Server");
-                string serverName = ReadXmlAttribute(member, "name", true) as string;
+                var serverName = ReadXmlAttribute(member, "name", true) as string;
 
-                bool newServer = false;
-                RegisteredServer rs = group.RegisteredServers[serverName];
+                var newServer = false;
+                var rs = group.RegisteredServers[serverName];
                 if (null == rs)
                 {
                     newServer = true;
                     rs = new RegisteredServer(group, serverName);
                 }
 
-                string description = ReadXmlAttribute(member, "description", false) as string;
+                var description = ReadXmlAttribute(member, "description", false) as string;
                 if (null != description)
                 {
                     rs.Description = description;
@@ -441,7 +442,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 }
 
                 // get the connection information
-                XmlNode connectionInfo = member.FirstChild;
+                var connectionInfo = member.FirstChild;
                 if (null == connectionInfo ||
                     connectionInfo.NodeType != XmlNodeType.Element ||
                     connectionInfo.Name != "ConnectionInformation")
@@ -449,10 +450,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     throw new InvalidSqlServer2005StoreFormatException(RegSvrStrings.InvalidSqlServer2005FileFormat(connectionInfo.Name));
                 }
 
-                DbConnectionStringBuilder connString = new DbConnectionStringBuilder();
-                bool integratedSecurity = true;
-                string userName = string.Empty;
-                string encryptedPassword = string.Empty;
+                var connString = new DbConnectionStringBuilder();
+                var integratedSecurity = true;
+                var userName = string.Empty;
+                var encryptedPassword = string.Empty;
 
                 foreach (XmlNode property in connectionInfo.ChildNodes)
                 {
@@ -511,7 +512,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     else
                     {
                         connString["user id"] = userName;
-                        if (!String.IsNullOrEmpty(encryptedPassword))
+                        if (!string.IsNullOrEmpty(encryptedPassword))
                         {
                             connString["password"] = rs.ProtectData(encryptedPassword, false);
                         }
@@ -627,7 +628,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// <returns>sttribute value</returns>
         private object ReadXmlAttribute(XmlNode node, string name, bool throwIfMissing)
         {
-            XmlAttribute attrib = node.Attributes[name];
+            var attrib = node.Attributes[name];
             if (null == attrib)
             {
                 if (throwIfMissing)
@@ -653,10 +654,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 this.localXmlStorageFile = GetLocalXmlFilePath();
             }
-            using (XmlTextWriter writer = new XmlTextWriter(this.localXmlStorageFile, null))
+            using (var writer = new XmlTextWriter(this.localXmlStorageFile, null))
             {
                 writer.Formatting = Formatting.Indented;
-                SfcSerializer sfcSerializer = new SfcSerializer();
+                var sfcSerializer = new SfcSerializer();
                 sfcSerializer.Serialize(this);
                 try
                 {
@@ -695,10 +696,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 GetStore(obj).CredentialPersistenceType = cpt;
                 GetStore(obj).UseStoreCredentialPersistenceType = true;
 
-                using (XmlTextWriter writer = new XmlTextWriter(file, null))
+                using (var writer = new XmlTextWriter(file, null))
                 {
                     writer.Formatting = Formatting.Indented;
-                    SfcSerializer sfcSerializer = new SfcSerializer();
+                    var sfcSerializer = new SfcSerializer();
                     sfcSerializer.FilterPropertyHandler += new FilterPropertyHandler(FilterProperty);
                     sfcSerializer.Serialize(obj);
                     sfcSerializer.Write(writer);
@@ -757,8 +758,8 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 // we need to morph the ConnectionStringWithEncryptedPassword
                 // as instructed by the user for serialization
-                RegisteredServer rs = propertyArgs.Instance as RegisteredServer;
-                CredentialPersistenceType cpt = rs.CredentialPersistenceType;
+                var rs = propertyArgs.Instance as RegisteredServer;
+                var cpt = rs.CredentialPersistenceType;
                 if (rs.GetStore().UseStoreCredentialPersistenceType)
                 {
                     cpt = rs.GetStore().CredentialPersistenceType;
@@ -769,12 +770,12 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             else if (propertyArgs.Instance.GetType() == typeof(RegisteredServer) &&
                 propertyArgs.PropertyName == "CredentialPersistenceType")
             {
-                RegisteredServer rs = propertyArgs.Instance as RegisteredServer;
+                var rs = propertyArgs.Instance as RegisteredServer;
                 // update CredentialPersistenceType as well because the connection
                 // string is serialized according to this setting
                 if (rs.GetStore().UseStoreCredentialPersistenceType)
                 {
-                    CredentialPersistenceType cpt = rs.GetStore().CredentialPersistenceType;
+                    var cpt = rs.GetStore().CredentialPersistenceType;
                     if (rs.CredentialPersistenceType == CredentialPersistenceType.PersistLoginName &&
                         cpt == CredentialPersistenceType.PersistLoginNameAndPassword)
                     {
@@ -921,7 +922,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             get
             {
-                return RegisteredServersStore.databaseEngineServerGroupName;
+                return databaseEngineServerGroupName;
             }
         }
 
@@ -932,7 +933,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             get
             {
-                return RegisteredServersStore.analysisServicesServerGroupName;
+                return analysisServicesServerGroupName;
             }
         }
 
@@ -944,7 +945,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             get
             {
-                return RegisteredServersStore.reportingServicesServerGroupName;
+                return reportingServicesServerGroupName;
             }
         }
 
@@ -956,7 +957,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             get
             {
-                return RegisteredServersStore.integrationServicesServerGroupName;
+                return integrationServicesServerGroupName;
             }
         }
 
@@ -968,7 +969,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             get
             {
-                return RegisteredServersStore.sqlServerCompactEditionServerGroupName;
+                return sqlServerCompactEditionServerGroupName;
             }
         }
 
@@ -980,7 +981,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             get
             {
-                return RegisteredServersStore.centralManagementServerGroupName;
+                return centralManagementServerGroupName;
             }
         }
 
@@ -1226,7 +1227,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 if (null == this.ServerConnection)
                 {
-                    STrace.Assert(!String.IsNullOrEmpty(this.LocalXmlStorageFile));
+                    STrace.Assert(!string.IsNullOrEmpty(this.LocalXmlStorageFile));
                     return this.LocalXmlStorageFile;
                 }
                 return this.ServerConnection.TrueName;
@@ -1282,7 +1283,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             switch (urnFragment.Name)
             {
-                case RegisteredServersStore.typeName: return new RegisteredServersStore.Key(this);
+                case typeName: return new RegisteredServersStore.Key(this);
                 case ServerGroup.typeName: return new ServerGroup.Key(urnFragment.FieldDictionary);
                 case RegisteredServer.typeName: return new RegisteredServer.Key(urnFragment.FieldDictionary);
                 default:
@@ -1492,7 +1493,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             public static bool operator ==(Key leftOperand, Key rightOperand)
             {
                 // If both are null, or both are same instance, return true.
-                if (System.Object.ReferenceEquals(leftOperand, rightOperand))
+                if (ReferenceEquals(leftOperand, rightOperand))
                     return true;
 
                 // If one is null, but not both, return false.
@@ -1546,7 +1547,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             /// <returns></returns>
             public override string GetUrnFragment()
             {
-                return RegisteredServersStore.typeName;
+                return typeName;
             }
 
         }
@@ -1575,17 +1576,32 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// our local xml file.
         private const string savePathSuffix = "\\Microsoft\\SQL Server Management Studio";
         private const string savePathLegacySuffixFormat = "\\Microsoft\\Microsoft SQL Server\\{0}\\Tools\\Shell";
-
-        private const string regSqlServerFileName = "RegSrvr.xml";
-
+#if MICROSOFTDATA
+        // Sort this array from newest version to oldest. As of SSMS 19 there's only one legacy file from SSMS 18 and prior.
+        // When the file format or connection string format changes in a way not compatible with prior versions of SSMS, 
+        // change the value of RegisteredServersFileName and put the old value in the front of this array.
+        // VBUMP
+        private static readonly string[] legacyFileNames = { "RegSrvr.xml" };
+        /// <summary>
+        /// Name of the registered servers file used by Sql Server Management Studio and stored in the user profile.
+        /// </summary>
+        public const string RegisteredServersFileName = "RegSrvr16.xml";
+#else
+        // SSMS 18 has no legacy file names in the same folder
+        private static readonly string[] legacyFileNames = { };
+        /// <summary>
+        /// Name of the registered servers file used by Sql Server Management Studio and stored in the user profile.
+        /// </summary>
+        public const string RegisteredServersFileName = "RegSrvr.xml";
+#endif
         private static string GetLocalXmlFilePath()
         {
-            return Path.Combine(GetSettingsDir(savePathSuffix), regSqlServerFileName);
+            return Path.Combine(GetSettingsDir(savePathSuffix), RegisteredServersFileName);
         }
 
         private static string GetSettingsDir(string suffix)
         {
-            string directory = String.Format(CultureInfo.InvariantCulture, "{0}{1}",
+            var directory = string.Format(CultureInfo.InvariantCulture, "{0}{1}",
                                              System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
                                              suffix);
             EnsureDirExists(directory);
@@ -1597,14 +1613,14 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// </summary>
         private static void EnsureDirExists(string directory)
         {
-            if (!System.IO.Directory.Exists(directory))
+            if (!Directory.Exists(directory))
             {
-                System.IO.Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(directory);
             }
         }
-        #endregion
+#endregion
 
-        #region Utilities
+#region Utilities
         internal static RegisteredServersStore GetStore(SfcInstance instance)
         {
             STrace.Assert(instance is ServerGroup || instance is RegisteredServer);
@@ -1621,7 +1637,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
             // we will use this as a counter to avoid spinning if the 
             // tree is corrupted with a cycle
-            int maxDepth = 0;
+            var maxDepth = 0;
 
             // walk the chain to the parent
             while (!(theGroup.Parent is RegisteredServersStore) && maxDepth < 10000)
@@ -1632,9 +1648,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
             return theGroup.Parent as RegisteredServersStore;
         }
-        #endregion
+#endregion
 
-        #region ISfcDiscoverObject Members
+#region ISfcDiscoverObject Members
         /// <summary>
         /// 
         /// </summary>
@@ -1643,7 +1659,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             if (sink.Action == SfcDependencyAction.Serialize)
             {
-                foreach (ServerGroup sg in this.ServerGroups)
+                foreach (var sg in this.ServerGroups)
                 {
                     sink.Add(SfcDependencyDirection.Inbound, sg, SfcTypeRelation.ContainedChild, false);
                 }
@@ -1652,7 +1668,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             return;
         }
 
-        #endregion
+#endregion
 
         // These are the GUIDs used by the downlevel registered servers file
         private const string DatabaseEngineServerTypeGuid = "8c91a03d-f9b4-46c0-a305-b5dcc79ff907";

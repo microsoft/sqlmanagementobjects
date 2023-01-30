@@ -29,13 +29,29 @@ Included items must then not match any entries in the exclude list to remain inc
             <!-- Match assembly file paths: -->
             <ModulePaths>
               <Include>
+                <ModulePath>.*Microsoft\.Data\.Tools\.Sql\.BatchParser\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.ConnectionInfo\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Dmf\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Dmf\.Common\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.HadrData\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.HadrModel\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.PolicyEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.RegisteredServers\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.Sdk\.Sfc\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Smo\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.SmoExtended\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Smo\.Notebook\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.RegSvrEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.SmoMetadataProvider\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.Assessment\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.SqlEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.SqlScriptPublish\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEvent\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEventDbScoped\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEventDbScopedEnum\.dll$</ModulePath>
+                <ModulePath>.*Microsoft\.SqlServer\.Management\.XEventEnum\.dll$</ModulePath>
               </Include>
               <Exclude>
-                <ModulePath>.*NUnit.*</ModulePath>
-                <ModulePath>.*moq.*</ModulePath>
-                <ModulePath>.*Microsoft\.SqlServer\.Test\..*</ModulePath>
-                <ModulePath>.*microsoft\.sqlserver\.sqlclrprovider\..*</ModulePath>
-                <ModulePath>.*microsoft\.sqlserver\.servicebrokerenum\..*</ModulePath>
               </Exclude>
             </ModulePaths>
 
@@ -72,7 +88,6 @@ Included items must then not match any entries in the exclude list to remain inc
             <!-- Match attributes on any code element: -->
             <Attributes>
               <Exclude>
-                <!-- Don't forget "Attribute" at the end of the name -->
                 <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
                 <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
                 <Attribute>^System\.Runtime\.CompilerServices.CompilerGeneratedAttribute$</Attribute>
@@ -80,7 +95,7 @@ Included items must then not match any entries in the exclude list to remain inc
                 <Attribute>^System\.Diagnostics\.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>
               </Exclude>
             </Attributes>
-
+ 
             <!-- Match the path of the source files in which each method is defined: -->
             <Sources>
               <Exclude>
@@ -91,7 +106,7 @@ Included items must then not match any entries in the exclude list to remain inc
                 <Source>.*\\vc\\include\\.*</Source>
               </Exclude>
             </Sources>
-
+ 
             <!-- Match the company name property in the assembly: -->
             <CompanyNames>
               <Exclude>
@@ -101,17 +116,15 @@ Included items must then not match any entries in the exclude list to remain inc
 
             <!-- Match the public key token of a signed assembly: -->
             <PublicKeyTokens>
-              <!-- Exclude Visual Studio extensions: -->
               <Exclude>
                 <PublicKeyToken>^B03F5F7F11D50A3A$</PublicKeyToken>
                 <PublicKeyToken>^71E9BCE111E9429C$</PublicKeyToken>
                 <PublicKeyToken>^8F50407C4E9E73B6$</PublicKeyToken>
                 <PublicKeyToken>^E361AF139669C375$</PublicKeyToken>
-                <!-- test key -->
                 <PublicKeyToken>^AE41E2615877EB90$</PublicKeyToken>
               </Exclude>
             </PublicKeyTokens>
-
+ 
             <!-- We recommend you do not change the following values: -->
             <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>
             <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>

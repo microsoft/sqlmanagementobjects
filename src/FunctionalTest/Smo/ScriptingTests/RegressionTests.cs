@@ -1,14 +1,17 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
+using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Test.Manageability.Utils;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.SqlServer.Test.SMO.ScriptingTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using _SMO = Microsoft.SqlServer.Management.Smo;
-
+using Assert = NUnit.Framework.Assert;
 
 namespace Microsoft.SqlServer.Test.SMO.RegressionTests
 {
@@ -45,15 +48,15 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
                     // Step 1. Create the test schema, a UDF to be used as a predicate, and a table.
                     //
 
-                    _SMO.Schema sch = new _SMO.Schema(database, SchemaName);
+                    var sch = new _SMO.Schema(database, SchemaName);
                     sch.Create();
-                    _SMO.UserDefinedFunction function = new _SMO.UserDefinedFunction(database, FunctionName, SchemaName);
+                    var function = new _SMO.UserDefinedFunction(database, FunctionName, SchemaName);
                     function.TextHeader = String.Format(FunctionTextHeaderFormat, SchemaName, FunctionName);
                     function.TextBody = FunctionTextBody;
                     function.Create();
 
-                    _SMO.Table tab = new _SMO.Table(database, tableName, SchemaName);
-                    _SMO.Column col = new _SMO.Column(tab, columnName, new _SMO.DataType(_SMO.SqlDataType.Int));
+                    var tab = new _SMO.Table(database, tableName, SchemaName);
+                    var col = new _SMO.Column(tab, columnName, new _SMO.DataType(_SMO.SqlDataType.Int));
                     tab.Columns.Add(col);
                     tab.Create();
 
@@ -62,9 +65,9 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
 
                     // Create a security policy with a simple predicate.
                     //
-                    _SMO.SecurityPolicy secPol = new _SMO.SecurityPolicy(database, SecPolName, SchemaName, true
+                    var secPol = new _SMO.SecurityPolicy(database, SecPolName, SchemaName, true
                         /* not for replication */, true /* is enabled */);
-                    _SMO.SecurityPredicate predicate = new _SMO.SecurityPredicate(secPol,
+                    var predicate = new _SMO.SecurityPredicate(secPol,
                         database.Tables[tableName, SchemaName],
                         String.Format(PredicateDefinitionFormat, SchemaName, FunctionName, columnName));
                     secPol.SecurityPredicates.Add(predicate);
@@ -75,20 +78,20 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
 
                     // Find the dependencies of the table.
                     //
-                    _SMO.DependencyWalker depWalker = new _SMO.DependencyWalker(database.Parent);
+                    var depWalker = new _SMO.DependencyWalker(database.Parent);
                     depWalker.DiscoveryProgress +=
                         new _SMO.ProgressReportEventHandler((object sender, _SMO.ProgressReportEventArgs args) =>
                         {
                             if (args.Current.Type.Equals("Table"))
                             {
                                 tab.Refresh();
-                                _SMO.Table depTable = (_SMO.Table) database.Parent.GetSmoObject(args.Current);
+                                var depTable = (_SMO.Table)database.Parent.GetSmoObject(args.Current);
                                 Assert.AreEqual(tab, depTable, "Table is not equal to the table created above.");
                             }
                             else if (args.Current.Type.Equals("SecurityPolicy"))
                             {
                                 secPol.Refresh();
-                                _SMO.SecurityPolicy depSecPol = (_SMO.SecurityPolicy) database.Parent.GetSmoObject(args.Current);
+                                var depSecPol = (_SMO.SecurityPolicy)database.Parent.GetSmoObject(args.Current);
                                 Assert.AreEqual(secPol, depSecPol,
                                     "Dependent security policy is not equal to the security policy created above.");
                             }
@@ -99,16 +102,33 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
                             }
                         });
 
-                    Urn[] urns = new Urn[1];
+                    var urns = new Urn[1];
                     urns[0] = tab.Urn;
-                    _SMO.DependencyTree tree = depWalker.DiscoverDependencies(urns, false /* don't show parents */);
-                    Assert.AreEqual(2, tree.Count,
+                    var tree = depWalker.DiscoverDependencies(urns, false /* don't show parents */);
+                    Assert.That(tree.Count, Is.EqualTo(2),
                         "There should only be two dependencies in the tree, the policy and the table.");
 
                     // Walk the dependencies and validate using the above handler.
                     //
-                    depWalker.WalkDependencies(tree);
+                    _ = depWalker.WalkDependencies(tree);
                 });
+        }
+
+        [TestMethod]
+        /// <summary>
+        /// Regression test for https://github.com/microsoft/sqlmanagementobjects/issues/123
+        /// </summary>
+        public void Table_Alter_when_Column_marked_for_drop_succeeds_on_all_platforms()
+        {
+            ExecuteWithDbDrop(db =>
+            {
+                var table = db.CreateTable("markfordrop", new[] {
+                    new ColumnProperties("col1"), new ColumnProperties("col2") });
+                table.Columns["col1"].MarkForDrop(true);
+                table.Alter();
+                table.Columns.ClearAndInitialize(string.Empty, Enumerable.Empty<string>());
+                Assert.That(table.Columns.Cast<_SMO.Column>().Select(c => c.Name), Is.EqualTo(new[] { "col2" }), "Column not dropped");
+            });
         }
     }
 }

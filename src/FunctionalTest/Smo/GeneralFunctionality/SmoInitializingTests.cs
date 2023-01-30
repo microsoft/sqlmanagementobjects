@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
@@ -23,13 +23,13 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
     public class SmoInitializingTests : SqlTestBase
     {
         /// <summary>
-        /// Verifies that calling CleanAndInitialize with a filter on a Table collection
+        /// Verifies that calling ClearAndInitialize with a filter on a Table collection
         /// will correctly clear the collection and fill it with the tables that meet the
         /// filter. This works for DW too but it's slow to run
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
-        public void CleanAndInitializeTestInitializesTheTablesUsingTheFilter()
+        public void ClearAndInitializeTestInitializesTheTablesUsingTheFilter()
         {
             ExecuteWithDbDrop(
                 dbNamePrefix: "SmoCleanAndInitializeTest",

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -167,6 +167,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
             if (this.AvailabilityGroupData.DataSecondaries.Any() 
                 && this.AvailabilityGroupData.PerformDataSynchronization != DataSynchronizationOption.AutomaticSeeding)
             {
+                AddInitialAgSeedingTasks(tasks);
                 foreach (PrimaryDatabaseData databaseData in this.AvailabilityGroupData.NewAvailabilityDatabases)
                 {
                     tasks.Add(new BackupDatabaseTask(databaseData.Name, this.AvailabilityGroupData));
@@ -205,6 +206,33 @@ namespace Microsoft.SqlServer.Management.HadrModel
             #endregion
 
             return tasks;
+        }
+
+        private void AddInitialAgSeedingTasks(IList<HadrTask> tasks)
+        {
+            // For a contained AG we have to backup and restore the <agname>_master and <agname>_msdb and join them to the AG
+            // before joining any user databases
+            if (AvailabilityGroupData.IsContained)
+            {
+                foreach (var systemDatabase in new[] { $"{AvailabilityGroupData.GroupName}_master", $"{AvailabilityGroupData.GroupName}_msdb" })
+                {
+                    tasks.Add(new BackupDatabaseTask(systemDatabase, AvailabilityGroupData));
+                    foreach (var availabilityGroupReplica in AvailabilityGroupData.DataSecondaries)
+                    {
+                        tasks.Add(new RestoreDatabaseTask(systemDatabase, AvailabilityGroupData, availabilityGroupReplica));
+                    }
+                    tasks.Add(new BackupLogTask(systemDatabase, AvailabilityGroupData));
+
+                    foreach (var availabilityGroupReplica in AvailabilityGroupData.DataSecondaries)
+                    {
+                        // For each secondary replica for the current database add a restore log action
+                        tasks.Add(new RestoreLogTask(systemDatabase, AvailabilityGroupData, availabilityGroupReplica));
+
+                        // For each secondary replica for the current database add a join availability group action
+                        tasks.Add(new JoinDatabaseToAvailabilityGroupTask(systemDatabase, AvailabilityGroupData, availabilityGroupReplica));
+                    }
+                }
+            }
         }
         #endregion
     }

@@ -214,7 +214,7 @@ OnlyScript120CompatibleFeatures = SQL Server 2014
 OnlyScript130CompatibleFeatures = SQL Server 2016
 OnlyScript140CompatibleFeatures = SQL Server 2017
 OnlyScript150CompatibleFeatures = SQL Server 2019
-OnlyScript160CompatibleFeatures = SQL Server v160
+OnlyScript160CompatibleFeatures = SQL Server 2022
 
 TargetEngineType = Script for the database engine type
 TargetEngineTypeDescription = Script only features compatible with the specified SQL Server database engine type.
@@ -230,10 +230,10 @@ StandardEdition = Microsoft SQL Server Standard Edition
 EnterpriseEdition = Microsoft SQL Server Enterprise Edition
 ExpressEdition = Microsoft SQL Server Express Edition
 SqlAzureDatabaseEdition = Microsoft Azure SQL Database Edition
-SqlDataWarehouseEdition = Microsoft Azure SQL Data Warehouse Edition
+SqlDataWarehouseEdition = Microsoft Azure Synapse Analytics dedicated SQL pools Edition
 StretchEdition = Microsoft SQL Server Stretch Database Edition
 SqlServerManagedInstanceEdition = Microsoft Azure SQL Database Managed Instance Edition
-SqlServerOnDemandEdition = Microsoft Azure SQL OnDemand Edition
+SqlServerOnDemandEdition = Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition
 SqlDatabaseEdgeEdition = Microsoft Azure SQL Edge Edition
 SqlAzureArcManagedInstanceEdition = Microsoft Azure Arc SQL Managed Instance Edition
 

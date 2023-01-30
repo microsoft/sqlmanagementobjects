@@ -90,23 +90,38 @@
     <version cloud_min_major='12'>
       <!-- sys.database_service_objectives may fail sometimes and raise an exception. We only return master in that case.
       When the query is run in a user database, sys.database_service_objectives doesn't return a row for master.
+      Also - sometimes sys.database_service_objectives has the wrong database_id so we leverage the fact there's only 1 
+      row in that view in the user database
       -->
       <prefix fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#'>
         create table #dso (database_id int primary key, azureEdition sysname null, engineEdition int)
         if serverproperty('EngineEdition') = 11
         BEGIN
-          insert into #dso select database_id, NULL, 11 from sys.databases
+        insert into #dso select database_id, NULL, 11 from sys.databases
         END
         ELSE
         BEGIN TRY
-          exec sp_executesql N'
-          insert into #dso select database_id, edition,
-          case when edition = ''DataWarehouse'' then 6 else 5 end
-          from sys.database_service_objectives'
+        if db_name() = 'master'
+        BEGIN
+        exec sp_executesql N'
+        insert into #dso select database_id, edition,
+        case when edition = ''DataWarehouse'' then 6 else 5 end
+        from sys.database_service_objectives'
+        END
+        ELSE
+        BEGIN
+        exec sp_executesql N'
+        DECLARE @databaseId INT
+        select @databaseId = database_id from sys.databases where name=db_name()
+        insert into #dso select top 1 @databaseId, edition, 
+        case when edition = ''DataWarehouse'' then 6 else 5 end
+        from sys.database_service_objectives'
+        END
         END TRY
         BEGIN CATCH
-          insert into #dso select database_id, N'', case when [name] = 'master' then 5 else 0 end from sys.databases
+        insert into #dso select database_id, N'', case when [name] = 'master' then 5 else 0 end from sys.databases
         END CATCH
+
       </prefix>
     </version>
 
@@ -279,7 +294,9 @@
       <property name="AzureEdition" type="nvarchar" cast='true'>ISNULL(dso.azureEdition, N'')</property>
       <property name='RealEngineEdition' type='int' access='read'>case when dtb.name = 'master' then ISNULL(dso.engineEdition, 5) else ISNULL(dso.engineEdition, 0) end</property>
     </version>
-
+    <version datawarehouse_enabled='true'>
+      <property name='RealEngineEdition' type='int' access='read'>6</property>
+    </version>
     <version cloud_min_major = '12'>
       <property name="DefaultFullTextCatalog" type="sysname" expensive='true'>ISNULL((select top 1 ftc.name from sys.fulltext_catalogs as ftc where ftc.is_default=1),N'')</property>
     </version>

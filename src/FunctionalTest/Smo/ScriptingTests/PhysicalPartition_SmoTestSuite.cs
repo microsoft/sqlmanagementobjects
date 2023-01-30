@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -145,6 +145,25 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 Assert.That(table, Is.Not.Null, "Database table " + "\"" + tableName + "\" was not created by the script: " + script);
                 Assert.That(table.HasXmlCompressedPartitions, Is.True, "Script should create table with xml compressed partition");
                 Assert.That(table.PhysicalPartitions.Cast<PhysicalPartition>().Select(p => p.XmlCompression), Is.EqualTo(new XmlCompressionType[] { XmlCompressionType.On }), "Table should have 1 partition");
+            });
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        public void SmoPhysicalPartition_Table_Create_succeeds_when_XmlCompression_not_set()
+        {
+            // Simulate creating the staging table like the SSMS Manage Partitions wizard
+            ExecuteWithDbDrop(database =>
+            {
+                var table = CreatePartitionedTable(database);
+                var partitionScheme = database.PartitionSchemes[table.PartitionScheme];
+                var newTable = new Table(database, "newTable", table.Schema);
+                newTable.Columns.Add(new Column(newTable, table.Columns[0].Name, table.Columns[0].DataType));
+                newTable.FileGroup = partitionScheme.FileGroups[0];
+                // Note XmlCompression on the new PhysicalPartition is not set
+                newTable.PhysicalPartitions.Add(new PhysicalPartition(newTable, 1, table.PhysicalPartitions[0].DataCompression));
+                var script = TSqlScriptingHelper.GenerateScriptForAction(database.Parent, newTable.Create);
+                Assert.That(script, Does.Contain("CREATE TABLE [dbo].[newTable]"), "Incorrect generated script");
             });
         }
 

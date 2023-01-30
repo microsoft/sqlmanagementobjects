@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -53,23 +53,40 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
             var permissionList = ServerContext.ConnectionContext.ExecuteWithResults(permissionQuery).Tables[0].Rows.Cast<DataRow>();
             var maxValue = Enum.GetValues(enumType).Cast<int>().Max();
             var textInfo = new CultureInfo("en-US", false).TextInfo;
-            var missingValues = new StringBuilder();
+            var typeName = enumType.Name.Substring(0, enumType.Name.IndexOf("PermissionSetValue"));
+
+            // codegen stringbuilders for missing permissions
+            var missingEnumValues = new StringBuilder();
+            var missingPermissionDefinitions = new StringBuilder($"{Environment.NewLine}{Environment.NewLine}Add the following to permissionOptions.cs in the {typeName}Permission class, in alphabetical order:{Environment.NewLine}{Environment.NewLine}");
+            var missingPermissionSetDefinitions = new StringBuilder($"{Environment.NewLine}{Environment.NewLine}Add the following to permissionOptions.cs in the {typeName}PermissionSet class, in alphabetical order:{Environment.NewLine}{Environment.NewLine}");
+
             foreach (var row in permissionList)
             {
                 var name = row["permission_name"].ToString().Trim();
                 var type = row["type"].ToString().Trim();
                 if (!permissionNames.Contains(name) || !permissionTypes.Contains(type))
                 {
-                    var enumName = new StringBuilder();
-                    foreach (var s in name.Split(' '))
-                    {
-                        enumName.Append(textInfo.ToTitleCase(s.ToLowerInvariant()));
-                    }
-                    enumName.Append($" = {++maxValue},");
-                    missingValues.Append($"{Environment.NewLine}[PermissionType(\"{type}\")]{Environment.NewLine}[PermissionName(\"{name}\")]{Environment.NewLine}{enumName}{Environment.NewLine}");
+                    var enumName = textInfo.ToTitleCase(name.ToLower()).Replace(" ", "");
+
+                    missingEnumValues.Append(
+                        $"{Environment.NewLine}[PermissionType(\"{type}\")]{Environment.NewLine}" +
+                        $"[PermissionName(\"{name}\")]{Environment.NewLine}" +
+                        $"{enumName} = {++maxValue},{Environment.NewLine}");
+                    missingPermissionDefinitions.Append(
+                        $"    public static {typeName}Permission {enumName}{Environment.NewLine}" +
+                        $"    {{{Environment.NewLine}"+
+                        $"        get {{ return new {typeName}Permission({enumType.Name}.{enumName}); }}{Environment.NewLine}" +
+                        $"    }}");
+                    missingPermissionSetDefinitions.Append(
+                        $"    public bool {enumName}{Environment.NewLine}" +
+                        $"    {{{Environment.NewLine}"+
+                        $"        get {{ return this.Storage[(int){enumType.Name}.{enumName}]; }}{Environment.NewLine}"+
+                        $"        set {{ this.Storage[(int){enumType.Name}.{enumName}] = value; }}{Environment.NewLine}" +
+                        $"    }}");
                 }
             }
-            Assert.That(missingValues.ToString(), Is.Empty, $"{ enumType.Name} is incomplete. Add the missing values.");
+
+            Assert.That(missingEnumValues.ToString(), Is.Empty, $"{enumType.Name} is incomplete. Add the missing values in permenum.cs and update permissionOptions.cs accordingly: {missingPermissionDefinitions}{missingPermissionSetDefinitions}");
         }
         /// <summary>
         /// Returns the set of string attribute values associated with the given enumeration.

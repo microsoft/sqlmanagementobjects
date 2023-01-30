@@ -141,5 +141,26 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             var copyString = new SqlConnectionStringBuilder(copy.ConnectionString);
             Assert.That(copyString.DataSource, Is.EqualTo("foobar"), "DataSource");
         }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_copy_preserves_encryption_settings()
+        {
+            var connInfo = new SqlConnectionInfo("someserver") { EncryptConnection = true, TrustServerCertificate = true };
+            var connInfoCopy = new SqlConnectionInfo(connInfo);
+            Assert.That(connInfoCopy.TrustServerCertificate, Is.True, "TrustServerCertificate copied to SqlConnectionInfo");
+            Assert.That(connInfoCopy.EncryptConnection, Is.True, "EncryptConnection copied to SqlConnectionInfo");
+            var serverConnection = new ServerConnection(connInfo);
+            (serverConnection as ISfcConnection).ForceDisconnected();
+            Assert.That(serverConnection.TrustServerCertificate, Is.True, "ServerConnection copies TrustServerCertificate from SqlConnectionInfo");
+            Assert.That(serverConnection.EncryptConnection, Is.True, "ServerConnection copies EncryptConnection from SqlConnectionInfo");
+            var databaseConnection = serverConnection.GetDatabaseConnection("somedb", poolConnection: false);
+            Assert.That(databaseConnection.TrustServerCertificate, Is.True, "GetDatabaseConnection copies TrustServerCertificate");
+            Assert.That(databaseConnection.EncryptConnection, Is.True, "GetDatabaseConnection copies EncryptConnection");
+            var actualConnectionString = new SqlConnectionStringBuilder(databaseConnection.SqlConnectionObject.ConnectionString);
+            // using == true to force use of implicit boolean operator if needed
+            Assert.That(actualConnectionString.Encrypt == true, Is.True, "GetDatabaseConnection connection Encrypt=true");
+            Assert.That(actualConnectionString.TrustServerCertificate, Is.True, "GetDatabaseConnection connection TrustServerCertificate=true");
+        }
     }
 }

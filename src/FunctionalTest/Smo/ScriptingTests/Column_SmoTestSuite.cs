@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -168,9 +168,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     var table = new _SMO.Table(database, tableName);
                     var columnA = "FirstName";
                     var columnB = "LastName";
+                    var columnC = "SomeDate";
                     var maskingFunction = @"partial(1, ""XXXXXXX"", 0)";
                     table.Columns.Add(new _SMO.Column(table, columnA) { DataType = _SMO.DataType.VarChar(100), IsMasked = true, MaskingFunction = maskingFunction });
                     table.Columns.Add(new _SMO.Column(table, columnB) { DataType = _SMO.DataType.VarChar(100) });
+                    table.Columns.Add(new _SMO.Column(table, columnC) { DataType = _SMO.DataType.DateTimeOffset(2) });
                     table.Create();
                     database.Refresh();
                     table = database.Tables[tableName];
@@ -191,6 +193,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     Assert.That(table.Columns[columnB].IsMasked, Is.True, "Alter column; IsMasked should be set");
                     Assert.That(table.Columns[columnB].MaskingFunction, Is.EqualTo(maskingFunction), "Alter column; Incorrect MaskingFunction");
 
+                    if (database.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase || database.ServerVersion.Major >= 16)
+                    {
+                        table.Columns[columnC].IsMasked = true;
+                        table.Columns[columnC].MaskingFunction = @"datetime(""s"")";
+                        table.Columns[columnC].Alter();
+                        table.Refresh();
+                        table.Columns.ClearAndInitialize(string.Empty, new[] { nameof(_SMO.Column.IsMasked), nameof(_SMO.Column.MaskingFunction) });
+                        Assert.That(table.Columns[columnC].IsMasked, Is.True, "IsMasked with datetime after Alter");
+                        Assert.That(table.Columns[columnC].MaskingFunction, Is.EqualTo(@"datetime(""s"")"), "MaskingFunction with datetime after Alter");
+                    }
                 });
         }
 

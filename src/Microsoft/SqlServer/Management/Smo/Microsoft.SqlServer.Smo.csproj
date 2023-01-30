@@ -652,8 +652,6 @@
   <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
       <Reference Include="System.Management" />
   </ItemGroup>
-<!-- BEGIN NOGITHUB -->
-<!-- END NOGITHUB -->
   <Target Name="RunCodeGen" 
     BeforeTargets="CoreResGen" 
     Condition="'$(BuildingInsideVisualStudio)'!='true' and '@(CodeGen)' != ''" 

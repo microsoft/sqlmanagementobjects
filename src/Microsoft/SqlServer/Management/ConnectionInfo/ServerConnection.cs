@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 namespace Microsoft.SqlServer.Management.Common
@@ -1775,6 +1775,11 @@ namespace Microsoft.SqlServer.Management.Common
         {
             get
             {
+#if MICROSOFTDATA
+                CheckDisconnected();
+                PoolConnect();
+                return SqlConnectionObject.ServerProcessId;
+#else
                 SqlExecutionModes em = this.SqlExecutionModes;
                 try
                 {
@@ -1785,6 +1790,7 @@ namespace Microsoft.SqlServer.Management.Common
                 {
                     this.SqlExecutionModes = em;
                 }
+#endif
             }
         }
 
@@ -2020,7 +2026,7 @@ namespace Microsoft.SqlServer.Management.Common
             /// <returns>Server connection</returns>
             private ServerConnection CreateServerConnection(string connString, string initialCatalog, bool poolConn, IRenewableToken accessToken = null)
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connString)
+                var builder = new SqlConnectionStringBuilder(connString)
                 {
                     InitialCatalog = initialCatalog,
                     Pooling = poolConn
@@ -2036,14 +2042,8 @@ namespace Microsoft.SqlServer.Management.Common
                 }
                 else
                 {
-#if !NETSTANDARD2_0
-                        serverConnection = new ServerConnection(builder.DataSource)
-                        { NonPooledConnection = !poolConn, ConnectionString = builder.ConnectionString };
-#else
-// we need to initialize the server connection from a SQL connection to avoid 
-// losing LoginName on .Net Core non-Windows platforms
+// Initialize the server connection from a SQL connection to make sure we copy all properties to the new connection
                     serverConnection = new ServerConnection(new SqlConnection(builder.ConnectionString));
-#endif
                 }
 
                 return serverConnection;

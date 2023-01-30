@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -3427,7 +3427,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // Check if system-time PERIOD needs to be altered
-            if (IsSupportedProperty("TemporalType", sp))
+            if (IsSupportedProperty(nameof(HasSystemTimePeriod), sp))
             {
                 ScriptSystemTimePeriodForAlter(alterQuery, sp);
             }

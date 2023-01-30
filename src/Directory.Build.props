@@ -27,7 +27,8 @@
     <CSharpProps Condition="'$(TargetGroup)'== 'netfx'">CSharp.NetFx.props</CSharpProps>
     <CSharpProps Condition="'$(TargetGroup)'== 'netcore'">CSharp.NetCore.props</CSharpProps>
     <CSharpProps Condition="'$(CSharpProps)'==''">CSharp.NetStandard.props</CSharpProps>
-    <NoWarn>$(NoWarn);NU5125;MSB3026</NoWarn>
+    <!-- 1668 is CSC complaining about the LIB environment variable having bogus paths, which come from VS -->
+    <NoWarn>$(NoWarn);NU5125;MSB3026;CS1668</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RestorePackagesPath>$(EnlistmentRoot)\packages</RestorePackagesPath>
     <ExcludeRestorePackageImports>false</ExcludeRestorePackageImports>
@@ -89,12 +90,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
-    <SqlParserPackageVersion>160.22510.0</SqlParserPackageVersion>
+    <SqlParserPackageVersion>160.22524.0</SqlParserPackageVersion>
     <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
-    <SqlClientPackageVersion>3.1.0</SqlClientPackageVersion>
+    <SqlClientPackageVersion>3.1.1</SqlClientPackageVersion>
   </PropertyGroup>
-<!-- BEGIN NOGITHUB -->
-<!-- END NOGITHUB --> 
   <Import Project="$(BuildPropsDir)\StrongName.props" Condition="Exists('$(BuildPropsDir)\StrongName.props')" />
   <Import Project="$(BuildPropsDir)\Version.props" />
   <Import Project="$(BuildPropsDir)\$(CSharpProps)" />
