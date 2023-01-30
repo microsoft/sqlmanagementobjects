@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <AssemblyMajorVersion Condition="'$(AssemblyMajorVersion)'==''">16</AssemblyMajorVersion>
+    <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'=='' and '$(GacVersion)' == 'true'">0</AssemblyMinorVersion>
+    <!-- minor version 200 distinguishes the Microsoft.Data.SqlClient dependent DLL from System.Data.SqlClient dependent -->
+    <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'=='' and '$(GacVersion)' != 'true' and '$(UseMicrosoftData)' == 'true'">200</AssemblyMinorVersion>
+    <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'==''">100</AssemblyMinorVersion>
+    <AssemblyBuildVersion Condition="'$(LocalBuildVersion)'!=''">$(LocalBuildVersion)</AssemblyBuildVersion>
+    <AssemblyBuildRevision Condition="'$(LocalBuildRevision)'!=''">$(LocalBuildRevision)</AssemblyBuildRevision>
+    <AssemblyBuildVersion Condition="'$(AssemblyBuildVersion)'==''">0</AssemblyBuildVersion>
+    <AssemblyBuildVersion Condition="'$(AssemblyBuildVersion)' &gt; '65535'">$([MSBUILD]::Modulo($(AssemblyBuildVersion), 65535))</AssemblyBuildVersion>
+    <AssemblyBuildRevision Condition="'$(AssemblyBuildRevision)'==''">0</AssemblyBuildRevision>
+    <AssemblyFileVersion Condition="'$(AssemblyFileVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</AssemblyFileVersion>
+    <InformationalVersion>$(AssemblyFileVersion)$(CommitIdForCurrentBuild)</InformationalVersion>
+    <FileVersion>$(AssemblyFileVersion)</FileVersion>
+    <Version>$(AssemblyFileVersion)</Version>
+    <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">0</PackageMajorVersionIncrement>
+    <PackageVersion Condition="'$(PackageVersion)' == ''">$(AssemblyMajorVersion)$(PackageMajorVersionIncrement).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</PackageVersion>
+    <AssemblyVersion Condition="'$(AssemblyVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).0.0</AssemblyVersion>
+  </PropertyGroup>
+</Project>

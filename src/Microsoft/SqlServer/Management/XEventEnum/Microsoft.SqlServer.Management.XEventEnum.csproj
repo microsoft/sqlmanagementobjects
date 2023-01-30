@@ -1,0 +1,96 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="xml\Action.xml">
+      <LogicalName>Action.xml</LogicalName>
+      <Link>xml\Action.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ActionInfo.xml">
+      <LogicalName>ActionInfo.xml</LogicalName>
+      <Link>xml\ActionInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\DataEventColumnInfo.xml">
+      <LogicalName>DataEventColumnInfo.xml</LogicalName>
+      <Link>xml\DataEventColumnInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\Event.xml">
+      <LogicalName>Event.xml</LogicalName>
+      <Link>xml\Event.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\EventColumnInfo.xml">
+      <LogicalName>EventColumnInfo.xml</LogicalName>
+      <Link>xml\EventColumnInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\EventField.xml">
+      <LogicalName>EventField.xml</LogicalName>
+      <Link>xml\EventField.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\EventInfo.xml">
+      <LogicalName>EventInfo.xml</LogicalName>
+      <Link>xml\EventInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_urn.xml">
+      <LogicalName>inc_urn.xml</LogicalName>
+      <Link>xml\inc_urn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\MapInfo.xml">
+      <LogicalName>MapInfo.xml</LogicalName>
+      <Link>xml\MapInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\MapValueInfo.xml">
+      <LogicalName>MapValueInfo.xml</LogicalName>
+      <Link>xml\MapValueInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\Package.xml">
+      <LogicalName>Package.xml</LogicalName>
+      <Link>xml\Package.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\PredCompareInfo.xml">
+      <LogicalName>PredCompareInfo.xml</LogicalName>
+      <Link>xml\PredCompareInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\PredSourceInfo.xml">
+      <LogicalName>PredSourceInfo.xml</LogicalName>
+      <Link>xml\PredSourceInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ReadOnlyEventColumnInfo.xml">
+      <LogicalName>ReadOnlyEventColumnInfo.xml</LogicalName>
+      <Link>xml\ReadOnlyEventColumnInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\Session.xml">
+      <LogicalName>Session.xml</LogicalName>
+      <Link>xml\Session.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\Target.xml">
+      <LogicalName>Target.xml</LogicalName>
+      <Link>xml\Target.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\TargetColumnInfo.xml">
+      <LogicalName>TargetColumnInfo.xml</LogicalName>
+      <Link>xml\TargetColumnInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\TargetField.xml">
+      <LogicalName>TargetField.xml</LogicalName>
+      <Link>xml\TargetField.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\TargetInfo.xml">
+      <LogicalName>TargetInfo.xml</LogicalName>
+      <Link>xml\TargetInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\TypeInfo.xml">
+      <LogicalName>TypeInfo.xml</LogicalName>
+      <Link>xml\TypeInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\XEStore.xml">
+      <LogicalName>XEStore.xml</LogicalName>
+      <Link>xml\XEStore.xml</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+</Project>

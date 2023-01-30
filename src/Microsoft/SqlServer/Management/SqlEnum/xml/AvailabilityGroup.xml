@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<EnumObject type="AvailabilityGroup" impl_type="SqlObject" min_major='11' >
+  <settings>
+    <property_link table="#tmpag_availability_groups" alias="AG"/>
+    <property_link fields='#PrimaryReplicaServerName#ID#LocalReplicaRole#'
+                   left_join="#tmpag_availability_group_states as agstates">AG.group_id = agstates.group_id</property_link>
+    <property_link fields='#ID#PrimaryReplicaServerName#LocalReplicaRole#'
+                   join="#tmpag_availability_replicas AS AR2">AG.group_id = AR2.group_id</property_link>
+    <property_link fields='#ID#PrimaryReplicaServerName#LocalReplicaRole#'
+                   join="#tmpag_availability_replica_states AS arstates2">AR2.replica_id = arstates2.replica_id AND arstates2.is_local = 1</property_link>
+    <property_link fields="#IsManagedInstanceLink#" left_join='#tmp_managed_instance_link AS MIL'>AG.group_id = MIL.group_id</property_link>
+    <prefix fields="#PrimaryReplicaServerName#ID#LocalReplicaRole#">
+      select agstates.group_id, agstates.primary_replica into #tmpag_availability_group_states from master.sys.dm_hadr_availability_group_states as agstates
+    </prefix>
+
+    <prefix>
+      select * into #tmpag_availability_groups from master.sys.availability_groups
+    </prefix>
+
+    <prefix fields="#ID#PrimaryReplicaServerName#LocalReplicaRole#">
+      select group_id, replica_id, replica_metadata_id into #tmpag_availability_replicas from master.sys.availability_replicas
+      select replica_id, is_local, role into #tmpag_availability_replica_states from master.sys.dm_hadr_availability_replica_states
+      </prefix>
+
+    <prefix fields="#IsManagedInstanceLink#">
+      select TMIL.group_id, count(*) as is_managed_instance_link into #tmp_managed_instance_link from sys.availability_replicas AS TMIL where TMIL.endpoint_url LIKE '%Server=%' and (select count(*) from sys.availability_replicas as A1 where A1.group_id = TMIL.group_id) = 2 group by TMIL.group_id having count(*) = 1
+    </prefix>
+
+    <postfix fields="#PrimaryReplicaServerName#ID#LocalReplicaRole#">
+      drop table #tmpag_availability_group_states
+    </postfix>
+
+    <postfix fields="#ID#PrimaryReplicaServerName#LocalReplicaRole#">
+      drop table #tmpag_availability_replicas
+      drop table #tmpag_availability_replica_states
+    </postfix>
+
+    <postfix fields="#IsManagedInstanceLink#">
+      drop table #tmp_managed_instance_link
+    </postfix>
+
+    <postfix>
+      drop table #tmpag_availability_groups
+    </postfix>
+
+  </settings>
+  <properties>
+    <include file='inc_urn.xml'/>
+
+    <version min_major='11'>
+      <property name="Name" type="sysname">AG.name</property>
+      <property name="UniqueId" type="uniqueidentifier" access="Read">AG.group_id</property>
+      <property name="AutomatedBackupPreference" type="tinyint" report_type="AvailabilityGroupAutomatedBackupPreference">ISNULL(AG.automated_backup_preference, 4)</property>
+      <property name="FailureConditionLevel" type="tinyint" report_type="AvailabilityGroupFailureConditionLevel">ISNULL(AG.failure_condition_level, 6)</property>
+      <property name="HealthCheckTimeout" type="int">ISNULL(AG.health_check_timeout, -1)</property>
+      <property name="PrimaryReplicaServerName" type="nvarchar" access="Read">ISNULL(agstates.primary_replica, '')</property>
+      <property name="LocalReplicaRole" type="int" report_type="AvailabilityReplicaRole" access="Read">ISNULL(arstates2.role, 3)</property>
+
+      <!-- enable permissions -->
+      <property name="PermissionClass" type="int" hidden='true'>108</property>
+
+      <!--This property is required to link the permission object for the availability group to the object-->
+      <!--Since the securable for the AG is attached to the replica, and not an AG wide property, the id is pulled from the AR2 table-->
+      <property name="ID" type="int" access="Read">AR2.replica_metadata_id</property>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+
+    <version min_major='13'>
+      <property name="BasicAvailabilityGroup" type="bit" cast="true">ISNULL(AG.basic_features, 0)</property>
+      <property name="DatabaseHealthTrigger" type="bit" cast="true">ISNULL(AG.db_failover, 0)</property>
+      <property name="DtcSupportEnabled" type="bit" cast="true">ISNULL(AG.dtc_support, 0)</property>
+      <property name="IsDistributedAvailabilityGroup" type="bit" cast="true">ISNULL(AG.is_distributed, 0)</property>
+    </version>
+
+    <version min_major='14'>
+      <property name="ClusterType" type="tinyint" report_type="AvailabilityGroupClusterType">ISNULL(AG.cluster_type, 0)</property>
+      <property name="RequiredSynchronizedSecondariesToCommit" type="int">ISNULL(AG.required_synchronized_secondaries_to_commit, 0)</property>
+    </version>
+    
+    <version min_major="7" max_major='14'>
+      <property name="IsManagedInstanceLink" type="bit" access="Read" cast="true" expensive="false">0</property>
+    </version>
+    
+    <version min_major='15'>
+      <property name="IsManagedInstanceLink" type="bit" access="Read" cast="true" expensive="true">ISNULL(MIL.is_managed_instance_link, 0) &amp; ISNULL(AG.is_distributed, 0)</property>
+    </version>
+
+    <version min_major='16'>
+      <property name="IsContained" type="bit" cast="true" read_only_after_creation="true" expensive="false">ISNULL(AG.is_contained, 0)</property>
+    </version>
+
+  </properties>
+</EnumObject>

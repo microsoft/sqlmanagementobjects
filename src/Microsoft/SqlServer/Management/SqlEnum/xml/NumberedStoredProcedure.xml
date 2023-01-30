@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<EnumObject type="StoredProcedure" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ID" />
+    </parent_link>
+
+    <version min_major='7' max_major='8'>
+      <property_link table='syscomments' alias = 'nsp'>nsp.colid = &lt;msparam&gt;1&lt;/msparam&gt; and nsp.number &gt; &lt;msparam&gt;1&lt;/msparam&gt;</property_link>
+    </version>
+    <version min_major='9' cloud_min_major='12'>
+      <property_link table='sys.numbered_procedures' alias = 'nsp'/>
+    </version>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="{0} + '/{2}[@Number=' + cast({1} AS nvarchar(20)) + ']'">
+        <link_field type='parent' field="Urn" />
+        <link_field type='local' field="Number" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+    <version min_major='7' max_major='8'>
+      <property name="Number" type="smallint" access='Read'>nsp.number</property>
+      <property name="Name" type="sysname" read_only_after_creation="true">object_name(nsp.id) + ';' + cast(nsp.number as nvarchar(20))</property>
+      <property name="IsEncrypted" type="bit" cast='true'>nsp.encrypted</property>
+
+      <!-- on 7-8 Definition is just a pointer to the text-->
+      <property name="Definition" type="nvarchar" size='80'
+        hidden='true'>cast(nsp.id as nvarchar(20)) + N'_' + cast(db_id() as nvarchar(20)) + N'_' + cast(nsp.number as nvarchar(20))</property>
+      <property name="ParentNumber" type='smallint' hidden='true'>nsp.number</property>
+      <property name="ID" type='int' hidden='true'>nsp.id</property>
+    </version>
+
+    <version min_major='9'  cloud_min_major='12'>
+      <property name="Number" type="smallint" access='Read'>nsp.procedure_number</property>
+      <property name="Name" type="sysname" read_only_after_creation="true">object_name(nsp.object_id) + ';' + cast(nsp.procedure_number as nvarchar(20))</property>
+      <property name="IsEncrypted" type="bit" cast='true'>CASE WHEN nsp.definition IS NULL THEN 1 ELSE 0 END</property>
+
+      <!-- here we just offer support for text, every object will do whatever it sees fit
+      take the whole text, parse it, etc -->
+      <property name="Definition" type="nvarchar" size='max' hidden='true'>nsp.definition</property>
+      <property name="ParentNumber" type='smallint' hidden='true'>nsp.procedure_number</property>
+      <property name="ID" type='int' hidden='true'>nsp.object_id</property>
+    </version>
+    <property name="IsSystemObject" type="int" hidden='true'>0</property>
+    <include file='inc_text.xml' />
+  </properties>
+</EnumObject>

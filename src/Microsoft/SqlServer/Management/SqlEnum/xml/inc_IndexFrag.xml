@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<EnumObject type="Inc_Fragmentation" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<version min_major='7' max_major='7'>
+			<post_process class_name='Microsoft.SqlServer.Management.Smo.PostProcessFragmentation'
+						triggered_fields='#IndexID#TableID#DatabaseName#'/>
+		</version>
+
+		<version min_major='8' max_major='8'>
+			<parent_link>
+				<link parent='Name' local='IndexName' />
+			</parent_link>
+
+			<request_parent_select>
+				<field name='ParentID' />
+				<field name='Name' />
+			</request_parent_select>
+			<property_link table="#contig_tmp as fi" />
+
+			<postfix>
+				drop table #contig_tmp
+			</postfix>
+		</version>
+
+		<version min_major='9'>
+			<parent_link>
+				<link parent='TableID' local='TableID' />
+				<link parent='IndexID' local='IndexID' />
+			</parent_link>
+			
+			<property_link expression_is_for_table_name='true' alias='fi'>
+				<link_multiple no='1' expression="sys.dm_db_index_physical_stats(@database_id, NULL, NULL, NULL, '{0}')">
+					<link_field type='local' field="FragmentationLevel" />
+				</link_multiple>
+			</property_link>
+
+			<prefix>
+declare @database_id int
+select @database_id = db_id()
+			</prefix>
+
+		</version>
+	</settings>
+	<properties>
+		<version min_major='7' max_major='7'>
+			<property name="IndexID" type="int" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property>
+			<property name="TableID" type="int" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ParentID" />
+				</link_multiple>
+			</property>
+			<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+			
+			<property name="Pages" type="int">null</property>
+			<property name="Extents" type="int">null</property>
+			<property name="ExtentSwitches" type="int">null</property>
+			<property name="AverageFreeBytes" type="float">null</property>
+			<property name="AveragePageDensity" type="float">null</property>
+			<property name="ScanDensity" type="float">null</property>
+			<property name="LogicalFragmentation" type="float">null</property>
+			<property name="ExtentFragmentation" type="float">null</property>
+		</version>
+		<version min_major='8' max_major='8'>		
+			<property name="IndexName" type="sysname" hidden='true' cast='true'>cast(fi.IndexName as varbinary(256))</property>
+			<property name="Depth" type="tinyint">fi.Level</property>
+			<property name="Pages" type="bigint">fi.Pages</property>
+			<property name="Rows" type="bigint">fi.Rows</property>
+			<property name="MinimumRecordSize" type="int">fi.MinimumRecordSize</property>
+			<property name="MaximumRecordSize" type="int">fi.MaximumRecordSize</property>
+			<property name="AverageRecordSize" type="float">fi.AverageRecordSize</property>
+			<property name="ForwardedRecords" type="bigint">fi.ForwardedRecords</property>
+			<property name="Extents" type="int">fi.Extents</property>
+			<property name="ExtentSwitches" type="int">fi.ExtentSwitches</property>
+			<property name="AverageFreeBytes" type="float">fi.AverageFreeBytes</property>			
+			<property name="AveragePageDensity" type="float">fi.AvgPageFullness</property>
+			<property name="ScanDensity" type="float">fi.ScanDensity</property>
+			<property name="BestCount" type="int">fi.BestCount</property>
+			<property name="ActualCount" type="int">fi.ActualCount</property>
+			<property name="LogicalFragmentation" type="float">fi.LogicalFragmentation</property>
+			<property name="ExtentFragmentation" type="float">fi.ExtentFragmentation</property>		
+		</version>
+		<version min_major='9'>
+			<property name="IndexID" type="int" hidden='true'>fi.index_id</property>
+			<property name="TableID" type="int" hidden='true'>fi.object_id</property>
+			<property name="Depth" type="tinyint">fi.index_depth</property>
+			<property name="Pages" type="bigint">fi.page_count</property>
+			<property name="Rows" type="bigint">fi.record_count</property>
+			<property name="MinimumRecordSize" type="int">fi.min_record_size_in_bytes</property>
+			<property name="MaximumRecordSize" type="int">fi.max_record_size_in_bytes</property>
+			<property name="AverageRecordSize" type="float">fi.avg_record_size_in_bytes</property>
+			<property name="ForwardedRecords" type="bigint">fi.forwarded_record_count</property>
+			<property name="AveragePageDensity" type="float">fi.avg_page_space_used_in_percent</property>
+			<property name="IndexType" type="nvarchar" size="30">fi.index_type_desc</property>
+			<property name="PartitionNumber" type="int">fi.partition_number</property>
+			<property name="GhostRows" type="bigint">fi.ghost_record_count</property>
+			<property name="VersionGhostRows" type="bigint">fi.version_ghost_record_count</property>
+			<property name="AverageFragmentation" type="float">fi.avg_fragmentation_in_percent</property>
+		</version>
+	</properties>
+</EnumObject>

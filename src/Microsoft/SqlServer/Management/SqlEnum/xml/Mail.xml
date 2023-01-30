@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<EnumObject type="Mail" impl_type="SqlObject" min_major='9'>
+    <settings>
+    </settings>
+   <properties>
+	<property name="Urn" type="nvarchar" size="600">
+		<link_multiple no='1' expression="{0} + '/Mail'">
+			<link_field type='parent' field="Urn" />
+		</link_multiple>
+	</property>
+    </properties>
+</EnumObject>

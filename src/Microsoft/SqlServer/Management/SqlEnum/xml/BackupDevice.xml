@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="BackupDevice" impl_type="SqlObject" min_major='7'>
+  <settings>
+    <version min_major='7' max_major='8'>
+      <property_link table = 'master.dbo.sysdevices o'>(o.status &amp; 0x10) &lt;&gt; 0</property_link>
+    </version>
+    <version min_major='9'>
+      <property_link table="sys.backup_devices o"></property_link>
+    </version>
+
+  </settings>
+
+
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="Name" type="sysname">o.name</property>
+    <version min_major='7' max_major='8'>
+      <property name="PhysicalLocation" type="sysname" read_only_after_creation="true">o.phyname</property>
+      <property name="BackupDeviceType" type="int" report_type='BackupDeviceType' read_only_after_creation="true">o.cntrltype</property>
+      <property name="SkipTapeLabel" type="bit" cast='true' read_only_after_creation="true">o.status &amp; 0x08</property>
+    </version>
+    <version min_major='9'>
+      <property name="PhysicalLocation" type="sysname" read_only_after_creation="true">o.physical_name</property>
+      <property name="BackupDeviceType" type="int" report_type='BackupDeviceType' read_only_after_creation="true">o.type</property>
+      <!-- This property is not supported on 9.0 but we return 0 in case someone is relying on it to have a value-->
+      <property name="SkipTapeLabel" type="bit" cast='true' read_only_after_creation="true">0</property>
+    </version>
+    <!--This object does not have an ID, so we're going to use the name  
+    to calculate policy health.
+    Note that this has to be consistent with the API implementation of UrnWithId.-->
+    <version min_major = '10'>
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='2' expression="'Server/{1}[@Name=' + quotename({0},'''') + ']'">
+          <link_field type='local' field="Name" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      <property name="PolicyHealthState" type="int" expensive ="true" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+        <link_multiple no='2' expression="case when 1=msdb.dbo.fn_syspolicy_is_automation_enabled() and exists (select * from msdb.dbo.syspolicy_system_health_state where target_query_expression_with_id like 'Server/{1}\[@Name=' + QUOTENAME({0}, '''') + '\]%' ESCAPE '\') then 1 else 0 end">
+          <link_field type='local' field="Name" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+    </version>
+  </properties>
+</EnumObject>

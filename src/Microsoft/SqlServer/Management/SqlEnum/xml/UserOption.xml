@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="UserOption" impl_type="UserOption" min_major='7' cloud_min_major='12'>
+    <settings>
+        <version min_major='7' max_major='8'>
+            <prefix>
+                declare @UserOption int
+                select @UserOption=c.value from master.dbo.sysconfigures c, master.dbo.spt_values v where v.type = 'C  ' and not c.status is null and v.number = c.config and v.name='user options'
+            </prefix>
+        </version>
+        <version min_major='9' cloud_min_major='12'>
+            <prefix>
+        declare @UserOption int
+        select @UserOption=convert(int, c.value) from sys.configurations c where c.name='user options'
+      </prefix>
+        </version>
+    </settings>
+    <properties>
+        <property name="DisableDefaultConstraintCheck" type="bit" cast='true' mode="deploy">@UserOption &amp; 1</property>
+        <property name="ImplicitTransactions" type="bit" cast='true' mode="deploy">@UserOption &amp; 2</property>
+        <property name="CursorCloseOnCommit" type="bit" cast='true' mode="deploy">@UserOption &amp; 4</property>
+        <property name="AnsiWarnings" type="bit" cast='true' mode="deploy">@UserOption &amp; 8</property>
+        <property name="AnsiPadding" type="bit" cast='true' mode="deploy">@UserOption &amp; 16</property>
+        <property name="AnsiNulls" type="bit" cast='true' mode="deploy">@UserOption &amp; 32</property>
+        <property name="AbortOnArithmeticErrors" type="bit" cast='true' mode="deploy">@UserOption &amp; 64</property>
+        <property name="IgnoreArithmeticErrors" type="bit" cast='true' mode="deploy">@UserOption &amp; 128</property>
+        <property name="QuotedIdentifier" type="bit" cast='true' mode="deploy">@UserOption &amp; 256</property>
+        <property name="NoCount" type="bit" cast='true' mode="deploy">@UserOption &amp; 512</property>
+        <property name="AnsiNullDefaultOn" type="bit" cast='true' mode="deploy">@UserOption &amp; 1024</property>
+        <property name="AnsiNullDefaultOff" type="bit" cast='true' mode="deploy">@UserOption &amp; 2048</property>
+        <property name="ConcatenateNullYieldsNull" type="bit" cast='true' mode="deploy">@UserOption &amp; 4096</property>
+        <property name="NumericRoundAbort" type="bit" cast='true' mode="deploy">@UserOption &amp; 8192</property>
+        <property name="AbortTransactionOnError" type="bit" cast='true' mode="deploy">@UserOption &amp; 16384</property>
+    </properties>
+</EnumObject>

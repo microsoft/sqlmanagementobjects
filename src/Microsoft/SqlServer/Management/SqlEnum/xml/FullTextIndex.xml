@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="FullTextIndex" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<parent_link>
+				<link parent="HasFullTextCatalog" local="HasFullTextCatalog" />
+			</parent_link>
+			
+			<property_link fields='#CatalogName#' join='sysfulltextcatalogs AS cat'>
+				<link_multiple no='1' expression="cat.ftcatid=OBJECTPROPERTY({0}, 'TableFullTextCatalogId')">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property_link>
+			<property_link fields='#UniqueIndexName#IsEnabled#PopulationStatus#ChangeTracking#' join='sysindexes AS si'>
+				<link_multiple no='1' expression="si.id = {0} and INDEXPROPERTY({0}, si.name, 'IsFulltextKey') &lt;&gt; 0">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property_link>
+		</version>
+	
+		<version min_major='9' cloud_min_major='12'>
+			<parent_link>
+				<link parent="ID" local="ParentID" />
+			</parent_link>
+		
+			<property_link table='sys.fulltext_indexes AS fti' />
+			<property_link fields='#CatalogName#' join='sys.fulltext_catalogs AS cat'>cat.fulltext_catalog_id = fti.fulltext_catalog_id</property_link>
+			<property_link fields='#UniqueIndexName#' join='sys.indexes AS si'>si.index_id=fti.unique_index_id and si.object_id=fti.object_id</property_link>
+		</version>
+
+		<version min_major='10' cloud_min_major='12'>
+			<property_link fields='#StopListName#' left_join='sys.fulltext_stoplists AS sl'>sl.stoplist_id = fti.stoplist_id</property_link>
+			<property_link fields='#FilegroupName#' join='sys.filegroups AS fg'>fg.data_space_id = fti.data_space_id</property_link>
+		</version>
+
+    <version min_major='11' cloud_min_major='12'>
+      <property_link fields='#SearchPropertyListName#' left_join='sys.registered_search_property_lists AS spl'>spl.property_list_id = fti.property_list_id</property_link>
+    </version>
+    
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='3' expression="{0} + '/{2}[@Name=' + quotename({1},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='parent' field="Name" />
+				<link_field field="NType" />				
+			</link_multiple>
+		</property>
+		
+		<property name="Name" type="sysname" expensive="true">
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="Name" />
+			</link_multiple>
+		</property>
+		
+		<property name="CatalogName" type="sysname" read_only_after_creation="true">cat.name</property>
+		
+		<version min_major='7' max_major='8'>
+			<property name="IsEnabled" type="bit" cast='true' access='Read'>
+				<link_multiple no='1' expression="OBJECTPROPERTY({0},'TableHasActiveFulltextIndex')">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property>
+			<property name="PopulationStatus" type="int" report_type="IndexPopulationStatus" access='Read'>
+				<link_multiple no='1' expression="ISNULL(OBJECTPROPERTY({0},'TableFullTextPopulateStatus'),0)">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property>
+			<property name="ChangeTracking" type="int" report_type="ChangeTracking" >
+				<link_multiple no='1' expression="ISNULL(OBJECTPROPERTY({0},'TableFullTextBackgroundUpdateIndexOn'),0) + ISNULL(OBJECTPROPERTY({0},'TableFullTextChangeTrackingOn'),0)">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property>
+			
+			<property name="ParentID" type="int" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ID" />
+				</link_multiple>
+			</property>
+			
+			<property name="HasFullTextCatalog" type="bit" hidden='true'>1</property>	
+		</version>
+		
+		<version min_major='9' cloud_min_major='12'>
+			<property name="IsEnabled" type="bit" cast='true' access='Read'>fti.is_enabled</property>
+			<property name="PopulationStatus" type="int" report_type="IndexPopulationStatus" access='Read'>OBJECTPROPERTY(fti.object_id,'TableFullTextPopulateStatus')</property>
+			<property name="ChangeTracking" type="int" report_type="ChangeTracking" >(case change_tracking_state when 'M' then 1 when 'A' then 2 else 0 end)</property>
+			<property name="ItemCount" type="int" access='Read'>OBJECTPROPERTY(fti.object_id,'TableFullTextItemCount')</property>
+			<property name="DocumentsProcessed" type="int" access='Read'>OBJECTPROPERTY(fti.object_id,'TableFullTextDocsProcessed')</property>
+			<property name="PendingChanges" type="int" access='Read'>OBJECTPROPERTY(fti.object_id,'TableFullTextPendingChanges')</property>
+			<property name="NumberOfFailures" type="int" access='Read'>OBJECTPROPERTY(fti.object_id,'TableFullTextFailCount')</property>
+			
+			<property name="ParentID" type="int" hidden='true'>fti.object_id</property>	
+		</version>
+		<version min_major='10' cloud_min_major='12'>
+			<property name="StopListOption" type="int" report_type="StopListOption">(case when fti.stoplist_id is NULL then 0 when fti.stoplist_id = 0 then 1 else 2 end)</property>
+			<property name="StopListName" type="nvarchar" size='128'>ISNULL(sl.name,N'')</property>
+			<property name="FilegroupName" type="sysname" read_only_after_creation="true">fg.name</property>
+		</version>
+
+
+
+    <property name="UniqueIndexName" type="sysname" read_only_after_creation="true">si.name</property>
+    <version min_major='10' cloud_min_major='12'>
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='2' expression="{0} + '/{1}'">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+    </version>
+    <version min_major='10'>
+      <property name="PolicyHealthState" type="int" expensive ="true" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+        <link_multiple no='2' expression="case when 1=msdb.dbo.fn_syspolicy_is_automation_enabled() and exists (select * from msdb.dbo.syspolicy_system_health_state where target_query_expression_with_id like 'Server/Database[@Id=' + CONVERT(nvarchar(15), db_id()) + ']/Table[@Id={0}]/{1}%' ESCAPE '\') then 1 else 0 end">
+          <link_field field="ParentId" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+    </version>
+    <version min_major='11' cloud_min_major='12'>
+      <property name="SearchPropertyListName" type="nvarchar" size='128'>ISNULL(spl.name,N'')</property>
+    </version>
+  </properties>
+</EnumObject>

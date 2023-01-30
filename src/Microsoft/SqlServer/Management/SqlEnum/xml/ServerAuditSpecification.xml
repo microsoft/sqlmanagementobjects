@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="ServerAuditSpecification" impl_type="SqlObject" min_major="10">
+    <settings>
+        <property_link table='sys.server_audit_specifications AS sas'></property_link>
+        <property_link fields='#AuditName#' left_join='sys.server_audits AS au'>sas.audit_guid = au.audit_guid</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name='Name' type='sysname'>sas.name</property>
+        <property name='ID' type='int' access='Read'>sas.server_specification_id</property>
+        <property name='Enabled' type='bit' access='Read'>sas.is_state_enabled</property>
+        <property name='Guid' type='uniqueidentifier' report_type2='System.Guid' access='Read'>sas.audit_guid</property>
+        <property name='AuditName' type='sysname'>ISNULL(au.name, '')</property>
+        <property name='CreateDate' type='datetime' access='Read'>sas.create_date</property>
+        <property name='DateLastModified' type='datetime' access='Read'>sas.modify_date</property>
+        <include file='inc_policy_health_state.xml'/>
+    </properties>
+</EnumObject>

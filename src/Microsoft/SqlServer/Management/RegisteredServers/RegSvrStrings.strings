@@ -1,0 +1,46 @@
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in 
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+
+[strings]
+NoSuchCollection(string name) = Collection '{0}' does not exist.
+ArgumentNullOrEmpty (string argument) = '{0}' cannot be Null or Empty.
+InvalidServerGroup(string name) = ServerGroup '{0}' does not exist.
+CannotRenameSystemServerGroup(string name) = ServerGroup '{0}' can not be renamed as it is a System Server Group.
+CannotDropSystemServerGroup(string name) = ServerGroup '{0}' can not be dropped as it is a System Server Group.
+ServerGroupAlreadyExists(string name) = ServerGroup '{0}' already exists.
+UnknownEnumeration(string type) = The value for enumeration type '{0}' is not valid.
+FailedOperation(string op) = The operation '{0}' failed.
+InvalidSqlServer2005FileFormat(string element) = The SqlServer 2005 server registration file has an invalid format. Error at element '{0}'.
+LocalStoreOnly = This operation is only valid against the local store.
+FailedToDeserialize = Unable to read the list of previously registered servers on this system. Re-register your servers in the 'Registered Servers' window.
+CannotCreateAServerGroupUnderneathCentralManagementServerGroup = Cannot create a server group immediately underneath the Central Management Server Group.
+# operation names
+Export=Export
+Import=Import
+Upgrade=Upgrade
+
+#
+# Well-known group display names
+#
+LocalServerStoreDisplayName = Local Server Groups
+CentralManagementServersDisplayName = Central Management Servers
+
+DatabaseEngineServerGroupDisplayName = Database Engine Server Group
+AnalysisServicesServerGroupDisplayName = Analysis Services Group
+ReportingServicesServerGroupDisplayName = Reporting Services Group
+IntegrationServicesServerGroupDisplayName = Integration Services Group
+SqlServerCompactServerGroupDisplayName = SQL Server Compact Edition Group
+CentralManagementServerGroupDisplayName = Central Management Server Group

@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<EnumObject type="PartitionScheme" impl_type="SqlObject" min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+    <settings>
+            <property_link table='sys.partition_schemes AS sps'/>
+            <property_link fields='#PartitionFunction#NextUsedFileGroup#FunctionFunOut#'
+                            join='sys.partition_functions AS spf'>sps.function_id = spf.function_id </property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">sps.name</property>
+        <property name="ID" type="int" access='Read'>sps.data_space_id</property>
+        <property name="FunctionFunOut" type="int" access='Read' hidden='true'>spf.fanout</property>
+        <property name="PartitionFunction" type="sysname" read_only_after_creation="true">spf.name</property>
+        <!-- "sys.destination_data_spaces" is not supported on Azure SQL DW database -->
+        <version min_major='9' cloud_min_major='12'>
+          <property name="NextUsedFileGroup" type="sysname">
+            ISNULL((case when spf.fanout &lt; (select count(*) from sys.destination_data_spaces sdd where sps.data_space_id = sdd.partition_scheme_id) then (select sf.name from sys.filegroups sf, sys.destination_data_spaces sdd where sf.data_space_id = sdd.data_space_id and sps.data_space_id = sdd.partition_scheme_id and sdd.destination_id &gt; spf.fanout) else null end),N'')
+          </property>
+        </version>
+        <!-- extended properties support -->
+        <property name="ExtPropClass" type="int" hidden='true'>20</property>
+        <property name="ExtPropMajorID" type="int" hidden='true'>sps.data_space_id</property>
+        <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

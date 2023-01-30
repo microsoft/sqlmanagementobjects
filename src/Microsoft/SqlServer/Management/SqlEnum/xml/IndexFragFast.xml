@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<EnumObject type="FragmentationFast" impl_type="SqlObject" min_major='7'>
+	<settings>
+
+		<version min_major='8' max_major='8'>
+			<prefix>
+				<link_multiple no='1' expression="
+create table #contig_tmp(ObjectName char(255) null, ObjectId int null, IndexName sysname null,
+		IndexId int null, Level tinyint null, Pages bigint null, Rows bigint null, MinimumRecordSize int null,
+		MaximumRecordSize int null, AverageRecordSize float null, ForwardedRecords bigint null, Extents int null,
+		ExtentSwitches int null, AverageFreeBytes float null, AvgPageFullness float null, ScanDensity float null, 
+		BestCount int null, ActualCount int null, LogicalFragmentation float null, ExtentFragmentation float null)				
+
+declare @IdxName sysname
+declare @TableId int
+declare @execStr nvarchar(255)
+
+declare crs insensitive cursor 
+	for ( {0} ) 
+for read only 
+open crs 
+fetch crs into @TableId, @IdxName
+while @@fetch_status &gt;= 0 
+begin 
+    set @execStr = 'DBCC SHOWCONTIG (' + QUOTENAME(object_name(@TableId), '''') + ',' + QUOTENAME(@IdxName, '''') + ') WITH TABLERESULTS, FAST'
+    insert into #contig_tmp exec sp_executesql @execStr
+	fetch crs into @TableId, @IdxName
+end 
+close crs
+deallocate crs">
+					<link_field field="ParentSelect" />
+				</link_multiple>
+			</prefix>
+		</version>
+	</settings>
+
+	<properties>
+		<include file='inc_IndexFrag.xml' />
+		<version min_major='9'>
+			<property name="FragmentationLevel" type="sysname" hidden='true'>LIMITED</property>
+		</version>
+	</properties>
+</EnumObject>

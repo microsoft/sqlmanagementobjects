@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<EnumObject type="PartitionFunction" impl_type="SqlObject" min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+	<settings main_table="sys.partition_functions AS spf" />
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">spf.name</property>
+		<property name="ID" type="int" access='Read'>spf.function_id</property>
+		<property name="RangeType" type="int" report_type="RangeType" cast='true' read_only_after_creation="true">spf.boundary_value_on_right</property>
+		<property name="CreateDate" type="datetime" access='Read'>spf.create_date</property>
+		<property name="NumberOfPartitions" type="int" access='Read'>spf.fanout</property>
+		<!-- extended properties support -->
+		<property name="ExtPropClass" type="int" hidden='true'>21</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>spf.function_id</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+	</properties>
+</EnumObject>

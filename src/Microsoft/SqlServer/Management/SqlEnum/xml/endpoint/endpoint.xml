@@ -1,0 +1,28 @@
+<?xml version='1.0' ?>
+<EnumObject type='Endpoints' impl_type='SqlObject' min_major='9'>
+	<settings>
+		<property_link table='sys.endpoints' alias='e'/>
+		<property_link fields='#Owner#' join='sys.server_principals AS sp'>sp.principal_id = e.principal_id</property_link>		
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />	
+		<property name='Name' type='sysname'>e.name</property>
+		<property name='ID' type='int'>e.endpoint_id</property>
+		<property name="Owner" type="nvarchar" size="128" >sp.name</property>
+		<property name='EndpointType' type='tinyint' report_type = 'EndpointType'>e.type</property>		
+		<property name='ProtocolType' type='tinyint' report_type = 'ProtocolType'>e.protocol</property>
+		<property name="EndpointState" type="int" report_type="EndpointState" access="Read">e.state</property>
+		<property name='IsAdminEndpoint' type='bit' access='Read'>e.is_admin_endpoint</property>
+		
+		
+		<!-- enable permissions -->
+		<property name="PermissionClass" type="int" hidden='true'>105</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when e.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+    <version min_major ="10">
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

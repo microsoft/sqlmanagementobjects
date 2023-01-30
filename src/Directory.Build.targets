@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.0.52" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <VersionInfoFile Condition="'$(VersionInfoFile)'==''">AssemblyVersionInfo.cs</VersionInfoFile>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(ExcludeVersionInfo)'==''">
+    <Compile Include="$(IntermediateOutputPath)$(VersionInfoFile)"/>
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <SqlStringResource>
+      <namespace Condition="'$(rootnamespace)'!='' and '%(namespace)' == ''">$(rootnamespace)</namespace>
+      <namespace Condition="'$(rootnamespace)'=='' and '%(namespace)' == ''">%(filename)</namespace>
+      <outresxfilename Condition="'%(outresxfilename)'==''">%(filename)</outresxfilename>
+      <outcodefilename Condition="'%(outcodefilename)'==''">%(filename)</outcodefilename>
+      <outclassname Condition="'%(outclassname)'==''">%(filename)</outclassname>
+      <resourcename Condition="'%(resourcename)'==''">%(namespace)</resourcename>
+      <resourcename Condition="'%(resourcename)'!=''">%(resourcename)</resourcename>
+      <additionaloptions Condition="'%(additionaloptions)'==''"></additionaloptions>
+    </SqlStringResource>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <QCustomInput Include="@(SqlStringResource)" />
+  </ItemGroup>
+  <ItemGroup Condition="'@(SqlStringResource)' != ''">
+    <PackageReference Include="Microsoft.Data.Tools.StringResourceTool" PrivateAssets="all" />
+  </ItemGroup>
+  <Target Name="GenAssemblyVersionInfoCs"
+      BeforeTargets="CoreCompile">
+    <PropertyGroup>
+        <Namespace Condition="'$(RootNamespace)' != ''">$(RootNamespace)</Namespace>
+        <Namespace Condition="'$(Namespace)'==''">$(AssemblyName)</Namespace>
+        <DefineConstants Condition="'$(ExcludeVersionInfo)' == 'true'">$(DefineConstants);EXCLUDE_ASSEMBLY_VERSION_INFO</DefineConstants>
+        <DefineConstants Condition="'$(ClsCompliant)' == 'true'">$(DefineConstants);CLSCOMPLIANT</DefineConstants>
+        <ClsCompliance Condition="'$(ClsCompliant)' == 'true'">[assembly: System.CLSCompliant(true)]</ClsCompliance>
+        <VersionDigest>$(AssemblyFileVersion)$(ClsCompliant)</VersionDigest>
+        <AssemblyVersionInfoContents>
+$(ClsCompliance)
+#if EXCLUDE_ASSEMBLY_VERSION_INFO
+#else
+namespace $(Namespace)
+{
+internal static class AssemblyVersionInfo
+{
+public const string VersionString = "$(AssemblyVersion)"%3B
+public const int MajorVersion = $(AssemblyMajorVersion)%3B
+}
+}
+#endif
+    </AssemblyVersionInfoContents>
+    </PropertyGroup>
+       <!-- Get the last version number we built with (if any) -->
+    <ReadLinesFromFile
+      Condition="Exists('$(IntermediateOutputPath)\LastVersionNumber')"
+      File="$(IntermediateOutputPath)\LastVersionNumber">
+      <Output TaskParameter="Lines" PropertyName="LastVersionNumber"/>
+    </ReadLinesFromFile>
+
+    <!-- Write ThisAssembly.cs if this is a new version number, or it is missing -->
+    <WriteLinesToFile
+      Condition="('$(LastVersionNumber)'!='$(VersionDigest)') or !Exists('$(IntermediateOutputPath)$(VersionInfoFile)')"
+      File="$(IntermediateOutputPath)$(VersionInfoFile)"
+      Lines="$(AssemblyVersionInfoContents)"
+      Overwrite="true"
+      Encoding="Unicode"/>
+
+    <!-- Write the new version number (if it has changed) -->
+    <WriteLinesToFile
+      Condition="'$(LastVersionNumber)'!='$(VersionDigest)'"
+      File="$(IntermediateOutputPath)\LastVersionNumber"
+      Lines="$(VersionDigest)"
+      Overwrite="true"
+      Encoding="Unicode"/>
+  </Target>
+  <Target Name="GetAdditionalAssemblyAttributes" AfterTargets="GetAssemblyAttributes">
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadata" Condition="%(AssemblyMetadata.Identity) != ''">
+        <_Parameter1>%(AssemblyMetadata.Identity)</_Parameter1>
+        <_Parameter2>%(AssemblyMetadata.Value)</_Parameter2>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo" Condition="%(InternalsVisibleTo.Identity) != ''">
+        <_Parameter1>%(InternalsVisibleTo.Identity)</_Parameter1>
+        <_Parameter1 Condition="$(SignAssembly) == 'true'">%(InternalsVisibleTo.Identity), PublicKey=%(InternalsVisibleTo.Key)</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+  <Target Name="FixTraceDefine" BeforeTargets="CoreCompile">
+    <PropertyGroup Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
+      <!-- SQLCLR doesn't support tracing but the Roslyn SDK forces TRACE on all the time -->
+      <DefineConstants>$([System.Text.RegularExpressions.Regex]::Replace('$(DefineConstants)', '\bTRACE\;?\b', ';'))</DefineConstants>
+    </PropertyGroup>
+  </Target>
+ </Project>

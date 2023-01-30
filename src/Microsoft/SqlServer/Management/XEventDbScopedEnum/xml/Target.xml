@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<EnumObject type="Target" impl_type="XEventObject" cloud_min_major='12'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table='sys.database_event_session_targets' alias='target'></property_link>
+
+    <property_link fields='#Description#' join='sys.dm_xe_objects' alias='object2'>target.name = object2.name AND object2.object_type='target'</property_link>
+    
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="ParentID" type="int" hidden="true">target.event_session_id</property>			
+    <property name='ID' type='int'>target.target_id</property>
+    <property name='Name' type='nvarchar' size='128'>target.package + '.' + target.name</property>
+    <property name='ModuleID' type='nvarchar' size='128'>target.module</property>
+    <property name='PackageName' type='nvarchar' size='60'>target.package</property>
+    <property name='Description' type='nvarchar' size='512'>object2.description</property>    
+  </properties>
+</EnumObject>

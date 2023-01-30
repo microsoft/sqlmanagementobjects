@@ -1,0 +1,39 @@
+<Project>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <SmoCodeGenOutputDir>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)</SmoCodeGenOutputDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <DdlEventsGenCompile Include="$(BuildPropsDir)\DdlEvents\*" />
+  </ItemGroup>
+  <PropertyGroup>
+      <Perl>$(PkgStrawberryPerl)\bin\perl.exe</Perl>
+    </PropertyGroup>
+  <ItemDefinitionGroup>
+    <!-- the defaults are for sqlenum -->
+    <EventsFileName>
+      <EventTraceBuildType Condition="'%(EventTraceBuildType)' == ''">SQLSERVER</EventTraceBuildType>
+      <GenType Condition="'%(GenType)' == ''">enum</GenType>
+      <ClassEnumTemplate Condition="'%(ClassEnumTemplate)' == ''">classenum_template</ClassEnumTemplate>
+      <EventEnumTemplate Condition="'%(EventEnumTemplate)' == ''">evtenum_template</EventEnumTemplate>
+      <CodeFile Condition="'%(CodeFile)' == ''">%(filename)</CodeFile>
+    </EventsFileName>
+  </ItemDefinitionGroup>
+  <Target Name="GenerateEventsCode" 
+    Condition="'@(EventsFileName)' != ''" 
+    AfterTargets="PrepareForBuild" 
+    BeforeTargets="ResolveReferences" 
+    Inputs="$(MSBuildThisFileFullPath);@(DdlEventsGenCompile)" 
+    Outputs="@(EventsFileName->'$(SmoCodeGenOutputDir)\%(CodeFile).cs')" >
+    <Message Importance="high" Text="$(Perl) &quot;$(BuildPropsDir)\DdlEvents\trc2evt.pl&quot; &quot;$(BuildPropsDir)\DdlEvents\trccomn.h&quot; &quot;$(BuildPropsDir)\DdlEvents\trcdef.cpp&quot; &quot;$(SmoCodeGenOutputDir)&quot; 0 %(EventsFileName.EventTraceBuildType)" />
+    <Exec Command="$(Perl) &quot;$(BuildPropsDir)\DdlEvents\trc2evt.pl&quot; &quot;$(BuildPropsDir)\DdlEvents\trccomn.h&quot; &quot;$(BuildPropsDir)\DdlEvents\trcdef.cpp&quot; &quot;$(SmoCodeGenOutputDir)&quot; 0 %(EventsFileName.EventTraceBuildType)" />
+    <Message Importance="high" Text="$(Perl) &quot;$(BuildPropsDir)\DdlEvents\evtschema.pl&quot; &quot;$(BuildPropsDir)\DdlEvents\eventsdef.cpp&quot; &quot;$(SmoCodeGenOutputDir)&quot;" />
+    <Exec Command="$(Perl) &quot;$(BuildPropsDir)\DdlEvents\evtschema.pl&quot; &quot;$(BuildPropsDir)\DdlEvents\eventsdef.cpp&quot; &quot;$(SmoCodeGenOutputDir)&quot;" />
+    <Message Importance="high" Text="$(Perl) &quot;$(BuildPropsDir)\DdlEvents\smoevt.pl&quot; %(EventsFileName.GenType) &quot;$(SmoCodeGenOutputDir)\eventsschema.tmp&quot; &quot;$(BuildPropsDir)\DdlEvents\%(EventsFileName.ClassEnumTemplate).cs&quot; &quot;$(BuildPropsDir)\DdlEvents\%(EventsFileName.EventEnumTemplate).cs&quot; &quot;$(SmoCodeGenOutputDir)\smoevt_gen_template.cs&quot; &gt; &quot;$(SmoCodeGenOutputDir)\%(EventsFileName.CodeFile).cs&quot;" />
+    <Exec Command="$(Perl) &quot;$(BuildPropsDir)\DdlEvents\smoevt.pl&quot; %(EventsFileName.GenType) &quot;$(SmoCodeGenOutputDir)\eventsschema.tmp&quot; &quot;$(BuildPropsDir)\DdlEvents\%(EventsFileName.ClassEnumTemplate).cs&quot; &quot;$(BuildPropsDir)\DdlEvents\%(EventsFileName.EventEnumTemplate).cs&quot; &quot;$(SmoCodeGenOutputDir)\smoevt_gen_template.cs&quot; &gt; &quot;$(SmoCodeGenOutputDir)\%(EventsFileName.CodeFile).cs&quot;" />
+    <ItemGroup>
+      <Compile Include="$(SmoCodeGenOutputDir)\%(EventsFileName.CodeFile).cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

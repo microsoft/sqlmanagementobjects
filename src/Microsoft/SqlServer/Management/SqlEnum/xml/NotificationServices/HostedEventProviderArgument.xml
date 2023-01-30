@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type='HostedEventProviderArgument' impl_type='SqlObject' min_major='9' >
+  <settings>
+    <parent_link>
+      <link parent="Id" local="ProviderId" />
+    </parent_link>
+    <request_parent_select>
+      <field name="ProviderId" />
+    </request_parent_select>
+    <property_link table="#tmp_hosted_event_provider_argument" alias="hepa" />
+    <prefix>
+CREATE TABLE #tmp_hosted_event_provider_argument(
+    ProviderArgumentId int,
+    ProviderId int,
+    ArgumentName nvarchar(255),
+    ArgumentValue nvarchar(4000)
+)
+INSERT #tmp_hosted_event_provider_argument EXEC [SchemaPrefix].NSGetProviderArguments
+    </prefix>
+    <postfix>
+DROP TABLE #tmp_hosted_event_provider_argument
+    </postfix>
+  </settings>
+  <properties>
+    <include file='inc_urn_single.xml' />
+    <property name="Name" type="nvarchar" size="255">hepa.ArgumentName</property>
+    <property name="Id" type="int" hidden="true">hepa.ProviderArgumentId</property>
+    <property name="ProviderId" type="int" hidden="true">hepa.ProviderId</property>
+    <property name="Value" type="nvarchar" size="4000">hepa.ArgumentValue</property>
+  </properties>
+</EnumObject>

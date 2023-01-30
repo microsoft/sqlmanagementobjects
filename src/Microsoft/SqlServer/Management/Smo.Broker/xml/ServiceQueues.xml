@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServiceQueue" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+        <property_link table="sys.service_queues AS sq"/>
+        <property_link table="sys.objects AS obj">obj.type='SQ' and sq.object_id=obj.object_id</property_link>
+        <property_link fields='#ExecutionContextPrincipal#' left_join="sys.database_principals AS dp">dp.principal_id = sq.execute_as_principal_id</property_link>
+        <property_link fields='#Schema#' join="sys.schemas AS ss">ss.schema_id = sq.schema_id</property_link>
+        <property_link fields='#FileGroup#' join="sys.internal_tables AS it">sq.object_id = it.parent_object_id</property_link>
+        <property_link fields='#FileGroup#' join="sys.indexes AS ind">ind.object_id = it.object_id and ind.index_id &lt; 2</property_link>
+        <property_link fields='#FileGroup#' join="sys.filegroups AS fg">fg.data_space_id = ind.data_space_id</property_link>
+        
+		
+        <post_process fields='#ProcedureDatabase#ProcedureSchema#ProcedureName#' class_name='Microsoft.SqlServer.Management.Smo.Broker.PostProcessSplitTriPartName'
+			triggered_fields='#TriPartProcedureName#' />
+	</settings>
+	<properties>
+		<include file='inc_urn_schema.xml' />
+	        <include file='inc_ext_prop.xml' />
+        	<property name="ExtPropClass" type="int" hidden='true'>1</property>
+
+		<property name="Name" type="sysname" access='Read'>sq.name</property>
+		<property name="ID" type="int" access='Read'>sq.object_id</property>
+		<property name="CreateDate" type="datetime" access='Read'>obj.create_date</property>
+		<property name="DateLastModified" type="datetime" access='Read'>obj.modify_date</property>
+		<property name="ExecutionContextPrincipal" type="sysname">ISNULL(dp.name,N'')</property>
+		<property name="ActivationExecutionContext" type="int" report_type="ActivationExecutionContext">(case when ISNULL(sq.execute_as_principal_id, -1) &lt; 0 then 2 else 3 end) </property>
+		<property name="MaxReaders" type="smallint">sq.max_readers</property>
+		<property name="ProcedureDatabase" type="sysname" usage="request">N''</property>
+		<property name="ProcedureSchema" type="sysname" usage="request">N''</property>
+		<property name="ProcedureName" type="sysname" usage="request">N''</property>
+		<property name="TriPartProcedureName" type="sysname" hidden="true">ISNULL(sq.activation_procedure,N'')</property>
+		<property name="Schema" type="sysname" access='Read'>ss.name</property>
+		<property name="FileGroup" type="sysname">fg.name</property>
+		<property name="RowCount" type="bigint" access='Read' expensive='true'>ISNULL((SELECT p.rows from sys.internal_tables as it
+	join sys.indexes as i on i.object_id = it.object_id and i.index_id = 1 
+	join sys.partitions as p on p.object_id = i.object_id and p.index_id = i.index_id
+	where sq.object_id = it.parent_id and it.parent_minor_id = 0 and it.internal_type = 201 ), 0)</property>
+		<property name="IsActivationEnabled" type="bit" cast='true'>sq.is_activation_enabled</property>
+		<property name="IsEnqueueEnabled" type="bit" cast='true'>sq.is_enqueue_enabled</property>
+		<property name="IsRetentionEnabled" type="bit" cast='true'>sq.is_retention_enabled</property>
+
+        <property name="IsSystemObject" type="bit" access='Read' cast='true'>obj.is_ms_shipped</property>
+    <version min_major='10' >
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+    <version min_major='10' min_minor='50'>
+      <property name="IsPoisonMessageHandlingEnabled" type="bit" cast='true'>sq.is_poison_message_handling_enabled</property>
+    </version>
+  </properties>
+</EnumObject>

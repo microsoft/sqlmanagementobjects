@@ -1,0 +1,28 @@
+<?xml version='1.0' ?>
+<EnumObject type='InstanceLogFile' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table='#tmp_InstLogFiles' alias='ilf'/>
+		<prefix>
+CREATE TABLE #tmp_InstLogFiles (
+    LogicalName nvarchar(128),
+    FilePath nvarchar(260),
+    FileGroupName nvarchar(128),
+    InitialSize nvarchar(32),
+    MaxSize nvarchar(32),
+    GrowthIncrement nvarchar(16)
+)
+INSERT INTO #tmp_InstLogFiles EXEC [SchemaPrefix].NSGetDatabaseFiles 'LOG_ONLY'
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_InstLogFiles
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '128'>ilf.LogicalName</property>
+		<property name='FileName' type='nvarchar' size = '260'>ilf.FilePath</property>
+		<property name='InitialSize' type='nvarchar' size = '32'>ilf.InitialSize</property>
+		<property name='MaxSize' type='nvarchar' size = '32'>ilf.MaxSize</property>
+		<property name='GrowthIncrement' type='nvarchar' size = '16'>ilf.GrowthIncrement</property>
+	</properties>
+</EnumObject>

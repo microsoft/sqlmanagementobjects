@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="PartitionSchemeParameter" min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+	<settings>
+		<parent_link>
+			<link parent = 'IndexID' local = 'IndexID'/>
+			<link parent = 'TableID' local = 'ObjectID'/>
+		</parent_link>
+		<property_link table='sys.index_columns ic'>ic.partition_ordinal &gt; 0</property_link>
+		<property_link fields='#Name#' join='sys.columns c'>c.object_id = ic.object_id and c.column_id = ic.column_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">c.name</property>
+		<property name="ID" type="int" cast="true">ic.partition_ordinal</property>
+		
+		<!-- used for parent link -->
+		<property name="IndexID" type="int" hidden='true'>ic.index_id</property>
+		<property name="ObjectID" type="int" hidden='true'>ic.object_id</property>
+	</properties>
+</EnumObject>

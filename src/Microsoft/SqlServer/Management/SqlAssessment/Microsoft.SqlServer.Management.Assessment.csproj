@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.Assessment</RootNamespace>
+    <AssemblyName>Microsoft.SqlServer.Management.Assessment</AssemblyName>
+    <SqlAssessmentSrcRoot>$(MsBuildThisFileDirectory)</SqlAssessmentSrcRoot>
+    <!-- Currently the assessment package doesn't have a netcoreapp3.1 binary, so use netstandard -->
+    <AssessmentRuntimeFramework>$(TargetFramework)</AssessmentRuntimeFramework>
+    <AssessmentRuntimeFramework Condition="'$(TargetGroup)' == 'netcore'">netstandard2.0</AssessmentRuntimeFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <DocumentationFile>"$(OutputPath)\Microsoft.SqlServer.Management.Assessment.xml"</DocumentationFile>
+  </PropertyGroup>  
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SqlServer.Assessment" 
+        GeneratePathProperty="true"/>
+    <PackageReference Include="Newtonsoft.json" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+  </ItemGroup>
+  
+</Project>

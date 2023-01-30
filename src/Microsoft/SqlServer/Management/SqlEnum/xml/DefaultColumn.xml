@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="DefaultID" />
+		</parent_link>
+		<version min_major='7' max_major='8'>
+			<property_link table = 'dbo.syscolumns AS c'/>
+		</version>
+		<version min_major='9'>
+			<property_link join = 'sys.columns AS c'/>
+		</version>
+	</settings>
+	<properties>
+		<version min_major='7' max_major='8'>
+			<!--needed for children inc_DefaultRule_column-->
+			<property name="DefaultID" type="int" hidden='true'>c.cdefault</property>
+		</version>
+		<version min_major='9'>
+			<!--needed for children inc_DefaultRule_column-->
+			<property name="DefaultID" type="int" hidden='true'>c.default_object_id</property>
+		</version>
+		<include file='inc_column_reference.xml' alias='c'/>
+	</properties>
+</EnumObject>
