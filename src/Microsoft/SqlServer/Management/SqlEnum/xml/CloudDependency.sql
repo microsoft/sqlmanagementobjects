@@ -166,6 +166,23 @@ begin
 			join sys.objects as o on o.object_id = p.object_id and o.type = 'AF'
 			where @iter_no = t.rank and t.object_type in (@udt, @uddt, @udtt) and (t.object_svr IS null and t.object_db = db_name())
 
+                -- table,view references partition scheme
+                insert #t1 (object_id, object_name, object_schema, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
+                    select o.object_id, o.name, SCHEMA_NAME(o.schema_id), t.object_db, (case o.type when 'V' then @v else @u end), t.object_id, t.object_name, t.object_schema, t.object_db, t.object_type, 1, @iter_no + 1
+                    from #t1 as t
+                    join sys.indexes as idx on idx.data_space_id = t.object_id
+                    join sys.objects as o on o.object_id = idx.object_id
+                    where @iter_no = t.rank and t.object_type = @part_sch and (t.object_svr IS null and t.object_db = db_name())
+                set @rows = @rows + @@rowcount
+
+                -- partition scheme references partition function
+                insert #t1 (object_id, object_name, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
+                    select ps.data_space_id, ps.name, t.object_db, @part_sch, t.object_id, t.object_name, t.object_schema, t.object_db, t.object_type, 1, @iter_no + 1
+                    from #t1 as t
+                    join sys.partition_schemes as ps on ps.function_id = t.object_id
+                    where @iter_no = t.rank and t.object_type = @part_func and (t.object_svr IS null and t.object_db = db_name())
+                set @rows = @rows + @@rowcount
+
 		-- synonym refrences object
 		insert #t1 (object_id, object_name, object_schema, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
 			select s.object_id, s.name, SCHEMA_NAME(s.schema_id), t.object_db, @synonym, t.object_id, t.object_name, t.object_schema, t.object_db, t.object_type, 0, @iter_no + 1
@@ -480,6 +497,25 @@ begin
 			join sys.tables as tbl on tbl.object_id = fk.referenced_object_id
 			where @iter_no = t.rank and t.object_type = @u and (t.object_svr IS null and t.object_db = db_name())
 		set @rows = @rows + @@rowcount
+                
+                -- Partition Schemes referenced by tables/views
+                insert #t1 (object_id, object_name, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
+                    select ps.data_space_id, ps.name, t.object_db, @part_sch, t.object_id, t.object_name, t.object_schema, t.object_db, t.object_type, 1, @iter_no + 1
+                    from #t1 as t
+                    join sys.indexes as idx on idx.object_id = t.object_id
+                    join sys.partition_schemes as ps on ps.data_space_id = idx.data_space_id
+                    where @iter_no = t.rank and t.object_type in (@u, @v) and (t.object_svr IS null and t.object_db = db_name())
+                set @rows = @rows + @@rowcount
+
+                -- Partition Function referenced by Partition Schemes
+                insert #t1 (object_id, object_name, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
+                    select pf.function_id, pf.name, t.object_db, @part_func, t.object_id, t.object_name, t.object_schema, t.object_db, t.object_type, 1, @iter_no + 1
+                    from #t1 as t
+                    join sys.partition_schemes as ps on ps.data_space_id = t.object_id
+                    join sys.partition_functions as pf on pf.function_id = ps.function_id
+                    where @iter_no = t.rank and t.object_type = @part_sch and (t.object_svr IS null and t.object_db = db_name())
+                set @rows = @rows + @@rowcount
+
 		
 		-- objects referenced by synonym
 		insert #t1 (object_id, object_name, object_schema, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
