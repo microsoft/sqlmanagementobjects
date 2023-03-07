@@ -515,7 +515,6 @@ begin
 			join sys.partition_functions as pf on pf.function_id = ps.function_id
 			where @iter_no = t.rank and t.object_type = @part_sch and (t.object_svr IS null and t.object_db = db_name())
 		set @rows = @rows + @@rowcount
-
 		
 		-- objects referenced by synonym
 		insert #t1 (object_id, object_name, object_schema, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
