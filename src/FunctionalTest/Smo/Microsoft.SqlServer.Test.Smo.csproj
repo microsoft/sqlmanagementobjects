@@ -76,6 +76,9 @@
     <EmbeddedResource Include="ScriptingTests\Scripts\ExternalLibrary_SmoTestSuite_Setup.sql">
       <LogicalName>ExternalLibrary_SmoTestSuite_Setup.sql</LogicalName>
     </EmbeddedResource>
+      <EmbeddedResource Include="ScriptingTests\Scripts\PartitionedTable.sql">
+          <LogicalName>PartitionedTable.sql</LogicalName>
+      </EmbeddedResource>
     <EmbeddedResource Include="ScriptingTests\Scripts\SqlAssembly_SmoTestSuite_Sql2016_Setup.sql">
       <LogicalName>SqlAssembly_SmoTestSuite_Sql2016_Setup.sql</LogicalName>
     </EmbeddedResource>

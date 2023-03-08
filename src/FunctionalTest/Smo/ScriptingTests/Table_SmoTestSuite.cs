@@ -1566,6 +1566,62 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
+        /// <summary>
+        /// Partitions of a table should be discovered by a dependency walker
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        public void VerifyPartitionDependenciesDiscovered()
+        {
+            // Extract the test script
+            //
+            const string scriptName = "PartitionedTable.sql";
+
+            string script = string.Empty;
+
+            using (var scriptStream = typeof(Table_SmoTestSuite).GetTypeInfo().Assembly.GetManifestResourceStream(scriptName))
+            using (var reader = new StreamReader(scriptStream))
+            {
+                script = reader.ReadToEnd();
+            }
+
+            ExecuteWithDbDrop(
+                database =>
+                {
+                    try
+                    {
+                        database.ExecuteNonQuery(script);
+                    }
+                    catch (_SMO.FailedOperationException se)
+                    {
+                        //Throw a new exception here since FailedOperationExceptions have a couple nested exceptions, so to
+                        //avoid having to iterate through them ourselves and append the messages we let the test framework
+                        //handle that
+                        throw new _SMO.FailedOperationException(String.Format("Failed to execute script {0}", scriptName), se);
+                    }
+
+                    database.Refresh();
+
+                    SqlSmoObject[] tables = database.Tables.Cast<SqlSmoObject>().ToArray();
+                    var dependencyWalker = new DependencyWalker(database.Parent);
+                    var dependencyTree = dependencyWalker.DiscoverDependencies(tables, DependencyType.Parents);
+                    var dependencies = dependencyWalker.WalkDependencies(dependencyTree);
+
+                    Assert.AreEqual(3, dependencies.Count, "Not all dependencies are discovered");
+                    Assert.AreEqual(nameof(PartitionFunction), dependencies[0].Urn.Type,
+                        "First dependency is not a partition function as expected");
+                    Assert.AreEqual(nameof(PartitionScheme), dependencies[1].Urn.Type,
+                        "Second dependency is not a partition scheme as expected");
+                    Assert.AreEqual(nameof(Table), dependencies[2].Urn.Type,
+                        "Third dependency is not a table as expected");
+                });
+        }
+
+
+
+
+
         #endregion
 
         #region Ledger Tests
