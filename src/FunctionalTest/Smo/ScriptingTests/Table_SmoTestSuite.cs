@@ -1608,16 +1608,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     var dependencyTree = dependencyWalker.DiscoverDependencies(tables, DependencyType.Parents);
                     var dependencies = dependencyWalker.WalkDependencies(dependencyTree);
 
-                    Assert.AreEqual(3, dependencies.Count, "Not all dependencies are discovered");
+                    Assert.That(dependencies.Count, Is.EqualTo(3), "Not all dependencies are discovered");
 
-                    Assert.AreEqual(nameof(PartitionFunction), dependencies[0].Urn.Type, "First dependency is not a partition function as expected");
-                    Assert.AreEqual("AgePartFunc", dependencies[0].Urn.GetNameForType(nameof(PartitionFunction)), "Partition function URN not retrieved correctly");
+                    Assert.That(dependencies[0].Urn.Type, Is.EqualTo(nameof(PartitionFunction)), "First dependency is not a partition function as expected");
+                    Assert.That(dependencies[0].Urn.GetNameForType(nameof(PartitionFunction)), Is.EqualTo("AgePartFunc"), "Partition function URN not retrieved correctly");
                     
-                    Assert.AreEqual(nameof(PartitionScheme), dependencies[1].Urn.Type, "Second dependency is not a partition scheme as expected");
-                    Assert.AreEqual("AgePartScheme", dependencies[1].Urn.GetNameForType(nameof(PartitionScheme)), "Partition scheme URN not retrieved correctly");
+                    Assert.That(dependencies[1].Urn.Type, Is.EqualTo(nameof(PartitionScheme)), "Second dependency is not a partition scheme as expected");
+                    Assert.That(dependencies[1].Urn.GetNameForType(nameof(PartitionScheme)), Is.EqualTo("AgePartScheme"), "Partition scheme URN not retrieved correctly");
 
-                    Assert.AreEqual(nameof(Table), dependencies[2].Urn.Type, "Third dependency is not a table as expected");
-                    Assert.AreEqual("Customers", dependencies[2].Urn.GetNameForType(nameof(Table)), "Table URN not retrieved correctly");
+                    Assert.That(dependencies[2].Urn.Type, Is.EqualTo(nameof(Table)), "Third dependency is not a table as expected");
+                    Assert.That(dependencies[2].Urn.GetNameForType(nameof(Table)), Is.EqualTo("Customers"), "Table URN not retrieved correctly");
                 });
         }
 
