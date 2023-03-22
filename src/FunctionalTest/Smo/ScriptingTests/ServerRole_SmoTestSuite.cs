@@ -65,6 +65,21 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
+        /// <summary>
+        /// Tests dropping a server role with IF EXISTS option through SMO on SQL16 and later.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
+            Edition = DatabaseEngineEdition.SqlDatabase)]
+        public void SeverRoles_loads_correctly_for_azure_db()
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    _SMO.Server server = database.Parent;
+                    Assert.IsTrue(server.Roles.Count > 0);
+            });
+        }
         #endregion // Scripting Tests
     }
 }

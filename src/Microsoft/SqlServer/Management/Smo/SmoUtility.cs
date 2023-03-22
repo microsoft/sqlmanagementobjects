@@ -272,6 +272,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(Parameter):
                     case nameof(Schema):
                     case nameof(Server):
+                    case nameof(ServerRole):
                     case nameof(Statistic):
                     case nameof(StatisticColumn):
                     case nameof(StoredProcedure):

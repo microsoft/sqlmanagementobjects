@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Role" impl_type="SqlObject" min_major='7'>
+<EnumObject type="Role" impl_type="SqlObject" min_major='7' cloud_min_major='12' datawarehouse_enabled='true'>
   <settings distinct='true'>
     <version min_major='7' max_major='8'>
       <property_link table = 'master.dbo.spt_values v1'>
@@ -24,7 +24,7 @@
       <property name="Description" type="nvarchar" size="250" table="master.dbo.spt_values v2" link="v2.low=-1 and v2.type='SRV' and v1.number=v2.number">v2.name</property>
       <property name="Number" type="int" hidden="true">v1.number</property>
     </version>
-    <version min_major='9'>
+    <version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="Name" type="sysname">r.name</property>
       <property name="ID" type="int">r.principal_id</property>
       <property name="Description" type="nvarchar" size="250">N''</property>
@@ -33,7 +33,7 @@
       <!-- enable permissions -->
       <property name="PermissionClass" type="int" hidden='true'>101</property>
     </version> 
-    <version min_major='11'>
+    <version min_major='11' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="DateModified" type="datetime" access="Read">r.modify_date</property>
       <property name="DateCreated" type="datetime" access="Read">r.create_date</property>
       <property name="Owner" type="sysname">ou.name</property>
