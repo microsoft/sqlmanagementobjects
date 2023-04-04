@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 
 namespace GetSmoObject
-
 {
     internal class SqlClientEventLogger : EventListener
     {
         private StringBuilder logs= new StringBuilder();
+
         public SqlClientEventLogger()
         {
         }
+
         protected override void OnEventSourceCreated(EventSource eventSource)
         {
             if (eventSource.Name.Equals("Microsoft.Data.SqlClient.EventSource"))
@@ -31,9 +32,7 @@ namespace GetSmoObject
                 logs = logs.Append(string.Join(Environment.NewLine, eventData.Payload.Select(p => $"{now} [{Environment.CurrentManagedThreadId}]: {p}")) + Environment.NewLine);
             }
         }
-        public override string ToString()
-        {
-            return logs.ToString();
-        }
+
+        public override string ToString() => logs.ToString();
     }
 }

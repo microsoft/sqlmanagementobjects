@@ -17,18 +17,19 @@ namespace GetSmoObject
             {
                 Console.WriteLine("GetSmoObject servername databasename \"URN of item to script\"");
                 Console.WriteLine("\tExample: GetSmoObject myserver.database.windows.net mydatabase \"Server\\Database[@Name='mydatabase']\\Table[@Name='table' and @Schema='schema']\"");
-                Console.WriteLine("\tSQL Server Management Studio users can find the URN of an object by expanding its child nodes in Object Explorer and examining the Output window content.")
+                Console.WriteLine("\tSQL Server Management Studio users can find the URN of an object by expanding its child nodes in Object Explorer and examining the Output window content.");
                 return;
             }
             var logger = new SqlClientEventLogger();
             try
             {
-                using (var connection = new SqlConnection(new SqlConnectionStringBuilder()
-                {
-                    DataSource = args[0],
-                    InitialCatalog = args[1],
-                    Authentication = SqlAuthenticationMethod.ActiveDirectoryInteractive
-                }.ConnectionString))
+                using (var connection = new SqlConnection(
+                                        new SqlConnectionStringBuilder()
+                                        {
+                                            DataSource = args[0],
+                                            InitialCatalog = args[1],
+                                            Authentication = SqlAuthenticationMethod.ActiveDirectoryInteractive
+                                        }.ConnectionString))
                 {
                     var server = new Server(new ServerConnection(connection));
                     var obj = (SqlSmoObject)server.GetSmoObject(args[2]);
