@@ -474,7 +474,10 @@ namespace Microsoft.SqlServer.Management.Smo
             if (forDiscovery)
             {
                 // During discovery the Indexes collection is expanded so let's optimize it
-                InitChildLevel(nameof(Index), new ScriptingPreferences(this), true);
+                if (State == SqlSmoState.Existing)
+                {
+                    InitChildLevel(nameof(Index), new ScriptingPreferences(this), true);
+                }
                 (new IndexPropagateInfo(Indexes)).PropagateInfo(propInfo);
             }
             else
@@ -540,17 +543,18 @@ namespace Microsoft.SqlServer.Management.Smo
         {
            if (!defaultTextMode)
                 {
-                    string[] fields = {   
-                                            "QuotedIdentifierStatus",
-                                            "IsSystemObject",
-                                            "AnsiNullsStatus",
-                                            "IsSchemaBound",
-                                            "IsEncrypted",
-                                            "HasColumnSpecification",
-                                            "ReturnsViewMetadata",
-                                            "ID",
-                                            "Owner",
-                                            "IsSchemaOwned"};
+                    string[] fields = {
+                                            nameof(AnsiNullsStatus),
+                                            nameof(DwMaterializedViewDistribution),
+                                            nameof(HasColumnSpecification),
+                                            nameof(ID),
+                                            nameof(IsSchemaBound),
+                                            nameof(IsEncrypted),
+                                            nameof(IsSystemObject),
+                                            nameof(IsSchemaOwned),
+                                            nameof(Owner),
+                                            nameof(QuotedIdentifierStatus),
+                                            nameof(ReturnsViewMetadata)};
                     List<string> list = GetSupportedScriptFields(typeof(View.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
                     list.Add("Text");
                     return list.ToArray();
@@ -558,10 +562,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 else
                 {
                     string[] fields = {   
-                                            "QuotedIdentifierStatus",
-                                            "IsSystemObject",
-                                            "AnsiNullsStatus",
-                                            "ID"};
+                                            nameof(AnsiNullsStatus),
+                                            nameof(IsSystemObject),
+                                            nameof(ID),
+                                            nameof(QuotedIdentifierStatus)};
                     List<string> list = GetSupportedScriptFields(typeof(View.PropertyMetadataProvider),fields, version, databaseEngineType, databaseEngineEdition);
                     list.Add("Text");
                     return list.ToArray();

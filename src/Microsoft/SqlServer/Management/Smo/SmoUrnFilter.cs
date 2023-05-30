@@ -93,6 +93,7 @@ namespace Microsoft.SqlServer.Management.Smo
         columnencryptionkey,
         columnencryptionkeyvalue,
         table,
+        sensitivityclassification,
         view,
         tableviewudf,
         creatingudf,

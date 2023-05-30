@@ -41,9 +41,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         public void SmoDropIfExists_SearchPropertyList_Sql16AndAfterOnPrem()
         {
-            this.ExecuteWithDbDrop(
+            ExecuteWithDbDrop(
                 database =>
                 {
                     _SMO.SearchPropertyList spl = new _SMO.SearchPropertyList(database,

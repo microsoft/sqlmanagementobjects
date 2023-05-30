@@ -27,7 +27,9 @@ namespace Microsoft.SqlServer.Management.Smo
         ///Load the certificate from executable.
         Executable = 2,
         ///Load the certificate from the specified assembly.
-        SqlAssembly = 3
+        SqlAssembly = 3,
+        ///Load the certificate from the binary stream
+        Binary = 4,
     }
 
     [Facets.EvaluationMode(Dmf.AutomatedPolicyEvaluationMode.CheckOnSchedule)]
@@ -620,6 +622,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 case CertificateSourceType.SqlAssembly:
                     AddToStringBuilderIfNotNull(sb, "ASSEMBLY ", certificateSource, false);
+                    break;
+
+                case CertificateSourceType.Binary:
+                    // Append certificate binary data.
+                    // Note we don't enclose it within N'' like in other cases above
+                    //
+                    sb.Append($"BINARY = {certificateSource}");
                     break;
 
                 default:

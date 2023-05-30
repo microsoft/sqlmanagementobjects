@@ -135,7 +135,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
 
-            StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            var sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
             if (sp.IncludeScripts.Header)
             {
@@ -188,12 +188,15 @@ namespace Microsoft.SqlServer.Management.Smo
 
             createQuery.Add(sb.ToString());
 
-
-            // This is required as ScriptImpl() method 
-            // doesn't use GetPropagateInfo()              
-            foreach (SearchProperty searchProperty in this.SearchProperties)
+            // Azure DB SPLs don't support custom search properties
+            if (sp.TargetDatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
             {
-                searchProperty.ScriptCreateInternal(createQuery, sp);
+                // This is required as ScriptImpl() method 
+                // doesn't use GetPropagateInfo()              
+                foreach (SearchProperty searchProperty in SearchProperties)
+                {
+                    searchProperty.ScriptCreateInternal(createQuery, sp);
+                }
             }
 
         }
@@ -289,15 +292,8 @@ namespace Microsoft.SqlServer.Management.Smo
             // Excluding Create action as ScriptImpl() method 
             // doesn't use GetPropagateInfo() 
             // And, ScriptCreate handles Propagation
-            bool bWithScript = action != PropagateAction.Create;
-
-            ArrayList propInfo = new ArrayList();
-            propInfo.Add(new PropagateInfo(SearchProperties, bWithScript));
-            PropagateInfo[] retArr = new PropagateInfo[propInfo.Count];
-            propInfo.CopyTo(retArr, 0);
-
-            return retArr;
+            var bWithScript = action != PropagateAction.Create;
+            return new PropagateInfo[] { new PropagateInfo(SearchProperties, bWithScript) };
         }
-
     }
 }

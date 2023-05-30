@@ -8,5 +8,8 @@
     <Company>Microsoft Corporation</Company>
     <BaseProduct>Microsoft Sql Server</BaseProduct>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <!-- add Source Link info to package/pdbs-->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 </Project>

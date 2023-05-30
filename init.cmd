@@ -46,8 +46,6 @@ doskey netcoretests=pushd %BASEDIR%target\distrib\debug\netcoreapp3.1$Tvstest.co
 
 title git %BASEDIR%
 
-set CommitIdForCurrentBuild=%ComputerName%
-
 REM Migration to PowerShell environment
 powershell.exe -ExecutionPolicy Unrestricted -File "%BASEDIR%init.ps1" -Initialize
 if "%errorlevel%" neq "0" (

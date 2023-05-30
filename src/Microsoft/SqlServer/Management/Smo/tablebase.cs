@@ -75,7 +75,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// returns the name of the type in the urn expression
-        /// </summary
+        /// </summary>
         public static string UrnSuffix
         {
             get
@@ -731,8 +731,8 @@ namespace Microsoft.SqlServer.Management.Smo
                             "SET ANSI_PADDING ON"));
                         //Setting Ansi padding for Clustered index as per table settings.
                         foreach (var idx in from Index idx in Indexes
-                                             where idx.IsClustered
-                                             select idx)
+                                            where idx.IsClustered
+                                            select idx)
                         {
                             idx.IsParentBeingScriptedWithANSIPaddingON = true;
                         }
@@ -1276,7 +1276,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             if ((null != m_PhysicalPartitions) &&
-				(PhysicalPartitions.IsXmlCollectionDirty()))
+                (PhysicalPartitions.IsXmlCollectionDirty()))
             {
                 return PhysicalPartitions.IsXmlCompressionCodeRequired(bAlter);
             }
@@ -2300,7 +2300,6 @@ namespace Microsoft.SqlServer.Management.Smo
                             var distributionColumnNames = string.Join(",", Columns.Cast<Column>()
                                 .Where(col => col.GetPropValueOptional(IsDistributedColumnPropertyName, false))
                                 .Select(col => MakeSqlBraket(col.GetPropValueOptional(DistributionColumnNamePropertyName, string.Empty))));
-                               
                             var distributionWithDistributionColName = $"{typeConverter.ConvertToInvariantString(distribution)} ( {distributionColumnNames} )";
 
                             this.AddPropertyToScript(distributionWithDistributionColName, "DISTRIBUTION = {0}", script);
@@ -2341,7 +2340,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     !hasClusteredIndex.IsNull ||
                     !hasHeapIndex.IsNull)
                 {
-                 
                     if (!hasClusteredIndex.IsNull && (bool)hasClusteredIndex.Value)
                     {
                         // for clustered columnstore indexes, there is no index name to be scripted
@@ -2367,7 +2365,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             {
                                 ScriptSqlDwOrderedClusteredColumnstoreIndexes(indexTypeConverter.ConvertToInvariantString(IndexType.ClusteredColumnStoreIndex), script, orderedCols);
                             }
-                         }
+                        }
                         else
                         {
                             if (script.Length > 0)
@@ -3588,7 +3586,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 CheckObjectState();
                 StringCollection queries = new StringCollection();
                 InsertUseDbIfNeeded(queries);
-                
                 queries.Add(string.Format(SmoApplication.DefaultCulture, "DBCC CHECKTABLE (N'{0}') WITH NO_INFOMSGS", SqlString(this.FullQualifiedName)));
 
                 return this.ExecutionManager.ExecuteNonQueryWithMessage(queries);
@@ -3612,7 +3609,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 CheckObjectState();
                 StringCollection queries = new StringCollection();
                 InsertUseDbIfNeeded(queries);
-                
                 queries.Add(string.Format(SmoApplication.DefaultCulture, "DBCC CHECKTABLE (N'{0}', NOINDEX)", SqlString(this.FullQualifiedName)));
 
                 return this.ExecutionManager.ExecuteNonQueryWithMessage(queries);
@@ -3993,7 +3989,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 indexPropagationList = null;
                 embeddedForeignKeyChecksList = null;
                 // During discovery the Indexes collection is expanded so let's optimize it
-                InitChildLevel(nameof(Index), new ScriptingPreferences(this), true);
+                if (State == SqlSmoState.Existing)
+                {
+                    InitChildLevel(nameof(Index), new ScriptingPreferences(this), true);
+                }
                 (new IndexPropagateInfo(Indexes)).PropagateInfo(propInfo);
             }
             else
