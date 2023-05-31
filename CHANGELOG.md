@@ -1,8 +1,18 @@
 # Change log
 
-Update this document for internal externally visible changes. Put most recent changes first.
+Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 170.18.0, 161.48044.0
+- Fix issue where `Table.Create` and `View.Create` were querying the server for indexes
+- Add `SearchPropertyList` support for Azure SQL Database
+- Add option to generate scripts exclusively for Data Classification, Create a new SMO object `SensitivityClassification` under `Database`
+- Add support for creating Certificate objects using binary-encoded certificate bytes (https://github.com/microsoft/sqlmanagementobjects/issues/132)
+
+
+## 161.48036.0
+
+- Fix [issue](https://github.com/microsoft/sqlmanagementobjects/issues/123) with `Table.Alter` for Synapse
 - Add initial replication of contained AG system databases to AG creation
 - Upgrade VSTest to 17.4.1 to remove workaround for unit test builds
 - Fix Databases collection not to login to each database when app asks for `Status` property

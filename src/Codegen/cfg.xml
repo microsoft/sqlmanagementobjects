@@ -126,6 +126,7 @@
       <collection element_type="Synonym" />
       <collection element_type="Sequence" />
       <collection element_type="Table" />
+      <collection element_type="SensitivityClassification" />
       <collection element_type="StoredProcedure" />
       <collection element_type="SqlAssembly" />
       <collection element_type="UserDefinedType" />
@@ -1000,6 +1001,16 @@
       <property name="IsDistributedColumn" generate="true"/>
       <!-- SQL GraphDB properties-->
       <property name="GraphType" generate="true" is_intrinsic="false"/>
+    </object>
+    <object class_name="SensitivityClassification" collection_name="SensitivityClassifications" urn="Server[@Name='']/Database/SensitivityClassification" parent_type="SqlSmoObject" >
+      <property name="SensitivityLabelId" generate="true" is_intrinsic="false" />
+      <property name="SensitivityLabelName" generate="true" is_intrinsic="false" />
+      <property name="SensitivityInformationTypeId" generate="true" is_intrinsic="false" />
+      <property name="SensitivityInformationTypeName" generate="true" is_intrinsic="false" />
+      <property name="SensitivityRank" generate="true" is_intrinsic="false" />
+      <property name="ReferencedTable" generate="true" is_intrinsic="false" reference_type="Table" reference_template="Server[@Name = '{0}']/Database[@Name = '{1}']/Table[@Name = '{2}' and @Schema = '{3}']" reference_template_parameters="Parent.Parent.ConnectionContext.TrueName,Parent.Name,ReferencedTable,ReferencedTableSchema"/>
+      <property name="ReferencedTableSchema" generate="true" is_intrinsic="false" reference_type="Schema" reference_template="Server[@Name = '{0}']/Database[@Name = '{1}']/Schema[@Name = '{2}']" reference_template_parameters="Parent.Parent.ConnectionContext.TrueName,Parent.Name,ReferencedTableSchema"/>
+      <property name="ReferencedColumn" generate="true" is_intrinsic="false" reference_type="Column" reference_template="Server[@Name = '{0}']/Database[@Name = '{1}']/Table[@Name = '{2}' and @Schema = '{3}']/Column[@Name = '{4}']" reference_template_parameters="Parent.Parent.ConnectionContext.TrueName,Parent.Name,ReferencedTable,ReferencedTableSchema,ReferencedColumn"/>
     </object>
     <object class_name="Trigger" collection_name="Triggers" urn="Server[@Name='']/Database/Table/Trigger" is_design_mode="true" parent_type="SqlSmoObject" parent_mode="Design" possible_parents="Table;View" has_schema="false" gen_body="trigger,server_events">
       <collection element_type="ExtendedProperty" />

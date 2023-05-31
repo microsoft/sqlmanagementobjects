@@ -1649,6 +1649,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 PlanGuide.UrnSuffix,
                 DatabaseAuditSpecification.UrnSuffix,
                 WorkloadManagementWorkloadGroup.UrnSuffix,
+                SensitivityClassification.UrnSuffix,
 
                 // 2nd tier objects can be scripted directly
                 Check.UrnSuffix,

@@ -26,6 +26,7 @@ using Assert = NUnit.Framework.Assert;
 using NUnit.Framework;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -5300,6 +5301,29 @@ set nocount off;
                     Assert.That(table.Name, Is.EqualTo(newname), "table.Name after Rename");
 
                 });
+            });
+        }
+
+        [TestMethod]
+        public void SmoTable_Create_should_not_query_indexes()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                var table = db.CreateTableDefinition("NoQuery");
+                var view = db.CreateViewDefinition("NoQuery", "dbo", "select 1");
+                var recorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId);
+                using (recorder)
+                {
+                    recorder.Start();
+                    Trace.TraceInformation("Calling Table.Create");
+                    var queries = table.ExecutionManager.RecordQueryText(table.Create);
+                    Assert.That(queries.ToSingleString(), Is.Not.Empty, "queries for table.Create");
+                    Trace.TraceInformation("Calling View.Create");
+                    queries = view.ExecutionManager.RecordQueryText(view.Create);
+                    Assert.That(queries.ToSingleString(), Is.Not.Empty, "queries for view.Create");
+                }
+                var messages = recorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
+                Assert.That(messages, Has.None.Contains("indexes"), "Should have no index queries during a table or view Create");
             });
         }
     }

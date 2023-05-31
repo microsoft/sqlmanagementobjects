@@ -16,6 +16,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using Microsoft.SqlServer.Test.Manageability.Utils;
+using System.Threading;
+using Microsoft.SqlServer.Management.Smo;
+using System.IO;
+using System.Collections.Specialized;
+using static Microsoft.SqlServer.Management.SqlParser.MetadataProvider.MetadataProviderUtils.Names;
+
 namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 {
     /// <summary>
@@ -50,7 +57,6 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                                 Trace.TraceError("Got exception accessing db properties:{0}", ex.GetType());
                                 throw;
                             }
-                            
                         }
                     }
                     catch (ConnectionFailureException e)
@@ -63,9 +69,74 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                         }
                         throw;
                     }
-                    
+
                 });
             });
+        }
+
+
+        /// <summary>
+        /// Tests that dw table with default ICC is scripted correctly.
+        /// Also, we validate the ColumnStoreOrderOrdinal from prefetch index.
+        ///
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDataWarehouse)]
+        public void DWTable_ScriptData_succeed()
+        {
+            this.ExecuteWithDbDrop(db => { 
+                var tableName = $"table{Guid.NewGuid()}";
+                var table = new _SMO.Table(db, tableName);
+                _SMO.Column c1 = new _SMO.Column(table, "col1", new _SMO.DataType(_SMO.SqlDataType.Int));
+                _SMO.Column c2 = new _SMO.Column(table, "col2", new _SMO.DataType(_SMO.SqlDataType.Int));
+                _SMO.Column c3 = new _SMO.Column(table, "col3", new _SMO.DataType(_SMO.SqlDataType.Int));
+                table.Columns.Add(c1);
+                table.Columns.Add(c2);
+                table.Columns.Add(c3);
+                table.Create();
+                table = db.Tables[tableName];
+
+                // Adding scrpiter. 
+                var scripter = new _SMO.Scripter(db.Parent);
+                scripter.Options.Indexes = false;
+                scripter.Options.TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlDataWarehouse;
+                scripter.Options.TargetDatabaseEngineType = DatabaseEngineType.SqlAzureDatabase;
+
+                // Validation of missing properties.
+                var missingProperties = new MissingProperties();
+                SqlSmoObject.PropertyMissing += missingProperties.OnPropertyMissing;
+                StringCollection script = null;
+                try
+                {
+                    script = scripter.Script(table);
+                    Assert.That(missingProperties.Properties.Where(p => p.StartsWith(nameof(IndexedColumn))), Is.Empty, "Clustered indexed columns should have been fetched.");
+                }
+                finally
+                {
+                    SqlSmoObject.PropertyMissing -= missingProperties.OnPropertyMissing;
+                    ServerContext.SetDefaultInitFields(allFields: false);
+                }
+               
+                // Validation of Scripting result.
+                var actualScript = script.ToSingleString().Trim().Replace("\r\n", " ").Replace("\n", " ");
+                Assert.That(actualScript,
+                        Does.EndWith(
+                        String.Format(@"SET ANSI_NULLS ON SET QUOTED_IDENTIFIER ON CREATE TABLE [dbo].{0} ( 	[col1] [int] NULL, 	[col2] [int] NULL, 	[col3] [int] NULL ) WITH ( 	DISTRIBUTION = ROUND_ROBIN, 	CLUSTERED COLUMNSTORE INDEX )", 
+                    SmoObjectHelpers.SqlBracketQuoteString(tableName))),"Wrong Creat script for DW table");
+            }, AzureDatabaseEdition.DataWarehouse);
+        }
+
+        class MissingProperties
+        {
+            public readonly IList<string> Properties = new List<string>();
+            private readonly int threadId = Thread.CurrentThread.ManagedThreadId;
+            public void OnPropertyMissing(object sender, PropertyMissingEventArgs args)
+            {
+                if (Thread.CurrentThread.ManagedThreadId == threadId)
+                {
+                    Properties.Add($"{args.TypeName}.{args.PropertyName}");
+                }
+            }
         }
     }
 }

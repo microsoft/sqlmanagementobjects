@@ -9,10 +9,10 @@
     <AssemblyBuildVersion Condition="'$(LocalBuildVersion)'!=''">$(LocalBuildVersion)</AssemblyBuildVersion>
     <AssemblyBuildRevision Condition="'$(LocalBuildRevision)'!=''">$(LocalBuildRevision)</AssemblyBuildRevision>
     <AssemblyBuildVersion Condition="'$(AssemblyBuildVersion)'==''">0</AssemblyBuildVersion>
-    <AssemblyBuildVersion Condition="'$(AssemblyBuildVersion)' &gt; '65535'">$([MSBUILD]::Modulo($(AssemblyBuildVersion), 65535))</AssemblyBuildVersion>
     <AssemblyBuildRevision Condition="'$(AssemblyBuildRevision)'==''">0</AssemblyBuildRevision>
     <AssemblyFileVersion Condition="'$(AssemblyFileVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</AssemblyFileVersion>
-    <InformationalVersion>$(AssemblyFileVersion)$(CommitIdForCurrentBuild)</InformationalVersion>
+    <!-- Source link will append the most recent branch commit id to the informational version -->
+    <InformationalVersion>$(AssemblyFileVersion)</InformationalVersion>
     <FileVersion>$(AssemblyFileVersion)</FileVersion>
     <Version>$(AssemblyFileVersion)</Version>
     <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">0</PackageMajorVersionIncrement>

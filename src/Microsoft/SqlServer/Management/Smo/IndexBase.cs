@@ -2652,27 +2652,28 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Indicates if the index belongs to a SQL DW table.
+        /// Indicates if the index belongs to a SQL DW table or DW materialized view.
         /// We need to rely on this getter instead of the SMO property(DwTableDistribution) while the index is being created.
         /// </summary>
-        /// <returns>True, if the index is a SQL DW table index; false otherwise.</returns>
+        /// <returns>True, if the index is a SQL DW table index or DW materialized view index; false otherwise.</returns>
         internal bool IsSqlDwIndex
         {
             get
             {
                 bool isSqlDwIndex = false;
-                if (this.Parent.IsSupportedProperty("DwTableDistribution"))
+                if (this.Parent.IsSupportedProperty(nameof(Table.DwTableDistribution)))
                 {
-
-                    if (this.Parent.GetPropValueOptional<DwTableDistributionType>("DwTableDistribution").HasValue)
+                    var dwTableDistribution = this.Parent.GetPropValueOptional<DwTableDistributionType>(nameof(Table.DwTableDistribution));
+                    if (dwTableDistribution.HasValue)
                     {
-                        if (this.Parent.GetPropValueOptional<DwTableDistributionType>("DwTableDistribution") != DwTableDistributionType.Undefined &&
-                            this.Parent.GetPropValueOptional<DwTableDistributionType>("DwTableDistribution") != DwTableDistributionType.None)
-                        {
-                            isSqlDwIndex = true;
-                        }
+                        isSqlDwIndex = dwTableDistribution != DwTableDistributionType.Undefined && dwTableDistribution != DwTableDistributionType.None;
                     }
                 }
+                else if (this is Index && this.Parent.IsSupportedProperty(nameof(View.DwMaterializedViewDistribution)))
+                {
+                    isSqlDwIndex = this.Parent.GetPropValueOptional<DwViewDistributionType>(nameof(View.DwMaterializedViewDistribution)).GetValueOrDefault(DwViewDistributionType.Undefined) != DwViewDistributionType.Undefined;
+                }
+
                 return isSqlDwIndex;
             }
         }

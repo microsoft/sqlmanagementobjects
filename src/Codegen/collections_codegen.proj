@@ -696,6 +696,14 @@
       <Parent>Database</Parent>
       <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
     </SmoCollectionGenCompile>
+    <SmoCollectionGenCompile Include="SensitivityClassification">
+      <MappedTypeVariable>SensitivityClassification</MappedTypeVariable>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <KeyType>string</KeyType>
+      <CollectionTemplate>$(SmoDirectory)\generic_collection.cs</CollectionTemplate>
+      <Parent>SqlSmoObject</Parent>
+      <RemainingMacros>/DSEALED /DITEM_BY_ID</RemainingMacros>
+    </SmoCollectionGenCompile>
     <SmoCollectionGenCompile Include="WorkloadManagementWorkloadClassifier">
       <MappedTypeVariable>WorkloadManagementWorkloadClassifier</MappedTypeVariable>
       <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
