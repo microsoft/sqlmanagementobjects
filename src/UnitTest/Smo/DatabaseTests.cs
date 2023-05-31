@@ -57,6 +57,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             typeof(SchemaCollection),
             typeof(SearchPropertyListCollection),
             typeof(SecurityPolicyCollection),
+            typeof(SensitivityClassificationCollection),
             typeof(SequenceCollection),
             typeof(SqlAssemblyCollection),
             typeof(StoredProcedureCollection),

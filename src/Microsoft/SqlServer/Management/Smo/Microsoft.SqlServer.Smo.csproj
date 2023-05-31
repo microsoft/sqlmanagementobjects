@@ -65,6 +65,7 @@
     <CodeGen Include="DatabaseOptions.cs" />
     <CodeGen Include="DatabaseReplicaState.cs" />
     <CodeGen Include="databaserole.cs" />
+    <CodeGen Include="SensitivityClassification.cs" />
     <CodeGen Include="DataFile.cs" />
     <CodeGen Include="Default.cs" />
     <CodeGen Include="DefaultConstraint.cs" />
@@ -297,6 +298,7 @@
     <Compile Include="$(SmoSourceDir)\Collections\SystemDataTypeCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\SystemMessageCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\TableCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SensitivityClassificationCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\TargetServerCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\TargetServerGroupCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\TriggerCollection.cs" />
@@ -358,6 +360,7 @@
     <Compile Include="$(SmoSourceDir)\ConfigurationValueBase.cs" />
     <Compile Include="$(SmoSourceDir)\CPUBase.cs" />
     <Compile Include="$(SmoSourceDir)\CredentialBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SensitivityClassificationBase.cs" />
     <Compile Include="$(SmoSourceDir)\DatabaseScopedCredentialBase.cs" />
     <Compile Include="$(SmoSourceDir)\CryptographicProviderBase.cs" />
     <Compile Include="$(SmoSourceDir)\DatabaseAuditSpecificationBase.cs" />

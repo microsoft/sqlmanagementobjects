@@ -2544,7 +2544,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (!this.ClusteredIndexes)
                 {
-                    smoUrnFilter.AddFilteredType("ClusteredIndex", null);
+                    //clustered columnstore index is default option for DW tables
+                    //pre-fetched independent of what the user chose for scripting options.
+                    if (this.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+                    {
+                        smoUrnFilter.AddFilteredType("ClusteredIndex", null);
+                    }
                 }
 
                 if (!this.NonClusteredIndexes)

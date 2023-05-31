@@ -92,8 +92,9 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
             ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
-
-            StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            // SearchProperty objects can be enumerated on Azure DB but cannot be created
+            ThrowIfCloud(sp.TargetDatabaseEngineType);
+            var sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
             if (sp.IncludeScripts.Header)
             {

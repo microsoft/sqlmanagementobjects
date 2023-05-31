@@ -566,6 +566,7 @@
         <object type="ResumableIndex" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="resumableindex.xml">
         </object>
       </object>
+      <object type="SensitivityClassification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SensitivityClassification.xml" />
       <object type="WorkloadManagementWorkloadClassifier" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="WorkloadManagementWorkloadClassifier.xml"/>
       <object type="View" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="View.xml">
         <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="TablePerm.xml" />

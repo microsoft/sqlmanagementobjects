@@ -38,6 +38,7 @@ namespace Microsoft.SqlServer.Management.Smo
             m_FileGroups = null;
             m_PlanGuides = null;
             m_Tables = null;
+            m_SensitivityClassifications = null;
             m_StoredProcedures = null;
             m_ExtendedStoredProcedures = null;
             m_UserDefinedFunctions = null;
@@ -2609,6 +2610,21 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        SensitivityClassificationCollection m_SensitivityClassifications;
+        [SfcObject(SfcContainerRelationship.ObjectContainer, SfcContainerCardinality.ZeroToAny, typeof(SensitivityClassification))]
+        public SensitivityClassificationCollection SensitivityClassifications
+        {
+            get
+            {
+                CheckObjectState();
+                if (m_SensitivityClassifications == null)
+                {
+                    m_SensitivityClassifications = new SensitivityClassificationCollection(this);
+                }
+                return m_SensitivityClassifications;
+            }
+        }
+
         DatabaseScopedCredentialCollection m_DatabaseScopedCredentials;
         [SfcObject(SfcContainerRelationship.ObjectContainer, SfcContainerCardinality.ZeroToAny, typeof(DatabaseScopedCredential))]
         public DatabaseScopedCredentialCollection DatabaseScopedCredentials
@@ -3790,6 +3806,11 @@ namespace Microsoft.SqlServer.Management.Smo
             if (null != m_Tables)
             {
                 m_Tables.MarkAllDropped();
+            }
+
+            if (null != m_SensitivityClassifications)
+            {
+                m_SensitivityClassifications.MarkAllDropped();
             }
 
             if (null != m_StoredProcedures)
@@ -6971,40 +6992,52 @@ SortedList list = new SortedList();
         /// <returns></returns>
         public bool IsLocalPrimaryReplica()
         {
-            bool retVal = false;
-            Server server = this.GetServerObject();
-
+            var retVal = false;
+            var server = GetServerObject();
+            server.SetDefaultInitFields(typeof(AvailabilityGroup), nameof(AvailabilityGroup.PrimaryReplicaServerName));
             //HADR is an unsupported feature in prior versions
-            if (this.ServerVersion.Major < 11)
+            if (ServerVersion.Major < 11)
             {
                 return retVal;
             }
 
             //HADR unsupported in Cloud
-            if ((Cmn.DatabaseEngineType.SqlAzureDatabase == this.DatabaseEngineType) ||
-                (!server.IsHadrEnabled))
+            if (DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || !server.IsHadrEnabled)
             {
                 return retVal;
             }
 
             //Non HADR databases will not have the property value set
-            if (string.IsNullOrEmpty(this.AvailabilityGroupName))
+            if (string.IsNullOrEmpty(AvailabilityGroupName))
             {
                 return retVal;
             }
 
             //It will return null if the DB is not part of any AG
-            AvailabilityGroup ag = server.AvailabilityGroups[this.AvailabilityGroupName];
+            var ag = server.AvailabilityGroups[AvailabilityGroupName];
 
             if (ag == null)
             {
                 throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("AvailabilityGroup"));
             }
 
-            //If the AG Name is set and ag == null; we should not stop throwing exception
-            string primaryReplicaServerName = ag.PrimaryReplicaServerName;
+            try
+            {
+                var obj = ExecutionManager.ExecuteScalar($"SELECT sys.fn_hadr_is_primary_replica({MakeSqlString(Name)})");
+                if (obj is bool isPrimary)
+                {
+                    return isPrimary;
+                }
+            }
+            catch (Exception e)
+            {
+                Diagnostics.TraceHelper.Trace("Database SMO Object", "Unable to query sys.fn_hadr_is_primary_replica. {0} {1}", e.Message, e.InnerException?.Message ?? "");
+            }
+            // If the query fails for some reason fall back to the old behavior
+            var primaryReplicaServerName = ag.PrimaryReplicaServerName;
             // InvariantCulture?
-            retVal = (NetCoreHelpers.StringCompare(this.GetServerName(), primaryReplicaServerName, true, CultureInfo.InvariantCulture) == 0);
+            retVal = (NetCoreHelpers.StringCompare(GetServerName(), primaryReplicaServerName, true, CultureInfo.InvariantCulture) == 0);
+            
             return retVal;
         }
 

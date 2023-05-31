@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<EnumObject type="SearchPropertyList" impl_type="SqlObject" min_major='11'>
+<EnumObject type="SearchPropertyList" impl_type="SqlObject" min_major='11' cloud_min_major='12'>
  
   <settings>
     <property_link table='sys.registered_search_property_lists AS spl' />
@@ -23,7 +23,9 @@
       </link_multiple>
     </property>
     <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
-    
-    <include file='inc_policy_health_state.xml'/>
+
+    <version min_major='11'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
   </properties>
 </EnumObject>

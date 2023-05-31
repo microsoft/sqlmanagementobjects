@@ -227,6 +227,10 @@
       <LogicalName>DatabaseScopedCredential.xml</LogicalName>
       <Link>xml\DatabaseScopedCredential.xml</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SensitivityClassification.xml">
+      <LogicalName>SensitivityClassification.xml</LogicalName>
+      <Link>xml\SensitivityClassification.xml</Link>
+    </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\WorkloadManagementWorkloadClassifier.xml">
       <LogicalName>WorkloadManagementWorkloadClassifier.xml</LogicalName>
       <Link>xml\WorkloadManagementWorkloadClassifier.xml</Link>

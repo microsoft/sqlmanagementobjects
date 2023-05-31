@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<EnumObject type="SearchProperty" impl_type="SqlObject" min_major='11'>
+<EnumObject type="SearchProperty" impl_type="SqlObject" min_major='11' cloud_min_major='12'>
   <settings>
     <parent_link>
       <link parent="ID" local="ParentID" />

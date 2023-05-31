@@ -197,6 +197,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         case "OrderColumn":
                         case "ResourceGovernor":
                         case "ResourcePool":
+                        case nameof(SensitivityClassification) :
                         case "ServerAuditSpecification":
                         case "UserDefinedTableType" :
                         case "WorkLoadGroup":
@@ -318,8 +319,11 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(PlanGuide) :
                     case nameof(QueryStoreOptions) :
                     case nameof(Rule) :
+                    case nameof(SearchProperty):
+                    case nameof(SearchPropertyList):
                     case nameof(SecurityPolicy) :
                     case nameof(SecurityPredicate) :
+                    case nameof(SensitivityClassification) :
                     case nameof(DatabaseScopedConfiguration):
                     case nameof(Sequence) :
                     case nameof(SqlAssembly) :
@@ -329,7 +333,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(UserDefinedType) :
                     case nameof(UserOptions) :
                     case nameof(XmlSchemaCollection) :
-                         return serverVersion.Major >= 12;
+                        return true;
                     case nameof(ExternalFileFormat):
                     case nameof(WorkloadManagementWorkloadGroup):
                          return false;
@@ -368,6 +372,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case nameof(Server):
                 case nameof(SecurityPolicy):
                 case nameof(SecurityPredicate):
+                case nameof(SensitivityClassification) :
                 case nameof(Statistic):
                 case nameof(StatisticColumn):
                 case nameof(StoredProcedure):

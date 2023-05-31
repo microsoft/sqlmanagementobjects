@@ -35,8 +35,6 @@ doskey netcoretests=pushd %BASEDIR%target\distrib\debug\netcoreapp3.1$Tvstest.co
 
 title git %BASEDIR%
 
-set CommitIdForCurrentBuild=%ComputerName%
-
 dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
 
 echo To open solution with SMO (code+test):
