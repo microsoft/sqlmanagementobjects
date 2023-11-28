@@ -5,9 +5,14 @@
       <link parent="ID" local="ParentID" />
     </parent_link>
     <property_link table='sys.database_event_session_targets' alias='target'></property_link>
-
-    <property_link fields='#Description#' join='sys.dm_xe_objects' alias='object2'>target.name = object2.name AND object2.object_type='target'</property_link>
-    
+    <property_link fields='#Description#' join='#t' alias='object2'>target.name = object2.name</property_link>
+    <prefix>
+      create table #t (name sysname collate catalog_default not null, description nvarchar(3072) not null)
+      insert into #t select name, description from sys.dm_xe_objects where object_type='target'
+    </prefix>
+    <postfix>
+      drop table #t
+    </postfix>
   </settings>
   <properties>
     <include file='inc_urn.xml' />

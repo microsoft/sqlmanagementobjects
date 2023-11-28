@@ -3,7 +3,15 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 170.23.0, 161.48050.0
+- Add ledger support in Database create options for MI in SSMS
+- Fixed the `Database.AvailabilityDatabaseSynchronizationState` property to reflect the correct synchronization state of MI databases in Managed Instance Link
+
+## 170.20.0
+- Add `OwnerLoginName` property to `JobSchedule` per [issue 120](https://github.com/microsoft/sqlmanagementobjects/issues/120)
+
 ## 170.18.0, 161.48044.0
+
 - Fix issue where `Table.Create` and `View.Create` were querying the server for indexes
 - Add `SearchPropertyList` support for Azure SQL Database
 - Add option to generate scripts exclusively for Data Classification, Create a new SMO object `SensitivityClassification` under `Database`

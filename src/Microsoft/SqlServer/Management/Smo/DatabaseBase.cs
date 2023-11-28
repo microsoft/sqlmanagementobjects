@@ -505,35 +505,41 @@ namespace Microsoft.SqlServer.Management.Smo
                     sbStatement.Append(Globals.newline);
                     sbStatement.Append(" FOR ATTACH");
                 }
-                else if (!isAzureDb && IsSupportedProperty("CatalogCollation", sp) && !targetEditionIsManagedServer)
+                else if (!isAzureDb)
                 {
-                    // Catalog Collation property is handled by ScriptCreateForCloud in Azure.  Do not append if this is a DB for attach.
-                    //
-                    Property catalogCollationType = this.GetPropertyOptional("CatalogCollation");
-
-                    // Don't script the property if set to ContainedDatabaseFixedCollation this will be handled by DB Containment.
-                    //
-                    if (catalogCollationType != null &&
-                        catalogCollationType.Value != null &&
-                        (CatalogCollationType)catalogCollationType.Value != CatalogCollationType.ContainedDatabaseFixedCollation)
+                    if (IsSupportedProperty("CatalogCollation", sp) && !targetEditionIsManagedServer)
                     {
-                        TypeConverter catalogCollationTypeConverter = SmoManagementUtil.GetTypeConverter(typeof(CatalogCollationType));
-                        string catalogCollationString = catalogCollationTypeConverter.ConvertToInvariantString(catalogCollationType.Value);
-                        sbStatement.Append(Globals.newline);
-                        sbStatement.Append(" WITH CATALOG_COLLATION = ");
-                        sbStatement.Append(catalogCollationString);
-                        hasCatalogCollation = true;
+                        // Catalog Collation property is handled by ScriptCreateForCloud in Azure.  Do not append if this is a DB for attach.
+                        //
+                        Property catalogCollationType = this.GetPropertyOptional("CatalogCollation");
+
+                        // Don't script the property if set to ContainedDatabaseFixedCollation this will be handled by DB Containment.
+                        //
+                        if (catalogCollationType != null &&
+                            catalogCollationType.Value != null &&
+                            (CatalogCollationType)catalogCollationType.Value != CatalogCollationType.ContainedDatabaseFixedCollation)
+                        {
+                            TypeConverter catalogCollationTypeConverter = SmoManagementUtil.GetTypeConverter(typeof(CatalogCollationType));
+                            string catalogCollationString = catalogCollationTypeConverter.ConvertToInvariantString(catalogCollationType.Value);
+                            sbStatement.Append(Globals.newline);
+                            sbStatement.Append(" WITH CATALOG_COLLATION = ");
+                            sbStatement.Append(catalogCollationString);
+                            hasCatalogCollation = true;
+                        }
                     }
 
                     // Appending Ledger Property only if Ledger is supported and Value is set.
+                    //
                     if (IsSupportedProperty(nameof(IsLedger), sp))
                     {
                         var isLedger = this.GetPropertyOptional(nameof(IsLedger));
 
                         // Only script the property if the value is set by the application
-                        if (isLedger != null && isLedger.Value != null)
+                        //
+                        if (isLedger?.Value != null)
                         {
                             // Ledger property - Appending Ledger = ON to the Statement
+                            //
                             sbStatement.Append(hasCatalogCollation ? ", " : $"{Globals.newline} WITH ");
                             sbStatement.AppendFormat("LEDGER = {0}", (bool)isLedger.Value ? "ON" : "OFF");
                         }

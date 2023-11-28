@@ -1,25 +1,26 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System;
-using System.Collections.Specialized;
-using System.Data;
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;
 #endif
-using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
-using Microsoft.SqlServer.Test.Manageability.Utils;
+using _SMO = Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
+using Microsoft.SqlServer.Test.Manageability.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using _SMO = Microsoft.SqlServer.Management.Smo;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
+using System.Linq;
 using System.Threading;
+using System;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -88,6 +89,118 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     Assert.That(res, Is.False,
                         "Retention value not correctly changed through SMO - expected FALSE, but the actual value in the database is TRUE.");
                 });
+        }
+
+        /// <summary>
+        /// Tests accessing AvailabilityDatabaseSynchronizationState property on SQL Server 2012+
+        /// The property is expected to be Synchronized when database is added to an availability group
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 11, HostPlatform = HostPlatformNames.Windows)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoDatabase_AvailabilityDatabaseSynchronizationState_OnPremV11OrNewer()
+        {
+            ExecuteWithDbDrop(
+                database =>
+                {
+                    database.TakeFullBackup();
+                    var server = database.Parent;
+                    var agName = "ag" + Guid.NewGuid();
+                    var ag = new _SMO.AvailabilityGroup(server, agName);
+
+                    if (server.VersionMajor >= 14)
+                    {
+                        ag.ClusterType = _SMO.AvailabilityGroupClusterType.None;
+                    }
+
+                    try
+                    {
+                        AlwaysOnTestHelper.CreateAvailabilityGroupForDatabase(server, ag, database.Name);
+                        Assert.That(database.AvailabilityDatabaseSynchronizationState,
+                            Is.EqualTo(AvailabilityDatabaseSynchronizationState.Synchronized),
+                            "AvailabilityDatabaseSynchronizationState should be Synchronized.");
+                    }
+                    finally
+                    {
+                        if (server.VersionMajor >= 13)
+                        {
+                            ag.DropIfExists();
+                        }
+                        else
+                        {
+                            // Drop if exists doesn't work for SQL Server 2014 or less
+                            ag.Drop();
+                        }
+                    }
+                });
+        }
+
+
+        /// <summary>
+        /// Tests accessing AvailabilityDatabaseSynchronizationState property on Azure Sql Managed Instance
+        /// Accessing property is expected to throw PropertyCannotBeRetrievedException when the property is not applicable
+        /// and return Synchronized if the database is in Managed Instance Link
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, Edition = DatabaseEngineEdition.SqlManagedInstance)]
+        public void SmoDatabase_AvailabilityDatabaseSynchronizationState_ManagedInstance()
+        {
+            ExecuteTest(
+                server =>
+                {
+                    var databasesWithNonNullSyncState = GetDatabasesWithNonNullSynchronizationState(server);
+
+                    foreach (_SMO.Database db in server.Databases)
+                    {
+                        if (databasesWithNonNullSyncState.Contains(db.Name))
+                        {
+                            Assert.That(() => db.AvailabilityDatabaseSynchronizationState,
+                                Is.EqualTo(AvailabilityDatabaseSynchronizationState.Synchronized),
+                                "AvailabilityDatabaseSynchronizationState should be Synchronized.");
+                        }
+                        else
+                        {
+                            Assert.Throws<PropertyCannotBeRetrievedException>(() => { var state = db.AvailabilityDatabaseSynchronizationState; },
+                                "Accessing the property AvailabilityDatabaseSynchronizationState should throw an exception when it's not applicable.");
+                        }
+                    }
+
+                });
+        }
+
+        private static List<string> GetDatabasesWithNonNullSynchronizationState(_SMO.Server server)
+        {
+            var dbs = new List<string>();
+
+            // This query returns synchronization state for the given database
+            // If database is not in availability group, no rows are returned
+            //
+            try
+            {
+                string getDatabasesWithNonNullSynchronizationStatesQuery = $@"
+                                select dtb.name as name
+                                from sys.dm_hadr_database_replica_states hadrd
+                                join sys.databases as dtb on dtb.database_id = hadrd.database_id
+                                join sys.availability_groups avag on hadrd.group_id = avag.group_id
+                                join sys.availability_replicas avar on avag.name = avar.replica_server_name
+                                join sys.availability_groups avag2 on avar.group_id = avag2.group_id
+                                where hadrd.is_local = 1";
+
+                var result = server.ConnectionContext.ExecuteWithResults(getDatabasesWithNonNullSynchronizationStatesQuery);
+
+                var databasesWithNonNullSynchronizationStates =
+                    (from row in result.Tables[0].AsEnumerable()
+                     select row["name"].ToString()).ToList();
+
+                dbs.AddRange(databasesWithNonNullSynchronizationStates);
+            }
+            catch
+            {
+                // This is likely due to user lacking VIEW DATABASE PERFORMANCE STATE
+                //
+            }
+
+            return dbs;
         }
 
         /// <summary>
@@ -438,6 +551,48 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             catalogCollationDb.CatalogCollation = CatalogCollationType.ContainedDatabaseFixedCollation;
                         },
                         "Should not have been able to set the catalog collation type to ContainedDatabaseFixedCollation");
+                });
+        }
+
+        /// <summary>
+        /// Verifies that database creation script is correct and can be successfully executed
+        /// on a Managed Instance
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
+        public void ScriptCreateDatabaseForManagedInstance()
+        {
+            this.ExecuteTest(
+                server =>
+                {
+                    Database db = null;
+                    var dbName = Guid.NewGuid().ToString();
+                    var newDbName = Guid.NewGuid().ToString();
+
+                    try
+                    {
+                        db = new Database(server, dbName);
+                        db.Create();
+
+                        // Generate database creation script
+                        //
+                        var createDatabaseScript = db.Script().ToSingleString();
+
+                        // Replace database name with a new one in a generated script
+                        //
+                        createDatabaseScript = createDatabaseScript.Replace(dbName, newDbName);
+
+                        // Try to create a new database
+                        //
+                        server.ExecutionManager.ExecuteNonQuery(createDatabaseScript);
+                    }
+                    finally
+                    {
+                        // Drop created databases
+                        //
+                        db.Drop();
+                        server.DropKillDatabaseNoThrow(newDbName);
+                    }
                 });
         }
 
@@ -1272,7 +1427,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
         public void Database_IsLedger_On()
         {
             this.ExecuteTest(
@@ -1308,7 +1463,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
         public void Database_IsLedger_OFF()
         {
             this.ExecuteTest(
@@ -1360,69 +1515,69 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 return;
             }
 
-             this.ExecuteMethodWithDbDrop(
-                server,
-                isOnline ? "online" : "offline",
-                database =>
-                {
-                    // Set the DB collation to the case-sensitive one to prove it doesn't have an effect to the scoped configurations.
-                    database.Collation = "SQL_Latin1_General_CP1_CS_AS";
+            this.ExecuteMethodWithDbDrop(
+               server,
+               isOnline ? "online" : "offline",
+               database =>
+               {
+                   // Set the DB collation to the case-sensitive one to prove it doesn't have an effect to the scoped configurations.
+                   database.Collation = "SQL_Latin1_General_CP1_CS_AS";
 
-                    // For the online scenario, the database is created before the alter of the database scoped configuration.
-                    // For the offline scenario, the database will be created after the alter of the database scoped configuration.
-                    if (isOnline)
-                    {
-                        database.Create();
-                    }
+                   // For the online scenario, the database is created before the alter of the database scoped configuration.
+                   // For the offline scenario, the database will be created after the alter of the database scoped configuration.
+                   if (isOnline)
+                   {
+                       database.Create();
+                   }
 
-                    try
-                    {
-                        TraceHelper.TraceInformation("Alter the database scoped configuration {0}{1} with Value {2}, Database {3}, Scenario {4} and API: {5}",
-                            configName,
-                            forSecondary ? " for secondary" : "",
-                            targetValue,
-                            database.Name,
-                            isOnline ? "Online" : "Offline",
-                            isEarly ? "Early" : "Generic");
+                   try
+                   {
+                       TraceHelper.TraceInformation("Alter the database scoped configuration {0}{1} with Value {2}, Database {3}, Scenario {4} and API: {5}",
+                           configName,
+                           forSecondary ? " for secondary" : "",
+                           targetValue,
+                           database.Name,
+                           isOnline ? "Online" : "Offline",
+                           isEarly ? "Early" : "Generic");
 
-                        AlterMaxdopOrOnOffOptionConfiguration(database, configName, forSecondary, isEarly, targetValue);
+                       AlterMaxdopOrOnOffOptionConfiguration(database, configName, forSecondary, isEarly, targetValue);
 
-                        if (isOnline)
-                        {
-                            database.Alter();
-                        }
-                        else
-                        {
-                            database.Create();
-                        }
+                       if (isOnline)
+                       {
+                           database.Alter();
+                       }
+                       else
+                       {
+                           database.Create();
+                       }
 
-                        // Throw an error if the operation is successful but it is expected to fail.
-                        Assert.That(shouldSucceed, Is.True, String.Format("Alter database scoped configuration {0}{1} with value {2} should not be successful.",
-                                    configName, forSecondary ? " for secondary" : "", targetValue));
+                       // Throw an error if the operation is successful but it is expected to fail.
+                       Assert.That(shouldSucceed, Is.True, String.Format("Alter database scoped configuration {0}{1} with value {2} should not be successful.",
+                                   configName, forSecondary ? " for secondary" : "", targetValue));
 
-                        // Verify the configuration values for the early and generic API.
-                        Assert.That(targetValue, Is.EqualTo(GetMaxdopOrOnOffOptionConfiguration(database, configName, forSecondary, isEarly: false)).IgnoreCase);
-                        if (isEarly)
-                        {
-                            Assert.That(targetValue, Is.EqualTo(GetMaxdopOrOnOffOptionConfiguration(database, configName, forSecondary, isEarly: true)).IgnoreCase);
-                        }
+                       // Verify the configuration values for the early and generic API.
+                       Assert.That(targetValue, Is.EqualTo(GetMaxdopOrOnOffOptionConfiguration(database, configName, forSecondary, isEarly: false)).IgnoreCase);
+                       if (isEarly)
+                       {
+                           Assert.That(targetValue, Is.EqualTo(GetMaxdopOrOnOffOptionConfiguration(database, configName, forSecondary, isEarly: true)).IgnoreCase);
+                       }
 
-                        // Verify the t-sql script of the database script configuration.
-                        StringCollection createQuery = new StringCollection();
-                        _SMO.ScriptingPreferences sp = new _SMO.ScriptingPreferences();
-                        sp.ScriptForAlter = false;
-                        database.ScriptAlter(createQuery, sp);
+                       // Verify the t-sql script of the database script configuration.
+                       StringCollection createQuery = new StringCollection();
+                       _SMO.ScriptingPreferences sp = new _SMO.ScriptingPreferences();
+                       sp.ScriptForAlter = false;
+                       database.ScriptAlter(createQuery, sp);
 
-                        Assert.That(createQuery.ToSingleString(), Does.Contain(String.Format("ALTER DATABASE SCOPED CONFIGURATION{0}SET {1} = {2};",
-                            forSecondary ? " FOR SECONDARY " : " ", configName, targetValue)).IgnoreCase);
-                    }
-                    catch (_SMO.SmoException e)
-                    {
-                        // Throw an error if the operation is failed but it is expected to success.
-                        Assert.That(shouldSucceed, Is.False, String.Format("Alter database scoped configuration {0}{1} with value {2} should be successful.\nException:{3}",
-                                    configName, forSecondary ? " for secondary" : "", targetValue, e.BuildRecursiveExceptionMessage()));
-                    }
-                });
+                       Assert.That(createQuery.ToSingleString(), Does.Contain(String.Format("ALTER DATABASE SCOPED CONFIGURATION{0}SET {1} = {2};",
+                           forSecondary ? " FOR SECONDARY " : " ", configName, targetValue)).IgnoreCase);
+                   }
+                   catch (_SMO.SmoException e)
+                   {
+                       // Throw an error if the operation is failed but it is expected to success.
+                       Assert.That(shouldSucceed, Is.False, String.Format("Alter database scoped configuration {0}{1} with value {2} should be successful.\nException:{3}",
+                                   configName, forSecondary ? " for secondary" : "", targetValue, e.BuildRecursiveExceptionMessage()));
+                   }
+               });
         }
 
         /// <summary>
