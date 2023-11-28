@@ -54,15 +54,18 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             var aDb = new AvailabilityDatabase(ag, dbName);
             ag.AvailabilityDatabases.Add(aDb);
-
-            ag.AvailabilityReplicas.Add(new AvailabilityReplica(ag, server.NetNameWithInstance())
+            var ar = new AvailabilityReplica(ag, server.NetNameWithInstance())
             {
                 EndpointUrl = "tcp://localhost:8022",
                 FailoverMode = AvailabilityReplicaFailoverMode.Manual,
                 AvailabilityMode = AvailabilityReplicaAvailabilityMode.SynchronousCommit,
-                SeedingMode = AvailabilityReplicaSeedingMode.Automatic,
                 ConnectionModeInSecondaryRole = AvailabilityReplicaConnectionModeInSecondaryRole.AllowNoConnections
-            });
+            };
+            ag.AvailabilityReplicas.Add(ar);
+            if(server.VersionMajor >= 13)
+            {
+                ar.SeedingMode = AvailabilityReplicaSeedingMode.Automatic;
+            }
             ag.Create();
         }
 

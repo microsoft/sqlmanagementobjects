@@ -399,7 +399,20 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                         }
                         else
                         {
-                            db.Create();
+                            try
+                            {
+                                db.Create();
+                            } 
+                            catch (SMO.SmoException se) when (se.BuildRecursiveExceptionMessage().Contains("Could not obtain exclusive lock on database 'model'") == true)
+                            {
+                                server.HandleModelLock();
+                                throw;
+                            }
+                            if (server.DatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+                            {
+                                db.FileGroups["PRIMARY"].Files[0].Size = 32768;
+                                db.Alter();
+                            }
                         }
                     }
                     else
@@ -620,6 +633,49 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 LoginType = loginType,
             };
             return login;
+        }
+
+        /// <summary>
+        /// Checks for spids holding locks on the model database
+        /// </summary>
+        /// <param name="server"></param>
+        public static void HandleModelLock(this SMO.Server server)
+        {
+            try
+            {
+                var dataSet = server.ExecutionManager.ExecuteWithResults(
+                    "select dtl.request_session_id, isnull(des.host_name,  N''), isnull(des.program_name, N''), isnull(des.login_name, N''), isnull(des.status, N''), isnull(des.last_request_start_time, '2023-08-22')  from sys.dm_tran_locks dtl join sys.dm_exec_sessions des on des.session_id = dtl.request_session_id  where resource_database_id = 3");
+                foreach (var row in dataSet.Tables[0].Rows.Cast<DataRow>())
+                {
+                    var spid = (int)row[0];
+                    var hostname = (string)row[1];
+                    var programname = (string)row[2];
+                    var loginname = (string)row[3];
+                    var status = (string)row[4];
+                    var requesttime = (DateTime) row[5];
+                    Trace.TraceWarning($"Model is locked by spid {spid}: {loginname}@{hostname} using {programname}. Status: {status} Last query time:{requesttime}");
+                    var dbcc = server.ExecutionManager.ExecuteWithResults($"DBCC INPUTBUFFER({spid})");
+                    foreach (var r in dbcc.Tables[0].Rows.Cast<DataRow>())
+                    {
+                        if (r["EventInfo"] is string eventInfo)
+                        {
+                            Trace.TraceWarning($"\tQuery text: {eventInfo}");
+                        }
+                    }
+                    
+                    if (status == "sleeping")
+                    {
+                        var closeSpid = Environment.GetEnvironmentVariable("SMOTEST_BREAKMODELLOCK");
+                        if (closeSpid == "1")
+                        {
+                            Trace.TraceWarning($"Force closing spid {spid}");
+                            server.KillProcess(spid);
+                        }
+                    }
+                    
+                }
+            }
+            catch { }
         }
     }
 }

@@ -6,8 +6,14 @@
     </parent_link>
     <property_link table='sys.database_event_session_events' alias='event'></property_link>
     
-    <property_link fields='#Description#' join='sys.dm_xe_objects' alias='object2'>event.name = object2.name AND object2.object_type='event'</property_link>
-    
+    <property_link fields='#Description#' join='#e' alias='object2'>event.name = object2.name</property_link>
+    <prefix fields='#Description#'>
+      create table #e (name sysname collate catalog_default, description nvarchar(3072))
+      insert into #e select name, description from sys.dm_xe_objects where object_type='event'
+    </prefix>
+    <postfix fields='#Description#'>
+      drop table #e
+    </postfix>
   </settings>
   <properties>
     <include file='inc_urn.xml' />

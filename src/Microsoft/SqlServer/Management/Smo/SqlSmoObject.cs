@@ -4324,7 +4324,6 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         if (databaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
                         {
-                            yield return nameof(Database.IsLedger);
                             yield return nameof(Database.RemoteDataArchiveEnabled);
                         }
                     }
@@ -4341,16 +4340,6 @@ namespace Microsoft.SqlServer.Management.Smo
                         if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
                         {
                             yield return nameof(Table.IndexSpaceUsed);
-                            yield return nameof(Table.IsDroppedLedgerTable);
-                            yield return nameof(Table.LedgerType);
-                            yield return nameof(Table.LedgerViewName);
-                            yield return nameof(Table.LedgerViewOperationTypeColumnName);
-                            yield return nameof(Table.LedgerViewSchema);
-                            yield return nameof(Table.LedgerViewSequenceNumberColumnName);
-                            yield return nameof(Table.LedgerViewTransactionIdColumnName);                
-                        }
-                        if (databaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
-                        {
                             yield return nameof(Table.IsDroppedLedgerTable);
                             yield return nameof(Table.LedgerType);
                             yield return nameof(Table.LedgerViewName);

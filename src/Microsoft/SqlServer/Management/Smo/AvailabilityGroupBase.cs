@@ -649,7 +649,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             var createScript = script.ToString();
             query.Add(createScript);
-            tc.TraceInformation("Generated create script: " + createScript);
+            tc.TraceInformation("Generated Create Script: {0}", createScript);
         }
 
         /// <summary>

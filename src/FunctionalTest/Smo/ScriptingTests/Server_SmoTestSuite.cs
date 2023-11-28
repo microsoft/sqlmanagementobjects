@@ -31,7 +31,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [UnsupportedDatabaseEngineType(DatabaseEngineType.SqlAzureDatabase)]
         [SqlTestArea(SqlTestArea.SMO)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlManagedInstance)]
         public void Server_CompareUrnWorksCorrectly_WithDifferentCollations()
         {
             this.ExecuteWithDbDrop(
