@@ -75,7 +75,7 @@
               left_join="#tmp_db_ags AS ags">ars.group_id = ags.group_id</property_link>
 
       <property_link fields = '#AvailabilityDatabaseSynchronizationState#'
-              left_join="#tmp_db_hadr_dbrs AS dbrs">dtb.group_database_id = dbrs.group_database_id and dbrs.is_local = 1</property_link>
+              left_join="#tmp_sync_states AS sync_state">dtb.database_id = sync_state.database_id</property_link>
     </version>
 
     <version min_major='11'>
@@ -705,7 +705,7 @@
     <!--HADR Properties-->
     <version min_major='11'>
       <property name="AvailabilityGroupName" type="sysname" access="Read" expensive ="true">ISNULL(ags.name, '')</property>
-      <property name="AvailabilityDatabaseSynchronizationState" type="tinyint" report_type="AvailabilityDatabaseSynchronizationState" access="Read" expensive ="true">dbrs.synchronization_state</property>
+      <property name="AvailabilityDatabaseSynchronizationState" type="tinyint" report_type="AvailabilityDatabaseSynchronizationState" access="Read" expensive ="true">sync_state.sync_state</property>
     </version>
 
     <version min_major='13'>

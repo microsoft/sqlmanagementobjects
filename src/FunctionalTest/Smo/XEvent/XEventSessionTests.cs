@@ -13,10 +13,13 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.SqlServer.Management.XEvent;
 using Microsoft.SqlServer.Management.XEventDbScoped;
-using NUF = NUnit.Framework;
+using NUnit.Framework;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.SqlServer.Management.Smo;
 using System.Linq;
+using Microsoft.SqlServer.Test.Manageability.Utils;
+using Assert = NUnit.Framework.Assert;
+using System.Reflection.Emit;
 
 namespace Microsoft.SqlServer.Test.SMO.XEvent
 {
@@ -123,6 +126,105 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
             });
         }
 
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
+        [DataRow("Latin1_General_100_CI_AS", CatalogCollationType.SQLLatin1GeneralCP1CIAS)]
+        [DataRow("Latin1_General_100_CI_AS", CatalogCollationType.DatabaseDefault)]
+        [DataRow("Latin1_General_100_CI_AS", null)]
+        [DataRow("SQL_Latin1_General_CP1_CS_AS", CatalogCollationType.DatabaseDefault)]
+        [DataRow("SQL_Latin1_General_CP1_CS_AS", CatalogCollationType.SQLLatin1GeneralCP1CIAS)]
+        [DataRow("SQL_Latin1_General_CP1_CS_AS", null)]
+        [DataRow("", null)]
+        [DataRow("", CatalogCollationType.SQLLatin1GeneralCP1CIAS)]
+        [DataRow("", CatalogCollationType.DatabaseDefault)]
+        public void EnumerateSessionsWithCaseSensitiveCatalogCollation(string collation, CatalogCollationType? catalogCollationType)
+        {
+            ExecuteTest(() =>
+            {
+                var db = new Database(ServerContext, "CSCollation" + Guid.NewGuid().ToString());
+                if (!string.IsNullOrEmpty(collation))
+                {
+                    db.Collation = collation;
+                }
+                if (catalogCollationType.HasValue)
+                {
+                    db.CatalogCollation = catalogCollationType.Value;
+                }
+                db.Create();
+                try
+                {
+                    db.ExecuteNonQuery(@"CREATE EVENT SESSION [newsession] ON DATABASE 
+ADD EVENT sqlserver.sql_batch_completed(
+    SET collect_batch_text=(1)
+    ACTION(sqlserver.client_app_name,sqlserver.database_id,sqlserver.query_hash,sqlserver.session_id,sqlserver.sql_text)
+    WHERE ([package0].[greater_than_uint64]([sqlserver].[database_id],(4)) AND [package0].[equal_boolean]([sqlserver].[is_system],(0))))
+ADD TARGET package0.ring_buffer(SET max_events_limit=(0),max_memory=(8192))
+WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=ON,STARTUP_STATE=OFF)
+");
+                    var sqlStoreConnection = new SqlStoreConnection(db.ExecutionManager.ConnectionContext.SqlConnectionObject);
+                    var xeStore = new DatabaseXEStore(sqlStoreConnection);
+                    Assert.That(xeStore.Sessions.Select(s => s.Name).ToList(), Has.Member("newsession"), "Session not found");
+                    var session = xeStore.Sessions["newsession"];
+                    var target = session.Targets.Single();
+                    Assert.That(target.Description, Contains.Substring("ring buffer"), "Wrong target description");
+                    var targetField = target.TargetFields.First();
+                    Assert.That(targetField.Name, Contains.Substring("max_events"), "Wrong target field name");
+                    var ev = session.Events.Single();
+                    Assert.That(ev.Name, Is.EqualTo("sqlserver.sql_batch_completed"), "Wrong event name");
+                    var action = ev.Actions["sqlserver.sql_text"];
+                    Assert.That(action.Description, Contains.Substring("SQL text"), "Wrong action description");
+                    var eventField = ev.EventFields.First();
+                    Assert.That(eventField.Name, Is.EqualTo("collect_batch_text"), "Wrong event field name");
+                    db.ExecutionManager.ConnectionContext.Disconnect();
+                }
+                finally
+                {
+                    _ = ServerContext.DropKillDatabaseNoThrow(db.Name);
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        public void EnumerateSessionsAndObjectDataOnPrem()
+        {
+            ExecuteTest(() =>
+            {
+                var sessionName = "newSession" + Guid.NewGuid().ToString();
+                _ = ServerContext.ConnectionContext.ExecuteNonQuery($@"CREATE EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.sql_batch_completed(
+    SET collect_batch_text=(1)
+    ACTION(sqlserver.client_app_name,sqlserver.database_id,sqlserver.query_hash,sqlserver.session_id,sqlserver.sql_text)
+    WHERE ([package0].[greater_than_uint64]([sqlserver].[database_id],(4)) AND [package0].[equal_boolean]([sqlserver].[is_system],(0))))
+ADD TARGET package0.ring_buffer(SET max_events_limit=(0),max_memory=(8192))
+WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=ON,STARTUP_STATE=OFF)
+");
+                try
+                {
+                    var sqlStoreConnection = new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject);
+                    var xeStore = new XEStore(sqlStoreConnection);
+                    Assert.That(xeStore.Sessions.Select(s => s.Name).ToList(), Has.Member(sessionName), "Session not found");
+                    var session = xeStore.Sessions[sessionName];
+                    var target = session.Targets.Single();
+                    Assert.That(target.Description, Contains.Substring("ring buffer"), "Wrong target description");
+                    var targetField = target.TargetFields.First();
+                    Assert.That(targetField.Name, Contains.Substring("max_events"), "Wrong target field name");
+                    var ev = session.Events.Single();
+                    Assert.That(ev.Name, Is.EqualTo("sqlserver.sql_batch_completed"), "Wrong event name");
+                    var action = ev.Actions["sqlserver.sql_text"];
+                    Assert.That(action.Description, Contains.Substring("SQL text"), "Wrong action description");
+                    var eventField = ev.EventFields.First();
+                    Assert.That(eventField.Name, Is.EqualTo("collect_batch_text"), "Wrong event field name");
+                }
+                finally
+                {
+                    _ = ServerContext.ConnectionContext.ExecuteNonQuery($"DROP EVENT SESSION [{sessionName}] ON SERVER");
+                }
+            });
+        }
+
         private void CreateSession(BaseXEStore store, out string name, out Session session)
         {
             name = Guid.NewGuid().ToString();
@@ -131,7 +233,7 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
                 store.Sessions[name].Drop();
             }
             session = store.CreateSession(name);
-            NUF.Assert.That(session.ScriptCreate, NUF.Throws.InstanceOf<XEventException>());
+            Assert.That(session.ScriptCreate, Throws.InstanceOf<XEventException>());
         }
 
         private BaseXEStore CreateStore(bool isServerScoped, Database db = null)
@@ -143,7 +245,7 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
             }
             else
             {
-                NUF.Assert.That(db, NUF.Is.Not.Null, "db parameter cannot be null for Database scoped tests");
+                Assert.That(db, Is.Not.Null, "db parameter cannot be null for Database scoped tests");
                 return new DatabaseXEStore(sqlStoreConnection, db.Name);
             }
         }
@@ -153,7 +255,7 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
             var connectionString = SqlConnectionStringBuilder.ToString();
             if (!isServerScoped)
             {
-                NUF.Assert.That(db, NUF.Is.Not.Null, "db parameter cannot be null for Database scoped tests");
+                Assert.That(db, Is.Not.Null, "db parameter cannot be null for Database scoped tests");
                 connectionString = new SqlConnectionStringBuilder(connectionString) { InitialCatalog = db.Name, Pooling = false }.ToString();
             }
             this.connection = new ServerConnection(new SqlConnection(connectionString));
@@ -198,7 +300,7 @@ ADD EVENT sqlos.wait_info_external(
             var eventInfo1 = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_info");
             var operand = new PredOperand(eventInfo.DataEventColumnInfoSet["wait_type"]);
 
-            NUF.Assert.Multiple(() =>
+            Assert.Multiple(() =>
             {
                 // Adding event into session
                 var evt = session.AddEvent(eventInfo);
@@ -207,7 +309,7 @@ ADD EVENT sqlos.wait_info_external(
                 evt1.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.EQ, operand, new PredValue(waitTypeDic.First(x => x.Value == "388").Key));
                 // Creating session environment 
                 session.Create();
-                NUF.Assert.That(session.ScriptCreate().ToString(), NUF.Is.EqualTo(expectedCreateString), "Generated Create script is not same as expected string!");
+                Assert.That(session.ScriptCreate().ToString(), Is.EqualTo(expectedCreateString), "Generated Create script is not same as expected string!");
 
                 //Alter section
                 evt.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.NE, operand, new PredValue(waitTypeDic.FirstOrDefault(x => x.Value == "'ABR'").Key));
@@ -216,7 +318,7 @@ ADD EVENT sqlos.wait_info_external(
                 var evt2 = session.AddEvent(eventInfo2);
                 evt2.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.NE, operand, new PredValue(388));
                 session.Alter();
-                NUF.Assert.That(session.ScriptAlter().ToString(), NUF.Is.EqualTo(expectedAlterString), "Generated Alter script is not same as expected string!");
+                Assert.That(session.ScriptAlter().ToString(), Is.EqualTo(expectedAlterString), "Generated Alter script is not same as expected string!");
                 session.Drop();
             });
         }
@@ -247,11 +349,11 @@ WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPAT
             store.Refresh();
 
             var session = store.Sessions[name];
-            NUF.Assert.Multiple(() =>
+            Assert.Multiple(() =>
             {
-                NUF.Assert.That(store.Sessions[name].Events["sqlos.wait_completed"].PredicateExpression, NUF.Is.EqualTo("([wait_type]='BROKER_START' AND [wait_type]=(388))"), "Generated PredExpression is not same as expected PredExpression!");
-                NUF.Assert.That(store.Sessions[name].Events["sqlos.wait_info"].PredicateExpression, NUF.Is.EqualTo("([wait_type]='ASSEMBLY_LOAD')"), "Generated PredExpression is not same as expected PredExpression!");
-                NUF.Assert.That(session.ScriptCreate().ToString(), NUF.Is.EqualTo(expectedCreateString), "Generated Create script is not same as expected string!");
+                Assert.That(store.Sessions[name].Events["sqlos.wait_completed"].PredicateExpression, Is.EqualTo("([wait_type]='BROKER_START' AND [wait_type]=(388))"), "Generated PredExpression is not same as expected PredExpression!");
+                Assert.That(store.Sessions[name].Events["sqlos.wait_info"].PredicateExpression, Is.EqualTo("([wait_type]='ASSEMBLY_LOAD')"), "Generated PredExpression is not same as expected PredExpression!");
+                Assert.That(session.ScriptCreate().ToString(), Is.EqualTo(expectedCreateString), "Generated Create script is not same as expected string!");
             });
             session.Drop();
         }
@@ -289,7 +391,7 @@ ALTER EVENT SESSION [{session.Name}] ON {createSessionOnString}
 ADD EVENT sqlos.wait_completed(
     WHERE ((([wait_type]=(450)) OR ([wait_type]=(1385))) OR ([wait_type]=('ACTIVE_RG_LIST'))))
 ".FixNewLines();
-            NUF.Assert.That(session.ScriptAlter().ToString(), NUF.Is.EqualTo(expectedCreateString), "Generated Alter script is not same as expected string!");
+            Assert.That(session.ScriptAlter().ToString(), Is.EqualTo(expectedCreateString), "Generated Alter script is not same as expected string!");
 
             session.Drop();
         }
@@ -315,7 +417,7 @@ ADD EVENT sqlserver.sp_statement_starting
             session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.sp_statement_starting"));
             session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_completed"));
 
-            NUF.Assert.That(session.ScriptAlter().ToString(), NUF.Is.EqualTo(expectedAlterString), "Generated Alter script is not same as expected string!");
+            Assert.That(session.ScriptAlter().ToString(), Is.EqualTo(expectedAlterString), "Generated Alter script is not same as expected string!");
 
             session.Drop();
         }

@@ -4,8 +4,18 @@
     <property_link table='sys.server_event_session_targets' alias='target'>session.event_session_id = target.event_session_id</property_link>
 
     <!--use object2/package2 since TargetField.xml uses object/package to join these 2 views-->
-    <property_link join='sys.dm_xe_objects' alias='object2'>target.name = object2.name AND object2.object_type='target'</property_link>
-    <property_link join='sys.dm_xe_packages' alias='package2'>target.module = package2.module_guid AND target.package = package2.name AND package2.guid = object2.package_guid</property_link>
+    <property_link join='#t' alias='object2'>target.name = object2.name</property_link>
+    <property_link join='#p' alias='package2'>target.module = package2.module_guid AND target.package = package2.name AND package2.guid = object2.package_guid</property_link>
+    <prefix>
+      create table #t (name sysname not null, package_guid uniqueidentifier not null, description nvarchar(3072) not null)
+      create table #p (module_guid uniqueidentifier not null, name sysname not null, guid uniqueidentifier not null)
+      insert into #t select name, package_guid, description from sys.dm_xe_objects where object_type='target'
+      insert into #p select module_guid, name, guid from sys.dm_xe_packages
+    </prefix>
+    <postfix>
+      drop table #t
+      drop table #p
+    </postfix>
 
   </settings>
   <properties>

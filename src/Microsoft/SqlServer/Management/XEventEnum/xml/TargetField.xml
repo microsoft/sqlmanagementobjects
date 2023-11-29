@@ -1,9 +1,21 @@
 <?xml version="1.0" ?>
 <EnumObject type="TargetField" impl_type="XEventObject" min_major='11'>
   <settings>
-	<property_link join='sys.dm_xe_object_columns' alias='col'>target.name = col.object_name AND col.column_type = 'customizable'</property_link>
-	<property_link left_join='sys.server_event_session_fields' alias='field'>target.event_session_id = field.event_session_id AND target.target_id = field.object_id AND col.name = field.name</property_link>
-    <property_link join='sys.dm_xe_packages' alias='package'>target.package = package.name AND package.guid = col.object_package_guid</property_link>
+  	<property_link join='#oc' alias='col'>target.name = col.object_name</property_link>
+	  <property_link left_join='sys.server_event_session_fields' alias='field'>target.event_session_id = field.event_session_id AND target.target_id = field.object_id AND col.name = field.name</property_link>
+    <property_link join='#packages' alias='package'>target.package = package.name AND package.guid = col.object_package_guid</property_link>
+    <!-- temp table names have to be unique here and in Target -->
+    <prefix>
+      create table #oc (name sysname, object_name sysname, object_package_guid uniqueidentifier, description nvarchar(3072))
+      create table #packages (name sysname, guid uniqueidentifier)
+      insert into #oc select name, object_name, object_package_guid, description from sys.dm_xe_object_columns where column_type = 'customizable'
+      insert into #packages select name, guid from sys.dm_xe_packages
+    </prefix>
+    <postfix>
+      drop table #oc
+      drop table #packages
+    </postfix>
+
   </settings>
   <properties>
     <include file='inc_urn.xml' />

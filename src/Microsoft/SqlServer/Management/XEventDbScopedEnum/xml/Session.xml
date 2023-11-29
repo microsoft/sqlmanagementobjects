@@ -2,7 +2,14 @@
 <EnumObject type="Session" impl_type="XEventObject" cloud_min_major='10'>
   <settings>
     <property_link table='sys.database_event_sessions' alias='session'/>
-    <property_link fields='#StartTime#IsRunning#' left_join='sys.dm_xe_database_sessions' alias='running'>running.name = session.name</property_link>
+    <property_link fields='#IsRunning#StartTime#' left_join='#rs' alias='running'>running.name = session.name</property_link>
+    <prefix fields='#IsRunning#StartTime#'>
+      create table #rs (name sysname collate catalog_default not null, create_time datetimeoffset not null)
+      insert into #rs select name, create_time from sys.dm_xe_database_sessions
+    </prefix>
+    <postfix fields='#IsRunning#StartTime#'>
+      drop table #rs
+    </postfix>
   </settings>
   <properties>
     <include file='inc_urn.xml' />

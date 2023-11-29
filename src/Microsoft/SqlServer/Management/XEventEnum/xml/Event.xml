@@ -4,8 +4,18 @@
     <property_link table='sys.server_event_session_events' alias='event'>session.event_session_id = event.event_session_id</property_link>
     
     <!--use object2/package2 since EventField.xml/Action.xml use object/package to join these 2 views-->
-    <property_link join='sys.dm_xe_objects' alias='object2'>event.name = object2.name AND object2.object_type='event'</property_link>
-    <property_link join='sys.dm_xe_packages' alias='package2'>event.module = package2.module_guid AND event.package = package2.name AND package2.guid = object2.package_guid</property_link>
+    <property_link join='#e' alias='object2'>event.name = object2.name</property_link>
+    <property_link join='#ev' alias='package2'>event.module = package2.module_guid AND event.package = package2.name AND package2.guid = object2.package_guid</property_link>
+    <prefix>
+      create table #e (name sysname, package_guid uniqueidentifier, description nvarchar(3072))
+      create table #ev (module_guid uniqueidentifier, name sysname, guid uniqueidentifier)
+      insert into #e select name, package_guid, description from sys.dm_xe_objects where object_type='event'
+      insert into #ev select module_guid, name, guid from sys.dm_xe_packages
+    </prefix>
+    <postfix>
+      drop table #e
+      drop table #ev
+    </postfix>
   </settings>
   <properties>
     <include file='inc_urn.xml' />

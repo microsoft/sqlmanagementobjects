@@ -8,7 +8,14 @@
     <property_link table='sys.database_event_session_actions' alias='action'></property_link>
 
     <!--action share names with other objects in dm_xe_objects, so here we need to add a filter on object_type-->
-    <property_link join='sys.dm_xe_objects' alias='object'>action.name = object.name AND object.object_type='action'</property_link>
+    <property_link  join='#a' alias='object'>action.name = object.name</property_link>
+    <prefix>
+      create table #a (name sysname collate catalog_default not null, description nvarchar(3072) not null)
+      insert into #a select name, description from sys.dm_xe_objects where object_type='action'
+    </prefix>
+    <postfix>
+      drop table #a
+    </postfix>
   </settings>
   <properties>
     <include file='inc_urn.xml' />    
