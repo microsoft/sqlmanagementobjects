@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="Rule" impl_type="SqlObject" min_major='7'  cloud_min_major='12'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link table="dbo.sysobjects AS obj">obj.xtype=N'R'</property_link>
+		</version>
+		<version min_major='9'  cloud_min_major='12'>
+			<property_link table="sys.objects" alias="obj">obj.type=N'R' and (0 = obj.parent_object_id or obj.parent_object_id is null)</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_object.xml' alias='obj' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#'/>
+		<include file='sql_module_link.xml' alias='obj' for='#Text#BodyStartIndex#' ro_after_creation='#Text#'/>
+
+		<version min_major='8' max_major='8'>
+			<!-- extended properties support -->
+			<property name="ObjectTypeName" type="sysname" hidden="true">N'RULE'</property>
+		</version>
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>

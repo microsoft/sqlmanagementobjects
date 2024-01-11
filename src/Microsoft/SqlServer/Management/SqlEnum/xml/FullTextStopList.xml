@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="FullTextStopList" impl_type="SqlObject" min_major='10' cloud_min_major='12'>
+	<settings>
+			<property_link table='sys.fulltext_stoplists AS sl' />
+			<property_link fields='#Owner#' join='sys.database_principals AS dp'>sl.principal_id=dp.principal_id</property_link>
+	</settings>
+	<properties>
+			<include file='inc_urn.xml' />
+			<property name="Name" type="sysname">sl.name</property>
+			<property name="Owner" type="sysname" read_only_after_creation="true">dp.name</property>
+			<property name="ID" type="int" access="Read">sl.stoplist_id</property>
+		
+		    <property name="ExtPropClass" type="int" hidden='true'>29</property>
+			<property name="ExtPropMajorID" type="int" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='local' field="ID" />
+				</link_multiple>
+			</property>
+			<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

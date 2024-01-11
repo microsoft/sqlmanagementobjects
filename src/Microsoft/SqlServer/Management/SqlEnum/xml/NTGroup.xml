@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<EnumObject type="WindowsGroup" impl_type="SqlObject" min_major='7'>
+	<settings>
+
+		<property_link table = "#tmpntgrp" alias = 't'/>
+		
+		<prefix>
+			<link_multiple no = '1' 
+expression = 'create table #tmpntgrp ( name sysname NULL, description nvarchar(255) NULL)
+insert into #tmpntgrp exec master.dbo.xp_enumgroups {0}'>
+				<link_field type='filter' field="Domain"/>
+			</link_multiple>
+		</prefix>
+		
+		<postfix>
+			drop table #tmpntgrp
+		</postfix>
+		
+	</settings>
+	<properties>
+		<property name="Name" type="sysname">t.name</property>
+		<property name="Description" type="nvarchar" size='255'>t.description</property>
+		<property name="Domain" type="nvarchar" size='255' expensive='true' usage='filter'>
+			<link_multiple no = '1' expression = '{0}'>
+				<link_field type='filter' field="Domain" default_value='NULL'/>
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

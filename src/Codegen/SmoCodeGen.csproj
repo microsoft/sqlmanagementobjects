@@ -1,0 +1,148 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DefineConstants>$(DefineConstants);SMOCODEGEN;NATIVEBATCHPARSER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetGroup)'!='netfx'">
+      <DefineConstants >$(DefineConstants);NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(ConnectionInfoSrc)\ConnectionEnums.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ConnectionException.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ConnectionInfoBase.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ConnectionInfoHelper.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ConnectionManager.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ConnectionSettings.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\EncryptionUtility.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ExecutionCache.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\FxCopSupressions.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\interfaces.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\irenewabletoken.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ISfcConnection.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\LocalizableTypeConverter.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\NetCoreHelpers.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SafeNativeMethods.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ServerConnection.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ServerInformation.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\ServerVersion.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlConnectionInfo.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlConnectionInfoWithConnection.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlContext.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlDirectConnection.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlOlapConnectionInfoBase.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SqlServerManagementException.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\StatementCapture.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\StatementEvent.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\AstNode.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Axis.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Depedencies.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\enumerator.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\EnumeratorException.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\EnumObject.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\EnumResult.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Enviroment.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Filter.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\FilterDecoder.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\FilterNode.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\FilterTranslate.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Function.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\FxCopExclusions.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Group.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\interfaces.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\ObjectCache.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\ObjectInfo.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\ObjectLoadInfoManager.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\ObjectProperty.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Operand.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Operator.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\request.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\RequestDependencies.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\RequestObjectInfo.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Root.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\urn.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\Util.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XmlCharType.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XmlUtil.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XPathException.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\xpathexpresion.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XPathExpresionBlock.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XPathHandler.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XPathNodeType.cs" />
+    <Compile Include="$(SfcSrc)\Enumerator\XPathScanner.cs" />
+    <Compile Include="$(SfcSrc)\ConnectionHelpers.cs" />
+    <Compile Include="$(SfcSrc)\NetCoreExtension.cs" />
+    <Compile Include="$(SfcSrc)\SmoManagementUtil.cs" />
+    <Compile Include="$(SfcSrc)\TraceHelper.cs" />
+    <Compile Include="$(SfcSrc)\XmlTextReader.cs" />
+    <Compile Include="$(SqlEnumSrc)\ConditionedSql.cs" />
+    <Compile Include="$(SqlEnumSrc)\DatabaseLevel.cs" />
+    <Compile Include="$(SqlEnumSrc)\DatabaseOption.cs" />
+    <Compile Include="$(SqlEnumSrc)\DataProvider.cs" />
+    <Compile Include="$(SqlEnumSrc)\DdlParser.cs" />
+    <Compile Include="$(SqlEnumSrc)\DiskFile.cs" />
+    <Compile Include="$(SqlEnumSrc)\EnumStructs.cs" />
+    <Compile Include="$(SqlEnumSrc)\EventSetBase.cs" />
+    <Compile Include="$(SqlEnumSrc)\FxCopExclusions.cs" />
+    <Compile Include="$(SqlEnumSrc)\permenum.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcess.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessCreateDateTime.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessDatabaseInsideAttribs.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessParam.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessText.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessVersion.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessXml.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessTable.cs" />
+    <Compile Include="$(SqlEnumSrc)\PostProcessWithRowCaching.cs" />
+    <Compile Include="$(SqlEnumSrc)\PrimaryFile.cs" />
+    <Compile Include="$(SqlEnumSrc)\QueryIsolation.cs" />
+    <Compile Include="$(SqlEnumSrc)\RequestParentSelect.cs" />
+    <Compile Include="$(SqlEnumSrc)\restoreplan.cs" />
+    <Compile Include="$(SqlEnumSrc)\Server.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlConditionedStatement.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlEnumDependencies.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlEnumNetCoreExtension.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlEnumResult.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlEnumStatementBuilderTestHook.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlLinkMultiple.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlObject.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlObjectBase.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlObjectProperty.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlObjectUnion.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlParentLink.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlPostProcess.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlPropertyLink.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlRequest.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlSecureString.cs" />
+    <Compile Include="$(SqlEnumSrc)\SqlUtil.cs" />
+    <Compile Include="$(SqlEnumSrc)\StatementBuilder.cs" />
+    <Compile Include="$(SqlEnumSrc)\TypeConverters.cs" />
+    <Compile Include="$(SqlEnumSrc)\Util.cs" />
+    <Compile Include="$(SqlEnumSrc)\XmlRead.cs" />
+    <Compile Include="CodeGen.cs" />
+    <Compile Include="ExecuteSqlFake.cs" />
+    <Compile Include="ModelGen.cs" />
+    <Compile Include="StringEnumerator.cs" />
+    <SqlStringResource Include="$(ConnectionInfoSrc)\StringConnectionInfo.strings" namespace="Microsoft.SqlServer.Management.Common" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
+    <SqlStringResource Include="$(SqlEnumSrc)\StringSqlEnumerator.strings" namespace="Microsoft.SqlServer.Management.Smo.SqlEnum" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
+    <SqlStringResource Include="$(SfcSrc)\SfcStrings.strings" namespace="Microsoft.SqlServer.Management.Sdk.Sfc" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
+    <Compile Include="$(SqlClrSrc)\FxCopExclusions.cs" />
+    <Compile Include="$(SqlClrSrc)\SqlClrProvider.cs" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <ProjectReference Include="$(BatchParserSrc)\Microsoft.Data.Tools.Sql.BatchParser.csproj" />
+    <PackageReference Include="System.Security.Principal.Windows" />  
+  </ItemGroup>
+</Project>

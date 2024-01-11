@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link>clmns.number = &lt;msparam&gt;0&lt;/msparam&gt; and &lt;msparam&gt;0&lt;/msparam&gt; = OBJECTPROPERTY(clmns.id, N'IsScalarFunction')</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='Column.xml' />
+	</properties>
+</EnumObject>

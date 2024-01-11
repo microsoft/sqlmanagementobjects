@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NotificationClass' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_notification_class" alias="nc" />
+		<prefix>
+CREATE TABLE #tmp_notification_class(
+    NotificationClassId int,
+    NotificationClassName nvarchar(255),
+	DigestDelivery bit,
+	MulticastDelivery bit,
+	ExpirationAge int,
+    FileGroup nvarchar(128),
+	NotificationBatchSize int,
+    ContentFormatterId int,
+    ClassName nvarchar(255),
+    AssemblyName nvarchar (260)
+)
+INSERT #tmp_notification_class EXEC [SchemaPrefix].NSGetNotificationClasses
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_notification_class
+        </postfix>
+    </settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">nc.NotificationClassName</property>
+        <property name="Id" type="int" hidden="true">nc.NotificationClassId</property>
+		<property name="DigestDelivery" type="bit">nc.DigestDelivery</property>
+		<property name="MulticastDelivery" type="bit">nc.MulticastDelivery</property>
+		<property name="ExpirationAge" type="int" >nc.ExpirationAge</property>
+		<property name="NotificationBatchSize" type="int">nc.NotificationBatchSize</property>
+		<property name="FileGroup" type="nvarchar" size="128">nc.FileGroup</property>
+		<property name="ContentFormatterId" type="int">nc.ContentFormatterId</property>
+		<property name="ClassName" type="nvarchar" size="255">nc.ClassName</property>
+		<property name="AssemblyName" type="nvarchar" size="260">nc.AssemblyName</property>
+	</properties>
+</EnumObject>

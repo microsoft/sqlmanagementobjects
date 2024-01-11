@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<EnumObject type="OwnedObject" impl_type="SqlObject" min_major='7'>
+	<version min_major='7' max_major='8'>
+		<union>
+			<settings>
+				<parent_link>
+					<link parent='ID' local='PrincipalID' />
+				</parent_link>
+
+				<property_link table="sysobjects AS ownobj">ownobj.type not in ( 'K', 'S' )</property_link>
+				<property_link left_join="sysobjects AS ownobj_parent">ownobj_parent.id = ownobj.parent_obj</property_link>
+
+				<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+							triggered_fields='#Type#ServerName#DatabaseName#Name#Schema#ParentName#ParentSchema#'/>
+			</settings>
+			<properties>
+				<property name="Urn" type="nvarchar" usage='request'>null</property>
+				<version min_major='7' max_major='7'>
+					<property name="ServerName" type="sysname" cast='true' hidden='true'>@@SERVERNAME</property>
+				</version>
+				<version min_major='8' max_major='8'>
+					<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+				</version>
+				<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+				<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+				<property name="Type" type="sysname" hidden='true'>ownobj.type</property>
+				<property name="Schema" type="sysname" hidden='true'>user_name(ownobj.uid)</property>
+				<property name="ParentName" type="sysname" hidden='true'>ownobj_parent.name</property>
+				<property name="ParentSchema" type="sysname" hidden='true'>user_name(ownobj_parent.uid)</property>
+
+				<property name="PrincipalID" type="int" cast='true' hidden='true'>ownobj.uid</property>
+			</properties>
+		</union>
+		<union>
+			<settings>
+				<parent_link>
+					<link parent='Name' local='PrincipalID' />
+				</parent_link>
+
+				<property_link table="systypes AS ownobj"/>
+
+				<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+							triggered_fields='#Type#ServerName#DatabaseName#Name#Schema#ParentName#ParentSchema#'/>
+			</settings>
+			<properties>
+				<property name="Urn" type="nvarchar" usage='request'>null</property>
+				<version min_major='7' max_major='7'>
+					<property name="ServerName" type="sysname" cast='true' hidden='true'>@@SERVERNAME</property>
+				</version>
+				<version min_major='8' max_major='8'>
+					<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+				</version>
+				<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+				<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+				<property name="Type" type="sysname" hidden='true'>N'UDDT'</property>
+				<property name="Schema" type="sysname" hidden='true'>N'dbo'</property>
+				<property name="ParentName" type="sysname" hidden='true'>null</property>
+				<property name="ParentSchema" type="sysname" hidden='true'>null</property>
+
+				<property name="PrincipalID" type="sysname" hidden='true'>N'dbo'</property>
+			</properties>
+		</union>
+	</version>
+	<version min_major='9'>
+		<union>
+			<settings>
+				<parent_link>
+					<link parent='ID' local='PrincipalID' />
+				</parent_link>
+
+				<property_link table="sys.assemblies AS ownobj" />
+			
+				<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+							triggered_fields='#Type#ServerName#DatabaseName#Name#'/>
+			</settings>
+			<properties>
+				<property name="Urn" type="nvarchar" usage='request'>null</property>
+				<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+				<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+				<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+				<property name="Type" type="sysname" hidden='true'>N'ASSEMBLY'</property>
+				
+				<property name="PrincipalID" type="int" hidden='true'>ownobj.principal_id</property>
+			</properties>
+		</union>
+		<union>
+			<settings>
+				<parent_link>
+					<link parent='ID' local='PrincipalID' />
+				</parent_link>
+
+				<property_link table="sys.schemas AS ownobj" />
+				
+				<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+							triggered_fields='#Type#ServerName#DatabaseName#Name#'/>
+			</settings>
+			<properties>
+				<property name="Urn" type="nvarchar" usage='request'>null</property>
+				<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+				<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+				<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+				<property name="Type" type="sysname" hidden='true'>N'SCHEMA'</property>
+				
+				<property name="PrincipalID" type="int" hidden='true'>ownobj.principal_id</property>
+			</properties>
+		</union>
+	</version>
+</EnumObject>

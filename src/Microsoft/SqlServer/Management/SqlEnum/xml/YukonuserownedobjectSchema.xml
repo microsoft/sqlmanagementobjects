@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<EnumObject type="OwnedObject" impl_type="SqlObject" min_major='9'>
+	<union>
+		<settings>
+			<parent_link>
+				<link parent='ID' local='SchemaID' />
+			</parent_link>
+		
+			<!-- filter out all objects which in their enumerator representation don't have a schema property -->
+      <version min_major='9'>
+        <property_link table="sys.all_objects AS ownobj">ownobj.type not in ('PK', 'C ', 'F ', 'UQ') and ( ownobj.type != 'D' or 0 = ownobj.parent_object_id)</property_link>
+      </version>
+
+            <property_link left_join="sys.all_objects AS ownobj_parent">ownobj_parent.object_id = ownobj.parent_object_id</property_link>
+			
+			<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+						triggered_fields='#Type#ServerName#DatabaseName#Name#Schema#ParentName#ParentSchema#'/>
+		</settings>
+		<properties>
+			<property name="Urn" type="nvarchar">null</property>
+			<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+			<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+			<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+			<property name="Type" type="sysname" hidden='true'>ownobj.type</property>
+			<property name="Schema" type="sysname" hidden='true'>schema_name(ownobj.schema_id)</property>
+			<property name="ParentName" type="sysname" hidden='true'>ownobj_parent.name</property>
+			<property name="ParentSchema" type="sysname" hidden='true'>schema_name(ownobj_parent.schema_id)</property>
+			<property name="SchemaID" type="sysname" hidden='true'>ownobj.schema_id</property>
+		</properties>
+	</union>
+	<union>
+		<settings>
+			<parent_link>
+				<link parent='ID' local='SchemaID' />
+			</parent_link>
+		
+			<property_link table="sys.types AS ownobj">ownobj.schema_id != 4</property_link>
+			
+			<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+						triggered_fields='#Type#ServerName#DatabaseName#Name#Schema#ParentName#ParentSchema#'/>
+		</settings>
+		<properties>
+			<property name="Urn" type="nvarchar">null</property>
+			<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+			<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+			<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+			<property name="Type" type="sysname" hidden='true'>CASE ownobj.system_type_id WHEN 240 THEN N'UDT' ELSE N'UDDT' END</property>
+			<property name="Schema" type="sysname" hidden='true'>schema_name(ownobj.schema_id)</property>
+			<property name="ParentName" type="sysname" hidden='true'>null</property>
+			<property name="ParentSchema" type="sysname" hidden='true'>null</property>
+			<property name="SchemaID" type="sysname" hidden='true'>ownobj.schema_id</property>
+		</properties>
+	</union>
+	<union>
+		<settings>
+			<parent_link>
+				<link parent='ID' local='SchemaID' />
+			</parent_link>
+		
+			<property_link table="sys.xml_schema_collections AS ownobj">ownobj.schema_id != 4</property_link>
+			
+			<post_process fields='#Urn#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwnObjects'
+						triggered_fields='#Type#ServerName#DatabaseName#Name#Schema#ParentName#ParentSchema#'/>
+		</settings>
+		<properties>
+			<property name="Urn" type="nvarchar">null</property>
+			<property name="ServerName" type="sysname" cast='true' hidden='true'>serverproperty(N'Servername')</property>
+			<property name="DatabaseName" type="sysname" hidden='true'>db_name()</property>
+			<property name="Name" type="sysname" hidden='true'>ownobj.name</property>
+			<property name="Type" type="sysname" hidden='true'>N'XMLSCHCOL'</property>
+			<property name="Schema" type="sysname" hidden='true'>schema_name(ownobj.schema_id)</property>
+			<property name="ParentName" type="sysname" hidden='true'>null</property>
+			<property name="ParentSchema" type="sysname" hidden='true'>null</property>
+			<property name="SchemaID" type="sysname" hidden='true'>ownobj.schema_id</property>
+		</properties>
+	</union>
+</EnumObject>

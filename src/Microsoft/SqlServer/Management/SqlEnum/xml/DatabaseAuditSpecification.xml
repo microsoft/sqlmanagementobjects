@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="DatabaseAuditSpecification" impl_type="SqlObject" min_major="10" >
+    <settings>
+        <property_link table='sys.database_audit_specifications AS das'></property_link>
+        <property_link fields='#AuditName#' left_join='sys.server_audits AS au'>das.audit_guid = au.audit_guid</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name='Name' type='sysname'>das.name</property>
+        <property name='ID' type='int' access='Read'>das.database_specification_id</property>
+        <property name='Enabled' type='bit' access='Read'>das.is_state_enabled</property>
+        <property name='Guid' type='uniqueidentifier' report_type2='System.Guid' access='Read'>das.audit_guid</property>
+        <property name='AuditName' type='sysname'>ISNULL(au.name, '')</property>
+        <property name='CreateDate' type='datetime' access='Read'>das.create_date</property>
+        <property name='DateLastModified' type='datetime' access='Read'>das.modify_date</property>
+        <property name='DatabaseName' type='sysname' access='Read'>db_name()</property>
+        <include file='inc_policy_health_state.xml'/>
+    </properties>
+</EnumObject>

@@ -1,0 +1,18 @@
+<?xml version='1.0' ?>
+<EnumObject type='KeyEncryption' impl_type='SqlObject' min_major='9'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='sys.key_encryptions' alias='ke'/>
+	</settings>
+	<properties>
+        <property name='ThumbPrint' type='varbinary' size = '32' access='read' cast='true'>ke.thumbprint</property>
+		<property name='SymmetricKeyEncryptionType' type='int' report_type='SymmetricKeyEncryptionType'
+>(case ke.crypt_type when 'ESKS' then 0 when 'EPUC' then 1 when 'ESKP' then 2 when 'EPUA' then 3 when 'ESKM' then 4 end)</property>
+
+		<property name='CryptProperty' type='varbinary' size = 'max' access='read' cast='true'>ke.crypt_property</property>
+
+		<property name='ParentID' type='int' access='read' hidden='true'>ke.key_id</property>		
+	</properties>
+</EnumObject>

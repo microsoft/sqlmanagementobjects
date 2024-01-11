@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<object urn="Server[@Name='$(SingleQuoteEscapedServerName)']/Database[@Name='$(SingleQuoteEscapedDatabaseName)']/Table[@Name='SmoBaselineVerification_TemporalLedgerTable' and @Schema='dbo']" type="Microsoft.SqlServer.Management.Smo.Table, Microsoft.SqlServer.Smo">
+  <property name="AnsiNullsStatus" type="System.Boolean, mscorlib">True</property>
+  <property name="ChangeTrackingEnabled" type="System.Boolean, mscorlib">False</property>
+  <property name="Checks" type="Microsoft.SqlServer.Management.Smo.CheckCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.CheckCollection</property>
+  <property name="Columns" type="Microsoft.SqlServer.Management.Smo.ColumnCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.ColumnCollection</property>
+  <property name="CreateDate" type="System.DateTime, mscorlib" NonDeterministic="true" />
+  <property name="DatabaseEngineEdition" type="Microsoft.SqlServer.Management.Common.DatabaseEngineEdition, Microsoft.SqlServer.ConnectionInfo">SqlDatabase</property>
+  <property name="DatabaseEngineType" type="Microsoft.SqlServer.Management.Common.DatabaseEngineType, Microsoft.SqlServer.ConnectionInfo">SqlAzureDatabase</property>
+  <property name="DataConsistencyCheck" type="System.Boolean, mscorlib">True</property>
+  <property name="DataRetentionEnabled" type="System.Boolean, mscorlib" exception="UnknownPropertyException" />
+  <property name="DataRetentionFilterColumnName" type="System.String, mscorlib" exception="UnknownPropertyException" />
+  <property name="DataRetentionPeriod" type="System.Int32, mscorlib" exception="UnknownPropertyException" />
+  <property name="DataRetentionPeriodUnit" type="Microsoft.SqlServer.Management.Smo.DataRetentionPeriodUnit, Microsoft.SqlServer.SqlEnum" exception="UnknownPropertyException" />
+  <property name="DataSourceName" type="System.String, mscorlib"></property>
+  <property name="DataSpaceUsed" type="System.Double, mscorlib" exception="UnknownPropertyException" />
+  <property name="DateLastModified" type="System.DateTime, mscorlib" NonDeterministic="true" />
+  <property name="Durability" type="Microsoft.SqlServer.Management.Smo.DurabilityType, Microsoft.SqlServer.SqlEnum">SchemaAndData</property>
+  <property name="DwTableDistribution" type="Microsoft.SqlServer.Management.Smo.DwTableDistributionType, Microsoft.SqlServer.SqlEnum" exception="UnknownPropertyException" />
+  <property name="EdgeConstraints" type="Microsoft.SqlServer.Management.Smo.EdgeConstraintCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.EdgeConstraintCollection</property>
+  <property name="Events" type="Microsoft.SqlServer.Management.Smo.TableEvents, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.TableEvents</property>
+  <property name="ExecutionManager" type="Microsoft.SqlServer.Management.Smo.ExecutionManager, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.ExecutionManager</property>
+  <property name="ExtendedProperties" type="Microsoft.SqlServer.Management.Smo.ExtendedPropertyCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.ExtendedPropertyCollection</property>
+  <property name="ExternalTableDistribution" type="Microsoft.SqlServer.Management.Smo.ExternalTableDistributionType, Microsoft.SqlServer.SqlEnum">None</property>
+  <property name="FakeSystemTable" type="System.Boolean, mscorlib">False</property>
+  <property name="FileFormatName" type="System.String, mscorlib" exception="UnknownPropertyException" />
+  <property name="FileFormatNameOd" type="System.String, mscorlib"></property>
+  <property name="FileGroup" type="System.String, mscorlib">PRIMARY</property>
+  <property name="FileStreamFileGroup" type="System.String, mscorlib"></property>
+  <property name="FileStreamPartitionScheme" type="System.String, mscorlib"></property>
+  <property name="FileTableDirectoryName" type="System.String, mscorlib"></property>
+  <property name="FileTableNameColumnCollation" type="System.String, mscorlib"></property>
+  <property name="FileTableNamespaceEnabled" type="System.Boolean, mscorlib">False</property>
+  <property name="ForeignKeys" type="Microsoft.SqlServer.Management.Smo.ForeignKeyCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.ForeignKeyCollection</property>
+  <property name="FullTextIndex" type="Microsoft.SqlServer.Management.Smo.FullTextIndex, Microsoft.SqlServer.Smo" null="true" />
+  <property name="HasAfterTrigger" type="System.Boolean, mscorlib">False</property>
+  <property name="HasClassifiedColumn" type="System.Boolean, mscorlib">False</property>
+  <property name="HasClusteredColumnStoreIndex" type="System.Boolean, mscorlib">False</property>
+  <property name="HasClusteredIndex" type="System.Boolean, mscorlib">True</property>
+  <property name="HasCompressedPartitions" type="System.Boolean, mscorlib">False</property>
+  <property name="HasDeleteTrigger" type="System.Boolean, mscorlib">False</property>
+  <property name="HasHeapIndex" type="System.Boolean, mscorlib">False</property>
+  <property name="HasIndex" type="System.Boolean, mscorlib">True</property>
+  <property name="HasInsertTrigger" type="System.Boolean, mscorlib">False</property>
+  <property name="HasInsteadOfTrigger" type="System.Boolean, mscorlib">False</property>
+  <property name="HasNonClusteredColumnStoreIndex" type="System.Boolean, mscorlib">False</property>
+  <property name="HasNonClusteredIndex" type="System.Boolean, mscorlib">False</property>
+  <property name="HasPrimaryClusteredIndex" type="System.Boolean, mscorlib">True</property>
+  <property name="HasSparseColumn" type="System.Boolean, mscorlib">False</property>
+  <property name="HasSpatialData" type="System.Boolean, mscorlib">False</property>
+  <property name="HasSystemTimePeriod" type="System.Boolean, mscorlib">True</property>
+  <property name="HasUpdateTrigger" type="System.Boolean, mscorlib">False</property>
+  <property name="HasXmlCompressedPartitions" type="System.Boolean, mscorlib" exception="UnknownPropertyException" />
+  <property name="HasXmlData" type="System.Boolean, mscorlib">False</property>
+  <property name="HasXmlIndex" type="System.Boolean, mscorlib">False</property>
+  <property name="HistoryRetentionPeriod" type="System.Int32, mscorlib">-1</property>
+  <property name="HistoryRetentionPeriodUnit" type="Microsoft.SqlServer.Management.Smo.TemporalHistoryRetentionPeriodUnit, Microsoft.SqlServer.SqlEnum">Infinite</property>
+  <property name="HistoryTableID" type="System.Int32, mscorlib" NonDeterministic="true" />
+  <property name="HistoryTableName" type="System.String, mscorlib">SmoBaselineVerification_HistoryTable_TemporalLedgerTable</property>
+  <property name="HistoryTableSchema" type="System.String, mscorlib">dbo</property>
+  <property name="ID" type="System.Int32, mscorlib" NonDeterministic="true" />
+  <property name="Indexes" type="Microsoft.SqlServer.Management.Smo.IndexCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.IndexCollection</property>
+  <property name="IndexSpaceUsed" type="System.Double, mscorlib" exception="UnknownPropertyException" />
+  <property name="IsDroppedLedgerTable" type="System.Boolean, mscorlib">False</property>
+  <property name="IsEdge" type="System.Boolean, mscorlib">False</property>
+  <property name="IsExternal" type="System.Boolean, mscorlib">False</property>
+  <property name="IsFileTable" type="System.Boolean, mscorlib">False</property>
+  <property name="IsIndexable" type="System.Boolean, mscorlib">True</property>
+  <property name="IsLedger" type="System.Boolean, mscorlib">True</property>
+  <property name="IsMemoryOptimized" type="System.Boolean, mscorlib">False</property>
+  <property name="IsNode" type="System.Boolean, mscorlib">False</property>
+  <property name="IsPartitioned" type="System.Boolean, mscorlib">False</property>
+  <property name="IsSchemaOwned" type="System.Boolean, mscorlib">True</property>
+  <property name="IsSystemObject" type="System.Boolean, mscorlib">False</property>
+  <property name="IsSystemVersioned" type="System.Boolean, mscorlib">True</property>
+  <property name="IsVarDecimalStorageFormatEnabled" type="System.Boolean, mscorlib" exception="UnknownPropertyException" />
+  <property name="LedgerType" type="Microsoft.SqlServer.Management.Smo.LedgerTableType, Microsoft.SqlServer.SqlEnum">UpdatableLedgerTable</property>
+  <property name="LedgerViewName" type="System.String, mscorlib">SmoBaselineVerification_CustomTemporalLedgerView</property>
+  <property name="LedgerViewOperationTypeColumnName" type="System.String, mscorlib">CustomLedgerViewOperationTypeColumnName</property>
+  <property name="LedgerViewOperationTypeDescColumnName" type="System.String, mscorlib">CustomLedgerViewOperationTypeDescColumnName</property>
+  <property name="LedgerViewSchema" type="System.String, mscorlib">dbo</property>
+  <property name="LedgerViewSequenceNumberColumnName" type="System.String, mscorlib">CustomLedgerViewSequenceNumberColumnName</property>
+  <property name="LedgerViewTransactionIdColumnName" type="System.String, mscorlib">CustomLedgerViewTransactionIdColumnName</property>
+  <property name="Location" type="System.String, mscorlib" exception="UnknownPropertyException" />
+  <property name="LocationOd" type="System.String, mscorlib"></property>
+  <property name="LockEscalation" type="Microsoft.SqlServer.Management.Smo.LockEscalationType, Microsoft.SqlServer.SqlEnum">Table</property>
+  <property name="LowPriorityAbortAfterWait" type="Microsoft.SqlServer.Management.Smo.AbortAfterWait, Microsoft.SqlServer.SqlEnum">None</property>
+  <property name="LowPriorityMaxDuration" type="System.Int32, mscorlib">0</property>
+  <property name="MaximumDegreeOfParallelism" type="System.Int32, mscorlib">-1</property>
+  <property name="Name" type="System.String, mscorlib">SmoBaselineVerification_TemporalLedgerTable</property>
+  <property name="OnlineHeapOperation" type="System.Boolean, mscorlib">False</property>
+  <property name="Owner" type="System.String, mscorlib">dbo</property>
+  <property name="Parent" type="Microsoft.SqlServer.Management.Smo.Database, Microsoft.SqlServer.Smo">[$(BracketEscapedDatabaseName)]</property>
+  <property name="ParentCollection" type="Microsoft.SqlServer.Management.Smo.AbstractCollectionBase, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.TableCollection</property>
+  <property name="PartitionScheme" type="System.String, mscorlib"></property>
+  <property name="PartitionSchemeParameters" type="Microsoft.SqlServer.Management.Smo.PartitionSchemeParameterCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.PartitionSchemeParameterCollection</property>
+  <property name="PhysicalPartitions" type="Microsoft.SqlServer.Management.Smo.PhysicalPartitionCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.PhysicalPartitionCollection</property>
+  <property name="Properties" type="Microsoft.SqlServer.Management.Smo.SqlPropertyCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.SqlPropertyCollection</property>
+  <property name="QuotedIdentifierStatus" type="System.Boolean, mscorlib">True</property>
+  <property name="RejectedRowLocation" type="System.String, mscorlib" exception="UnknownPropertyException" />
+  <property name="RejectSampleValue" type="System.Double, mscorlib" exception="UnknownPropertyException" />
+  <property name="RejectType" type="Microsoft.SqlServer.Management.Smo.ExternalTableRejectType, Microsoft.SqlServer.SqlEnum" exception="UnknownPropertyException" />
+  <property name="RejectValue" type="System.Double, mscorlib" exception="UnknownPropertyException" />
+  <property name="RemoteDataArchiveDataMigrationState" type="Microsoft.SqlServer.Management.Smo.RemoteDataArchiveMigrationState, Microsoft.SqlServer.Smo" exception="UnknownPropertyException" />
+  <property name="RemoteDataArchiveEnabled" type="System.Boolean, mscorlib" exception="UnknownPropertyException" />
+  <property name="RemoteDataArchiveFilterPredicate" type="System.String, mscorlib" exception="UnknownPropertyException" />
+  <property name="RemoteObjectName" type="System.String, mscorlib"></property>
+  <property name="RemoteSchemaName" type="System.String, mscorlib"></property>
+  <property name="RemoteTableName" type="System.String, mscorlib" exception="UnknownPropertyException" />
+  <property name="RemoteTableProvisioned" type="System.Boolean, mscorlib" exception="UnknownPropertyException" />
+  <property name="Replicated" type="System.Boolean, mscorlib">False</property>
+  <property name="ResumableIndexes" type="Microsoft.SqlServer.Management.Smo.ResumableIndexCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.ResumableIndexCollection</property>
+  <property name="RowCount" type="System.Int64, mscorlib">0</property>
+  <property name="RowCountAsDouble" type="System.Double, mscorlib">0</property>
+  <property name="Schema" type="System.String, mscorlib">dbo</property>
+  <property name="ServerVersion" type="Microsoft.SqlServer.Management.Common.ServerVersion, Microsoft.SqlServer.ConnectionInfo">$(ServerVersion)</property>
+  <property name="ShardingColumnName" type="System.String, mscorlib"></property>
+  <property name="State" type="Microsoft.SqlServer.Management.Smo.SqlSmoState, Microsoft.SqlServer.Smo">Existing</property>
+  <property name="Statistics" type="Microsoft.SqlServer.Management.Smo.StatisticCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.StatisticCollection</property>
+  <property name="SystemTimePeriodEndColumn" type="System.String, mscorlib">ValidTo</property>
+  <property name="SystemTimePeriodStartColumn" type="System.String, mscorlib">ValidFrom</property>
+  <property name="TemporalType" type="Microsoft.SqlServer.Management.Smo.TableTemporalType, Microsoft.SqlServer.Smo">SystemVersioned</property>
+  <property name="TextFileGroup" type="System.String, mscorlib"></property>
+  <property name="TrackColumnsUpdatedEnabled" type="System.Boolean, mscorlib">False</property>
+  <property name="Triggers" type="Microsoft.SqlServer.Management.Smo.TriggerCollection, Microsoft.SqlServer.Smo">Microsoft.SqlServer.Management.Smo.TriggerCollection</property>
+  <property name="Urn" type="Microsoft.SqlServer.Management.Sdk.Sfc.Urn, Microsoft.SqlServer.Management.Sdk.Sfc">Server[@Name='$(SingleQuoteEscapedServerName)']/Database[@Name='$(SingleQuoteEscapedDatabaseName)']/Table[@Name='SmoBaselineVerification_TemporalLedgerTable' and @Schema='dbo']</property>
+  <property name="UserData" type="System.Object, mscorlib" null="true" />
+  <script target_server="Sql2008">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2008
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) NOT NULL,
+	[ValidTo] [datetime2](7) NOT NULL,
+	[ledger_start_transaction_id] [bigint] NOT NULL,
+	[ledger_end_transaction_id] [bigint] NULL,
+	[ledger_start_sequence_number] [bigint] NOT NULL,
+	[ledger_end_sequence_number] [bigint] NULL
+) ON [PRIMARY]
+
+</script>
+  <script target_server="Sql2008R2">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2008 R2
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) NOT NULL,
+	[ValidTo] [datetime2](7) NOT NULL,
+	[ledger_start_transaction_id] [bigint] NOT NULL,
+	[ledger_end_transaction_id] [bigint] NULL,
+	[ledger_start_sequence_number] [bigint] NOT NULL,
+	[ledger_end_sequence_number] [bigint] NULL
+) ON [PRIMARY]
+
+</script>
+  <script target_server="Sql2012">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2012
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SmoBaselineVerification_TemporalLedgerTable]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) NOT NULL,
+	[ValidTo] [datetime2](7) NOT NULL,
+	[ledger_start_transaction_id] [bigint] NOT NULL,
+	[ledger_end_transaction_id] [bigint] NULL,
+	[ledger_start_sequence_number] [bigint] NOT NULL,
+	[ledger_end_sequence_number] [bigint] NULL
+) ON [PRIMARY]
+END
+</script>
+  <script target_server="Sql2014">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2014
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) NOT NULL,
+	[ValidTo] [datetime2](7) NOT NULL,
+	[ledger_start_transaction_id] [bigint] NOT NULL,
+	[ledger_end_transaction_id] [bigint] NULL,
+	[ledger_start_sequence_number] [bigint] NOT NULL,
+	[ledger_end_sequence_number] [bigint] NULL
+) ON [PRIMARY]
+
+</script>
+  <script target_server="Sql2016">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2016
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+	[ValidTo] [datetime2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+	[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,
+	[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,
+	[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,
+	[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL,
+	PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo])
+) ON [PRIMARY]
+WITH
+(
+SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[SmoBaselineVerification_HistoryTable_TemporalLedgerTable])
+)
+
+</script>
+  <script target_server="Sql2017">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2017
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+	[ValidTo] [datetime2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+	[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,
+	[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,
+	[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,
+	[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL,
+	PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo])
+) ON [PRIMARY]
+WITH
+(
+SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[SmoBaselineVerification_HistoryTable_TemporalLedgerTable])
+)
+
+</script>
+  <script target_server="Sqlv150">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2019
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+	[ValidTo] [datetime2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+	[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,
+	[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,
+	[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,
+	[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL,
+	PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo])
+) ON [PRIMARY]
+WITH
+(
+SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[SmoBaselineVerification_HistoryTable_TemporalLedgerTable])
+)
+
+</script>
+  <script target_server="Sqlv160">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Server Version : SQL Server 2022
+    Target Database Engine Edition : Unknown
+    Target Database Engine Type : Standalone SQL Server
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+	[ValidTo] [datetime2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+	[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,
+	[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,
+	[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,
+	[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL,
+	PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo])
+) ON [PRIMARY]
+WITH
+(
+SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[SmoBaselineVerification_HistoryTable_TemporalLedgerTable]), 
+LEDGER = ON (LEDGER_VIEW = [dbo].[SmoBaselineVerification_CustomTemporalLedgerView] (TRANSACTION_ID_COLUMN_NAME = [CustomLedgerViewTransactionIdColumnName], SEQUENCE_NUMBER_COLUMN_NAME = [CustomLedgerViewSequenceNumberColumnName], OPERATION_TYPE_COLUMN_NAME = [CustomLedgerViewOperationTypeColumnName], OPERATION_TYPE_DESC_COLUMN_NAME = [CustomLedgerViewOperationTypeDescColumnName]))
+)
+
+</script>
+  <script target_server="AzureSterlingV12">/*    ==Scripting Parameters==
+
+    Source Database Engine Edition : Microsoft Azure SQL Database Edition
+    Source Database Engine Type : Microsoft Azure SQL Database
+
+    Target Database Engine Edition : Microsoft Azure SQL Database Edition
+    Target Database Engine Type : Microsoft Azure SQL Database
+*/
+
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+CREATE TABLE [dbo].[SmoBaselineVerification_TemporalLedgerTable](
+	[c1] [int] NOT NULL,
+	[ValidFrom] [datetime2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+	[ValidTo] [datetime2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+	[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,
+	[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,
+	[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,
+	[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL,
+	PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo])
+) ON [PRIMARY]
+WITH
+(
+SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[SmoBaselineVerification_HistoryTable_TemporalLedgerTable]), 
+LEDGER = ON (LEDGER_VIEW = [dbo].[SmoBaselineVerification_CustomTemporalLedgerView] (TRANSACTION_ID_COLUMN_NAME = [CustomLedgerViewTransactionIdColumnName], SEQUENCE_NUMBER_COLUMN_NAME = [CustomLedgerViewSequenceNumberColumnName], OPERATION_TYPE_COLUMN_NAME = [CustomLedgerViewOperationTypeColumnName], OPERATION_TYPE_DESC_COLUMN_NAME = [CustomLedgerViewOperationTypeDescColumnName]))
+)
+
+</script>
+</object>

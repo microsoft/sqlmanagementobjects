@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.Dmf</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.DmfSqlClrWrapper" Key="$(RealPublicKey)"/>
+  </ItemGroup>
+  <ItemGroup Label="string resources">
+    <SqlStringResource Include="ExceptionTemplates.strings" >
+      <outresxfilename>ExceptionTemplatesSR</outresxfilename>
+      <outcodefilename>ExceptionTemplatesSR</outcodefilename>
+      <outclassname>ExceptionTemplatesSR</outclassname>
+    </SqlStringResource>
+    <SqlStringResource Include="FacetProperties.strings" >
+      <outresxfilename>FacetPropertiesSR</outresxfilename>
+      <outcodefilename>FacetPropertiesSR</outcodefilename>
+      <outclassname>FacetPropertiesSR</outclassname>
+    </SqlStringResource>
+    <SqlStringResource Include="LocalizableResources.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
+    <ProjectReference Include="$(DmfCommonSrc)\Microsoft.SqlServer.Dmf.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <PackageReference Include="System.Security.Permissions"/>
+  </ItemGroup>
+</Project>

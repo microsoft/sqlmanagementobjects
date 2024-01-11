@@ -1,0 +1,38 @@
+<?xml version='1.0' ?>
+<EnumObject type='SymmetricKey' impl_type='SqlObject' min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
+	<settings>
+		<property_link table='sys.symmetric_keys' alias='c'>c.symmetric_key_id &lt;&gt; 101</property_link>
+		<property_link fields = '#IsOpen#' left_join='sys.openkeys AS ok'>ok.key_id=c.symmetric_key_id and ok.database_id=db_id()</property_link>
+		<version min_major='10'>
+			<property_link fields='#ProviderName#' left_join='sys.cryptographic_providers AS cp'>cp.guid = c.cryptographic_provider_guid</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>c.name</property>
+		<property name='ID' type='int'>c.symmetric_key_id</property>
+		<property name='Owner' type='sysname'>user_name(c.principal_id)</property>
+		<property name='CreateDate' type='datetime' access='read'>c.create_date</property>
+        <property name='KeyGuid' type='uniqueidentifier' access='read'>c.key_guid</property>
+        <property name='KeyLength' type='int' access='read'>c.key_length</property>
+		<property name='EncryptionAlgorithm' type='int' report_type='SymmetricKeyEncryptionAlgorithm' access='read'
+		>(case c.key_algorithm when 'R2' then 0 when 'R4' then 1 when 'D' then 2 when 'D3' then 3 when 'DX' then 4 when 'A1' then 5 when 'A2' then 6 when 'A3' then 7 when 'DT' then 8 else -1 end)</property>
+		<property name='DateLastModified' type='datetime' access='read'>c.modify_date</property>
+		<property name='IsOpen' type='bit' access='Read' cast='true'>ISNULL(ok.status, 0)</property>
+		<version min_major='10'>
+			<property name='ProviderName' type='sysname'>ISNULL(cp.name, '')</property>
+		</version>
+
+		<!-- enable permissions -->
+		<property name="ExtPropClass" type="int" hidden='true'>24</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>

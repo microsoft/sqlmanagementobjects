@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.Smo.Wmi</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Management" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlStringResource Include="StringWmiEnumerator.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(DmfCommonSrc)\Microsoft.SqlServer.Dmf.Common.csproj" />
+    <ProjectReference Include="$(ConnectionInfosrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(SmoSrc)\microsoft.sqlserver.smo.csproj" />
+    <ProjectReference Include="$(SqlEnumSrc)\microsoft.sqlserver.sqlenum.csproj" />
+  </ItemGroup>
+</Project>

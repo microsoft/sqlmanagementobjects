@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='Generator' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_generators" alias="gen" />
+		<prefix>
+CREATE TABLE #tmp_generators(
+    ApplicationName nvarchar(max),
+	GeneratorId int,
+	GeneratorName nvarchar(255),
+	SystemName nvarchar(255),
+    PreviousFiringTime datetime,
+    ThreadPoolSize int,
+    ActivationState tinyint
+)
+INSERT #tmp_generators EXEC [SchemaPrefix].NSGetGenerators
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_generators
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">gen.GeneratorName</property>
+		<property name="Id" type="int">gen.GeneratorId</property>
+		<property name="SystemName" type="nvarchar" size="255">gen.SystemName</property>
+        <property name="PreviousFiringTime" type="datetime" access="Read">gen.PreviousFiringTime</property>
+        <property name="ThreadPoolSize" type="int">gen.ThreadPoolSize</property>
+		<property name="ActivationState" type="tinyint" report_type='NSActivationState' access="Read">gen.ActivationState</property>
+	</properties>
+</EnumObject>

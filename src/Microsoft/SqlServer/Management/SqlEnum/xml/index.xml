@@ -1,0 +1,368 @@
+<?xml version="1.0" ?>
+<EnumObject type="Index" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <version min_major='7' max_major='8'>
+      <!-- ignore heap( > 0 ), and we need only indexes (<255) -->
+      <property_link table="dbo.sysindexes AS i">i.indid &gt; &lt;msparam&gt;0&lt;/msparam&gt; and i.indid &lt; &lt;msparam&gt;255&lt;/msparam&gt; and &lt;msparam&gt;1&lt;/msparam&gt; != INDEXPROPERTY(i.id,i.name,N'IsStatistics') and &lt;msparam&gt;1&lt;/msparam&gt; != INDEXPROPERTY(i.id,i.name,N'IsHypothetical')</property_link>
+      <property_link fields = '#KeyID#IsSystemNamed#' left_join="dbo.sysobjects AS k">k.parent_obj = i.id AND k.name = i.name AND k.xtype IN (N'PK', N'UQ')</property_link>
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <!-- ignore heap( > 0 )-->
+      <property_link table="sys.indexes AS i">i.index_id &gt; &lt;msparam&gt;0&lt;/msparam&gt; and i.is_hypothetical = &lt;msparam&gt;0&lt;/msparam&gt;</property_link>
+      <property_link fields='#NoAutomaticRecomputation#' left_join="sys.stats AS s">s.stats_id = i.index_id AND s.object_id = i.object_id</property_link>
+      <property_link fields = '#KeyID#IsSystemNamed#' left_join="sys.key_constraints AS k">k.parent_object_id = i.object_id AND k.unique_index_id = i.index_id</property_link>
+    </version>
+
+    <version min_major='14' cloud_min_major='12'>
+      <property_link fields='#ResumableOperationState#' left_join="sys.index_resumable_operations AS op">op.index_id = i.index_id AND op.object_id = i.object_id</property_link>
+    </version>
+
+    <version min_major ="9" max_major='10' >
+      <property_link fields = '#IndexType#SecondaryXmlIndexType#ParentXmlIndex#' left_join="sys.xml_indexes AS xi">xi.object_id = i.object_id AND xi.index_id = i.index_id</property_link>
+      <property_link fields = '#ParentXmlIndex#' left_join="sys.xml_indexes AS xi2">xi2.object_id = xi.object_id AND xi2.index_id = xi.using_xml_index_id</property_link>
+    </version>
+    
+    <version min_major ="11" cloud_min_major='12' >
+      <property_link fields = '#IndexType#SecondaryXmlIndexType#ParentXmlIndex#IndexedXmlPathName#' left_join="sys.xml_indexes AS xi">xi.object_id = i.object_id AND xi.index_id = i.index_id</property_link>
+      <property_link fields = '#ParentXmlIndex#' left_join="sys.xml_indexes AS xi2">xi2.object_id = xi.object_id AND xi2.index_id = xi.using_xml_index_id</property_link>
+    </version>
+
+    <version min_major ='10' cloud_min_major='10'>
+      <property_link fields='#SpatialIndexType#' left_join="sys.spatial_indexes AS spi">i.object_id = spi.object_id and i.index_id = spi.index_id</property_link>
+      <property_link fields='#BoundingBoxXMin#BoundingBoxYMin#BoundingBoxXMax#BoundingBoxYMax#Level1Grid#Level2Grid#Level3Grid#Level4Grid#CellsPerObject#' left_join='sys.spatial_index_tessellations as si'>i.object_id = si.object_id and i.index_id = si.index_id</property_link>
+    </version>
+    <version min_major ='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields = '#TableIDForPartition#' left_join="sys.all_objects AS allobj">
+        allobj.name = 'extended_index_' + cast(i.object_id AS varchar) + '_' + cast(i.index_id AS varchar) AND allobj.type='IT'
+      </property_link>
+    </version>
+    <version min_major ='11' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields = '#HasCompressedPartitions#HasXmlCompressedPartitions#' left_join="sys.all_objects AS allobj">
+        allobj.name = 'extended_index_' + cast(i.object_id AS varchar) + '_' + cast(i.index_id AS varchar) AND allobj.type='IT'
+      </property_link>
+    </version>
+
+    <version min_major ="11">
+      <property_link fields='#IsFileTableDefined#' left_join="sys.filetable_system_defined_objects AS filetableobj">i.object_id = filetableobj.object_id</property_link>
+    </version>
+
+    <version min_major ="12" cloud_min_major='12'>
+      <property_link fields='#BucketCount#' left_join="sys.hash_indexes AS hi">i.object_id = hi.object_id AND i.index_id = hi.index_id</property_link>
+    </version>
+
+    <!-- Selective XML Index (SXI) was introduced in SP1. First build with SXI was SQL11_PCU_Main 11.0.2813 -->
+    <version min_major ="11"  min_build='2813' cloud_min_major='12'>
+      <property_link fields='#IndexedXmlPathName#' left_join="sys.selective_xml_index_paths AS indexedpaths">xi.object_id = indexedpaths.object_id AND xi.using_xml_index_id = indexedpaths.index_id AND xi.path_id = indexedpaths.path_id</property_link>
+    </version>
+     
+    <version min_major='7'>
+      <prefix fields="#SpaceUsed#">declare @PageSize float select @PageSize=v.low/1024.0 from master.dbo.spt_values v where v.number=&lt;msparam&gt;1&lt;/msparam&gt; and v.type=&lt;msparam&gt;E&lt;/msparam&gt;</prefix>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <version min_major='7' max_major='8'>
+      <property name="Name" type="sysname" mode="design#deploy">i.name</property>
+      <property name="ID" type="int" cast='true'>i.indid</property>
+      <property name="IsSystemObject" type="bit" access="Read" cast='true'>OBJECTPROPERTY(i.id,N'IsMSShipped')</property>
+      <property name="IsFullTextKey" type="bit" cast='true'>INDEXPROPERTY(i.id,i.name,N'IsFulltextKey')</property>
+      <property name="NoAutomaticRecomputation" type="bit" cast='true' mode="design#deploy">CASE WHEN (i.status &amp; 0x1000000) &lt;&gt; 0 THEN 1 ELSE 0 END</property>
+      <property name="FillFactor" type="tinyint" cast='true' read_only_after_creation="true" mode="design#deploy">INDEXPROPERTY(i.id,i.name,N'IndexFillFactor')</property>
+      <property name="SpaceUsed" type="float" expensive='true' access='Read'>CASE WHEN (i.indid = 1) THEN (i.used - i.dpages - ISNULL((SELECT
+                                SUM(j.used) FROM dbo.sysindexes AS j WHERE (j.indid &gt; 1) AND (j.indid &lt; 255) AND (j.id = i.id) AND (j.name = i.name)), 0)) * @PageSize ELSE i.used * @PageSize END</property>
+      <property name="IsClustered" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">CASE i.indid WHEN 1 THEN 1 ELSE 0 END</property>
+      <property name="IndexKeyType" type="int" report_type="IndexKeyType" read_only_after_creation="true" mode="design#deploy">CASE WHEN 0 != i.status&amp;0x800 THEN 1 WHEN 0 != i.status&amp;0x1000 THEN 2 ELSE 0 END</property>
+      <property name="IsUnique" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">i.status&amp;2</property>
+      <property name="IgnoreDuplicateKeys" type="bit" cast='true' mode="design#deploy">CASE WHEN 0 != (i.status&amp;0x01) THEN 1 ELSE 0 END</property>
+      <property name="DisallowRowLocks" type="bit" cast='true' mode="design#deploy">INDEXPROPERTY(i.id, i.name, N'IsRowLockDisallowed')</property>
+      <property name="DisallowPageLocks" type="bit" cast='true' mode="design#deploy">INDEXPROPERTY(i.id, i.name, N'IsPageLockDisallowed')</property>
+      <property name="PadIndex" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">INDEXPROPERTY(i.id, i.name, N'IsPadIndex')</property>
+      <property name="IsSystemNamed" type="bit" cast='true' access='Read'>ISNULL(k.status &amp; 4, 0)</property>
+      <property name="ParentID" type="int" hidden='true'>i.id</property>
+      <property name="KeyID" type="int" hidden='true'>k.id</property>
+      <!-- used for link with PartitionSchemeParameter, inc_storage -->
+      <property name="IndexID" type="int" hidden='true' cast='true'>i.indid</property>
+      <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>CASE i.indid WHEN 1 THEN 0 ELSE 1 END</property>
+    </version>
+    <version min_major='8' max_major='8'>
+      <!-- extended properties support : commented out: sysproperties is not accessible to regular users
+			<property name="ExtPropClass" type="int" hidden='true'>
+				<link_multiple no='1' expression="CASE ({0}) WHEN 0 THEN 6 ELSE 3 END">
+					<link_field type='local' field="IndexKeyType" />
+				</link_multiple>
+			</property>
+			-->
+      <property name="ObjectTypeName" type="int" hidden='true'>
+        <link_multiple no='1' expression="CASE ({0}) WHEN 0 THEN N'INDEX' ELSE N'CONSTRAINT' END ">
+          <link_field type='filter' field="IndexKeyType" default_value="0"/>
+        </link_multiple>
+      </property>
+      <include file ="inc_level2SupportProperties.xml"/>
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Name" type="sysname" mode="design#deploy">i.name</property>
+      <property name="ID" type="int" cast='true'>i.index_id</property>
+      <property name="IsSystemObject" type="bit" access="Read" cast='true'>OBJECTPROPERTY(i.object_id,N'IsMSShipped')</property>
+      <property name="NoAutomaticRecomputation" type="bit" mode="design#deploy">ISNULL(s.no_recompute,0)</property>
+      <property name="FillFactor" type="tinyint" read_only_after_creation="true" mode="design#deploy">i.fill_factor</property>
+      <property name="IsClustered" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">CASE i.index_id WHEN 1 THEN 1 ELSE 0 END</property>
+      <property name="IndexKeyType" type="int" report_type="IndexKeyType" read_only_after_creation="true" mode="design#deploy">i.is_primary_key + 2*i.is_unique_constraint</property>
+      <property name="IsUnique" type="bit" read_only_after_creation="true" mode="design#deploy">i.is_unique</property>
+      <property name="IgnoreDuplicateKeys" type="bit" mode="design#deploy">i.ignore_dup_key</property>
+      <property name="DisallowRowLocks" type="bit" mode="design#deploy">~i.allow_row_locks</property>
+      <property name="DisallowPageLocks" type="bit" mode="design#deploy">~i.allow_page_locks</property>
+      <property name="PadIndex" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">ISNULL(INDEXPROPERTY(i.object_id, i.name, N'IsPadIndex'), 0)</property>
+      <!-- will report 0 for hypothetical indexes -->
+      <property name="IsDisabled" type="bit" access="Read">i.is_disabled</property>
+      <property name="IsSystemNamed" type="bit" cast='true' access='Read'>ISNULL(k.is_system_named, 0)</property>
+      <property name="ParentID" type="int" hidden='true'>i.object_id</property>
+      <property name="KeyID" type="int" hidden='true'>k.object_id</property>
+      <!-- used for link with PartitionSchemeParameter, inc_storage -->
+      <property name="IndexID" type="int" hidden='true' cast='true'>i.index_id</property>
+      <!-- used for link with PartitionSchemeParameter -->
+      <property name="TableID" type="int" hidden='true' cast='true'>i.object_id</property>
+      <!-- extended properties support -->
+      <property name="ExtPropClass" type="int" hidden='true'>
+        <link_multiple no='1' expression="CASE ({0}) WHEN 0 THEN 7 ELSE 1 END">
+          <link_field type='local' field="IndexKeyType" />
+        </link_multiple>
+      </property>
+
+      <!-- fragmentation info support:IndexNameFromFilter, TableNameFromFilter, ParentSysObj -->
+      <property name="IndexNameFromFilter" type="sysname" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='filter' field="Name" default_value="'*'"/>
+        </link_multiple>
+      </property>
+      <property name="TableNameFromFilter" type="sysname" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='parent' field="TableNameFromFilter"/>
+        </link_multiple>
+      </property>
+      <property name="ParentSysObj" type='bit' hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='parent' field="IsSystemObject" />
+        </link_multiple>
+      </property>
+    </version>
+
+    <version min_major='9'>
+      <!-- will report 0 for hypothetical indexes -->
+      <!--when modify check datatabase.xml and table.xml IndexSpaceUsed for consistency -->
+      <property name="SpaceUsed" type="float" expensive='true' access='Read'>
+        ISNULL((select @PageSize * SUM(a.used_pages - CASE WHEN a.type &lt;&gt; 1 THEN a.used_pages WHEN p.index_id &lt; 2 THEN a.data_pages ELSE 0 END)
+        FROM sys.partitions as p
+        JOIN sys.allocation_units as a ON a.container_id = p.partition_id
+        WHERE p.object_id = i.object_id AND p.index_id = i.index_id),0.0)</property>
+    </version>
+    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="IsFullTextKey" type="bit" cast='true'>INDEXPROPERTY(i.object_id,i.name,N'IsFulltextKey')</property>
+      <property name="IsXmlIndex" type="bit" access="Read" cast='true'>case when i.type=3 then 1 else 0 end</property>
+      <property name="DataSpaceID" type="int" hidden='true'>i.data_space_id</property>
+    </version>
+    <version min_major='9' cloud_min_major='12'>
+      <property name='SecondaryXmlIndexType' type="int" report_type="SecondaryXmlIndexType" read_only_after_creation="true">case UPPER(ISNULL(xi.secondary_type,'')) when 'P' then 1 when 'V' then 2 when 'R' then 3 else 0 end</property>
+      <property name='ParentXmlIndex' type="sysname" read_only_after_creation="true">ISNULL(xi2.name, N'')</property>
+    </version>
+    <version min_major='9' max_major='10'>
+       <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>CASE i.type WHEN 1 THEN 0 WHEN 3 THEN CASE WHEN xi.using_xml_index_id IS NULL THEN 2 ELSE 3 END WHEN 4 THEN 4 WHEN 6 THEN 5 ELSE 1 END</property>
+    </version>
+    <version min_major='10' cloud_min_major='10'>
+      <property name ="SpatialIndexType" type="tinyint"  cast ="true" report_type='SpatialIndexType' read_only_after_creation="true">ISNULL(spi.spatial_index_type,0)</property>
+      <property name ="BoundingBoxXMin" type="float" size ="53"  cast ="true" read_only_after_creation="true">ISNULL(si.bounding_box_xmin,0)</property>
+      <property name ="BoundingBoxYMin" type="float" size="53"  cast ="true" read_only_after_creation="true">ISNULL(si.bounding_box_ymin,0)</property>
+      <property name ="BoundingBoxXMax" type="float"  size="53" cast ="true" read_only_after_creation="true">ISNULL(si.bounding_box_xmax,0)</property>
+      <property name ="BoundingBoxYMax" type="float"  size="53" cast ="true" read_only_after_creation="true">ISNULL(si.bounding_box_ymax,0)</property>
+      <property name ="Level1Grid" type="smallint"  cast ="true" report_type="SpatialGeoLevelSize" read_only_after_creation="true">ISNULL(si.level_1_grid,0)</property>
+      <property name ="Level2Grid" type="smallint"  cast ="true" report_type="SpatialGeoLevelSize" read_only_after_creation="true">ISNULL(si.level_2_grid,0)</property>
+      <property name ="Level3Grid" type="smallint"  cast ="true" report_type="SpatialGeoLevelSize" read_only_after_creation="true">ISNULL(si.level_3_grid,0)</property>
+      <property name ="Level4Grid" type="smallint"  cast ="true" report_type="SpatialGeoLevelSize" read_only_after_creation="true">ISNULL(si.level_4_grid,0)</property>
+      <property name ="CellsPerObject" type="int" cast ="true" read_only_after_creation="true">ISNULL(si.cells_per_object,0)</property>
+      <property name ="IsSpatialIndex" type="bit" access ="read" cast ='true'>case when i.type=4 then 1 else 0 end</property>
+    </version>
+    <version min_major="7" cloud_min_major='10' max_major='9' cloud_max_major='11'>
+        <property name="HasSparseColumn" type="bit" cast='true' access='Read'>0</property>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <!-- used for link with PhysicalPartition-->
+      <property name="IndexIDForPartition" type="int" hidden='true' cast='true'>(CASE WHEN i.type = 4 THEN 1 ELSE i.index_id END)</property>
+      <!-- used for link with PhysicalPartition -->
+      <property name="TableIDForPartition" type="int" hidden='true' cast='true'>(CASE WHEN i.type = 4 THEN allobj.object_id ELSE i.object_id END)</property>
+      <!-- whether any source columns for the index are sparse -->
+      <property name="HasSparseColumn" type="bit" cast='true' access='Read'>
+        ISNULL ((select distinct 1 from sys.index_columns ic 
+                 join sys.columns c on ic.object_id = c.object_id and c.column_id = ic.column_id 
+                 where c.is_sparse = 1 and c.object_id = i.object_id and ic.index_id = i.index_id), 0)
+      </property>
+    </version>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="HasFilter" type="bit" access='read'>i.has_filter</property>
+      <property name="FilterDefinition" type="nvarchar" size='max' read_only_after_creation="true" mode="deploy">ISNULL(i.filter_definition, N'')</property>
+    </version>
+    <version cloud_min_major='10' cloud_max_major='11'>
+      <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>CASE i.type WHEN 1 THEN 0 WHEN 4 THEN 4 ELSE 1 END</property>
+    </version>
+
+    <version min_major='7'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <include alias='i' file='inc_storage.xml' ro_after_creation='#FileStreamFileGroup#FileStreamPartitionScheme#'/>
+    </version>
+
+    <version min_major='11'>
+      <property name="IsFileTableDefined" type="bit" cast='true' access="read">CASE WHEN filetableobj.object_id IS NULL THEN 0 ELSE 1 END</property>
+    </version>
+    
+
+     <!-- IndexType: Looks up sys.indexes.type and returns an SMO index type
+      		SMO Index Type				SMO Value	Sys.indexes.type
+      		ClusteredIndex				0			1
+      		NonClusteredIndex 			1			2
+      		PrimaryXmlIndex				2			3
+      		SecondaryXmlIndex			3			3 (note special case to distinguish xml indexes)
+      		SpatialIndex				4			4
+      		NonClusteredColumnStoreIndex		5			6
+      		HashIndex				6			7
+		(selective xml index)			7			3
+		(selective xml index)			8			3
+      		ClusteredColumnStoreIndex		9			5-->
+
+    <!-- Selective XML Index (SXI) was introduced in SP1. First build with SXI was SQL11_PCU_Main 11.0.2813 -->
+    <version min_major='11' max_major='11' min_minor='0' max_minor='0' max_build="2812">
+       <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
+          CASE i.type WHEN 1 THEN 0 WHEN 3 THEN CASE
+                      WHEN xi.using_xml_index_id IS NULL THEN 2 ELSE 3 END
+                      WHEN 4 THEN 4 WHEN 6 THEN 5 WHEN 7 THEN 6 ELSE 1 END
+       </property>
+    </version>
+
+    <!-- We must specify max_minor, otherwise XmlReader will fail to distinguish the following from the one above it-->
+    <version min_major='11' max_major='11' min_minor='0' max_minor='0' min_build="2813">
+      
+       <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
+          CASE i.type WHEN 1 THEN 0 WHEN 4 THEN 4
+                      WHEN 3 THEN CASE xi.xml_index_type WHEN 0 THEN 2 WHEN 1 THEN 3 WHEN 2 THEN 7 WHEN 3 THEN 8 END
+                      WHEN 4 THEN 4 WHEN 6 THEN 5 ELSE 1 END
+       </property>
+    </version>
+
+    <!-- Hash Indexes and Clustered Columnstore indexes added in SQL2014 (version 12) -->
+    <version min_major='12' cloud_min_major='12'>
+       <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
+          CASE i.type WHEN 1 THEN 0 WHEN 4 THEN 4
+                      WHEN 3 THEN CASE xi.xml_index_type WHEN 0 THEN 2 WHEN 1 THEN 3 WHEN 2 THEN 7 WHEN 3 THEN 8 END
+                      WHEN 4 THEN 4 WHEN 6 THEN 5 WHEN 7 THEN 6 WHEN 5 THEN 9 ELSE 1 END
+       </property>
+    </version>
+
+    <!-- Hash Indexes and Clustered Columnstore indexes added in SQL2014 (version 12) 
+         SQL DW does not support xml indexes. -->
+    <!-- IndexType: Looks up sys.indexes.type and returns an SMO index type
+          SMO Index Type                SMO Value Sys.indexes.type
+          HeapIndex                     10        0
+          ClusteredIndex                0         1
+          NonClusteredIndex             1         2
+          PrimaryXmlIndex               2         3 (not supported for SQL DW)
+          SecondaryXmlIndex             3         3 (note special case to distinguish xml indexes) (not supported for SQL DW)
+          SpatialIndex                  4         4 (not supported for SQL DW)
+          NonClusteredColumnStoreIndex  5         6
+          HashIndex                     6         7
+          (selective xml index)         7         3 (not supported for SQL DW)
+          (selective xml index)         8         3 (not supported for SQL DW)
+          ClusteredColumnStoreIndex     9         5 -->
+          
+    <version datawarehouse_enabled='true'>
+      <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
+        CASE i.type
+        WHEN 0 THEN 10
+        WHEN 1 THEN 0
+        WHEN 2 THEN 1
+        WHEN 6 THEN 5
+        WHEN 7 THEN 6
+        WHEN 5 THEN 9
+        END
+      </property>
+    </version>
+
+    <!-- extended properties support -->
+    <property name="ExtPropMajorID" type="int" hidden='true'>
+      <link_multiple no='3' expression="CASE ({0}) WHEN 0 THEN {1} ELSE {2} END">
+        <link_field type='local' field="IndexKeyType" />
+        <link_field type='local' field="ParentID" />
+        <link_field type='local' field="KeyID" />
+      </link_multiple>
+    </property>
+    <property name="ExtPropMinorID" type="int" hidden='true'>
+      <link_multiple no='2' expression="CASE ({0}) WHEN 0 THEN {1} ELSE 0 END">
+        <link_field type='local' field="IndexKeyType" />
+        <link_field type='local' field="ID" />
+      </link_multiple>
+    </property>
+
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+
+    <version min_major ='10' max_major='10'>
+      <property name="HasCompressedPartitions" type="bit" access='Read' cast='true' expensive='true'>
+        case when ((SELECT  MAX(data_compression) FROM sys.partitions  WHERE object_id = i.object_id AND index_id = i.index_id) &gt; 0) then 1 else 0 end
+      </property>
+    </version>
+
+    <version min_major ='11' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="HasCompressedPartitions" type="bit" access='Read' cast='true' expensive='true'>
+        case when ((SELECT  MAX(data_compression) FROM sys.partitions  WHERE object_id = (CASE WHEN i.type = 4 THEN allobj.object_id ELSE i.object_id END) AND index_id = (CASE WHEN i.type = 4 THEN 1 ELSE i.index_id END)) &gt; 0) then 1 else 0 end
+      </property>
+    </version>
+      
+    <version min_major='16'>
+      <property name="HasXmlCompressedPartitions" type="bit" access='Read' cast='true' expensive='true'>
+        case when ((SELECT  MAX(case when xml_compression = 1 then 1 else 0 end) FROM sys.partitions  WHERE object_id = (CASE WHEN i.type = 4 THEN allobj.object_id ELSE i.object_id END) AND index_id = (CASE WHEN i.type = 4 THEN 1 ELSE i.index_id END)) &gt; 0) then 1 else 0 end
+      </property>
+    </version>    
+
+     <!--Hekaton properties-->
+    <version min_major ='12' cloud_min_major='12'>
+      <property name="BucketCount" type="int" cast="true" read_only_after_creation="true">case when (i.type=7) then hi.bucket_count else 0 end</property>
+      <!--This returns true for indexes in memory optimized table or table type. -->  
+      <property name="IsMemoryOptimized" type="bit" cast="true" read_only_after_creation="true" expensive="true">
+          CASE WHEN ((SELECT o.type FROM sys.objects o WHERE o.object_id=i.object_id)='U')
+          THEN
+          CASE WHEN ((SELECT tbl.is_memory_optimized FROM sys.tables tbl WHERE tbl.object_id = i.object_id)=1) THEN 1 ELSE 0 END
+          ELSE
+          CASE WHEN ((SELECT tt.is_memory_optimized FROM sys.table_types tt WHERE tt.type_table_object_id = i.object_id)=1) THEN 1 ELSE 0 END
+          END
+      </property>
+    </version>
+
+    <version min_major="13" cloud_min_major="12">
+       <property name='CompressionDelay' type='int' cast='true' read_only_after_creation='false' mode="design#deploy" default_value="0">i.compression_delay</property>
+    </version>
+
+    <!-- SXI was introduced in SP1. First build with SXI was SQL11_PCU_Main 11.0.2813 -->
+    <version min_major ='11' max_major ='11' min_minor='0' max_minor='0' max_build='2812'>
+      <property name="IndexedXmlPathName" type="sysname" read_only_after_creation="true">
+         N''
+      </property>
+    </version>
+    
+    <version min_major ='11' min_minor='0' min_build='2813' cloud_min_major='12'>
+      <property name="IndexedXmlPathName" type="sysname" read_only_after_creation="true">
+        ISNULL(indexedpaths.name, N'')
+      </property>
+    </version>
+
+    <version min_major='14' cloud_min_major='12'>
+      <property name="ResumableOperationState" type="int" access='Read' report_type="ResumableOperationStateType">
+        <!-- op.state=0 for RUNNING, op.state=1 for PAUSED, op.state=2 for NONE -->
+        ISNULL(op.state, 2)
+      </property>
+    </version>
+
+    <version min_major='15' cloud_min_major='12'>
+      <property name="IsOptimizedForSequentialKey" type="bit" cast="true" mode="design#deploy">ISNULL(INDEXPROPERTY(i.object_id, i.name, N'IsOptimizedForSequentialKey'), 0)</property>
+    </version>
+
+  </properties>
+</EnumObject>

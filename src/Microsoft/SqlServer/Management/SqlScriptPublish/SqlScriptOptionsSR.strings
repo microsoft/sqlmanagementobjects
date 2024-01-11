@@ -1,0 +1,377 @@
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in parameters,
+# which are identified with the .NET {x} format (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+
+#
+# LocStudio comments description:
+#
+
+; For localizers and UE (These comments will be seen in LocStudio)
+# For internal use (These comments will not be seen in LocStudio)
+
+# Comments should be added before the string. 
+
+# When the string resource file is complied the tool will read these comments 
+# and push the comment using the <comment> tag into the resx file.  
+# LocStudio parser looks in the resx file for the comment tag to load comments 
+# into the instruction field of the database. 
+# 
+# For LocStudio to parse the comments the resx name must match the .resources 
+# name in the manifest, so if you rename the namespace you need to change the 
+# name of the project as well.  After you have done this you will need to make a 
+# single character change to the string file and save, so that the SR.String cs 
+# file has the correct namespace embedded in it. 
+#
+
+[strings]
+
+
+# 
+#
+#
+
+# GenerateScriptDefOptionsData - STRINGS
+
+General = General
+TableView = Table/View Options
+OptionsLabel = &Options
+PublishingOptions = Publishing Options
+
+TrueText = True
+FalseText = False
+
+ScriptUseDatabase = Script USE DATABASE
+Generateusedatabase = Generate USE DATABASE statement.
+ScriptLogins = Script Logins
+Generatescriptfordatabaselogins = Script all logins available on the server. Passwords will not be scripted.
+ScriptObjectLevelPermissions = Script Object-Level Permissions
+Generateobjectlevelpermissions = Generate object-level permissions.
+
+PublishObjectLevelPermissions = Publish Object-Level Permissions
+PublishDObjectLevelPermissions = Publish object-level permissions
+
+ScriptCreate = Script CREATE
+ScriptDrop = Script DROP
+ScriptCreateDrop = Script DROP and CREATE
+ScriptCreateDropDescription = Script Object CREATE/DROP statements.
+
+TypesOfDataToScriptDesc = Generates script that contains schema only or schema and data.
+TypesOfDataToScript = Types of data to script
+DataOnly = Data only
+SchemaOnly = Schema only
+SchemaAndData = Schema and data
+
+CreateMode = Generate Object CREATE statements.
+DropMode = Generate Object DROP statements.
+GenerateScriptForDependentObjects = Generate Script for Dependent Objects
+Generatescriptfordependentobjectsofeachtablescripted = Generate script for dependent objects for each object scripted.
+
+PublishForDependentObjects = Publish Dependent Objects
+Publishfordependentobjectsofeachtablescripted = Publish dependent objects for each object that is published.
+
+IncludeDescriptiveHeaders = Include Descriptive Headers
+Includedescriptiveheadersforeachtablescripted = Include descriptive headers for each object scripted.
+
+IncludeScriptingParametersHeader = Include Scripting Parameters Header
+IncludeScriptingParametersHeaderDescription = Include header containing information about the scripting parameters used.
+
+ContinueScriptingOnError = Continue scripting on Error
+Continuescriptifanerroroccuredorotherwisestop = Continue to script if an error occurs. Otherwise, stop.
+AppendToFile = Append to File
+Appendtofilethegeneratedscript = Append the generated script to a file.
+ScriptExtendedProperties = Script Extended Properties
+Scriptextendedpropertiesforeachtablescripted = Script the Extended Properties for each object scripted.
+
+PublishExtendedProperties = Publish Extended Properties
+Publishextendedpropertiesforeachtablescripted = Publish the Extended Properties for each object that is scripted.
+
+ScriptOwnerForTheObjects = Script owner for the objects.
+ScriptOwner = Script Owner
+
+Prefixschemaforobjects = Prefix object names with the object schema.
+SchemaQualify = Schema qualify object names.
+IncludeIfNotExists = Check for object existence
+Scriptobjectswithifnotexistoption = Check that an object with the given name exists before dropping or altering or that an object with the given name does not exist before creating.
+GenerateScriptCollation = Script Collation
+Scriptobjectswithcollation = Script the objects that use collation.
+
+PublishCollation = Publish Collation
+Publishobjectswithcollation = Publish the objects that use collation.
+
+Default = Script Defaults
+ScriptChangeTracking = Script Change Tracking
+ScriptChangeTrackingInformation = Scripts the change tracking information.
+ScriptDefaults = Script the default values.
+ScriptDataCompression = Script Data Compression Options
+ScriptXmlCompression = Script Xml Compression Options
+ScriptDataCompressionInformation = Scripts the data compression information.
+ScriptXmlCompressionInformation = Scripts the xml compression information.
+
+PublishDefault = Publish Defaults
+PublishDefaults = Publish the default values.
+
+Onlyscript70compatiblefeaturesforeachtablescripted = Generate script only for SQL Server 7.0 compatible features for each object scripted.
+ScriptIndexes = Script Indexes
+Scriptindexesforeachtablescripted = Script the indexes (including XML and clustered indexes) for each table or indexed view scripted.
+
+PublishIndexes = Publish Indexes
+Publishindexesforeachtablescripted = Publish the indexes for each table or indexed view that is published. This includes XML and clustered indexes.
+
+ScriptFullTextIndexes = Script Full-Text Indexes
+Scriptfulltextindexesforeachtablescripted = Script the full-text indexes for each table or indexed view scripted.
+
+PublishFullTextIndexes = Publish Full-Text Indexes
+Publishfulltextindexesforeachtablescripted = Publish the full-text indexes for each table or indexed view that is published.
+
+ScriptTriggers = Script Triggers
+Scripttriggersforeachtablescripted = Script the triggers for each table or view scripted.
+
+PublishTriggers = Publish Triggers
+Publishtriggersforeachtablescripted = Publish the triggers for each table or view that is published.
+
+ScriptPrimaryKeys = Script Primary Keys
+Scriptprimarykeysforeachtablescripted = Script the primary keys for each table or view scripted.
+
+PublishPrimaryKeys = Publish Primary Keys
+Publishprimarykeysforeachtablescripted = Publish the primary keys for each table or view that is published.
+
+ScriptUniqueKeys = Script Unique Keys
+Scriptuniqueskeysforeachtablescripted = Script the unique keys for each table or view scripted.
+
+PublishUniqueKeys = Publish Unique Keys
+Publishuniqueskeysforeachtablescripted = Publish the unique keys for each table or view that is published.
+
+ScriptForeignKeys = Script Foreign Keys
+Scriptforeignkeysforeachtablescripted = Script the foreign keys for each table scripted.
+
+PublishForeignKeys = Publish Foreign Keys
+Publishforeignkeysforeachtablescripted = Publish the foreign keys for each table that is published.
+
+ScriptCheckConstraints = Script Check Constraints
+Scriptcheckconstraintsforeachtablescripted = Script the check constraints for each table or view scripted.
+
+PublishCheckConstraints = Publish CHECK Constraints
+Publishcheckconstraintsforeachtablescripted = Publish CHECK constraints for each table or view that is published.
+
+ScriptConvertUDDT = Convert UDDTs to Base Types
+Generateconvertuddt = Convert user-defined data types to base types.
+ScriptStatistics = Script Statistics
+generatescriptstatistics = Script statistics, and optionally include histograms, for each selected table or view.
+ScriptStatisticsNone = Do not script statistics
+ScriptStatisticsDDL = Script statistics
+ScriptStatisticsAll = Script statistics and histograms
+
+PublishStatistics = Publish Statistics
+Publishgeneratescriptstatistics = Publish statistics, and optionally include histograms, for each table or view that is selected.
+PublishStatisticsNone = Do not publish statistics
+PublishStatisticsDDL = Publish statistics
+PublishStatisticsAll = Publish statistics and histograms
+
+IncludeVarDecimal = Script Vardecimal Options
+IncludeVarDecimalDescription = Script options to set vardecimal storage format.
+
+Bindings = Script Bindings
+BindingsDescription = Script options to set bindings option.
+
+PublishIncludeVarDecimal = Publish Vardecimal Options
+PublishIncludeVarDecimalDescription = Publish options to set vardecimal storage format.
+
+ScriptDriIncludeSystemNames = Include system constraint names
+generateDriIncludeSystemNames = Include system generated constraint names to enforce declarative referential integrity. 
+ScriptAnsiPadding = ANSI Padding
+generateAnsiPadding = Generates ANSI padding statements.
+
+
+ScriptDatabaseCreate = Script Database Create
+genreatescriptdatabasecreate = Generate the CREATE DATABASE script when it scripts the whole database.
+
+UseTransactionForPublish = Publish by using a transaction.
+UseTransactionForPublishDesc = Publish to provider atomically by using a transaction.
+
+# GenerateScriptTableOptionsData -STRINGS
+
+GenerateCreateCommand = Generate CREATE Command
+GenerateDropCommand = Generate DROP Command
+
+CompatibleFeatures = Script for Server Version
+CompatibleFeaturesDescription = Script only features compatible with the specified version of SQL Server
+
+PublishCompatibleFeatures = Publish for Server Version
+PublishCompatibleFeaturesDescription = Publish only the features that are compatible with the specified version of SQL Server.
+
+OnlyScript90CompatibleFeatures = SQL Server 2005
+OnlyScript100CompatibleFeatures = SQL Server 2008
+OnlyScript105CompatibleFeatures = SQL Server 2008 R2
+OnlyScript110CompatibleFeatures = SQL Server 2012
+OnlyScript120CompatibleFeatures = SQL Server 2014
+OnlyScript130CompatibleFeatures = SQL Server 2016
+OnlyScript140CompatibleFeatures = SQL Server 2017
+OnlyScript150CompatibleFeatures = SQL Server 2019
+OnlyScript160CompatibleFeatures = SQL Server 2022
+
+TargetEngineType = Script for the database engine type
+TargetEngineTypeDescription = Script only features compatible with the specified SQL Server database engine type.
+
+TargetEngineEdition = Script for the database engine edition
+TargetEngineEditionDescription = Script only features compatible with the specified SQL Server database engine edition.
+
+SingleInstanceEngineType = Stand-alone instance
+; this must match the string "syntax.SqlAzureDatabase" in namespace Microsoft.SqlServer.Management.UserSettings.ScriptingOptions
+SqlAzureEngineType = Microsoft Azure SQL Database
+PersonalEdition = Microsoft SQL Server Personal Edition
+StandardEdition = Microsoft SQL Server Standard Edition
+EnterpriseEdition = Microsoft SQL Server Enterprise Edition
+ExpressEdition = Microsoft SQL Server Express Edition
+SqlAzureDatabaseEdition = Microsoft Azure SQL Database Edition
+SqlDataWarehouseEdition = Microsoft Azure Synapse Analytics dedicated SQL pools Edition
+StretchEdition = Microsoft SQL Server Stretch Database Edition
+SqlServerManagedInstanceEdition = Microsoft Azure SQL Database Managed Instance Edition
+SqlServerOnDemandEdition = Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition
+SqlDatabaseEdgeEdition = Microsoft Azure SQL Edge Edition
+SqlAzureArcManagedInstanceEdition = Microsoft Azure Arc SQL Managed Instance Edition
+
+IncludeUnsupportedStatements = Include unsupported statements
+IncludeUnsupportedStatementsDescription = Include statements in the script that are not supported on the specified SQL Server database engine type.
+
+# GenerateScriptProgress - STRINGS
+GenerateScriptProgressTitle = Generate Script Progress
+PublishProgressTitle = Publish Database Progress
+GenerateScriptTable = Table 
+GenerateScriptView = View 
+GenerateScriptSP = Stored procedure 
+GenerateScriptUdf = User-defined function 
+GenerateScriptUddt = User-defined data type
+GenerateScriptUdtt = User-defined table type
+GenerateScriptDefault = Default 
+GenerateScriptRule = Rule 
+GenerateScriptAppRole = Application role
+GenerateScriptAssembly = Assembly
+GenerateScriptDatabaseTrigger = Database (DDL) trigger
+GenerateScriptDatabaseRole = Database role
+GenerateScriptSynonym = Synonym
+GenerateScriptUser = User
+GenerateScriptXMLSchema = XML schema collection
+GenerateScriptSchema = Schema
+GenerateScriptDatabase = Database
+GenerateScriptPlanGuide = Plan guide
+GenerateScriptProgressDiscovery(string databaseName) = Determining objects in database '{0}' that will be scripted.
+GenerateScriptUserDefinedType = User-defined type
+GenerateScriptFullTextCatalog = Full text catalog
+GenerateScriptUserDefinedAggregate = User-defined aggregate
+
+# Errors -STRINGS
+GenerateScriptDBNotFound(string databaseName) = Database '{0}' is unavailable.
+GenerateScriptNoObjects(string databaseName) = There are no objects in database '{0}' of the types scriptable by this wizard.
+GenerateScriptFileExists(string fileName) = The file '{0}' already exists. Do you want to overwrite this file?
+GenerateScriptInvalidDirectory(string directoryName) = The path name '{0}' is not valid. The path may not exist, you may not have permissions to access that folder, or the disk may be full or write-protected. Provide a valid path name to continue.
+GenarateScriptInvalidFile(string filename) = The path or file name '{0}' is not valid. The path may not exist, you may not have permissions to create a file in that folder, or the disk may be full or write-protected. Provide a valid path and file name to continue.
+GenerateScriptStatsWarning = Scripting statistics and histograms can significantly increase the time that is required to generate the scripts. Additionally this will increase the size of the resulting script file.
+
+#ProviderListDialog -STRINGS
+ProviderListTitle = Hosting Providers
+ConfiguredProviders = &Configured providers: 
+MSAAConfiguredProviders = Configured providers: 
+ProviderName = Name
+WebServiceAddress = Web service address
+NewText = &New...
+EditText = &Edit...
+TestText = &Test
+DeleteText = &Delete
+MSAANewText = New...
+MSAAEditText = Edit...
+MSAATestText = Test
+MSAADeleteText = Delete
+ProviderDeleteMessage = This command will remove the selected provider.  Continue?
+ProviderDeleteTitle = Delete provider
+TestTitleSuccess = Test successful
+TestSuccessMessage = The connection to {0} was successful.
+TestTitleFailure = Test failed
+TestFailureMessage = {0} could not be contacted.
+TestFailureUsernamePasswordMessage = The username and password for {0} are incorrect.
+ProviderListSaveChangeMessage = Providers have changed.\nDo you want to save the changes?
+ProviderListSaveChangeTitle = Save Changes
+ERROR_SaveFailedTitle = Saving Error
+ERROR_DeleteFailedTitle = Deleting Error
+MSAAButtonPanel = Button Panel
+
+#ProviderDetailDialog - STRINGS
+ProviderDetailTitle = Provider configuration for {0}
+ProviderDetailProviderName = Na&me
+MSAAProviderDetailProviderName = Name
+ProviderDetailWebAdd = &Web service address
+MSAAProviderDetailWebAdd = Web service address
+ProviderDetailWebSerAuth = Web service authentication
+ProviderDetailWebSerUser = &User name
+ProviderDetailWebSerPassword = &Password
+ProviderDetailWebSerSavePassword = &Save password
+ProviderDetailDatabaseGroup = &Available databases
+SetAsDefaultText = Set as de&fault
+MSAAProviderDetailWebSerUser = User name
+MSAAProviderDetailWebSerPassword = Password
+MSAAProviderDetailWebSerSavePassword = Save password
+MSAAProviderDetailDatabaseGroup = Available databases
+MSAASetAsDefaultText = Set as default
+DownloadConfigurationsText = Download configurations
+ProviderDetailDeleteMessage = This command will remove the selected database from the list.  Continue?
+ProviderDetailDeleteTitle = Remove database
+ProviderDetailConfirmDownloadTitle = Download Database Configurations
+ProviderDetailConfirmDownloadText = This command will connect to the hosting provider and download database configuration information.\nIf the operation is successful, existing database configurations will be deleted.\n\nContinue?
+ProviderDetailDownloadSucceedTitle = Download Succeeded
+ProviderDetailDownloadSucceedText = Database configurations were downloaded successfully.
+ProviderDetailDownloadFailedTitle = Download Failed
+ProviderDetailDownloadFailedNotConfigured = Database configurations could not be downloaded.\nThe hosting provider has not been configured to support this operation.
+ProviderDetailDownloadFailedCannotConnect = {0} could not be contacted.
+ProviderDetailDownloadFailedUserPassword = The user name and password for {0} are incorrect.
+ProviderDetailSaveChangeMessage = Provider {0} has changed.\nDo you want to save the changes? 
+ProviderDetailSaveChangeTitle = Save Changes
+ProviderDetailEmptyProviderNameMessage = {0} is required.
+ProviderDetailEmptyProviderNameMessageTitle = Error
+ProviderDetailNewProvider = new provider
+
+#DatabaseDetailDialog - STRINGS
+DatabaseDetailTitle = Database {0}
+DatabaseDetailDatabaseName = &Database name
+DatabaseDetailServerName = Se&rver name
+MSAADatabaseDetailDatabaseName = Database name
+MSAADatabaseDetailServerName = Server name
+DatabaseDetailAuthentication = Database &authentication
+DatabaseDetailUserName = &User name
+DatabaseDetailPassword = &Password
+DatabaseDetailSavePassword = &Save password
+MSAADatabaseDetailUserName = User name
+MSAADatabaseDetailPassword = Password
+MSAADatabaseDetailSavePassword = Save password
+DatabaseDetailSaveChangeMessage = Database {0} has changed.\nDo you want to save the changes?
+DatabaseDetailSaveChangeTitle = Save Changes
+DatabaseDetailEmptyDatabaseNameMessage = {0} is required.
+DatabaseDetailEmptyDatabaseNameMessageTitle = Error
+DatabaseDetailNewDatabase = new database
+
+#RemoteCreditDialog - STRINGS
+RemoteCreditDialogTitle = Enter User Credentials
+RemoteCreditSubTitle = Enter username and password:
+RemoteCreditProviderGroupText = Provider
+RemoteCreditDatabaseGroupText = Remote database
+RemoteCreditProviderName = Name
+RemoteCreditWebAdd = Web service address
+RemoteCreditWebSerUser = &User name
+RemoteCreditWebSerPassword = &Password
+MSAARemoteCreditWebSerUser = User name
+MSAARemoteCreditWebSerPassword = Password
+RemoteCreditDatabaseName = Database name
+RemoteCreditServerName = Server name
+RemoteCreditUserName = Use&r name
+RemoteCreditPassword = Pass&word
+MSAARemoteCreditUserName = MSAA User name
+MSAARemoteCreditPassword = MSAA Password
+
+#Publish output option - STRINGS
+PublishOutputOptionTitle = Select an Output Location
+PublishOutputOptionSubTitle = Select the database and Web service that you want to publish the database to.

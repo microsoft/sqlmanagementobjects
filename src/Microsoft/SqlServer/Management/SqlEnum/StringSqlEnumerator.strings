@@ -1,0 +1,315 @@
+# ------------------------------------------------------------
+# Copyright (c) Microsoft Corporation.  All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+# ------------------------------------------------------------
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in 
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+
+# SMO build specific comment
+# after generating the .resx file, run resgen on it and get the .resources file
+# please remember to also check that .resources in, along with the 
+# .strings and .cs file
+[strings]
+
+IncorrectVersionTag(string elemContent) = Incorrect version tag. You must specify either a min_major, cloud_min_major or datawarehouse_enabled attribute. \n\n{0}
+ObjectNotSupportedOnSqlDw = This object is not supported on Azure Synapse Analytics databases.
+ObjectSupportedOnlyOnSqlEdge = This object is only supported on Azure SQL Edge.
+InvalidAttributeValue = Value '{0}' on attribute '{1}' was unable to be parsed correctly.
+NullVersionOnLoadingCfgFile = Version was not specified on loading configuration file.
+EnumObjectTagNotFound = Enumeration object tag was not found.
+InvalidConnectionType = Connection type is not valid.
+OnlyPathOrFullName = Only Path or only FullName must be specified.
+FileNameMustHavePath = A Path must be specified with a FileName.
+DatabaseNameMustBeSpecified = Database name must be specified.
+FailedToLoadResFileFromPaths(fileName, paths) = File '{0}' was not found. Search paths were:\n{1}\nThe file might be missing in sources or misspelled in config.xml, or case sensitivity may not be preserved.
+FailedToLoadResFileFromAssembly(fileName, assembly) = File '{0}' was not found in Assembly {1}.\nThe file might be missing in sources or misspelled in config.xml, or case sensitivity may not be preserved.
+UnsupportedTypeDepDiscovery(string objType, string suppList) = {0} is not supported in dependency discovery. Only objects of the following types are supported: {1}.
+QueryNotSupportedPostProcess(string propList) = Cannot provide DataReader because of the properties: {0}
+
+FailedToLoadAssembly(string assembly) = failed to load assembly {0}.
+FailedToCreateUrn(string objCode) = failed to create Urn for object code: {0}
+UnknownOperator = Unknown operator.
+PropMustBeSpecified(string prop, string obj) = {0} must be specified on {1}.
+InvalidUrnForDepends(string urn) = Urn is not valid for dependency discovery: {0}
+TooManyDbLevels = too many database levels.
+CouldNotInstantiateObj(string objType) = could not instantiate object {0}.
+NotDerivedFrom(string objType, string objName) = {0} is not derived from {1}.
+UnknownType(string type) = Unknown type: {0}.
+InvalidConfigurationFile = Configuration file is not valid.
+MissingSection(string section) = invalid configuration file: missing section {0}.
+NotDbObject = object is not under database.
+NotSingleDb = objects are not in a single database.
+NoClassNamePostProcess = <post_process> tag missing class_name.
+InvalidVersion(string version) = Operation not supported on version {0}.
+InvalidSqlServer(string productName) = Operation not supported on {0}.
+DatabaseNameMustBeSpecifiedinTheUrn(string urn) = The database name must be specified in the urn: {0}
+CouldNotGetInfoFromDependencyRow(string rowInformation) = Failed to retrieve dependency information ({0}).
+SqlServer90Name = SQL Server 2005
+SqlServer80Name = SQL Server 2000
+SmoSQLCLRUnAvailable=The functionality you're trying to execute is disabled inside SQLCLR, if you still want to execute this functionality you can try executing it inside your client application.
+UnknownPermissionType(string permissionType) = Unknown Permission type {0}
+UnknownPermissionCode(int code) = Undefined permission code {0}
+
+;Job execution status
+Executing = Executing
+WaitingForWorkerThread = Waiting for worker thread
+BetweenRetries = Between retries
+Idle = Not running
+Suspended = Suspended
+WaitingForStepToFinish = Waiting for step to finish
+PerformingCompletionAction = Performing completion action
+Unknown = Unknown
+Queued = Queued
+
+;ContainmentType
+ctNone = None
+ctPartial = Partial
+
+;RecoveryModel
+rmFull = Full
+rmBulkLogged = Bulk Logged
+rmSimple = Simple
+
+;MirroringStatus
+msNone = None
+msSuspended = Suspended
+msDisconnected = Disconnected
+msSynchronizing = Synchronizing
+msPendingFailover = Pending Failover
+msSynchronized = Synchronized
+
+;AvailabilityGroupRollupSynchronizationState
+agshNoneSynchronizing = None Synchronizing
+agshPartiallySynchronizing = Partially Synchronizing
+agshAllSynchronizing = All Synchronizing
+agshAllSynchronized = All Synchronized
+
+;AvailabilityGroupVirtualNameHealth
+
+;AvailabilityReplicaOperationalState
+arosPendingFailover = Pending Failover
+arosPending = Pending
+arosOnline = Online
+arosOffline = Offline
+arosFailed = Failed
+arosFailedNoQuorum = Failed No Quorum
+
+;AvailabilityReplicaRollupRecoveryState
+arrhInProgress = In Progress
+arrhOnline = Online
+
+;AvailabilityReplicaRollupSynchronizationState
+arshNotSynchronizing = Not Synchronizing
+arshSynchronizing = Synchronizing
+arshSynchronized = Synchronized
+
+;AvailabilityReplicaRole
+arrUninitialized = Uninitialized
+arrResolving = Resolving
+arrSecondary = Secondary
+arrPrimary = Primary
+
+;AvailabilityReplicaConnectionState
+arcsDisconnected = Disconnected
+arcsConnected = Connected
+
+;HADRManagerStatus
+hmsPendingCommunication = Pending communication
+hmsRunning = Running
+hmsFailed = Failed
+
+;ClusterQuorumType
+cqtNodeMajority = Node Majority
+cqtNodeAndDiskMajority = Node and Disk Majority
+cqtNodeAndFileshareMajority = Node and Fileshare Majority
+cqtDiskOnly = Disk Only
+cqtNotApplicable = Not Applicable
+cqtCloudWitness = Cloud Witness
+
+;ClusterQuorumState
+cqsUnknownQuorumState = Unknown Quorum State
+cqsNormalQuorum = Normal Quorum
+cqsForcedQuorum = Forced Quorum
+cqsNotApplicable = Not Applicable
+
+;ClusterMemberType
+cmtNode = Node
+cmtDiskWitness = Disk Witness
+cmtFileshareWitness = Fileshare Witness
+cmtCloudWitness = Cloud Witness
+
+;ClusterMemberState
+cmsOffline = Offline
+cmsPartiallyOnline = Partially Online
+cmsOnline = Online
+cmsUnknown = Unknown
+
+# Availability Replica Read Modes
+;The availability replica in secondary role will not allow any connections
+replicaReadModeNoConnections = Disallow connections
+;The availability replica in secondary role will allow only read-intent connections
+replicaReadModeReadIntentConnectionsOnly = Allow only read-intent connections
+;The availability replica in secondary role will allow all connections for read access, including connections running with older clients
+replicaReadModeAllConnections = Allow all connections
+
+# Availability Replica Connection Modes In Primary Role
+cmprReadWriteConnections = Allow read/write connections
+cmprAllConnections = Allow all connections
+
+# Availability Replica Connection Modes in Secondary Role
+;The availability replica in secondary role will not allow any connections
+cmsrNoConnections = No
+;The availability replica in secondary role will allow only read-intent connections
+cmsrReadIntentConnectionsOnly = Read-intent only
+;The availability replica in secondary role will allow all connections for read access, including connections running with older clients
+cmsrAllConnections = Yes
+
+#Availability mode
+seedingModeAutomatic = Automatic
+seedingModeManual = Manual
+
+#Availability mode
+aramSynchronousCommit = Synchronous commit
+aramAsynchronousCommit = Asynchronous commit
+aramConfigurationOnly = Configuration only
+
+#Failover mode
+arfmAutomatic = Automatic
+arfmManual = Manual
+arfmExternal = External
+
+# Availability Replica Join State
+arjsNotJoined = Not Joined
+arjsJoinedStandaloneInstance = Joined Standalone Instance
+arjsJoinedFailoverClusterInstance = Joined SQL Server Failover Cluster Instance
+
+;AvailabilityDatabaseSynchronizationState
+adssNotSynchronizing = Not Synchronizing
+adssSynchronizing = Synchronizing
+adssSynchronized = Synchronized
+adssReverting = Reverting
+adssInitializing = Initializing
+
+;DatabaseReplicaSuspendReason
+drsrSuspendFromUser = Suspend From User
+drsrSuspendFromPartner = Suspend From Partner
+drsrSuspendFromRedo = Suspend From Redo
+drsrSuspendFromApply = Suspend From Apply
+drsrSuspendFromCapture = Suspend From Capture
+drsrSuspendFromRestart = Suspend From Restart
+drsrSuspendFromUndo = Suspend From Undo
+drsrNotApplicable = Not Applicable
+
+;AvailabilityGroupAutomatedBackupPreference
+agabpPrimary = Primary
+agabpSecondaryOnly = Secondary Only
+agabpSecondary = Secondary
+agabpNone = None
+
+;AvailabilityGroupFailureConditionLevel
+agfcOnServerDown = On Server Down
+agfcOnServerUnresponsive = On Server Unresponsive
+agfcOnCriticalServerErrors = On Critical Server Errors
+agfcOnModerateServerErrors = On Moderate Server Errors
+agfcOnAnyQualifiedFailureCondition = On Any Qualified Failure Condition
+
+;AvailabilityGroupListenerIPState
+aglipOffline = Offline
+aglipOnline = Online
+aglipOnlinePending = Online Pending
+agliFailure = Failure
+agliUnknown = Unknown
+
+;AvailabilityGroupClusterType
+agctExternal = EXTERNAL
+agctNone = NONE
+agctWsfc = Windows Server Failover Cluster
+
+#FileGroup types
+;Standard Rows FileGroup
+fgtRowsFileGroup = A filegroup used for row data
+fgtFileStreamDataFileGroup = A filegroup used for filestream data
+fgtMemoryOptimizedDataFileGroup = A filegroup used for memory optimized data
+
+#Security Predicate Types
+;SecurityPredicateType
+securityPredicateTypeFilter = Filter
+securityPredicateTypeBlock = Block
+
+#Security Predicate Operations
+;SecurityPredicateOperation
+securityPredicateOperationAll = All
+securityPredicateOperationAfterInsert = After Insert
+securityPredicateOperationAfterUpdate = After Update
+securityPredicateOperationBeforeUpdate = Before Update
+securityPredicateOperationBeforeDelete = Before Delete
+
+#IndexType enum strings
+Clustered = Clustered
+NonClustered = Non-Clustered
+PrimaryXml = Primary XML
+SecondaryXml = Secondary XML
+Spatial = Spatial
+NonClusteredColumnStore = Non-Clustered Columnstore
+NonClusteredHash = Non-Clustered Hash
+SelectiveXml = Selective XML
+SecondarySelectiveXml = Secondary Selective XML
+ClusteredColumnStore = Clustered Columnstore
+Heap = Heap
+
+#AgentSubSystem enum strings
+TransactSql = Transact-SQL script (T-SQL)
+ActiveScripting = ActiveX Script
+CmdExec = Operating system (CmdExec)
+AnalysisCommand = SQL Server Analysis Services Command
+AnalysisQuery = SQL Server Analysis Services Query
+ReplDistribution = Replication Distributor
+ReplMerge = Replication Merge
+ReplQueueReader = Replication Queue Reader
+ReplSnapshot = Replication Snapshot
+ReplLogReader = Replication Transaction-Log Reader
+SSIS = SQL Server Integration Services Package
+PowerShell = PowerShell
+
+#Catalog Collation type strings
+dbCatalogCollationDatabaseDefault = Database Default
+dbCatalogCollationContained = Latin1_General_100_CI_AS_KS_WS_SC
+dbCatalogCollationSQL_Latin1_General_CP1_CI_AS = SQL_Latin1_General_CP1_CI_AS
+
+#Audit Destination strings
+UnknownDest = Unknown
+FileDest = File
+SecurityLogDest = Security Log
+ApplicationLogDest = Application Log
+UrlDest = URL
+ExternalMonitorDest = External Monitor
+
+#Audit Options strings
+OnFailureActionContinue = Continue
+OnFailureActionShutdown = Shutdown SQL Server instance
+OnFailureActionFail = Fail operation
+
+#QueryStore Mode strings
+Off = Off
+On = On
+ReadOnly = Read only
+ReadWrite = Read write
+Error = Error
+All = All
+Auto = Auto
+None = None
+Custom = Custom
+

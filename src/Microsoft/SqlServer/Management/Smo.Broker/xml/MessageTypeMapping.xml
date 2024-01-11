@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<EnumObject type="MessageTypeMapping" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+		<parent_link>
+			<link parent='ID' local = 'ServiceID'/>
+		</parent_link>
+		<property_link table = 'sys.service_contract_message_usages scmu'/>
+		<property_link fields = '#Name#' table = 'sys.service_message_types mt'>
+			mt.message_type_id = scmu.message_type_id
+		</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="NType" type="sysname" access='Read' hidden='true'>MessageTypeMapping</property>
+		<property name="Name" type="sysname">mt.name</property>
+		<property name="ServiceID" type="int" hidden='true'>scmu.service_contract_id</property>		
+		<property name="MessageSource" type="int" report_type = 'Broker.MessageSource'>(case when scmu.is_sent_by_initiator=1 and is_sent_by_target=0 then  0
+                                                                   																		     when scmu.is_sent_by_initiator=0 and is_sent_by_target=1  then  1
+                                                                																			  when scmu.is_sent_by_initiator=1 and is_sent_by_target=1  then 2 end )</property>		
+	</properties>
+</EnumObject>

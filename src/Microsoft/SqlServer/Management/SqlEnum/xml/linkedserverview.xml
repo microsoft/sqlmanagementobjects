@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="LinkedServerView" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent="ServerName" local="ServerName" />
+		</parent_link>
+		<!-- selecting both linkedServerName and CatalogName from the Parent -->
+		<request_parent_select>
+			<field name='ServerName' />
+			<field name='Name' />
+			<field name='IsCatalogSupport' />
+		</request_parent_select>
+		<property_link table="#tmp_sp_tables_ex" alias="tste" />
+		<!--
+		1) There is no way to request SYSTEMVIEWS and VIEWS in one call
+		2) #tmp_sp_tables_ex_all : select all objects(Tables,systemtables,views,systemviews) into this table.
+		3) #tmp_sp_tables_ex:  this table contains only SYSTEM VIEWS and VIEWS
+		4) If catalog support not exist (@IsCatalogSupportExist=0) then pass NULL to @table_catalog		
+		5)schemaname can be null for some providers, we can't handle this in OE so make the schemaname.objectname (or)
+		    only objectname using the property SchemaObjectName		
+		-->
+		<prefix>
+			<link_multiple no='1' expression="
+				create table #tmp_sp_tables_ex (is_catalog_error bit null,server_name nvarchar(128) null,server_catalog_name nvarchar(128) null,TABLE_CAT sysname null, TABLE_SCHEM sysname null,TABLE_NAME sysname null,TABLE_TYPE varchar(32) null,REMARKS varchar(254) null) 				
+				create table #tmp_sp_tables_ex_all (TABLE_CAT sysname null, TABLE_SCHEM sysname null,TABLE_NAME sysname null,TABLE_TYPE varchar(32) null,REMARKS varchar(254) null)		
+                declare @TableServerName sysname
+				declare @TableCatalogName sysname
+				declare @IsCatalogSupportExist bit
+                declare TableServerCrs cursor local fast_forward
+                for ( {0} ) 
+                open TableServerCrs 
+                fetch TableServerCrs into @TableServerName,@TableCatalogName,@IsCatalogSupportExist
+                while @@fetch_status &gt;= 0                 
+				begin
+				IF (@IsCatalogSupportExist=0)
+				BEGIN
+				insert into #tmp_sp_tables_ex_all (TABLE_CAT,TABLE_SCHEM,TABLE_NAME,TABLE_TYPE,REMARKS) EXEC master.dbo.sp_tables_ex
+			    @table_server = @TableServerName
+			    ,@table_name = NULL
+			    ,@table_schema = NULL
+			    ,@table_catalog = NULL
+			    ,@table_type = NULL
+				insert into #tmp_sp_tables_ex (TABLE_CAT,TABLE_SCHEM,TABLE_NAME,TABLE_TYPE,REMARKS) select TABLE_CAT,TABLE_SCHEM,TABLE_NAME,TABLE_TYPE,REMARKS from #tmp_sp_tables_ex_all where TABLE_TYPE in  ('SYSTEM VIEW','VIEW')
+				update #tmp_sp_tables_ex set server_catalog_name = NULL
+				END
+				ELSE
+				BEGIN
+				insert into #tmp_sp_tables_ex_all (TABLE_CAT,TABLE_SCHEM,TABLE_NAME,TABLE_TYPE,REMARKS) EXEC master.dbo.sp_tables_ex
+			    @table_server = @TableServerName
+			    ,@table_name = NULL
+			    ,@table_schema = NULL
+			    ,@table_catalog = @TableCatalogName
+			    ,@table_type = NULL
+				insert into #tmp_sp_tables_ex (TABLE_CAT,TABLE_SCHEM,TABLE_NAME,TABLE_TYPE,REMARKS) select TABLE_CAT,TABLE_SCHEM,TABLE_NAME,TABLE_TYPE,REMARKS from #tmp_sp_tables_ex_all where TABLE_TYPE in  ('SYSTEM VIEW','VIEW')
+				update #tmp_sp_tables_ex set server_catalog_name = @TableCatalogName
+				END				
+                update #tmp_sp_tables_ex set server_name = @TableServerName																
+                fetch TableServerCrs into @TableServerName,@TableCatalogName,@IsCatalogSupportExist
+                end
+                close TableServerCrs
+                deallocate TableServerCrs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+			drop table #tmp_sp_tables_ex
+			drop table #tmp_sp_tables_ex_all
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="4000">
+			<link_multiple no='4' expression="{0} + '/{3}[@Name=' + quotename({1},'''') + ' and @Schema=' + quotename({2},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="Name" />
+				<link_field type='local' field="Schema" />
+				<link_field field="NType" />
+			</link_multiple>
+		</property>
+		<property name="NType" type="sysname" access='Read' hidden='true'>LinkedServerView</property>
+		<property name="ServerName" type="nvarchar" size="128" hidden='true'>tste.server_name</property>
+		<property name="ServerCatalogName" type="nvarchar" size="128" hidden='true'>tste.server_catalog_name</property>
+		<property name="CatalogName" type="sysname" >ISNULL(tste.TABLE_CAT,'')</property>
+		<property name="Schema" type="sysname">ISNULL(tste.TABLE_SCHEM,'')</property>
+		<property name="Name" type="sysname">tste.TABLE_NAME</property>
+		<property name="TableType" type="varchar" size="32">tste.TABLE_TYPE</property>
+		<property name="SchemaObjectName" type="sysname">
+			<link_multiple no='2' expression="case when ( tste.TABLE_SCHEM in ('') or (tste.TABLE_SCHEM IS NULL) ) then {1} else {0}+'.'+{1} end">
+				<link_field type='local' field="Schema" />
+				<link_field type='local' field="Name" />
+			</link_multiple>
+		</property>
+		<property name="Remarks" type="varchar" size="254">tste.REMARKS</property>
+		<property name="IsSystemObject" type="bit" access="Read" >case when tste.TABLE_TYPE in ('SYSTEM VIEW') then 1 else 0 end</property>
+	</properties>
+</EnumObject>

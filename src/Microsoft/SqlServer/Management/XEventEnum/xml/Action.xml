@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<EnumObject type="Action" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.server_event_session_actions' alias='action'>event.event_session_id = action.event_session_id AND event.event_id = action.event_id</property_link>
+    
+    <!--action share names with other objects in dm_xe_objects, so here we need to add a filter on object_type-->
+    <property_link join='#a' alias='object'>action.name = object.name</property_link>
+    <property_link join='#p' alias='package'>action.module = package.module_guid AND action.package = package.name AND package.guid = object.package_guid</property_link>
+    <prefix>
+      create table #a (name sysname not null, package_guid uniqueidentifier, description nvarchar(3072) not null)
+      create table #p (module_guid uniqueidentifier not null, name sysname not null, guid uniqueidentifier)
+      insert into #a select name, package_guid, description from sys.dm_xe_objects where object_type='action'
+      insert into #p select module_guid, name, guid from sys.dm_xe_packages
+    </prefix>
+    <postfix>
+      drop table #a
+      drop table #p
+    </postfix>
+
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />    
+    <property name='Name' type='nvarchar' size='128'>action.package + '.' + action.name</property>
+    <property name='ModuleID' type='nvarchar' size='128'>action.module</property>
+    <property name='PackageName' type='nvarchar' size='60'>action.package</property>
+    <property name='Description' type='nvarchar' size='512'>object.description</property>
+  </properties>
+</EnumObject>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>  
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.HadrModel</RootNamespace>
+  </PropertyGroup>
+ 
+  <!-- Project references -->
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(HadrDataSrc)\Microsoft.SqlServer.Management.HadrData.csproj" />
+    <ProjectReference Include="$(XEventSrc)\Microsoft.SqlServer.Management.XEvent.csproj" />
+    <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />
+  </ItemGroup>
+  <!--
+    Runs localization by default for a project which has strings to localize.
+    To suppress localization, /p:EnableLocalization=false should be passed in as a MSBuild argument.
+  -->
+  <PropertyGroup>
+    <EnableLocalization Condition="'$(EnableLocalization)' != ''">$(EnableLocalization)</EnableLocalization>
+    <EnableLocalization Condition="'$(EnableLocalization)' == ''">true</EnableLocalization>
+  </PropertyGroup>
+</Project>

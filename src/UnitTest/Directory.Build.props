@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project >
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <EnableLocalization>false</EnableLocalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NewtonSoft.Json" />
+    <Compile Include="$(MSBuildthisfileDirectory)Common\UnitTestBase.cs" />
+  </ItemGroup>
+</Project>

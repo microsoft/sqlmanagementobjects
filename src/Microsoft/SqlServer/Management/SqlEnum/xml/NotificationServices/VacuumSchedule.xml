@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='VacuumSchedule' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_vacuum_schedule" alias="dvs" />
+		<prefix>
+CREATE TABLE #tmp_vacuum_schedule(
+	VacuumScheduleId int,
+	StartTime datetime,
+	Interval int
+)
+INSERT #tmp_vacuum_schedule EXEC [SchemaPrefix].NSGetVacuumSchedule
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_vacuum_schedule
+        </postfix>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no="3" expression="{0} + '/{2}[@Id=''' + CAST({1} AS sysname) + ''']'">
+				<link_field type="parent" field="Urn" /> 
+				<link_field type="local" field="Id" /> 
+				<link_field field="NType" /> 
+			</link_multiple>
+		</property>
+		<property name="Name" type="sysname" cast="true">dvs.VacuumScheduleId</property>
+		<property name="Id" type="int" hidden="true">dvs.VacuumScheduleId</property>
+		<property name="StartTime" type="datetime">dvs.StartTime</property>
+        <property name="Interval" type="int">dvs.Interval</property>
+	</properties>
+</EnumObject>

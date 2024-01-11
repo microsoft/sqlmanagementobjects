@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true'>
+	<settings>
+		<version min_major = '7' max_major = '8'>
+			<property_link>prmssn.id = 0</property_link>
+		</version>		
+		<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+			<property_link>prmssn.class = 0</property_link>
+		</version>		
+	</settings>
+	<properties>
+		<include file='inc_perm.xml' alias='database'/>
+		<property name="Code" type="int" report_type = 'DatabasePermissionSetValue'>null</property>
+	</properties>
+</EnumObject>
