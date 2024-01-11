@@ -21,7 +21,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with: 
         name: tests
-        path: target\distrib\Debug\netcoreapp3.1
+        path: bin\Debug\net6.0
   test:
     runs-on: ubuntu-latest
     needs: build
