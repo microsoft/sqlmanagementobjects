@@ -12,6 +12,7 @@ namespace Microsoft.SqlServer.Management.Common
     using System.Diagnostics;
     using System.Security;
     using Microsoft.SqlServer.Server;
+    using System.Runtime.CompilerServices;
 
     ///<summary>
     ///connection settings and creation
@@ -42,10 +43,14 @@ namespace Microsoft.SqlServer.Management.Common
         private SecureString m_ConnectionString;
         private bool m_MultipleActiveResultSets;
         private bool shouldEncryptConnection = false;
+        private bool strictEncryption;
+#if MICROSOFTDATA
+        private string hostNameInCertificate;
+#endif
         private string additionalParameters = null;
         private SqlConnectionInfo.AuthenticationMethod m_Authentication;
         private string m_ApplicationIntent;
-        
+
         public IRenewableToken AccessToken { get; set; }
 
         /// <summary>
@@ -115,10 +120,10 @@ namespace Microsoft.SqlServer.Management.Common
         {
             cs.m_ServerInstance = m_ServerInstance;
             cs.m_Login = m_Login;
-            cs.m_Password = m_Password != null ? m_Password.Copy() : null;
+            cs.m_Password = m_Password?.Copy();
             cs.m_LoginSecure = m_LoginSecure;
             cs.m_ConnectAsUserName = m_ConnectAsUserName;
-            cs.m_ConnectAsUserPassword = m_ConnectAsUserPassword != null ? m_ConnectAsUserPassword.Copy() : null;
+            cs.m_ConnectAsUserPassword = m_ConnectAsUserPassword?.Copy();
             cs.m_ConnectAsUser = m_ConnectAsUser;
             cs.m_NonPooledConnection = m_NonPooledConnection;
             cs.m_PooledConnectionLifetime = m_PooledConnectionLifetime;
@@ -132,12 +137,16 @@ namespace Microsoft.SqlServer.Management.Common
             cs.m_PacketSize = m_PacketSize;
             cs.m_MultipleActiveResultSets = m_MultipleActiveResultSets;
             cs.shouldEncryptConnection = shouldEncryptConnection;
+            cs.strictEncryption = StrictEncryption;
+#if MICROSOFTDATA
+            cs.hostNameInCertificate = hostNameInCertificate;
+#endif
             cs.additionalParameters = additionalParameters;
             cs.m_TrustServerCertificate = m_TrustServerCertificate;
             cs.m_Authentication = m_Authentication;
             cs.m_ApplicationIntent = m_ApplicationIntent;
             cs.AccessToken = AccessToken;
-            cs.m_ConnectionString = this.m_ConnectionString;
+            cs.m_ConnectionString = m_ConnectionString;
         }
 
         /// <summary>
@@ -178,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Common
             {
                 m_ServerInstance = sci.ServerName;
             }
-            this.LoginSecure = sci.UseIntegratedSecurity;
+            LoginSecure = sci.UseIntegratedSecurity;
             if (!m_LoginSecure)
             {
                 if (IsValidString(sci.UserName))
@@ -206,18 +215,25 @@ namespace Microsoft.SqlServer.Management.Common
 
             if (sci.EncryptConnection)
             {
-                this.shouldEncryptConnection = true;
+                shouldEncryptConnection = true;
             }
 
-            this.m_TrustServerCertificate = sci.TrustServerCertificate;
+            if (sci.StrictEncryption)
+            {
+                StrictEncryption = sci.StrictEncryption;
+            }
+#if MICROSOFTDATA
+            hostNameInCertificate = sci.HostNameInCertificate;
+#endif
+            m_TrustServerCertificate = sci.TrustServerCertificate;
 
-            this.m_Authentication = sci.Authentication;
+            m_Authentication = sci.Authentication;
 
-            this.m_ApplicationIntent = sci.ApplicationIntent;
+            m_ApplicationIntent = sci.ApplicationIntent;
 
-            this.AccessToken = sci.AccessToken;
+            AccessToken = sci.AccessToken;
 
-            this.additionalParameters = sci.AdditionalParameters;
+            additionalParameters = sci.AdditionalParameters;
         }
 
         /// <summary>
@@ -226,15 +242,15 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="sc"></param>
         internal void InitFromSqlConnection(SqlConnection sc)
         {
-            this.NonPooledConnection = true;
+            NonPooledConnection = true;
             if (!SqlContext.IsAvailable)
             {
-                this.ServerInstance = sc.DataSource;
-                this.PacketSize = sc.PacketSize;
-                this.ConnectTimeout = sc.ConnectionTimeout;
-                this.WorkstationId = sc.WorkstationId ?? string.Empty;
+                ServerInstance = sc.DataSource;
+                PacketSize = sc.PacketSize;
+                ConnectTimeout = sc.ConnectionTimeout;
+                WorkstationId = sc.WorkstationId ?? string.Empty;
             }
-            this.DatabaseName = sc.Database;
+            DatabaseName = sc.Database;
             var connectionStringBuilder = new SqlConnectionStringBuilder(sc.ConnectionString);
 
             // Rather than keep track of the SqlCredential separately, we'll just merge the user name and password into our
@@ -245,13 +261,17 @@ namespace Microsoft.SqlServer.Management.Common
                 connectionStringBuilder.UserID = sc.Credential.UserId;
                 connectionStringBuilder.Password = EncryptionUtility.DecryptSecureString(sc.Credential.Password);
             }
-            this.m_LoginSecure = connectionStringBuilder.IntegratedSecurity;
-            this.m_Login = connectionStringBuilder.UserID;
-            this.m_Password = EncryptionUtility.EncryptString(connectionStringBuilder.Password);
-            TrustServerCertificate = connectionStringBuilder.TrustServerCertificate;
+            m_LoginSecure = connectionStringBuilder.IntegratedSecurity;
+            m_Login = connectionStringBuilder.UserID;
+            m_Password = EncryptionUtility.EncryptString(connectionStringBuilder.Password);
             shouldEncryptConnection = connectionStringBuilder.Encrypt;
+#if MICROSOFTDATA
+            StrictEncryption = connectionStringBuilder.Encrypt == SqlConnectionEncryptOption.Strict;
+            hostNameInCertificate = connectionStringBuilder.HostNameInCertificate;
+#endif
+            TrustServerCertificate = connectionStringBuilder.TrustServerCertificate;
             // Assigning ConnectionString must be the last line of this method
-            this.ConnectionString = connectionStringBuilder.ConnectionString;
+            ConnectionString = connectionStringBuilder.ConnectionString;
         }
 
         ///<summary>
@@ -293,10 +313,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public string Login
         {
-            get
-            {
-                return m_Login;
-            }
+            get => m_Login;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -312,7 +329,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         internal bool IsPasswordInitialized
         {
-            get { return IsValidString(Password, false); }
+            get => IsValidString(Password, false);
         }
 
         ///<summary>
@@ -325,17 +342,7 @@ namespace Microsoft.SqlServer.Management.Common
         [System.ComponentModel.Browsable(false)]
         public string Password
         {
-            get
-            {
-                string result = String.Empty;
-
-                if (m_Password != null)
-                {
-                    result = EncryptionUtility.DecryptSecureString(m_Password);
-                }
-
-                return result;
-            }
+            get => m_Password != null ? EncryptionUtility.DecryptSecureString(m_Password) : string.Empty;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -364,21 +371,7 @@ namespace Microsoft.SqlServer.Management.Common
         [System.ComponentModel.Browsable(false)]
         public SecureString SecurePassword
         {
-            get
-            {
-                SecureString result = null;
-
-                if (m_Password == null)
-                {
-                    result = new SecureString();
-                }
-                else
-                {
-                    result = m_Password.Copy();
-                }
-
-                return result;
-            }
+            get => m_Password == null ? new SecureString() : m_Password.Copy();
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -399,17 +392,10 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
 
-        internal void ForceSetPassword(string value)
-        {
-            if ((value != null) && (value.Length != 0))
-            {
-                m_Password = EncryptionUtility.EncryptString(value);
-            }
-            else
-            {
-                m_Password = null;
-            }
-        }
+        internal void ForceSetPassword(string value) =>
+            m_Password = ((value != null) && (value.Length != 0))
+                ? EncryptionUtility.EncryptString(value)
+                : null;
 
         ///<summary>
         /// If set to true, Windows integrated security is used and Login and Password are ignored.
@@ -419,15 +405,12 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public bool LoginSecure
         {
-            get
-            {
-                return m_LoginSecure;
-            }
+            get => m_LoginSecure;
             set
             {
-               ThrowIfUpdatesAreBlocked();
-               ThrowIfConnectionStringIsSet("LoginSecure");
-               m_LoginSecure = value;
+                ThrowIfUpdatesAreBlocked();
+                ThrowIfConnectionStringIsSet("LoginSecure");
+                m_LoginSecure = value;
             }
         }
 
@@ -442,10 +425,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <remarks>Two user name formats are supported: "domain\user" and "user@domain"</remarks>
         public string ConnectAsUserName
         {
-            get
-            {
-                return m_ConnectAsUserName;
-            }
+            get => m_ConnectAsUserName;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -464,17 +444,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public string ConnectAsUserPassword
         {
-            get
-            {
-                string result = String.Empty;
-
-                if (m_ConnectAsUserPassword != null)
-                {
-                    result = EncryptionUtility.DecryptSecureString(m_ConnectAsUserPassword);
-                }
-
-                return result;
-            }
+            get => m_ConnectAsUserPassword != null ? EncryptionUtility.DecryptSecureString(m_ConnectAsUserPassword) : string.Empty;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -502,10 +472,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <exception cref="ConnectionCannotBeChangedException" />
         public bool ConnectAsUser
         {
-            get
-            {
-                return m_ConnectAsUser;
-            }
+            get => m_ConnectAsUser;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -523,10 +490,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public bool NonPooledConnection
         {
-            get
-            {
-                return m_NonPooledConnection;
-            }
+            get => m_NonPooledConnection;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -545,10 +509,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public int PooledConnectionLifetime
         {
-            get
-            {
-                return m_PooledConnectionLifetime;
-            }
+            get => m_PooledConnectionLifetime;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -566,10 +527,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public int MinPoolSize
         {
-            get
-            {
-                return m_MinPoolSize;
-            }
+            get => m_MinPoolSize;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -587,10 +545,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public int MaxPoolSize
         {
-            get
-            {
-                return m_MaxPoolSize;
-            }
+            get => m_MaxPoolSize;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -610,10 +565,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public int ConnectTimeout
         {
-            get
-            {
-                return m_ConnectTimeout;
-            }
+            get => m_ConnectTimeout;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -629,10 +581,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <value></value>
         public SqlConnectionInfo.AuthenticationMethod Authentication
         {
-            get
-            {
-                return m_Authentication;
-            }
+            get => m_Authentication;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -648,10 +597,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <value></value>
         public string ApplicationIntent
         {
-            get
-            {
-                return m_ApplicationIntent;
-            }
+            get => m_ApplicationIntent;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -665,10 +611,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <value></value>
         public bool TrustServerCertificate
         {
-            get
-            {
-                return m_TrustServerCertificate;
-            }
+            get => m_TrustServerCertificate;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -687,21 +630,7 @@ namespace Microsoft.SqlServer.Management.Common
         [System.ComponentModel.Browsable(false)]
         public string ConnectionString
         {
-            get
-            {
-                string result;
-
-                if (null == m_ConnectionString)
-                {
-                    result = GetConnectionString();
-                }
-                else
-                {
-                    result = EncryptionUtility.DecryptSecureString(m_ConnectionString);
-                }
-
-                return result;
-            }
+            get => null == m_ConnectionString ? GetConnectionString() : EncryptionUtility.DecryptSecureString(m_ConnectionString);
             set
             {
                 ThrowIfInvalidValue(value, "ConnectionString", false);
@@ -709,13 +638,16 @@ namespace Microsoft.SqlServer.Management.Common
                 if (!string.IsNullOrEmpty(value))
                 {
                     m_ConnectionString = EncryptionUtility.EncryptString(value);
+                    var connStr = new SqlConnectionStringBuilder(value);
+                    m_DatabaseName = connStr.InitialCatalog;
                 }
                 else
                 {
                     m_ConnectionString = null;
+                    m_DatabaseName = string.Empty;
                 }
 
-                this.m_ResetConnectionString = true;
+                m_ResetConnectionString = true;
             }
         }
 
@@ -731,17 +663,7 @@ namespace Microsoft.SqlServer.Management.Common
         [System.ComponentModel.Browsable(false)]
         public SecureString SecureConnectionString
         {
-            get
-            {
-                if (null == m_ConnectionString)
-                {
-                    return EncryptionUtility.EncryptString(GetConnectionString());
-                }
-                else
-                {
-                    return m_ConnectionString;
-                }
-            }
+            get => m_ConnectionString ?? EncryptionUtility.EncryptString(GetConnectionString());
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -754,7 +676,7 @@ namespace Microsoft.SqlServer.Management.Common
                     m_ConnectionString = null;
                 }
 
-                this.m_ResetConnectionString = true;
+                m_ResetConnectionString = true;
             }
         }
 
@@ -769,10 +691,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public NetworkProtocol NetworkProtocol
         {
-            get
-            {
-                return m_NetworkProtocol;
-            }
+            get => m_NetworkProtocol;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -786,7 +705,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         internal bool IsApplicationNameInitialized
         {
-            get { return IsValidString(m_ApplicationName); }
+            get => IsValidString(m_ApplicationName);
         }
 
         ///<summary>
@@ -798,10 +717,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public string ApplicationName
         {
-            get
-            {
-                return m_ApplicationName;
-            }
+            get => m_ApplicationName;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -816,7 +732,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         internal bool IsWorkstationIdInitialized
         {
-            get { return IsValidString(m_WorkstationId); }
+            get => IsValidString(m_WorkstationId);
         }
 
         ///<summary>
@@ -827,10 +743,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public string WorkstationId
         {
-            get
-            {
-                return m_WorkstationId;
-            }
+            get => m_WorkstationId;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -845,7 +758,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         internal bool IsDatabaseNameInitialized
         {
-            get { return IsValidString(m_DatabaseName); }
+            get => IsValidString(m_DatabaseName);
         }
 
         /// <summary>
@@ -853,10 +766,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public string DatabaseName
         {
-            get
-            {
-                return m_DatabaseName;
-            }
+            get => m_DatabaseName;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -875,10 +785,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public int PacketSize
         {
-            get
-            {
-                return m_PacketSize;
-            }
+            get => m_PacketSize;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -894,10 +801,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <value></value>
         public bool MultipleActiveResultSets
         {
-            get
-            {
-                return m_MultipleActiveResultSets;
-            }
+            get => m_MultipleActiveResultSets;
             set
             {
                 ThrowIfUpdatesAreBlocked();
@@ -965,28 +869,55 @@ namespace Microsoft.SqlServer.Management.Common
         /// <value></value>
         public bool EncryptConnection
         {
-            get
-            {
-                return this.shouldEncryptConnection;
-            }
-
+            get => shouldEncryptConnection;
             set
             {
                 ThrowIfUpdatesAreBlocked();
                 ThrowIfConnectionStringIsSet("EncryptConnection");
-                this.shouldEncryptConnection = value;
+                shouldEncryptConnection = value;
             }
         }
+
+        /// <summary>
+        /// Whether "encrypt=strict" is specified in the connection string. 
+        /// When true, the value of <see cref="EncryptConnection"/> is ignored.
+        /// </summary>
+        public bool StrictEncryption
+        {
+            get => strictEncryption;
+            set
+            {
+                ThrowIfUpdatesAreBlocked();
+                ThrowIfConnectionStringIsSet();
+                strictEncryption = value;
+            }
+        }
+
+#if MICROSOFTDATA
+        /// <summary>
+        /// The host name provided in certificate to be used for certificate validation.
+        /// </summary>
+        public string HostNameInCertificate
+        {
+            get => hostNameInCertificate;
+            set
+            {
+                ThrowIfUpdatesAreBlocked();
+                ThrowIfConnectionStringIsSet();
+                hostNameInCertificate = value;
+            }
+        }
+#endif
 
         /// <summary>
         /// Returns whether additional parameters have been specified in connection string
         /// </summary>
         internal string AdditionalParameters
         {
-            get { return this.additionalParameters; }
+            get => additionalParameters;
         }
 
-        private void ThrowIfConnectionStringIsSet(string propertyName)
+        private void ThrowIfConnectionStringIsSet([CallerMemberName] string propertyName = "")
         {
             if ((m_ConnectionString != null) && IsValidString(ConnectionString))
             {
@@ -995,16 +926,13 @@ namespace Microsoft.SqlServer.Management.Common
             else
             {
                 //If any of the field of Connection String is changed that means the user's intent is to reset the connection string.
-                this.m_ResetConnectionString = true;
+                m_ResetConnectionString = true;
             }
         }
 
         internal bool IsReadAccessBlocked
         {
-            get
-            {
-                return ((m_ConnectionString != null) && IsValidString(ConnectionString));
-            }
+            get => (m_ConnectionString != null) && IsValidString(ConnectionString);
         }
 
         /// <summary>
@@ -1012,7 +940,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         private void ThrowIfUpdatesAreBlocked()
         {
-            if (this.BlockUpdates)
+            if (BlockUpdates)
             {
                 throw new ConnectionCannotBeChangedException(StringConnectionInfo.ConnectionCannotBeChanged);
             }
@@ -1020,17 +948,14 @@ namespace Microsoft.SqlServer.Management.Common
 
         private void ThrowIfLoginSecure(string propertyName)
         {
-            if (true == this.LoginSecure)
+            if (true == LoginSecure)
             {
                 throw new InvalidPropertyValueException(
                     StringConnectionInfo.CannotSetWhenLoginSecure(propertyName));
             }
         }
 
-        private void ThrowIfInvalidValue(string str, string propertyName)
-        {
-            ThrowIfInvalidValue(str, propertyName, true);
-        }
+        private void ThrowIfInvalidValue(string str, string propertyName) => ThrowIfInvalidValue(str, propertyName, true);
 
         /// <summary>
         /// check if the input value is valid ( != null )
@@ -1048,9 +973,7 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         protected string ThrowIfPropertyNotSet(string propertyName, string str)
-        {
-            return ThrowIfPropertyNotSet(propertyName, str, true);
-        }
+            => ThrowIfPropertyNotSet(propertyName, str, true);
 
         protected string ThrowIfPropertyNotSet(string propertyName, string str, bool checkEmpty)
         {
@@ -1078,24 +1001,14 @@ namespace Microsoft.SqlServer.Management.Common
             }
         }
 
-        private bool IsValidString(string str)
-        {
-            return IsValidString(str, true);
-        }
+        private bool IsValidString(string str) => IsValidString(str, true);
 
-        private bool IsValidString(string str, bool checkEmpty)
-        {
-            if (null == str || (checkEmpty && str.Length <= 0))
-            {
-                return false;
-            }
-            return true;
-        }
+        private bool IsValidString(string str, bool checkEmpty) => null != str && !(checkEmpty && str.Length <= 0);
 
         private string GetNetworkProtocolString()
         {
             string strNetProtocol = String.Empty;
-            switch (this.NetworkProtocol)
+            switch (NetworkProtocol)
             {
                 case NetworkProtocol.TcpIp:
                     strNetProtocol = "dbmssocn";
@@ -1153,8 +1066,8 @@ namespace Microsoft.SqlServer.Management.Common
             }
             else
             {
-                sbConnectionString.DataSource = this.ServerInstance;
-                if (this.LoginSecure)   // Trusted login
+                sbConnectionString.DataSource = ServerInstance;
+                if (LoginSecure)   // Trusted login
                 {
                     sbConnectionString.IntegratedSecurity = true;
                 }
@@ -1181,11 +1094,11 @@ namespace Microsoft.SqlServer.Management.Common
                     }
                 }
 
-                if (this.ConnectTimeout != ConnectionTimeout_Default)
+                if (ConnectTimeout != ConnectionTimeout_Default)
                 {
-                    sbConnectionString.ConnectTimeout = this.ConnectTimeout;
+                    sbConnectionString.ConnectTimeout = ConnectTimeout;
                 }
-                if (this.NetworkProtocol != NetworkProtocol.NotSpecified)
+                if (NetworkProtocol != NetworkProtocol.NotSpecified)
                 {
 #if !NETSTANDARD2_0 && !NETCOREAPP
                     //NetworkLibrary property not implemented in .NetCore
@@ -1195,57 +1108,74 @@ namespace Microsoft.SqlServer.Management.Common
                 // database name
                 if (IsValidString(m_DatabaseName))
                 {
-                    sbConnectionString.InitialCatalog = this.DatabaseName;
+                    sbConnectionString.InitialCatalog = DatabaseName;
                 }
 
                 // workstation id
                 if (IsValidString(m_WorkstationId))
                 {
-                    sbConnectionString.WorkstationID = this.WorkstationId;
+                    sbConnectionString.WorkstationID = WorkstationId;
                 }
 
                 // application name
                 if (IsValidString(m_ApplicationName))
                 {
-                    sbConnectionString.ApplicationName = this.ApplicationName;
+                    sbConnectionString.ApplicationName = ApplicationName;
                 }
 
-                if (this.PooledConnectionLifetime != PooledConnectionLifetime_Default)
+                if (PooledConnectionLifetime != PooledConnectionLifetime_Default)
                 {
                     // The property LoadBalnceTimeout corresponds to the minimum time, in seconds, for the connection to live in the connection pool before being destroyed
-                    sbConnectionString.LoadBalanceTimeout = this.PooledConnectionLifetime;
+                    sbConnectionString.LoadBalanceTimeout = PooledConnectionLifetime;
                 }
 
-                if (this.MaxPoolSize != MaxPoolSize_Default && this.MaxPoolSize > 0)
+                if (MaxPoolSize != MaxPoolSize_Default && MaxPoolSize > 0)
                 {
-                    sbConnectionString.MaxPoolSize = this.MaxPoolSize;
+                    sbConnectionString.MaxPoolSize = MaxPoolSize;
                 }
 
-                if (this.MinPoolSize != MinPoolSize_Default)
+                if (MinPoolSize != MinPoolSize_Default)
                 {
-                    sbConnectionString.MinPoolSize = this.MinPoolSize;
+                    sbConnectionString.MinPoolSize = MinPoolSize;
                 }
 
-                if (this.NonPooledConnection != NonPooledConnection_Default)
+                if (NonPooledConnection != NonPooledConnection_Default)
                 {
                     sbConnectionString.Pooling = false;
                 }
 
-                if (this.PacketSize != PacketSize_Default)
+                if (PacketSize != PacketSize_Default)
                 {
-                    sbConnectionString.PacketSize = this.PacketSize;
+                    sbConnectionString.PacketSize = PacketSize;
                 }
 
-                sbConnectionString.Encrypt = this.shouldEncryptConnection;
+                if (StrictEncryption)
+                {
+#if MICROSOFTDATA
+                    sbConnectionString.Encrypt = SqlConnectionEncryptOption.Strict;
+#else
+                    sbConnectionString.Encrypt = true;
+#endif
+                }
+                else
+                {
+                    sbConnectionString.Encrypt = shouldEncryptConnection;
+                }
 
-                sbConnectionString.TrustServerCertificate = this.TrustServerCertificate;
+#if MICROSOFTDATA
+                if (!string.IsNullOrEmpty(hostNameInCertificate))
+                {
+                    sbConnectionString.HostNameInCertificate = hostNameInCertificate;
+                }
+#endif
+                sbConnectionString.TrustServerCertificate = TrustServerCertificate;
 
-                if (this.AccessToken == null && this.Authentication != SqlConnectionInfo.AuthenticationMethod.NotSpecified)
+                if (AccessToken == null && Authentication != SqlConnectionInfo.AuthenticationMethod.NotSpecified)
                 {
                     SetAuthentication(sbConnectionString);
                 }
 
-                if (IsValidString(this.ApplicationIntent))
+                if (IsValidString(ApplicationIntent))
                 {
                     SetApplicationIntent(sbConnectionString);
                 }
@@ -1269,7 +1199,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         private void SetAuthentication(SqlConnectionStringBuilder sbConnectionString)
         {
-            if (Enum.TryParse(this.Authentication.ToString(), true, out SqlAuthenticationMethod sqlAuthentication))
+            if (Enum.TryParse(Authentication.ToString(), true, out SqlAuthenticationMethod sqlAuthentication))
             {
                 sbConnectionString.Authentication = sqlAuthentication;
             }
@@ -1285,7 +1215,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         private void SetApplicationIntent(SqlConnectionStringBuilder sbConnectionString)
         {
-            if (Enum.TryParse(this.ApplicationIntent, true, out ApplicationIntent applicationIntent))
+            if (Enum.TryParse(ApplicationIntent, true, out ApplicationIntent applicationIntent))
             {
                 sbConnectionString.ApplicationIntent = applicationIntent;
             }
@@ -1303,9 +1233,9 @@ namespace Microsoft.SqlServer.Management.Common
             get
             {
                 string initialCatalog = string.Empty;
-                if (!string.IsNullOrEmpty(this.ConnectionString))
+                if (!string.IsNullOrEmpty(ConnectionString))
                 {
-                    SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(this.ConnectionString);
+                    SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConnectionString);
                     initialCatalog = scsb.InitialCatalog;
                 }
 
@@ -1315,10 +1245,7 @@ namespace Microsoft.SqlServer.Management.Common
 
         internal bool BlockUpdates
         {
-            get
-            {
-                return m_BlockUpdates;
-            }
+            get => m_BlockUpdates;
             set
             {
                 m_BlockUpdates = value;
@@ -1331,19 +1258,13 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         protected bool ResetConnectionString
         {
-            get
-            {
-                return m_ResetConnectionString;
-            }
+            get => m_ResetConnectionString;
             set
             {
                 m_ResetConnectionString = value;
             }
         }
 
-        public override String ToString()
-        {
-            return this.ConnectionString;
-        }
+        public override string ToString() => ConnectionString;
     }
 }

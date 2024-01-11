@@ -472,7 +472,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             m_fs = new FileStream(realFile, FileMode.Open,FileAccess.Read, FileShare.Read);
-#elif !NETSTANDARD2_0 && !NETCOREAPP
+#elif NETFRAMEWORK
             m_fs = ManagementUtil.LoadResourceFromAssembly(a, strFile);
 #else
             m_fs = a.GetManifestResourceStream(a.GetName().Name + "." + strFile) ??
@@ -480,7 +480,7 @@ namespace Microsoft.SqlServer.Management.Smo
 #endif
             if (null == m_fs)
             {
-                throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FailedToLoadResFileFromAssembly(strFile, a.CodeBase));
+                throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FailedToLoadResFileFromAssembly(strFile, a.Location));
             }
             LoadInternal();
         }

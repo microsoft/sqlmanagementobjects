@@ -3,9 +3,8 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetfxVersion);netcoreapp3.1</TargetFrameworks>
-    <!-- the auto generated redirect for newtonsoft breaks the runtime resolver -->
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <EnableLocalization>false</EnableLocalization>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NewtonSoft.Json" />

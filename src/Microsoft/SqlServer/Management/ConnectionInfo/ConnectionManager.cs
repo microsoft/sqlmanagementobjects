@@ -546,7 +546,7 @@ end;";
         /// <summary>
         /// connects to the server impersonating if necessary
         /// </summary>
-        void InternalConnect()
+        private void InternalConnect()
         {
             if (ConnectAsUser && !(IsReadAccessBlocked || SqlContext.IsAvailable))
             {

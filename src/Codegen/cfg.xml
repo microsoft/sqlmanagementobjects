@@ -2551,6 +2551,7 @@
       <property name="IsEnabled" generate="true" is_intrinsic="false" />
       <property name="JobCount" generate="true" is_intrinsic="false" />
       <property name="ScheduleUid" generate="false" />
+      <property name="OwnerLoginName" generate="true" />
     </object>
   </namespace>
   <namespace name="Microsoft.SqlServer.Management.Smo.RegisteredServers">

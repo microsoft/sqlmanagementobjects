@@ -3,9 +3,18 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 170.23.0
+
+- Upgraded SqlClient to 5.1.2 and removed direct Azure SDK dependencies from the nuget package
+- Fix createdrop script error for versioned table in ledger database
+- Improve scripting of dependency objects in Azure SQL database
+- Added `ObjectId` parameter in User and Login create options
+- Fix `Database.PrefetchObjects` not to throw for SQL version earlier than 2016
+
 ## 170.23.0, 161.48050.0
 - Add ledger support in Database create options for MI in SSMS
 - Fixed the `Database.AvailabilityDatabaseSynchronizationState` property to reflect the correct synchronization state of MI databases in Managed Instance Link
+- Fix database scoped extended events enumeration on Azure SQL database instances having DATABASE_DEFAULT catalog collation
 
 ## 170.20.0
 - Add `OwnerLoginName` property to `JobSchedule` per [issue 120](https://github.com/microsoft/sqlmanagementobjects/issues/120)

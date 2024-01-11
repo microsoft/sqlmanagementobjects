@@ -4,11 +4,11 @@
 using Microsoft.SqlServer.Management.Common;
 using System;
 using System.Reflection;
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Runtime.Serialization;
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
 using System.Security.Permissions;
 #endif
 using System.Text;
@@ -134,7 +134,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// Base constructor
         /// </summary>
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 #endif
         public DmfException()
@@ -146,7 +146,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <summary>
         /// Base constructor
         /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 #endif
         public DmfException(string message)
@@ -158,7 +158,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <summary>
         /// Base constructor
         /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 #endif
         public DmfException(string message, Exception innerException)
@@ -171,7 +171,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <summary>
         /// Base constructor
         /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
 #endif
 
@@ -270,7 +270,7 @@ namespace Microsoft.SqlServer.Management.Dmf
     /// <summary>
     /// This exception gets thrown when FacetRepository attempts to scan the same assembly for the second time
     /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
     [Serializable]
 #endif
 #if APTCA_ENABLED
@@ -314,7 +314,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             assembly = (string)info.GetValue("assembly", typeof(string));
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
 
         /// <summary>
         /// Serialization helper
@@ -379,7 +379,7 @@ namespace Microsoft.SqlServer.Management.Dmf
     /// <summary>
     /// This exception gets thrown when operator's arguments have incompatible types
     /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
     [Serializable]
 #endif
 #if APTCA_ENABLED
@@ -430,7 +430,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             typeRight = info.GetString("typeRight");
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -500,7 +500,7 @@ namespace Microsoft.SqlServer.Management.Dmf
     /// <summary>
     /// This exception gets thrown when operator's arguments have incompatible types
     /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
     [Serializable]
 #endif
 #if APTCA_ENABLED
@@ -553,7 +553,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             type = info.GetString("type");
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -622,7 +622,7 @@ namespace Microsoft.SqlServer.Management.Dmf
     /// <summary>
     /// This exception gets thrown when function receives argument of unexpected type
     /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
     [Serializable]
 #endif
 #if APTCA_ENABLED
@@ -683,7 +683,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -756,7 +756,7 @@ namespace Microsoft.SqlServer.Management.Dmf
     /// <summary>
     /// This exception gets thrown when function receives unexpected number of arguments
     /// </summary>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
     [Serializable]
 #endif
 #if APTCA_ENABLED
@@ -818,7 +818,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -943,7 +943,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1056,7 +1056,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <param name="info"></param>
         /// <param name="context"></param>
         ///
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1167,7 +1167,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1289,7 +1289,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1471,7 +1471,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1593,7 +1593,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1702,7 +1702,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1805,7 +1805,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -1928,7 +1928,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2027,7 +2027,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2145,7 +2145,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2269,7 +2269,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2359,7 +2359,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2491,7 +2491,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2603,7 +2603,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2749,7 +2749,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -2878,7 +2878,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3006,7 +3006,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3140,7 +3140,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3267,7 +3267,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3341,7 +3341,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3416,7 +3416,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3498,7 +3498,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3520,7 +3520,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <param name="failedObjectName"></param>
         /// <param name="failedObjectType"></param>
         /// <param name="innerException"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SuppressMessage("Microsoft.Globalization", "CA1303:DoNotPassLiteralsAsLocalizedParameters", MessageId = "Microsoft.SqlServer.Management.Smo.SmoException.#ctor(System.String,System.Exception)")]
 #endif
         public FailedOperationException(
@@ -3670,7 +3670,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3784,7 +3784,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -3874,7 +3874,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4008,7 +4008,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4119,7 +4119,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4214,7 +4214,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4329,7 +4329,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4405,7 +4405,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4498,7 +4498,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4634,7 +4634,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4742,7 +4742,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4838,7 +4838,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4904,7 +4904,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -4987,7 +4987,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExpectedErrors>
+  <!--Missing properties trigger extra SQL queries and should be minimized during scripting by using PreFetch and GetScriptInitFields appropriately-->
+  <MissingProperties>
+    <PropertyList Type="DatabaseDdlTrigger">
+      <Property>IsSystemObject</Property>
+      <Property>Text</Property>
+    </PropertyList>
+    <PropertyList Type="DataFile">
+      <Property>IsPrimaryFile</Property>
+    </PropertyList>
+    <PropertyList Type="Information">
+      <Property>EngineEdition</Property>
+    </PropertyList>
+    <PropertyList Type="NumberedStoredProcedure">
+      <Property>Text</Property>
+    </PropertyList>
+    <PropertyList Type="UserOptions">
+      <Property>AnsiNulls</Property>
+    </PropertyList>
+  </MissingProperties>
+  <SupportedObjectTypes>
+    <DatabaseObjectType>Table</DatabaseObjectType>
+    <DatabaseObjectType>View</DatabaseObjectType>
+    <DatabaseObjectType>StoredProcedure</DatabaseObjectType>
+    <DatabaseObjectType>UserDefinedFunction</DatabaseObjectType>
+    <DatabaseObjectType>UserDefinedDataType</DatabaseObjectType>
+    <DatabaseObjectType>User</DatabaseObjectType>
+    <DatabaseObjectType>Default</DatabaseObjectType>
+    <DatabaseObjectType>Rule</DatabaseObjectType>
+    <DatabaseObjectType>DatabaseRole</DatabaseObjectType>
+    <DatabaseObjectType>ApplicationRole</DatabaseObjectType>
+    <DatabaseObjectType>SqlAssembly</DatabaseObjectType>
+    <DatabaseObjectType>DdlTrigger</DatabaseObjectType>
+    <DatabaseObjectType>Synonym</DatabaseObjectType>
+    <DatabaseObjectType>XmlSchemaCollection</DatabaseObjectType>
+    <DatabaseObjectType>Schema</DatabaseObjectType>
+    <DatabaseObjectType>PlanGuide</DatabaseObjectType>
+    <DatabaseObjectType>UserDefinedType</DatabaseObjectType>
+    <DatabaseObjectType>UserDefinedAggregate</DatabaseObjectType>
+    <DatabaseObjectType>FullTextCatalog</DatabaseObjectType>
+    <DatabaseObjectType>UserDefinedTableType</DatabaseObjectType>
+  </SupportedObjectTypes>
+</ExpectedErrors>

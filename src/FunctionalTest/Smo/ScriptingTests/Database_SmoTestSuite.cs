@@ -66,6 +66,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoDatabase_TemporalRetentionProperty_AzureSterlingV12()
         {
             this.ExecuteWithDbDrop(
@@ -245,6 +246,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Trying_To_Access_AzureDB_With_DBManager_Role_Only_Does_Not_Throw()
         {
             // We use the ExecuteWithMasterDb() overload to get back "master", so we can create a "low-privileged" login/user
@@ -534,24 +536,22 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
             Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void CatalogCollation_IsScriptedCorrectly()
         {
-            this.ExecuteTest(
-                server =>
-                {
-                    TestCatalogCollationType(server, CatalogCollationType.DatabaseDefault);
-                    TestCatalogCollationType(server, CatalogCollationType.SQLLatin1GeneralCP1CIAS);
+            this.ExecuteTest(server => TestCatalogCollationType(server, CatalogCollationType.DatabaseDefault));
+            this.ExecuteTest(server => TestCatalogCollationType(server, CatalogCollationType.SQLLatin1GeneralCP1CIAS));
+            this.ExecuteTest(server =>
+            {
+                _SMO.Database catalogCollationDb = server.CreateDatabaseDefinition("catalogCollationDb");
 
-                    // Create a DB, and verify that setting the catalog collation to the fixed contained DB collation raises the appropriate exception.
-                    //
-                    _SMO.Database catalogCollationDb = server.CreateDatabaseDefinition("catalogCollationDb");
-                    Assert.Throws<SmoException>(
-                        () =>
-                        {
-                            catalogCollationDb.CatalogCollation = CatalogCollationType.ContainedDatabaseFixedCollation;
-                        },
-                        "Should not have been able to set the catalog collation type to ContainedDatabaseFixedCollation");
-                });
+                Assert.Throws<SmoException>(
+                    () =>
+                    {
+                        catalogCollationDb.CatalogCollation = CatalogCollationType.ContainedDatabaseFixedCollation;
+                    },
+                    "Should not have been able to set the catalog collation type to ContainedDatabaseFixedCollation");
+            });
         }
 
         /// <summary>
@@ -1152,6 +1152,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_CanChangeOwner()
         {
             this.ExecuteWithDbDrop(
@@ -1183,6 +1184,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_CanChangeOwner_WithExistingUser()
         {
             this.ExecuteWithDbDrop(
@@ -1214,6 +1216,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_ChangeOwnerWithExistingUserAndNoOverride_ThrowsException()
         {
             this.ExecuteWithDbDrop(
@@ -1248,6 +1251,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_DBComparerTest()
         {
             this.ExecuteTest(
@@ -1303,12 +1307,19 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             ExecuteWithDbDrop((db) =>
             {
                 var time1 = (DateTime)db.ExecutionManager.ConnectionContext.ExecuteScalar("select GETDATE()");
-                db.CheckTables(RepairType.None);
-                var time2 = (DateTime)db.ExecutionManager.ConnectionContext.ExecuteScalar("select GETDATE()");
-                db.Refresh();
-                db.Parent.SetDefaultInitFields(typeof(_SMO.Database), "LastGoodCheckDbTime");
-                var dt = db.LastGoodCheckDbTime;
-                Assert.That(dt, Is.InRange(time1, time2), "LastGoodCheckDbTime");
+                try
+                {
+                    _ = db.CheckTables(RepairType.None);
+                    var time2 = (DateTime)db.ExecutionManager.ConnectionContext.ExecuteScalar("select GETDATE()");
+                    db.Refresh();
+                    db.Parent.SetDefaultInitFields(typeof(_SMO.Database), "LastGoodCheckDbTime");
+                    var dt = db.LastGoodCheckDbTime;
+                    Assert.That(dt, Is.InRange(time1, time2), "LastGoodCheckDbTime");
+                }
+                catch (FailedOperationException foe) when (foe.GetBaseException() is SqlException sqlex && sqlex.Number == 5030)
+                {
+                    TraceHelper.TraceInformation("DBCC failed because the database couldn't be locked");
+                }
             });
         }
 
@@ -1321,6 +1332,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_Rename_Does_Not_Break_Functionality()
         {
             ExecuteWithDbDrop((db) =>
@@ -1428,6 +1440,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_IsLedger_On()
         {
             this.ExecuteTest(
@@ -1464,6 +1477,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_IsLedger_OFF()
         {
             this.ExecuteTest(

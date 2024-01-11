@@ -33,7 +33,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 int id = ((ScheduleObjectKey)key).ID;
                 if( id == JobScheduleCollectionBase.GetDefaultID() )
                 {
-                    Property propID = this.Properties["ID"];
+                    Property propID = Properties["ID"];
                     if( propID.Retrieved || propID.Dirty )
                     {
                         id = (int)propID.Value;
@@ -63,8 +63,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         public JobSchedule(SqlSmoObject parent, string name) : base()
         {
             ValidateName(name);
-            this.key = new ScheduleObjectKey(name, JobScheduleCollectionBase.GetDefaultID());
-            this.Parent = parent;
+            key = new ScheduleObjectKey(name, JobScheduleCollectionBase.GetDefaultID());
+            Parent = parent;
         }
 
         internal JobSchedule(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
@@ -88,66 +88,40 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
-            StringBuilder createQuery = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            var createQuery = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            bool isSharedSched = IsShared;
+            var isSharedSched = IsShared;
             int count;
 
+            var returnCode = Job.GetReturnCode(sp);
             ExecuteForScalar = true;
             if (isSharedSched)
             {
-                // shared schedules cannot be scripted for 7.0 and 8.0
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
 
                 if (sp.ForDirectExecution)
                 {
-                    createQuery.Append("DECLARE @schedule_id int");
-                    createQuery.Append(Globals.newline);
+                    _ = createQuery.Append("DECLARE @schedule_id int");
+                    _ = createQuery.Append(Globals.newline);
                 }
                 //We are expecting the schedule_id to be returned by this query
-                createQuery.AppendFormat(SmoApplication.DefaultCulture,
-                            "EXEC msdb.dbo.sp_add_schedule @schedule_name=N'{0}'", SqlString(this.Name));
+                _ = createQuery.AppendFormat(SmoApplication.DefaultCulture,
+                            "EXEC msdb.dbo.sp_add_schedule @schedule_name=N'{0}'", SqlString(Name));
                 count = 1;
             }
             else
             {
-                if (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80)
+                if (sp.ForDirectExecution)
                 {
-                    if (sp.ForDirectExecution)
-                    {
-                        createQuery.Append("DECLARE @schedule_id int");
-                        createQuery.Append(Globals.newline);
-                    }
-                    createQuery.AppendFormat(SmoApplication.DefaultCulture,
-                        "EXEC {0}msdb.dbo.sp_add_jobschedule {1}, @name=N'{2}'",
-                        Job.GetReturnCode(sp),
-                        ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(sp),
-                        SqlString(this.Name));
-
-                    count = 2;
+                    _ = createQuery.Append("DECLARE @schedule_id int");
+                    _ = createQuery.Append(Globals.newline);
                 }
-                else
-                {
-                    if (sp.ForDirectExecution)
-                    {
-                        // The Shiloh stored procedure does not return the schedule id, sp 
-                        // we will obtain it by querying for the highest id 
-                        createQuery.Append("begin transaction");
-                        createQuery.Append(Globals.newline);
-                        createQuery.Append("create table #tmp_sp_help_jobschedule1 (schedule_id int null, schedule_name nvarchar(128) null, enabled int null, freq_type int null, freq_interval int null, freq_subday_type int null, freq_subday_interval int null, freq_relative_interval int null, freq_recurrence_factor int null, active_start_date int null, active_end_date int null, active_start_time int null, active_end_time int null, date_created datetime null, schedule_description nvarchar(4000) null, next_run_date int null, next_run_time int null, job_id uniqueidentifier null)");
-                        createQuery.Append(Globals.newline);
-                        createQuery.Append("DECLARE @schedule_id int");
-                        createQuery.Append(Globals.newline);
-                    }
+                _ = createQuery.AppendFormat(SmoApplication.DefaultCulture,
+                    "EXEC {0}msdb.dbo.sp_add_jobschedule {1}, @name=N'{2}'",
+                    returnCode,
+                    ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(sp),
+                    SqlString(Name));
 
-                    createQuery.AppendFormat(SmoApplication.DefaultCulture,
-                        "EXEC {0}msdb.dbo.sp_add_jobschedule {1}, @name=N'{2}'",
-                        Job.GetReturnCode(sp),
-                        ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(sp),
-                        SqlString(this.Name));
-
-                    count = 2;
-                }
+                count = 2;
             }
 
             GetAllParams(createQuery, sp, ref count);
@@ -155,9 +129,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             // Add the @schedule_uid parameter if the creation sproc supports it. SQL 2008
             // (Version100) supports it, but 2005 (Version90) only supported it for shared
             // schedules. SQL 2000 (Version80) did not support it at all.
-            if (this.ServerVersion.Major >= 9 &&
-                ((sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100) ||
-                 (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90 && isSharedSched)))
+            if ((sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100) ||
+                 (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90 && isSharedSched))
             {
                 GetParameter(createQuery, sp, "ScheduleUid", "@schedule_uid=N'{0}'", ref count);
             }
@@ -166,31 +139,27 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             //get the schedule_id if we are in execution mode
             if (sp.ForDirectExecution)
             {
-                if (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80)
-                {
-                    createQuery.Append(", @schedule_id = @schedule_id OUTPUT");
-                    createQuery.Append(Globals.newline);
-                    createQuery.Append("select @schedule_id");
-                }
-                else
-                {
-                    // The Shiloh stored procedure does not return the schedule id, sp 
-                    // we will obtain it by querying for the highest id 
-                    createQuery.Append(Globals.newline);
-                    createQuery.AppendFormat(SmoApplication.DefaultCulture,
-                        "insert into #tmp_sp_help_jobschedule1 (schedule_id, schedule_name, enabled, freq_type, freq_interval, freq_subday_type, freq_subday_interval, freq_relative_interval, freq_recurrence_factor, active_start_date, active_end_date, active_start_time, active_end_time, date_created, schedule_description, next_run_date, next_run_time) 	exec msdb.dbo.sp_help_jobschedule  {0}",
-                        ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(sp));
-                    createQuery.Append(Globals.newline);
-
-                    createQuery.Append("select max(schedule_id) from #tmp_sp_help_jobschedule1");
-                    createQuery.Append(Globals.newline);
-                    createQuery.Append("drop table #tmp_sp_help_jobschedule1");
-                    createQuery.Append(Globals.newline);
-                    createQuery.Append("commit transaction");
-                }
+                _ = createQuery.Append(", @schedule_id = @schedule_id OUTPUT");
+                _ = createQuery.Append(Globals.newline);
             }
-
-            queries.Add(createQuery.ToString());
+            var ownerLoginName = GetPropValueOptional(nameof(OwnerLoginName), string.Empty);
+            if (sp.IncludeScripts.Owner && !string.IsNullOrEmpty(ownerLoginName))
+            {
+                if (!isSharedSched && sp.Agent.InScriptJob)
+                {
+                    _ = createQuery.Append(Globals.newline);
+                    Job.AddCheckErrorCode(createQuery);
+                }
+                _ = createQuery.Append(Globals.newline);
+                _ = createQuery.Append($"exec {returnCode}msdb.dbo.sp_update_schedule @name=N'{SqlString(Name)}', @owner_login_name=N'{SqlString(ownerLoginName)}'");
+                _ = createQuery.Append(Globals.newline);
+            }
+            //get the schedule_id if we are in execution mode
+            if (sp.ForDirectExecution)
+            {
+                _ = createQuery.Append("select @schedule_id");
+            }
+            _ = queries.Add(createQuery.ToString());
         }
 
         
@@ -198,32 +167,36 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             get 
             {
-                return this.ParentColl.ParentInstance is JobServer;
+                return ParentColl.ParentInstance is JobServer;
             }
         }
 
         private void GetAllParams(StringBuilder sb, ScriptingPreferences sp, ref int count)
         {
-            GetBoolParameter(sb, sp, "IsEnabled", "@enabled={0}", ref count);
-            GetEnumParameter( sb, sp, "FrequencyTypes", "@freq_type={0}", 
+            GetBoolParameter(sb, sp, nameof(IsEnabled), "@enabled={0}", ref count);
+            GetEnumParameter( sb, sp, nameof(FrequencyTypes), "@freq_type={0}", 
                             typeof(FrequencyTypes), ref count );
-            GetParameter( sb, sp, "FrequencyInterval", "@freq_interval={0}", ref count);
-            GetEnumParameter( sb, sp, "FrequencySubDayTypes", "@freq_subday_type={0}",
+            GetParameter( sb, sp, nameof(FrequencyInterval), "@freq_interval={0}", ref count);
+            GetEnumParameter( sb, sp, nameof(FrequencySubDayTypes), "@freq_subday_type={0}",
                             typeof(FrequencySubDayTypes), ref count)  ;
-            GetParameter( sb, sp, "FrequencySubDayInterval", "@freq_subday_interval={0}", ref count);
-            GetEnumParameter( sb, sp, "FrequencyRelativeIntervals", "@freq_relative_interval={0}",
+            GetParameter( sb, sp, nameof(FrequencySubDayInterval), "@freq_subday_interval={0}", ref count);
+            GetEnumParameter( sb, sp, nameof(FrequencyRelativeIntervals), "@freq_relative_interval={0}",
                             typeof( FrequencyRelativeIntervals), ref count);
-            GetParameter( sb, sp, "FrequencyRecurrenceFactor", "@freq_recurrence_factor={0}", ref count);
-            GetDateTimeParameterAsInt( sb, sp, "ActiveStartDate", "@active_start_date={0}", ref count);
-            GetDateTimeParameterAsInt( sb, sp, "ActiveEndDate", "@active_end_date={0}", ref count);
-            GetTimeSpanParameterAsInt( sb, sp, "ActiveStartTimeOfDay", "@active_start_time={0}", ref count);
-            GetTimeSpanParameterAsInt( sb, sp, "ActiveEndTimeOfDay", "@active_end_time={0}", ref count);
+            GetParameter( sb, sp, nameof(FrequencyRecurrenceFactor), "@freq_recurrence_factor={0}", ref count);
+            _ = GetDateTimeParameterAsInt(sb, sp, nameof(ActiveStartDate), "@active_start_date={0}", ref count);
+            _ = GetDateTimeParameterAsInt(sb, sp, nameof(ActiveEndDate), "@active_end_date={0}", ref count);
+            _ = GetTimeSpanParameterAsInt(sb, sp, nameof(ActiveStartTimeOfDay), "@active_start_time={0}", ref count);
+            _ = GetTimeSpanParameterAsInt(sb, sp, nameof(ActiveEndTimeOfDay), "@active_end_time={0}", ref count);
+            if (sp.ScriptForAlter && sp.IncludeScripts.Owner)
+            {
+                _ = GetStringParameter(sb, sp, nameof(OwnerLoginName), "@owner_login_name=N'{0}'", ref count);
+            }
         }
 
         //get the schedule_id if this is a shared schedule
         protected override void PostCreate()
         {
-            if( !this.ExecutionManager.Recording )
+            if( !ExecutionManager.Recording )
             {
                 SetId((int)(ScalarResult[1]));
             }
@@ -327,7 +300,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 sb.AppendFormat(SmoApplication.DefaultCulture,
                             "EXEC msdb.dbo.sp_delete_jobschedule {0}, @name=N'{1}'",
                             ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(sp),
-                            SqlString(this.Name));
+                            SqlString(Name));
             }
 
             queries.Add(sb.ToString());
@@ -342,32 +315,14 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             StringBuilder alterQuery = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             int count;
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            alterQuery.AppendFormat(SmoApplication.DefaultCulture,
+                                    "EXEC msdb.dbo.sp_update_schedule @schedule_id={0}", ID);
+            count = 1;
+            GetAllParams(alterQuery, sp, ref count);
+            
+            if (count > 1)
             {
-                alterQuery.AppendFormat(SmoApplication.DefaultCulture,
-                                        "EXEC msdb.dbo.sp_update_schedule @schedule_id={0}", ID);
-                count = 1;
-                GetAllParams(alterQuery, sp, ref count);
-
-                if (count > 1)
-                {
-                    queries.Add(alterQuery.ToString());
-                }
-            }
-            else
-            {
-                alterQuery.AppendFormat(SmoApplication.DefaultCulture,
-                                        "EXEC msdb.dbo.sp_update_jobschedule {0}, @name=N'{1}'",
-                                        ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(),
-                                        SqlString(this.Name));
-
-                count = 2;
-                GetAllParams(alterQuery, sp, ref count);
-
-                if (count > 2)
-                {
-                    queries.Add(alterQuery.ToString());
-                }
+                queries.Add(alterQuery.ToString());
             }
         }
         
@@ -378,20 +333,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         internal override void ScriptRename(StringCollection queries, ScriptingPreferences sp, string newName)
         {
-            if(sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
-            {
-                queries.Add( string.Format(SmoApplication.DefaultCulture,  
-                                "EXEC msdb.dbo.sp_update_schedule @schedule_id={0}, @new_name=N'{1}'", 
-                                ID, SqlString(newName)));
-            }
-            else
-            {
-            queries.Add( string.Format(SmoApplication.DefaultCulture,  
-                                           "EXEC msdb.dbo.sp_update_jobschedule {0}, @name=N'{1}', @new_name=N'{2}'", 
-                                           ((Job)ParentColl.ParentInstance).JobIdOrJobNameParameter(),
-                                           SqlString( this.Name), 
-                                           SqlString(newName)));
-            }
+            queries.Add(string.Format(SmoApplication.DefaultCulture,
+                            "EXEC msdb.dbo.sp_update_schedule @schedule_id={0}, @new_name=N'{1}'",
+                            ID, SqlString(newName)));
         }
 
         /// <summary>
@@ -424,12 +368,12 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     
                 if( IsShared)
                 {
-                    string reqStr = string.Format(SmoApplication.DefaultCulture, "{0}/Job/Schedule[@ID={1}]", this.Urn.Parent, ID);
+                    string reqStr = string.Format(SmoApplication.DefaultCulture, "{0}/Job/Schedule[@ID={1}]", Urn.Parent, ID);
                     r = new Request(reqStr);
                 }
                 else
                 {
-                    string reqStr = string.Format(SmoApplication.DefaultCulture, "{0}/Job/Schedule[@ID={1}]", this.Parent.Urn.Parent, ID);
+                    string reqStr = string.Format(SmoApplication.DefaultCulture, "{0}/Job/Schedule[@ID={1}]", Parent.Urn.Parent, ID);
                     r = new Request(reqStr);
                 }
 
@@ -439,7 +383,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 parentProps.Fields = new String[]{ "JobID"};
                 r.ParentPropertiesRequests[0] = parentProps;
         
-                DataTable jobs = this.ExecutionManager.GetEnumeratorData( r );
+                DataTable jobs = ExecutionManager.GetEnumeratorData( r );
 
                 Guid[] guids = new Guid[jobs.Rows.Count];
                 for(int i = 0; i < jobs.Rows.Count; i++)
@@ -463,11 +407,11 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             get
             {
-                return (System.Guid)this.Properties.GetValueWithNullReplacement("ScheduleUid");
+                return (System.Guid)Properties.GetValueWithNullReplacement("ScheduleUid");
             }
             set
             {
-                if(this.State != SqlSmoState.Creating)
+                if(State != SqlSmoState.Creating)
                 {
                     throw new PropertyReadOnlyException("ScheduleUid");
                 }

@@ -313,7 +313,7 @@
     <Compile Include="$(SmoSourceDir)\Collections\UserDefinedTypeCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\ViewCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\WorkloadGroupCollection.cs" />
-	<Compile Include="$(SmoSourceDir)\Collections\WorkloadManagementWorkloadClassifierCollection.cs" />
+	  <Compile Include="$(SmoSourceDir)\Collections\WorkloadManagementWorkloadClassifierCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\WorkloadManagementWorkloadGroupCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\XmlSchemaCollectionCollection.cs" />
   </ItemGroup>
@@ -632,7 +632,7 @@
   <Import Project="$(BuildPropsDir)\DdlEvents.targets" />
   <PropertyGroup>
       <CodeGenPlatform Condition="'$(TargetGroup)' == 'netfx'">$(TargetFramework)</CodeGenPlatform>
-      <CodeGenPlatform Condition="'$(TargetGroup)' != 'netfx'">netcoreapp3.1</CodeGenPlatform>
+      <CodeGenPlatform Condition="'$(TargetGroup)' != 'netfx'">net6.0</CodeGenPlatform>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="$(BrokerEnumSrc)\Microsoft.SqlServer.ServiceBrokerEnum.csproj" />
@@ -649,6 +649,7 @@
      <CodeGenInput Include="$(SfcSrc)\Enumerator\*.cs" />
      <CodeGenInput Include="$(SfcSrc)\Enumerator\*.strings" />
      <CodeGenInput Include="$(SfcSrc)\Enumerator\xml\**\*.xml" />
+     <CodeGenInput Include="$(SqlEnumSrc)\xml\**\*.xml" />
      <CodeGenInput Include="$(CodeGenSrc)\*" />
      <Compile Include="@(CodeGen->'$(CodeGenOutputDir)\%(filename).cs')" />
    </ItemGroup>

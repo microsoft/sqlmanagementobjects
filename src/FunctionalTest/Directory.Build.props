@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <TargetFrameworks>$(NetfxVersion);netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

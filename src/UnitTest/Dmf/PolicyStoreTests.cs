@@ -16,6 +16,7 @@ namespace Microsoft.SqlServer.Test.DmfUnitTests
         // Update this list whenever a new Facet is added to support policy based management
         const string AllFacets = "ApplicationRole,AsymmetricKey,Audit,AvailabilityDatabase,AvailabilityGroup,AvailabilityReplica,BackupDevice,BrokerPriority,BrokerService,Certificate,ColumnEncryptionKey,ColumnEncryptionKeyValue,ColumnMasterKey,Credential,CryptographicProvider,Database,DatabaseAuditSpecification,DatabaseDdlTrigger,DatabaseReplicaState,DatabaseRole,DataFile,Default,Endpoint,FileGroup,FullTextCatalog,FullTextIndex,FullTextStopList,IAvailabilityGroupState,IDatabaseMaintenanceFacet,IDatabaseOptions,IDatabasePerformanceFacet,IDatabaseSecurityFacet,ILoginOptions,IMultipartNameFacet,INameFacet,Index,IServerAuditFacet,IServerConfigurationFacet,IServerInformation,IServerPerformanceFacet,IServerSecurityFacet,IServerSelectionFacet,IServerSettings,IServerSetupFacet,ISmartAdminState,ISurfaceAreaFacet,ITableOptions,IUserOptions,IViewOptions,LinkedServer,LogFile,Login,MessageType,PartitionFunction,PartitionScheme,PlanGuide,RemoteServiceBinding,ResourceGovernor,ResourcePool,Rule,Schema,SearchPropertyList,Sequence,Server,ServerAuditSpecification,ServerDdlTrigger,ServerRole,ServiceContract,ServiceQueue,ServiceRoute,SmartAdmin,Statistic,StoredProcedure,SymmetricKey,Synonym,Table,Trigger,User,UserDefinedAggregate,UserDefinedDataType,UserDefinedFunction,UserDefinedTableType,UserDefinedType,View,WorkloadGroup,XmlSchemaCollection";
         [TestMethod]
+        [TestCategory("Unit")]
         public void PolicyStore_EnumDomainFacets_returns_correct_set()
         {
             var allFacets = PolicyStore.EnumDomainFacets("SMO", null).Cast<FacetInfo>();
@@ -23,12 +24,13 @@ namespace Microsoft.SqlServer.Test.DmfUnitTests
             Trace.TraceInformation($"EnumDomainFacets:{facetNames}");
             Assert.That(facetNames, Is.EqualTo(AllFacets), "EnumDomainFacets returns all facets");
             allFacets = PolicyStore.Facets.Cast<FacetInfo>();
-            facetNames = string.Join(",", allFacets.Select(f => f.FacetType.Name).OrderBy(n => n).ToArray());
+            facetNames = string.Join(",", allFacets.Where(f => f.FacetType.Namespace != "Microsoft.SqlServer.Management.Utility").Select(f => f.FacetType.Name).OrderBy(n => n).ToArray());
             Trace.TraceInformation($"Facets:{facetNames}");
             Assert.That(facetNames, Is.EqualTo(AllFacets), "Facets returns all facets");
         }
 
         [TestMethod]
+        [TestCategory("Unit")]
         public void PolicyStore_EnumRootFacets()
         {
             var rootFacets = PolicyStore.EnumRootFacets(typeof(Management.Smo.Server));

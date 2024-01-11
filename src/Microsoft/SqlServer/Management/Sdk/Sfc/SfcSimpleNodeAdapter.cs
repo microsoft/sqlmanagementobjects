@@ -105,12 +105,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return GetProperty(reference, propertyName);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 return null;
             }
@@ -122,12 +118,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return GetObject(reference, childName);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 return null;
             }
@@ -139,12 +131,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return GetEnumerable(reference, enumName);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 return null;
             }
@@ -156,12 +144,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return GetUrn(reference);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 return null;
             }
@@ -173,12 +157,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return IsCriteriaMatched(reference);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 return false;
             }
@@ -190,12 +170,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return IsSupported(reference);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 return false;
             }

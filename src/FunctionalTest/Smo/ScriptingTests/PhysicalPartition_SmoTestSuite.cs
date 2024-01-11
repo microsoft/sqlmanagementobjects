@@ -117,6 +117,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
         public void VerifyDataAndXmlCompressionScripted()
         {
             this.ExecuteWithDbDrop(

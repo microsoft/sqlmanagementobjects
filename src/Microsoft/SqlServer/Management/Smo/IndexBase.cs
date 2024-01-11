@@ -2602,6 +2602,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     case IndexType.SpatialIndex:
                     case IndexType.NonClusteredColumnStoreIndex:
                     case IndexType.ClusteredColumnStoreIndex:
+                    case IndexType.SelectiveXmlIndex:
+                    case IndexType.SecondarySelectiveXmlIndex:
                         return false;
                 }
 

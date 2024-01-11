@@ -706,29 +706,10 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 server.ExecutionManager.ExecuteNonQuery(queries);
             }
-            catch (Exception e)
+            catch (Exception e) when (e.InnerException is SqlException se && se.Errors.Cast<SqlError>().Any(err => err.Number == 3014))
             {
                 // We've got a list of errors in the exception. If there is 3014 among them, then we know
                 // that backup/restore has succeeded, the errors can be ignored and we can eat up the error
-                if (e.InnerException != null)
-                {
-                    SqlException se = e.InnerException as SqlException;
-                    if (se != null)
-                    {
-                        bool completeNotificationFound = false;
-                        foreach (SqlError err in se.Errors)
-                        {
-                            if (err.Number == 3014 /* Complete notification */ )
-                            {
-                                completeNotificationFound = true;
-                            }
-                        }
-                        if (!completeNotificationFound)
-                        {
-                            throw e;
-                        }
-                    }
-                }
             }
         }
 

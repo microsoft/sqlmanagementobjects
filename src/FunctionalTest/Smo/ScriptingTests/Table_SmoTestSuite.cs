@@ -188,25 +188,46 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 this.TestContext.FullyQualifiedTestClassName,
                 database =>
                 {
+                    var ctEnabled = database.ChangeTrackingEnabled;
                     //Need to enable ChangeTracking on DB before it can be enabled on table
                     // setting all the change tracking properties for code coverage
-                    database.ChangeTrackingEnabled = true;
-                    database.ChangeTrackingAutoCleanUp = true;
-                    database.ChangeTrackingRetentionPeriod = 1;
-                    database.ChangeTrackingRetentionPeriodUnits = RetentionPeriodUnits.Hours;
-                    database.Alter();
-
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
-                    table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
-                    table.ChangeTrackingEnabled = true;
-                    table.Alter();
-                    database.Refresh();
-                    table.Refresh();
-                    Assert.That(database.ChangeTrackingEnabled, Is.True, "database ChangeTrackingEnabled");
-                    Assert.That(database.ChangeTrackingRetentionPeriodUnits, Is.EqualTo(RetentionPeriodUnits.Hours), "database ChangeTrackingRetentionPeriodUnits");
-                    Assert.That(database.ChangeTrackingRetentionPeriod, Is.EqualTo(1), "database ChangeTrackingRetentionPeriod");
-                    Assert.That(database.ChangeTrackingAutoCleanUp, Is.True, "database ChangeTrackingAutoCleanup");
-                    Assert.That(table.ChangeTrackingEnabled, Is.True, "table ChangeTrackingEnabled");
+                    if (!ctEnabled)
+                    {
+                        database.ChangeTrackingEnabled = true;
+                        database.ChangeTrackingAutoCleanUp = true;
+                        database.ChangeTrackingRetentionPeriod = 1;
+                        database.ChangeTrackingRetentionPeriodUnits = RetentionPeriodUnits.Hours;
+                        database.Alter();
+                    }
+                    try
+                    {
+                        _SMO.Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                        try
+                        {
+                            table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
+                            table.ChangeTrackingEnabled = true;
+                            table.Alter();
+                            database.Refresh();
+                            table.Refresh();
+                            Assert.That(database.ChangeTrackingEnabled, Is.True, "database ChangeTrackingEnabled");
+                            Assert.That(database.ChangeTrackingRetentionPeriodUnits, Is.EqualTo(RetentionPeriodUnits.Hours), "database ChangeTrackingRetentionPeriodUnits");
+                            Assert.That(database.ChangeTrackingRetentionPeriod, Is.EqualTo(1), "database ChangeTrackingRetentionPeriod");
+                            Assert.That(database.ChangeTrackingAutoCleanUp, Is.True, "database ChangeTrackingAutoCleanup");
+                            Assert.That(table.ChangeTrackingEnabled, Is.True, "table ChangeTrackingEnabled");
+                        }
+                        finally
+                        {
+                            table.Drop();
+                        }
+                    }
+                    finally
+                    {
+                        if (!ctEnabled)
+                        {
+                            database.ChangeTrackingEnabled = false;
+                            database.Alter();
+                        }
+                    }
                 });
         }
 
@@ -1573,6 +1594,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyPartitionDependenciesDiscovered()
         {
             // Extract the test script
@@ -1842,6 +1864,24 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         public void SmoTable_CreateLedgerTemporalWithOptionalColumnsDefined()
         {
             CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true, defineOptionalColumns: true);
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
+        public void SmoTable_CreateLedgerHistoryTable()
+        {
+            ExecuteFromDbPool(
+               db =>
+               {
+                   var table = new Table(db, "historytable") { LedgerType = LedgerTableType.HistoryTable };
+                   var c1 = new Column(table, "c1", DataType.Int);
+                   table.Columns.Add(c1);
+
+                   // Verify that ledger history table can't be created.
+                   Assert.Throws<FailedOperationException>(table.Create, "Ledger history table can't be created.");
+               });
         }
 
         private void CreateAndVerifyLedgerTable(bool systemVersioned, bool temporal, bool defineOptionalColumns = false)
@@ -4773,6 +4813,7 @@ set nocount off;
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, HostPlatform = HostPlatformNames.Windows, Edition = DatabaseEngineEdition.Enterprise, MinMajor = 11)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoTable_enumerating_twenty_thousand_tables_with_scripting_properties_runs_quickly()
         {
             ExecuteTest(() =>

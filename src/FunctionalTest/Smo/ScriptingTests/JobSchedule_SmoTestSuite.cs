@@ -2,13 +2,16 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Linq;
 using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo.Agent;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
-
-
+using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -37,14 +40,70 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                           "Current job schedule not dropped with DropIfExists.");
         }
 
-        /// <summary>
-        /// Tests dropping a job schedule with IF EXISTS option through SMO on SQL16 and later.
-        /// </summary>
         [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 10)]
+        public void JobSchedule_OwnerLoginName_set_by_Create_and_Alter()
+        {
+            ExecuteFromDbPool(
+                database =>
+                {
+                    var jobSvr = database.Parent.JobServer;
+                    var job = new Job(jobSvr,
+                        GenerateUniqueSmoObjectName("job"));
+                    var jobSched = new JobSchedule(job,
+                        GenerateSmoObjectName("jbschd"))
+                    {
+                        OwnerLoginName = "sa"
+                    };
+
+                    
+                    try
+                    {
+                        job.Create();
+                        jobSched.Create();
+                        jobSvr.Jobs.ClearAndInitialize($"[@Name='{Urn.EscapeString(job.Name)}']", Enumerable.Empty<string>());
+                        job = jobSvr.Jobs[job.Name];
+                        Assert.Multiple(() =>
+                        {
+                            Assert.That(job.JobSchedules[0].Name, Is.EqualTo(jobSched.Name), "Schedule name");
+                            Assert.That(job.JobSchedules[0].OwnerLoginName, Is.EqualTo("sa"), "Schedule OwnerLoginName after Create");
+                        });
+                        var newOwner = database.Parent.Logins.Cast<_SMO.Login>().FirstOrDefault(l => l.Name != "sa");
+                        if (newOwner == null)
+                        {
+                            Trace.TraceWarning("No login exists to assign as schedule owner");
+                        }
+                        else
+                        {
+                            jobSched = job.JobSchedules[0];
+                            jobSched.OwnerLoginName = newOwner.Name;
+                            jobSched.Alter();
+                            jobSvr.Jobs.ClearAndInitialize($"[@Name='{Urn.EscapeString(job.Name)}']", Enumerable.Empty<string>());
+                            job = jobSvr.Jobs[job.Name];
+                            Assert.That(job.JobSchedules[0].OwnerLoginName, Is.EqualTo(newOwner.Name), "Schedule OwnerLoginName after Alter");
+                        }
+                    }
+                    finally
+                    {
+                        if (jobSched.State == _SMO.SqlSmoState.Existing)
+                        {
+                            jobSched.Drop();
+                        }
+                        if (job.State == _SMO.SqlSmoState.Existing)
+                        {
+                            job.Drop();
+                        }
+                    }
+                });
+        }
+                /// <summary>
+                /// Tests dropping a job schedule with IF EXISTS option through SMO on SQL16 and later.
+                /// </summary>
+            [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
         public void SmoDropIfExists_JobSchedule_Sql16AndAfterOnPrem()
         {
-            this.ExecuteWithDbDrop(
+            ExecuteFromDbPool(
                 database =>
                 {
                     JobServer jobSvr = database.Parent.JobServer;

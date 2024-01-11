@@ -42,7 +42,7 @@ namespace Microsoft.SqlServer.Management.Common
             /// <summary>
             /// The current AD or Kerberos principal credentials are used to connect
             /// </summary>
-            ActiveDirectoryIntegrated =  3,
+            ActiveDirectoryIntegrated = 3,
             //skipping 4 as that maps to Microsoft.SqlServer.Management.UI.ConnectionDlg.SqlServerType.ActiveDirectoryUniversalAuthenticationType (in SqlServerType.cs).
             //This was a bug in SSDT where we were using this enum to set the UIConnectionInfo.AuthenticationType (which is an int, so it stored the int value)
             //and when it went through UIConnectionInfoUtil.GetCoreConnectionInfo, it was set to "4" which made it go down the UniversalAuth code path
@@ -73,10 +73,10 @@ namespace Microsoft.SqlServer.Management.Common
             /// </summary>
             ActiveDirectoryDefault = 9
         }
-		
-        private StringBuilder m_sbApplicationName           = null;
-        private StringBuilder m_sbWorkstationID         = null;
-        private NetworkProtocol m_eNetworkProtocol      = DefaultNetworkProtocol;
+
+        private StringBuilder m_sbApplicationName = null;
+        private StringBuilder m_sbWorkstationID = null;
+        private NetworkProtocol m_eNetworkProtocol = DefaultNetworkProtocol;
 
         private Int32 m_PoolConnectionLifeTime = -1;
         private Int32 m_MaxPoolSize = -1;
@@ -84,22 +84,22 @@ namespace Microsoft.SqlServer.Management.Common
         private Int32 m_PacketSize = -1;
         private bool shouldEncryptConnection = false;
         private string additionalParameters = null;
+#if MICROSOFTDATA
+        private string hostNameInCertificate = null;
+#endif
         private bool trustServerCertificate = false;
         private AuthenticationMethod m_Authentication = AuthenticationMethod.NotSpecified;
         private string m_ApplicationIntent = null;
 
 
         [NonSerialized]
-            private SqlBoolean m_Pooled = SqlBoolean.Null;
+        private SqlBoolean m_Pooled = SqlBoolean.Null;
 
         /// <summary>
         /// Checks whether "Authentication" is supported in the runtime environment
         /// </summary>
         /// <returns></returns>
-        public static Boolean IsAuthenticationKeywordSupported()
-        {
-            return true;
-        }
+        public static bool IsAuthenticationKeywordSupported() => true;
 
         /// <summary>
         /// Retrieve the Authentication value from SqlConnectionStringBuilder and convert it to SqlConnectionInfo.AuthenticationMethod
@@ -108,7 +108,6 @@ namespace Microsoft.SqlServer.Management.Common
         /// <returns>SqlConnectionInfo.AuthenticationMethod</returns>
         public static AuthenticationMethod GetAuthenticationMethod(SqlConnectionStringBuilder connectionStringBuilder)
         {
-            
             object value = connectionStringBuilder.Authentication;
 
             if (value == null)
@@ -120,7 +119,6 @@ namespace Microsoft.SqlServer.Management.Common
             {
                 return val;
             }
-     
             return AuthenticationMethod.NotSpecified;
         }
 
@@ -131,24 +129,29 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         // special user friendly constructors
-        public SqlConnectionInfo( string serverName ) : base( serverName, ConnectionType.Sql){}
+        public SqlConnectionInfo(string serverName) : base(serverName, ConnectionType.Sql) { }
 
-        public SqlConnectionInfo( string serverName, string userName, string password ) :
-        base(serverName, userName, password, ConnectionType.Sql) {}
+        public SqlConnectionInfo(string serverName, string userName, string password) :
+        base(serverName, userName, password, ConnectionType.Sql)
+        { }
 
         //copy ctor
         public SqlConnectionInfo(SqlConnectionInfo conn) : base((SqlOlapConnectionInfoBase)conn)
         {
-            m_sbApplicationName         = conn.m_sbApplicationName;
-            m_sbWorkstationID           = conn.m_sbWorkstationID;
-            m_eNetworkProtocol          = conn.m_eNetworkProtocol;
-            m_PacketSize                = conn.m_PacketSize;
-            this.shouldEncryptConnection = conn.shouldEncryptConnection;
-            this.additionalParameters   = conn.additionalParameters;
-            this.m_Authentication       = conn.Authentication;
-            this.m_ApplicationIntent    = conn.ApplicationIntent;
-            this.trustServerCertificate = conn.TrustServerCertificate;
-            this.AccessToken = conn.AccessToken;
+            m_sbApplicationName = conn.m_sbApplicationName;
+            m_sbWorkstationID = conn.m_sbWorkstationID;
+            m_eNetworkProtocol = conn.m_eNetworkProtocol;
+            m_PacketSize = conn.m_PacketSize;
+            shouldEncryptConnection = conn.shouldEncryptConnection;
+            StrictEncryption = conn.StrictEncryption;
+            additionalParameters = conn.additionalParameters;
+            m_Authentication = conn.Authentication;
+            m_ApplicationIntent = conn.ApplicationIntent;
+            trustServerCertificate = conn.TrustServerCertificate;
+            AccessToken = conn.AccessToken;
+#if MICROSOFTDATA
+            HostNameInCertificate = conn.HostNameInCertificate;
+#endif
         }
 
         /// <summary>
@@ -161,52 +164,49 @@ namespace Microsoft.SqlServer.Management.Common
         {
             if (serverConnection.IsApplicationNameInitialized)
             {
-                this.m_sbApplicationName = new StringBuilder(serverConnection.ApplicationName);
+                m_sbApplicationName = new StringBuilder(serverConnection.ApplicationName);
             }
             if (serverConnection.IsWorkstationIdInitialized)
             {
-                this.m_sbWorkstationID = new StringBuilder(serverConnection.WorkstationId);
+                m_sbWorkstationID = new StringBuilder(serverConnection.WorkstationId);
             }
-            this.m_eNetworkProtocol = serverConnection.NetworkProtocol;
-            this.m_PoolConnectionLifeTime = serverConnection.PooledConnectionLifetime;
-            this.m_MaxPoolSize = serverConnection.MaxPoolSize;
-            this.m_MinPoolSize = serverConnection.MinPoolSize;
-            this.m_Pooled = !serverConnection.NonPooledConnection;
-            this.ServerNameInternal = new StringBuilder(serverConnection.ServerInstance);
+            m_eNetworkProtocol = serverConnection.NetworkProtocol;
+            m_PoolConnectionLifeTime = serverConnection.PooledConnectionLifetime;
+            m_MaxPoolSize = serverConnection.MaxPoolSize;
+            m_MinPoolSize = serverConnection.MinPoolSize;
+            m_Pooled = !serverConnection.NonPooledConnection;
+            ServerNameInternal = new StringBuilder(serverConnection.ServerInstance);
             if (serverConnection.IsLoginInitialized)
             {
-                this.UserNameInternal = new StringBuilder(serverConnection.Login);
+                UserNameInternal = new StringBuilder(serverConnection.Login);
             }
             if (serverConnection.IsPasswordInitialized)
             {
-                this.PasswordInternal = EncryptionUtility.EncryptString(serverConnection.Password);
+                PasswordInternal = EncryptionUtility.EncryptString(serverConnection.Password);
             }
-            this.IntegratedSecurityInternal = serverConnection.LoginSecure;
+            IntegratedSecurityInternal = serverConnection.LoginSecure;
             if (serverConnection.IsDatabaseNameInitialized)
             {
-                this.DatabaseNameInternal = new StringBuilder(serverConnection.DatabaseName);
+                DatabaseNameInternal = new StringBuilder(serverConnection.DatabaseName);
             }
-            this.ConnectionTimeoutInternal = serverConnection.ConnectTimeout;
-            this.EncryptConnection = serverConnection.EncryptConnection;
-            this.additionalParameters = serverConnection.AdditionalParameters;
-            this.AccessToken = serverConnection.AccessToken;
+            ConnectionTimeoutInternal = serverConnection.ConnectTimeout;
+            EncryptConnection = serverConnection.EncryptConnection;
+            additionalParameters = serverConnection.AdditionalParameters;
+            AccessToken = serverConnection.AccessToken;
             trustServerCertificate = serverConnection.TrustServerCertificate;
+            StrictEncryption = serverConnection.StrictEncryption;
+#if MICROSOFTDATA
+            HostNameInCertificate = serverConnection.HostNameInCertificate;
+#endif
         }
 
         public string ApplicationName
         {
-            get
-            {
-                if ( null == m_sbApplicationName )
-                    return String.Empty;
-                else
-                    return m_sbApplicationName.ToString();
-            }
-
+            get => (null == m_sbApplicationName) ? string.Empty : m_sbApplicationName.ToString();
             set
             {
                 //Call NetCoreHelpers StringCompare method to call the appropriate method for this framework.
-                if (null == m_sbApplicationName || 0 != m_sbApplicationName.ToString().StringCompare( value, false, ConnectionInfoBase.DefaultCulture))
+                if (null == m_sbApplicationName || 0 != m_sbApplicationName.ToString().StringCompare(value, false, ConnectionInfoBase.DefaultCulture))
                 {
                     m_sbApplicationName = new StringBuilder(value);
                     ConnectionParmsChanged();
@@ -216,18 +216,11 @@ namespace Microsoft.SqlServer.Management.Common
 
         public string WorkstationId
         {
-            get
-            {
-                if ( null == m_sbWorkstationID )
-                    return String.Empty;
-                else
-                    return m_sbWorkstationID.ToString();
-            }
-
+            get => null == m_sbWorkstationID ? string.Empty : m_sbWorkstationID.ToString();
             set
             {
                 //Call NetCoreHelpers StringCompare method to call the appropriate method for this framework.
-                if (null == m_sbWorkstationID || 0 != m_sbWorkstationID.ToString().StringCompare( value, false, ConnectionInfoBase.DefaultCulture))
+                if (null == m_sbWorkstationID || 0 != m_sbWorkstationID.ToString().StringCompare(value, false, ConnectionInfoBase.DefaultCulture))
                 {
                     m_sbWorkstationID = new StringBuilder(value);
                     ConnectionParmsChanged();
@@ -237,11 +230,7 @@ namespace Microsoft.SqlServer.Management.Common
 
         public NetworkProtocol ConnectionProtocol
         {
-            get
-            {
-                return m_eNetworkProtocol;
-            }
-
+            get => m_eNetworkProtocol;
             set
             {
                 if (value != m_eNetworkProtocol)
@@ -257,11 +246,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public AuthenticationMethod Authentication
         {
-            get
-            {
-               return m_Authentication;
-            }
-
+            get => m_Authentication;
             set
             {
                 if (value == m_Authentication)
@@ -272,7 +257,7 @@ namespace Microsoft.SqlServer.Management.Common
                 m_Authentication = value;
 
                 //Simialr to UserId: Any time user changes Authentication to Active Directory Integrated we need to reset integrated security flag
-                if(UseIntegratedSecurity && value == AuthenticationMethod.ActiveDirectoryIntegrated)
+                if (UseIntegratedSecurity && value == AuthenticationMethod.ActiveDirectoryIntegrated)
                 {
                     UseIntegratedSecurity = false;
                 }
@@ -286,11 +271,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public string ApplicationIntent
         {
-            get
-            {
-                return m_ApplicationIntent;
-            }
-
+            get => m_ApplicationIntent;
             set
             {
                 if (value == m_ApplicationIntent)
@@ -309,11 +290,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public bool TrustServerCertificate
         {
-            get
-            {
-                return trustServerCertificate;
-            }
-
+            get => trustServerCertificate;
             set
             {
                 if (value != trustServerCertificate)
@@ -327,11 +304,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <summary>
         /// The access token value to use for universal auth
         /// </summary>
-        public IRenewableToken AccessToken
-        {
-            get;
-            set;
-        }
+        public IRenewableToken AccessToken { get; set; }
 
         string NetworkProtocolString
         {
@@ -382,7 +355,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
             get
             {
-                if ( RebuildConnectionStringInternal )
+                if (RebuildConnectionStringInternal)
                 {
                     ConnectionSettings cs = new ConnectionSettings(this);
                     ConnectionStringInternal = EncryptionUtility.EncryptString(cs.ConnectionString);
@@ -396,14 +369,11 @@ namespace Microsoft.SqlServer.Management.Common
         /// Deep copy
         /// </summary>
         /// <returns></returns>
-        public SqlConnectionInfo Copy()
-        {
-            return new SqlConnectionInfo(this);
-        }
+        public SqlConnectionInfo Copy() => new SqlConnectionInfo(this);
 
         public override string ToString()
         {
-            StringBuilder sbText = new StringBuilder( base.ToString() );
+            StringBuilder sbText = new StringBuilder(base.ToString());
             sbText.AppendFormat(", timeout = {0}, database = {1}, protocol = {2}, workstation = {3}, integrated security = {4}",
                                 ConnectionTimeout, DatabaseName, ConnectionProtocol, WorkstationId, UseIntegratedSecurity);
             return sbText.ToString();
@@ -417,99 +387,85 @@ namespace Microsoft.SqlServer.Management.Common
         public override IDbConnection CreateConnectionObject()
         {
             SqlConnection conn = new SqlConnection(ConnectionString);
-            if (this.AccessToken != null)
+            if (AccessToken != null)
             {
-                ConnectionInfoHelper.SetTokenOnConnection(conn, this.AccessToken.GetAccessToken());
+                ConnectionInfoHelper.SetTokenOnConnection(conn, AccessToken.GetAccessToken());
             }
 
             return conn;
         }
 
-        public Int32 PoolConnectionLifeTime
+        public int PoolConnectionLifeTime
         {
-            get
-            {
-                return m_PoolConnectionLifeTime;
-            }
-            set
-            {
-                m_PoolConnectionLifeTime = value;
-            }
+            get => m_PoolConnectionLifeTime;
+            set => m_PoolConnectionLifeTime = value;
         }
 
-        public Int32 PacketSize
+        public int PacketSize
         {
-            get
-            {
-                return m_PacketSize;
-            }
-            set
-            {
-                m_PacketSize = value;
-            }
+            get => m_PacketSize;
+            set => m_PacketSize = value;
         }
 
-        public Int32 MaxPoolSize
+        public int MaxPoolSize
         {
-            get
-            {
-                return m_MaxPoolSize;
-            }
-            set
-            {
-                m_MaxPoolSize = value;
-            }
+            get => m_MaxPoolSize;
+            set => m_MaxPoolSize = value;
         }
 
-        public Int32 MinPoolSize
+        public int MinPoolSize
         {
-            get
-            {
-                return m_MinPoolSize;
-            }
-            set
-            {
-                m_MinPoolSize = value;
-            }
+            get => m_MinPoolSize;
+            set => m_MinPoolSize = value;
         }
 
         public SqlBoolean Pooled
         {
-            get
-            {
-                return m_Pooled;
-            }
-            set
-            {
-                m_Pooled = value;
-            }
+            get => m_Pooled;
+            set => m_Pooled = value;
         }
 
+        /// <summary>
+        /// Whether to set Encrypt=true in the connection string
+        /// </summary>
         public bool EncryptConnection
         {
-            get
-            {
-                return this.shouldEncryptConnection;
-            }
-
+            get => shouldEncryptConnection;
             set
             {
-                this.shouldEncryptConnection = value;
+                shouldEncryptConnection = value;
+                ConnectionParmsChanged();
             }
         }
 
-        public String AdditionalParameters
+        /// <summary>
+        /// Whether to set Encrypt=Strict in the connection string. 
+        /// If Strict is not supported by the current SqlClient, when true this value will set Encrypt=true
+        /// </summary>
+        public bool StrictEncryption { get; set; }
+
+#if MICROSOFTDATA
+        /// <summary>
+        /// Sets host name provided in certificate to be used for certificate validation.
+        /// </summary>
+        public string HostNameInCertificate
         {
-            get
-            {
-                return this.additionalParameters;
-            }
+            get => hostNameInCertificate;
             set
             {
-                this.additionalParameters = value;
+                hostNameInCertificate = value;
+                ConnectionParmsChanged();
+            }
+        }
+#endif
 
-                //Recreate the Connection string since some new parameters are added here
-                RebuildConnectionStringInternal = true;
+        public string AdditionalParameters
+        {
+            get => additionalParameters;
+            set
+            {
+                additionalParameters = value;
+                ConnectionParmsChanged();
             }
         }
 
@@ -519,9 +475,6 @@ namespace Microsoft.SqlServer.Management.Common
         /// <returns></returns>
         /// <remarks>
         /// "ApplicationIntent" is not supported until .Net4.5</remarks>
-        public static Boolean IsApplicationIntentKeywordSupported()
-        {
-            return true;
-        }
+        public static bool IsApplicationIntentKeywordSupported() => true;
     }
 }

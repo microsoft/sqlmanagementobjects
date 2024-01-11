@@ -8,6 +8,7 @@
     <NoWarn>$(NoWarn);NU1603</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
@@ -18,7 +19,8 @@
     <ProjectReference Include="$(RegisteredServersSrc)\Microsoft.SqlServer.Management.RegisteredServers.csproj" />
     <ProjectReference Include="$(DmfSrc)\Microsoft.SqlServer.Dmf.csproj" />
     <ProjectReference Include="$(SqlScriptPublishSrc)\Microsoft.SqlServer.Management.SqlScriptPublish.csproj" />
-    <PackageReference Condition="'$(SqlClientReferenceImported)'!='true' or '$(UseMicrosoftData)' != 'true'" Include="Azure.Identity" />
+    <ProjectReference Include="..\..\Microsoft\SqlServer\Management\XEventDbScoped\Microsoft.SqlServer.Management.XEventDbScoped.csproj" />
+    <PackageReference Condition="'$(SqlClientReferenceImported)'!='true' or '$(UseMicrosoftData)' == 'false'" Include="Azure.Identity" />
   </ItemGroup>
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj" />
   <ItemGroup>

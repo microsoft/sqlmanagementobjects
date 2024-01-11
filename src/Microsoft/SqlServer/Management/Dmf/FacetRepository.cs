@@ -555,7 +555,7 @@ namespace Microsoft.SqlServer.Management.Facets
                     fas.EvaluationMode = ((EvaluationModeAttribute)ema).AutomatedPolicyEvaluationMode;
                 }
 
-                // Get roottacet for the facet
+                // Get rootfacet for the facet
                 //
                 Attribute rta = Attribute.GetCustomAttribute(si, typeof(RootFacetAttribute));
                 if (null != rta)
@@ -567,7 +567,7 @@ namespace Microsoft.SqlServer.Management.Facets
             }
         }
 
-        /// <summary>
+        /// <summary> 
         /// Scans Assembly for Adapters.
         /// Adapter inherits a management facet.
         /// Adapter is bound to {Interface; ObjectType} key pairs. 

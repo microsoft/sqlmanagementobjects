@@ -163,7 +163,7 @@ namespace Microsoft.SqlServer.Test.SMO.DMF
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15, HostPlatform = "Windows")]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlManagedInstance)]
         public void Server_blocks_sproc_creation_based_on_policy_150_plus()
         {
             Test_creation_policy_impl();

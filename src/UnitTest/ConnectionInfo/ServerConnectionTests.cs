@@ -162,5 +162,31 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             Assert.That(actualConnectionString.Encrypt == true, Is.True, "GetDatabaseConnection connection Encrypt=true");
             Assert.That(actualConnectionString.TrustServerCertificate, Is.True, "GetDatabaseConnection connection TrustServerCertificate=true");
         }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_constructors_and_ConnectionString_set_DatabaseName()
+        {
+            var connStr = new SqlConnectionStringBuilder() { InitialCatalog = "somedatabase" }.ToString();
+            var serverConn = new ServerConnection(new SqlConnection(connStr));
+            Assert.That(serverConn.DatabaseName, Is.EqualTo("somedatabase"), "SqlConnection");
+            serverConn = new ServerConnection() { ConnectionString= connStr };
+            Assert.That(serverConn.DatabaseName, Is.EqualTo("somedatabase"), "ConnectionString property");
+            serverConn = new ServerConnection(new SqlConnectionInfo("someserver") { DatabaseName = "somedatabase" });
+            Assert.That(serverConn.DatabaseName, Is.EqualTo("somedatabase"), "SqlConnectionInfo");
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_GetDatabaseConnection_returns_original_connection_on_name_match()
+        {
+            var serverConnection = new ServerConnection("someserver") { DatabaseName = "somedatabase", DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition = DatabaseEngineEdition.SqlDatabase };
+            (serverConnection as ISfcConnection).ForceDisconnected();
+            var databaseConnection = serverConnection.GetDatabaseConnection("somedatabase");
+            Assert.That(databaseConnection, Is.SameAs(serverConnection), "Created new connection for matching database name");
+            databaseConnection = serverConnection.GetDatabaseConnection("someotherdatabase");
+            Assert.That(databaseConnection, Is.Not.SameAs(serverConnection), "Reused same connection for mismatched database name");
+            Assert.That(databaseConnection.DatabaseName, Is.EqualTo("someotherdatabase"), "Wrong name");
+        }
     }
 }

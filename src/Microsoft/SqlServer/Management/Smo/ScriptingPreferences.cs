@@ -573,7 +573,7 @@ namespace Microsoft.SqlServer.Management.Smo
         public bool Collation { get; set; }
 
         /// <summary>
-        /// Gets or sets owner script in included or not
+        /// Gets or sets whether to script object owners
         /// </summary>
         public bool Owner { get; set; }
 

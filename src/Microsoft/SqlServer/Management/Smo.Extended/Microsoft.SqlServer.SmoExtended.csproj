@@ -12,6 +12,7 @@
     <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.WmiEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(RealPublicKey)"/>
   </ItemGroup>
   <ItemGroup>
     <SqlStringResource Include="DatabaseRestorePlannerSR.strings" >

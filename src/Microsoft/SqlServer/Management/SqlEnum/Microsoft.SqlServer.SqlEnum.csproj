@@ -1117,6 +1117,10 @@
       <LogicalName>SQL11Dependency.sql</LogicalName>
       <Link>xml\SQL11Dependency.sql</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SQL13Dependency.sql">
+      <LogicalName>SQL13Dependency.sql</LogicalName>
+      <Link>xml\SQL13Dependency.sql</Link>
+    </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SqlAssembly.xml">
       <LogicalName>SqlAssembly.xml</LogicalName>
       <Link>xml\SqlAssembly.xml</Link>

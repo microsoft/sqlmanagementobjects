@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 using System.Diagnostics;
+using Microsoft.SqlServer.Management.SqlParser.SqlCodeDom;
 
 namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 {
@@ -91,21 +92,33 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 var threads = new List<ThreadData>();
                 var startHandle = new ManualResetEvent(false);
                 var finishHandle = new CountdownEvent(10);
-                for (int i = 0; i < 10; ++i)
+                try
                 {
-                    var threadData = new ThreadData()
+
+                    for (int i = 0; i < 10; ++i)
                     {
-                        waitHandle = startHandle,
-                        dbName = db.Name,
-                        completeHandle = finishHandle
-                    };
-                    var thread = new Thread(DatabaseEnumerationThread);
-                    thread.Start(threadData);
-                    threads.Add(threadData);
+                        var threadData = new ThreadData()
+                        {
+                            waitHandle = startHandle,
+                            dbName = db.Name,
+                            completeHandle = finishHandle
+                        };
+                        var thread = new Thread(DatabaseEnumerationThread);
+                        thread.Start(threadData);
+                        threads.Add(threadData);
+                    }
+                    startHandle.Set();
+                    finishHandle.Wait();
+                    Assert.That(threads.Select(t => t.exception), Is.EquivalentTo(new Exception[10]), "No exception should be thrown");
                 }
-                startHandle.Set();
-                finishHandle.Wait();
-                Assert.That(threads.Select(t => t.exception), Is.EquivalentTo(new Exception[10]), "No exception should be thrown");
+                finally
+                {
+                    startHandle.Close();
+                    foreach (var thread in threads)
+                    {
+                        thread.waitHandle.Close();
+                    }
+                }
             });
         }
 
@@ -217,7 +230,6 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         static extern bool CredFree([In] IntPtr cred);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         static extern bool CredDelete(
             string targetName,
             CRED_TYPE type,
@@ -225,7 +237,6 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
             );
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         static extern bool CredEnumerate(
             string targetName,
             int flags,

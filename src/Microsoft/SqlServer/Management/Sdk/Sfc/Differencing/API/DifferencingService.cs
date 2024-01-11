@@ -101,12 +101,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing
                     return null;
                 }
             }
-            catch (Exception e)
+            catch (Exception e) when (!Differencer.IsSystemGeneratedException(e))
             {
-                if (Differencer.IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.Trace(Differencer.ComponentName, "Exception loading provider, '{0}'.", name);
                 return null;
             }

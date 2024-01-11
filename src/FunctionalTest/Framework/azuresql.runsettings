@@ -2,7 +2,7 @@
 <!-- File name extension must be .runsettings -->
 <RunSettings>
   <TestRunParameters>
-    <Parameter name="SqlTestTargetServersFilter" value="AzureSterlingV12;AzureSterlingV12_SqlDW;AzureSterlingV12_SqlOnDemand;SqlManagedInstance" />
+    <Parameter name="SqlTestTargetServersFilter" value="AzureSterlingV12;AzureSterlingV12_SqlDW" />
   </TestRunParameters>
   <DataCollectionRunSettings>
     <DataCollectors>

@@ -624,6 +624,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
+            // do not script create history table for a temporal table in a ledger database
+            //
+            if (IsSupportedProperty(nameof(LedgerType)) && GetPropValueOptional(nameof(LedgerType), LedgerTableType.None) == LedgerTableType.HistoryTable)
+            {
+                return;
+            }
+
             //create intermediate string collection
             StringCollection scqueries = new StringCollection();
 
@@ -3080,6 +3087,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
+            // Dropped ledger tables and ledger history tables can't be dropped
+            if (IsSupportedProperty(nameof(LedgerType)) && (LedgerType == LedgerTableType.HistoryTable || IsDroppedLedgerTable))
+            {
+                return;
+            }
             // Script DROP SYSTEM VERSIONING prior to dropping a temporal table
             // otherwise, DROP statement will fail
             //

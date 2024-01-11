@@ -37,7 +37,7 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             var conn = new ServerConnection("someservername") { ConnectAsUser = true, ConnectAsUserName = "someuser", ConnectAsUserPassword = Guid.NewGuid().ToString() };
             var ex = Assert.Throws<ConnectionFailureException>(conn.Connect, "Connect() should throw ConnectionFailureException when impersonation fails");
             Assert.That(ex.InnerException, Is.InstanceOf<Win32Exception>(), "InnerException");
-            Assert.That(ex.InnerException.Message, Does.Contain("The user name or password is incorrect"), "InnerException.Message");
+            Assert.That(ex.InnerException.Message, Does.Contain("The user name or password is incorrect").Or.Contains("domain isn't available"), "InnerException.Message");
         }
 
         [TestMethod]

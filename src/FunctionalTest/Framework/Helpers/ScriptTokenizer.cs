@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
@@ -97,6 +98,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         private const string TOKEN_ErrorLogPath = "$(ErrorLogPath)";
         private const string TOKEN_SingleQuoteEscapedErrorLogPath = "$(SingleQuoteEscapedErrorLogPath)";
 
+        // eg: DF__TestSequence__Id__245D67DE
+        private const string TOKEN_Sequence_Id = "$(SequenceId)";
+
+        private const string TOKEN_DatabaseCollation = "$(DatabaseCollation)";
+        private const string TOKEN_CatalogCollation = "$(CatalogCollation)";
+
         /// <summary>
         /// Replaces certain strings in the specified string with tokens for generic comparison.
         ///
@@ -138,7 +145,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             var bracketQuotedServerNameInternalRegex = new Regex(@"(\[[^\]]*)" + Regex.Escape(internalServerName) + @"([[^\]]*)", RegexOptions.IgnoreCase);
             var clusteredIndexNameRegex = new Regex(@"(ClusteredIndex_[a-z0-9]{32})");
             var edgeConstraintNameRegex = new Regex(@"(EC__.*__[A-Z0-9a-z]*)");
-            
+            var sequenceIdRegex = new Regex(@"(DF__TestSequence__Id__[A-Z0-9a-z]*)");
 
             var scriptDateRegex = new Regex(@"(Script Date:.* [P|A]M)", RegexOptions.IgnoreCase);
             var scriptStatsStreamRegex = new Regex(@"(STATS_STREAM = (?:0[xX])?[0-9a-fA-F]+)", RegexOptions.IgnoreCase);
@@ -155,6 +162,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             str = bracketQuotedServerNameInternalRegex.Replace(str, replacementString.FormatStr(TOKEN_BracketEscapedServerInternalName));
             str = clusteredIndexNameRegex.Replace(str, TOKEN_ClusteredIndexName);
             str = edgeConstraintNameRegex.Replace(str, TOKEN_EdgeConstraintName);
+            str = sequenceIdRegex.Replace(str, TOKEN_Sequence_Id);
             
             if (trueServerName.Length >= internalServerName.Length)
             {
@@ -223,6 +231,16 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     foreach (DataFile dataFile in fileGroup.Files)
                     {
                         str = str.Replace(dataFile.FileName, $"$({ dataFile.Name }_FileName)");
+
+                        // Sometimes we need to additionally pre-process data file paths in order to ensure a match with 
+                        // the generated T-SQL. For example, a local file-system path like this one is problematic:
+                        //
+                        // C:\WFRoot\DB8C.1\Fabric\work\\Applications\Worker.CL_App13\work\\data\76238ca4-5ca1-44e6-a208-3338c284b48d.xtp
+                        // 
+                        // Here we have things like '\W' which are considered as escape characters and won't be matched. Because of that,
+                        // we're escaping "\" character to cover such cases.
+                        //
+                        str = str.Replace(dataFile.FileName.Replace("\\", "\\\\"), $"$({dataFile.Name}_FileName)");
                     }
                 }
             }
@@ -285,6 +303,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             //Tokenize the stripped values as well
             str = TokenizeStrippedValues(str);
 
+            // The Azure DB might have been created separately from the test run and have different collation
+            if (database.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+            {
+                var catalogCollationTypeConverter = TypeDescriptor.GetConverter(typeof(CatalogCollationType));
+                
+                str = str.Replace(database.Collation, TOKEN_DatabaseCollation);
+                if (database.IsSupportedProperty(nameof(Database.CatalogCollation)))
+                {
+                    var catalogCollationString = catalogCollationTypeConverter.ConvertToInvariantString(database.CatalogCollation);
+                    str = str.Replace(catalogCollationString, TOKEN_CatalogCollation);
+                }
+            }
             return str;
         }
 

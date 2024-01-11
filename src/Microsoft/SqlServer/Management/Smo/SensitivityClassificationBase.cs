@@ -1,15 +1,13 @@
 // Copyright (c) Microsoft.
 // Licensed under the MIT license.
 
-using Microsoft.SqlServer.Management.Sdk.Sfc;
-using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-using Cmn = Microsoft.SqlServer.Management.Common;
 using System.Collections.Specialized;
+using Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
+#pragma warning disable 1590, 1591, 1592, 1573, 1571, 1570, 1572, 1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    public partial class SensitivityClassification : NamedSmoObject, IScriptable
+    public partial class SensitivityClassification : NamedSmoObject, IDroppable, IScriptable
     {
         internal SensitivityClassification(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)
@@ -26,6 +24,14 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return nameof(SensitivityClassification);
             }
+        }
+
+        /// <summary>
+        /// Drops the object from the database
+        /// </summary>
+        public void Drop()
+        {
+            DropImpl();
         }
 
         public StringCollection Script() 

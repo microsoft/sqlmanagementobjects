@@ -272,6 +272,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SqlRequiredFeature(SqlFeature.Hekaton)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void HekatonColumnstoreScripting()
         {
             ExecuteWithDbDrop(
@@ -1002,8 +1003,8 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
             // Execute the index rebuild on a separate thread so that we can cancel the operation after starting the rebuild,
             // which will cause the trigger created above to fire and then delay the execution for 10 minutes
-            String query = String.Format("ALTER INDEX {0} ON {1} REBUILD WITH (ONLINE = ON, RESUMABLE = ON)", index.FullQualifiedName, table);
-            Thread thread = new Thread(() => database.ExecutionManager.ConnectionContext.ExecuteNonQuery(query, ExecutionTypes.ContinueOnError));
+            var query = $"ALTER INDEX {index.FullQualifiedName} ON {table} REBUILD WITH (ONLINE = ON, RESUMABLE = ON)";
+            var thread = new Thread(() => { try { _ = database.ExecutionManager.ConnectionContext.ExecuteNonQuery(query, ExecutionTypes.ContinueOnError); } catch { } });
             thread.Start();
 
             // Wait for 10 seconds to give it plenty of time to start the rebuild operation.
@@ -1487,15 +1488,11 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                     {
                         TestIsOptimizedForSequentialKey_SpatialIndexNegative(database);
                     }
-                    catch(Exception e)
+                    catch(Exception) when (this.ServerContext.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabaseEdge)
                     {
                         // Spatial Index uses CLR (Common language Runtime) and this is not supported on
                         // SqlDatabaseEdge. Hence we can ignore this test for Edge
                         //
-                        if (this.ServerContext.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabaseEdge)
-                        {
-                            throw e;
-                        }
                     }
                 });
         }

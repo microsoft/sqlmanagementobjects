@@ -49,7 +49,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="DestinationDatabaseName">Name of the database to be restored.</param>
         /// <param name="backupSet">The backup set.</param>
-        public Restore(string DestinationDatabaseName,BackupSet backupSet) : base()
+        public Restore(string DestinationDatabaseName, BackupSet backupSet) : base()
         {
             this.Database = DestinationDatabaseName;
             this.m_Partial = false;
@@ -59,17 +59,17 @@ namespace Microsoft.SqlServer.Management.Smo
             this.m_ReplaceDatabase = false;
             this.m_bVerifySuccess = false;
             this.m_RelocateFiles = new ArrayList();
-            switch(backupSet.BackupSetType)
+            switch (backupSet.BackupSetType)
             {
                 case BackupSetType.Database:
                 case BackupSetType.Differential:
                     this.m_RestoreAction = RestoreActionType.Database;
                     break;
-                
+
                 case BackupSetType.Log:
                     this.m_RestoreAction = RestoreActionType.Log;
                     break;
-                
+
                 case BackupSetType.FileOrFileGroup:
                 case BackupSetType.FileOrFileGroupDifferential:
                     this.m_RestoreAction = RestoreActionType.Files;
@@ -79,7 +79,7 @@ namespace Microsoft.SqlServer.Management.Smo
             for (int i = 1; i <= backupSet.BackupMediaSet.FamilyCount; i++)
             {
                 var item = from BackupMedia bkMedia in backupSet.BackupMediaSet.BackupMediaList
-                           where bkMedia.FamilySequenceNumber == i 
+                           where bkMedia.FamilySequenceNumber == i
                            orderby bkMedia.MirrorSequenceNumber ascending
                            select bkMedia;
                 if (item.Count() > 0)
@@ -142,7 +142,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             return SqlVerify(srv, false, out errorMessage);
         }
-        
         /// <summary>
         /// Runs Verify operation in a synchronous way, i.e. 
         /// the call blocks until verification is completed.
@@ -184,9 +183,13 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 // Provide error message to caller
                 if (exception.InnerException != null && exception.InnerException is SqlException)
+                {
                     errorMessage = exception.InnerException.Message;
+                }
                 else
+                {
                     errorMessage = exception.Message;
+                }
             }
             finally
             {
@@ -249,7 +252,7 @@ namespace Microsoft.SqlServer.Management.Smo
             verifyStmt.Append(Globals.newline);
             verifyStmt.AppendFormat(SmoApplication.DefaultCulture,
                                 "select @backupSetId = position from msdb..backupset where database_name={0} and backup_set_id=(select max(backup_set_id) from msdb..backupset where database_name={0} )",
-                                SqlSmoObject.MakeSqlString(this.Database) );
+                                SqlSmoObject.MakeSqlString(this.Database));
             verifyStmt.Append(Globals.newline);
             verifyStmt.AppendFormat(SmoApplication.DefaultCulture,
                                 "if @backupSetId is null begin raiserror({0}, 16, 1) end",
@@ -324,7 +327,7 @@ namespace Microsoft.SqlServer.Management.Smo
             verifyStmt.Append(Globals.newline);
             verifyStmt.AppendFormat(SmoApplication.DefaultCulture,
                                 "select @backupSetId = position from msdb..backupset where database_name={0} and  type={1} and backup_set_id=(select max(backup_set_id) from msdb..backupset where database_name={0} and  type={1})",
-                                SqlSmoObject.MakeSqlString(this.Database), 
+                                SqlSmoObject.MakeSqlString(this.Database),
                                 SqlSmoObject.MakeSqlString(GetBackupTypeName(sqlVerifyAction)));
             verifyStmt.Append(Globals.newline);
             verifyStmt.AppendFormat(SmoApplication.DefaultCulture,
@@ -420,12 +423,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
             sb.Append("RESTORE VERIFYONLY");
 
-            sb.Append(" FROM " );
+            sb.Append(" FROM ");
             GetDevicesScript(sb, Devices, targetVersion);
-            sb.Append(" WITH " );
+            sb.Append(" WITH ");
 
             this.AddCredential(targetVersion, sb, false, true);
-            
+
             if (!ignoreFileNumber)
             {
                 if (0 < this.FileNumber)
@@ -439,27 +442,28 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
 
-            if( true == UnloadTapeAfter )
+            if (UnloadTapeAfter)
             {
-                sb.Append(" UNLOAD, " );
+                sb.Append(" UNLOAD, ");
             }
             else
             {
-                sb.Append(" NOUNLOAD, " );
+                sb.Append(" NOUNLOAD, ");
             }
 
-            if( loadHistory )
-                sb.Append( " LOADHISTORY, " );
+            if (loadHistory)
+            {
+                sb.Append(" LOADHISTORY, ");
+            }
 
-
-            AddPassword(targetVersion, sb , false, true);
+            AddPassword(targetVersion, sb, false, true);
 
             AddMediaPassword(targetVersion, sb, false, true);
-            
 
-            if( true == NoRewind && 7 != targetVersion.Major )
+
+            if (NoRewind && 7 != targetVersion.Major)
             {
-                sb.Append(" NOREWIND, " );
+                sb.Append(" NOREWIND, ");
             }
 
             RemoveLastComma(sb);
@@ -467,7 +471,6 @@ namespace Microsoft.SqlServer.Management.Smo
             return sb.ToString();
         }
 
-     
         private void OnBeforeSqlVerify(object sender, EventArgs args)
         {
             this.m_bVerifySuccess = false;
@@ -485,7 +488,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // Unregister from our internal events
             this.Information -= new ServerMessageEventHandler(OnInfoMessage);
-    
             ExecutionManager em = sender as ExecutionManager;
             if (null != em)
             {
@@ -507,34 +509,34 @@ namespace Microsoft.SqlServer.Management.Smo
 
             sb.Append("RESTORE FILELISTONLY");
 
-            sb.Append(" FROM " );
+            sb.Append(" FROM ");
             GetDevicesScript(sb, Devices, targetVersion);
-            sb.Append(" WITH " );
+            sb.Append(" WITH ");
 
             this.AddCredential(targetVersion, sb, false, true);
 
-            if( true == UnloadTapeAfter )
+            if (UnloadTapeAfter)
             {
-                sb.Append(" UNLOAD, " );
+                sb.Append(" UNLOAD, ");
             }
             else
             {
-                sb.Append(" NOUNLOAD, " );
+                sb.Append(" NOUNLOAD, ");
             }
 
-            if( 0 < this.FileNumber ) 
+            if (0 < this.FileNumber)
             {
-                sb.AppendFormat(SmoApplication.DefaultCulture, " FILE = {0}, " , m_FileNumber);
+                sb.AppendFormat(SmoApplication.DefaultCulture, " FILE = {0}, ", m_FileNumber);
             }
 
             AddPassword(targetVersion, sb, false, true);
 
             AddMediaPassword(targetVersion, sb, false, true);
-            
+
 
             RemoveLastComma(sb);
 
-            return ExecuteSqlWithResults( srv, sb.ToString() ).Tables[0];
+            return ExecuteSqlWithResults(srv, sb.ToString()).Tables[0];
         }
 
         public DataTable ReadMediaHeader(Server srv)
@@ -544,26 +546,26 @@ namespace Microsoft.SqlServer.Management.Smo
 
             sb.Append("RESTORE LABELONLY");
 
-            sb.Append(" FROM " );
+            sb.Append(" FROM ");
             GetDevicesScript(sb, Devices, targetVersion);
-            sb.Append(" WITH " );
+            sb.Append(" WITH ");
 
             this.AddCredential(targetVersion, sb, false, true);
 
-            if( true == UnloadTapeAfter )
+            if (UnloadTapeAfter)
             {
-                sb.Append(" UNLOAD, " );
+                sb.Append(" UNLOAD, ");
             }
             else
             {
-                sb.Append(" NOUNLOAD, " );
+                sb.Append(" NOUNLOAD, ");
             }
 
             AddMediaPassword(targetVersion, sb, false, true);
-            
+
             RemoveLastComma(sb);
 
-            return ExecuteSqlWithResults( srv, sb.ToString() ).Tables[0];
+            return ExecuteSqlWithResults(srv, sb.ToString()).Tables[0];
         }
 
         public DataTable ReadBackupHeader(Server srv)
@@ -573,43 +575,44 @@ namespace Microsoft.SqlServer.Management.Smo
 
             sb.Append("RESTORE HEADERONLY");
 
-            sb.Append(" FROM " );
+            sb.Append(" FROM ");
             GetDevicesScript(sb, Devices, targetVersion);
-            sb.Append(" WITH " );
+            sb.Append(" WITH ");
 
             this.AddCredential(targetVersion, sb, false, true);
 
-            if( true == UnloadTapeAfter )
+            if (UnloadTapeAfter)
             {
-                sb.Append(" UNLOAD, " );
+                sb.Append(" UNLOAD, ");
             }
             else
             {
-                sb.Append(" NOUNLOAD, " );
+                sb.Append(" NOUNLOAD, ");
             }
 
-            if( 0 < this.FileNumber ) 
+            if (0 < this.FileNumber)
             {
-                sb.AppendFormat(SmoApplication.DefaultCulture, " FILE = {0}, " , m_FileNumber);
+                sb.AppendFormat(SmoApplication.DefaultCulture, " FILE = {0}, ", m_FileNumber);
             }
 
             AddPassword(targetVersion, sb, false, true);
 
             AddMediaPassword(targetVersion, sb, false, true);
-           
+
 
             RemoveLastComma(sb);
 
-            return ExecuteSqlWithResults( srv, sb.ToString() ).Tables[0];
+            return ExecuteSqlWithResults(srv, sb.ToString()).Tables[0];
         }
 
         public DataTable ReadSuspectPageTable(Server server)
         {
-            if( server.ServerVersion.Major < 9 )
+            if (server.ServerVersion.Major < 9)
+            {
                 throw new FailedOperationException(ExceptionTemplates.UnsupportedVersion(server.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
-
-            StringBuilder statement = new StringBuilder( Globals.INIT_BUFFER_SIZE );
-            statement.Append( "select * from msdb.dbo.suspect_pages" );
+            }
+            StringBuilder statement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            statement.Append("select * from msdb.dbo.suspect_pages");
             GetDbFileFilter(statement);
 
             return ExecuteSqlWithResults(server, statement.ToString()).Tables[0];
@@ -617,56 +620,61 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public void ClearSuspectPageTable(Server srv)
         {
-            if( srv.ServerVersion.Major < 9 )
+            if (srv.ServerVersion.Major < 9)
+            {
                 throw new FailedOperationException(ExceptionTemplates.UnsupportedVersion(srv.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
-
-            StringBuilder statement = new StringBuilder( Globals.INIT_BUFFER_SIZE );
-            statement.Append( "delete from msdb.dbo.suspect_pages" );
+            }
+            StringBuilder statement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            statement.Append("delete from msdb.dbo.suspect_pages");
             GetDbFileFilter(statement);
 
             StringCollection queries = new StringCollection();
             queries.Add(statement.ToString());
-            
             ExecuteSql(srv, queries);
         }
 
         private void GetDbFileFilter(StringBuilder selectStmt)
         {
-            if( null != this.Database )
+            if (null != this.Database)
             {
-                selectStmt.AppendFormat(SmoApplication.DefaultCulture,  " where database_id in (select dbid from master.dbo.sysdatabases where name = N'{0}')", 
-                    SqlSmoObject.SqlString(this.Database) );
+                selectStmt.AppendFormat(SmoApplication.DefaultCulture, " where database_id in (select dbid from master.dbo.sysdatabases where name = N'{0}')",
+                    SqlSmoObject.SqlString(this.Database));
 
-                if( this.DatabaseFiles.Count > 1 && null != this.Offset && 0 < this.Offset.Length )
-                    throw new FailedOperationException(ExceptionTemplates.OneFilePageSupported).SetHelpContext("OneFilePageSupported");
-                
-                if( this.DatabaseFiles.Count > 0 )
+                if (this.DatabaseFiles.Count > 1 && null != this.Offset && 0 < this.Offset.Length)
                 {
-                    selectStmt.AppendFormat(SmoApplication.DefaultCulture,  " and file_id in ( select fileid from [{0}].dbo.sysfiles where name in ( ", 
-                        SqlSmoObject.SqlBraket(this.Database) );
+                    throw new FailedOperationException(ExceptionTemplates.OneFilePageSupported).SetHelpContext("OneFilePageSupported");
+                }
+                if (this.DatabaseFiles.Count > 0)
+                {
+                    selectStmt.AppendFormat(SmoApplication.DefaultCulture, " and file_id in ( select fileid from [{0}].dbo.sysfiles where name in ( ",
+                        SqlSmoObject.SqlBraket(this.Database));
 
                     int idx = 0;
-                    foreach( string filename in this.DatabaseFiles )
+                    foreach (string filename in this.DatabaseFiles)
                     {
-                        if( idx++ > 0)
-                            selectStmt.Append( Globals.commaspace );
-                        selectStmt.AppendFormat(SmoApplication.DefaultCulture, "N'{0}'", SqlSmoObject.SqlString(filename) );
+                        if (idx++ > 0)
+                        {
+                            selectStmt.Append(Globals.commaspace);
+                        }
+                        selectStmt.AppendFormat(SmoApplication.DefaultCulture, "N'{0}'", SqlSmoObject.SqlString(filename));
                     }
 
-                    selectStmt.Append( " )  )" );
+                    selectStmt.Append(" )  )");
                 }
 
-                if( null != this.Offset && 0 < this.Offset.Length )
+                if (null != this.Offset && 0 < this.Offset.Length)
                 {
-                    selectStmt.Append( " and page_id in (" );
+                    selectStmt.Append(" and page_id in (");
                     int commaIdx = 0;
-                    foreach( long offset in this.Offset )
+                    foreach (long offset in this.Offset)
                     {
-                        if( commaIdx++ > 0 )
-                            selectStmt.Append( Globals.commaspace );
-                        selectStmt.AppendFormat(SmoApplication.DefaultCulture, "0x{0:x}", offset );
+                        if (commaIdx++ > 0)
+                        {
+                            selectStmt.Append(Globals.commaspace);
+                        }
+                        selectStmt.AppendFormat(SmoApplication.DefaultCulture, "0x{0:x}", offset);
                     }
-                    selectStmt.Append( " ) " );
+                    selectStmt.Append(" ) ");
                 }
             }
 
@@ -676,76 +684,80 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             ServerVersion targetVersion = server.ServerVersion;
             StringCollection retColl = new StringCollection();
-            
+
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            if( null == Database || Database.Length == 0 )
+            if (null == Database || Database.Length == 0)
             {
                 //throw new SmoException(ExceptionTemplates.PropertyNotSet("Database", "Resrtore"));
                 throw new PropertyNotSetException("Database");
             }
 
             bool onlineFiles = false;
-            
+
             // get the header of the statements
-            switch(m_RestoreAction)
+            switch (m_RestoreAction)
             {
-                case RestoreActionType.Database :
+                case RestoreActionType.Database:
                     sb.AppendFormat(SmoApplication.DefaultCulture, "RESTORE DATABASE [{0}]", SqlSmoObject.SqlBraket(Database));
                     break;
-                case RestoreActionType.OnlineFiles : 
+                case RestoreActionType.OnlineFiles:
                     onlineFiles = true;
                     goto case RestoreActionType.Files;
-                case RestoreActionType.Files :
-                {
-                    sb.AppendFormat(SmoApplication.DefaultCulture, "RESTORE DATABASE [{0}]", SqlSmoObject.SqlBraket(Database));
-                    int ncnt = 0;
-                    foreach(string filename in this.DatabaseFiles )
+                case RestoreActionType.Files:
                     {
-                        if( ncnt++ > 0)
-                            sb.Append( Globals.commaspace );
-                        sb.AppendFormat(SmoApplication.DefaultCulture, " FILE = N'{0}'", SqlSmoObject.SqlString(filename));
-                    }
+                        sb.AppendFormat(SmoApplication.DefaultCulture, "RESTORE DATABASE [{0}]", SqlSmoObject.SqlBraket(Database));
+                        int ncnt = 0;
+                        foreach (string filename in this.DatabaseFiles)
+                        {
+                            if (ncnt++ > 0)
+                            {
+                                sb.Append(Globals.commaspace);
+                            }
+                            sb.AppendFormat(SmoApplication.DefaultCulture, " FILE = N'{0}'", SqlSmoObject.SqlString(filename));
+                        }
 
-                    foreach( string fgname in this.DatabaseFileGroups )
-                    {
-                        if( ncnt++ > 0)
-                            sb.Append( Globals.commaspace );
-                        sb.AppendFormat(SmoApplication.DefaultCulture, " FILEGROUP = N'{0}'", SqlSmoObject.SqlString(fgname));
+                        foreach (string fgname in this.DatabaseFileGroups)
+                        {
+                            if (ncnt++ > 0)
+                            {
+                                sb.Append(Globals.commaspace);
+                            }
+                            sb.AppendFormat(SmoApplication.DefaultCulture, " FILEGROUP = N'{0}'", SqlSmoObject.SqlString(fgname));
+                        }
+                        break;
                     }
-                    break;
-                }
-                case RestoreActionType.Log : 
+                case RestoreActionType.Log:
                     sb.AppendFormat(SmoApplication.DefaultCulture, "RESTORE LOG [{0}]", SqlSmoObject.SqlBraket(Database));
                     break;
-                case RestoreActionType.OnlinePage : 
-                {
-                    Database db = server.Databases[this.Database];
-                    if (null == db)
+                case RestoreActionType.OnlinePage:
                     {
-                        throw new PropertyNotSetException("Database");
-                    }
-                    if (this.DatabasePages.Count == 0)
-                    {
-                        throw new PropertyNotSetException("DatabasePages");
-                    }
+                        Database db = server.Databases[this.Database];
+                        if (null == db)
+                        {
+                            throw new PropertyNotSetException("Database");
+                        }
+                        if (this.DatabasePages.Count == 0)
+                        {
+                            throw new PropertyNotSetException("DatabasePages");
+                        }
 
-                    sb.AppendFormat(SmoApplication.DefaultCulture, "RESTORE DATABASE [{0}] PAGE=", SqlSmoObject.SqlBraket(Database));
+                        sb.AppendFormat(SmoApplication.DefaultCulture, "RESTORE DATABASE [{0}] PAGE=", SqlSmoObject.SqlBraket(Database));
 
-                    StringBuilder pageStrBuilder = new StringBuilder();
-                    foreach (SuspectPage dbPage in this.DatabasePages)
-                    {
-                        pageStrBuilder.Append(dbPage.ToString()+ ", ");
+                        StringBuilder pageStrBuilder = new StringBuilder();
+                        foreach (SuspectPage dbPage in this.DatabasePages)
+                        {
+                            pageStrBuilder.Append(dbPage.ToString() + ", ");
+                        }
+                        RemoveLastComma(pageStrBuilder);
+                        sb.AppendFormat(SmoApplication.DefaultCulture, "'{0}'", pageStrBuilder.ToString());
+
                     }
-                    RemoveLastComma(pageStrBuilder);
-                    sb.AppendFormat(SmoApplication.DefaultCulture, "'{0}'", pageStrBuilder.ToString());
-
-                }
                     break;
-                    
+
             }
 
             // get backupdevices, do some validations first
-            if( Devices.Count == 0)
+            if (Devices.Count == 0)
             {
                 if (m_RestoreAction == RestoreActionType.Log && this.FileNumber == 0)
                 {
@@ -813,17 +825,17 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                if (false == bPartialRestore && RestoreActionType.Files != m_RestoreAction)
+                if (!bPartialRestore && RestoreActionType.Files != m_RestoreAction)
                 {
-                    if (true == m_KeepReplication && 7 != targetVersion.Major)
+                    if (m_KeepReplication && 7 != targetVersion.Major)
                     {
                         sb.Append(" KEEP_REPLICATION, ");
                     }
                 }
 
-                if (false == bPartialRestore && RestoreActionType.Files != m_RestoreAction)
+                if (!bPartialRestore && RestoreActionType.Files != m_RestoreAction)
                 {
-                    if (true == m_KeepTemporalRetention && 12 < targetVersion.Major)
+                    if (m_KeepTemporalRetention && 12 < targetVersion.Major)
                     {
                         // Available in SQL2016+ (v13+)
                         //
@@ -843,17 +855,17 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
 
                 }
-                if (!norecSet && true == NoRecovery)
+                if (!norecSet && NoRecovery)
                 {
                     sb.Append(" NORECOVERY, ");
                 }
 
-                if (true == NoRewind && 7 != targetVersion.Major)
+                if (NoRewind && 7 != targetVersion.Major)
                 {
                     sb.Append(" NOREWIND, ");
                 }
 
-                if (true == UnloadTapeAfter)
+                if (UnloadTapeAfter)
                 {
                     sb.Append(" UNLOAD, ");
                 }
@@ -862,12 +874,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.Append(" NOUNLOAD, ");
                 }
 
-                if (true == m_ReplaceDatabase && RestoreActionType.Log != m_RestoreAction)
+                if (m_ReplaceDatabase && RestoreActionType.Log != m_RestoreAction)
                 {
                     sb.Append(" REPLACE, ");
                 }
 
-                if (true == Restart)
+                if (Restart)
                 {
                     sb.Append(" RESTART, ");
                 }
@@ -939,15 +951,21 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 // Checksum
-                if (9 <= targetVersion.Major && true == Checksum)
+                if (9 <= targetVersion.Major && Checksum)
                 {
                     sb.Append(" CHECKSUM, ");
                 }
 
                 // ContinueAfterError
-                if (9 <= targetVersion.Major && true == ContinueAfterError)
+                if (9 <= targetVersion.Major && ContinueAfterError)
                 {
                     sb.Append(" CONTINUE_AFTER_ERROR, ");
+                }
+
+                // Restore options
+                if (!String.IsNullOrEmpty(Options) && 16 <= targetVersion.Major)
+                {
+                    sb.Append(FormattableString.Invariant($" RESTORE_OPTIONS = '{Options}', "));
                 }
 
                 RemoveLastComma(sb);
@@ -958,18 +976,19 @@ namespace Microsoft.SqlServer.Management.Smo
             // Add another statement to clean up suspect page table (if requested)
             if (this.clearSuspectPageTableAfterRestore)
             {
-                if( server.ServerVersion.Major < 9 )
+                if (server.ServerVersion.Major < 9)
+                {
                     throw new FailedOperationException(ExceptionTemplates.UnsupportedVersion(server.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
+                }
 
-                StringBuilder statement = new StringBuilder( Globals.INIT_BUFFER_SIZE );
-                statement.Append( "delete from msdb.dbo.suspect_pages" );
+                StringBuilder statement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+                statement.Append("delete from msdb.dbo.suspect_pages");
                 GetDbFileFilter(statement);
 
                 retColl.Add(statement.ToString());
             }
 
             return retColl;
-            
         }
 
         /// <summary>
@@ -984,14 +1003,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 // Run T-SQL
                 ExecuteSql(srv, Script(srv));
 
-                if (!srv.ExecutionManager.Recording && (Action == RestoreActionType.Database || Action == RestoreActionType.Log) )
+                if (!srv.ExecutionManager.Recording && (Action == RestoreActionType.Database || Action == RestoreActionType.Log))
                 {
                     if (!SmoApplication.eventsSingleton.IsNullDatabaseEvent())
                     {
-                        SmoApplication.eventsSingleton.CallDatabaseEvent(srv, 
-                                new DatabaseEventArgs(srv.Databases[this.Database].Urn, 
-                                                srv.Databases[this.Database], 
-                                                this.Database, 
+                        SmoApplication.eventsSingleton.CallDatabaseEvent(srv,
+                                new DatabaseEventArgs(srv.Databases[this.Database].Urn,
+                                                srv.Databases[this.Database],
+                                                this.Database,
                                                 DatabaseEventType.Restore));
                     }
                 }
@@ -1030,7 +1049,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         void RemoveLastComma(StringBuilder sb)
         {
-            if( 0 <= sb.Length - 2 && ',' == sb[sb.Length - 2] )
+            if (0 <= sb.Length - 2 && ',' == sb[sb.Length - 2])
             {
                 sb.Remove(sb.Length - 2, 2);
             }
@@ -1203,7 +1222,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public RestoreActionType Action
         {
-            get 
+            get
             {
                 return m_RestoreAction;
             }
@@ -1227,7 +1246,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         long[] offset = null;
-        public long[] Offset 
+        public long[] Offset
         {
             get { return offset; }
             set { offset = value; }
@@ -1258,7 +1277,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Verify latest database backup
         /// </summary>
-        VerifyDatabase = 0,     
+        VerifyDatabase = 0,
         /// <summary>
         /// Verify latest log backup
         /// </summary>
@@ -1270,17 +1289,17 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Verify latest incremental backup
         /// </summary>
-        VerifyIncremental = 3   
+        VerifyIncremental = 3
     }
 
-    
+
 
     public class RelocateFile
     {
         private string m_LogicalFileName;
         private string m_PhysicalFileName;
 
-        public RelocateFile() 
+        public RelocateFile()
         {
         }
 

@@ -27,13 +27,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // on Yukon we'll have just three mirrors
             this.mirrors = new BackupDeviceList[MIRRORS_COUNT];
-            for( int i = 0; i < this.mirrors.Length; ++i )
+            for (int i = 0; i < this.mirrors.Length; ++i)
             {
                 this.mirrors[i] = new BackupDeviceList();
             }
         }
 
-        
         internal Backup(bool checkForHADRMaintPlan)
             : this()
         {
@@ -253,7 +252,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // BlockSize
             //
-            if (this.BlockSize <= 0 && targetEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+            if (this.BlockSize <= 0 && targetEngineEdition == DatabaseEngineEdition.SqlManagedInstance && IsAzureBlobBackupRestore(this.Devices))
             {
                 // Managed Instances support only backups to URL (blob) destinations. Transfer speed can be
                 // greatly increased if proper values are set for BLOCKSIZE and MAXTRANSFERSIZE arguments.
@@ -285,7 +284,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // MaxTransferSize
             //
-            if (this.MaxTransferSize <= 0 && targetEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+            if (this.MaxTransferSize <= 0 && targetEngineEdition == DatabaseEngineEdition.SqlManagedInstance && IsAzureBlobBackupRestore(this.Devices))
             {
                 // Managed Instances support only backups to URL (blob) destinations. Transfer speed can be
                 // greatly increased if proper values are set for BLOCKSIZE and MAXTRANSFERSIZE arguments.
@@ -457,7 +456,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
             }
-            if (BackupActionType.Log == m_BackupAction && !norecSet && true == NoRecovery)
+            if (BackupActionType.Log == m_BackupAction && !norecSet && NoRecovery)
             {
                 if (nWithCnt++ > 0)
                 {
@@ -555,6 +554,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append("CONTINUE_AFTER_ERROR");
             }
 
+            // Backup options
+            if ((16 <= targetVersion.Major) && !String.IsNullOrEmpty(this.Options))
+            {
+                if (nWithCnt++ > 0)
+                {
+                    sb.Append(Globals.commaspace);
+                }
+                sb.AppendFormat(SmoApplication.DefaultCulture, "BACKUP_OPTIONS = '{0}'", this.Options);
+            }
+
             try
             {
                 sb = this.CheckForHADRMaintPlan(targetServer, sb);
@@ -571,7 +580,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public BackupActionType Action
         {
-            get 
+            get
             {
                 return m_BackupAction;
             }
@@ -581,7 +590,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  string m_BackupSetDescription;
+        private string m_BackupSetDescription;
         public string BackupSetDescription
         {
             get
@@ -594,7 +603,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  string m_BackupSetName;
+        private string m_BackupSetName;
         public string BackupSetName
         {
             get
@@ -607,7 +616,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  DateTime m_ExpirationDate;
+        private DateTime m_ExpirationDate;
         public DateTime ExpirationDate
         {
             get
@@ -620,7 +629,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  bool m_FormatMedia;
+        private bool m_FormatMedia;
         public bool FormatMedia
         {
             get
@@ -633,7 +642,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  bool m_Initialize;
+        private bool m_Initialize;
         public bool Initialize
         {
             get
@@ -646,7 +655,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  string m_MediaDescription;
+        private string m_MediaDescription;
         public string MediaDescription
         {
             get
@@ -659,7 +668,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  int m_RetainDays;
+        private int m_RetainDays;
         public int RetainDays
         {
             get
@@ -672,7 +681,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private  bool m_SkipTapeHeader;
+        private bool m_SkipTapeHeader;
         public bool SkipTapeHeader
         {
             get
@@ -720,7 +729,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return m_Incremental; }
             set { m_Incremental = value; }
         }
-        
         // Mirrors
         private BackupDeviceList[] mirrors;
 
