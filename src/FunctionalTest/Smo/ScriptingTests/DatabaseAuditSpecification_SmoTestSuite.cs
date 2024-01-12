@@ -52,20 +52,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     _SMO.Audit audit = new _SMO.Audit(server, GenerateUniqueSmoObjectName("audit"));
                     _SMO.DatabaseAuditSpecification auditSpec =
                         new _SMO.DatabaseAuditSpecification(database, GenerateUniqueSmoObjectName("auditSpec"));
-
+                    audit.DestinationType = _SMO.AuditDestinationType.ApplicationLog;
+                    audit.Create();
                     try
                     {
-                        audit.DestinationType = _SMO.AuditDestinationType.ApplicationLog;
-                        audit.Create();
-
                         auditSpec.AuditName = audit.Name;
 
                         VerifySmoObjectDropIfExists(auditSpec, database);
                     }
-                    catch (Exception)
+                    finally
                     {
-                        audit.DropIfExists();
-                        throw;
+                        audit.Drop();
                     }
                 });
         }

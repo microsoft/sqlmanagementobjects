@@ -6,6 +6,8 @@
     <RootNamespace>Microsoft.SqlServer.Management.Common</RootNamespace>
     <ClsCompliant>true</ClsCompliant>
     <DefineConstants Condition="'$(UseNativeBatchParser)'=='true'">$(DefineConstants);NATIVEBATCHPARSER</DefineConstants>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.SqlServer.ConnectionInfoExtended" Key="$(RealPublicKey)"/>

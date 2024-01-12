@@ -37,6 +37,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <summary>
         /// Azure Ledger Database support
         /// </summary>
-        AzureLedger
+        AzureLedger,
+
+        /// <summary>
+        /// Mark a server as NoDropCreate if it doesn't support database create/drop
+        /// </summary>
+        NoDropCreate,
     }
 }

@@ -28,7 +28,10 @@ namespace Microsoft.SqlServer.Management.Smo
             this.InitVariables();
         }
 
-    private SqlSecureString password;
+        private SqlSecureString password;
+
+        // Service Principal Object ID obtained from Microsoft Entra ID
+        private Guid objectId;
 
         private void InitVariables()
         {
@@ -108,6 +111,26 @@ namespace Microsoft.SqlServer.Management.Smo
                     m_ExtendedProperties = new ExtendedPropertyCollection(this);
                 }
                 return m_ExtendedProperties;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the objectId of this user object. 
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.ReadOnlyAfterCreation | SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
+        public Guid ObjectId
+        {
+            get
+            {
+                return this.objectId;
+            }
+            set
+            {
+                if (this.State != SqlSmoState.Creating)
+                {
+                    throw new SmoException(ExceptionTemplates.ObjectIdCannotBeSet);
+                }
+                this.objectId = value;
             }
         }
 
@@ -475,6 +498,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     AddComma(sbOption, ref optionAdded);
                     sbOption.Append("DEFAULT_SCHEMA=");
                     sbOption.Append(MakeSqlBraket(s));
+                }
+
+                if (type == UserType.External && this.State == SqlSmoState.Creating && ObjectId != Guid.Empty)
+                {
+                    AddComma(sbOption, ref optionAdded);
+                    sbOption.Append($"OBJECT_ID = {MakeSqlString(ObjectId.ToString())}");
                 }
 
                 if (sbOption.Length > 0)
@@ -1251,7 +1280,7 @@ namespace Microsoft.SqlServer.Management.Smo
             base.AddScriptPermission(query, sp);
         }
 
-               /// <summary>
+        /// <summary>
         /// Add to Role script
         /// </summary>
         /// <param name="role"></param>
@@ -1267,45 +1296,45 @@ namespace Microsoft.SqlServer.Management.Smo
             else
             {
 
-            string prefix;
-            //Prefix should be based on TargetServerVersion instead of this Server Version
-            if (sp != null)
-            {
-                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
+                string prefix;
+                //Prefix should be based on TargetServerVersion instead of this Server Version
+                if (sp != null)
                 {
-                    prefix = "sys";
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
+                    {
+                        prefix = "sys";
+                    }
+                    else
+                    {
+                        prefix = "dbo";
+                    }
                 }
                 else
                 {
-                    prefix = "dbo";
+                    if (this.ServerVersion.Major >= 9)
+                    {
+                        prefix = "sys";
+                    }
+                    else
+                    {
+                        prefix = "dbo";
+                    }
                 }
-            }
-            else
-            {
-                if (this.ServerVersion.Major >= 9)
+                string username;
+                if (sp != null)
                 {
-                    prefix = "sys";
+                    // Will already be in N'xyz' format
+                    username = this.FormatFullNameForScripting(sp, false);
                 }
                 else
                 {
-                    prefix = "dbo";
+                    username = MakeSqlString(this.Name);
                 }
-            }
-            string username;
-            if (sp != null)
-            {
-                // Will already be in N'xyz' format
-                username = this.FormatFullNameForScripting(sp, false);
-            }
-            else
-            {
-                username = MakeSqlString(this.Name);
-            }
 
-            return string.Format(SmoApplication.DefaultCulture,
-                "{0}.sp_addrolemember @rolename = {1}, @membername = {2}",
-                prefix, MakeSqlString(role), username);
-        }
+                return string.Format(SmoApplication.DefaultCulture,
+                    "{0}.sp_addrolemember @rolename = {1}, @membername = {2}",
+                    prefix, MakeSqlString(role), username);
+            }
         }
 
 
@@ -1323,11 +1352,11 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
 
-        StringCollection sc = new StringCollection();
-        sc.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(GetDBName())));
-        sc.Add(ScriptAddToRole(role, new ScriptingPreferences(this)));
-        this.ExecutionManager.ExecuteNonQuery(sc);
-    }
+            StringCollection sc = new StringCollection();
+            sc.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(GetDBName())));
+            sc.Add(ScriptAddToRole(role, new ScriptingPreferences(this)));
+            this.ExecutionManager.ExecuteNonQuery(sc);
+        }
 
 
         public void Rename(string newname)

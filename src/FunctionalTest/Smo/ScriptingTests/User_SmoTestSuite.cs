@@ -94,5 +94,40 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
+        /// <summary>
+        /// Test for scripting external users using ObjectId which checks if scripting is returning appropriate string.
+        /// CreateSmoObject(user) won't work since the syntax call does the search of user in Azure Active Directory,
+        /// so we only check the script string.
+        /// </summary>
+        [TestMethod]
+        [SqlRequiredFeature(SqlFeature.AADLoginsSqlDB)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        public void SmoCreateFromExternalProviderUsingEntraObjectIdSQLDB_User()
+        {
+            this.ExecuteWithDbDrop(
+                database =>
+                {
+                    _SMO.User user = new _SMO.User(database, GenerateUniqueSmoObjectName("user"));
+                    user.UserType = _SMO.UserType.External;
+                    user.ObjectId = Guid.NewGuid();
+
+                    _SMO.ScriptingOptions so = new _SMO.ScriptingOptions();
+                    string scriptUser = ScriptSmoObject((_SMO.IScriptable)user, so);
+                    string expectedOutput = $"CREATE USER {user.FullQualifiedName} FROM  EXTERNAL PROVIDER  WITH OBJECT_ID = N'{user.ObjectId}'\r\n";
+                    Assert.That(scriptUser, Is.EqualTo(expectedOutput), "CREATE USER syntax is not scripted correctly. This user type should include keywords 'FROM EXTERNAL PROVIDER USING OBJECT_ID'.");
+
+                    user.DefaultSchema = "MySchema";
+                    so = new _SMO.ScriptingOptions();
+                    scriptUser = ScriptSmoObject((_SMO.IScriptable)user, so);
+                    expectedOutput = $"CREATE USER {user.FullQualifiedName} FROM  EXTERNAL PROVIDER  WITH DEFAULT_SCHEMA=[{user.DefaultSchema}], OBJECT_ID = N'{user.ObjectId}'\r\n";
+                    Assert.That(scriptUser, Is.EqualTo(expectedOutput), "CREATE USER syntax is not scripted correctly. This user type should include keywords 'FROM EXTERNAL PROVIDER USING OBJECT_ID'.");
+
+                    so.ScriptDrops = true;
+                    scriptUser = ScriptSmoObject((_SMO.IScriptable)user, so);
+                    expectedOutput = $"DROP USER {user.FullQualifiedName}\r\n";
+                    Assert.That(scriptUser, Is.EqualTo(expectedOutput), "DROP USER syntax is not scripted correctly.");
+                });
+        }
+
     }
 }

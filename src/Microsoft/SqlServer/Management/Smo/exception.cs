@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Server;
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
 using System.Security.Permissions;
 #else
 using System.Collections.Generic;
@@ -317,7 +317,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -423,7 +423,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
- #if !NETSTANDARD2_0
+ #if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -538,7 +538,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="info">T:System.Runtime.Serialization.SerializationInfo object that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -647,7 +647,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="info">T:System.Runtime.Serialization.SerializationInfo object that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -758,7 +758,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -862,7 +862,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -971,7 +971,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -1083,7 +1083,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -1202,7 +1202,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -1328,7 +1328,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -1495,7 +1495,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -1729,7 +1729,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif

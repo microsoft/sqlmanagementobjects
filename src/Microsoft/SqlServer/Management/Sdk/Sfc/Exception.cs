@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
 using System.Security.Permissions;
 #endif
 
@@ -162,7 +162,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             propertyName = (string)info.GetValue("propertyName", typeof(string));
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -218,7 +218,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             propertyName = (string)info.GetValue("propertyName", typeof(string));
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -280,7 +280,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             keyName = (string)info.GetValue("keyName", typeof(string));
         }
         
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -437,7 +437,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             objName = (string)info.GetValue("objName", typeof(string));
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -1036,7 +1036,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.toMode = (string)info.GetValue("toMode", typeof(string));
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>

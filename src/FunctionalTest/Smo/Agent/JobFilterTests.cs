@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -32,21 +32,32 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
                     Is.EquivalentTo(allJobs.Select(j => j.Name)), "EnumJobs should match Jobs collection");
                 if (allJobs.Length == 0)
                 {
+                    Trace.TraceWarning("There are no jobs");
                     return;
                 }
-                var jobCategory = ServerContext.JobServer.JobCategories[allJobs[0].Category].ID;
+                var idx = 0;
+                while (idx < allJobs.Length && allJobs[idx].JobSteps.Count == 0)
+                {
+                    idx++;
+                }
+                if (idx == allJobs.Length)
+                {
+                    Trace.TraceWarning("There are no jobs with steps to validate");
+                    return;
+                }
+                var jobCategory = ServerContext.JobServer.JobCategories[allJobs[idx].Category].ID;
                 // there's a race condition but the set of jobs on our test servers change slowly
                 var jobFilter = new JobFilter
                 {
-                    Category = allJobs[0].Category,
-                    Owner = allJobs[0].OwnerLoginName,
-                    JobType = allJobs[0].JobType,
-                    StepSubsystem = allJobs[0].JobSteps[0].SubSystem,
-                    Enabled = allJobs[0].IsEnabled                   
+                    Category = allJobs[idx].Category,
+                    Owner = allJobs[idx].OwnerLoginName,
+                    JobType = allJobs[idx].JobType,
+                    StepSubsystem = allJobs[idx].JobSteps[0].SubSystem,
+                    Enabled = allJobs[idx].IsEnabled
                 };
                 var data = ServerContext.JobServer.EnumJobs(jobFilter);
                 var filteredJobs = data.Rows.Cast<DataRow>().ToArray();
-                Assert.That(filteredJobs.Select(r => (string)r["Name"]), Has.Member(allJobs[0].Name), "Filter should have found the job");
+                Assert.That(filteredJobs.Select(r => (string)r["Name"]), Has.Member(allJobs[idx].Name), "Filter should have found the job");
                 Assert.That(filteredJobs.Select(r => (int)r["CategoryID"]), Has.All.EqualTo(jobCategory), "Category filter");
                 Assert.That(filteredJobs.Select(r => (string)r["OwnerLoginName"]), Has.All.EqualTo(jobFilter.Owner), "Owner filter");
                 Assert.That(filteredJobs.Select(r => (bool)r["IsEnabled"]), Has.All.EqualTo(jobFilter.Enabled), "Enabled filter");

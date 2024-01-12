@@ -879,7 +879,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private bool IsBackupDeviceUrl()
         {
             Uri testUri;
-            return (Uri.TryCreate(this.TailLogBackupFile, UriKind.Absolute, out testUri) && (testUri.Scheme == Uri.UriSchemeHttps || testUri.Scheme == Uri.UriSchemeHttp));
+            return Uri.TryCreate(this.TailLogBackupFile, UriKind.Absolute, out testUri) && (testUri.Scheme != Uri.UriSchemeFile);
         }
 
 #endregion

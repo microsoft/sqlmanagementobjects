@@ -46,7 +46,7 @@
 		</version>			
 		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="ID" type="int" access='Read'>u.principal_id</property>
-			<property name="IsSystemObject" type="bit" access='Read' cast = 'true'>CASE WHEN u.principal_id &lt; 5 OR u.principal_id = 16382 OR u.principal_id = 16383 THEN 1 ELSE 0 END</property>
+			<property name="IsSystemObject" type="bit" access='Read' cast = 'true'>CASE WHEN u.principal_id &lt; 5 OR (u.principal_id &gt;= 16384 and u.principal_id &lt; 16400) THEN 1 ELSE 0 END</property>
 			<property name="LoginType" type="int" report_type="LoginType" access='read'>CASE WHEN N'U' = u.type THEN 0 WHEN N'G' = u.type THEN 1 WHEN N'S' = u.type THEN 2 WHEN N'C' = u.type THEN 3 WHEN N'K' = u.type THEN 4 WHEN N'E' = u.type THEN 5 WHEN N'X' = u.type THEN 6 END</property>
 			<property name="HasDBAccess" type="bit" access='Read' cast='true'>CASE dp.state WHEN N'G' THEN 1 WHEN 'W' THEN 1 ELSE 0 END</property>
 			<property name="Sid" type="varbinary" size = "85" access='Read'>u.sid</property>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetfxVersion);netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
     <RootNamespace>Microsoft.SqlServer.Management.Smo.Wmi</RootNamespace>
   </PropertyGroup>
   <ItemGroup>

@@ -16,6 +16,8 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using SMO = Microsoft.SqlServer.Management.Smo;
+using Microsoft.SqlServer.Management.XEventDbScoped;
+using Microsoft.SqlServer.Management.XEvent;
 
 namespace Microsoft.SqlServer.Test.Manageability.Utils
 {
@@ -703,5 +705,136 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             key.Create(AsymmetricKeyEncryptionAlgorithm.Rsa1024, Guid.NewGuid().ToString());
             return key;
         }
-    } 
+
+        /// <summary>
+        /// Clears out all the user objects so a database can be reused instead of dropped and recreated.
+        /// The Database object reference should not be used again after this operation.
+        /// </summary>
+        /// <param name="database"></param>
+        public static void DropAllObjects(this Database database)
+        {
+            database.Refresh();
+            database.Parent.SetDefaultInitFields(typeof(UserDefinedFunction), true);
+            database.Parent.SetDefaultInitFields(typeof(StoredProcedure), true);
+            var tableFields = Table.GetScriptFields(typeof(Database), database.Parent.ServerVersion, database.DatabaseEngineType, database.DatabaseEngineEdition, false);
+            database.Parent.SetDefaultInitFields(typeof(Table), nameof(Table.IsSystemObject), nameof(Table.IsDroppedLedgerTable));
+            database.Parent.SetDefaultInitFields(typeof(Table), tableFields);
+            database.Parent.SetDefaultInitFields(typeof(View), nameof(View.LedgerViewType), nameof(View.IsDroppedLedgerView), nameof(View.IsSystemObject));
+            database.Parent.SetDefaultInitFields(typeof(SMO.Broker.BrokerService), nameof(SMO.Broker.BrokerService.IsSystemObject));
+            database.Parent.SetDefaultInitFields(typeof(SMO.Broker.ServiceQueue), nameof(SMO.Broker.ServiceQueue.IsSystemObject));
+            database.Parent.SetDefaultInitFields(typeof(DatabaseRole), nameof(DatabaseRole.IsFixedRole));
+            var objects = GetDatabaseObjects(database).SelectMany(o => o).Where(o => !o.IsSystemObjectInternal() && o.State == SqlSmoState.Existing).ToArray();
+            var scriptMaker = new ScriptMaker(database.Parent, new ScriptingOptions(database) { ScriptDrops = true, AllowSystemObjects = false, WithDependencies = true });
+            var statements = scriptMaker.Script(objects);
+            // Some statements in the script like DISABLE TRIGGER have to come after a semicolon delimited statement
+            var script = statements.ToDelimitedSingleString(";");
+            database.ExecuteNonQuery(script);
+            if (database.IsSupportedObject<SMO.Broker.ServiceBroker>())
+            {
+                database.ServiceBroker.DropAll<SMO.Broker.BrokerPriority>(() => database.ServiceBroker.Priorities);
+                database.ServiceBroker.DropAll<SMO.Broker.BrokerService>(() => database.ServiceBroker.Services);
+                database.ServiceBroker.DropAll<SMO.Broker.ServiceQueue>(() => database.ServiceBroker.Queues);
+            }
+            database.DropAll<FullTextStopList>(() => database.FullTextStopLists);
+            database.DropAll<FullTextCatalog>(() => database.FullTextCatalogs);
+            // These drops need to be performed in dependency order
+            database.DropAll<ApplicationRole>(() => database.ApplicationRoles);
+            database.DropAll<ColumnEncryptionKey>(() => database.ColumnEncryptionKeys);
+            database.DropAll<ColumnMasterKey>(() => database.ColumnMasterKeys);
+            database.DropAll<DatabaseAuditSpecification>(() => database.DatabaseAuditSpecifications);
+            database.DropAll<ExternalDataSource>(() => database.ExternalDataSources);
+            database.DropAll<DatabaseScopedCredential>(() => database.DatabaseScopedCredentials);
+            database.DropAll<ExternalLanguage>(() => database.ExternalLanguages);
+            database.DropAll<ExternalFileFormat>(() => database.ExternalFileFormats);
+            database.DropAll<ExternalLibrary>(() => database.ExternalLibraries);
+            database.DropAll<ExternalStreamingJob>(() => database.ExternalStreamingJobs);
+            database.DropAll<ExternalStream>(() => database.ExternalStreams);
+            database.DropAll<SearchPropertyList>(() => database.SearchPropertyLists);
+            database.DropAll<SensitivityClassification>(() => database.SensitivityClassifications);
+            database.DropAll<SymmetricKey>(() => database.SymmetricKeys);
+            database.DropAll<User>(() => database.Users);
+            database.DropAll<AsymmetricKey>(() => database.AsymmetricKeys);
+            database.DropAll<Certificate>(() => database.Certificates);
+            var lockedSchemas = new HashSet<string>();
+            database.Tables.ClearAndInitialize(null, null);
+            database.Views.ClearAndInitialize(null, null);
+            foreach (var schema in database.Tables.Cast<Table>().Where(t => t.IsImmutable()).Select(t => t.Schema))
+            {
+                _ = lockedSchemas.Add(schema);
+            }
+            foreach (var schema in database.Views.Cast<View>().Where(v => v.IsDroppedLedgerView).Select(v => v.Schema))
+            {
+                _ = lockedSchemas.Add(schema);
+            }
+            database.DropAll<Schema>(() => database.Schemas, s => !lockedSchemas.Contains(s.Name));
+            // Maybe IsFixedRole should also be used for IsSystemObject
+            database.DropAll<DatabaseRole>(() => database.Roles, r => !r.IsFixedRole && r.Name != "public");
+            database.DropAll<ExtendedProperty>(() => database.ExtendedProperties);
+            database.MasterKey?.Drop();
+            BaseXEStore xeStore;
+            xeStore = database.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase ?
+                 (BaseXEStore)new DatabaseXEStore(new Management.Sdk.Sfc.SqlStoreConnection(database.ExecutionManager.ConnectionContext.SqlConnectionObject)) :
+                 new XEStore(new Management.Sdk.Sfc.SqlStoreConnection(database.Parent.ConnectionContext.SqlConnectionObject));
+            foreach (var session in xeStore.Sessions.ToList())
+            {
+                session.Drop();
+            }
+        }
+
+        /// <summary>
+        /// Drops all the objects in the given collection
+        /// TODO: consider changing the parameters to a LINQ Expression from which to derive the object type and collection reference
+        /// eg database.DropAll(d => d.ApplicationRoles)
+        /// We could do this once generic collections are implemented.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parent"></param>
+        /// <param name="collection"></param>
+        /// <param name="predicate">Optional predicate to filter items to drop. Return true for droppable items</param>
+        public static void DropAll<T>(this SqlSmoObject parent, Func<SmoCollectionBase> collection, Func<T, bool> predicate = null) where T : SqlSmoObject, IDroppable
+        {
+            if (parent.IsSupportedObject<T>())
+            {
+                // not every object has IsSystemObject but try to get it.
+                parent.GetServerObject().SetDefaultInitFields(typeof(T), "IsSystemObject");
+                var col = collection();
+                col.ClearAndInitialize("", Enumerable.Empty<string>());
+                predicate = predicate ?? ((o) => true);
+                foreach (var obj in col.Cast<T>().Where(o => !o.IsSystemObjectInternal() && predicate(o)).ToList())
+                {
+                    obj.Drop();
+                }
+                col.ResetCollection();
+            }
+        }
+        private static IEnumerable<IList<SqlSmoObject>> GetDatabaseObjects(Database database)
+        {
+            Func<Table, bool> tablePredicate = (table) => true;
+            Func<View, bool> viewPredicate = (view) => true;
+            if (database.Parent.IsSupportedProperty(typeof(Table), nameof(Table.LedgerType)))
+            {
+                tablePredicate = t => !t.IsDroppedLedgerTable && t.LedgerType != LedgerTableType.HistoryTable;
+                viewPredicate = v => !v.IsDroppedLedgerView && v.LedgerViewType != LedgerViewType.LedgerView;
+            }
+            yield return database.Tables.Cast<Table>().Where(tablePredicate).Cast<SqlSmoObject>().ToList();
+            yield return database.UserDefinedFunctions.Cast<SqlSmoObject>().ToList();
+            yield return database.Views.Cast<View>().Where(viewPredicate).Cast<SqlSmoObject>().ToList();
+            yield return database.StoredProcedures.Cast<SqlSmoObject>().ToList();
+            yield return database.Defaults.Cast<SqlSmoObject>().ToList();
+            yield return database.Rules.Cast<SqlSmoObject>().ToList();
+            yield return database.UserDefinedAggregates.Cast<SqlSmoObject>().ToList();
+            yield return database.Synonyms.Cast<SqlSmoObject>().ToList();
+            yield return database.Sequences.Cast<SqlSmoObject>().ToList();
+            yield return database.UserDefinedDataTypes.Cast<SqlSmoObject>().ToList();
+            yield return database.XmlSchemaCollections.Cast<SqlSmoObject>().ToList();
+            yield return database.UserDefinedTypes.Cast<SqlSmoObject>().ToList();
+            yield return database.Assemblies.Cast<SqlSmoObject>().ToList();
+            yield return database.PartitionSchemes.Cast<SqlSmoObject>().ToList();
+            yield return database.PartitionFunctions.Cast<SqlSmoObject>().ToList();
+            yield return database.UserDefinedTableTypes.Cast<SqlSmoObject>().ToList();
+            yield return database.Triggers.Cast<SqlSmoObject>().ToList();
+            yield return database.PlanGuides.Cast<SqlSmoObject>().ToList();
+        }
+
+    }
 }

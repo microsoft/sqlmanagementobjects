@@ -535,13 +535,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 disposable.Dispose();
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    // it is more important to report System exception than being peaceful.
-                    throw e;
-                }
 
                 // otherwise simple log and return
                 TraceHelper.LogExCatch(e);
@@ -566,12 +561,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
@@ -595,12 +586,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetRelatedContainerNames: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetRelatedContainerNames: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
@@ -625,12 +612,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetNaturalOrder: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetNaturalOrder: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
@@ -655,12 +638,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetIsValueAvailable: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetIsValueAvailable: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
@@ -692,12 +671,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetSortedList: exception occurred {0}.", ae);
                 throw new ArgumentException("list", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetSortedList: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), source.ToString());
@@ -722,12 +697,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetComparer: exception occurred {0}.", ae);
                 throw new ArgumentException("list", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetComparer: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), list.ToString());
@@ -750,12 +721,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetRelatedObjectNames: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetRelatedObjectNames: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
@@ -778,12 +745,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 TraceHelper.Trace(Differencer.ComponentName, "GetPropertyNames: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
-            catch (Exception e)
+            catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                if (IsSystemGeneratedException(e))
-                {
-                    throw e;
-                }
                 TraceHelper.LogExCatch(e);
                 TraceHelper.Trace(Differencer.ComponentName, "GetPropertyNames: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
@@ -804,12 +767,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                         return provider;
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    if (IsSystemGeneratedException(e))
-                    {
-                        throw e;
-                    }
                     TraceHelper.LogExCatch(e);
                     TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
@@ -833,12 +792,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                         return provider;
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    if (IsSystemGeneratedException(e))
-                    {
-                        throw e;
-                    }
                     TraceHelper.LogExCatch(e);
                     TraceHelper.Trace(Differencer.ComponentName, "FindNameProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
@@ -862,12 +817,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                         return provider;
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    if (IsSystemGeneratedException(e))
-                    {
-                        throw e;
-                    }
                     TraceHelper.LogExCatch(e);
                     TraceHelper.Trace(Differencer.ComponentName, "FindAvailableValueProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
@@ -891,12 +842,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                         return provider;
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    if (IsSystemGeneratedException(e))
-                    {
-                        throw e;
-                    }
                     TraceHelper.LogExCatch(e);
                     TraceHelper.Trace(Differencer.ComponentName, "FindContainerSortingProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), source.ToString());
@@ -920,12 +867,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                         return provider;
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    if (IsSystemGeneratedException(e))
-                    {
-                        throw e;
-                    }
                     TraceHelper.LogExCatch(e);
                     TraceHelper.Trace(Differencer.ComponentName, "FindPropertyComparerProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), source.ToString());

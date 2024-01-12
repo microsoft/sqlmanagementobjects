@@ -7,6 +7,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Test.Manageability.Utils;
+using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
@@ -41,7 +42,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                     var table3Name = db.CreateTable("Initi'alize3SmoCleanAnd").Name;
 
                     // no filter is our control group
-                    Assert.That(db.Tables.GetNames(), Is.EquivalentTo(new[] {table1Name, table2Name, table3Name}),
+                    Assert.That(db.Tables.Cast<Table>().Where(t => !t.IsImmutable()).Select(t => t.Name), Is.EquivalentTo(new[] {table1Name, table2Name, table3Name}),
                         "Unexpected number of tables before clearing and filtering");
                     db.Tables.ClearAndInitialize("[(@Name = '" + Urn.EscapeString(table1Name) + "')]",
                         new string[] { });

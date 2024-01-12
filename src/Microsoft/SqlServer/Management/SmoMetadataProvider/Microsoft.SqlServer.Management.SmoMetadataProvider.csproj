@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetFxVersion);netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>$(NetFxVersion);net6.0</TargetFrameworks>
     <RootNamespace>Microsoft.SqlServer.Management.SmoMetadataProvider</RootNamespace>
   </PropertyGroup>
   <ItemGroup>

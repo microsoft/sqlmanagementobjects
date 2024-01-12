@@ -1894,18 +1894,20 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         /// <summary>
-        ///     Returns a connection that has the specified database name in the connection string
+        /// Returns a connection that has the specified database name in the connection string.
+        /// If the current connection is already referencing the given database, the current connection is returned.
         /// </summary>
         /// <param name="dbName"></param>
         /// <param name="poolConnection"></param>
         /// <returns></returns>
         public ServerConnection GetDatabaseConnection(string dbName, bool poolConnection = true)
         {
-            return ConnectionFactory.GetInstance(this).GetDatabaseConnection(dbName, poolConnection, this.AccessToken);
+            return GetDatabaseConnection(dbName, poolConnection, null);
         }
 
         /// <summary>
         /// Returns a connection that has the specified database name in the connection string
+        /// If the current connection is already referencing the given database, the current connection is returned.
         /// </summary>
         /// <param name="dbName"></param>
         /// <param name="poolConnection"></param>
@@ -1913,7 +1915,10 @@ namespace Microsoft.SqlServer.Management.Common
         /// <returns></returns>
         public ServerConnection GetDatabaseConnection(string dbName, bool poolConnection, IRenewableToken accessToken)
         {
-            return ConnectionFactory.GetInstance(this).GetDatabaseConnection(dbName, poolConnection, accessToken ?? this.AccessToken);
+            var dbNamesComparer = ServerConnection.ConnectionFactory.GetInstance(this).ServerComparer.DatabaseNameEqualityComparer;
+            return dbNamesComparer.Equals(dbName, DatabaseName) ?
+                  this
+                : ConnectionFactory.GetInstance(this).GetDatabaseConnection(dbName, poolConnection, accessToken ?? AccessToken);
         }
 
         /// <summary>

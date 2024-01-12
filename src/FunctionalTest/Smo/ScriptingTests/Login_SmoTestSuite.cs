@@ -305,6 +305,36 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 }
             });
         }
+
+        /// <summary>
+        /// Test for scripting external logins using ObjectId which checks if scripting is returning appropriate string.
+        /// CreateSmoObject(login) won't work since the syntax call does the search of login in Azure Active Directory,
+        /// so we only check the script string.
+        /// </summary>
+        [TestMethod]
+        [SqlRequiredFeature(SqlFeature.AADLoginsSqlDB)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        public void SmoCreateFromExternalProviderUsingEntraObjectIdSQLDB_Login()
+        {
+            ExecuteTest(() =>
+            {
+                var server = new _SMO.Server(this.ServerContext.ConnectionContext);
+                Login login = new Login(server,
+                    GenerateUniqueSmoObjectName("login"));
+                login.LoginType = LoginType.ExternalUser;
+                login.ObjectId = Guid.NewGuid();
+
+                ScriptingOptions so = new ScriptingOptions();
+                string scriptLogin = ScriptSmoObject((IScriptable)login, so);
+                string expectedOutput = $"CREATE LOGIN {login.FullQualifiedName} FROM EXTERNAL PROVIDER WITH OBJECT_ID = N'{login.ObjectId}'\r\n";
+                Assert.That(scriptLogin, Is.EqualTo(expectedOutput), "CREATE LOGIN syntax is not scripted correctly. This login type should include keywords 'FROM EXTERNAL PROVIDER USING OBJECT_ID'.");
+
+                so.ScriptDrops = true;
+                scriptLogin = ScriptSmoObject((IScriptable)login, so);
+                expectedOutput = $"DROP LOGIN {login.FullQualifiedName}\r\n";
+                Assert.That(scriptLogin, Is.EqualTo(expectedOutput), "DROP LOGIN syntax is not scripted correctly.");
+            });
+        }
 #endregion // Scripting Tests
     }
 }

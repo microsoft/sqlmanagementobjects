@@ -4,7 +4,7 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.TestPlatform" Version="16.1.1" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.TestPlatform" Version="17.3" GeneratePathProperty="true" />
     <QCustomInput Include="$(EnlistmentRoot)\src\UnitTest\unittest.runsettings" />
   </ItemGroup>
   <Target Condition="'$(BuildingInsideVisualStudio)' != 'true' and '$(SkipUnitTests)' != 'true' and ('$(QBUILD)' != '1' or '$(EnableQTest)' == 'false') " 

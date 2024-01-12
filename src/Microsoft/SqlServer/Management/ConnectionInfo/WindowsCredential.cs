@@ -28,7 +28,6 @@ namespace Microsoft.SqlServer.Management.Common
         static extern bool CredFree([In] IntPtr cred);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         static extern bool CredDelete(
             string targetName,
             CRED_TYPE type,
@@ -36,7 +35,6 @@ namespace Microsoft.SqlServer.Management.Common
             );
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         static extern bool CredEnumerate(
             string targetName,
             int flags,

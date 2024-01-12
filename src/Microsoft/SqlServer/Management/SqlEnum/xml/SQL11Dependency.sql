@@ -867,7 +867,7 @@ end
         DEALLOCATE db_cursor
     
 
---final select
+--final select to return trigger
 select ISNULL(t.object_id, 0) as [object_id], t.object_name, ISNULL(t.object_schema, '') as [object_schema], ISNULL(t.object_db, '') as [object_db], ISNULL(t.object_svr, '') as [object_svr], t.object_type, ISNULL(t.relative_id, 0) as [relative_id], t.relative_name, ISNULL(t.relative_schema, '') as [relative_schema], relative_db, ISNULL(t.relative_svr, '') as [relative_svr], t.relative_type, t.schema_bound, ISNULL(CASE WHEN p.type= 'U' then @u when p.type = 'V' then @v end, 0) as [ptype], ISNULL(p.name, '') as [pname], ISNULL(SCHEMA_NAME(p.schema_id), '') as [pschema]
  from #t1 as t
  left join sys.objects as o on (t.object_type = @tr and o.object_id = t.object_id) or (t.relative_type = @tr and o.object_id = t.relative_id)

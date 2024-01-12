@@ -1,8 +1,36 @@
 # Introduction
 
-This file will log substantial changes made to SMO between public releases to nuget.org.
+This file will no longer be updated. Changes will be logged to [CHANGELOG.md](../ChangeLog.md)
 
-## 170.7.0-preview
+## 161.48028.0
+
+- Add certificate and asymmetric key user support for Azure DB
+- Change the name of the XML file used by SSMS 19 to RegSrvr16.xml
+
+## 161.47027.0
+
+- Fix distribution columns on scripting for taking into consideration more than one distribution column
+- Add new EXTGOV_OPERATION_GROUP audit action type
+- Force [QUOTED_IDENTIFIER ON](https://github.com/microsoft/sqlmanagementobjects/issues/96) for all tables 
+- Change Databases enumeration on Azure DB to ignore `sys.databases` entries that don't have an entry in `sys.database_service_objectives`. Prevents attempted logins to user databases when enumerating databases on the logical master
+- Update permissions enumeration for SQL Server 2022
+
+## 161.47021.0
+
+- Add `LedgerViewSchema` property to table objects
+- Fix an issue that caused ledger tables with views with different schemas to be scripted improperly
+- Added support for `Contained Availability Groups`: new AvailabilityGroup.IsContained and AvailabilityGroup.ReuseSystemDatabases properties and updated Create() method.
+- Fixed generate scripts test for SQL 2012
+- Added automated tests for `JobServer` methods
+- Marked several `JobServer` methods supporting SQL 2005 and earlier as Obsolete
+- Marked unused property `JobServerFilter.OldestFirst` as Obsolete
+- Add `IsDroppedLedgerTable` and `IsDroppedLedgerView` properties to table and view objects, respectively
+- Add `IsDroppedLedgerColumn` properties to column, and updated scripting to not include dropped ledger columns in script creation
+- Fixed heuristic in [Wmi.ManagedComputer](https://github.com/microsoft/sqlmanagementobjects/issues/83) to determine the correct WMI namespace to connect to,
+  to workaround a bug where SQL Setup setup does not fully uninstall the SQL WMI Provider.
+- Update `ConnectionManager.InternalConnect` to retry connection in response to error 42109 (serverless instance is waking up)
+
+## 170.6.0-preview
 
 - Add SmoMetadataProvider preview package
 
@@ -19,21 +47,6 @@ This file will log substantial changes made to SMO between public releases to nu
 - Fix EnumObjects sort by Schema
 - Add new enumeration values for SQL Server 2022 permissions
 - Script FIRST_ROW support for serverless Synapse
-
-## 161.47021.0
-
-- Add `LedgerViewSchema` property to table objects
-- Fix an issue that caused ledger tables with views with different schemas to be scripted improperly
-- Added support for `Contained Availability Groups`: new AvailabilityGroup.IsContained and AvailabilityGroup.ReuseSystemDatabases properties and updated Create() method.
-- Fixed generate scripts test for SQL 2012
-- Added automated tests for `JobServer` methods
-- Marked several `JobServer` methods supporting SQL 2005 and earlier as Obsolete
-- Marked unused property `JobServerFilter.OldestFirst` as Obsolete
-- Add `IsDroppedLedgerTable` and `IsDroppedLedgerView` properties to table and view objects, respectively
-- Add `IsDroppedLedgerColumn` properties to column, and updated scripting to not include dropped ledger columns in script creation
-- Fixed heuristic in [Wmi.ManagedComputer](https://github.com/microsoft/sqlmanagementobjects/issues/83) to determine the correct WMI namespace to connect to,
-  to workaround a bug where SQL Setup setup does not fully uninstall the SQL WMI Provider.
-- Update `ConnectionManager.InternalConnect` to retry connection in response to error 42109 (serverless instance is waking up)
 
 ## 161.47008.0
 

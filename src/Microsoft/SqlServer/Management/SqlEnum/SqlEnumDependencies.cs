@@ -18,6 +18,8 @@ namespace Microsoft.SqlServer.Management.Smo
 #endif
     using Microsoft.SqlServer.Management.Sdk.Sfc;
     using Microsoft.SqlServer.Management.Smo.SqlEnum;
+    using System.Diagnostics;
+    using System.Linq;
 
 
     /// <summary>
@@ -385,7 +387,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     sqlEnumDependenciesSingleton.m_typeConvertTable[203] = new SqlTypeConvert("DdlTrigger", 203, "DdlTrigger");
                     sqlEnumDependenciesSingleton.m_typeConvertTable[204] = new SqlTypeConvert("PlanGuide", 204, "PlanGuide");
                     sqlEnumDependenciesSingleton.m_typeConvertTable[13] = new SqlTypeConvert("Sequence", 13, "Sequence");
-                    sqlEnumDependenciesSingleton.m_typeConvertTable[20] = new SqlTypeConvert("SecurityPolicy", 20, "SecurityPolicy");
+                    sqlEnumDependenciesSingleton.m_typeConvertTable[19] = new SqlTypeConvert("SecurityPolicy", 19, "SecurityPolicy");
+                    
+
                 }
                 return sqlEnumDependenciesSingleton.m_typeConvertTable;
             }
@@ -417,7 +421,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "DdlTrigger": return 203;
                 case "PlanGuide": return 204;
                 case "Sequence": return 13;
-                case "SecurityPolicy": return 20;
+                case "SecurityPolicy": return 19;
+                
             }
             StringBuilder typelist = new StringBuilder();
             int count = 0;
@@ -617,9 +622,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     resourceFileName = "KatmaiDependency.sql";
                 }
-                else if (m_targetVersion.Major >= 11)
+                else if (m_targetVersion.Major < 13)
                 {
                     resourceFileName = "SQL11Dependency.sql";
+                }
+                else
+                {
+                    resourceFileName = "SQL13Dependency.sql";
                 }
             }
             String sp = String.Format(CultureInfo.InvariantCulture, 
@@ -636,6 +645,10 @@ namespace Microsoft.SqlServer.Management.Smo
             tr.Dispose();
             queries.Add(sp);
             DataTable dt;
+#if DEBUG
+            var q = queries.Cast<string>().Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s)).ToString();
+            Trace.TraceInformation("Final dep query:\r\n" + q);
+#endif
             if (this.IsDbCloud)
             {
                 dt = ExecuteSql.ExecuteWithResults(queries, ci, m_database);
@@ -945,11 +958,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if ("Trigger" == stc.Name)
                 {
-                    surn += String.Format(CultureInfo.InvariantCulture, "{0}[@Name='{1}' and @Schema='{2}']/Trigger[@Name='{3}']",
-                        FindByNo(((short)(row["relative_type"]))).Name,
-                        Urn.EscapeString((string)row["relative_name"]),
-                        Urn.EscapeString((string)row["relative_schema"]),
-                        Urn.EscapeString((string)row["object_name"]));
+                    surn += $"{FindByNo(((short)(row["relative_type"]))).Name}[@Name='{Urn.EscapeString((string)row["relative_name"])}' and @Schema='{Urn.EscapeString((string)row["relative_schema"])}']/{stc.Name}[@Name='{Urn.EscapeString((string)row["object_name"])}']";
                     return surn;
                 }
                 if (typeof(System.DBNull) == row["object_schema"].GetType())
@@ -980,7 +989,7 @@ namespace Microsoft.SqlServer.Management.Smo
             short type = forParent ? (short)row["object_type"] : (short)row["relative_type"];
 
             SqlTypeConvert stc = FindByNo(type);
-
+            Debug.Assert(stc != null, "No SqlType found for " + type.ToString());
             if (string.Empty != serverName)
             {
                 surn = String.Format(CultureInfo.InvariantCulture, "Server[@Name='{0}']/", Urn.EscapeString(serverName));
@@ -1005,19 +1014,15 @@ namespace Microsoft.SqlServer.Management.Smo
 
             try
             {
-                if ("Trigger" == stc.Name)      // For table-triggers we need to have the parent's name to build the URN.
+                if ((row["pname"] is string pname) && pname != "") 
+                // For some types we need to have the parent's name to build the URN.
                 {
                     string pschema = (string)row["pschema"];
-                    string pname = (string)row["pname"];
                     int ptype = (int)row["ptype"];
 
                     // none of these values can be null or empty
 
-                    surn += String.Format(CultureInfo.InvariantCulture, "{0}[@Name='{1}' and @Schema='{2}']/Trigger[@Name='{3}']",
-                        FindByNo(ptype).Name,
-                        Urn.EscapeString(pname),
-                        Urn.EscapeString(pschema),
-                        Urn.EscapeString(name));
+                    surn += $"{FindByNo(ptype).Name}[@Name='{Urn.EscapeString(pname)}' and @Schema='{Urn.EscapeString(pschema)}']/{stc.Name}[@Name='{Urn.EscapeString(name)}']";
                     return surn;
                 }
                 if (string.Empty == schemaName)

@@ -786,14 +786,18 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     origFkList = new HashSet<Urn>(fkList);
                 }
-
+                this.Server.SetDefaultInitFields(typeof(ForeignKey), nameof(ForeignKey.IsFileTableDefined));
                 foreach (Table tb in tableList)
                 {
                     foreach (ForeignKey fk in tb.ForeignKeys)
                     {
-                        if (origFkList.Add(fk.Urn))
+                        // file table defined FKs are system managed
+                        if (!fk.IsSupportedProperty(nameof(fk.IsFileTableDefined)) || !fk.IsFileTableDefined)
                         {
-                            fkList.Add(fk.Urn);
+                            if (origFkList.Add(fk.Urn))
+                            {
+                                fkList.Add(fk.Urn);
+                            }
                         }
                     }
                 }

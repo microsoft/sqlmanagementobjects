@@ -23,6 +23,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(MinMajor = 13, DatabaseEngineType = Management.Common.DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = Management.Common.DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Scripter_Script_supports_CreateOrAlter_for_sql2016_and_beyond()
         {
             ExecuteFromDbPool(db =>

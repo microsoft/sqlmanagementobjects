@@ -49,6 +49,9 @@ namespace Microsoft.SqlServer.Management.Smo
         private StringCollection credentialCollection = new StringCollection();
         private string oldCredential = string.Empty;
 
+        // Service Principal Object ID obtained from Microsoft Entra ID
+        private Guid objectId;
+
         void InitVariables()
         {
             this.password = null;
@@ -67,6 +70,26 @@ namespace Microsoft.SqlServer.Management.Smo
             set
             {
                 base.Name = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the objectId of this login object. 
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.ReadOnlyAfterCreation | SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
+        public Guid ObjectId
+        {
+            get
+            {
+                return this.objectId;
+            }
+            set
+            {
+                if (this.State != SqlSmoState.Creating)
+                {
+                    throw new SmoException(ExceptionTemplates.ObjectIdCannotBeSet);
+                }
+                this.objectId = value;
             }
         }
 
@@ -1007,6 +1030,11 @@ namespace Microsoft.SqlServer.Management.Smo
             else
             {
                 sb.Append(" FROM EXTERNAL PROVIDER");
+                
+                if (this.State == SqlSmoState.Creating && ObjectId != Guid.Empty)
+                {
+                    sbOption.Append($"OBJECT_ID = {MakeSqlString(ObjectId.ToString())}");
+                }
             }
 
             if (sbOption.Length > 0)

@@ -176,6 +176,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptDrop(StringCollection queries, ScriptingPreferences sp)
         {
+            if (IsSupportedProperty(nameof(LedgerViewType)) && (IsDroppedLedgerView || LedgerViewType == LedgerViewType.LedgerView))
+            {
+                return;
+            }
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
             // format full table name for scripting

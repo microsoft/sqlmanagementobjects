@@ -554,7 +554,7 @@ END", SqlStatement.ToString());
 #if CLSCOMPLIANT
         [CLSCompliant(false)]
 #endif
-       public BackupDeviceList Devices
+        public BackupDeviceList Devices
         {
             get
             {
@@ -645,6 +645,19 @@ END", SqlStatement.ToString());
             set
             {
                 mediaName = value;
+            }
+        }
+
+        private string options = null;
+        public string Options
+        {
+            get
+            {
+                return options;
+            }
+            set
+            {
+                options = value;
             }
         }
 
@@ -915,7 +928,25 @@ END", SqlStatement.ToString());
         internal static bool IsBackupDeviceUrl(string url)
         {
             Uri testUri;
-            return (Uri.TryCreate(url, UriKind.Absolute, out testUri) && (testUri.Scheme == Uri.UriSchemeHttps || testUri.Scheme == Uri.UriSchemeHttp));
+            return Uri.TryCreate(url, UriKind.Absolute, out testUri) && (testUri.Scheme != Uri.UriSchemeFile);
+        }
+
+        internal static bool IsHttpsUrl(string url)
+        {
+            Uri testUri;
+            return Uri.TryCreate(url, UriKind.Absolute, out testUri) && (testUri.Scheme == Uri.UriSchemeHttps);
+        }
+
+        internal static bool IsAzureBlobBackupRestore(BackupDeviceList devices)
+        {
+            foreach (BackupDeviceItem device in devices)
+            {
+                if (!IsHttpsUrl(device.Name))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -1305,7 +1336,7 @@ END", SqlStatement.ToString());
             private set;
         }
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SuspectPage"/> class.
@@ -1317,7 +1348,7 @@ END", SqlStatement.ToString());
             this.FileID = fileID;
             this.PageID = pageID;
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.
@@ -1429,7 +1460,7 @@ END", SqlStatement.ToString());
 #endif
     public class BackupDeviceList : List<BackupDeviceItem>
     {
-#region Constructors
+        #region Constructors
 
         public BackupDeviceList()
             : base()
@@ -1445,7 +1476,7 @@ END", SqlStatement.ToString());
             : base(capacity)
         {
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Adds a new BackupDeviceItem to the collection

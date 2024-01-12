@@ -738,6 +738,7 @@ InvalidEdgeConstraintParent = Edge constraints are only allowed on edge tables.
 EmptyConstraintName = The constraint name cannot be null or empty.
 InvalidEdgeConstraintDefinition = Edge constraints should have at least one encapsulated clause having from and to sides.
 InvalidEdgeConstraintReferentialAction(string referentialAction) = An invalid referential action for edge constraint was encountered. The value that was received for delete referential action is '{0}'. Edge constraints can only support CASCADE and NO ACTION options on delete.
+ObjectIdCannotBeSet = ObjectId can be set only while creating a new user or login.
 
 ####################################################################
 ; UserDefinedTableType Exceptions

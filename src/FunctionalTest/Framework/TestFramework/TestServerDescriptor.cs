@@ -32,7 +32,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// Backup connection string to use in case of a failure while running
         /// the test using the first connection string
         /// </summary>
-        public IEnumerable<string> BackupConnnectionStrings { get; set; }
+        public IEnumerable<string> BackupConnectionStrings { get; set; } = Enumerable.Empty<string>();
 
         /// <summary>
         /// Iterates through all the connection strings defined for this server target, starting with the
@@ -44,7 +44,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             {
                 yield return ConnectionString;
 
-                foreach (string connString in BackupConnnectionStrings)
+                foreach (string connString in BackupConnectionStrings)
                 {
                     yield return connString;
                 }
@@ -64,7 +64,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <summary>
         /// The features that the server is reserved for.
         /// </summary>
-        public IEnumerable<SqlFeature> ReservedFor { get; set; }
+        public IEnumerable<SqlFeature> ReservedFor { get; set; } = Enumerable.Empty<SqlFeature>();
 
         /// <summary>
         /// Expected HostPlatform
@@ -113,7 +113,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                     .Select(connStringElement => new TestServerDescriptor
                     {
                         ConnectionString = GetConnectionString(connStringElement, azureKeyVaultHelper),
-                        BackupConnnectionStrings = new List<string>(new[] { connStringElement.GetStringAttribute("backupConnectionString") }.Where(c => !string.IsNullOrEmpty(c))),
+                        BackupConnectionStrings = new List<string>(new[] { connStringElement.GetStringAttribute("backupConnectionString") }.Where(c => !string.IsNullOrEmpty(c))),
                         Name = connStringElement.GetStringAttribute("name"),
                         HostPlatform = connStringElement.GetStringAttribute("hostplatform"),
                         DatabaseEngineType = connStringElement.GetAttribute("databaseenginetype",

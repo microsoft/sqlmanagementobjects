@@ -21,39 +21,42 @@ if /I "%BASEDIR:~43,1%" NEQ "" (
 REM Setup common doskey shortcuts
 doskey root=pushd %BASEDIR%$*
 doskey src=pushd %BASEDIR%src\$*
-doskey out=pushd %BASEDIR%target\distrib\$*
+doskey out=pushd %BASEDIR%bin\$*
+doskey bin=pushd %BASEDIR%bin\$*
 doskey prod=pushd %BASEDIR%src\Microsoft\SqlServer\Management\$*
 doskey sfc=pushd %BASEDIR%src\Microsoft\SqlServer\Management\Sdk\sfc
 doskey smo=pushd %BASEDIR%src\Microsoft\SqlServer\Management\Smo
 doskey smoenum=pushd %BASEDIR%src\Microsoft\SqlServer\Management\SqlEnum\$*
-doskey clean=powershell.exe -ExecutionPolicy Unrestricted -File "%BASEDIR%init.ps1" -Clean
 doskey tst=pushd %BASEDIR%src\FunctionalTest\Smo\$*
+doskey slngen19=slngen -vs "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.exe" $*
 
 REM == Common test command:
-doskey rtests=pushd %BASEDIR%target\distrib\debug\net462$Tvstest.console.exe microsoft.sqlserver.test.smo.dll /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
-doskey netcoretests=pushd %BASEDIR%target\distrib\debug\netcoreapp3.1$Tvstest.console.exe microsoft.sqlserver.test.smo.dll /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
+doskey rtests=pushd %BASEDIR%bin\debug\net462$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
+doskey netcoretests=pushd %BASEDIR%bin\debug\net6.0$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
 
 title git %BASEDIR%
 
 dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
 
+echo.
 echo To open solution with SMO (code+test):
 echo    slngen src\FunctionalTest\Smo\Microsoft.SqlServer.Test.Smo.csproj
 echo    REM == Then use "Test | Configure Run Settings | Select Solution Wide Runsettings File"
 echo    REM == and point it to one of the .runsettings under %BASEDIR%src\FunctionalTest\Framework
+echo    REM == You'll need to edit connection strings in src/functionaltest/framework/toolsconnectioninfo.xml.
 echo    REM == Select "Test | Test Explorer" and you are ready to run tests!
-
-echo    To run tests (alias: rtests):
-echo    pushd %BASEDIR%target\distrib\debug\net462
+echo.
+echo To run tests (alias: rtests):
+echo    pushd %BASEDIR%bin\debug\net462
 echo    REM == If you want to trim down the list of servers, use something like this:
 echo    REM == SET SqlTestTargetServersFilter=Sql2017;Sqlv150
 echo    REM == See %BASEDIR%src\FunctionalTest\Framework\ConnectionInfo.xml 
 echo    REM == for all the friendly names available.
-echo    REM == You'll need to edit connection strings in src/functionaltest/smo/toolsconnectioninfo.xml and copy the file to the same directory as the tests DLL
+echo    REM == You'll need to edit connection strings in src/functionaltest/framework/toolsconnectioninfo.xml.
 echo    vstest.console.exe microsoft.sqlserver.test.smo.dll /TestCaseFilter:"(TestCategory != Staging)" /logger:trx /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings
 echo.
 echo To run tests for netcore (alias: netcoretests)
-echo    pushd %BASEDIR%target\distrib\debug\netcoreapp3.1
+echo    pushd %BASEDIR%bin\debug\net6.0
 echo    REM == If you want to trim down the list of servers, use something like this:
 echo    REM == SET SqlTestTargetServersFilter=Sql2017;Sqlv150
 echo    REM == See %BASEDIR%src\FunctionalTest\Framework\ConnectionInfo.xml 

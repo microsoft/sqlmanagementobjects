@@ -40,33 +40,38 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             _serverConnections ?? (_serverConnections = LoadConnStrings());
 
         /// <summary>
-        /// Reads the connection strings defined in the embedded ConnectionStrings.xml resource
+        /// Reads the connection strings defined in the appropriate JSON or XML file
         /// and puts them into a dictionary for easy access
         /// </summary>
         /// <returns></returns>
         private static ConnectionData LoadConnStrings()
         {
             var serverConnections = new ConnectionData();
-            var connectionDocument = LoadConnectionDocument();
-            var akvElement = connectionDocument.XPathSelectElement(@"//AkvAccess");
-            if (akvElement != null && akvElement.Element("VaultName") != null)
+            IEnumerable<TestServerDescriptor> descriptors = JsonTestServerSource.TryLoadServerConnections();
+            if (!descriptors.Any())
             {
-                serverConnections.AzureKeyVaultHelper = new AzureKeyVaultHelper(akvElement.Element("VaultName").Value)
+                var connectionDocument = LoadConnectionDocument();
+                var akvElement = connectionDocument.XPathSelectElement(@"//AkvAccess");
+                if (akvElement != null && akvElement.Element("VaultName") != null)
                 {
-                    AzureApplicationId = akvElement.Element("AzureApplicationId")?.Value,
-                    AzureTenantId = akvElement.Element("AzureTenantId")?.Value,
-                    CertificateThumbprints = akvElement.Elements("Thumbprint").Select(s => s.Value).ToArray()
-                };
+                    serverConnections.AzureKeyVaultHelper = new AzureKeyVaultHelper(akvElement.Element("VaultName").Value)
+                    {
+                        AzureApplicationId = akvElement.Element("AzureApplicationId")?.Value,
+                        AzureTenantId = akvElement.Element("AzureTenantId")?.Value,
+                        CertificateThumbprints = akvElement.Elements("Thumbprint").Select(s => s.Value).ToArray()
+                    };
+                }
+                descriptors = TestServerDescriptor.GetServerDescriptors(connectionDocument, serverConnections.AzureKeyVaultHelper);
             }
-            foreach (var descriptor in TestServerDescriptor.GetServerDescriptors(connectionDocument, serverConnections.AzureKeyVaultHelper))
+            foreach (var descriptor in descriptors)
             {
                 //SqlTestTargetServersFilter env variable was empty/didn't exist or it contained this server, add to our overall list
                 var svr = new SMO.Server(new ServerConnection(new SqlConnection(descriptor.ConnectionString)));
                TraceHelper.TraceInformation("Loaded connection string '{0}' = '{1}'{2}", 
                     descriptor.Name, 
                     new SqlConnectionStringBuilder(descriptor.ConnectionString).DataSource,
-                descriptor.BackupConnnectionStrings.Any() ? 
-                    "Backups = " + descriptor.BackupConnnectionStrings :
+                descriptor.BackupConnectionStrings.Any() ? 
+                    "Backups = " + descriptor.BackupConnectionStrings :
                     string.Empty);
                 serverConnections.ServerDescriptors.Add(descriptor.Name, new Tuple<SMO.Server, TestServerDescriptor>(svr, descriptor));
             }

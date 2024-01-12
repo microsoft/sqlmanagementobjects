@@ -4827,7 +4827,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal void PrefetchTables(ScriptingPreferences options)
         {
-            PrefetchTables(options, "Table");
+            PrefetchTables(options, Table.UrnSuffix);
         }
 
         internal void PrefetchTables(ScriptingPreferences options, string tableFilter)
@@ -4839,7 +4839,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal void PrefetchViews(ScriptingPreferences options)
         {
-            PrefetchViews(options, "View");
+            PrefetchViews(options, View.UrnSuffix);
         }
 
         internal void PrefetchViews(ScriptingPreferences options, string viewFilter)
@@ -4849,11 +4849,14 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal void PrefetchSecurityPolicy(ScriptingPreferences options)
         {
-            InitChildLevel($"{nameof(SecurityPolicy)}", options, true);
-
-            if (options.IncludeScripts.ExtendedProperties && this.IsSupportedObject<ExtendedProperty>(options))
+            if (this.IsSupportedObject<SecurityPolicy>(options))
             {
-                InitChildLevel($"{nameof(SecurityPolicy)}/{nameof(ExtendedProperty)}", options, true);
+                InitChildLevel($"{nameof(SecurityPolicy)}", options, true);
+
+                if (options.IncludeScripts.ExtendedProperties && this.IsSupportedObject<ExtendedProperty>(options))
+                {
+                    InitChildLevel($"{nameof(SecurityPolicy)}/{nameof(ExtendedProperty)}", options, true);
+                }
             }
         }
 
@@ -6615,9 +6618,9 @@ SortedList list = new SortedList();
             // eg: ALTER DATABASE [MyDatabase] SET ACCELERATED_DATABASE_RECOVERY = ON (PERSISTENT_VERSION_STORE_FILEGROUP = [VersionStoreFG])
             // The filegroup can only be changed if one disables ADR first
             // https://docs.microsoft.com/sql/relational-databases/accelerated-database-recovery-management?view=sql-server-ver15
-            if (IsSupportedProperty(nameof(AcceleratedRecoveryEnabled), sp))
+            if (IsSupportedProperty(nameof(AcceleratedRecoveryEnabled), sp) && !targetEditionIsManagedServer)
             {
-                var propAdr = Properties.Get(nameof(AcceleratedRecoveryEnabled));                
+                var propAdr = Properties.Get(nameof(AcceleratedRecoveryEnabled));
                 if (null != propAdr.Value &&
                 (propAdr.Dirty || !sp.ForDirectExecution))
                 {

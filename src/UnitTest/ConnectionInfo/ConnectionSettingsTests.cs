@@ -24,9 +24,7 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
         public void VerifyInteractiveModeConnectionSettings()
         {
             string connectionString;
-            var userName = "test@test.com";
-            //switch validation based on if .Net 4.7.2+ is installed by looking for ActiveDirectoryInteractive in SqlClient
-            var isInteractiveSupported =  Enum.IsDefined(typeof(SqlAuthenticationMethod), SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryInteractive.ToString());
+            string userName = "test@test.com";
            
             var settings = new ConnectionSettings()
             {
@@ -35,31 +33,21 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
                 ServerInstance = "SqlServerName"
             };
 
-            if (isInteractiveSupported)
-            {
 
 #if !MICROSOFTDATA
-                Assert.Throws<Microsoft.SqlServer.Management.Common.PropertyNotSetException>(
-               delegate { connectionString = settings.ConnectionString; },
-               "Expect Property Not Set Exception");
-               // Setup user name
+            Assert.Throws<Microsoft.SqlServer.Management.Common.PropertyNotSetException>(
+            delegate { connectionString = settings.ConnectionString; },
+            "Expect Property Not Set Exception");
+            // Setup user name
 
 #endif
-                settings.Login = userName;
-                connectionString = settings.ConnectionString;
-                Assert.That(connectionString, Does.Contain(userName).IgnoreCase, "Connection string should have user name set");
+            settings.Login = userName;
+            connectionString = settings.ConnectionString;
+            Assert.That(connectionString, Does.Contain(userName).IgnoreCase, "Connection string should have user name set");
                                 
                 //test that you can create a sqlconnection object with the connection string
                 var conn = new SqlConnection(connectionString);
                 Assert.That(conn.ConnectionString == connectionString, "Connection string should be set in SqlConnection");
-            }
-            else
-            {
-                settings.Login = userName;
-                Assert.Throws<Microsoft.SqlServer.Management.Common.InvalidPropertyValueException>(
-                    delegate { connectionString = settings.ConnectionString; },
-                    "Expect the use of ActiveDirectoryInteractive without support in SqlClient throws an exception");
-            }
         }
 
         [TestMethod]
@@ -80,6 +68,82 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             Assert.That(connectionStringBuilder.ApplicationIntent, Is.EqualTo(ApplicationIntent.ReadWrite),
                 "Unknown value should map to the default ReadWrite");
         }
+
+#if MICROSOFTDATA
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void SqlConnectionInfo_supports_HostNameInCertificate()
+        {
+            string testdomain = "exmaple.net";
+            var connectionInfo = new SqlConnectionInfo("myserver")
+            {
+                EncryptConnection = true,
+                HostNameInCertificate = testdomain
+            };
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionInfo.ConnectionString);
+            Assert.That(connectionStringBuilder.HostNameInCertificate, Is.EqualTo(testdomain),
+                "HostNameInCertificate should be set to provided value.");
+
+            connectionInfo.HostNameInCertificate = null;
+            connectionStringBuilder = new SqlConnectionStringBuilder(connectionInfo.ConnectionString);
+            Assert.That(connectionStringBuilder.HostNameInCertificate, Is.EqualTo(String.Empty),
+                "Setting HostNameInCertificate to null should be handled.");
+
+            connectionInfo.HostNameInCertificate = String.Empty;
+            connectionStringBuilder = new SqlConnectionStringBuilder(connectionInfo.ConnectionString);
+            Assert.That(connectionStringBuilder.HostNameInCertificate, Is.EqualTo(String.Empty),
+                "Setting HostNameInCertificate to empty string should be handled.");
+        }
+#endif
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ConnectionSettings_handles_strict_encryption()
+        {
+            var conn = new ConnectionSettings()
+            {
+                StrictEncryption = true
+            };
+            var connStr = new SqlConnectionStringBuilder(conn.ConnectionString);
+            // Using == true forces use of the implicit bool operator
+            Assert.That(connStr.Encrypt == true, Is.True, "Setting StrictEncryption sets SqlConnectionStringBuilder.Encrypt to true");
+#if MICROSOFTDATA
+            Assert.That(connStr.Encrypt, Is.EqualTo(SqlConnectionEncryptOption.Strict), "Setting StrictEncryption sets Encrypt=Strict");
+#endif
+            conn = new ConnectionSettings()
+            {
+                EncryptConnection = true
+            };
+            connStr = new SqlConnectionStringBuilder(conn.ConnectionString);
+            Assert.That(connStr.Encrypt == true, Is.True, "Setting EncryptConnection=true sets SqlConnectionStringBuilder.Encrypt to true");
+#if MICROSOFTDATA
+            Assert.That(connStr.Encrypt, Is.EqualTo(SqlConnectionEncryptOption.Mandatory), "Setting EncryptConnection=true sets Encrypt=Mandatory");
+#endif
+            var sqlConnectionInfo = new SqlConnectionInfo("someserver") { StrictEncryption = true };
+            var connFromInfo = new ConnectionSettings(sqlConnectionInfo);
+            Assert.That(connFromInfo.StrictEncryption, Is.True, "ConnectionSettings should copy StrictEncryption value from SqlConnectionInfo");
+            var sqlConnectionInfoCopy = new SqlConnectionInfo(sqlConnectionInfo);
+            Assert.That(sqlConnectionInfoCopy.StrictEncryption, Is.True, "SqlConnectionInfo copy constructor should copy StrictEncryption value");
+
+            var sqlConnection = new SqlConnection(new SqlConnectionStringBuilder()
+            {
+#if MICROSOFTDATA
+                Encrypt = SqlConnectionEncryptOption.Strict
+#else
+                Encrypt = true
+#endif
+            }.ConnectionString);
+            var serverConnection = new ServerConnection(sqlConnection);
+            Assert.That(serverConnection.EncryptConnection, Is.True, "ServerConnection.EncryptConnection from SqlConnection");
+#if MICROSOFTDATA
+            Assert.That(serverConnection.StrictEncryption, Is.True, "ServerConnection.StrictEncryption from SqlConnection");
+#else
+            Assert.That(serverConnection.StrictEncryption, Is.False, "ServerConnection.StrictEncryption from SqlConnection");
+#endif
+            Assert.Throws<PropertyNotAvailableException>(() => serverConnection.StrictEncryption = false, 
+                "Setting StrictEncryption after assigning ConnectionString should throw");
+        }
+    
 
         private const string username = "someuser";
         private const string pwd = "placeholderpwd";

@@ -154,6 +154,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_Drop_does_not_throw_when_Parent_is_user_database()
         {
             ExecuteWithDbDrop(db =>
@@ -242,6 +243,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestMethod]
         [TestCategory("Legacy")]    /* test prone to race condition (so it seems), not for PR validation */
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.Express)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)] // alter has to run on the master
         public void Database_enabling_encryption_creates_encryption_key()
         {
             ExecuteWithDbDrop(db =>
@@ -337,6 +339,7 @@ END");
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)] // hyperscale doesn't support shrink
         public void Database_shrink()
         {
             ExecuteFromDbPool((db) =>
@@ -405,6 +408,7 @@ END");
                 Assert.That(() => db.PrefetchObjects(null), Throws.InstanceOf<ArgumentNullException>(), "PrefetchObjects(null)");
                 Assert.That(() => db.PrefetchObjects(typeof(Table), (ScriptingPreferences)null), Throws.InstanceOf<ArgumentNullException>(), "PrefetchObjects(Table, (ScriptingPreferences)null)");
                 Assert.That(() => db.PrefetchObjects(typeof(Table), (ScriptingOptions)null), Throws.InstanceOf<ArgumentNullException>(), "PrefetchObjects(Table, (ScriptingOptions)null)");
+                Assert.DoesNotThrow(db.PrefetchObjects, "PrefetchObjects()");
             });
         }
 
@@ -875,6 +879,7 @@ END");
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Script_HyperScale_DataBase()
         {
             string backupFile = null;
@@ -883,14 +888,14 @@ END");
             {
                 script = db.Script();
                 var commands = script;
-                string expected = $"CREATE DATABASE {db.FullQualifiedName} COLLATE SQL_Latin1_General_CP1_CS_AS  (EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_2') WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF;{Environment.NewLine}";
+                string expected = $"CREATE DATABASE {db.FullQualifiedName} COLLATE {db.Collation}  (EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_2') WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF;{Environment.NewLine}";
                 Assert.That(commands, Has.Exactly(1).EqualTo(expected), "Invalid Query to Create Hyperscale database");
             });
 
         }
 
         [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, Edition = DatabaseEngineEdition.Enterprise)]
         public void Database_EnumGroups_returns_windows_group_users()
         {
             ExecuteFromDbPool(db =>
@@ -942,6 +947,26 @@ END");
                 db.Alter();
                 db.Refresh();
                 Assert.That(db.AcceleratedRecoveryEnabled, Is.False, "AcceleratedRecoveryEnabled set to false by Alter");
+            });
+        }
+
+        [TestMethod]
+        [DataRow(true, DisplayName = "Test the 'True' value for the 'accelerated recovery'")]
+        [DataRow(false, DisplayName = "Test the 'False' value for the 'accelerated recovery'")]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
+        public void Database_Alter_ignores_accelerated_recovery_on_managed_instances(bool acceleratedRecoveryValue)
+        {
+            ExecuteFromDbPool(db =>
+            {
+                db.AcceleratedRecoveryEnabled = acceleratedRecoveryValue;
+                db.Alter();
+                db.Refresh();
+
+                // Accelerated recovery should always be 'true'
+                //
+                Assert.IsTrue(
+                    db.AcceleratedRecoveryEnabled,
+                    "AcceleratedRecoveryEnabled should always be true");
             });
         }
 
@@ -1041,6 +1066,7 @@ END");
 #if MICROSOFTDATA
         [TestMethod]
         [SupportedServerVersionRange(Edition=DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_enumerating_databases_does_not_login_to_each_database()
         {
             ExecuteTest(() =>

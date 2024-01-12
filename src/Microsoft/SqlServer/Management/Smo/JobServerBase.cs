@@ -779,8 +779,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 ThrowIfBelowVersion90();
                 if( null == sharedSchedules )
                 {
-                    sharedSchedules = new JobScheduleCollection( this );
-                    sharedSchedules.AcceptDuplicateNames = true;
+                    sharedSchedules = new JobScheduleCollection(this)
+                    {
+                        AcceptDuplicateNames = true
+                    };
                 }
 
                 return sharedSchedules;

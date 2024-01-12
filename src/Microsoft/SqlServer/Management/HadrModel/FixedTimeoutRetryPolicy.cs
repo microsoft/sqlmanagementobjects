@@ -34,16 +34,6 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="interval">wait interval between retires</param>
         public FixedTimeoutRetryPolicy(TimeSpan timeout, TimeSpan interval)
         {
-            if (timeout == null)
-            {
-                throw new ArgumentNullException("timeout");
-            }
-
-            if (interval == null)
-            {
-                throw new ArgumentNullException("interval");
-            }
-
             this.timeout = timeout;
             this.interval = interval;
             this.startTime = DateTime.MaxValue;

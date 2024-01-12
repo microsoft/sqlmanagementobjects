@@ -28,9 +28,9 @@ namespace Microsoft.SqlServer.Management.Smo
             this.existingSearchProperties = existingSearchProperties;
             foreach (DataRow row in this.searchPropertyListExtender.SearchProperties.Rows)
             {
-                string searchPropertyName = row["Name"] as string;                
+                var searchPropertyName = row["Name"] as string;                
                 this.AddMatchingRowForName(searchPropertyName, (int)row["RowId"]);
-                string guidIntId = row["PropertySetGuid"] as string + row["IntID"].ToString();
+                var guidIntId = (row["PropertySetGuid"] as string) + row["IntID"].ToString();
                 this.AddMatchingRowForGuidIntId(guidIntId, (int)row["RowId"]);
             }
         }
@@ -240,7 +240,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if ((this.IsEquals(columnName, "PropertySetGuid") || this.IsEquals(columnName, "IntID")) && this.IsValidGuidAndIntIds(rowId))
             {
-                string guidIntId = row["PropertySetGuid"] as string + this.GetNormalizedIntId(row["IntID"].ToString());
+                string guidIntId = (row["PropertySetGuid"] as string) + this.GetNormalizedIntId(row["IntID"].ToString());
                 this.RemoveMatchingRowForGuidIntId(guidIntId, rowId);
             }
 
@@ -263,7 +263,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 case "IntID":
                     this.ValidateIntID(rowId, proposedValue);
-                    proposedValue = row["PropertySetGuid"] as string + this.GetNormalizedIntId(proposedValue);
+                    proposedValue = (row["PropertySetGuid"] as string) + this.GetNormalizedIntId(proposedValue);
                     this.ValidateGuidIntId(rowId, proposedValue);
                     break;
                 case "Description":
@@ -362,7 +362,7 @@ DataRowChangeEventArgs e)
 
             if (this.IsValidGuidAndIntIds(rowId))
             {
-                string guidIntId = row["PropertySetGuid"] as string + this.GetNormalizedIntId(row["IntID"].ToString());
+                var guidIntId = (row["PropertySetGuid"] as string) + this.GetNormalizedIntId(row["IntID"].ToString());
                 //remove the row from mapped rows of current guidIntId
                 this.RemoveMatchingRowForGuidIntId(guidIntId, rowId);
             }

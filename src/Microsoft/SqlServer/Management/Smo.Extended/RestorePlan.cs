@@ -254,31 +254,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 ScriptPostRestore(script, dbUserAccessState);
                 this.server.ExecutionManager.ExecuteNonQueryWithMessage(script, new ServerMessageEventHandler(OnInfoMessage), true);
             }
-            catch (Exception e)
+            catch (Exception e) when (e.InnerException is SqlException se && se.Errors.Cast<SqlError>().Any(err => err.Number == 3014))
             {
-                if (e.InnerException != null)
-                {
-                    var se = e.InnerException as SqlException;
-                    if (se != null)
-                    {
-                        bool completeNotificationFound = false;
-                        foreach (SqlError err in se.Errors)
-                        {
-                            if (err.Number == 3014 /* Complete notification */ )
-                            {
-                                completeNotificationFound = true;
-                            }
-                        }
-                        if (!completeNotificationFound)
-                        {
-                            throw e;
-                        }
-                    }
-                }
-                else
-                {
-                    throw e;
-                }
+                
             }
             finally
             {

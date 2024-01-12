@@ -33,30 +33,20 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            // We need to emulated the binding redirects from ssms.exe.config for some DLLs
-            // Also the batchparserclient is from sql and depends on an older
-            // version of connectioninfo.
-            var redirections = new HashSet<string>(new[] {
-                "Microsoft.SqlServer.BatchParserClient",
-                "Microsoft.SqlServer.ConnectionInfo",
-                "Microsoft.IdentityModel.Clients.ActiveDirectory",
-                "Newtonsoft.Json" }, System.StringComparer.OrdinalIgnoreCase);
-
+            // We don't control all dependency DLL versions in every environment so just 
+            // load whatever version is in the same folder as the test, if possible.
             var an = new AssemblyName(args.Name);
-            if (redirections.Contains(an.Name))
+            var dll = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), an.Name + ".dll");
+            Trace.TraceInformation($"Trying to load dll:{dll}");
+            try
             {
-                var dll = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), an.Name + ".dll");
-                Trace.TraceInformation($"Trying to load dll:{dll}");
-                try
-                {
-                    var assembly = Assembly.LoadFrom(dll);
-                    Trace.TraceInformation($"Loaded {dll}");
-                    return assembly;
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceError($"Unable to load {dll}: {e}");
-                }
+                var assembly = Assembly.LoadFrom(dll);
+                Trace.TraceInformation($"Loaded {dll}");
+                return assembly;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError($"Unable to load {dll}: {e}");
             }
             return null;
         }
@@ -293,12 +283,25 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             this.ExecuteTestMethodWithFailureRetry(
                 () =>
                 {
-                    Database db = TestServerPoolManager.GetDbFromPool(poolName, this.ServerContext);
+                    Database db;
+                    if (ServerContext.ConnectionContext.DatabaseEngineType == DatabaseEngineType.Standalone ||
+                    ServerContext.ConnectionContext.SqlConnectionObject.Database == "master"
+                    || ServerContext.ConnectionContext.SqlConnectionObject.Database == "")
+                    {
+                        db = TestServerPoolManager.GetDbFromPool(poolName, ServerContext);
+                    }
+                    else
+                    {
+                        db = ServerContext.Databases.Cast<Database>().First(d => d.Name != "master");
+                        db.DropAllObjects();
+
+                    }
                     Trace.TraceInformation($"Returning database {db.Name} for pool {poolName}");
-                    if (db.UserAccess == DatabaseUserAccess.Single)
+                    if (db.UserAccess == DatabaseUserAccess.Single || db.ReadOnly)
                     {
                         Trace.TraceInformation("Prior test set database to single user, setting back to multiple");
                         db.UserAccess = DatabaseUserAccess.Multiple;
+                        db.ReadOnly = false;
                         db.Alter();
                     }
                     db.ExecutionManager.ConnectionContext.Disconnect();
@@ -468,9 +471,41 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                         }
                     }
                     Database db;
+                    var noDrop = false;
                     try
                     {
-                        db = this.ServerContext.CreateDatabaseWithRetry(dbNamePrefix, requestedEdition, dbBackupFile);
+                        if (ServerContext.DatabaseEngineType == DatabaseEngineType.Standalone ||
+                              ServerContext.ConnectionContext.SqlConnectionObject.Database == "master"
+                              || ServerContext.ConnectionContext.SqlConnectionObject.Database == "")
+                        {
+                            db = ServerContext.CreateDatabaseWithRetry(dbNamePrefix, requestedEdition, dbBackupFile);
+                        }
+                        else
+                        {
+                            Trace.TraceInformation("Reusing user database " + ServerContext.ConnectionContext.SqlConnectionObject.Database);
+                            // For Azure databases, when connected directly to a user database specified in the
+                            // connection file, we just reuse it for every test and don't run any tests in parallel.
+                            db = ServerContext.Databases.Cast<Database>().First(d => d.Name != "master");
+                            db.DropAllObjects();
+                            Trace.TraceInformation("Resetting database state for reuse");
+                            db.UserAccess = DatabaseUserAccess.Multiple;
+                            db.ReadOnly = false;
+                            db.AutoUpdateStatisticsEnabled = true;
+                            if (db.ChangeTrackingEnabled)
+                            {
+                                db.ChangeTrackingAutoCleanUp = false;
+                                db.ChangeTrackingEnabled = false;
+                            }
+                            db.Alter();
+                            
+                            db.ExecutionManager.ConnectionContext.Disconnect();
+                            db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteSql;
+                            ServerContext.Databases.ClearAndInitialize(null, null);
+                            // We return a fresh Database object because after DropAllObjects the object has some incorrect internal state.
+                            // It would take a long time to investigate the sources of inconsistency and that work would have little customer value.
+                            db = ServerContext.Databases[db.Name];
+                            noDrop = true;
+                        }
                     }
                     finally
                     {
@@ -506,9 +541,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                         // snapshots have to be deleted first
                         if (dbSnapshot != null)
                         {
-                            this.ServerContext.DropKillDatabaseNoThrow(dbSnapshot.Name);
+                            ServerContext.DropKillDatabaseNoThrow(dbSnapshot.Name);
                         }
-                        this.ServerContext.DropKillDatabaseNoThrow(db.Name);
+                        if (!noDrop)
+                        {
+                            ServerContext.DropKillDatabaseNoThrow(db.Name);
+                        }
                     }
                 });
         }

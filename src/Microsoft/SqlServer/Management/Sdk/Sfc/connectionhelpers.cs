@@ -113,20 +113,11 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         serverConnection.ExecuteNonQuery(String.Format(CultureInfo.InvariantCulture,
                             "use [{0}]", Util.EscapeString(dbName, ']')));
                     }
-                    catch (Exception exc)
+                    catch (Exception exc) when (exc.InnerException is SqlException sqlExc 
+                                && (sqlExc.Number == 916 //The server principal is not able to access the database under the current security context.
+                                || sqlExc.Number == 911)) //Database does not exist. Make sure that the name is entered correctly.)
                     {
-                        SqlException sqlExc = exc.InnerException as SqlException;
-                        if (sqlExc != null
-                            && (sqlExc.Number == 916 //The server principal is not able to access the database under the current security context.
-                                || sqlExc.Number == 911) //Database does not exist. Make sure that the name is entered correctly.
-                            )
-                        {
-                            TraceHelper.LogExCatch(exc);
-                        }
-                        else
-                        {
-                            throw exc;
-                        }
+                        TraceHelper.LogExCatch(exc);
                     }
                     finally
                     {

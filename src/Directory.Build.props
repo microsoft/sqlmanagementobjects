@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <TargetFolder Condition="'$(TargetFolder)'==''">target\distrib</TargetFolder>
+    <TargetFolder Condition="'$(TargetFolder)'==''">bin</TargetFolder>
   </PropertyGroup>
   <PropertyGroup Label="GAC build settings" Condition="'$(GacVersion)' == 'true'">
     <BaseOutputPath Condition="'$(BaseOutputPath)'==''">$(EnlistmentRoot)\$(TargetFolder)\gac</BaseOutputPath>
@@ -21,25 +21,22 @@
     <!-- Workspace used by the loc tool -->
     <BuildPropsDir>$(EnlistmentRoot)\SmoBuild\</BuildPropsDir>
     <TargetGroup Condition="'$(TargetFramework)'=='netstandard2.0'">netstandard</TargetGroup>
-    <TargetGroup Condition="'$(TargetFramework)'=='netcoreapp2.2'">netstandard</TargetGroup>
-    <TargetGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">netcore</TargetGroup>
+    <TargetGroup Condition="'$(TargetFramework)'=='net6.0'">netcore</TargetGroup>
     <TargetGroup Condition="'$(TargetGroup)'==''">netfx</TargetGroup>
     <CSharpProps Condition="'$(TargetGroup)'== 'netfx'">CSharp.NetFx.props</CSharpProps>
     <CSharpProps Condition="'$(TargetGroup)'== 'netcore'">CSharp.NetCore.props</CSharpProps>
     <CSharpProps Condition="'$(CSharpProps)'==''">CSharp.NetStandard.props</CSharpProps>
+    <!-- CA1416 warns if a method is only usable on Windows -->
     <!-- 1668 is CSC complaining about the LIB environment variable having bogus paths, which come from VS -->
-    <NoWarn>$(NoWarn);NU5125;MSB3026;CS1668</NoWarn>
+    <NoWarn>$(NoWarn);NU5125;MSB3026;CA1416;CS1668</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RestorePackagesPath>$(EnlistmentRoot)\packages</RestorePackagesPath>
     <ExcludeRestorePackageImports>false</ExcludeRestorePackageImports>
     <!-- MICROSOFTDATA is defined for builds using Microsoft.Data.SqlClient. NetStandard/NetCore always uses it. 
-         NetFx applocal builds are conditional based on the ADO pipeline variable MicrosoftDataBuild.
          GAC builds NEVER reference Microsoft.Data.SqlClient.
      -->
-    <UseMicrosoftData Condition="'$(TargetGroup)' != 'netfx'">true</UseMicrosoftData>
-    <UseMicrosoftData Condition="'$(GacVersion)'!='true' and '$(UseMicrosoftData)' == ''">$(MicrosoftDataBuild)</UseMicrosoftData>
-    <UseMicrosoftData Condition="'$(GacVersion)'!='true' and '$(UseMicrosoftData)' == ''">true</UseMicrosoftData>
-    <DefineConstants Condition="'$(UseMicrosoftData)' == 'true'" >$(DefineConstants);MICROSOFTDATA</DefineConstants>
+    <UseMicrosoftData Condition="'$(GacVersion)'=='true' and '$(TargetGroup)'=='netfx'">false</UseMicrosoftData>
+    <DefineConstants Condition="'$(UseMicrosoftData)' != 'false'" >$(DefineConstants);MICROSOFTDATA</DefineConstants>
     <!-- try to stay in sync with SqlServer PS module/ssms/sql assessment for newtonsoft -->
   </PropertyGroup>
   <PropertyGroup Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
@@ -52,7 +49,7 @@
   1. For SSMS and SQL engine builds which are indexed and need to be debuggable by pre-vs2019 
   2. Debug net462 builds which are used for code coverage
   -->
-  <PropertyGroup Condition="'$(Configuration)|$(UseMicrosoftData)|$(TargetGroup)' == 'Release||netfx' or '$(Configuration)|$(UseMicrosoftData)|$(TargetGroup)' == 'Release|false|netfx'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetGroup)' == 'Release|netfx'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -90,9 +87,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
-    <SqlParserPackageVersion>160.22524.0</SqlParserPackageVersion>
+    <SqlParserPackageVersion>171.24.0</SqlParserPackageVersion>
     <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
-    <SqlClientPackageVersion>3.1.1</SqlClientPackageVersion>
+    <SqlClientPackageVersion>5.1.2</SqlClientPackageVersion>
   </PropertyGroup>
   <Import Project="$(BuildPropsDir)\StrongName.props" Condition="Exists('$(BuildPropsDir)\StrongName.props')" />
   <Import Project="$(BuildPropsDir)\Version.props" />
