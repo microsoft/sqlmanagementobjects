@@ -10,6 +10,7 @@ using _SMO = Microsoft.SqlServer.Management.Smo;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 using NUnit.Framework.Internal;
+using System;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -86,7 +87,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     string scriptData = edgeConstraint.Script().ToSingleString();
 
                     string expectedScriptData = $"ALTER TABLE {edgeTable.FullQualifiedName} ADD CONSTRAINT [{edgeConstraint.Name}]" +
-                        $" CONNECTION ({fromNode.FullQualifiedName} To {toNode.FullQualifiedName})\r\n";
+                        $" CONNECTION ({fromNode.FullQualifiedName} To {toNode.FullQualifiedName}){Environment.NewLine}";
 
                     Assert.That(scriptData, Is.EqualTo(expectedScriptData));
                 });
