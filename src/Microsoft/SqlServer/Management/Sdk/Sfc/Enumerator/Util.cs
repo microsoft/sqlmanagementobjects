@@ -27,7 +27,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 			switch(strDBType)
 			{
 				case "xml":goto case "text";
-				case "nvarchar":goto case "text";
+                case "json": goto case "text";
+                case "nvarchar":goto case "text";
 				case "varchar":goto case "text";
 				case "sysname":goto case "text";
 				case "nchar":goto case "text";

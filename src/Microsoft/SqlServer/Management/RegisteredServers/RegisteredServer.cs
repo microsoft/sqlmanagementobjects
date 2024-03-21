@@ -28,7 +28,7 @@ using STrace = System.Diagnostics.Trace;
 namespace Microsoft.SqlServer.Management.RegisteredServers
 {
     /// <summary>
-    /// 
+    /// Represents a server connection saved to a registered server file. Used by SQL Server Management Studio's Registered Servers feature.
     /// </summary>
     public sealed partial class RegisteredServer : SfcInstance, ISfcValidate, ISfcCreatable, ISfcAlterable, ISfcDroppable, ISfcRenamable, IRenamable, ISfcMovable
     {
@@ -462,7 +462,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             /// <param name="obj1"></param>
             /// <param name="obj2"></param>
             /// <returns></returns>
-            public new static bool Equals(object obj1, object obj2)
+            public static new bool Equals(object obj1, object obj2)
             {
                 return (obj1 as Key) == (obj2 as Key);
             }
@@ -581,7 +581,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         } // public class Key
 
         // Singleton factory class
-        sealed class ObjectFactory : SfcObjectFactory
+        private sealed class ObjectFactory : SfcObjectFactory
         {
             static readonly ObjectFactory instance = new ObjectFactory();
 
@@ -985,6 +985,20 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 return Convert.ToString(sfcProperty.Value ?? string.Empty);
             }
             set { this.Properties["ActiveDirectoryTenant"].Value = value; }
+        }
+
+        /// <summary>
+        /// Tag value that is managed by the host application
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.None)]
+        public string Tag
+        {
+            get
+            {
+                var sfcProperty = Properties[nameof(Tag)];
+                return Convert.ToString(sfcProperty.Value ?? string.Empty);
+            }
+            set => Properties[nameof(Tag)].Value = value; 
         }
 
         /// <summary>

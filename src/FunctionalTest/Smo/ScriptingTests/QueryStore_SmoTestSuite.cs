@@ -39,7 +39,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             QueryStoreOperationMode operationMode in
                                 Enum.GetValues(typeof (QueryStoreOperationMode))
                                     .Cast<QueryStoreOperationMode>()
-                                    .Except(new[] { QueryStoreOperationMode.Off }))
+                                    .Except(new[] { QueryStoreOperationMode.Off, QueryStoreOperationMode.Error }))
                         {
                             SetAndValidateOption(database,
                                 typeof (QueryStoreOptions).GetProperty("DesiredState"),
@@ -48,6 +48,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         }
 
                         database.QueryStoreOptions.DesiredState = QueryStoreOperationMode.ReadWrite;
+                        database.Alter();
 
                         foreach (QueryStoreCaptureMode captureMode in
                             Enum.GetValues(typeof(QueryStoreCaptureMode))

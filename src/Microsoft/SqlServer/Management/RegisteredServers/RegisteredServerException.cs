@@ -156,51 +156,5 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             }
         }
     }
-
-
-    /// <summary>
-    /// Exception thrown when upgrading from SqlServer2005
-    /// </summary>
-    [Serializable]
-    // VBUMP Remove this in V17
-    public class InvalidSqlServer2005StoreFormatException : RegisteredServerException
-    {
-        /// <summary>
-        /// Base constructor
-        /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public InvalidSqlServer2005StoreFormatException()
-            : base()
-        {
-        }
-
-        /// <summary>
-        /// Base constructor
-        /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public InvalidSqlServer2005StoreFormatException(string message)
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        /// Base constructor
-        /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public InvalidSqlServer2005StoreFormatException(string message, Exception innerException)
-            :
-            base(message, innerException)
-        {
-        }
-
-        /// <summary>
-        /// Base constructor
-        /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        protected InvalidSqlServer2005StoreFormatException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-   }
 }
 

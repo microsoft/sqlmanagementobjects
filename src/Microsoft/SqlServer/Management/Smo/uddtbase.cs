@@ -336,17 +336,6 @@ END
                     sb.Append("binary(8)");
                 }
             }
-            else if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70 && 0 == oObj.StringComparer.Compare("bigint", sType))
-            {
-                if (bSquareBraketsForNative)
-                {
-                    sb.Append("[int]");
-                }
-                else
-                {
-                    sb.Append("int");
-                }
-            }
             else
             {
                 //no need for SqlBraket as it is a system type. it will only slow us down
@@ -363,9 +352,13 @@ END
                 SqlDataType sqlDataType = DataType.SqlToEnum(sType);
 
                 // raise error if data type is not supported on target version.
-                if (!DataType.IsDataTypeSupportedOnTargetVersion(sqlDataType, sp.TargetServerVersion))
+                if (!DataType.IsDataTypeSupportedOnTargetVersion(sqlDataType, sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition))
                 {
-                    SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+                    throw new SmoException(ExceptionTemplates.UnsupportedDataTypeOnTarget(
+                        sqlDataType.ToString(),
+                        sp.TargetServerVersion.ToString(),
+                        sp.TargetDatabaseEngineType.ToString(),
+                        sp.TargetDatabaseEngineEdition.ToString()));
                 }
 
                 // raise error if data type is not supported on target engine type.
@@ -579,7 +572,7 @@ END
         static internal bool IsSystemType(SqlSmoObject oObj, ScriptingPreferences sp)
         {
             String type = oObj.Properties.Get("DataType").Value as string;
-            return DataType.IsSystemDataType(DataType.SqlToEnum(type), sp.TargetServerVersion);
+            return DataType.IsSystemDataType(DataType.SqlToEnum(type), sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition);
         }
 
         /// <summary>

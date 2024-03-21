@@ -194,6 +194,11 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalLibrary); }
         }
 
+        public static DatabasePermission AlterAnyExternalMirror
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalMirror); }
+        }
+
         public static DatabasePermission AlterAnyExternalStream
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalStream); }
@@ -871,6 +876,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalLibrary]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalLibrary] = value; }
+        }
+
+        public bool AlterAnyExternalMirror
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalMirror]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalMirror] = value; }
         }
 
         public bool AlterAnyExternalStream

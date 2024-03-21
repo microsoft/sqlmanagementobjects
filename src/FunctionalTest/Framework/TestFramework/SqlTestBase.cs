@@ -36,6 +36,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             // We don't control all dependency DLL versions in every environment so just 
             // load whatever version is in the same folder as the test, if possible.
             var an = new AssemblyName(args.Name);
+            if (an.Name.ToLower().EndsWith(".resources"))
+            {
+                // We are not really in the business of loading resources, so avoid unnecessary tracing...
+                return null;
+            }
+
             var dll = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), an.Name + ".dll");
             Trace.TraceInformation($"Trying to load dll:{dll}");
             try

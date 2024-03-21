@@ -203,6 +203,7 @@
                       <RegisteredServers:OtherParams type="string" />
                       <RegisteredServers:AuthenticationType type="int">0</RegisteredServers:AuthenticationType>
                       <RegisteredServers:ActiveDirectoryTenant type="string" />
+                      <RegisteredServers:Tag type="string">Sample Tag</RegisteredServers:Tag>
                     </RegisteredServers:RegisteredServer>
                   </data>
                 </document>

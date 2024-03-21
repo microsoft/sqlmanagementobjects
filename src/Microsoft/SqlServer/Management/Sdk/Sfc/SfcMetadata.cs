@@ -152,8 +152,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
         /// 
         /// The flag affects the behaviour of Differentiator. If it is true, then when 
         /// the order of a child in one graph differs from that of another graph, the 
-        /// child object will appear as a �remove� entry from its original position, and 
-        /// as an �add� to the new position.
+        /// child object will appear as a 'remove' entry from its original position, and 
+        /// as an 'add' to the new position.
         /// </summary>
         NaturalOrder = 0x0010,
         /// <summary>

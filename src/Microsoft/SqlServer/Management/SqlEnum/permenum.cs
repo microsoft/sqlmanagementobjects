@@ -345,6 +345,10 @@ namespace Microsoft.SqlServer.Management.Smo
         [PermissionName("ALTER LEDGER CONFIGURATION")]
         AlterLedgerConfiguration = 105,
 
+        [PermissionType("ALEM")]
+        [PermissionName("ALTER ANY EXTERNAL MIRROR")]
+        AlterAnyExternalMirror = 106,
+
     }
 
     ///<summary>enum containing all possible ObjectPermissions</summary>

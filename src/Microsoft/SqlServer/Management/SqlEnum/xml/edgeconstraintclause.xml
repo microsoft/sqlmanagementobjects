@@ -19,5 +19,7 @@
     <property name="ExtPropClass" type="int" hidden='true'>1</property>
     <property name="From" type="nvarchar">f.name</property>
     <property name="To" type="nvarchar">t.name</property>
+    <property name="FromSchema" type="nvarchar">schema_name(f.schema_id)</property>
+    <property name="ToSchema" type="nvarchar">schema_name(t.schema_id)</property>
   </properties>
 </EnumObject>

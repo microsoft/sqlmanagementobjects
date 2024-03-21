@@ -224,6 +224,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.AlterAnyExternalJob: return permissionSet.AlterAnyExternalJob;
                 case DatabasePermissionType.AlterAnyExternalLanguage: return permissionSet.AlterAnyExternalLanguage;
                 case DatabasePermissionType.AlterAnyExternalLibrary: return permissionSet.AlterAnyExternalLibrary;
+                case DatabasePermissionType.AlterAnyExternalMirror: return permissionSet.AlterAnyExternalMirror;
                 case DatabasePermissionType.AlterAnyExternalStream: return permissionSet.AlterAnyExternalStream;
                 case DatabasePermissionType.AlterAnyFulltextCatalog: return permissionSet.AlterAnyFulltextCatalog;
                 case DatabasePermissionType.AlterAnyMask: return permissionSet.AlterAnyMask;

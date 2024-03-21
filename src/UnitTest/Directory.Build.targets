@@ -3,11 +3,7 @@
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.TestPlatform" Version="17.3" GeneratePathProperty="true" />
-    <QCustomInput Include="$(EnlistmentRoot)\src\UnitTest\unittest.runsettings" />
-  </ItemGroup>
-  <Target Condition="'$(BuildingInsideVisualStudio)' != 'true' and '$(SkipUnitTests)' != 'true' and ('$(QBUILD)' != '1' or '$(EnableQTest)' == 'false') " 
+  <Target Condition="'$(BuildingInsideVisualStudio)' != 'true' and '$(SkipUnitTests)' != 'true'" 
     Inputs="$(MSBuildAllProjects);$(OutputPath)$(AssemblyName).dll"
     Outputs="$(Outdir)\Testrun_$(AssemblyName).txt"
     Name="RunUnitTests" 
@@ -15,7 +11,7 @@
     <PropertyGroup>
       
       <RunSettings>/Settings:$(EnlistmentRoot)\src\UnitTest\unittest.runsettings</RunSettings>
-      <VsTestDirectory>$(PkgMicrosoft_TestPlatform)\tools\net451\Common7\IDE\Extensions\TestPlatform\</VsTestDirectory>
+      <VsTestDirectory>$(PkgMicrosoft_TestPlatform)\tools\net462\Common7\IDE\Extensions\TestPlatform\</VsTestDirectory>
       <TestDll>$(OutputPath)$(AssemblyName).dll</TestDll>
       <TestCategory Condition="'$(TestCategory)' == ''">Unit</TestCategory>
       <TestFilter Condition="'$(TestCategory)' != ''">/TestCaseFilter:&quot;TestCategory=$(TestCategory)&quot;</TestFilter>

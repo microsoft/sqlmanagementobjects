@@ -36,6 +36,7 @@ namespace Microsoft.SqlServer.Management.Smo
             switch(strDBType)
             {
                 case "xml":goto case "text";
+                case "json": goto case "text";
                 case "nvarchar":goto case "text";
                 case "varchar":goto case "text";
                 case "sysname":goto case "text";

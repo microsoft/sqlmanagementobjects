@@ -147,10 +147,16 @@ UnsupportedColumnCollation(string columnName, string parentName, string collatio
 UnsupportedDatabaseCollation(string collationName, string targetVersion) = The source database's collation is {0}.  {1}, does not support this collation.
 
 ; this exception gets thrown when trying to script out columns with data types not supported in the target version
-UnsupportedColumnType(string parentName, string columnName, string columnDataType, string targetVersion) = Column {1} in object {0} contains type {2}, which is not supported in the target server version, {3}.
+UnsupportedColumnType(string parentName, string columnName, string columnDataType, string targetVersion, string engineType, string editionType) = Column {1} in object {0} contains type {2}, which is not supported in the target server version {3}, engine type {4}, edition {5}.
 
 ; this exception gets thrown when trying to script out columns with data types not supported in the target engine type
 UnsupportedColumnTypeOnEngineType(string parentName, string columnName, string columnDataType, string engineType) = Column {1} in object {0} contains type {2}, which is not supported in the target engine type, {3}.
+
+; this exception gets thrown when trying to script out a data type not supported in certain target servers (version, engine type, edition type)
+UnsupportedDataTypeOnTarget(string dataType, string targetVersion, string engineType, string editionType) = Data type {0} is not supported in the target server: version {1}, engine type {2}, edition type {3}.
+
+; this exception gets thrown when trying to script out a data type not scritable in certain target servers (version, engine type, edition type)
+UnscriptableDataTypeOnTarget(string dataType, string targetVersion, string engineType, string editionType) = Data type {0} which cannot be scripted in the target server: version {1}, engine type {2}, edition type {3}.
 
 ; this exception gets thrown when the user is requesting a collection that is not availabel on this version of server.
 CollectionNotAvailable(string objectname, string serverversion) = {0} collection is not accessible on server version {1}.

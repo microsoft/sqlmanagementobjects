@@ -4,19 +4,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
+using Microsoft.SqlServer.Management.Common;
 
-/*
- * Date, Time, DateTimeOffset, and DateTime2 data types added 23 Oct 2006 by jennbeck
- *
- */
-
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
     /// <summary>
     /// The SqlDataType specifies the type of the DataType object.
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags")]
     public enum SqlDataType
     {
         None    = 0, // Not set.
@@ -59,11 +53,12 @@ namespace Microsoft.SqlServer.Management.Smo
         UserDefinedTableType = 40, //User defined table type
         HierarchyId = 41, //system clr type
         Geometry = 42, // A datatype used for planar 2-dimensional geometries.
-        Geography = 43 // A geodetic datatype.
+        Geography = 43, // A geodetic datatype.
+        Json = 44 // A json datatype.
 
-        /** !!IMPORTANT!! If updating this with new types make sure to update IsDataTypeSupportedOnTargetVersion and/or IsSystemDataType with the new type!
-         * You should also update the AllSqlDataTypeValues_SupportedOnAllApplicableVersions unit test with the new type and minimum version
-         */
+        // !!IMPORTANT!! If updating this with new types make sure to update IsDataTypeSupportedOnTargetVersion and/or IsSystemDataType with the new type!
+        // You should also update the AllSqlDataTypeValues_SupportedOnAllApplicableVersions unit test with the new type and minimum version
+        //
     }
 
     /// <summary>
@@ -118,6 +113,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.Xml:
                 case SqlDataType.SysName:
                 case SqlDataType.Date:
+                case SqlDataType.Json:
                     this.sqlDataType = sqlDataType;
                     this.name = GetSqlName(sqlDataType);
                     break;
@@ -154,7 +150,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// maxLength specifies the precision.
         /// </summary>
         /// <param name="sqlDataType"></param>
-        /// <param name="precisionOrMaxLength"></param>
+        /// <param name="precisionOrMaxLengthOrScale"></param>
         public DataType(SqlDataType sqlDataType, Int32 precisionOrMaxLengthOrScale)
         {
             switch(sqlDataType)
@@ -798,14 +794,22 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Creates a DataType of type SqlDataType.DateTime2
         /// </summary>
-        /// <param name="precision"></param>
+        /// <param name="scale"></param>
         /// <returns></returns>
         public static DataType DateTime2(Int32 scale)
         {
             return new DataType(SqlDataType.DateTime2, scale);
         }
 
-#endregion
+        /// <summary>
+        /// Creates a DataType of type SqlDataType.Json
+        /// </summary>
+        public static DataType Json
+        {
+            get { return new DataType(SqlDataType.Json); }
+        }
+
+        #endregion
 
         public override string ToString()
         {
@@ -1305,6 +1309,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     return "datetimeoffset";
                 case SqlDataType.DateTime2:
                     return "datetime2";
+                case SqlDataType.Json:
+                    return "json";
             }
 
             return string.Empty;
@@ -1474,6 +1480,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "userdefineddatatype":
                     sqlDataType = SqlDataType.UserDefinedDataType;
                     break;
+                case "json":
+                    sqlDataType = SqlDataType.Json;
+                    break;
 
                 default:
                     /*Removing Strace as in case of computed columns , there might
@@ -1557,25 +1566,63 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             return false;
         }
+
+        private static bool IsSystemDataType160(SqlDataType dataType)
+        {
+            if (IsSystemDataType100(dataType))
+            {
+                return true;
+            }
+
+            switch (dataType)
+            {
+                case SqlDataType.Json:
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>
-        /// This function verify whether given data type is system type or not for given version
+        /// This function verify whether given data type is system type or not for given version, engine type/edition.
         /// </summary>
         /// <param name="dataType"></param>
         /// <param name="targetVersion"></param>
+        /// <param name="engineType"></param>
+        /// <param name="engineEdition"></param>
         /// <returns></returns>
-        internal static bool IsSystemDataType(SqlDataType dataType, SqlServerVersion targetVersion)
+        internal static bool IsSystemDataType(SqlDataType dataType, SqlServerVersion targetVersion, DatabaseEngineType engineType, DatabaseEngineEdition engineEdition)
         {
-            switch (targetVersion)
+            // SQL DB doesn't care about server version
+            //
+            if (engineType == DatabaseEngineType.SqlAzureDatabase)
             {
-                case SqlServerVersion.Version80:
-                    return IsSystemDataType80(dataType);
-                case SqlServerVersion.Version90:
-                    return IsSystemDataType90(dataType);
-                default:
-                    //No new types have been added post-2008. If a new type is added
-                    //later on then a new IsSystemDataType method should be added
-                    //with those new types - and that one set as the default.
-                    return IsSystemDataType100(dataType);
+                return IsSystemDataTypeOnAzure(dataType, engineEdition);
+            }
+
+            // We don't want to check the SQL version for MI (its engine type is Standalone)
+            // because versionless MI and versioned MI may have different versions.
+            // Since both of them are supposed to support all system data types, we simply
+            // treat them as the latest SQL version.
+            //
+            if (engineEdition == DatabaseEngineEdition.SqlManagedInstance || targetVersion >= SqlServerVersion.Version160)
+            {
+                // If a new type is added later on then a new IsSystemDataType method should be added
+                // with those new types - and that one set as the default. Also update IsSystemDataTypeOnAzure
+                // with the new IsSystemDataType method because Azure uses the latest types.
+                //
+                return IsSystemDataType160(dataType);
+            }
+            else if (targetVersion <= SqlServerVersion.Version80)
+            {
+                return IsSystemDataType80(dataType);
+            }
+            else if (targetVersion <= SqlServerVersion.Version90)
+            {
+                return IsSystemDataType90(dataType);
+            }
+            else
+            {
+                return IsSystemDataType100(dataType);
             }
         }
 
@@ -1583,11 +1630,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Determines if the data type is supported on the target version
         /// </summary>
         /// <param name="dataType">The <see cref="SqlDataType"/> to check</param>
+        /// <param name="targetVersion">The <see cref="SqlServerVersion"/> to check</param>
+        /// <param name="engineType">The <see cref="SqlDataType"/> to check</param>
+        /// <param name="engineEdition">The <see cref="DatabaseEngineEdition"/> to check</param>
         /// <returns></returns>
-        internal static bool IsDataTypeSupportedOnTargetVersion(SqlDataType dataType, SqlServerVersion targetVersion)
+        internal static bool IsDataTypeSupportedOnTargetVersion(SqlDataType dataType, SqlServerVersion targetVersion, DatabaseEngineType engineType, DatabaseEngineEdition engineEdition)
         {
             //Check if it's a known system type and if so whether it's supported
-            if (IsSystemDataType(dataType, targetVersion))
+            if (IsSystemDataType(dataType, targetVersion, engineType, engineEdition))
             {
                 return true;
             }
@@ -1605,15 +1655,59 @@ namespace Microsoft.SqlServer.Management.Smo
                 return true;
             }
 
-            //Unknown type? This should never happen since the above checks should cover all types in SqlDataType
-            Diagnostics.TraceHelper.Assert(false, "Unknown data type {0} - has IsDataTypeSupportedOnTargetVersion been updated with the latest supported types?");
             return false;
         }
 
+        // This method should not be used in future code as now Cloud does support UDT. It is not removed because existing code may be dependent on it and the impact
+        // of removing it is hard to evaluate.
+        // For the new code, if we want to check the supportability of a data type in Azure, it is suggested to use IsSystemDataTypeOnAzure.
+        //
         internal static bool IsDataTypeSupportedOnCloud(SqlDataType dataType)
         {
             //Only UserDefinedType is not supported on Cloud.
             return dataType != SqlDataType.UserDefinedType;
+        }
+
+        internal static bool IsSystemDataTypeOnAzure(SqlDataType dataType, DatabaseEngineEdition engineEdition)
+        {
+            bool isSupported = true;
+            switch (engineEdition)
+            {
+                // By default, Azure engine type doesn't have restrictions on data types. However,
+                // Some engine edition may have its own supportablitiy of data types.
+                // Add such editions as cases here.
+                //
+                case DatabaseEngineEdition.SqlDataWarehouse:
+                    isSupported = IsDataTypeSupportedOnSqlDw(dataType);
+                    break;
+                default:
+                    break;
+            }
+
+            // If the data type is supported, check if it is a system data type
+            //
+            return isSupported ? IsSystemDataType160(dataType) : false;
+        }
+
+        internal static bool IsDataTypeSupportedOnSqlDw(SqlDataType dataType)
+        {
+            // JSON data type is not supported on SQL DW.
+            //
+            return dataType != SqlDataType.Json;
+        }
+
+        internal static void CheckColumnTypeSupportability(string parentName, string columnName, SqlDataType dataType, ScriptingPreferences sp)
+        {
+            if (!IsDataTypeSupportedOnTargetVersion(dataType, sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition))
+            {
+                throw new SmoException(ExceptionTemplates.UnsupportedColumnType(
+                    parentName,
+                    columnName,
+                    dataType.ToString(),
+                    sp.TargetServerVersion.ToString(),
+                    sp.TargetDatabaseEngineType.ToString(),
+                    sp.TargetDatabaseEngineEdition.ToString()));
+            }
         }
 
         /// <summary>

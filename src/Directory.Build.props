@@ -87,9 +87,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
-    <SqlParserPackageVersion>171.24.0</SqlParserPackageVersion>
+    <SqlParserPackageVersion>172.0.1</SqlParserPackageVersion>
     <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
-    <SqlClientPackageVersion>5.1.2</SqlClientPackageVersion>
+    <SqlClientPackageVersion>5.1.4</SqlClientPackageVersion>
   </PropertyGroup>
   <Import Project="$(BuildPropsDir)\StrongName.props" Condition="Exists('$(BuildPropsDir)\StrongName.props')" />
   <Import Project="$(BuildPropsDir)\Version.props" />

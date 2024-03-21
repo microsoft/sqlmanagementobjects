@@ -30,6 +30,21 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Constructor to instantiate an EdgeConstraintClause object. It would help consumers.
+        /// </summary>
+        /// <param name="parent"> Parent object that encapsulates this object (EdgeConstraint in this case) </param>
+        /// <param name="fromTable">Table that forms origin of the connection</param>
+        /// <param name="toTable">Table that forms the sink of the connection</param>
+        public EdgeConstraintClause(EdgeConstraint parent, Table fromTable, Table toTable)
+            : base(parent.EdgeConstraintClauses, new SimpleObjectKey(fromTable.ID.ToString()+'_'+toTable.ID.ToString()), SqlSmoState.Creating)
+        {
+            this.From = fromTable.Name;
+            this.To = toTable.Name;
+            this.FromSchema = fromTable.Schema;
+            this.ToSchema = toTable.Schema;
+        }
+
+        /// <summary>
         /// Property accessor for URN suffix needed to traverse to this object in the explorer.
         /// </summary>
         /// <returns>name of the type in the urn expression</returns>
@@ -58,8 +73,10 @@ namespace Microsoft.SqlServer.Management.Smo
                                     bool defaultTextMode)
         {
             string[] fields = {
-                                        "From",
-                                        "To"
+                                        nameof(EdgeConstraintClause.From),
+                                        nameof(EdgeConstraintClause.To),
+                                        nameof(EdgeConstraintClause.FromSchema),
+                                        nameof(EdgeConstraintClause.ToSchema)
                               };
             List<string> list = GetSupportedScriptFields(typeof(EdgeConstraintClause.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
             return list.ToArray();

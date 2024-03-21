@@ -93,7 +93,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
-        private static IEnumerable<ColumnProperties> GetAllDataTypeColumns()
+        private static IEnumerable<ColumnProperties> GetAllDataTypeColumns(_SMO.Database database)
         {
             var i = 0;
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.BigInt);
@@ -132,17 +132,21 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Time(1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.DateTimeOffset(1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.DateTime2(1));
+
+            if (database.Parent.IsJsonDataTypeEnabled && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+            {
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Json);
+            }
         }
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
         public void Column_script_all_data_types()
         {
-
             ExecuteFromDbPool(
                 database =>
                 {
-                    var columns = GetAllDataTypeColumns().OrderBy(c => c.Name).ToArray();
+                    var columns = GetAllDataTypeColumns(database).OrderBy(c => c.Name).ToArray();
                     _SMO.Table table = database.CreateTable(this.TestContext.TestName, columns);
                     table.Refresh();
                     var createdColumns = table.Columns.Cast<_SMO.Column>()

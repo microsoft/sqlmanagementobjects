@@ -33,6 +33,12 @@
           "Microsoft.SourceLink.Common": "1.1.1"
         }
       },
+      "Microsoft.TestPlatform": {
+        "type": "Direct",
+        "requested": "[17.6.0, )",
+        "resolved": "17.6.0",
+        "contentHash": "rtDdZ3XQ/G/N2AcxsRfz7YWzYx65ywFuQFVHYhVT6c4vlV85PxqZCbK1rgTAo9HsnLTIrUN6ueXt2C+rKDGxaQ=="
+      },
       "Moq": {
         "type": "Direct",
         "requested": "[4.16.1, )",
@@ -217,8 +223,8 @@
       },
       "Microsoft.SqlServer.Management.SqlParser": {
         "type": "Transitive",
-        "resolved": "171.24.0",
-        "contentHash": "Zjic6VG1U6gZb/xnbmYlL+jv/wRy4ylzPYlbDPb7iThuyildrqjSXM2+y7obIgspK/uGpkM4dLjQOcrj9IprCg=="
+        "resolved": "172.0.1",
+        "contentHash": "zACdeVlP4UK+etsZvz2XFV1nUHLEQWbOKiIafx9YzXLKDqc1ytb06DVrwacsIeSSvY8PG2kmbs5/XaM7JqO08Q=="
       },
       "System.Buffers": {
         "type": "Transitive",
@@ -362,151 +368,151 @@
       "microsoft.sqlserver.connectioninfo": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.SqlClrProvider": "[170.23298.0, )"
+          "Microsoft.SqlServer.SqlClrProvider": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.dmf": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf.Common": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf.Common": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.dmf.common": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.assessment": {
         "type": "Project",
         "dependencies": {
           "Microsoft.SqlServer.Assessment": "[1.1.9, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
           "Newtonsoft.json": "[13.0.1, )"
         }
       },
       "microsoft.sqlserver.management.collector": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.hadrdata": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.hadrmodel": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEvent": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEvent": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.registeredservers": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.sdk.sfc": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.smometadataprovider": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlParser": "[171.24.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlParser": "[172.0.1, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.sqlscriptpublish": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo.Notebook": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo.Notebook": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.xevent": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.xeventdbscoped": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEvent": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEvent": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.policyenum": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.servicebrokerenum": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.smo": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf.Common": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.ServiceBrokerEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf.Common": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.ServiceBrokerEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.smo.notebook": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
           "NewtonSoft.Json": "[13.0.1, )"
         }
       },
       "microsoft.sqlserver.smoextended": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.sqlclrprovider": {
@@ -515,9 +521,9 @@
       "microsoft.sqlserver.sqlenum": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlClrProvider": "[170.23298.0, )"
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlClrProvider": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.test.manageability.utils": {
@@ -528,17 +534,17 @@
           "MSTest.TestAdapter": "[2.2.10, )",
           "MSTest.TestFramework": "[2.2.10, )",
           "Microsoft.NET.Test.Sdk": "[17.3.0, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrModel": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.RegisteredServers": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlScriptPublish": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEventDbScoped": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrModel": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.RegisteredServers": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlScriptPublish": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEventDbScoped": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
           "Moq": "[4.16.1, )",
           "NUnit": "[3.11.0, )",
           "Newtonsoft.Json": "[13.0.1, )",
@@ -552,24 +558,24 @@
           "MSTest.TestAdapter": "[2.2.10, )",
           "MSTest.TestFramework": "[2.2.10, )",
           "Microsoft.NET.Test.Sdk": "[17.3.0, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Assessment": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Collector": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrModel": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.RegisteredServers": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SmoMetadataProvider": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlScriptPublish": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEvent": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEventDbScoped": "[170.23298.0, )",
-          "Microsoft.SqlServer.PolicyEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo.Notebook": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.Test.Manageability.Utils": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Assessment": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Collector": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrModel": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.RegisteredServers": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SmoMetadataProvider": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlScriptPublish": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEvent": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEventDbScoped": "[171.24065.0, )",
+          "Microsoft.SqlServer.PolicyEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo.Notebook": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.Test.Manageability.Utils": "[171.24065.0, )",
           "Moq": "[4.16.1, )",
           "NUnit": "[3.11.0, )",
           "Newtonsoft.Json": "[13.0.1, )",
@@ -583,17 +589,17 @@
           "MSTest.TestAdapter": "[2.2.10, )",
           "MSTest.TestFramework": "[2.2.10, )",
           "Microsoft.NET.Test.Sdk": "[17.3.0, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrModel": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.RegisteredServers": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlScriptPublish": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.Test.Manageability.Utils": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrModel": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.RegisteredServers": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlScriptPublish": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.Test.Manageability.Utils": "[171.24065.0, )",
           "Moq": "[4.16.1, )",
           "NUnit": "[3.11.0, )",
           "System.Threading.Tasks.Extensions": "[4.5.4, )"
@@ -645,18 +651,18 @@
       },
       "Microsoft.Data.SqlClient": {
         "type": "Direct",
-        "requested": "[5.1.2, 6.0.0)",
-        "resolved": "5.1.2",
-        "contentHash": "q/F1HTOn9QLwgRp4esJIA1b2X15faeV8WozkNhvU3Zk0DcYDWUsEf5WMkbypY4CaNkZntOduods5wLyv8I699w==",
+        "requested": "[5.1.4, 6.0.0)",
+        "resolved": "5.1.4",
+        "contentHash": "RSGSodusrPSVPKBLETRTH51G0yUQS28rD1hi2svTKS1GOsvUWxUpE8hgnKnUFC9RNjzfQmfUp+T0lJHFtlT3HQ==",
         "dependencies": {
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.3",
           "Microsoft.Data.SqlClient.SNI.runtime": "5.1.1",
-          "Microsoft.Identity.Client": "4.47.2",
+          "Microsoft.Identity.Client": "4.56.0",
           "Microsoft.IdentityModel.JsonWebTokens": "6.24.0",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.24.0",
           "Microsoft.SqlServer.Server": "1.0.0",
           "System.Configuration.ConfigurationManager": "6.0.1",
-          "System.Diagnostics.DiagnosticSource": "6.0.0",
+          "System.Diagnostics.DiagnosticSource": "6.0.1",
           "System.Runtime.Caching": "6.0.0",
           "System.Security.Cryptography.Cng": "5.0.0",
           "System.Security.Principal.Windows": "5.0.0",
@@ -692,6 +698,12 @@
           "Microsoft.Build.Tasks.Git": "1.1.1",
           "Microsoft.SourceLink.Common": "1.1.1"
         }
+      },
+      "Microsoft.TestPlatform": {
+        "type": "Direct",
+        "requested": "[17.6.0, )",
+        "resolved": "17.6.0",
+        "contentHash": "rtDdZ3XQ/G/N2AcxsRfz7YWzYx65ywFuQFVHYhVT6c4vlV85PxqZCbK1rgTAo9HsnLTIrUN6ueXt2C+rKDGxaQ=="
       },
       "Moq": {
         "type": "Direct",
@@ -945,8 +957,8 @@
       },
       "Microsoft.SqlServer.Management.SqlParser": {
         "type": "Transitive",
-        "resolved": "171.24.0",
-        "contentHash": "Zjic6VG1U6gZb/xnbmYlL+jv/wRy4ylzPYlbDPb7iThuyildrqjSXM2+y7obIgspK/uGpkM4dLjQOcrj9IprCg==",
+        "resolved": "172.0.1",
+        "contentHash": "zACdeVlP4UK+etsZvz2XFV1nUHLEQWbOKiIafx9YzXLKDqc1ytb06DVrwacsIeSSvY8PG2kmbs5/XaM7JqO08Q==",
         "dependencies": {
           "System.CodeDom": "4.7.0",
           "System.Text.Json": "6.0.0"
@@ -1626,14 +1638,14 @@
       "microsoft.data.tools.sql.batchparser": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)"
         }
       },
       "microsoft.sqlserver.connectioninfo": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.Data.Tools.Sql.BatchParser": "[170.23298.0, )",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.Data.Tools.Sql.BatchParser": "[171.24065.0, )",
           "System.Data.OleDb": "[6.0.0, )",
           "System.Management": "[6.0.0, )",
           "System.Security.Principal.Windows": "[5.0.0, )"
@@ -1642,12 +1654,12 @@
       "microsoft.sqlserver.dmf": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf.Common": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf.Common": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
           "System.Security.Cryptography.ProtectedData": "[6.0.0, )",
           "System.Security.Permissions": "[6.0.0, )"
         }
@@ -1655,57 +1667,57 @@
       "microsoft.sqlserver.dmf.common": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.assessment": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
           "Microsoft.SqlServer.Assessment": "[1.1.9, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
           "Newtonsoft.json": "[13.0.1, )"
         }
       },
       "microsoft.sqlserver.management.collector": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.hadrdata": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.hadrmodel": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEvent": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEvent": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.registeredservers": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
           "System.Security.Cryptography.ProtectedData": "[6.0.0, )",
           "System.Security.Permissions": "[6.0.0, )"
         }
@@ -1713,57 +1725,57 @@
       "microsoft.sqlserver.management.sdk.sfc": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.smometadataprovider": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlParser": "[171.24.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlParser": "[172.0.1, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.sqlscriptpublish": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo.Notebook": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo.Notebook": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.xevent": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.management.xeventdbscoped": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEvent": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEvent": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.policyenum": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
           "System.Security.Cryptography.ProtectedData": "[6.0.0, )",
           "System.Security.Permissions": "[6.0.0, )"
         }
@@ -1771,10 +1783,10 @@
       "microsoft.sqlserver.servicebrokerenum": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
           "System.Security.Cryptography.ProtectedData": "[6.0.0, )",
           "System.Security.Permissions": "[6.0.0, )"
         }
@@ -1782,38 +1794,38 @@
       "microsoft.sqlserver.smo": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf.Common": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.ServiceBrokerEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf.Common": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.ServiceBrokerEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.smo.notebook": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
           "NewtonSoft.Json": "[13.0.1, )"
         }
       },
       "microsoft.sqlserver.smoextended": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.sqlenum": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )"
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )"
         }
       },
       "microsoft.sqlserver.test.manageability.utils": {
@@ -1822,19 +1834,19 @@
           "Azure.Security.KeyVault.Secrets": "[4.4.0, )",
           "MSTest.TestAdapter": "[2.2.10, )",
           "MSTest.TestFramework": "[2.2.10, )",
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
           "Microsoft.NET.Test.Sdk": "[17.3.0, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrModel": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.RegisteredServers": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlScriptPublish": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEventDbScoped": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrModel": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.RegisteredServers": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlScriptPublish": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEventDbScoped": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
           "Moq": "[4.16.1, )",
           "NUnit": "[3.11.0, )",
           "Newtonsoft.Json": "[13.0.1, )",
@@ -1847,26 +1859,26 @@
           "Azure.Security.KeyVault.Secrets": "[4.4.0, )",
           "MSTest.TestAdapter": "[2.2.10, )",
           "MSTest.TestFramework": "[2.2.10, )",
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
           "Microsoft.NET.Test.Sdk": "[17.3.0, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Assessment": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Collector": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrModel": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.RegisteredServers": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SmoMetadataProvider": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlScriptPublish": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEvent": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.XEventDbScoped": "[170.23298.0, )",
-          "Microsoft.SqlServer.PolicyEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo.Notebook": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.Test.Manageability.Utils": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Assessment": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Collector": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrModel": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.RegisteredServers": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SmoMetadataProvider": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlScriptPublish": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEvent": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.XEventDbScoped": "[171.24065.0, )",
+          "Microsoft.SqlServer.PolicyEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo.Notebook": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.Test.Manageability.Utils": "[171.24065.0, )",
           "Moq": "[4.16.1, )",
           "NUnit": "[3.11.0, )",
           "Newtonsoft.Json": "[13.0.1, )",
@@ -1879,19 +1891,19 @@
           "Azure.Security.KeyVault.Secrets": "[4.4.0, )",
           "MSTest.TestAdapter": "[2.2.10, )",
           "MSTest.TestFramework": "[2.2.10, )",
-          "Microsoft.Data.SqlClient": "[5.1.2, 6.0.0)",
+          "Microsoft.Data.SqlClient": "[5.1.4, 6.0.0)",
           "Microsoft.NET.Test.Sdk": "[17.3.0, )",
-          "Microsoft.SqlServer.ConnectionInfo": "[170.23298.0, )",
-          "Microsoft.SqlServer.Dmf": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrData": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.HadrModel": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.RegisteredServers": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.Sdk.Sfc": "[170.23298.0, )",
-          "Microsoft.SqlServer.Management.SqlScriptPublish": "[170.23298.0, )",
-          "Microsoft.SqlServer.Smo": "[170.23298.0, )",
-          "Microsoft.SqlServer.SmoExtended": "[170.23298.0, )",
-          "Microsoft.SqlServer.SqlEnum": "[170.23298.0, )",
-          "Microsoft.SqlServer.Test.Manageability.Utils": "[170.23298.0, )",
+          "Microsoft.SqlServer.ConnectionInfo": "[171.24065.0, )",
+          "Microsoft.SqlServer.Dmf": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrData": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.HadrModel": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.RegisteredServers": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.Sdk.Sfc": "[171.24065.0, )",
+          "Microsoft.SqlServer.Management.SqlScriptPublish": "[171.24065.0, )",
+          "Microsoft.SqlServer.Smo": "[171.24065.0, )",
+          "Microsoft.SqlServer.SmoExtended": "[171.24065.0, )",
+          "Microsoft.SqlServer.SqlEnum": "[171.24065.0, )",
+          "Microsoft.SqlServer.Test.Manageability.Utils": "[171.24065.0, )",
           "Moq": "[4.16.1, )",
           "NUnit": "[3.11.0, )",
           "System.Threading.Tasks.Extensions": "[4.5.4, )"
