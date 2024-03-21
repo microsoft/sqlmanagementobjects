@@ -1,0 +1,5 @@
+
+
+OffByDefault_AdHocDistributedQueriesEnabled = Ad-hoc Distributed Queries Enabled
+OffByDefault_DatabaseMailEnabled = Database Mail Enabled
+ConditionExpressionOnObject(string policy) = {0} ConditionExpression

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='EventChronicleRule' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="EventClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="EventClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_event_chronicle_rule" alias="ecr" />
+		<prefix>
+CREATE TABLE #tmp_event_chronicle_rule(
+    RuleId int,
+    RuleName nvarchar(255),  
+    RuleType tinyint,
+    Action ntext,
+    ActionTimeout int,
+    EventClassId int,
+    SubscriptionClassId int,
+    EventClassName nvarchar(255),
+    InputTypeName nvarchar (128),
+    InputTypeSchema nvarchar (128),
+    SqlUserName nvarchar (128),
+    SqlLoginName nvarchar (128)
+)
+INSERT #tmp_event_chronicle_rule EXEC [SchemaPrefix].NSGetRulesOnType @RuleType = 0
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_event_chronicle_rule
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="Id" type="int" hidden="true">ecr.RuleId</property>
+		<property name="Name" type="nvarchar" size="255">ecr.RuleName</property>
+        <property name="SubscriptionClassId" type="int" hidden="true">ecr.SubscriptionClassId</property>
+		<property name="Action" type="ntext">ecr.Action</property>
+		<property name="ActionTimeout" type="int">ecr.ActionTimeout</property>
+		<property name="EventClassId" type="int" hidden="true">ecr.EventClassId</property>
+	</properties>
+</EnumObject>

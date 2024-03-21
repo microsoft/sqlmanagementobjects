@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="UserDefinedAggregateParameter" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='sys.parameters AS par' >par.is_output = 0</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">par.name</property>
+		<property name="ID" type="int" access='Read'>par.parameter_id</property>
+		<property name="ParentID" type="int" hidden="true">par.object_id</property>
+		<version min_major='10' cloud_min_major='12'>
+			<property name="IsReadOnly" type="bit">par.is_readonly</property>
+		</version>
+		<include file='inc_type.xml' alias='par'/>
+		
+		<!-- extended properties support -->
+		<property name="ExtPropClass" type="int" hidden='true'>2</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>par.object_id</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>par.parameter_id</property>
+	</properties>
+</EnumObject>

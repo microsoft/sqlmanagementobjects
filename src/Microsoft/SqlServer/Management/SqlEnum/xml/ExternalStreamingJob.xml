@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalStreamingJob" impl_type="SqlObject" min_major='15'>
+  <settings>
+    <version min_major='15'>
+        <property_link table="sys.external_streaming_jobs" alias="ext_streaming_job"/>
+    </version>
+  </settings>
+  <properties>
+    <version min_major='15'>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">ext_streaming_job.name</property>
+        <property name="ID" type="int" access="read">ext_streaming_job.object_id</property>
+        <property name="Type" type="char" size="2" access="read">ext_streaming_job.type</property>
+        <property name="TypeDesc" type="nvarchar" size="60" access="read">ext_streaming_job.type_desc</property>
+        <property name="CreateDate" type="datetime" access="read">ext_streaming_job.create_date</property>
+        <property name="IsSystemObject" type="bit" cast='true' access="read">ext_streaming_job.is_ms_shipped</property>
+        <property name="IsPublished" type="bit" cast='true' access="read">ext_streaming_job.is_published</property>
+        <property name="IsSchemaPublished" type="bit" cast='true' access="read">ext_streaming_job.is_schema_published</property>
+        <property name="Statement" type="nvarchar">ISNULL(ext_streaming_job.statement,N'')</property>
+        <property name="Status" type="int" report_type="ExternalStreamingJobStatusType">ext_streaming_job.status</property>
+    </version>
+  </properties>
+</EnumObject>

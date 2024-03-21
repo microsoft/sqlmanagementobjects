@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<EnumObject type="AlertNotification" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent='Name' local='AlertName' />
+		</parent_link>
+		<request_parent_select>
+			<field name='Name' />
+		</request_parent_select>
+		<property_link table="#alert_notification_tmp ant" />
+		<prefix>
+			<link_multiple no='1' expression="
+create table #alert_notification_tmp(AlertName sysname default '', OperatorId int, OperatorName sysname, UseEmail bit, UsePager bit, UseNetSend bit, HasEmail bit, HasPager bit, HasNetSend bit)
+declare @AlertName sysname
+
+declare crs cursor local fast_forward
+	for ( {0} ) 
+open crs 
+fetch crs into @AlertName
+while @@fetch_status &gt;= 0 
+begin 
+		insert #alert_notification_tmp (OperatorId,OperatorName,UseEmail,UsePager,UseNetSend,HasEmail,HasPager,HasNetSend) exec msdb.dbo.sp_help_notification 'OPERATORS', @AlertName, 'ACTUAL', 7
+		update #alert_notification_tmp set AlertName=@AlertName where AlertName = ''
+		fetch crs into @AlertName
+end 
+close crs
+deallocate crs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+			drop table #alert_notification_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="OperatorId" type="int">ant.OperatorId</property>
+		<property name="OperatorName" type="sysname">ant.OperatorName</property>
+		<property name="UseEmail" type="bit">ant.UseEmail</property>
+		<property name="UsePager" type="bit">ant.UsePager</property>
+		<property name="UseNetSend" type="bit">ant.UseNetSend</property>				
+		<property name="HasEmail" type="bit">ant.HasEmail</property>
+		<property name="HasPager" type="bit">ant.HasPager</property>
+		<property name="HasNetSend" type="bit">ant.HasNetSend</property>				
+		<property name="AlertName" type="sysname" hidden='true'>ant.AlertName</property>
+	</properties>
+</EnumObject>

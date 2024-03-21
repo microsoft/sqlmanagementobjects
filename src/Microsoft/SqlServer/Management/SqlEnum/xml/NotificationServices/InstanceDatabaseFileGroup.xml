@@ -1,0 +1,31 @@
+<?xml version='1.0' ?>
+<EnumObject type='InstanceDatabaseFileGroup' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table='#tmp_InstanceDatabaseFileGroups' alias='idfg'/>
+		<prefix>
+CREATE TABLE #tmp_InstDatabaseFiles1 (
+    LogicalName nvarchar(128),
+    FilePath nvarchar(260),
+    FileGroupName nvarchar(128),
+    InitialSize nvarchar(32),
+    MaxSize nvarchar(32),
+    GrowthIncrement nvarchar(16)
+)
+
+CREATE TABLE #tmp_InstanceDatabaseFileGroups (
+    FileGroupName nvarchar(128)
+)
+
+INSERT INTO #tmp_InstDatabaseFiles1 EXEC [SchemaPrefix].NSGetDatabaseFiles 'DATA_ONLY'
+INSERT INTO #tmp_InstanceDatabaseFileGroups SELECT DISTINCT FileGroupName FROM #tmp_InstDatabaseFiles1
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_InstanceDatabaseFileGroups
+DROP TABLE #tmp_InstDatabaseFiles1
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '128'>idfg.FileGroupName</property>
+	</properties>
+</EnumObject>

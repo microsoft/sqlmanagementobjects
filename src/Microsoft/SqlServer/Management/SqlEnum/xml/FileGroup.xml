@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="FileGroup" impl_type="SqlObject" min_major='7'  cloud_min_major='12' >
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link table='dbo.sysfilegroups AS g' />
+			<prefix fields="#Size#">declare @PageSize float select @PageSize=v.low/1024.0 from master..spt_values v 
+				where v.number=1 and v.type='E'
+			</prefix>
+		</version>
+		<version min_major='9'  cloud_min_major='12'>
+			<property_link table='sys.filegroups AS g' />
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<version min_major='7' max_major='8'>
+			<property name="Name" type="sysname">g.groupname</property>
+			<property name="ID" type="int" cast='true'>g.groupid</property>
+			<property name="ReadOnly" type="bit" cast='true'>g.status &amp; 0x08</property>
+			<property name="IsDefault" type="bit" cast='true'>g.status &amp; 0x10</property>
+			<!-- return 0 if it has no files -->
+			<property name="Size" type="float" access="Read" cast='true'>ISNULL((select sum(s.size * @PageSize) from dbo.sysfiles s where s.groupid = g.groupid), 0)</property>
+		</version>
+		<version min_major='9' cloud_min_major='12' >
+			<property name="Name" type="sysname" cast='true'>cast(g.name as varbinary(256))</property>
+			<property name="ID" type="int">g.data_space_id</property>
+			<property name="ReadOnly" type="bit">g.is_read_only</property>
+			<property name="IsDefault" type="bit" cast='true'>g.is_default</property>
+			<property name="IsFileStream" type="bit" cast='true' read_only_after_creation="true">CASE WHEN 'FD'=g.type THEN 1 ELSE 0 END</property>
+			<property name="FileGroupType" type="int" report_type="FileGroupType" read_only_after_creation="true">CASE g.type WHEN 'FG' THEN 0 WHEN 'PS' THEN 1 WHEN 'FD' THEN 2 WHEN 'FX' THEN 3 END</property>
+			<!-- return 0 if it has no files -->
+			<property name="Size" type="float" cast='true'>ISNULL((select sum(cast(gs.size as float))*convert(float,8) from sys.database_files gs where gs.data_space_id = g.data_space_id), 0)</property>
+		</version>
+		<version min_major="10" >
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+		<version min_major='13'>
+			<property name="AutogrowAllFiles" type="bit" cast='true'>g.is_autogrow_all_files</property>
+		</version>
+	</properties>
+</EnumObject>

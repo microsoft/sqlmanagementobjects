@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<EnumObject type="UserDefinedAggregate" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+	<settings>
+		<property_link table="sys.objects AS obj">obj.type=N'AF'</property_link>
+		<property_link fields='#ClassName#AssemblyName#' table="sys.assembly_modules AS am">am.object_id = obj.object_id</property_link>
+		<property_link fields='#AssemblyName#' left_join='sys.assemblies AS asmbl'>asmbl.assembly_id = am.assembly_id</property_link>
+		<property_link fields='#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#XmlSchemaNamespace#XmlSchemaNamespaceSchema#XmlDocumentConstraint#UserType#'
+				left_join='sys.all_parameters AS ret_param'>ret_param.object_id = obj.object_id and ret_param.is_output = 1</property_link>
+	</settings>
+	<properties>
+        <include file='inc_object.xml' alias='obj' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#'/>
+        <include file='inc_type.xml' alias='ret_param' />
+    <version min_major='9' cloud_min_major='12'>
+        <property name="AssemblyName" type="sysname">asmbl.name</property>
+        <property name="ClassName" type="sysname">am.assembly_class</property>
+    </version>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

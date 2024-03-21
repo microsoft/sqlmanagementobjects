@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project >
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <UseSmoPackageProperties>false</UseSmoPackageProperties>
+  </PropertyGroup>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl/>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TestFrameworkSrc>$(EnlistmentRoot)\src\FunctionalTest\Framework</TestFrameworkSrc>
+    <SmoTestSrc>$(EnlistmentRoot)\src\FunctionalTest\Smo</SmoTestSrc>
+  </PropertyGroup>
+</Project>

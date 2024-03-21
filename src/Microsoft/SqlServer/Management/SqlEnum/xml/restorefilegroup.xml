@@ -1,0 +1,13 @@
+<?xml version='1.0' ?>
+<EnumObject type='restorefilegroup' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent='ID' local = 'RestoreHistoryId'/>
+		</parent_link>
+		<property_link table='msdb.dbo.restorefilegroup rtsfg'/>
+	</settings>
+	<properties>
+		<property name='RestoreHistoryId' type='int' hidden = 'true'>rtsfg.restore_history_id</property>
+		<property name='Name' type='nvarchar' size='128'>rtsfg.filegroup_name</property>
+	</properties>
+</EnumObject>

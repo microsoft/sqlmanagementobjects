@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<EnumObject type="PartitionSchemeFileGroup" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+	<settings>
+		<property_link join='sys.destination_data_spaces AS sdd'>
+			<link_multiple no='2' expression="sdd.partition_scheme_id = {0} and sdd.destination_id &lt;= {1}">
+				<link_field type='parent' field="ID" />
+				<link_field type='parent' field="FunctionFunOut" />
+			</link_multiple>
+		</property_link>
+		<property_link fields='#Name#' 
+				join='sys.filegroups AS sf'>sf.data_space_id = sdd.data_space_id</property_link>
+	</settings>
+	<properties>
+		<property name="Name" type="sysname" access='Read'>sf.name</property>
+		<property name="ID" type="int" access='Read'>sdd.destination_id</property>
+	</properties>
+</EnumObject>

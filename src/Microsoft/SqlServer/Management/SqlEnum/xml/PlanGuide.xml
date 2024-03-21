@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="PlanGuide" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+    <settings>
+        <property_link table='sys.plan_guides AS pg' />
+        <property_link fields = '#ScopeObjectName#ScopeSchemaName#' 
+                left_join="sys.objects AS o">pg.scope_object_id = o.object_id</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">pg.name</property>
+        <property name="ID" type="int" access="Read">pg.plan_guide_id</property>
+        <property name="Statement" type="nvarchar" size='max' read_only_after_creation="true">ISNULL(pg.query_text, N'')</property>
+        <property name="ScopeType" type="tinyint" report_type="PlanGuideType" read_only_after_creation="true">pg.scope_type</property>
+        <property name="ScopeObjectName" type="sysname" read_only_after_creation="true">ISNULL(o.name, N'')</property>
+        <property name="ScopeSchemaName" type="sysname" read_only_after_creation="true">ISNULL(schema_name(o.schema_id), N'')</property>        
+        <property name="IsDisabled" type="bit">pg.is_disabled</property>
+        <property name="Parameters" type="nvarchar" size='max' read_only_after_creation="true">ISNULL(pg.parameters, N'')</property>
+        <property name="Hints" type="nvarchar" size='max' read_only_after_creation="true">ISNULL(pg.hints, N'')</property>
+
+        <!-- extended properties support -->
+        <property name="ExtPropClass" type="int" hidden='true'>27</property>
+        <property name="ExtPropMajorID" type="int" hidden='true'>pg.plan_guide_id</property>
+        <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+
+        <version min_major='9' max_major='9'>
+            <property name="ScopeBatch" type="nvarchar" size='max' read_only_after_creation="true">
+                ISNULL((case when ((pg.scope_type = 2 and pg.scope_batch is null) or pg.scope_type = 3) then pg.query_text else pg.scope_batch
+                end), N'')
+            </property>
+        </version>
+
+        <version min_major='10'  cloud_min_major='12'>
+            <property name="ScopeBatch" type="nvarchar" size='max' read_only_after_creation="true">ISNULL(pg.scope_batch, N'')</property>
+        </version>
+        <version min_major='10'>
+            <include file='inc_policy_health_state.xml'/>
+        </version>
+            
+    </properties>
+</EnumObject>

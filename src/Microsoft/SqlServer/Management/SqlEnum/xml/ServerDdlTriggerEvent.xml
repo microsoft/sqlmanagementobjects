@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ServerDdlTriggerEvent" impl_type="SqlObject" min_major='9'>
+	<settings main_table="sys.server_trigger_events te">
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+	</settings>
+	<properties>
+		<property name="EventType" type="int" access="Read">te.type</property>
+		<property name="EventTypeDescription" type="nvarchar" size="60"  access="Read">te.type_desc</property>
+		<property name="ObjectIdentifier" type="varchar" size='300' 
+			access="Read">cast(db_id() as varchar(20)) + '_' + cast(te.object_id as varchar(20))</property>		
+		<property name="ParentID" type="int" hidden='true'>te.object_id</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,50 @@
+<!-- This repo relies on the CentralPackageVersions SDK
+     See https://github.com/Microsoft/MSBuildSdks/tree/main/src/CentralPackageVersions
+     This file lists every nuget package dependency and its required version. 
+     Do not put Version attributes on PackageReference tags in individual projects.
+     Add explicit references to transitive package dependencies if the msbuild binlog shows there
+     are double writes due to multiple versions of a package being imported.
+     It's common that we could import packages A and B that both depend on package C but 2 different versions.
+     Without a PackageReference to C, our build could pick up either version of C in a non-deterministic manner.
+     The binlog viewer will show both versions being copied to the output folder as a double write.
+-->
+<Project>
+    <PropertyGroup>
+      <DotNetPackagesVersion>6.0.0</DotNetPackagesVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Update="Azure.Core" Version="1.35.0" />
+        <PackageReference Update="Azure.Identity" Version="1.10.3" />
+        <PackageReference Update="Azure.Security.KeyVault.Secrets" Version="4.4.0" />
+        <PackageReference Update="Microsoft.Data.SqlClient" Version="[$(SqlClientPackageVersion),6)" />
+        <PackageReference Update="Microsoft.Data.Tools.StringResourceTool" Version="3.2.0" />
+        <PackageReference Update="Microsoft.Identity.Client"                                Version="4.56.0" />
+        <PackageReference Update="Microsoft.Identity.Client.Desktop"                        Version="4.56.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+        <PackageReference Update="Microsoft.SqlServer.Assessment" Version="1.1.9" />
+        <PackageReference Update="Microsoft.SqlServer.Management.SqlParser" Version="$(SqlParserPackageVersion)" />
+        <PackageReference Update="Moq" Version="4.16.1" />
+        <PackageReference Update="MSTest.TestAdapter" Version="2.2.10" />
+        <PackageReference Update="MSTest.TestFramework" Version="2.2.10" />
+        <PackageReference Update="NewtonSoft.Json" Version="13.0.1" />
+        <PackageReference Update="NUnit" Version="3.11.0" />
+        <PackageReference Update="System.Buffers"                                           Version="4.5.1" />
+        <PackageReference Update="System.Data.OleDb" Version="$(DotNetPackagesVersion)" />
+        <PackageReference Update="System.Diagnostics.DiagnosticSource"                      Version="6.0.1" />
+        <PackageReference Update="System.Management" Version="$(DotNetPackagesVersion)" />
+        <PackageReference Update="System.Memory"                                            Version="4.5.5"/>
+        <PackageReference Update="System.Runtime.CompilerServices.Unsafe"                   Version="$(DotNetPackagesVersion)" />
+        <PackageReference Update="System.Security.Cryptography.ProtectedData" Version="$(DotNetPackagesVersion)" />
+        <PackageReference Update="System.Security.Permissions" Version="$(DotNetPackagesVersion)" />
+        <PackageReference Update="System.Security.Principal.Windows" Version="5.0.0" />
+        <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" />
+        <PackageReference Update="System.ValueTuple" Version="4.5.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <!-- GlobalPackageReference packages are installed and processed by msbuild but are not referenced by the C# compiler -->
+        <GlobalPackageReference Include="StrawberryPerl" Version="5.28.0.1" GeneratePathProperty="true" />
+        <GlobalPackageReference Include="Microsoft.TestPlatform" Version="17.6.0" GeneratePathProperty="true" />
+
+    </ItemGroup>
+
+</Project>

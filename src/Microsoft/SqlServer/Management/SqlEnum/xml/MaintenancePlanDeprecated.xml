@@ -1,0 +1,19 @@
+<?xml version='1.0' ?>
+<EnumObject type='Sysdbmaintplans' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<property_link table='msdb.dbo.sysdbmaintplans' alias='s'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='ID' type='uniqueidentifier'>s.plan_id</property>
+		<property name='Name' type='sysname'>s.plan_name</property>
+		<property name='DateCreated' type='datetime'>s.date_created</property>
+		<property name='Owner' type='sysname'>s.owner</property>
+		<property name='MaxHistoryRows' type='int'>s.max_history_rows</property>
+		<property name='RemoteHistoryServer' type='sysname'>s.remote_history_server</property>
+		<property name='MaxRemoteHistoryRows' type='int'>s.max_remote_history_rows</property>
+		<version min_major='8'>
+			<property name='LogShipping' type='bit'>s.log_shipping</property>
+		</version>
+	</properties>
+</EnumObject>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="DistributionColumn" impl_type="SqlObject" min_major='11'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="IndexID" />
+      <link parent="ParentID" local="TableID" />
+    </parent_link>
+      <property_link table = "sys.index_columns AS dc_ic">((dc_ic.distribution_ordinal !=0) AND (dc_ic.index_id = i.index_id) AND (dc_ic.object_id = i.object_id))</property_link>
+      <property_link fields = '#Name#' join="sys.columns AS clmns">((clmns.object_id = dc_ic.object_id) AND (clmns.column_id = dc_ic.column_id))</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+      <property name="Name" type="sysname">clmns.name</property>
+      <property name="ID" type="int" access="Read" cast='true'>dc_ic.distribution_ordinal</property>
+      <property name="TableID" type="int" hidden='true'>dc_ic.object_id</property>
+      <property name="IndexID" type="int" hidden='true'>dc_ic.index_id</property>
+  </properties>
+</EnumObject>
+  

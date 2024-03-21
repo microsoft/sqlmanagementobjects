@@ -1,0 +1,195 @@
+
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in 
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+[strings]
+
+#### Logical Facets
+MultipartNameName=Multipart Name
+MultipartNameDesc=Describes name information of an object, including name and schema.
+
+ServerSecurityName=Server Security
+ServerSecurityDesc=Exposes properties of the Server object that encapsulates security aspects of an instance of the Database Engine. 
+
+ServerPerformanceName=Server Performance
+ServerPerformanceDesc=Exposes properties of the Server object that encapsulate performance aspects of an instance of the Database Engine.
+
+ServerAuditName=Server Audit
+ServerAuditDesc=Exposes properties of the Server object that encapsulates audit aspects of an instance of the Database Engine.
+
+ServerSurfaceAreaConfigurationName=Surface Area Configuration
+ServerSurfaceAreaConfigurationDesc=Surface area configuration for features of the Database Engine. Only the features required by your application should be enabled. Disabling unused features helps protect your server by reducing the surface area.
+
+
+#### Logical Facet Properties
+NameName=Name
+SchemaName=Schema
+
+NameDesc=Object name.
+SchemaDesc=Object schema.
+
+
+PublicServerRoleIsGrantedPermissionsName=Public Server Role Permissions
+LoginModeName=Login  Mode
+XPCmdShellEnabledName=xp_cmdshell Enabled
+CrossDBOwnershipChainingEnabledName=Cross DB Ownership Chaining Enabled
+CommonCriteriaComplianceEnabledName=Common Criteria Compliance Enabled
+ServiceBrokerEndpointActiveName=Service Broker Endpoint Active
+ServiceBrokerEndpointActiveDesc=Service Broker provides queuing and reliable messaging for the Database Engine. Service Broker uses an endpoint for communication between instances, which opens a TCP/IP port on the server. Enable the Service Broker endpoint only if your applications use Service Broker to communicate between instances. Returns TRUE when a Service Broker endpoint exists and is in the STARTED state. Returns FALSE when Service Broker does not exist on the computer or it exists but is not started. Configure the endpoint to TRUE to start a stopped or disabled endpoint. The operation will fail if the endpoint does not exist on the server. Configure the endpoint to FALSE to disable the Service Broker endpoint.
+SoapEndpointsEnabledName=SOAP Endpoints Enabled
+SoapEndpointsEnabledDesc=The SOAP endpoint can be in either a started, stopped or disabled state. Returns TRUE if at least one SOAP endpoint is responding to SOAP requests. Returns FALSE if all SOAP endpoints are disabled or if there are no SOAP endpoints. Configuring it to FALSE will disable all the soap endpoints.
+
+	
+PublicServerRoleIsGrantedPermissionsDesc=Returns True if the Public server role has permissions set on the server.
+LoginModeDesc=Authentication Mode on SQL Server
+XPCmdShellEnabledDesc=xp_cmdshell creates a Windows process that has same security rights as the SQL Server service.
+CrossDBOwnershipChainingEnabledDesc=Configures cross-database ownership chaining for an instance of SQL Server.
+CommonCriteriaComplianceEnabledDesc=The common criteria compliance enabled option enables the following: Residual Information Protection (RIP), the ability to view login statistics, and that column GRANT should not override table DENY.
+
+BlockedProcessThresholdName=Blocked Process Threshold
+AffinityMaskName=Affinity Mask 
+Affinity64MaskName=Affinity64 Mask 
+AffinityMaskIOName=Affinity Mask I/O
+Affinity64IOMaskName=Affinity64 Mask I/O
+DynamicLocksName=Dynamic Locks 
+LightweightPoolingEnabledName=Lightweight Pooling Enabled
+MaxDegreeOfParallelismName=Max Degree Of Parallelism
+CostThresholdforParallelismName=Cost Threshold for Parallelism
+MaxWorkerThreadsName=Max Worker Threads 
+NetworkPacketSizeName=Network Packet Size
+OpenObjectsName=Open Objects 
+
+BlockedProcessThresholdDesc=Specifies the threshold, in seconds, at which blocked process reports are generated.
+AffinityMaskDesc=Binds SQL Server disk I/O to a specified subset of CPUs.
+Affinity64MaskDesc=Binds SQL Server disk I/O to a specified subset of CPUs. This option is available only on the 64-bit version of Microsoft SQL Server.
+AffinityMaskIODesc=Binds SQL Server threads to a specified subset of CPUs.
+Affinity64IOMaskDesc=Binds processors to specific threads. This option is similar to the affinity mask option. Use affinity mask to bind the first 32 processors, and use affinity64 mask to bind the remaining processors on the computer. This option is available only on the 64-bit version of Microsoft SQL Server.
+DynamicLocksDesc=Sets the maximum number of available locks. This option limits the amount of memory the Database Engine uses for locks.
+LightweightPoolingEnabledDesc=Provides a means of reducing the system overhead that is associated with the excessive context switching that occurs sometimes in symmetric multiprocessing (SMP) environments.
+MaxDegreeOfParallelismDesc=Limits the number of processors that are used to run a single statement for each parallel plan execution.
+CostThresholdforParallelismDesc=Specifies the threshold at which SQL Server creates and runs parallel plans for queries. 
+MaxWorkerThreadsDesc=Configures the number of worker threads that are available to SQL Server processes.
+NetworkPacketSizeDesc=Sets the packet size (in bytes) that is used across the whole network
+OpenObjectsDesc=Sets the maximum number of database objects that can be open at one time on an instance of SQL Server 2000 Database objects are those objects that are defined in the sysobjects table: tables, views, rules, stored procedures, defaults, and triggers
+
+DefaultTraceEnabledName=Default Trace Enabled
+C2AuditTracingEnabledName=C2 Audit Tracing Enabled
+LoginAuditLevelName=Login Audit Level
+
+DefaultTraceEnabledDesc=Enables the default trace option. The default trace option provides a persistent log of activity and changes that are primarily related to the configuration options.
+C2AuditTracingEnabledDesc=Audits all attempts to access statements and objects. Writes attempts to a file in the SQL Server Data folder.
+LoginAuditLevelDesc=Sets auditing mode for tracking Logins that have logged with success/failure.
+
+
+AdHocRemoteQueriesEnabledName=Ad-hoc Remote Queries Enabled
+DatabaseMailEnabledName=Database Mail Enabled
+ClrIntegrationEnabledName=CLR Integration Enabled
+OleAutomationEnabledName=OLE Automation Enabled
+RemoteDacEnabledName=Remote DAC Enabled
+SqlMailEnabledName=SqlMail Enabled
+WebAssistantEnabledName=Web Assistant Enabled
+
+AdHocRemoteQueriesEnabledDesc=The OPENROWSET and OPENDATASOURCE functions support ad hoc connections to remote data sources without linked or remote servers. Enable these functions only if your applications and scripts call them.
+DatabaseMailEnabledDesc=Database Mail is a component for sending e-mail messages from the Database Engine using SMTP. Enable Database Mail stored procedures only if you plan to configure and use Database Mail.
+ClrIntegrationEnabledDesc=Common language runtime (CLR) integration enables you to write stored procedures, triggers, user-defined types and user-defined functions using any .NET Framework language. Enable CLR integration only if you use the CLR.
+OleAutomationEnabledDesc=The OLE Automation extended stored procedures (XPs) allow Transact-SQL batches, stored procedures, and triggers to reference custom OLE Automation objects. Enable OLE Automation only if applications or Transact-SQL scripts use OLE Automation XPs.
+RemoteDacEnabledDesc=A dedicated administrator connection (DAC) allows an administrator to connect to a server when the Database Engine will not respond to regular connections. Enable this option only if you will use DAC from a remote computer.
+SqlMailEnabledDesc=SQL Mail supports legacy applications that send and receive e-mail messages from the Database Engine. SQL Mail is deprecated in SQL Server 2005 and replaced by Database Mail. Enable SQL Mail stored procedures only if you plan to configure and use SQL Mail for backward compatibility.
+WebAssistantEnabledDesc=Web Assistant stored procedures, which generate HTML files from SQL Server databases, are deprecated in SQL Server 2005. Enable Web Assistance only if your applications generate HTML using Web Assistant stored procedures.
+XPCmdShellEnabledDescSAC=The xp_cmdshell extended stored procedure runs operating system commands from within the Database Engine. Enable xp_cmdshell only if your application or scripts must use xp_cmdshell to run operating system commands.
+
+
+
+IServerSecurityFacet_CmdExecRightsForSystemAdminsOnlyName=CmdExec Rights for System Admins Only
+IServerSecurityFacet_CmdExecRightsForSystemAdminsOnlyDesc=Confirms that only members of sysadmins fixed server role can execute CmdExec and ActiveX Script job steps. Applies only to SQL Server 2000.
+IServerSecurityFacet_ProxyAccountIsGrantedToPublicRoleName=ProxyAccount Granted To Public
+IServerSecurityFacet_ProxyAccountIsGrantedToPublicRoleDesc=Checks whether SQL Server Agent proxy account has been granted to the Public role. Returns True if a SQL Server Agent proxy account has been granted to the Public role. Applies only to SQL Server 2005 and later versions.
+IServerSecurityFacet_ReplaceAlertTokensEnabledName=Replace Alert Token Replacement Enabled
+IServerSecurityFacet_ReplaceAlertTokensEnabledDesc=Alert Replacement flag enables replacement of alert tokens. Applies only to SQL Server 2005 Service Pack 1 and later versions.
+IServerSecurityFacet_ProxyAccountEnabledName=Server Proxy Account Enabled
+IServerSecurityFacet_ProxyAccountEnabledDesc=xp_cmdshell is executed under the context of the Server Proxy account.
+
+#HADR Adapters
+
+AvailabilityGroupStateName=Availability Group State
+AvailabilityGroupStateDesc=A logical facet exposing the state of an Availability Group.
+
+AvailabilityGroupState_IsOnlineName=Is Online
+AvailabilityGroupState_IsOnlineDesc=A Boolean value indicating whether a primary replica exists in the Availability Group.
+
+AvailabilityGroupState_IsAutoFailoverName=Is Automatic Failover
+AvailabilityGroupState_IsAutoFailoverDesc=A Boolean value indicating whether the Availability Group has a primary that is set to Automatic Failover Mode.
+
+AvailabilityGroupState_NumberOfSynchronizedSecondaryReplicasName=Number of Synchronized Secondary Replicas
+AvailabilityGroupState_NumberOfSynchronizedSecondaryReplicasDesc=The number of Synchronous replicas with Automatic Failover Mode that are in Synchronized state.
+
+AvailabilityGroupState_NumberOfNotSynchronizingReplicasName=Number of Not Synchronizing Replicas
+AvailabilityGroupState_NumberOfNotSynchronizingReplicasDesc=The number of Synchronous replicas that are in Not Synchronizing state.
+
+AvailabilityGroupState_NumberOfNotSynchronizedReplicasName=Number of Synchronizing Synchronous Replicas
+AvailabilityGroupState_NumberOfNotSynchronizedReplicasDesc=The number of Synchronous replicas that are not in Synchronized state.
+
+AvailabilityGroupState_NumberOfReplicasWithUnhealthyRoleName=Number of Resolving Replicas
+AvailabilityGroupState_NumberOfReplicasWithUnhealthyRoleDesc=The number of replicas that are in Resolving role.
+
+AvailabilityGroupState_NumberOfDisconnectedReplicasName=Number of Disconnected Replicas
+AvailabilityGroupState_NumberOfDisconnectedReplicasDesc=The number of replicas that are not in Connected state.
+
+
+#SmartAdmin Adapters
+SmartAdminStateName = SmartAdmin State
+SmartAdminStateDesc = A logical facet exposing the state of Smartadmin.
+
+SmartAdminState_IsMasterSwitchEnabledName = Is Master switch enabled
+SmartAdminState_IsMasterSwitchEnabledDesc = A Boolean value indicating whether master switch is turned on.
+
+SmartAdminState_IsBackupEnabledName = Is Smart backup enabled
+SmartAdminState_IsBackupEnabledDesc =  A Boolean value indicating whether smartbackup is enabled.
+
+SmartAdminState_NumberOfStorageConnectivityErrorsName = Number of Storage Connectivity Errors
+SmartAdminState_NumberOfStorageConnectivityErrorsDesc = The number of storage connectivity errors while performing backups or file retention.
+
+SmartAdminState_NumberOfSqlErrorsName = Number of Sql Server errors
+SmartAdminState_NumberOfSqlErrorsDesc = The number of  Sql Server errors.
+
+SmartAdminState_NumberOfInvalidCredentialErrorsName = Number of Invalid Credential errors
+SmartAdminState_NumberOfInvalidCredentialErrorsDesc = The number of Invalid Credential errors
+
+SmartAdminState_NumberOfOtherErrorsName = Number of other errors.
+SmartAdminState_NumberOfOtherErrorsDesc = The number of all other errors.
+
+SmartAdminState_NumberOfCorruptedOrDeletedBackupsName = Number of corrupted or deleted backups.
+SmartAdminState_NumberOfCorruptedOrDeletedBackupsDesc =  The number of corrupted or deleted backups.
+
+
+
+SmartAdminState_IsSmartBackupOnlineName = Is SmartBackup online.
+SmartAdminState_IsSmartBackupOnlineDesc = A Boolean value indicating whether smartbackup is turned on.
+
+SmartAdminState_IsStorageAccountAccessibleName = Is Storage Account accessible.
+SmartAdminState_IsStorageAccountAccessibleDesc = A Boolean value indicating whether storage account is accessible.
+
+SmartAdminState_NumberOfBackupsWithRestoreHeaderOnlyFailedName = Number of backups with restore header only failed.
+SmartAdminState_NumberOfBackupsWithRestoreHeaderOnlyFailedDesc = The number of backups that had issues while restoring backup header.
+
+SmartAdminState_NumberOfUserDeletedBackupsName = Number of backups thar were deleted by the user.
+SmartAdminState_NumberOfUserDeletedBackupsDesc = The number of backup files that were deleted by user 
+
+SmartAdminState_NumberOfBackupLoopsName = Number of backup loops.
+SmartAdminState_NumberOfBackupLoopsDesc = The number of backup loops.
+
+SmartAdminState_NumberOfRetentionLoopsName = Number of retention loops.
+SmartAdminState_NumberOfRetentionLoopsDesc = The number of retention loops.
+####

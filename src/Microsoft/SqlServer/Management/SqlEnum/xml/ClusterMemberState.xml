@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="ClusterMemberState" impl_type="SqlObject" min_major='11'>
+  <settings>
+      <property_link table="sys.dm_hadr_cluster_members cm"></property_link>
+  </settings>
+
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="Name" type="sysname">cm.member_name</property>
+    <property name="MemberType" type="tinyint" report_type="ClusterMemberType">cm.member_type</property>
+    <property name="member_state" type="tinyint" report_type="ClusterMemberState">ISNULL(cm.member_state, 2)</property>
+    <property name="NumberOfQuorumVotes" type="int">ISNULL(cm.number_of_quorum_votes, -1)</property>
+  </properties>
+</EnumObject>

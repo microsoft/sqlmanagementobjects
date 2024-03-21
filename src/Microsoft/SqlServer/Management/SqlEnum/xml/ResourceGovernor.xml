@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<EnumObject type="ResourceGovernor" impl_type="ResourceGovernor" min_major='10' >
+  <settings>
+    <property_link table="sys.resource_governor_configuration AS c"/>
+  </settings>
+  <properties>
+    <include file='inc_urn_single.xml' />
+    <property name="ClassifierFunction" type="sysname">
+      CASE WHEN OBJECT_NAME(c.classifier_function_id) IS NULL THEN N''  ELSE QUOTENAME(OBJECT_SCHEMA_NAME(c.classifier_function_id, 1)) + N'.' + QUOTENAME(OBJECT_NAME(c.classifier_function_id, 1))  END
+    </property>
+    <version min_major='12'>
+      <property name='MaxOutstandingIOPerVolume' type='int'>c.max_outstanding_io_per_volume</property>
+    </version>
+    <property name='Enabled' type='bit' cast='true'>c.is_enabled</property>
+    <property name='ReconfigurePending' type='bit' cast='true' access='Read'>(SELECT is_reconfiguration_pending FROM sys.dm_resource_governor_configuration)</property>
+    <!--This object does not have an ID or a  name.
+    Note that this has to be consistent with the API implementation of UrnWithId.-->
+    <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+      <link_multiple no='1' expression="'Server/{0}'">
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+    <property name="PolicyHealthState" type="int" expensive ="true" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+      <link_multiple no='1' expression="case when 1=msdb.dbo.fn_syspolicy_is_automation_enabled() and exists (select * from msdb.dbo.syspolicy_system_health_state where target_query_expression_with_id like 'Server/{0}%' ESCAPE '\') then 1 else 0 end">
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+  </properties>
+</EnumObject>

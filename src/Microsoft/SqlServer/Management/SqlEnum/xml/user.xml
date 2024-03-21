@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+<EnumObject type="User" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link 
+				table = 'dbo.sysusers AS u'>((u.issqlrole != &lt;msparam&gt;1&lt;/msparam&gt; and u.isapprole != &lt;msparam&gt;1&lt;/msparam&gt; ) or (u.sid=&lt;msparam&gt;0x00&lt;/msparam&gt;)) and u.isaliased != &lt;msparam&gt;1&lt;/msparam&gt; and u.hasdbaccess != &lt;msparam&gt;0&lt;/msparam&gt;</property_link>
+		</version>
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link table = 'sys.database_principals AS u'>u.type in ('U', 'S', 'G', 'C', 'K' ,'E', 'X')</property_link>
+			<property_link fields="#HasDBAccess#" left_join="sys.database_permissions AS dp">dp.grantee_principal_id = u.principal_id and dp.type = &lt;msparam&gt;CO&lt;/msparam&gt;</property_link>
+    </version>
+    <version min_major ="9"  cloud_min_major='12'>
+      <property_link fields="#AsymmetricKey#" left_join="sys.asymmetric_keys AS ak">ak.sid = u.sid</property_link>
+    </version>
+    <version min_major ="9"  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields="#Certificate#" left_join="sys.certificates AS cert">cert.sid = u.sid</property_link>
+    </version>
+    <version cloud_min_major='10' datawarehouse_enabled='true'>
+      <post_process fields = '#Login#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessUser' triggered_fields='#Sid1#'></post_process>
+     </version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname" mode="design">u.name</property>
+    <version min_major='7' max_major='8'>
+			<property name="ID" type="int" cast = 'true' access='Read'>u.uid</property>
+			<property name="Login" type="sysname" read_only_after_creation="true" mode="design">ISNULL(suser_sname(u.sid),N'')</property>
+			<property name="IsSystemObject" type="bit" access='Read'
+				cast = 'true'>CASE WHEN u.uid = 1 OR u.uid = 16382 OR u.uid = 16383 THEN 1 ELSE 0 END</property>
+			<property name="LoginType" type="int" report_type="LoginType" access='read'>CASE WHEN 0 &lt;&gt; u.isntuser THEN 0 WHEN 0 &lt;&gt; u.isntgroup THEN 1 ELSE 2 END</property>
+            <property name="UserType" type="int" report_type="UserType" read_only_after_creation="true" mode="design">0</property>
+			<property name="Sid" type="varbinary" size = "85" access='Read'>u.sid</property>
+			<property name="HasDBAccess" type="bit" access='Read' cast='true'>u.hasdbaccess</property>
+	
+			<property name="CreateDate" type="datetime" access='Read'>u.createdate</property>
+			<property name="DateLastModified" type="datetime" access='Read'>u.updatedate</property>
+
+			<!-- extended properties support : commented out: sysproperties is not accessible to regular users -->
+			<property name="ExtPropClass" type="int" hidden='true'>2</property>
+			<property name="ObjectTypeName" type="sysname" hidden="true">N'USER'</property>
+			<property name="ObjectNameFromFilter" type="sysname" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='filter' field="Name" default_value="default"/>
+				</link_multiple>
+			</property>
+		</version>			
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="ID" type="int" access='Read'>u.principal_id</property>
+			<property name="IsSystemObject" type="bit" access='Read' cast = 'true'>CASE WHEN u.principal_id &lt; 5 OR (u.principal_id &gt;= 16384 and u.principal_id &lt; 16400) THEN 1 ELSE 0 END</property>
+			<property name="LoginType" type="int" report_type="LoginType" access='read'>CASE WHEN N'U' = u.type THEN 0 WHEN N'G' = u.type THEN 1 WHEN N'S' = u.type THEN 2 WHEN N'C' = u.type THEN 3 WHEN N'K' = u.type THEN 4 WHEN N'E' = u.type THEN 5 WHEN N'X' = u.type THEN 6 END</property>
+			<property name="HasDBAccess" type="bit" access='Read' cast='true'>CASE dp.state WHEN N'G' THEN 1 WHEN 'W' THEN 1 ELSE 0 END</property>
+			<property name="Sid" type="varbinary" size = "85" access='Read'>u.sid</property>
+      			<property name="CreateDate" type="datetime" access='Read'>u.create_date</property>
+			<property name="DateLastModified" type="datetime" access='Read'>u.modify_date</property>
+			<property name="DefaultSchema" type="sysname" mode="design">ISNULL(u.default_schema_name,N'')</property>
+			
+			<!-- extended properties support -->	
+			<property name="ExtPropClass" type="int" hidden='true'>4</property>
+		</version>
+    <version min_major='9'  cloud_min_major='12'>
+      <property name="AsymmetricKey" type="sysname" read_only_after_creation="true">ISNULL(ak.name,N'')</property>
+    </version>
+    <version min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="Certificate" type="sysname" read_only_after_creation="true">ISNULL(cert.name,N'')</property>
+    </version>
+    <version min_major='9'>
+      <property name="Login" type="sysname" read_only_after_creation="true" mode="design">ISNULL(suser_sname(u.sid),N'')</property>
+    </version>    
+    <version min_major='9' max_major='10'>
+      <property name="UserType" type="int" report_type="UserType" read_only_after_creation="true" mode="design">CASE WHEN N'C' = u.type THEN 1 WHEN N'K' = u.type THEN 2 WHEN N'S' = u.type AND suser_sname(u.sid) IS NULL THEN 3 ELSE 0 END</property>
+      <property name="AuthenticationType" type="int" report_type="AuthenticationType" access='Read'>CASE WHEN N'U' = u.type or N'G' = u.type THEN 3 WHEN N'S' = u.type and suser_sname(u.sid) IS NOT NULL THEN 1 ELSE 0 END</property>
+    </version>
+    <version cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Login" type="sysname" read_only_after_creation="true" expensive='true'>0</property>
+      <property name="Sid1" type="nvarchar" size ="85" access='Read' hidden='true'>ISNULL(convert(nvarchar(85), u.sid, 1),N'')</property>
+    </version>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="UserType" type="int" report_type="UserType" read_only_after_creation="true" mode="design">
+        CASE
+        WHEN N'C' = u.type THEN 1
+        WHEN N'K' = u.type THEN 2
+        WHEN N'S' = u.type AND u.authentication_type != 2 AND u.authentication_type != 1 THEN 3
+        WHEN N'E' = u.type or N'X' = u.type THEN 4
+        ELSE 0 END
+      </property>
+     <property name="AuthenticationType" type="int" report_type="AuthenticationType" access='Read'>u.authentication_type</property>
+    </version>
+    <version min_major='11'>
+      <property name="DefaultLanguageLcid" type="int">ISNULL(u.default_language_lcid, -1)</property>
+      <property name="DefaultLanguageName" type="sysname">ISNULL(u.default_language_name,N'')</property>
+      <property name="AuthenticationType" type="int" report_type="AuthenticationType" access='Read'>u.authentication_type</property>
+      <property name="UserType" type="int" report_type="UserType" read_only_after_creation="true" mode="design">
+        CASE
+        WHEN N'C' = u.type THEN 1
+        WHEN N'K' = u.type THEN 2
+        WHEN N'S' = u.type AND SUSER_SNAME(u.sid) is null AND u.authentication_type != 2 THEN 3
+        WHEN N'E' = u.type or N'X' = u.type THEN 4
+        ELSE 0 END
+      </property>
+    </version>
+		<!-- extended properties support -->
+		<property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>
