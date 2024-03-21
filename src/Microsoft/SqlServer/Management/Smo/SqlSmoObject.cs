@@ -3475,7 +3475,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Handles additional processing required for scriping insert startements for data
+        /// Handles additional processing required for scripting insert statements for data
         /// </summary>
         /// <param name="s"> the column value to be processed</param>
         /// <returns></returns>
@@ -8329,6 +8329,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
                 case SqlDataType.HierarchyId:
                     this.Properties.Get("DataType").Value = dataType.GetSqlName(SqlDataType.HierarchyId);
+                    break;
+                case SqlDataType.Json:
+                    this.Properties.Get("DataType").Value = dataType.GetSqlName(SqlDataType.Json);
                     break;
             }
         }

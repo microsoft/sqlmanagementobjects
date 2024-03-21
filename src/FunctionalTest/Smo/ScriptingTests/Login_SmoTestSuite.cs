@@ -115,6 +115,35 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         }
 
         /// <summary>
+        /// Test for scripting external logins which checks if scripting is returning appropriate string on SQL22 and later.
+        /// CreateSmoObject(login) won't work since the syntax call does the search of login in Azure Active Directory,
+        /// so we only check the script string.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        public void SmoCreateFromExternalProviderOnPrem_Login()
+        {
+            this.ExecuteWithDbDrop(
+                database =>
+                {
+                    _SMO.Server server = database.Parent;
+                    Login login = new Login(server,
+                        GenerateUniqueSmoObjectName("login"));
+                    login.LoginType = LoginType.ExternalUser;
+
+                    ScriptingOptions so = new ScriptingOptions();
+                    string scriptLogin = ScriptSmoObject((IScriptable)login, so);
+                    string expectedOutput = string.Format("CREATE LOGIN {0} FROM EXTERNAL PROVIDER\r\n", login.FullQualifiedName);
+                    Assert.That(scriptLogin, Is.EqualTo(expectedOutput), "CREATE LOGIN syntax is not scripted correctly. This login type should include keywords 'FROM EXTERNAL PROVIDER'.");
+
+                    so.ScriptDrops = true;
+                    scriptLogin = ScriptSmoObject((IScriptable)login, so);
+                    expectedOutput = string.Format("DROP LOGIN {0}\r\n", login.FullQualifiedName);
+                    Assert.That(scriptLogin, Is.EqualTo(expectedOutput), "DROP LOGIN syntax is not scripted correctly.");
+                });
+        }
+
+        /// <summary>
         /// Test for scripting external logins which checks if scripting is returning appropriate string.
         /// CreateSmoObject(login) won't work since the syntax call does the search of login in Azure Active Directory,
         /// so we only check the script string.

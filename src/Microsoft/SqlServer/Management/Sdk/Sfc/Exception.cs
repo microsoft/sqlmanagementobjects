@@ -133,61 +133,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         }
     }
 
-    /// <summary>
-    /// This exception gets thrown when trying to set a readonly property
-    /// </summary>
-    [Serializable]
-    // VBUMP Remove from V17, it appears to be unused. SMO has its own PropertyReadOnlyException.
-    public sealed class SfcPropertyReadOnlyException : SfcException
-    {
-        string propertyName = null;
-        
-        public SfcPropertyReadOnlyException() : this(string.Empty, null)
-        {
-        }
-
-        public SfcPropertyReadOnlyException(string propertyName) : this(propertyName, null)
-        {
-        }
-
-        internal SfcPropertyReadOnlyException(string propertyName, Exception innerException) : base(string.Empty, innerException)
-        {
-            this.propertyName = propertyName;
-            Init();
-        }
-
-        private SfcPropertyReadOnlyException(SerializationInfo info, StreamingContext context)
-            : base (info, context)
-        {
-            propertyName = (string)info.GetValue("propertyName", typeof(string));
-        }
-
-#if NETFRAMEWORK
-        /// <summary>
-        /// Serialization helper
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="context"></param>
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("propertyName", this.propertyName);
-            base.GetObjectData(info, context);
-        }
-#endif
-        public override string Message 
-        {
-            get 
-            {
-                return propertyName;
-            }
-        }
-        
-        private void Init()
-        {
-            SetHelpContext("SfcPropertyReadOnlyException");
-        }
-    }
 
     /// <summary>
     /// This exception gets thrown when a property is not set but it

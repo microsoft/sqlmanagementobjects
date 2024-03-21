@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+﻿﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 #if MICROSOFTDATA
@@ -187,7 +187,7 @@ WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPAT
 
         [TestMethod]
         [SqlTestArea(SqlTestArea.ExtendedEvents)]
-        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 12)]
         public void EnumerateSessionsAndObjectDataOnPrem()
         {
             ExecuteTest(() =>

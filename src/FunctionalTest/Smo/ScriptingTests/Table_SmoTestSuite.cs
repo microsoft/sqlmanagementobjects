@@ -4481,6 +4481,111 @@ AS NODE ON [PRIMARY]
 
         #endregion
 
+        #region JSON column tests
+
+        /// <summary>
+        /// This test verifies that JSON column is correctly scripted for insert statements.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        public void ScriptingInsertTableWithJsonColumnTest()
+        {
+            ExecuteFromDbPool(
+                this.TestContext.FullyQualifiedTestClassName,
+                (database) =>
+                {
+                     if (database.Parent.IsJsonDataTypeEnabled)
+                    { 
+                        string jsonString = @"[\
+]";
+                        string queryMatch = @"INSERT \[.*\]\.\[.*\] \(\[jsonColumn\]\) VALUES \(CAST\(N'\[\]' AS Json\)\)";
+
+                        var table = new _SMO.Table(database, "jsonTable");
+                        var jsonColumn = new _SMO.Column(table, "jsonColumn", new _SMO.DataType(_SMO.SqlDataType.Json));
+                        table.Columns.Add(jsonColumn);
+                        table.Create();
+
+                        string insertQuery = "INSERT INTO " + table.Name.SqlBracketQuoteString() + string.Format(" values('{0}')", jsonString);
+
+                        database.ExecuteNonQuery(insertQuery);
+
+                        _SMO.Scripter scripter = new _SMO.Scripter(database.Parent);
+                        scripter.Options.ScriptData = true;
+                        scripter.Options.ScriptSchema = true;
+
+                        bool isRecordInserted = false;
+                        IEnumerable<string> scripts = scripter.EnumScript(new Urn[] { table.Urn });
+                        foreach (string script in scripts)
+                        {
+                            if (script.StartsWith(string.Format("INSERT {0}", table.FullQualifiedName), ignoreCase: true, culture: CultureInfo.InvariantCulture))
+                            {
+                                if (!Regex.IsMatch(script, queryMatch, RegexOptions.IgnoreCase))
+                                {
+                                    Assert.Fail(string.Format("Unexpected data row found during script generation of JSON tables that fails match with expected value, the data row generated was {0}", script));
+                                }
+
+                                isRecordInserted = true;
+                            }
+                        }
+
+                        Assert.True(isRecordInserted, string.Format("The expected data row was not inserted correctly. The table DDLs are as follows: \n {0}", string.Join("\n", scripts)));
+
+                        table.DropIfExists();
+                        string tableCreateScript = (from string script in scripts where script.StartsWith("CREATE", StringComparison.InvariantCultureIgnoreCase) select script).First();
+                        Assert.DoesNotThrow(() => database.ExecuteNonQuery(tableCreateScript), string.Format("The generated table DDL was invalid and failed to create the table, script generated was {0}", tableCreateScript));
+                    }
+                });
+        }
+
+        /// <summary>
+        /// This test verifies JSON column is only supported/scriptable for certain server/engine/edition combinations.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        public void ScriptingJsonColumnCrossVersionTest()
+        {
+            ExecuteFromDbPool(
+                this.TestContext.FullyQualifiedTestClassName,
+                (database) =>
+                {
+                    if (database.Parent.IsJsonDataTypeEnabled && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+                    {
+                        var table = new _SMO.Table(database, "jsonTable");
+                        try
+                        {
+                            var jsonColumn = new _SMO.Column(table, "jsonColumn", new _SMO.DataType(_SMO.SqlDataType.Json));
+                            table.Columns.Add(jsonColumn);
+                            table.Create();
+
+                            _SMO.Scripter scripter = new _SMO.Scripter(database.Parent);
+                            scripter.Options.ScriptSchema = true;
+
+                            // 1. JSON is not supported for Standalone SQL versions less than 160.
+                            //
+                            scripter.Options.TargetDatabaseEngineType = DatabaseEngineType.Standalone;
+                            scripter.Options.TargetServerVersion = SqlServerVersion.Version100;
+                            Assert.Throws<FailedOperationException>(() => scripter.EnumScript(new Urn[] { table.Urn }), "Scripting JSON for SQL version 100 should not be supported.");
+
+                            // 2. JSON is not supported in SQL DW
+                            //
+                            scripter.Options.TargetDatabaseEngineType = DatabaseEngineType.SqlAzureDatabase;
+                            scripter.Options.TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlDataWarehouse;
+                            Assert.Throws<FailedOperationException>(() => scripter.EnumScript(new Urn[] { table.Urn }), "Scripting JSON for SQL DW should not be supported.");
+                        }
+                        finally
+                        {
+                            table.DropIfExists();
+                        }
+                    }
+                });
+        }
+
+        #endregion
+
         #endregion // Scripting Tests
 
         #region Sparse column tests

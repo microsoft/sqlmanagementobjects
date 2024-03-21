@@ -914,21 +914,14 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             SqlDataType sqlDataType = GetNativeDataType();
 
-            // check for differnt versions
-            bool isSupported = DataType.IsDataTypeSupportedOnTargetVersion(
-                                                sqlDataType,
-                                                options.TargetServerVersion);
-
-            if (!isSupported)
-            {
-                // parent can be table, view, udf
-                throw new SmoException(ExceptionTemplates.UnsupportedColumnType(((NamedSmoObject)this.Parent).Name, ((NamedSmoObject)this).Name, sqlDataType.ToString(), GetSqlServerName(options)));
-            }
+            // check for supportability
+            //
+            DataType.CheckColumnTypeSupportability(((NamedSmoObject)this.Parent).Name, this.Name, sqlDataType, options);
 
             if (Cmn.DatabaseEngineType.SqlAzureDatabase == options.TargetDatabaseEngineType)
             {
                 // check for cloud
-                isSupported = DataType.IsDataTypeSupportedOnCloud(sqlDataType);
+                bool isSupported = DataType.IsDataTypeSupportedOnCloud(sqlDataType);
 
                 if (!isSupported)
                 {

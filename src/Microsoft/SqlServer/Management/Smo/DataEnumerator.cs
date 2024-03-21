@@ -929,14 +929,17 @@ namespace Microsoft.SqlServer.Management.Smo
                     formattedValue = this.FormatSqlVariantValue(columnIndex);
                     break;
 
+                case SqlDataType.Json:
+                    formattedValue = String.Format(
+                        CultureInfo.InvariantCulture,
+                        "CAST({0} AS Json)", SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString()));
+
+                    break;
+
                 default:
                     // We are explictly handling all types that we support. We will not attempt
                     // to support types that we don't understand.
-                    // In any case, this code should never be hit because TableScriptCommand
-                    // does an explict check for all types that we support and throws
-                    // if it sees a type that we don't understand. If we ever hit this code
-                    // then there is a bug either in TableScriptCommand where we are checking for supported
-                    // types or we are not explictly handling scripting data for the said type
+
                     //
                     Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "ERROR: Attempting to script data for type " + dataType);
 

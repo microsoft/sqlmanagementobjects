@@ -875,9 +875,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         if (bForCreate)
                         {
-                            if ((Cmn.DatabaseEngineEdition.SqlManagedInstance == this.DatabaseEngineEdition ||
-                                 Cmn.DatabaseEngineEdition.SqlOnDemand == this.DatabaseEngineEdition)
-                                && (this.LoginType == LoginType.ExternalUser || this.LoginType == LoginType.ExternalGroup))
+                            if (this.LoginType == LoginType.ExternalUser || this.LoginType == LoginType.ExternalGroup)
                             {
                                 sb.Append(" FROM EXTERNAL PROVIDER");
                             }

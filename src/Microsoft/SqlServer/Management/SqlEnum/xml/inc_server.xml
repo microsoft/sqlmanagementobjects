@@ -585,5 +585,12 @@
      <property name="ReservedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'ReservedStorageSizeMB' )</property>
      <property name="UsedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'UsedStorageSizeMB' )</property>
     </version>
+
+    <version min_major='7' max_major='15' datawarehouse_enabled='true'>
+      <property name="IsJsonDataTypeEnabled" type="bit" cast="true" access="Read" expensive='true'>0</property>
+    </version>
+    <version min_major='16' cloud_min_major='12'>
+      <property name="IsJsonDataTypeEnabled" type="bit" cast="true" access="Read" expensive='true'>case when exists(select * from sys.types where system_type_id = 244) then 1 else 0 end</property>
+    </version>
   </properties>
 </EnumObject>

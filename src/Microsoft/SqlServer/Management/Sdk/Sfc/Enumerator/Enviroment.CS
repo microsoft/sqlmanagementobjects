@@ -166,9 +166,9 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                                                         DatabaseEngineType.Standalone, 
 
                                                         DatabaseEngineEdition.Unknown,
-                                                        //This method doesn�t have any connection info being passed, and not being used by SFC. 
+                                                        //This method doesn't have any connection info being passed, and not being used by SFC. 
                                                         //And, there is a corresponding overloaded method that takes the connection info. 
-                                                        //The best match for connection in this method is �version�, so passing the same.
+                                                        //The best match for connection in this method is 'version', so passing the same.
                                                         version
                                                         
                                                         ); 

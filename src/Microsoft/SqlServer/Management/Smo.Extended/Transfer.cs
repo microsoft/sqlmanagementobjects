@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Management.Smo
     /// <summary>
     /// Instance class encapsulating Transfer object
     /// </summary>
-    public class Transfer : DataTransferBase, ITransferMetadataProvider
+    public class Transfer : DataTransferBase
     {
         public Transfer() : base() 
         {
@@ -722,14 +722,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
 
 
-        /// <summary>
-        /// Returns the component that is used to perform transfer
-        /// </summary>
-        /// <returns></returns>
-        public IDataTransferProvider GetTransferProvider()
-        {
-            throw new NotSupportedException();
-        }
         
         public event DataTransferEventHandler DataTransferEvent;
 
@@ -751,26 +743,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.OnDataTransferProgress(DataTransferEventType.Information, message);
         }
 
-#region ITransferMetadataProvider Members
-
-        /// <summary>
-        /// Save the metadata in the paths provided by the variables in the input list
-        /// </summary>
-        void ITransferMetadataProvider.SaveMetadata()
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// returns the options as a collection of named variables
-        /// </summary>
-        /// <returns></returns>
-        SortedList ITransferMetadataProvider.GetOptions()
-        {
-            throw new NotSupportedException();
-        }
-
-#endregion
         private string GetTempDir()
         {
             // We will use the temp folder

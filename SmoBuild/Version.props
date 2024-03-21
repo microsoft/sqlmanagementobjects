@@ -13,7 +13,7 @@
     <InformationalVersion>$(AssemblyFileVersion)</InformationalVersion>
     <FileVersion>$(AssemblyFileVersion)</FileVersion>
     <Version>$(AssemblyFileVersion)</Version>
-    <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">0</PackageMajorVersionIncrement>
+    <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">1</PackageMajorVersionIncrement>
     <PackageVersion Condition="'$(PackageVersion)' == ''">$(AssemblyMajorVersion)$(PackageMajorVersionIncrement).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</PackageVersion>
     <AssemblyVersion Condition="'$(AssemblyVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).0.0</AssemblyVersion>
   </PropertyGroup>

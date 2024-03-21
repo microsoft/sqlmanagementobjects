@@ -272,8 +272,12 @@ namespace Microsoft.SqlServer.Management.Smo
         private String ScriptEdgeConstraintClauses()
         {
             return string.Join(",",
-                (from EdgeConstraintClause clause in this.EdgeConstraintClauses
-                 select string.Format("{0} To {1}", MakeSqlBraket(clause.From), MakeSqlBraket(clause.To))));
+                 from EdgeConstraintClause clause in this.EdgeConstraintClauses
+                 let fromSchemaMaybe = clause.GetPropValueOptional(nameof(EdgeConstraintClause.FromSchema))
+                 let toSchemaMaybe = clause.GetPropValueOptional(nameof(EdgeConstraintClause.ToSchema))
+                 let fromSchema = (fromSchemaMaybe != null) ? MakeSqlBraket(fromSchemaMaybe.ToString()) + "." : string.Empty
+                 let toSchema = (toSchemaMaybe != null) ? MakeSqlBraket(toSchemaMaybe.ToString()) + "." : string.Empty
+                 select $"{fromSchema}{MakeSqlBraket(clause.From)} To {toSchema}{MakeSqlBraket(clause.To)}");
         }
 
         /// <summary>

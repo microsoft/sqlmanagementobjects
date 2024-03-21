@@ -220,6 +220,8 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                     return DataTypeSpec.Variant;
                 case Smo.SqlDataType.Xml:
                     return DataTypeSpec.Xml;
+                case Smo.SqlDataType.Json:
+                    return DataTypeSpec.Json;
 
                 default:
                     Debug.Assert(IsSmoUserDefinedDataType(sqlDataType) || (sqlDataType == Smo.SqlDataType.None),

@@ -46,6 +46,7 @@
       <property name="BuildNumber" generate="true" is_intrinsic="false" />
       <property name="IsCaseSensitive" generate="true" is_intrinsic="false" />
       <property name="IsFullTextInstalled" generate="true" is_intrinsic="false" />
+	  <property name="IsJsonDataTypeEnabled" generate="true" is_intrinsic="false" />
       <property name="MasterDBLogPath" generate="true" is_intrinsic="false" />
       <property name="MasterDBPath" generate="true" is_intrinsic="false" />
       <property name="ErrorLogPath" generate="true" is_intrinsic="false" />
@@ -1604,6 +1605,8 @@
     <object class_name="EdgeConstraintClause" collection_name="EdgeConstraintClauses" urn="Server[@Name='']/Database/Table/EdgeConstraint/EdgeConstraintClause" is_design_mode="true" parent_type="SqlSmoObject" parent_mode="Design" possible_parents="EdgeConstraint" >
       <property name="From" generate="true" is_intrinsic="false" />
       <property name="To" generate="true" is_intrinsic="false" />
+      <property name="FromSchema" generate="true" is_intrinsic="false" />
+      <property name="ToSchema" generate="true" is_intrinsic="false" />
     </object>
 
     <!--End: Edge constraint def-->

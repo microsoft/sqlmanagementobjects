@@ -11,8 +11,7 @@ namespace Microsoft.SqlServer.Management.Common
     /// ConnectionException is the base class for most ConnectionInfo exceptions
     /// </summary>
     [Serializable]
-    // VBUMP For V17 replace SystemException with SqlServerManagementException. SystemException is reserved for .Net Framework.
-    public class ConnectionException : SystemException
+    public class ConnectionException : Exception
     {
         
         /// <summary>

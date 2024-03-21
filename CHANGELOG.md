@@ -3,31 +3,38 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 171.30.0
+
+- <b>BREAKING</b>: Move Transfer interfaces to Smo.Extended and remove unused/non-implemented interfaces. This is a breaking change that requires recompilation of apps that use Transfer.
+- Change base class of `ConnectionException` to `Exception`
+- Update major package version to 171
+- add new database permission alter any external mirror for azure sql database
+
 ## 170.23.0
 
+- Fix bug where creating Microsoft Entra ID logins for Azure SQL database and On Prem databases was disabled
 - Upgraded SqlClient to 5.1.2 and removed direct Azure SDK dependencies from the nuget package
 - Fix createdrop script error for versioned table in ledger database
+- Fix database scoped extended events enumeration on Azure SQL database instances having DATABASE_DEFAULT catalog collation
 - Improve scripting of dependency objects in Azure SQL database
 - Added `ObjectId` parameter in User and Login create options
 - Fix `Database.PrefetchObjects` not to throw for SQL version earlier than 2016
-
-## 170.23.0, 161.48050.0
 - Add ledger support in Database create options for MI in SSMS
-- Fixed the `Database.AvailabilityDatabaseSynchronizationState` property to reflect the correct synchronization state of MI databases in Managed Instance Link
-- Fix database scoped extended events enumeration on Azure SQL database instances having DATABASE_DEFAULT catalog collation
-
-## 170.20.0
 - Add `OwnerLoginName` property to `JobSchedule` per [issue 120](https://github.com/microsoft/sqlmanagementobjects/issues/120)
+- Fixed the `Database.AvailabilityDatabaseSynchronizationState` property to reflect the correct synchronization state of MI databases in Managed Instance Link
 
-## 170.18.0, 161.48044.0
+## 170.18.0
+
+- Add `SearchPropertyList` support for Azure SQL Database
+
+## 170.17.0, 161.48044.0
 
 - Fix issue where `Table.Create` and `View.Create` were querying the server for indexes
-- Add `SearchPropertyList` support for Azure SQL Database
 - Add option to generate scripts exclusively for Data Classification, Create a new SMO object `SensitivityClassification` under `Database`
 - Add support for creating Certificate objects using binary-encoded certificate bytes (https://github.com/microsoft/sqlmanagementobjects/issues/132)
+- Fix for incorrect scripting of Database objects targeting SQL Managed Instances
 
-
-## 161.48036.0
+## 170.13.0, 161.48036.0
 
 - Fix [issue](https://github.com/microsoft/sqlmanagementobjects/issues/123) with `Table.Alter` for Synapse
 - Add initial replication of contained AG system databases to AG creation
@@ -36,19 +43,33 @@ Once we push a new version to nuget.org add a double hash header for that versio
 - Enable datetime masked columns
 - Update product display names
 - Add database, server, and object permissions for SQL Server 2019 and SQL Server 2022
+- Add support for strict encryption and HostNameInCertificate 
 
-## 161.48028.0
+
+## 170.12.0, 161.48028.0
 
 - Add certificate and asymmetric key user support for Azure DB
 - Change the name of the XML file used by SSMS 19 to RegSrvr16.xml
+- Change `SetDefaultInitFields` to [allow inclusion of properties unsupported](https://github.com/microsoft/sqlmanagementobjects/issues/84) by the connected SQL edition. 
 
-## 161.47027.0
+## 170.11.0, 161.47027.0
 
 - Fix distribution columns on scripting for taking into consideration more than one distribution column
 - Add new EXTGOV_OPERATION_GROUP audit action type
 - Force [QUOTED_IDENTIFIER ON](https://github.com/microsoft/sqlmanagementobjects/issues/96) for all tables 
 - Change Databases enumeration on Azure DB to ignore `sys.databases` entries that don't have an entry in `sys.database_service_objectives`. Prevents attempted logins to user databases when enumerating databases on the logical master
 - Update permissions enumeration for SQL Server 2022
+
+## 170.6.0-preview
+
+- Add SmoMetadataProvider preview package
+- Replace netcoreapp3.1 with net6
+
+## 170.5.0-preview
+
+- First public 170 build on Nuget.org
+- Upgrade Microsoft.Data.SqlClient to version 5.0
+- Upgrade build tools to VS2022
 
 ## 161.47021.0
 

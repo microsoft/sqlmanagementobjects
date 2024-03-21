@@ -58,6 +58,7 @@ namespace Microsoft.SqlServer.Test.RegisteredServersUnitTests
                 Assert.That(store.DatabaseEngineServerGroup.IsSystemServerGroup, Is.True, "DatabaseEngineServerGroup.IsSystemServerGroup");
                 Assert.That(groups["Group1"].Description, Is.EqualTo("Group1 description"), "Group1 description");
                 Assert.That(server.UseCustomConnectionColor, Is.True, "UseCustomConnectionColor");
+                Assert.That(server.Tag, Is.EqualTo("Sample Tag"), "myserver Tag");
                 int color = unchecked((int)0xFF00FF00);
                 Assert.That(server.CustomConnectionColorArgb, Is.EqualTo(color), "CustomConnectionColorArgb");
                 Assert.That(server.ConnectionStringWithEncryptedPassword, Is.EqualTo("data source=myserver;initial catalog=mydatabase;integrated security=True;pooling=False;multipleactiveresultsets=False;connect timeout=90;encrypt=True;trustservercertificate=False;packet size=4096;column encryption setting=Enabled"), "ConnectionStringWithEncryptedPassword");

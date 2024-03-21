@@ -2493,6 +2493,9 @@ Server_ClusterQuorumStateDesc=Gets the current state of cluster quorum for the W
 Server_IsPolyBaseInstalledName=Is PolyBase Installed
 Server_IsPolyBaseInstalledDesc=Gets the Boolean value that specifies whether the PolyBase feature is installed in the current instance of Microsoft SQL Server.
 
+Server_IsJsonDataTypeEnabledName=Is JSON data type enabled
+Server_IsJsonDataTypeEnabledDesc=Gets the Boolean value that specifies whether the JSON data type feature is enabled in the current instance of Microsoft SQL Server.
+
 Server_IsXTPSupportedName=Is XTP Supported
 Server_IsXTPSupportedDesc=Gets the Boolean value that specifies whether the instance of Microsoft SQL Server supports extreme transaction processing (XTP).
 

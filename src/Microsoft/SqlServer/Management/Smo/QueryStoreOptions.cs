@@ -104,6 +104,8 @@ namespace Microsoft.SqlServer.Management.Smo
         [LocDisplayName("ReadWrite")]
         [TsqlSyntaxString("READ_WRITE")]
         ReadWrite = 2,
+        [LocDisplayName("Error")]
+        Error = 3,
     }
 
     /// <summary>

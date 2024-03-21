@@ -7,7 +7,10 @@ using Microsoft.SqlServer.Test.Manageability.Utils;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
+using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using NUnit.Framework.Internal;
+using System;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -83,11 +86,47 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     string scriptData = edgeConstraint.Script().ToSingleString();
 
-                    Assert.IsTrue(scriptData.Contains("CONNECTION"));
-                    Assert.IsTrue(scriptData.Contains("To"));
-                    Assert.IsTrue(scriptData.Contains("fromTable"));
-                    Assert.IsTrue(scriptData.Contains("toTable"));
+                    string expectedScriptData = $"ALTER TABLE {edgeTable.FullQualifiedName} ADD CONSTRAINT [{edgeConstraint.Name}]" +
+                        $" CONNECTION ({fromNode.FullQualifiedName} To {toNode.FullQualifiedName}){Environment.NewLine}";
 
+                    Assert.That(scriptData, Is.EqualTo(expectedScriptData));
+                });
+        }
+
+        /// <summary>
+        /// Tests that EdgeConstraints are scripted correctly with different schemas.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
+        public void SmoScripting_ECWithMultipleSchemas_Sql19AndAfterOnPrem()
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    var fromSchema = new _SMO.Schema(database, SmoObjectHelpers.GenerateUniqueObjectName("fromSchema"));
+                    fromSchema.Create();
+                    var fromNode = GetTestGraphTable(database, "fromTable", true, fromSchema.Name);
+
+                    var toSchema = new _SMO.Schema(database, SmoObjectHelpers.GenerateUniqueObjectName("toSchema"));
+                    toSchema.Create();
+                    var toNode = GetTestGraphTable(database, "toTable", true, toSchema.Name);
+
+                    var edgeTable = new _SMO.Table(database, SmoObjectHelpers.GenerateUniqueObjectName("edgeTable"));
+                    edgeTable.IsEdge = true;
+                    var edgeConstraintName = GenerateSmoObjectName("EC_TEST");
+                    edgeTable.EdgeConstraints.Add(new _SMO.EdgeConstraint(edgeTable, edgeConstraintName));
+                    edgeTable.EdgeConstraints[edgeConstraintName].EdgeConstraintClauses.Add(GetEdgeConstraintTestClause(edgeTable.EdgeConstraints[edgeConstraintName], fromNode, toNode));
+                    edgeTable.Create();
+
+                    var expectedECName = (string)database.ExecutionManager.ExecuteScalar($@"SELECT name FROM sys.edge_constraints
+                        WHERE type = 'EC' AND parent_object_id = {edgeTable.ID}");
+                    Assert.That(edgeConstraintName, Is.EqualTo(expectedECName), "Edge constraint is not found in the table.");
+                    
+                    var scripter = new _SMO.Scripter(database.Parent);
+                    var script = scripter.Script(edgeTable);
+                    var expectedScriptData = $"ALTER TABLE {edgeTable.FullQualifiedName} ADD CONSTRAINT [{_SMO.SqlSmoObject.SqlBraket(edgeConstraintName)}]" +
+                        $" CONNECTION ({fromNode.FullQualifiedName} To {toNode.FullQualifiedName})";
+                    Assert.That(script, Has.Member(expectedScriptData), "Incorrect edge constraint script got generated.");
                 });
         }
 
@@ -154,10 +193,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             // EdgeConstraint clauses have a non-functional name. Therefore a numeric value is being used
             // as a name below.
             //
-            _SMO.EdgeConstraintClause edgeConstraintClause = new _SMO.EdgeConstraintClause(edgeConstraint, "1567");
-
-            edgeConstraintClause.From = fromTable.Name;
-            edgeConstraintClause.To = toTable.Name;
+            _SMO.EdgeConstraintClause edgeConstraintClause = new _SMO.EdgeConstraintClause(edgeConstraint, fromTable, toTable);
 
             return edgeConstraintClause;
         }
@@ -169,14 +205,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="database">Reference of the database object which is the parent of the table to be created</param>
         /// <param name="name">name identifier of the new table</param>
         /// <param name="isNode">flag identifying whether the graph table represents a node or an edge</param>
+        /// <param name="schemaName">schema of the new table</param>
         /// <returns>Test instance of a Graph Table</returns>
-        private Table GetTestGraphTable(Database database, string name, bool isNode)
+        private Table GetTestGraphTable(Database database, string name, bool isNode, string schemaName = "dbo")
         {
-            TableProperties tableProps = new TableProperties();
-            tableProps.IsEdge = !isNode;
-            tableProps.IsNode = isNode;
+            TableProperties tableProps = new TableProperties()
+            {
+                IsNode = isNode,
+                IsEdge = !isNode,
+            };
 
-            _SMO.Table graphTable = DatabaseObjectHelpers.CreateTable(database, name, "dbo", tableProps);
+            _SMO.Table graphTable = DatabaseObjectHelpers.CreateTable(database, name, schemaName, tableProps);
             return graphTable;
         }
     }

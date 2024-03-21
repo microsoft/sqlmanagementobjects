@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace Microsoft.SqlServer.Management.Common
@@ -10,14 +9,11 @@ namespace Microsoft.SqlServer.Management.Common
     /// <summary>
     /// SqlServerManagementException is the base class for all SQL Management Objects exceptions. 
     /// </summary>
-    [SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
-    // VBUMP: For V17, make this class abstract or the constructors all protected
     public class SqlServerManagementException : Exception
     {
         /// <summary>
         /// Constructs a new SqlServerManagementException with an empty message and no inner exception
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SqlServerManagementException()
         {
             Init();
@@ -27,7 +23,6 @@ namespace Microsoft.SqlServer.Management.Common
         /// Constructs a new SqlServerManagementException with the given message and no inner exception
         /// </summary>
         /// <param name="message"></param>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SqlServerManagementException(string message)
             : base(message)
         {
@@ -39,7 +34,6 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         /// <param name="message"></param>
         /// <param name="innerException"></param>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SqlServerManagementException(string message, Exception innerException)
             :
             base(message, innerException)
