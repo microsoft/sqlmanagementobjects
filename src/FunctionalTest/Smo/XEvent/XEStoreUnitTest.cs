@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
 {
-
+	
     /// <summary>
     /// Summary description for XEStoreUnitTest
     /// </summary>
