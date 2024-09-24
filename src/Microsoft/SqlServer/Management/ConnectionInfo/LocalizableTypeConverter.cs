@@ -633,7 +633,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="type"></param>
         /// <param name="manager"></param>
         internal CommonLocalizableEnumConverter(System.Type type, ResourceManager manager)
-            : base(type.GetType())
+            : base(type)
         {
             // we get a resource manager from the LocalizableTypeCoverter so we just keep using that one
             LoadLocalizedNames(type, manager);
@@ -646,7 +646,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         /// <param name="type"></param>
         public CommonLocalizableEnumConverter(System.Type type)
-            : base(type.GetType())
+            : base(type)
         {
             // we don't have a resource manager yet so we need to go get one from the attribute.
             ResourceManager manager = null;
