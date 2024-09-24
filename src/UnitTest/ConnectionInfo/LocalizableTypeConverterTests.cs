@@ -68,6 +68,9 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
                 TypeConverter typeConverter = TypeDescriptor.GetConverter(type);
                 Assert.That(typeConverter, Is.Not.Null, "Type {0} did not have a TypeConverter defined", type.Name);
 
+                // ensure the converter accepts the enum value as valid
+                Assert.That(typeConverter.IsValid(enumValue), Is.True);
+
                 FieldInfo fi = type.GetField(Enum.GetName(type, enumValue));
 
                 string typeConverterString =
