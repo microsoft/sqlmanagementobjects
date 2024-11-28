@@ -200,6 +200,7 @@
       <property name="ID" generate="true" is_intrinsic="false" />
       <property name="IndexSpaceUsage" generate="true" is_intrinsic="false" />
       <property name="IsAccessible" generate="true" is_intrinsic="false" />
+      <property name="IsFabricDatabase" generate="true" is_intrinsic="false" />
       <property name="IsDatabaseSnapshot" generate="true" is_intrinsic="false" />
       <property name="IsDatabaseSnapshotBase" generate="true" is_intrinsic="false" />
       <property name="IsDbAccessAdmin" generate="true" is_intrinsic="false" />

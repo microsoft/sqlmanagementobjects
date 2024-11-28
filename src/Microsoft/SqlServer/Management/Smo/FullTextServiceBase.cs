@@ -157,7 +157,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // Script Alter if dirty or Create if target version 9 or above
                     if ((sp.ScriptForAlter && property.Dirty) ||
-                        (!sp.ScriptForAlter && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90))
+                        (!sp.ScriptForAlter && sp.TargetServerVersion >= SqlServerVersion.Version90))
                     {
                         statement.AppendFormat(SmoApplication.DefaultCulture,
                             "EXEC master.dbo.sp_fulltext_service @action=N'verify_signature', @value={0}", (bool)property.Value ? 0 : 1);
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // Script Alter if dirty or Create if target version 9 or above
                     if ((sp.ScriptForAlter && property.Dirty) ||
-                        (!sp.ScriptForAlter && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90))
+                        (!sp.ScriptForAlter && sp.TargetServerVersion >= SqlServerVersion.Version90))
                     {
                         statement.AppendFormat(SmoApplication.DefaultCulture,
                             "EXEC master.dbo.sp_fulltext_service @action=N'load_os_resources', @value={0}", (bool)property.Value ? 1 : 0);
@@ -190,10 +190,10 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (null != (property = this.Properties.Get("ConnectTimeout")).Value)
                 {
-                    // Script Alter if dirty or Create if target version 7 or 8
+                    // Script Alter if dirty or Create if target version 8
                     if ((sp.ScriptForAlter && property.Dirty) ||
                         (!sp.ScriptForAlter &&
-                            (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version70 && sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)))
+                            (sp.TargetServerVersion <= SqlServerVersion.Version80)))
                     {
                         TimeSpan ts = (TimeSpan)property.Value;
 
@@ -227,7 +227,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // Script for Alter if dirty or Create if target version is 8
                     if ((sp.ScriptForAlter && property.Dirty) ||
-                        (!sp.ScriptForAlter && sp.TargetServerVersionInternal == SqlServerVersionInternal.Version80))
+                        (!sp.ScriptForAlter && sp.TargetServerVersion == SqlServerVersion.Version80))
                     {
                         TimeSpan ts = (TimeSpan)property.Value;
 
@@ -269,7 +269,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             //Catalog Upgrade Option
-            if (ServerVersion.Major >= 10 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100)
+            if (ServerVersion.Major >= 10 && sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 property = this.Properties.Get("CatalogUpgradeOption");
 

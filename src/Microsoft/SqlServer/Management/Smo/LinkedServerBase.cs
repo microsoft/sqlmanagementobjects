@@ -215,13 +215,13 @@ namespace Microsoft.SqlServer.Management.Smo
             GetStringOption(query, sp, "Subscriber", "sub");
 
             // only on 8.0 
-            if (SqlServerVersionInternal.Version80 == sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version80 == sp.TargetServerVersion)
             {
                 GetStringOption(query, sp, "DistPublisher", "dpub");
             }
 
             // the following work only for 8.0 and beyond
-            if ((int)SqlServerVersionInternal.Version80 <= (int)sp.TargetServerVersionInternal)
+            if ((int)SqlServerVersion.Version80 <= (int)sp.TargetServerVersion)
             {
                 GetStringOption(query, sp, "ConnectTimeout", "connect timeout");
                 GetStringOption(query, sp, "CollationName", "collation name");
@@ -231,7 +231,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // the following work only for 10.0 and beyond
-            if ((this.ServerVersion.Major >= 10) && ((int)SqlServerVersionInternal.Version100 <= (int)sp.TargetServerVersionInternal))
+            if ((this.ServerVersion.Major >= 10) && ((int)SqlServerVersion.Version100 <= (int)sp.TargetServerVersion))
             {
                 GetStringOption(query, sp, "IsPromotionofDistributedTransactionsForRPCEnabled", "remote proc transaction promotion");
             }
@@ -336,7 +336,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (sp.IncludeScripts.ExistenceCheck)
             {
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture,
                                 Scripts.INCLUDE_EXISTS_LINKED_SERVER90,

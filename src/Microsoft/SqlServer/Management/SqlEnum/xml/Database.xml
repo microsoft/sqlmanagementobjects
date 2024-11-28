@@ -216,7 +216,6 @@
                     triggered_fields='#DatabaseName3#'/>
     </version>
 
-    <!--SQL-XI property have post processing calculations, need to update version when vBump is done.-->
     <version min_major='12' cloud_min_major='12'>
       <post_process fields = '#HasFileInCloud#'
                     class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
@@ -756,6 +755,12 @@
       <property name="PersistentVersionStoreSizeKB" expensive="true" type="bigint" access="read">ISNULL(pfg.persistent_version_store_size_kb, 0)</property>
       <!--  Property only available on SQL EDGE i.e EngineEdition == 9 -->
       <property name="DataRetentionEnabled" type="bit" cast="true">ISNULL((select is_data_retention_enabled from #temp_data_retention_property as tdrp where tdrp.db_id = dtb.database_id),0)</property>
+    </version>
+    <version cloud_min_major="12">
+      <property name="IsFabricDatabase" type="bit" cast="true" access="Read">case when serverproperty('EngineEdition') = 12 then 1 else 0 end</property>
+    </version>
+    <version min_major="7" datawarehouse_enabled='true'>
+      <property name="IsFabricDatabase" type="bit" cast="true" access="Read">0</property>
     </version>
   </properties>
 

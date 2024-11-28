@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Smo
@@ -111,104 +112,19 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private SqlServerVersionInternal m_eTargetServerVersion;
-
-        /// <summary>
-        /// The server version on which the scripts will run.
-        /// </summary>
-        internal SqlServerVersionInternal TargetServerVersionInternal
-        {
-            get
-            {
-                return m_eTargetServerVersion;
-            }
-            set
-            {
-                m_eTargetServerVersion = value;
-                this.VersionDirty = true;
-            }
-        }
+        // VBUMP - use latest in-market
+        private SqlServerVersion m_eTargetServerVersion = SqlServerVersion.Version160;
 
         /// <summary>
         /// The server version on which the scripts will run.
         /// </summary>
         internal SqlServerVersion TargetServerVersion
         {
-            get
-            {
-                // the main purpose of this second enumeration is to
-                // hide the fact that 7.0 is supported - it is only exposed
-                // internally for a limited set of functionality.
-                switch (m_eTargetServerVersion)
-                {
-                    case SqlServerVersionInternal.Version70:
-                    // 7.0 is reported as 8.0
-                    case SqlServerVersionInternal.Version80:
-                        return SqlServerVersion.Version80;
-                    case SqlServerVersionInternal.Version90:
-                        return SqlServerVersion.Version90;
-                    case SqlServerVersionInternal.Version100:
-                        return SqlServerVersion.Version100;
-                    case SqlServerVersionInternal.Version105:
-                        return SqlServerVersion.Version105;
-                    case SqlServerVersionInternal.Version110:
-                        return SqlServerVersion.Version110;
-                    case SqlServerVersionInternal.Version120:
-                        return SqlServerVersion.Version120;
-                    case SqlServerVersionInternal.Version130:
-                        return SqlServerVersion.Version130;
-                    case SqlServerVersionInternal.Version140:
-                        return SqlServerVersion.Version140;
-                    case SqlServerVersionInternal.Version150:
-                        return SqlServerVersion.Version150;
-                    case SqlServerVersionInternal.Version160:
-                        return SqlServerVersion.Version160;
-                    default:
-                        Diagnostics.TraceHelper.Assert(false, "unexpected server version");
-                        return SqlServerVersion.Version160;
-                }
-            }
+            get => m_eTargetServerVersion;
             set
             {
-                switch (value)
-                {
-                    case SqlServerVersion.Version80:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version80;
-                        break;
-                    case SqlServerVersion.Version90:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version90;
-                        break;
-                    case SqlServerVersion.Version100:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version100;
-                        break;
-                    case SqlServerVersion.Version105:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version105;
-                        break;
-                    case SqlServerVersion.Version110:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version110;
-                        break;
-                    case SqlServerVersion.Version120:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version120;
-                        break;
-                    case SqlServerVersion.Version130:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version130;
-                        break;
-                    case SqlServerVersion.Version140:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version140;
-                        break;
-                    case SqlServerVersion.Version150:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version150;
-                        break;
-                    case SqlServerVersion.Version160:
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version160;
-                        break;
-                    default:
-                        Diagnostics.TraceHelper.Assert(false, "unexpected server version");
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version160;
-                        break;
-                }
-
-                this.VersionDirty = true;
+                m_eTargetServerVersion = value;
+                VersionDirty = true;
             }
         }
 
@@ -248,7 +164,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Sets the TargetServerVersionInternal based on input ServerVersion structure.
+        /// Sets the TargetServerVersion based on input ServerVersion structure.
         /// </summary>
         /// <param name="ver"></param>
         internal void SetTargetServerVersion(ServerVersion ver)
@@ -257,49 +173,54 @@ namespace Microsoft.SqlServer.Management.Smo
             switch (ver.Major)
             {
                 case 8:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version80;
+                    m_eTargetServerVersion = SqlServerVersion.Version80;
                     break;
 
                 case 9:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version90;
+                    m_eTargetServerVersion = SqlServerVersion.Version90;
                     break;
 
                 case 10:
                     if (ver.Minor == 0)
                     {
-                        m_eTargetServerVersion = SqlServerVersionInternal.Version100;
+                        m_eTargetServerVersion = SqlServerVersion.Version100;
                         break;
                     }
                     Diagnostics.TraceHelper.Assert(ver.Minor == 50, "unexpected server version");
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version105;
+                    m_eTargetServerVersion = SqlServerVersion.Version105;
                     break;
 
                 case 11:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version110;
+                    m_eTargetServerVersion = SqlServerVersion.Version110;
                     break;
 
                 case 12:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version120;
+                    m_eTargetServerVersion = SqlServerVersion.Version120;
                     break;
 
                 case 13:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version130;
+                    m_eTargetServerVersion = SqlServerVersion.Version130;
                     break;
 
                 case 14:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version140;
+                    m_eTargetServerVersion = SqlServerVersion.Version140;
                     break;
 
                 case 15:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version150;
+                    m_eTargetServerVersion = SqlServerVersion.Version150;
                     break;
 
                 case 16:
-                    m_eTargetServerVersion = SqlServerVersionInternal.Version160;
+                    m_eTargetServerVersion = SqlServerVersion.Version160;
                     break;
 
+                case 17:
+                    m_eTargetServerVersion = SqlServerVersion.Version170;
+                    break;
+                // VBUMP
                 default:
-                    Diagnostics.TraceHelper.Assert(false, "unexpected server version");
+                    Debug.Fail($"Unknown server version {ver.Major}. Treating it as 17.");
+                    m_eTargetServerVersion = SqlServerVersion.Version170;
                     break;
             }
         }
@@ -490,9 +411,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.NewLine = Globals.newline;
             this.SuppressDirtyCheck = true;
             this.SfcChildren = true;
-
-            // the default target version is latest (in-market)
-            this.m_eTargetServerVersion = SqlServerVersionInternal.Version140;
 
             // the default target database engine type is Singleton
             m_eTargetDatabaseEngineType = DatabaseEngineType.Standalone;

@@ -10,7 +10,7 @@
 		<property name="ID" type="int">s.schema_id</property>		
 		<property name="Owner" type="sysname" mode="design">ISNULL(dp1.name, N'')</property>
 		<property name="IsSystemObject" type="bit" access='Read' cast='true'>
-      case when s.name in ('dbo','guest','INFORMATION_SCHEMA','sys','db_owner','db_accessadmin','db_securityadmin','db_ddladmin','db_backupoperator','db_datareader','db_datawriter','db_denydatareader', 'db_denydatawriter') then 1 else 0 end</property>
+      case when s.name in ('dbo','guest','INFORMATION_SCHEMA','sys','changefeed', 'db_owner','db_accessadmin','db_securityadmin','db_ddladmin','db_backupoperator','db_datareader','db_datawriter','db_denydatareader', 'db_denydatawriter') then 1 else 0 end</property>
 		<version min_major='10' >
 			<include file='inc_policy_health_state.xml'/>
 		</version>

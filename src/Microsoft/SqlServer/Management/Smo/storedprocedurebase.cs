@@ -210,7 +210,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.AppendFormat(SmoApplication.DefaultCulture, "{0} PROCEDURE {1}", Scripts.ALTER, FormatFullNameForScripting(sp));
                     break;
                 case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
-                    ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersionInternal,
+                    ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
                         ExceptionTemplates.CreateOrAlterDownlevel(
                             "Procedure",
                             GetSqlServerName(sp)));
@@ -274,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (ServerVersion.Major >= 9 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 AddScriptExecuteAs(sb, sp, this.Properties, ref bNeedsComma);
             }
@@ -310,7 +310,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         GetSqlServerName(sp)));
 
                 // it insures we can't script a CLR SP that targets a 8.0 server
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion90(sp.TargetServerVersion,
                     ExceptionTemplates.ClrStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
@@ -363,7 +363,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         GetSqlServerName(sp)));
 
                 // it insures we can't script a CLR SP that targets a 8.0 server
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion90(sp.TargetServerVersion,
                     ExceptionTemplates.ClrStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
@@ -401,7 +401,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     string sExists;
                     sExists = (sp.ScriptForAlter) ? string.Empty : "NOT";
-                    if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)
+                    if (sp.TargetServerVersion <= SqlServerVersion.Version80)
                     {
                         sb.AppendFormat(SmoApplication.DefaultCulture,
                             Scripts.INCLUDE_EXISTS_PROCEDURE80, sExists,
@@ -541,7 +541,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // SMO thinks CLR sprocs are encrypted
             if (this.State != SqlSmoState.Creating && this.IsEncrypted && this.ImplementationType == ImplementationType.TransactSql)
             {
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion90(sp.TargetServerVersion,
                     ExceptionTemplates.EncryptedStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
@@ -595,16 +595,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
-                sb.AppendFormat(SmoApplication.DefaultCulture, sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 ?
+                sb.AppendFormat(SmoApplication.DefaultCulture, sp.TargetServerVersion < SqlServerVersion.Version90 ?
                     Scripts.INCLUDE_EXISTS_PROCEDURE80 : Scripts.INCLUDE_EXISTS_PROCEDURE90,
                     "", SqlString(sFullScriptingName));
                 sb.Append(Globals.newline);
             }
 
             sb.AppendFormat(SmoApplication.DefaultCulture, "DROP PROCEDURE {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 sFullScriptingName);
 
             queries.Add(sb.ToString());

@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
 {
-	
+
     /// <summary>
     /// Summary description for XEStoreUnitTest
     /// </summary>

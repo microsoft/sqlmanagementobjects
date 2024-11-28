@@ -13,14 +13,22 @@
       <DotNetPackagesVersion>6.0.0</DotNetPackagesVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Update="Azure.Core" Version="1.35.0" />
-        <PackageReference Update="Azure.Identity" Version="1.10.3" />
+        <!--
+        When adding new package dependencies here, make sure to also add those packages to
+        Microsoft.SqlServer.Smo.TestUtils.nuspec if they affect any of the related test utilities.
+        -->
+        <PackageReference Update="Azure.Core" Version="1.41.0" />
+        <PackageReference Update="Azure.Identity" Version="1.11.4" />
+        <PackageReference Update="Azure.ResourceManager" Version="1.8.0" />
+        <PackageReference Update="Azure.ResourceManager.Storage" Version="1.1.1" />
         <PackageReference Update="Azure.Security.KeyVault.Secrets" Version="4.4.0" />
+        <PackageReference Update="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
         <PackageReference Update="Microsoft.Data.SqlClient" Version="[$(SqlClientPackageVersion),6)" />
         <PackageReference Update="Microsoft.Data.Tools.StringResourceTool" Version="3.2.0" />
-        <PackageReference Update="Microsoft.Identity.Client"                                Version="4.56.0" />
-        <PackageReference Update="Microsoft.Identity.Client.Desktop"                        Version="4.56.0" />
+        <PackageReference Update="Microsoft.Identity.Client" Version="4.61.3" />
+        <PackageReference Update="Microsoft.Identity.Client.Desktop" Version="4.61.3" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+        <PackageReference Update="Microsoft.SqlServer.ADO.Identity" Version="171.38.0" />
         <PackageReference Update="Microsoft.SqlServer.Assessment" Version="1.1.9" />
         <PackageReference Update="Microsoft.SqlServer.Management.SqlParser" Version="$(SqlParserPackageVersion)" />
         <PackageReference Update="Moq" Version="4.16.1" />
@@ -28,23 +36,24 @@
         <PackageReference Update="MSTest.TestFramework" Version="2.2.10" />
         <PackageReference Update="NewtonSoft.Json" Version="13.0.1" />
         <PackageReference Update="NUnit" Version="3.11.0" />
-        <PackageReference Update="System.Buffers"                                           Version="4.5.1" />
+        <PackageReference Update="System.Buffers" Version="4.5.1" />
+        <PackageReference Update="System.CommandLine" Version="2.0.0-beta4.22272.1" />
         <PackageReference Update="System.Data.OleDb" Version="$(DotNetPackagesVersion)" />
-        <PackageReference Update="System.Diagnostics.DiagnosticSource"                      Version="6.0.1" />
+        <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="6.0.1" />
         <PackageReference Update="System.Management" Version="$(DotNetPackagesVersion)" />
-        <PackageReference Update="System.Memory"                                            Version="4.5.5"/>
-        <PackageReference Update="System.Runtime.CompilerServices.Unsafe"                   Version="$(DotNetPackagesVersion)" />
+        <PackageReference Update="System.Memory" Version="4.5.5" />
+        <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="$(DotNetPackagesVersion)" />
         <PackageReference Update="System.Security.Cryptography.ProtectedData" Version="$(DotNetPackagesVersion)" />
         <PackageReference Update="System.Security.Permissions" Version="$(DotNetPackagesVersion)" />
         <PackageReference Update="System.Security.Principal.Windows" Version="5.0.0" />
+        <PackageReference Update="System.Text.Encodings.Web" Version="8.0.0" />
+        <PackageReference Update="System.Text.Json" Version="8.0.4" />
         <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" />
         <PackageReference Update="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
     <ItemGroup>
         <!-- GlobalPackageReference packages are installed and processed by msbuild but are not referenced by the C# compiler -->
-        <GlobalPackageReference Include="StrawberryPerl" Version="5.28.0.1" GeneratePathProperty="true" />
         <GlobalPackageReference Include="Microsoft.TestPlatform" Version="17.6.0" GeneratePathProperty="true" />
-
     </ItemGroup>
 
 </Project>

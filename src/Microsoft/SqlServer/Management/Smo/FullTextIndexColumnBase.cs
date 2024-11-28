@@ -75,7 +75,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal void ScriptAlterFullTextIndexColumn(StringCollection queries, ScriptingPreferences sp)
         {
             //  ALTER COLUMN syntax is only available in Denali or later
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version110)
             {
                 StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -143,7 +143,7 @@ namespace Microsoft.SqlServer.Management.Smo
             FullTextIndex ftIndex = (FullTextIndex)ParentColl.ParentInstance;
             TableViewBase table = (TableViewBase)ftIndex.Parent;
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 // ALTER FULLTEXT INDEX ON <tablename>
                 sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER FULLTEXT INDEX ON {0} ADD (", table.FormatFullNameForScripting(sp));
@@ -205,7 +205,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 string language = String.Empty;
                 // LANGUAGE <language_string> is only supported on Shiloh or bigger
                 if (this.ServerVersion.Major >= 8 && //current server bigger than 7 and
-                    sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version80) //scripting for server bigger than 7
+                    sp.TargetServerVersion >= SqlServerVersion.Version80) //scripting for server bigger than 7
                 {
                     Property propLan = Properties.Get("Language");
                     if (propLan.Value != null)
@@ -237,7 +237,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                if (this.ServerVersion.Major >= 8 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version80
+                if (this.ServerVersion.Major >= 8 && sp.TargetServerVersion >= SqlServerVersion.Version80
                     && language.Length > 0)
                 {
                     sb.Append(", @language=@lcid");
@@ -274,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Smo
             FullTextIndex ftIndex = (FullTextIndex)ParentColl.ParentInstance;
             TableViewBase table = (TableViewBase)ftIndex.Parent;
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER FULLTEXT INDEX ON {0} DROP ({1}) ",
                                 table.FormatFullNameForScripting(sp),

@@ -309,7 +309,7 @@ namespace Microsoft.SqlServer.Management.Smo
             tc.Assert(null != query, "String collection should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -410,7 +410,7 @@ namespace Microsoft.SqlServer.Management.Smo
             tc.Assert(null != query, "String collection should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             string availabilityModeScript = null;
@@ -525,7 +525,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //REMOVE REPLICA ON �server_name� 
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -626,7 +626,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
 
                         case BackupPriorityPropertyName:
-                            if (scriptingPreferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version130)
+                            if (scriptingPreferences.TargetServerVersion >= SqlServerVersion.Version130)
                             {
                                 Property basicAgProp = this.Parent.GetPropertyOptional(AvailabilityGroup.BasicAvailabilityGroupPropertyName);
                                 if (basicAgProp.IsNull || (basicAgProp.Value.Equals(false)))

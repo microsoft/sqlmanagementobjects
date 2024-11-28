@@ -324,7 +324,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_UDDT90, "", SqlString(ScriptName.Length > 0 ? ScriptName : Name), SqlString(ScriptName.Length > 0 ? ScriptName : Schema));
                 sb.Append(sp.NewLine);
@@ -335,7 +335,7 @@ namespace Microsoft.SqlServer.Management.Smo
              * permission specifications for the table type
              */
             sb.AppendFormat(SmoApplication.DefaultCulture, "DROP TYPE {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 fullTableTypeName);
 
             dropQuery.Add(sb.ToString());

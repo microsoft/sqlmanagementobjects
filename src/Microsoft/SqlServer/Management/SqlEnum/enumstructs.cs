@@ -933,7 +933,12 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Compatibility level for SQL v160
         /// </summary>
-        Version160 = 160
+        Version160 = 160,
+        /// <summary>
+        /// Compatibility level for SQL v170
+        /// </summary>
+        Version170 = 170
+        // VBUMP
     }
 
     ///

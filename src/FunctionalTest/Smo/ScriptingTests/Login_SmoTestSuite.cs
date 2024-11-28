@@ -11,6 +11,8 @@ using Assert = NUnit.Framework.Assert;
 using System.Linq;
 using Microsoft.SqlServer.Test.Manageability.Utils;
 using Microsoft.SqlServer.Management.Smo;
+using System.Diagnostics;
+
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
@@ -133,12 +135,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     ScriptingOptions so = new ScriptingOptions();
                     string scriptLogin = ScriptSmoObject((IScriptable)login, so);
-                    string expectedOutput = string.Format("CREATE LOGIN {0} FROM EXTERNAL PROVIDER\r\n", login.FullQualifiedName);
+                    string expectedOutput = $"CREATE LOGIN {login.FullQualifiedName} FROM EXTERNAL PROVIDER{Environment.NewLine}";
                     Assert.That(scriptLogin, Is.EqualTo(expectedOutput), "CREATE LOGIN syntax is not scripted correctly. This login type should include keywords 'FROM EXTERNAL PROVIDER'.");
 
                     so.ScriptDrops = true;
                     scriptLogin = ScriptSmoObject((IScriptable)login, so);
-                    expectedOutput = string.Format("DROP LOGIN {0}\r\n", login.FullQualifiedName);
+                    expectedOutput = $"DROP LOGIN {login.FullQualifiedName}{Environment.NewLine}";
                     Assert.That(scriptLogin, Is.EqualTo(expectedOutput), "DROP LOGIN syntax is not scripted correctly.");
                 });
         }
@@ -199,6 +201,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             ExecuteFromDbPool(db =>
             {
+                if (ServerContext.LoginMode == ServerLoginMode.Integrated)
+                {
+                    Trace.TraceInformation($"Skipping Login test on {ServerContext.Name} because the server doesn't support SQL auth");
+                    return;
+                }
                 var login = new Login(db.Parent, GenerateUniqueSmoObjectName("login"))
                 {
                     LoginType = LoginType.SqlLogin,
@@ -286,6 +293,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             ExecuteTest(() =>
             {
+                if (ServerContext.LoginMode == ServerLoginMode.Integrated)
+                {
+                    Trace.TraceInformation($"Skipping ChangePassword test on {ServerContext.Name} because the server doesn't support SQL auth");
+                    return;
+                }
                 var login = new Login(ServerContext, GenerateUniqueSmoObjectName("login"))
                 {
                     LoginType = LoginType.SqlLogin,

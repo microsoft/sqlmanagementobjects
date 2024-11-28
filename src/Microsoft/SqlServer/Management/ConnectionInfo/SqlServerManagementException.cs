@@ -41,10 +41,12 @@ namespace Microsoft.SqlServer.Management.Common
             Init();
         }
 
+#if !NETCOREAPP
         protected SqlServerManagementException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
 
         private void Init()
         {

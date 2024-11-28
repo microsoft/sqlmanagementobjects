@@ -87,13 +87,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             ExecuteFromDbPool(database =>
             {
                 // First create a table with a default constraint column to make sure the fix didn't break that
-                var tbl = new _SMO.Table(database, GenerateSmoObjectName("DefCon"));
+                var tbl = database.CreateTableDefinition("DefCon");
                 var column = new _SMO.Column(tbl, "col1", _SMO.DataType.Int) { Nullable = false };
                 var constraint = column.AddDefaultConstraint();
                 constraint.Text = "5";
                 tbl.Columns.Add(column);
                 Assert.DoesNotThrow(() => tbl.Create(), "Failed to create table with default constraint column");
-                database.ExecuteNonQuery(string.Format("USE [{0}] insert into [{1}] ([col1]) values (2)", _SMO.SqlSmoObject.EscapeString(database.Name, ']'), _SMO.SqlSmoObject.EscapeString(tbl.Name, ']')) );
+                database.ExecuteNonQuery(string.Format("USE [{0}] insert into [{1}] ([col_1],[col1]) values (1,2)", _SMO.SqlSmoObject.EscapeString(database.Name, ']'), _SMO.SqlSmoObject.EscapeString(tbl.Name, ']')) );
                 tbl.Refresh();
                 column = new _SMO.Column(tbl, "col2", _SMO.DataType.Int) {Nullable = false};
                 constraint = column.AddDefaultConstraint();

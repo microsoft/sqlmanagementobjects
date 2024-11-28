@@ -5,12 +5,15 @@
   <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj' and '$(UseMicrosoftData)' != 'false'">
     <PackageReference Include="Azure.Core" PrivateAssets="all" />
     <PackageReference Include="Azure.Identity" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.Identity.Client" PrivateAssets="all" />
     <PackageReference Include="System.Buffers" PrivateAssets="all" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" PrivateAssets="all" />
     <PackageReference Include="System.Memory" PrivateAssets="all" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" PrivateAssets="all" />
+    <PackageReference Include="System.Text.Encodings.Web" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Json" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj'  and '$(GacVersion)' != 'true'" >
     <PackageReference Include="System.ValueTuple" PrivateAssets="all" />

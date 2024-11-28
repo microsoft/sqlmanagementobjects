@@ -395,7 +395,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void ScriptProperties(StringCollection queries, ScriptingPreferences sp)
         {
 
-            ThrowIfSourceOrDestBelowVersion120(sp.TargetServerVersionInternal);
+            ThrowIfSourceOrDestBelowVersion120(sp.TargetServerVersion);
 
             // Sample Query : 
             // turn on - master switch - EXEC [msdb].[smart_admin].[sp_backup_master_switch] @new_state  = 1

@@ -102,7 +102,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool updateStream = sp.Data.OptimizerData &&
                                 this.ServerVersion.Major >= 9 &&
-                                sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90;
+                                sp.TargetServerVersion >= SqlServerVersion.Version90;
             // skip statistics that are created automatically for index
             // if we don't require optimizer data
             if (GetPropValueOptional("IsFromIndexCreation", false) &&
@@ -147,7 +147,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.IncludeScripts.ExistenceCheck)
             {
                 TableViewBase statParent = (TableViewBase)Parent;
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_STATISTIC90, ifExists,
                         FormatFullNameForScripting(sp, false),
@@ -223,7 +223,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             //We are not checking for SQL injection
             //Adding the WHERE clause for FILTER, except in the case of UPDATE STATISTICS (which does not support filters).
-            if (this.ServerVersion.Major >= 10 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100)
+            if (this.ServerVersion.Major >= 10 && sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 string FilterDefinition = Properties.Get("FilterDefinition").Value as string;
                 if (null != FilterDefinition && 0 < FilterDefinition.Length && !isUpdateStatistics)
@@ -237,7 +237,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (sp.Data.OptimizerData &&
                 this.ServerVersion.Major >= 9 &&
-                sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 &&
+                sp.TargetServerVersion >= SqlServerVersion.Version90 &&
                 this.ServerInfo.DatabaseEngineEdition != Cmn.DatabaseEngineEdition.SqlDataWarehouse)
             {
                 Property statStream = Properties.Get("Stream");
@@ -524,7 +524,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.IncludeScripts.ExistenceCheck)
             {
                 TableViewBase statParent = (TableViewBase)Parent;
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_STATISTIC90, "",
                         FormatFullNameForScripting(sp, false),

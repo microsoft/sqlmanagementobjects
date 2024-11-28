@@ -213,7 +213,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             // Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             // IsDHCP cannot be set to true, since no sensible script can be produced in this case.

@@ -99,13 +99,13 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.IncludeScripts.ExistenceCheck)
             {
                 sb.Append(string.Format(SmoApplication.DefaultCulture,
-                                    sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 ? Scripts.INCLUDE_EXISTS_APPROLE80 : Scripts.INCLUDE_EXISTS_APPROLE90,
+                                    sp.TargetServerVersion < SqlServerVersion.Version90 ? Scripts.INCLUDE_EXISTS_APPROLE80 : Scripts.INCLUDE_EXISTS_APPROLE90,
                                     "", FormatFullNameForScripting(sp, false)));
                 sb.Append(sp.NewLine);
             }
 
             //if 7.0, 8.0
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 sb.Append("EXEC dbo.sp_dropapprole @rolename = " + FormatFullNameForScripting(sp, false));
             }
@@ -162,7 +162,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             //if 7.0, 8.0
-            if ( SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal  )
+            if ( SqlServerVersion.Version90 > sp.TargetServerVersion  )
             {
                 if (sp.IncludeScripts.ExistenceCheck)
                 {
@@ -288,7 +288,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Debug.Assert(this.password == null, "Cannot change password using Alter().");
 
             //if 7.0, 8.0
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 throw new InvalidVersionSmoOperationException(this.ServerVersion);
             }

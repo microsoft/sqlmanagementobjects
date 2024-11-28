@@ -89,5 +89,8 @@
     <EmbeddedResource Include="ScriptingTests\ValidateTableDataRetention_DataRetentionPeriodOption.sql">
       <LogicalName>DbSetup_SqlDatabaseEdge.sql</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="CentralManagementServer\TestSrvr.xml">
+      <LogicalName>testsrvr</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

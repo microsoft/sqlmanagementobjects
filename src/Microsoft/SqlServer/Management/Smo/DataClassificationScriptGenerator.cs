@@ -211,7 +211,7 @@ EXEC sp_dropextendedproperty @name = N'{0}', @level0type = N'schema', @level0nam
             //  - If it exists, return the corresponding script generator.
             //  - If it doesn't exist, return the corresponding script generator based on source server version.
             bool isV150 = sp == null ? VersionUtils.IsSql15Azure12OrLater(column.DatabaseEngineType, column.ServerVersion) :
-                VersionUtils.IsTargetVersionSql15Azure12OrLater(sp.TargetDatabaseEngineType, sp.TargetServerVersionInternal);
+                VersionUtils.IsTargetVersionSql15Azure12OrLater(sp.TargetDatabaseEngineType, sp.TargetServerVersion);
 
             return isV150 ? new V15(column, sp) : new V7(column, sp) as DataClassificationScriptGenerator;
         }
@@ -222,7 +222,7 @@ EXEC sp_dropextendedproperty @name = N'{0}', @level0type = N'schema', @level0nam
             //  - If it exists, return the corresponding script generator.
             //  - If it doesn't exist, return the corresponding script generator based on source server version.
             bool isV150 = sp == null ? VersionUtils.IsSql15Azure12OrLater(sensitivityClassification.DatabaseEngineType, sensitivityClassification.ServerVersion) :
-                VersionUtils.IsTargetVersionSql15Azure12OrLater(sp.TargetDatabaseEngineType, sp.TargetServerVersionInternal);
+                VersionUtils.IsTargetVersionSql15Azure12OrLater(sp.TargetDatabaseEngineType, sp.TargetServerVersion);
 
             return isV150 ? new V15(sensitivityClassification, sp) : new V7(sensitivityClassification, sp) as DataClassificationScriptGenerator;
         }

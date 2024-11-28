@@ -13,6 +13,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
     /// Attribute to assign to a TestMethod or TestClass to identify a SqlFeature whose presence in the enabled_features
     /// tag should block the test
     /// </summary>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class UnsupportedFeatureAttribute : SqlUnsupportedDimensionAttribute
     {
         private readonly SqlFeature feature;

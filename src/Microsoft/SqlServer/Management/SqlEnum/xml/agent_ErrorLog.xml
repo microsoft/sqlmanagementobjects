@@ -1,132 +1,11 @@
 ﻿<?xml version="1.0" ?>
-<EnumObject type="ErrorLog" impl_type="SqlObject" min_major='7'>
+<EnumObject type="ErrorLog" impl_type="SqlObject" min_major='9'>
 	<settings>
 		<property_link table="#err_log_tmp er" />
-		<version min_major='9'>
-			<prefix>
-				create table #err_log_tmp(ArchiveNo int, CreateDate nvarchar(24), Size int)
-				insert #err_log_tmp exec master.dbo.sp_enumerrorlogs 2
-			</prefix>
-		</version>
-		<version min_major='7' max_major='8'>
-			<prefix>
-				create table #err_log_tmp(ArchiveNo int, CreateDate datetime, Size int, ErrorLog NVARCHAR(255))
-
-				DECLARE @errorlog_path NVARCHAR(255)
-				DECLARE @errorlog_dir NVARCHAR(255)
-				DECLARE @errorlog_partfile NVARCHAR(255)
-				DECLARE @errorlog NVARCHAR(255)
-				DECLARE @dotIdx INT
-				DECLARE @slashIdx INT
-				DECLARE @logexists INT
-				DECLARE @ArchiveNo INT
-			</prefix>
-		</version>
-
-		<version min_major='7' max_major='7'>
-			<prefix>
-				EXECUTE master.dbo.xp_regread N'HKEY_LOCAL_MACHINE',
-				N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent',
-				N'ErrorLogFile',
-				@errorlog_path OUTPUT,
-				N'no_output'
-			</prefix>
-		</version>
-
-		<version min_major='8' max_major='8'>
-			<prefix>
-				EXECUTE master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE',
-				N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent',
-				N'ErrorLogFile',
-				@errorlog_path OUTPUT,
-				N'no_output'
-			</prefix>
-		</version>
-
-		<version min_major='7' max_major='8'>
-			<!-- take special care on how we convert the LastWriteTime from xp_getfiledetails
-			sometimes we get only minutes and seconds and sometimes only secconds.
-			Also the hour can have only one digit
-			In all this cases replace the missing digits with 0-->
-			-->
-			<prefix>
-				EXECUTE master.dbo.xp_fileexist @errorlog_path, @logexists OUTPUT
-
-				IF(@logexists = 1)
-				BEGIN
-				create table #err_logs_dir_tmp(ErrorLog NVARCHAR(255), d int, f int)
-				create table #file_details_tmp(AltName NVARCHAR(32) NULL, Size int, CDate INT, CTime INT, LWDate INT, LWTime INT,  LADate INT, LATime INT, Attributes INT)
-
-				INSERT #file_details_tmp EXECUTE master.dbo.xp_getfiledetails @errorlog_path
-
-				SET @errorlog_path = REVERSE(@errorlog_path)
-
-				SET @dotIdx = CHARINDEX(N'.', @errorlog_path);
-				SET @slashIdx = CHARINDEX(N'\', @errorlog_path);
-				SET @errorlog_path = REVERSE(@errorlog_path)
-				SET @errorlog_dir = @errorlog_path
-
-				if(@slashIdx &lt;&gt; 0)
-				BEGIN
-				SET @errorlog_dir = SUBSTRING(@errorlog_path, 1, LEN(@errorlog_path) - @slashIdx)
-				SET @errorlog_partfile= SUBSTRING(@errorlog_path, LEN(@errorlog_path) - @slashIdx + 2, 255)
-				END
-
-				if(@dotIdx &lt;&gt; 0)
-				BEGIN
-				SET @errorlog_partfile = SUBSTRING(@errorlog_partfile, 1, LEN(@errorlog_partfile) - @dotIdx + 1)
-				END
-
-				INSERT #err_logs_dir_tmp EXECUTE master.dbo.xp_dirtree @errorlog_dir, 1, 1
-
-				INSERT #err_log_tmp(ArchiveNo, CreateDate, Size, ErrorLog)
-				SELECT
-				0,
-				-- convert the 2 int's (20020912  152026) to yyyy-mm-dd hh:mi:ss
-				CONVERT(datetime, STUFF(STUFF(STR(LWDate, 8), 7, 0, '-'), 5, 0, '-') + ' ' +
-				STUFF(STUFF(REPLACE(STR(LWTime,6), ' ', '0'), 5, 0, ':'), 3, 0, ':')
-				, 120),
-				Size,
-				@errorlog_path
-				FROM #file_details_tmp
-
-				DELETE #file_details_tmp
-
-				declare crslogs insensitive cursor
-				for ( SELECT ErrorLog FROM #err_logs_dir_tmp WHERE ErrorLog like @errorlog_partfile + '[1-9]' )
-				for read only
-				open crslogs
-				fetch crslogs into @errorlog
-				while @@fetch_status &gt;= 0
-				begin
-				SET @ArchiveNo = CONVERT(INT, SUBSTRING(@errorlog, LEN(@errorlog_partfile) + 1, 1))
-				SET @errorlog = @errorlog_dir + '\' + @errorlog
-
-				INSERT #file_details_tmp EXECUTE master.dbo.xp_getfiledetails @errorlog
-
-				INSERT #err_log_tmp(ArchiveNo, CreateDate, Size, ErrorLog)
-				SELECT
-				@ArchiveNo,
-				-- convert the 2 int's (20020912  152026) to yyyy-mm-dd hh:mi:ss
-				CONVERT(datetime, STUFF(STUFF(STR(LWDate, 8), 7, 0, '-'), 5, 0, '-') + ' ' +
-				STUFF(STUFF(REPLACE(STR(LWTime,6), ' ', '0'), 5, 0, ':'), 3, 0, ':')
-				, 120),
-				Size,
-				@errorlog
-				FROM #file_details_tmp
-
-				DELETE #file_details_tmp
-
-				fetch crslogs into @errorlog
-				end
-				close crslogs
-				deallocate crslogs
-
-				DROP TABLE #file_details_tmp
-				DROP TABLE #err_logs_dir_tmp
-				END
-			</prefix>
-		</version>
+		<prefix>
+			create table #err_log_tmp(ArchiveNo int, CreateDate nvarchar(24), Size int)
+			insert #err_log_tmp exec master.dbo.sp_enumerrorlogs 2
+		</prefix>
 		<postfix>
 			drop table #err_log_tmp
 		</postfix>
@@ -141,14 +20,12 @@
 		</property>
 		<property name="Name" type="sysname" cast='true'>er.ArchiveNo</property>
 		<property name="ArchiveNo" type="int">er.ArchiveNo</property>
-		<version min_major='7' max_major='8'>
-			<property name="CreateDate" type="datetime">er.CreateDate</property>
-		</version>
-		<version min_major='9'>
-			<property name="CreateDate" type="datetime">CONVERT(datetime, er.CreateDate, 101)</property>
-		</version>
-		<version min_major='8'>
-			<property name="Size" type="int">er.Size</property>
-		</version>
+		<property name="CreateDate" type="datetime">CONVERT(datetime, er.CreateDate, 101)</property>
+		<!-- The er.CreateDate really is a DateLastModified without any offset/TZ info. It's a public property, so we cannot
+		     really change it now (in 2024), but at least we can expose a true DateLastModified properly typed for applications
+			 to start consuming.
+		 -->
+		<property name="DateLastModified" type="datetimeoffset">TODATETIMEOFFSET(CONVERT(datetime, er.CreateDate, 101),DATEDIFF(minute, SYSUTCDATETIME(), SYSDATETIME()))</property>
+		<property name="Size" type="int">er.Size</property>
 	</properties>
 </EnumObject>

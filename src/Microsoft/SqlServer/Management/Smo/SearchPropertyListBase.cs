@@ -133,7 +133,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
 
             var sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -220,7 +220,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptDrop(StringCollection dropQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -278,7 +278,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptAlter(StringCollection alterQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
 
             if (sp.IncludeScripts.Owner)
             {

@@ -5,7 +5,4 @@
     <!-- SqlClrProvider doesn't build for all platforms, let it get pulled in as needed-->
     <ProjectReference Remove="**\Microsoft.SqlServer.SqlClrProvider.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(GacVersion)' != 'true'">
-    <ProjectReference Remove="**\Microsoft.SqlServer.BatchParserClient.csproj" />
-  </ItemGroup>
 </Project>

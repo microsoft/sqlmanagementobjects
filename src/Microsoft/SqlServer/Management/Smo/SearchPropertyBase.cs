@@ -91,7 +91,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             // SearchProperty objects can be enumerated on Azure DB but cannot be created
             ThrowIfCloud(sp.TargetDatabaseEngineType);
             var sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -159,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptDrop(StringCollection dropQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
 
             // DROP N'property_name'
             dropQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER {0} {1} DROP {2};", SearchPropertyListConstants.SearchPropertyList, MakeSqlBraket(this.Parent.Name), MakeSqlString(this.Name)));

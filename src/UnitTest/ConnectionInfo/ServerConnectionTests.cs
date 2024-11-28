@@ -188,5 +188,17 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             Assert.That(databaseConnection, Is.Not.SameAs(serverConnection), "Reused same connection for mismatched database name");
             Assert.That(databaseConnection.DatabaseName, Is.EqualTo("someotherdatabase"), "Wrong name");
         }
+
+#if MICROSOFTDATA
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_constructor_copies_Authentication_from_SqlConnection()
+        {
+            var connStr = new SqlConnectionStringBuilder() { Authentication = SqlAuthenticationMethod.ActiveDirectoryServicePrincipal };
+            var serverConnection = new ServerConnection(new SqlConnection(connStr.ConnectionString));
+            Assert.That(serverConnection.Authentication, Is.EqualTo(SqlConnectionInfo.AuthenticationMethod.ActiveDirectoryServicePrincipal));
+
+        }
+#endif
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
@@ -97,25 +98,6 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
     /// <summary>
-    /// Internal enum - contains all versions supported by SMO.
-    /// Note that 7.0 is not exposed publicly so this is why we have this enum.
-    /// </summary>
-    internal enum SqlServerVersionInternal
-    {
-        Version70 = 0,
-        Version80 = 1,
-        Version90 = 2,
-        Version100 = 3,
-        Version105 = 4,
-        Version110 = 5,
-        Version120 = 6,
-        Version130 = 7,
-        Version140 = 8,
-        Version150 = 9,
-        Version160 = 10
-    }
-
-    /// <summary>
     /// Enumerates versions of SqlServer supported by SMO.
     /// </summary>
 
@@ -144,6 +126,9 @@ namespace Microsoft.SqlServer.Management.Smo
         Version150 = 9,
         [DisplayNameKey("ServerSQLv160")]
         Version160 = 10,
+        [DisplayNameKey("ServerSQLv170")]
+        Version170 = 11,
+        // VBUMP
     }
 
     public static class TypeConverters
@@ -824,20 +809,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        /// <summary>
-        /// The server version on which the scripts will run.
-        /// </summary>
-        internal SqlServerVersionInternal TargetServerVersionInternal
-        {
-            get
-            {
-                return this.scriptingPreferences.TargetServerVersionInternal;
-            }
-            set
-            {
-                this.scriptingPreferences.TargetServerVersionInternal = value;
-            }
-        }
 
         /// <summary>
         /// The server version on which the scripts will run.
@@ -885,7 +856,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Sets the TargetServerVersionInternal based on a ServerVersion structure.
+        /// Sets the TargetServerVersion based on a ServerVersion structure.
         /// </summary>
         /// <param name="ver"></param>
         public void SetTargetServerVersion(ServerVersion ver)
@@ -915,9 +886,14 @@ namespace Microsoft.SqlServer.Management.Smo
                     return new ServerVersion(14, 0, 0);
                 case SqlServerVersion.Version150:
                     return new ServerVersion(15, 0, 0);
-                default:
-                    Diagnostics.TraceHelper.Assert(ver == SqlServerVersion.Version160, "unexpected server version");
+                case SqlServerVersion.Version160:
                     return new ServerVersion(16, 0, 0);
+                case SqlServerVersion.Version170:
+                    return new ServerVersion(17, 0, 0);
+                    //VBUMP
+                default:
+                    Debug.Fail("unexpected server version");
+                    return new ServerVersion(17, 0, 0);
             }
         }
         /// <summary>

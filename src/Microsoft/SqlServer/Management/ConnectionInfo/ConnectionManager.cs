@@ -706,7 +706,6 @@ end;";
                                 bool catchException)
         {
             //Connection should already be open.
-            string currentDatabaseContext = this.SqlConnectionObject.Database;
 
             try
             {
@@ -724,68 +723,79 @@ end;";
                         return null;
                 }
             }
-            catch (SqlException exc)
+            catch (SqlException exc) when (HandleExecuteException(exc, action,
+                                execObject,
+                                catchException,
+                                fillDataSet, out object result))
             {
-                SqlConnection sqlConnection = this.SqlConnectionObject;
-                bool retry = false;
-                lock(this.connectionLock)
-                {
-                    if (catchException)
-                    {
-                        // For exceptions related to expired tokens, we need to close the connection and force a reopen                
-                        if (AccessToken != null && exc.Number == 0 && exc.Class == 0xb && sqlConnection.State == ConnectionState.Open)
-                        {
-                            sqlConnection.Close();
-                        }
-                        //All SqlExceptions doesn't close SqlConnection object, hence I am catching all the SqlExceptions
-                        //and re-executing only in those cases where connection has been closed with the execption.
-                        if (!this.IsConnectionOpen(sqlConnection)) //Connection is not open.
-                        {
-                            // this is a duplicate check for non-null AccessToken,
-                            // but at some point the initial retry assignment could change to have
-                            // other scenarios that force a closing of the connection
-                            if (AccessToken != null)
-                            {
-                                ConnectionInfoHelper.SetTokenOnConnection(sqlConnection, AccessToken.GetAccessToken());
-                            }
-                            sqlConnection.Open();
-                            // This logic might have an issue if dbname changes. To avoid this issue and avoid running extra queries
-                            // SqlConnection should provide the database id as well
-                            if (sqlConnection.Database != currentDatabaseContext)
-                            {
-                                // we have to make sure database still exists before switching
-                                if (this.IsDatabaseValid(sqlConnection, currentDatabaseContext))
-                                {
-                                    sqlConnection.ChangeDatabase(currentDatabaseContext);
-                                        //resetting original database context.
-                                }
-                            }
-
-                            retry = true;
-                        }
-                    }
-                }
-
-                if (retry)
-                {
-                    try
-                    {
-                        return ExecuteTSql(action, execObject, fillDataSet, false); //Sending false and ensuring that only 1 reattempt is made.
-                    }
-                    catch (SqlException caughtException) //Catch exceptions occuring in retries.
-                    {
-                        Trace.TraceError(string.Format(
-                                                System.Globalization.CultureInfo.CurrentCulture,
-                                                "Exception caught and not thrown while connection retry: {0}",
-                                                caughtException.Message)
-                                                );
-                    }
-                }
-
-                throw exc;
+                return result;
             }
         }
 
+        private bool HandleExecuteException(SqlException exc, ExecuteTSqlAction action,
+                                object execObject, bool catchException,
+                                DataSet fillDataSet, out object result)
+        {
+            var currentDatabaseContext = SqlConnectionObject.Database;
+            var sqlConnection = SqlConnectionObject;
+            var retry = false;
+            lock (connectionLock)
+            {
+                if (catchException)
+                {
+                    // For exceptions related to expired tokens, we need to close the connection and force a reopen
+                    if (AccessToken != null && exc.Number == 0 && exc.Class == 0xb && sqlConnection.State == ConnectionState.Open)
+                    {
+                        sqlConnection.Close();
+                    }
+                    //All SqlExceptions doesn't close SqlConnection object, hence I am catching all the SqlExceptions
+                    //and re-executing only in those cases where connection has been closed with the execption.
+                    if (!IsConnectionOpen(sqlConnection)) //Connection is not open.
+                    {
+                        // this is a duplicate check for non-null AccessToken,
+                        // but at some point the initial retry assignment could change to have
+                        // other scenarios that force a closing of the connection
+                        if (AccessToken != null)
+                        {
+                            ConnectionInfoHelper.SetTokenOnConnection(sqlConnection, AccessToken.GetAccessToken());
+                        }
+                        sqlConnection.Open();
+                        // This logic might have an issue if dbname changes. To avoid this issue and avoid running extra queries
+                        // SqlConnection should provide the database id as well
+                        if (sqlConnection.Database != currentDatabaseContext)
+                        {
+                            // we have to make sure database still exists before switching
+                            if (IsDatabaseValid(sqlConnection, currentDatabaseContext))
+                            {
+                                sqlConnection.ChangeDatabase(currentDatabaseContext);
+                                //resetting original database context.
+                            }
+                        }
+
+                        retry = true;
+                    }
+                }
+            }
+
+            if (retry)
+            {
+                try
+                {
+                    result = ExecuteTSql(action, execObject, fillDataSet, false); //Sending false and ensuring that only 1 reattempt is made.
+                    return true;
+                }
+                catch (SqlException caughtException) //Catch exceptions occuring in retries.
+                {
+                    Trace.TraceError(string.Format(
+                                            CultureInfo.CurrentCulture,
+                                            "Exception caught and not thrown while connection retry: {0}",
+                                            caughtException.Message)
+                                            );
+                }
+            }
+            result = null;
+            return false;
+        }
         /// <summary>
         /// Verifies that a given database exists
         /// </summary>

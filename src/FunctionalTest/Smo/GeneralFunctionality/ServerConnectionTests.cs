@@ -41,6 +41,11 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         {
             ExecuteWithDbDrop((db) =>
             {
+                if (SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.NotSpecified && SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.SqlPassword)
+                {
+                    Trace.TraceWarning($"Skipping SqlCredential test on {SqlConnectionStringBuilder.DataSource} because SQL logins are not available");
+                    return;
+                }
                 var pwd = this.SqlConnectionStringBuilder.Password;
                 var secureString = new SecureString();
                 foreach (var c in pwd)
@@ -272,12 +277,12 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestMethod]
         public void ServerConnection_SqlExecutionMode_is_preserved_after_lazy_fetch_queries()
         {
-            ExecuteTest(() =>
+            ExecuteFromDbPool((db) =>
             {
                 var conn = new SqlConnection(ServerContext.ConnectionContext.ConnectionString);
                 var server = new Management.Smo.Server(new ServerConnection(conn));
                 server.ConnectionContext.SqlExecutionModes = SqlExecutionModes.CaptureSql;
-                var db = server.Databases[0];
+                db = server.Databases[db.Name];
                 // It's important to trigger a full property dictionary lazy fetch to reproduce the issue being tested
                 var temp = !db.IsSupportedProperty(nameof(db.IsDatabaseSnapshot)) || db.IsDatabaseSnapshot;
                 Trace.TraceInformation($"Tracing otherwise unused value {temp}");

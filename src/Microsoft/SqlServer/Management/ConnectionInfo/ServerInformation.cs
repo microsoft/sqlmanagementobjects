@@ -3,7 +3,9 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text;
 #if MICROSOFTDATA
 #else
@@ -109,6 +111,7 @@ namespace Microsoft.SqlServer.Management.Common
             get { return connectionProtocol; }
         }
 
+        private static readonly HashSet<DatabaseEngineEdition> validEditions = new HashSet<DatabaseEngineEdition>(Enum.GetValues(typeof(DatabaseEngineEdition)).Cast<DatabaseEngineEdition>());
         // this query needs to be safe on all platforms. DW and Sql2005 don't support CONNECTIONPROPERTY
         private const string serverVersionQuery = @"DECLARE @edition sysname;
 SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
@@ -131,7 +134,7 @@ SERVERPROPERTY('ProductVersion') AS ProductVersion,
                 // Pre v14 is all Windows
                 cmdBuilder.AppendLine(@"select N'Windows' as host_platform");
             }
-
+                
             if (serverVersion.Major >= 10)
             {
                 cmdBuilder.AppendLine(@"if @edition = N'SQL Azure' 
@@ -151,9 +154,13 @@ else
                 dataAdapter.SelectCommand = sqlCommand;
                 dataAdapter.Fill(dataSet);
 
-                DatabaseEngineType engineType = (DatabaseEngineType)dataSet.Tables[0].Rows[0]["DatabaseEngineType"];
-                DatabaseEngineEdition edition = (DatabaseEngineEdition)dataSet.Tables[0].Rows[0]["DatabaseEngineEdition"];
-
+                var engineType = (DatabaseEngineType)dataSet.Tables[0].Rows[0]["DatabaseEngineType"];
+                var edition = (DatabaseEngineEdition)dataSet.Tables[0].Rows[0]["DatabaseEngineEdition"];
+                // Treat unknown editions from Azure the same as Azure SQL database
+                if (engineType == DatabaseEngineType.SqlAzureDatabase && !validEditions.Contains(edition))
+                {
+                    edition = DatabaseEngineEdition.SqlDatabase;
+                }
                 // If we're on Managed Instance, don't treat it as a "Sql Azure", but as "Standalone"
                 // Also, determine the underlying engine version.
                 //

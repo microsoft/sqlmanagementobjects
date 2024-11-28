@@ -1,0 +1,99 @@
+
+trigger: none # https://aka.ms/obpipelines/triggers
+
+parameters: # parameters are shown up in ADO UI in a build queue time
+- name: 'debug'
+  displayName: 'Enable debug output'
+  type: boolean
+  default: false
+
+resources:
+  repositories: 
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - template: include-commonvariables.yml@self
+  - name: AssemblyBuildVersion
+    value: $[counter(format('{0}{1}',variables['FabricOpsMajorVersion'], variables['FabricOpsMinorVersion']), 0)]
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  parameters:
+    featureFlags:
+      EnableCDPxPAT: false
+    cloudvault: # https://aka.ms/obpipelines/cloudvault
+      enabled: false
+    globalSdl: # https://aka.ms/obpipelines/sdl
+      tsa:
+        enabled: false # onebranch publish all sdl results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
+      # credscan:
+      #   suppressionsFile: $(Build.SourcesDirectory)\.config\CredScanSuppressions.json
+      binskim:
+        break: true # Is this redundant with ob_sdk_binskim_break?
+        scanOutputDirectoryOnly: true 
+      policheck:
+        break: true # always break the build on policheck issues. You can disable it by setting to 'false'
+      suppression:
+         suppressionFile: $(Build.SourcesDirectory)\.gdn\global.gdnsuppress
+
+    stages:
+    - stage: build
+      jobs:
+      - job: PublicPackages
+        pool:
+          type: windows  # read more about custom job pool types at https://aka.ms/obpipelines/yaml/jobs
+
+        variables:
+            ob_outputDirectory: '$(BaseOutputPath)' # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
+            ob_sdl_binskim_break: true # https://aka.ms/obpipelines/sdl
+            ob_symbolsPublishing_enabled:  ${{ or( eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/rel') ) }} # https://aka.ms/obpipelines/symbols
+            # ob_sdl_suppression_suppressionFile: $(Build.SourcesDirectory)\.gdn\build.official.gdnsuppress
+
+        steps:
+          - task: onebranch.pipeline.version@1 # generates automatic version. For other versioning options check https://aka.ms/obpipelines/versioning
+            displayName: 'Set up BuildNumber'
+            inputs:
+              system: 'Custom'
+              customVersion: '$(FabricOpsMajorVersion).$(FabricOpsMinorVersion).$(AssemblyBuildVersion)'
+              exclude_commit: true
+
+          - template: .pipelines/include-build-fabricops.yml@self
+            parameters:
+              BuildConfiguration: Release
+              MsBuildArguments: /bl:$(ob_outputDirectory)\msbuild.binlog
+    
+          - task: onebranch.pipeline.signing@1 # https://aka.ms/obpipelines/signing
+            displayName: 'Sign output'
+            inputs:
+              command: 'sign'
+              signing_profile: 'external_distribution'
+              files_to_sign: '**/Microsoft.SqlServer.Management.FabricUtils.dll;**/SqlFabricOps.dll;**/SqlFabricOps.exe'
+              search_root: '$(BaseOutputPath)'
+
+          - task: onebranch.pipeline.signing@1 # https://aka.ms/obpipelines/signing
+            displayName: 'Sign apphost'
+            inputs:
+              command: 'sign'
+              signing_profile: 'external_distribution'
+              files_to_sign: '**/apphost.exe'
+              search_root: '$(Build.SourcesDirectory)\obj'
+
+          - task: MSBuild@1
+            displayName: 'Build public nuget packages'
+            inputs:
+              solution: src\FabricOps\dirs.proj
+              createLogFile: true
+              logFileVerbosity: diag
+              msbuildArguments: -noAutoResponse -restore:false -p:Configuration=Release /p:ContinuousIntegrationBuild=true /p:nobuild=true /t:pack
+
+          - task: onebranch.pipeline.signing@1 # https://aka.ms/obpipelines/signing
+            displayName: 'Sign public nuget packages'
+            inputs:
+              command: 'sign'
+              signing_profile: 'external_distribution'
+              files_to_sign: '**/*nupkg'
+              search_root: '$(BaseOutputPath)'
+

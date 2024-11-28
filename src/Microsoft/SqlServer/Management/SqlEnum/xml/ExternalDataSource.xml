@@ -21,8 +21,8 @@
     </version>
     <!--  External Generics is only available on prem. -->
     <version min_major='15'>
-      <property name="ConnectionOptions" access="read" type="sysname">ISNULL(eds.connection_options,N'')</property>
-      <property name="PushdownOption"    access="read" type="tinyint" report_type="ExternalDataSourcePushdownOption">case when ISNULL(eds.pushdown,N'OFF') = 'OFF' then 0 else 1 end</property>
+      <property name="ConnectionOptions" type="sysname">ISNULL(eds.connection_options,N'')</property>
+      <property name="PushdownOption" type="tinyint" report_type="ExternalDataSourcePushdownOption">case when ISNULL(eds.pushdown,N'OFF') = 'OFF' then 0 else 1 end</property>
     </version>
   </properties>
 </EnumObject>

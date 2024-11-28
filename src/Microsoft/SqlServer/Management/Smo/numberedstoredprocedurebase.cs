@@ -183,7 +183,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (sp.IncludeScripts.ExistenceCheck)
                 {
-                    if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)
+                    if (sp.TargetServerVersion <= SqlServerVersion.Version80)
                     {
                         sb.AppendFormat(SmoApplication.DefaultCulture,
                             Scripts.INCLUDE_EXISTS_NUMBERED_PROCEDURE80, "NOT",

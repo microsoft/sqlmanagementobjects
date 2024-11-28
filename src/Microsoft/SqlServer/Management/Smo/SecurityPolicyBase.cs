@@ -155,7 +155,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.Append(string.Format(SmoApplication.DefaultCulture,
                    Scripts.INCLUDE_EXISTS_SECURITY_POLICY, String.Empty, fullyFormattedName));
@@ -165,10 +165,10 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             sb.Append("DROP SECURITY POLICY " +
-                ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty) +
+                ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty) +
                 fullyFormattedName);
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.Append(sp.NewLine);
                 sb.Append(Scripts.END);

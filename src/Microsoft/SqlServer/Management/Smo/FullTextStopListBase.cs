@@ -106,7 +106,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             Property property;
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
             {
                 if (sp.IncludeScripts.Header)
                 {
@@ -230,7 +230,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
             {
                 if (sp.IncludeScripts.Header)
                 {

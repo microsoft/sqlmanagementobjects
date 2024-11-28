@@ -306,7 +306,7 @@ namespace Microsoft.SqlServer.Management.Smo
         //
         private void ScriptAudit(StringCollection query, ScriptingPreferences sp, bool create)
         {
-            ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion100(sp.TargetServerVersion);
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
 
@@ -364,7 +364,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Property filter = this.GetPropertyOptional("Filter");
                 string strFilter = filter.Value as string;
 
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110
+                if (sp.TargetServerVersion >= SqlServerVersion.Version110
                     && sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone)
                 {
                     if ((create || filter.Dirty) && !string.IsNullOrEmpty(strFilter))
@@ -500,7 +500,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             return failureAction;
 
                         case OnFailureAction.FailOperation:
-                            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110 && sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone)
+                            if (sp.TargetServerVersion >= SqlServerVersion.Version110 && sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone)
                             {
                                 return failureAction;
                             }
@@ -585,7 +585,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if ((maxFiles.Dirty || (create && !maxFiles.IsNull)) && ((int)maxFiles.Value != 0 || (!maxRolloverFiles.Dirty && !create)))
                 {
-                    if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version110
                         && sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone)
                     {
                         //script max files

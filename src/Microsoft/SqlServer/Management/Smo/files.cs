@@ -340,14 +340,12 @@ namespace Microsoft.SqlServer.Management.Smo
         // is accepting. 
         private void AppendSize(ScriptingPreferences sp, StringBuilder ddl, double size)
         {
-            // is source or target a Sphinx server?
-            bool is70 = ((ServerVersion.Major == 7) || (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70));
 
             bool isTransformed = false;
             if (size > Int32.MaxValue)
             {
-                // transform KB into MB for 7.0, GB for 8.0
-                size = size / (01 << (is70 ? 10 : 20));
+                // transform KB into  GB 
+                size = size / (01 <<  20);
                 isTransformed = true;
             }
 
@@ -359,7 +357,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (isTransformed)
             {
                 ddl.AppendFormat(SmoApplication.DefaultCulture, "{0}{1} ",
-                        Convert.ToInt32(size, SmoApplication.DefaultCulture), is70 ? "MB" : "GB");
+                        Convert.ToInt32(size, SmoApplication.DefaultCulture), "GB");
             }
             else
             {
@@ -397,7 +395,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Property pMaxSize = Properties.Get("MaxSize");
 
-            if (this.IsFileStreamBasedFile() && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version110)
+            if (this.IsFileStreamBasedFile() && sp.TargetServerVersion < SqlServerVersion.Version110)
             {
                 // The MaxSize property specification is not valid for FileStream based filegroups
                 // in versions less than Denali.
@@ -989,7 +987,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             //Default not allowed for primary filegroup at time of creation of database as it is default automatically.
             if (Properties.Get("IsDefault").Value != null && this.Properties["IsDefault"].Dirty && this.IsDefault 
-                && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100 &&
+                && sp.TargetServerVersion >= SqlServerVersion.Version100 &&
                 this.ServerVersion.Major >= 10)
             {
                 throw new SmoException(ExceptionTemplates.PrimaryAlreadyDefault);

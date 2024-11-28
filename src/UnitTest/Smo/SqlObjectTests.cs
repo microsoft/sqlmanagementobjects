@@ -32,7 +32,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                                      "test\"db", "test\"\"db", //Double Quotes (not reserved character, added for completeness since it is reserved in other scenarios such as T-SQL)
                                      "test'[\"''[[\"\""}; //All
 
-#if NET462
+#if NET462_OR_GREATER
         [TestInitialize]
         public void Initialize()
         {
@@ -125,7 +125,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             }
         }
 
-#if NET462
+#if NET462_OR_GREATER
         [TestMethod]
         [TestCategory("Unit")]
         public void When_isolation_registry_valid_BuildSql_returns_script_with_isolation_set()
@@ -154,8 +154,8 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
         public void SqlPropertMetadataProvider_implementations_have_correct_number_of_versions()
         {
             // VBUMP
-            const int standaloneVersionCount = 11; //7.0, 8.0, 9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0
-            const int cloudVersionCount = 3; //10.0, 11.0, 12.0
+            int standaloneVersionCount = new[] { 7.0, 8.0, 9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0 }.Length;
+            int cloudVersionCount = new[] { 10.0, 11.0, 12.0 }.Length;
             var metadataType = typeof(SqlPropertyMetadataProvider);
             var providers = metadataType.Assembly.GetTypes().Where(t => t != metadataType && metadataType.IsAssignableFrom(t)).ToArray();
             Assert.Multiple(() =>

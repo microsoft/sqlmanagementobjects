@@ -15,11 +15,13 @@ namespace Microsoft.SqlServer.Management.Common
         internal TransferException() : base() {}
         internal TransferException(string message) : base(message) {}
         internal TransferException(string message, Exception innerException) : base(message, innerException) {}
+#if !NETCOREAPP
 
         protected TransferException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     public delegate void DataTransferEventHandler(object sender, DataTransferEventArgs e);

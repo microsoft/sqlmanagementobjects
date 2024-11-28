@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -208,10 +209,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDataWarehouse)]
         public void When_user_has_no_access_to_master_sproc_can_be_scripted()
         {
-            this.ExecuteWithDbDrop(
+            ExecuteWithDbDrop(
                 db =>
                 {
-                   
+
                     var name = GenerateSmoObjectName("procNoMaster");
                     _SMO.StoredProcedure proc = new _SMO.StoredProcedure(db, name);
 
@@ -236,7 +237,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                                 InitialCatalog = db.Name,
                                 UserID = user.Name,
                                 // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="not secret")]
-                                Password = pwd
+                                Password = pwd,
+                                Authentication = SqlAuthenticationMethod.SqlPassword,
                             };
                         using (var sqlConn = new SqlConnection(connStr.ToString()))
                         {

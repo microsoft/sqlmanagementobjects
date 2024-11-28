@@ -105,11 +105,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void ScriptUDF(StringCollection queries, ScriptingPreferences sp, ScriptHeaderType scriptHeaderType)
         {
-            // for UDF we do not do anything on 7.0 server
-            if (SqlServerVersionInternal.Version70 == sp.TargetServerVersionInternal)
-            {
-                return;
-            }
             // Azure SQL DW database only support Scaler-Valued UDF, throw if object not this type while
             // scripting against SQL DW
             UserDefinedFunctionType functionType = this.GetPropValueOptional<UserDefinedFunctionType>("FunctionType",
@@ -173,26 +168,17 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (ImplementationType.SqlClr == (ImplementationType)property.Value)
                 {
-                    // CLR procedures are not supported on versions prior to 9.0 or Azure
-                    //prior to version 12 (Sterling) so throw an error saying we can't create it there
-                    if (ServerVersion.Major < 9 ||
-                        (this.DatabaseEngineType == Cmn.DatabaseEngineType.SqlAzureDatabase && ServerVersion.Major < 12))
+                    // CLR procedures are not supported on versions prior to 9.0 
+                    if (ServerVersion.Major < 9)
                     {
                         throw new WrongPropertyValueException(ExceptionTemplates.ClrNotSupported("ImplementationType", ServerVersion.ToString()));
                     }
 
                     //CLR UDF is not supported if target server is Azure below v12.0
-                    if (sp.TargetDatabaseEngineType == Cmn.DatabaseEngineType.SqlAzureDatabase)
-                    {
-                        ThrowIfBelowVersion120(sp.TargetServerVersionInternal,
-                            ExceptionTemplates.ClrUserDefinedFunctionDownlevel(
-                            FormatFullNameForScripting(sp, true),
-                            GetSqlServerName(sp)));
-                    }
-                    else
+                    if (sp.TargetDatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
                     {
                     // it insures we can't script a CLR UDF that targets a 8.0 server
-                   ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+                   ThrowIfBelowVersion90(sp.TargetServerVersion,
                         ExceptionTemplates.ClrUserDefinedFunctionDownlevel(
                             FormatFullNameForScripting(sp, true),
                             GetSqlServerName(sp)));
@@ -208,7 +194,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     string sExists;
                     sExists = (sp.ScriptForAlter) ? string.Empty : "NOT";
-                    if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 && this.ServerVersion.Major >= 9)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90 && this.ServerVersion.Major >= 9)
                     {
                         sb.AppendFormat(Scripts.INCLUDE_EXISTS_FUNCTION90, sExists, SqlString(sFullScriptingName));
                     }
@@ -223,7 +209,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             StringBuilder udfBody = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            if (false == this.TextMode || (true == sp.OldOptions.EnforceScriptingPreferences && true == sp.DataType.UserDefinedDataTypesToBaseType))
+            if (!TextMode || (sp.OldOptions.EnforceScriptingPreferences && sp.DataType.UserDefinedDataTypesToBaseType))
             {
                 if (!sp.OldOptions.DdlBodyOnly)
                 {
@@ -236,7 +222,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             udfBody.AppendFormat(SmoApplication.DefaultCulture, "{0} FUNCTION {1}", Scripts.ALTER, sFullScriptingName);
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
-                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersionInternal,
+                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
                                 ExceptionTemplates.CreateOrAlterDownlevel(
                                     "Function",
                                     GetSqlServerName(sp)));
@@ -284,7 +270,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         if (!IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType))
                         {
                             if (ServerVersion.Major >= 13 &&
-                                sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130)
+                                sp.TargetServerVersion >= SqlServerVersion.Version130)
                             {
                                 // script Hekaton properties
                                 if (IsSupportedProperty("IsNativelyCompiled", sp))
@@ -303,7 +289,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         // we can't specify execution context for inline table-valued functions
                         if (type != UserDefinedFunctionType.Inline)
@@ -375,10 +361,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        // this check ensures we can't script a CLR UDF that targets Cloud Engine below v12.0
-                        ThrowIfCloudAndBelowVersion120(sp.TargetDatabaseEngineType, sp.TargetServerVersionInternal, ExceptionTemplates.ClrUserDefinedFunctionDownlevel(
-                                FormatFullNameForScripting(sp, true),
-                                GetSqlServerName(sp)));
 
                         udfBody.Append("EXTERNAL NAME ");
 
@@ -448,12 +430,12 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
             // UDFs are not scriptable on 7.0
-            ThrowIfBelowVersion80(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion80(sp.TargetServerVersion);
             ThrowIfCompatibilityLevelBelow80();
 
             if (this.State != SqlSmoState.Creating && this.IsEncrypted && this.ImplementationType == ImplementationType.TransactSql)
             {
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion90(sp.TargetServerVersion,
                     ExceptionTemplates.EncryptedUserDefinedFunctionsDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
@@ -485,7 +467,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptCreateOrAlter(StringCollection queries, ScriptingPreferences sp)
         {
             // UDFs are not scriptable on 7.0
-            ThrowIfBelowVersion80(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion80(sp.TargetServerVersion);
             ThrowIfCompatibilityLevelBelow80();
 
             InitializeKeepDirtyValues();
@@ -525,16 +507,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
-                sb.AppendFormat(SmoApplication.DefaultCulture, sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 ?
+                sb.AppendFormat(SmoApplication.DefaultCulture, sp.TargetServerVersion < SqlServerVersion.Version90 ?
                     Scripts.INCLUDE_EXISTS_FUNCTION80 : Scripts.INCLUDE_EXISTS_FUNCTION90,
                     "", SqlString(sFullScriptingName));
                 sb.Append(sp.NewLine);
             }
 
             sb.AppendFormat(SmoApplication.DefaultCulture, "DROP FUNCTION {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 sFullScriptingName);
 
             queries.Add(sb.ToString());

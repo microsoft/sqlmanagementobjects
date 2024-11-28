@@ -181,7 +181,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         SqlException se = cfe.InnerException as SqlException;
                         if (se != null && (se.Number == 40892 || se.Number == 4060 ||
-                           (this.State == SqlSmoState.Existing && (se.Number == 916 || se.Number == 18456 || se.Number == 110003))))
+                           (State == SqlSmoState.Existing && (se.Number == 916 || se.Number == 18456 || se.Number == 110003))) ||
+                           // For non-SQL auth, 18456 is raised for databases that don't exist
+                           (State == SqlSmoState.Creating && se.Number == 18456))
                         {
                             // Pass args as params since cfe may contain {#} in it which will cause formatting to fail if inserted directly
                             Diagnostics.TraceHelper.Trace("Database SMO Object", "Failed to connect for edition fetch, defaulting to Unknown edition. State: {0} PropertyBagState: {1} {2}", State, propertyBagState, cfe);
@@ -399,7 +401,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (sp.IncludeScripts.ExistenceCheck)
             {
-                if ((int) SqlServerVersionInternal.Version90 <= (int) sp.TargetServerVersionInternal)
+                if ((int) SqlServerVersion.Version90 <= (int) sp.TargetServerVersion)
                 {
                     sbStatement.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_DATABASE90, "NOT",
                         FormatFullNameForScripting(sp, false));
@@ -485,7 +487,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 // on 7.0 server we do not script collation , and ScriptCreateForCloud handles collation for azure
                 if (!isAzureDb && sp.IncludeScripts.Collation && this.ServerVersion.Major > 7 &&
-                    ((int) SqlServerVersionInternal.Version80 <= (int) sp.TargetServerVersionInternal))
+                    ((int) SqlServerVersion.Version80 <= (int) sp.TargetServerVersion))
                 {
                     Property propCollation = State == SqlSmoState.Creating
                         ? Properties.Get("Collation")
@@ -548,7 +550,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion < SqlServerVersion.Version90)
                 {
                     throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyOn90).SetHelpContext(
                         "SupportedOnlyOn90");
@@ -616,7 +618,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if(SmoUtility.IsSupportedObject<FileGroup>(this, sp) && !IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType))
             {
                 if(this.ServerVersion.Major >= 13 &&
-                    (int) SqlServerVersionInternal.Version130 <= (int) sp.TargetServerVersionInternal)
+                    (int) SqlServerVersion.Version130 <= (int) sp.TargetServerVersion)
                 {
                     GetAutoGrowFilesScript(createQuery, sp);
                 }
@@ -624,18 +626,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (!databaseIsView)
             {
-                if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70)
-                {
-                    ScriptDbProps70Comp(createQuery, sp);
-                }
-                else
-                {
                     ScriptDbProps80Comp(createQuery, sp, isAzureDb);
-                }
             }
 
             // enable vardecimal compression as needed
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 bool forCreateScript = true;
                 ScriptVardecimalCompression(createQuery, sp, forCreateScript);
@@ -1007,36 +1002,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private void ScriptDbProps70Comp(StringCollection query, ScriptingPreferences sp)
-        {
-            bool bSuppressDirtyCheck = sp.SuppressDirtyCheck;
-
-            string dbName = this.FormatFullNameForScripting(sp, false);
-
-            if (IsSupportedProperty("IsFullTextEnabled", sp))
-            {
-                Property propFullTextEnabled = Properties.Get("IsFullTextEnabled");
-                if (null != propFullTextEnabled.Value &&
-                     (propFullTextEnabled.Dirty || !sp.ScriptForAlter))
-                {
-                    query.Add(string.Format(SmoApplication.DefaultCulture,
-                        "IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')){0}begin{0}EXEC {1}.[dbo].[sp_fulltext_database] @action = '{2}'{0}end",
-                        Globals.newline, FormatFullNameForScripting(sp), (bool)propFullTextEnabled.Value ? "enable" : "disable"));
-                }
-            }
-
-            Property propCompat = Properties.Get("CompatibilityLevel");
-            if (null != propCompat.Value && (propCompat.Dirty || !sp.ScriptForAlter))
-            {
-                //script only if compatibility level is less than the target server
-                if ((int)(CompatibilityLevel)propCompat.Value <= 70)
-                {
-                    query.Add(string.Format(SmoApplication.DefaultCulture, "EXEC sp_dbcmptlevel @dbname={0}, @new_cmptlevel={1}",
-                                             dbName, Enum.Format(typeof(CompatibilityLevel), (CompatibilityLevel)propCompat.Value, "d")));
-                }
-            }
-
-        }
 
         private void ScriptDbProps80Comp(StringCollection query, ScriptingPreferences sp, bool isAzureDb)
         {
@@ -1075,51 +1040,56 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void AddCompatibilityLevel(StringCollection query, ScriptingPreferences sp)
         {
-            Property propCompat = Properties.Get("CompatibilityLevel");
+            Property propCompat = Properties.Get(nameof(CompatibilityLevel));
             if (null != propCompat.Value && (propCompat.Dirty || !sp.ScriptForAlter))
             {
+                // VBUMP
+                var isVersion170WithCompatLevelLessThan170 =
+                    (sp.TargetServerVersion == SqlServerVersion.Version170) &&
+                    ((int)(CompatibilityLevel)propCompat.Value <= 170);
+
                 bool isTargetSqlAzureOrMIOrMIAA = (sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase) ||
                     (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance) ||
                     (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlAzureArcManagedInstance);
 
                 bool isVersion160WithCompatLevelLessThan160 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version160) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version160) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 160);
 
                 bool isVersion150WithCompatLevelLessThan150 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version150) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version150) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 150);
 
                 bool isVersion140WithCompatLevelLessThan140 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version140) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version140) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 140);
 
                 bool isVersion130WithCompatLevelLessThan130 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version130) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version130) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 130);
 
                 bool isVersion120WithCompatLevelLessThan120 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version120) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version120) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 120);
 
                 bool isVersion110WithCompatLevelLessThan110 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version110) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version110) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 110);
 
                 bool isVersion105WithCompatLevelLessThan105 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version105) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version105) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 105);
 
                 bool isVersion100WithCompatLevelLessThan100 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version100) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version100) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 100);
 
                 bool isVersion90WithCompatLevelLessThan90 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version90) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 90);
 
                 bool isVersion80WithCompatLevelLessThan80 =
-                    (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version80) &&
+                    (sp.TargetServerVersion == SqlServerVersion.Version80) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 80);
 
                 bool isVersion80Or90WithLowerCompatLevel = isVersion90WithCompatLevelLessThan90 || isVersion80WithCompatLevelLessThan80;
@@ -1133,7 +1103,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     isVersion140WithCompatLevelLessThan140 ||
                     isVersion150WithCompatLevelLessThan150 ||
                     isVersion160WithCompatLevelLessThan160 ||
+                    isVersion170WithCompatLevelLessThan170 ||
                     isTargetSqlAzureOrMIOrMIAA;
+                    // VBUMP
 
                 //script only if compatibility level is less than the target server
                 // on Alter() we just script it and let the server fail if it is not correct
@@ -1165,21 +1137,21 @@ namespace Microsoft.SqlServer.Management.Smo
         private CompatibilityLevel UpgradeCompatibilityValueIfRequired(ScriptingPreferences sp, CompatibilityLevel compatibilityLevel)
         {
             // Return Compatibility level 90 if it is less when scripting for server version 110.
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110 && compatibilityLevel <= CompatibilityLevel.Version80)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version110 && compatibilityLevel <= CompatibilityLevel.Version80)
             {
                 return CompatibilityLevel.Version90;
             }
 
             //Return Compatibility level 80 if it is less when scripting for Server version 100/105
-            if (((sp.TargetServerVersionInternal == SqlServerVersionInternal.Version105) ||
-                (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version100)) &&
+            if (((sp.TargetServerVersion == SqlServerVersion.Version105) ||
+                (sp.TargetServerVersion == SqlServerVersion.Version100)) &&
                 (compatibilityLevel <= CompatibilityLevel.Version70))
             {
                 return CompatibilityLevel.Version80;
             }
 
             //Return Compatibility level 70 if it is less when Scripting for Server version 90
-            if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90 && compatibilityLevel <= CompatibilityLevel.Version65)
+            if (sp.TargetServerVersion == SqlServerVersion.Version90 && compatibilityLevel <= CompatibilityLevel.Version65)
             {
                 return CompatibilityLevel.Version70;
             }
@@ -1874,7 +1846,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     //When ContainmentType is not None, then only we will not script the database
                     //to the earlier versions and to SqlAzure database engine.
                     ThrowIfCloud(sp.TargetDatabaseEngineType);
-                    ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+                    ThrowIfBelowVersion110(sp.TargetServerVersion);
 
                     this.DefaultFullTextLanguage.VerifyBothLcidAndNameNotDirty(false);
                     this.DefaultLanguage.VerifyBothLcidAndNameNotDirty(false);
@@ -1898,18 +1870,13 @@ namespace Microsoft.SqlServer.Management.Smo
             //Scripts containment related part of create database ddl
             this.ScriptAlterContainmentDDL(sp, alterQuery);
 
-            if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70)
+            
+            ScriptDbProps80Comp(alterQuery, sp, Cmn.DatabaseEngineType.SqlAzureDatabase == sp.TargetDatabaseEngineType);
+            if (IsSupportedProperty("MirroringPartner", sp))
             {
-                ScriptDbProps70Comp(alterQuery, sp);
+                ScriptMirroringOptions(alterQuery, sp);
             }
-            else
-            {
-                ScriptDbProps80Comp(alterQuery, sp, Cmn.DatabaseEngineType.SqlAzureDatabase == sp.TargetDatabaseEngineType);
-                if (IsSupportedProperty("MirroringPartner", sp))
-                {
-                    ScriptMirroringOptions(alterQuery, sp);
-                }
-            }
+            
 
             if (IsSupportedProperty("EncryptionEnabled", sp))
             {
@@ -1959,7 +1926,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 bool forCreateScript = false;
                 ScriptVardecimalCompression(alterQuery, sp, forCreateScript);
@@ -2032,10 +1999,10 @@ namespace Microsoft.SqlServer.Management.Smo
             // no one can delete "master" database with this function!!
             //note: conditional scripting (so.IncludeIfNotExists) is not supported for
             //  the gateway intercepted statements like Database/Login DDLs -sivasat
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130 &&
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130 &&
                 DatabaseEngineType.SqlAzureDatabase != sp.TargetDatabaseEngineType)
             {
-                if ((int)SqlServerVersionInternal.Version90 <= (int)sp.TargetServerVersionInternal)
+                if ((int)SqlServerVersion.Version90 <= (int)sp.TargetServerVersion)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_DATABASE90,
                                 "", FormatFullNameForScripting(sp, false));
@@ -2049,7 +2016,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             sb.AppendFormat(SmoApplication.DefaultCulture, "DROP DATABASE {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130 &&
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130 &&
                 DatabaseEngineType.SqlAzureDatabase != sp.TargetDatabaseEngineType) ? "IF EXISTS " : string.Empty,
                 FormatFullNameForScripting(sp));
             dropQuery.Add(sb.ToString());
@@ -5461,11 +5428,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private StringCollection GetDefaultFileGroupScript(ScriptingPreferences sp, string dataSpaceName)
         {
             StringCollection results = new StringCollection();
-            if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version70)
-            {
-                throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyOn80).SetHelpContext("SupportedOnlyOn80");
-            }
-            else if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version80)
+            if (sp.TargetServerVersion == SqlServerVersion.Version80)
             {
                 // we check whether the filegroup exists and is already default.  engine throws if
                 // we try to make set default on a filegroup that is already default.
@@ -5514,7 +5477,7 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 ScriptingPreferences sp = new ScriptingPreferences(this);
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version100)
+                if (sp.TargetServerVersion < SqlServerVersion.Version100)
                 {
                     throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyOn100).SetHelpContext("SupportedOnlyOn100");
                 }
@@ -6415,7 +6378,7 @@ SortedList list = new SortedList();
 
             //script only if we are on Yukon or target Yukon and later
             if (this.ServerVersion.Major >= 9 &&
-                sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 // Don't script for Managed Instances - not supported
                 //
@@ -6529,7 +6492,7 @@ SortedList list = new SortedList();
                 ScriptPageVerify(sp, query);
             }
 
-            if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)//for 8.0
+            if (sp.TargetServerVersion < SqlServerVersion.Version90)//for 8.0
             {
                 Property propDbChaining = Properties.Get("DatabaseOwnershipChaining");
                 if (null != propDbChaining.Value &&
@@ -6798,7 +6761,7 @@ SortedList list = new SortedList();
         {
             if (IsSupportedProperty("PageVerify", sp))
             {
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90) //for 8.0
+                if (sp.TargetServerVersion < SqlServerVersion.Version90) //for 8.0
                 {
                     string dbName = this.FormatFullNameForScripting(sp, false);
                     switch (GetPageVerify(sp))

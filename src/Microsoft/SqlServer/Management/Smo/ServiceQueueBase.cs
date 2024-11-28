@@ -76,7 +76,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
 
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             // retrieve the DDL 
             GetDDL(queries, sp, true );
@@ -283,7 +283,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
                 sb.AppendFormat(SmoApplication.DefaultCulture,  " )" );
             }
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version105 &&
+            if (sp.TargetServerVersion >= SqlServerVersion.Version105 &&
                (this.ServerVersion.Major > 10 || (this.ServerVersion.Major >= 10 && this.ServerVersion.Minor >= 50)))
             {
                 object isPoisonMessageHandlingEnabled = GetPropValueOptional("IsPoisonMessageHandlingEnabled");
@@ -318,7 +318,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
 
         internal override void ScriptDrop(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);

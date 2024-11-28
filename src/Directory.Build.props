@@ -21,14 +21,14 @@
     <!-- Workspace used by the loc tool -->
     <BuildPropsDir>$(EnlistmentRoot)\SmoBuild\</BuildPropsDir>
     <TargetGroup Condition="'$(TargetFramework)'=='netstandard2.0'">netstandard</TargetGroup>
-    <TargetGroup Condition="'$(TargetFramework)'=='net6.0'">netcore</TargetGroup>
+    <TargetGroup Condition="'$(TargetFramework)'=='net6.0' or '$(TargetFramework)'=='net8.0'">netcore</TargetGroup>
     <TargetGroup Condition="'$(TargetGroup)'==''">netfx</TargetGroup>
     <CSharpProps Condition="'$(TargetGroup)'== 'netfx'">CSharp.NetFx.props</CSharpProps>
     <CSharpProps Condition="'$(TargetGroup)'== 'netcore'">CSharp.NetCore.props</CSharpProps>
     <CSharpProps Condition="'$(CSharpProps)'==''">CSharp.NetStandard.props</CSharpProps>
     <!-- CA1416 warns if a method is only usable on Windows -->
     <!-- 1668 is CSC complaining about the LIB environment variable having bogus paths, which come from VS -->
-    <NoWarn>$(NoWarn);NU5125;MSB3026;CA1416;CS1668</NoWarn>
+    <NoWarn>$(NoWarn);NU5125;MSB3026;CA1416;CS1668;NU1903</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RestorePackagesPath>$(EnlistmentRoot)\packages</RestorePackagesPath>
     <ExcludeRestorePackageImports>false</ExcludeRestorePackageImports>
@@ -37,7 +37,6 @@
      -->
     <UseMicrosoftData Condition="'$(GacVersion)'=='true' and '$(TargetGroup)'=='netfx'">false</UseMicrosoftData>
     <DefineConstants Condition="'$(UseMicrosoftData)' != 'false'" >$(DefineConstants);MICROSOFTDATA</DefineConstants>
-    <!-- try to stay in sync with SqlServer PS module/ssms/sql assessment for newtonsoft -->
   </PropertyGroup>
   <PropertyGroup Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
      <UseNativeBatchParser>true</UseNativeBatchParser>
@@ -47,13 +46,13 @@
   </PropertyGroup>
   <!-- The default PDB type is now "portable" which is fine for most uses. However, we need full PDBs in 2 cases:
   1. For SSMS and SQL engine builds which are indexed and need to be debuggable by pre-vs2019 
-  2. Debug net462 builds which are used for code coverage
+  2. Debug net472 builds which are used for code coverage
   -->
   <PropertyGroup Condition="'$(Configuration)|$(TargetGroup)' == 'Release|netfx'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net462|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net472|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -87,9 +86,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
-    <SqlParserPackageVersion>172.0.1</SqlParserPackageVersion>
+    <SqlParserPackageVersion>172.1.1</SqlParserPackageVersion>
     <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
-    <SqlClientPackageVersion>5.1.4</SqlClientPackageVersion>
+    <SqlClientPackageVersion>5.1.5</SqlClientPackageVersion>
   </PropertyGroup>
   <Import Project="$(BuildPropsDir)\StrongName.props" Condition="Exists('$(BuildPropsDir)\StrongName.props')" />
   <Import Project="$(BuildPropsDir)\Version.props" />

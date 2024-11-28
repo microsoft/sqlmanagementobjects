@@ -1,52 +1,20 @@
 <?xml version="1.0" ?>
-<EnumObject type="ErrorLogText" impl_type="SqlObject" min_major='7'>
+<EnumObject type="ErrorLogText" impl_type="SqlObject" min_major='9'>
 	<settings>
 		<parent_link>
 			<link parent='ArchiveNo' local='ArchiveNo' />
 		</parent_link>
 	
-		<version min_major='7' max_major='8'>
-			<request_parent_select>
-				<field name='ArchiveNo' />							
-			</request_parent_select>
-		</version>
-		<version min_major='9'>
-			<request_parent_select>
-				<field name='ArchiveNo' />
-			</request_parent_select>
-		</version>
+		<request_parent_select>
+			<field name='ArchiveNo' />
+		</request_parent_select>
+
 		<property_link table="#err_log_text_tmp ert" />
-		<version min_major='9' >
-			<prefix>
-				<link_multiple no='1' expression="
+		<prefix>
+			<link_multiple no='1' expression="
 create table #err_log_text_tmp(LogDate datetime null, ErrorLevel int null, Text nvarchar(4000), ContinuationRow bit, ArchiveNo int null)
 declare @ArchiveNoChild int
 
-declare crs insensitive cursor 
-	for ( {0} ) 
-for read only 
-open crs 
-fetch crs into @ArchiveNoChild
-while @@fetch_status &gt;= 0 
-begin 
-		insert #err_log_text_tmp (LogDate, ErrorLevel, Text) exec master.dbo.sp_readerrorlog @ArchiveNoChild, 2
-		update #err_log_text_tmp set ArchiveNo = @ArchiveNoChild where ArchiveNo is null
-		fetch crs into @ArchiveNoChild
-end 
-close crs
-deallocate crs
-">
-					<link_field field="ParentSelect" />
-				</link_multiple>
-			</prefix>
-		</version>
-		<version min_major='7' max_major='8'>
-			<prefix>
-				<link_multiple no='1' expression="
-create table #err_log_text_tmp(LogDate datetime null, ErrorLevel int null, Text nvarchar(4000), ContinuationRow bit, ArchiveNo int null)
-declare @ErrorLogChild nvarchar(255)
-declare @ArchiveNoChild int
-				
 declare crs insensitive cursor 
 for ( {0} ) 
 for read only 
@@ -54,26 +22,17 @@ open crs
 fetch crs into @ArchiveNoChild
 while @@fetch_status &gt;= 0 
 begin 
-        set @ErrorLogChild = (select top 1 ErrorLog from #err_log_tmp where ArchiveNo = @ArchiveNoChild)
-        insert #err_log_text_tmp (Text, ContinuationRow) exec master.dbo.sp_readerrorlog -1, @ErrorLogChild
-		update #err_log_text_tmp set ArchiveNo  = @ArchiveNoChild where ArchiveNo is null
-
-		fetch crs into @ArchiveNoChild
+	insert #err_log_text_tmp (LogDate, ErrorLevel, Text) exec master.dbo.sp_readerrorlog @ArchiveNoChild, 2
+	update #err_log_text_tmp set ArchiveNo = @ArchiveNoChild where ArchiveNo is null
+	fetch crs into @ArchiveNoChild
 end 
 close crs
 deallocate crs
-
-UPDATE #err_log_text_tmp
-    SET LogDate = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]%'
-    THEN CONVERT(datetime, LEFT(Text, 19), 120) ELSE NULL END,
-    ErrorLevel = CASE SUBSTRING(Text, 21, 3) WHEN '- ?' THEN 3 WHEN '- +' THEN 2 ELSE 1 END,
-    Text = SUBSTRING(Text, 25, 4000)
-WHERE ContinuationRow = 0
 ">
-					<link_field field="ParentSelect" />
-				</link_multiple>
-			</prefix>
-		</version>
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+
         <postfix>
 			drop table #err_log_text_tmp
 		</postfix>

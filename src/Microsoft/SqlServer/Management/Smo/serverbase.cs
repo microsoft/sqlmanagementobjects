@@ -3041,6 +3041,10 @@ namespace Microsoft.SqlServer.Management.Smo
             else if (typeObject == typeof(Database))
             {
                 yield return nameof(Database.Name);
+                // The DatabaseEngineEdition value of a Fabric database will still be SqlDatabase but
+                // apps frequently need to distinguish Fabric instances from non-Fabric instances so make it relatively
+                // cheap to determine.
+                yield return nameof(Database.IsFabricDatabase);
                 // If we are connected to an OnDemand or DataWarehouse instance through the ServerConnection
                 // the Database can only be the same edition as the ServerConnection.
                 // If we are connected to logical master then Database can have a different edition, so

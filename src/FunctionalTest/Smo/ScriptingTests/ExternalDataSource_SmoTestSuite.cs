@@ -34,7 +34,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// 9. Verify altered properties.
         /// 10. Test dropping external data source using the generated script.  Verify it was dropped correctly.
         [VSTest.TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor =15)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor = 15)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestArea(SqlTestArea.Polybase)]
         // DEVNOTE(MatteoT) 7/7/2019. Should we enable on SQL Azure yet (DBCC TRACEON does not work there).
@@ -45,7 +45,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             string[] externalDataSourceResourceManagerLocations = { @"10.10.10.10:1010", @"10.10.10.10:1111" }; // test-only value for the resource manager location; the create/drop DDLs don't connect to in
             string[] externalDataSourceCredentials = { "cred1", "cred]1" };
             string[] externalDataSourceNames = { "eds1", "eds[]1", "eds'1", "eds--1" };
-            
+
             this.ExecuteWithDbDrop(
                 this.TestContext.TestName,
                 database =>
@@ -137,7 +137,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests dropping an external data source with IF EXISTS option through SMO on SQL16 and later.
         /// </summary>
         [VSTest.TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor=15, HostPlatform = HostPlatformNames.Windows)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor = 15, HostPlatform = HostPlatformNames.Windows)]
         // DEVNOTE(MatteoT): SQL v150 on Linux should be supported once I figure out how to enable hadoop.
         //[SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15, HostPlatform = HostPlatformNames.Linux)]
         public void SmoDropIfExists_ExternalDataSource_Sql16AndAfterOnPrem()
@@ -201,12 +201,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="externalDataSourceCredential">The credential property value.</param>
         /// <param name="newExternalDataSourceCredential">The new credential property value.</param>
         private void VerifyPositiveExternalDataSourceCreateAlterDropHelperPolybase(
-            Database db, 
-            string externalDataSourceName, 
+            Database db,
+            string externalDataSourceName,
             string externalDataSourceLocation,
             string newExternalDataSourceLocation,
-            string externalDataSourceResourceManagerLocation, 
-            string newExternalDataSourceResourceManagerLocation, 
+            string externalDataSourceResourceManagerLocation,
+            string newExternalDataSourceResourceManagerLocation,
             string externalDataSourceCredential,
             string newExternalDataSourceCredential)
         {
@@ -220,7 +220,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             const string ExternalDataSourceTestName = "External Data Source Testing";
 
             ExternalDataSourceType dataSourceType = ExternalDataSourceType.Hadoop;
-            
+
             //
             // Step 1. Create an external data source with type and location properties.
             //
@@ -239,7 +239,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     string.Format(
                         DatabaseCredentialQuery,
                     SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSourceCredential),
-                    SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSourceCredential))); 
+                    SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSourceCredential)));
 
                 // verify credential was created successfully
                 Assert.AreEqual(externalDataSourceCredential, (string)db.ExecutionManager.ConnectionContext.ExecuteScalar(string.Format(DatabaseCredentialNameQuery, externalDataSourceCredential)), "Database credential was not found.");
@@ -278,21 +278,21 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             scriptTemplate.Append(
                 string.Format(
                     ExternalDataSourceScriptCreateTemplate,
-                    fullyFormatedNameForScripting, 
-                    this.GetSqlFragmentForDataSourceType(externalDataSource.DataSourceType), 
+                    fullyFormatedNameForScripting,
+                    this.GetSqlFragmentForDataSourceType(externalDataSource.DataSourceType),
                     SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSource.Location)));
 
             // check for optional properties
             if (!string.IsNullOrEmpty(externalDataSource.ResourceManagerLocation))
             {
                 scriptTemplate.Append(
-                    string.Format(", RESOURCE_MANAGER_LOCATION = N'{0}'", 
+                    string.Format(", RESOURCE_MANAGER_LOCATION = N'{0}'",
                         SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSource.ResourceManagerLocation)));
             }
             if (!string.IsNullOrEmpty(externalDataSource.Credential))
             {
                 scriptTemplate.Append(
-                    string.Format(", CREDENTIAL = [{0}]", 
+                    string.Format(", CREDENTIAL = [{0}]",
                         SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSource.Credential)));
             }
 
@@ -351,7 +351,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             Assert.AreEqual(externalDataSourceName, externalDataSource.Name, "Recreated external data source name does not match the original data source name.");
             Assert.AreEqual(dataSourceType, externalDataSource.DataSourceType, "Recreated external data source does not have the same value for Type.");
             Assert.AreEqual(externalDataSourceLocation, externalDataSource.Location, "Recreated external data souce does not have the same value for Location.");
-            
+
             // verify optional properties
             if (!string.IsNullOrEmpty(externalDataSourceResourceManagerLocation))
             {
@@ -382,7 +382,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 // verify credential was created successfully
                 Assert.AreEqual(newExternalDataSourceCredential, (string)db.ExecutionManager.ConnectionContext.ExecuteScalar(string.Format(DatabaseCredentialNameQuery, newExternalDataSourceCredential)), "Database credential was not found.");
             }
-            
+
             externalDataSource.Credential = newExternalDataSourceCredential;
 
             externalDataSource.Alter();
@@ -462,7 +462,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
             db.ExecuteNonQuery(
                 string.Format(
-                    DatabaseCredentialQuery, 
+                    DatabaseCredentialQuery,
                     SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSourceCredential),
                     SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSourceCredential)));
 
@@ -471,7 +471,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 (string)db.ExecutionManager.ConnectionContext.ExecuteScalar(
                     string.Format(
                         DatabaseCredentialNameQuery,
-                        SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSourceCredential))), 
+                        SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSourceCredential))),
                 "Database credential was not found.");
 
             externalDataSource.Credential = externalDataSourceCredential;
@@ -483,7 +483,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             }
 
             externalDataSource.Create();
-            
+
             // Verify the external data source was created by querying the external data sources system view.
             Assert.AreEqual(1, (int)db.ExecutionManager.ConnectionContext.ExecuteScalar(ExternalDataSourceCountQuery), "External data source was not created.");
 
@@ -513,10 +513,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             string createExternalDataSourceScripts = sb.ToString();
             string bracketEscapedExternalDataSourceName = SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSource.Name);
             scriptTemplate.Append(string.Format(ExternalDataSourceScriptCreateTemplate,
-                bracketEscapedExternalDataSourceName, 
-                this.GetSqlFragmentForDataSourceType(externalDataSource.DataSourceType), 
+                bracketEscapedExternalDataSourceName,
+                this.GetSqlFragmentForDataSourceType(externalDataSource.DataSourceType),
                 SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSource.Location),
-                SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSource.Credential), 
+                SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSource.Credential),
                 SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSource.DatabaseName)));
 
             // Check for optional properties (GQ).
@@ -600,7 +600,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             Assert.AreEqual(0, db.ExternalDataSources.Count, "There should be no external data sources present in the collection.");
             Assert.AreEqual(0, (int)db.ExecutionManager.ConnectionContext.ExecuteScalar(ExternalDataSourceCountQuery), "There should be no external data sources present in the database.");
         }
-        
+
         /// Tests creating, dropping and scripting of Polybase external data source objects via SMO.
         /// Negative test steps:
         /// 1. Create an external data source with no required properties.
@@ -610,7 +610,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// 5. Alter an external data source to specify the ResourceManagerLocation property where the external data location is on WASBS.
         /// 6. Alter a polybase external data source to specify a GQ property.
         [VSTest.TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor =15)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor = 15)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestArea(SqlTestArea.Polybase)]
         public void VerifyNegativeExternalDataSourceCreateAlterDropPolybase()
@@ -618,7 +618,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
             string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"wasbs://commondatabases@sqltoolstestsstorage.blob.core.windows.net/" };
             string[] externalDataSourceResourceManagerLocations = { @"10.10.10.10:1010", @"10.10.10.10:1111" };
-            
+
             this.ExecuteWithDbDrop(this.TestContext.TestName,
                 database =>
                 {
@@ -669,16 +669,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="externalDataSourceResourceManagerLocation">The external data source resource manager location property value.</param>
         /// <param name="newExternalDataSourceResourceManagerLocation">The new external data source resource manager location property value.</param>
         private void VerifyNegativeExternalDataSourceCreateAlterDropHelperPolybase(
-            Database db, 
+            Database db,
             string externalDataSourceLocation,
             string newExternalDataSourceLocation,
-            string externalDataSourceResourceManagerLocation, 
+            string externalDataSourceResourceManagerLocation,
             string newExternalDataSourceResourceManagerLocation)
         {
             // const definitions
             const string ExternalDataSourceName = "eds1";
             const string ExternalDataSourceTestName = "External Data Source Testing";
-            
+
             ExternalDataSourceType dataSourceType = ExternalDataSourceType.Hadoop;
 
             //
@@ -993,7 +993,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 string.Format(
                     DatabaseCredentialQuery,
                     SmoObjectHelpers.SqlEscapeSingleQuote(externalDataSourceCredential),
-                    SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSourceCredential))); 
+                    SmoObjectHelpers.SqlEscapeClosingBracket(externalDataSourceCredential)));
             externalDataSource.Create();
 
             //
@@ -1109,6 +1109,84 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     // This is really unreachabled code, but the compiler can't tell that Assert.Fail() actually throws.
                     throw new InvalidArgumentException("dataSourceType");
             }
+        }
+
+        /// <summary>
+        /// Verifies data source options that exist only in v150 (SQL 2019) and above.
+        /// </summary>
+        [VSTest.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
+        [SqlTestArea(SqlTestArea.Polybase)]
+        [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
+        public void VerifyExternalDataSource_v150AndAbove()
+        {
+            ExecuteWithDbDrop(
+                "ExternalDataSourceSmo_",
+                database =>
+                {
+                    ExternalDataSource eds = new ExternalDataSource(database, "eds_" + (TestContext.TestName ?? Guid.NewGuid().ToString()))
+                    {
+                        DataSourceType = ExternalDataSourceType.ExternalGenerics,
+                        Location = "sqlserver://127.0.0.1:1433"
+                    };
+
+                    eds.Create();
+
+                    // 1. Check default values
+                    Assert.That(eds.PushdownOption, Is.EqualTo(ExternalDataSourcePushdownOption.On));
+                    Assert.That(eds.ConnectionOptions, Is.Null.Or.Empty);
+
+                    // 2. Check that default values are not present in scripted output
+                    const string pushdownName = "PUSHDOWN";
+                    const string connOptionsName = "CONNECTION_OPTIONS";
+                    Action<StringCollection> verifyScript = (collection) =>
+                    {
+                        foreach (var script in collection)
+                        {
+                            Assert.That(script, Does.Not.Contain(pushdownName));
+                            Assert.That(script, Does.Not.Contain(connOptionsName));
+                        }
+                    };
+                    var scriptCol = new StringCollection();
+                    var pref = new ScriptingPreferences(eds);
+
+                    eds.ScriptCreate(scriptCol, pref);
+                    verifyScript(scriptCol);
+
+                    scriptCol.Clear();
+                    eds.ScriptAlter(scriptCol, pref);
+                    verifyScript(scriptCol);
+
+                    // 3. Set different values and verify they are scripted out correctly
+                    var pushdownOption = ExternalDataSourcePushdownOption.Off;
+                    var connOptions = "Server=localhost;Database=NotARealDatabase;";
+
+                    verifyScript = (collection) =>
+                    {
+                        foreach (var script in collection)
+                        {
+                            Assert.That(script, Does.Contain($"{pushdownName} = {pushdownOption}").IgnoreCase);
+                            Assert.That(script, Does.Contain($"{connOptionsName} = N'{connOptions}'").IgnoreCase);
+                        }
+                    };
+
+                    eds.PushdownOption = pushdownOption;
+                    eds.ConnectionOptions = connOptions;
+
+                    scriptCol.Clear();
+                    eds.ScriptAlter(scriptCol, pref);
+                    verifyScript(scriptCol);
+
+                    eds.Alter();
+                    eds.Refresh();
+
+                    Assert.That(eds.PushdownOption, Is.EqualTo(pushdownOption));
+                    Assert.That(eds.ConnectionOptions, Is.EqualTo(connOptions));
+
+                    scriptCol.Clear();
+                    eds.ScriptCreate(scriptCol, pref);
+                    verifyScript(scriptCol);
+                });
         }
     }
 }

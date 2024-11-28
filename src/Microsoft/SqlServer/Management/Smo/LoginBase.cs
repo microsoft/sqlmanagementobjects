@@ -471,7 +471,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp"></param>
         internal void ScriptCreateCheck(StringCollection query, ScriptingPreferences sp)
         {
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 // Skip the ALTER DISABLE generation part since it can cause its own throws sometimes
                 ScriptLogin(query, sp, true, true);
@@ -493,7 +493,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 ScriptCreateGreaterEqual9(query, sp);
             }
@@ -1210,7 +1210,7 @@ namespace Microsoft.SqlServer.Management.Smo
         // generates the scripts for the alter action
         internal override void ScriptAlter(StringCollection query, ScriptingPreferences sp)
         {
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 ScriptAlterGreaterEqual9(query, sp);
             }
@@ -1327,7 +1327,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 if (Cmn.DatabaseEngineType.SqlAzureDatabase != sp.TargetDatabaseEngineType &&
                     sp.IncludeScripts.ExistenceCheck)
@@ -1576,7 +1576,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
 
-            if (VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersionInternal))
+            if (VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersion))
             {
                 return string.Format(SmoApplication.DefaultCulture,
                         "ALTER SERVER ROLE {0} ADD MEMBER {1}", MakeSqlBraket(role), MakeSqlBraket(this.Name));
@@ -1584,7 +1584,7 @@ namespace Microsoft.SqlServer.Management.Smo
             else
             {
                 string prefix;
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     prefix = "sys";
                 }
@@ -1850,7 +1850,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // on 8.0 and below we do not have permissions on Logins
-            if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80 ||
+            if (sp.TargetServerVersion <= SqlServerVersion.Version80 ||
                 this.ServerVersion.Major <= 8 ||
                 IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType)) //Server level permissions are not supported in cloud.
             {

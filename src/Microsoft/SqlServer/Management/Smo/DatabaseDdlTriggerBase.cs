@@ -148,13 +148,13 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
             string sFullScriptingName = FormatFullNameForScripting(sp);
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture,GetIfNotExistStatement(sp, ""));
             }
             sb.AppendFormat(SmoApplication.DefaultCulture,
                                         "DROP TRIGGER {0}{1} ON DATABASE",
-                                        (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                                        (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                                         sFullScriptingName);
             queries.Add(sb.ToString());
         }

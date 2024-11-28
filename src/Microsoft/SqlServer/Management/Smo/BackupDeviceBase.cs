@@ -73,9 +73,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     break;
                 case BackupDeviceType.Pipe:
-                    if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90)
+                    if (sp.TargetServerVersion == SqlServerVersion.Version90)
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.BackupToPipesNotSupported(sp.TargetServerVersionInternal.ToString()));
+                        throw new WrongPropertyValueException(ExceptionTemplates.BackupToPipesNotSupported(sp.TargetServerVersion.ToString()));
                     }
 
                     deviceType = "pipe";

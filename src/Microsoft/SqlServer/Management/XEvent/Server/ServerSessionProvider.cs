@@ -17,9 +17,7 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// Constructs a ServerSessionProvider
         /// </summary>
         /// <param name="session"></param>
-        public ServerSessionProvider(Session session) : base(session, 
-            "EVENT SESSION " + SfcTsqlProcFormatter.MakeSqlBracket(session.Name) + " ON SERVER ", 
-            sessionName => String.Format(CultureInfo.InvariantCulture, "CREATE EVENT SESSION {0} ON SERVER ", SfcTsqlProcFormatter.MakeSqlBracket(sessionName)))
+        public ServerSessionProvider(Session session) : base(session, "SERVER")
         {
         }
 

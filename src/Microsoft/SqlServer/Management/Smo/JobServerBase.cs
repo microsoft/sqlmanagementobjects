@@ -204,7 +204,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             GetStringParameter(statement, sp, "LocalHostAlias", "@local_host_server=N'{0}'", ref count);
 
             if (this.ServerVersion.Major >= 9 &&
-                sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 GetBoolParameter(statement, sp, "ReplaceAlertTokensEnabled", "@alert_replace_runtime_tokens={0}", ref count);
             }
@@ -213,7 +213,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             // if Server version is sql 11 and target scripting version is sql 11 and greater use sp_set_sqlagent_properties
             // for all other scenarios, generate script based on xp_instance_regwrite calls
             if (this.ServerVersion.Major >= 11 &&
-               sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110)
+               sp.TargetServerVersion >= SqlServerVersion.Version110)
             {
                 // If target server is SQL 11 and script version is also is SQL 11 and greater then rely on sp_set_sqlagent_properties to set  database mail settings
                 GetStringParameter(statement, sp, "DatabaseMailProfile", "@databasemail_profile=N'{0}'", ref count);

@@ -388,7 +388,11 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             scriptingOptions.ScriptXmlCompression = SqlScriptOptions.ConvertBooleanTypeOptionToBoolean(this.scriptOptions.ScriptXmlCompressionOptions);
 
             // VBUMP
-            if (this.scriptOptions.ScriptCompatibilityOption == SqlScriptOptions.ScriptCompatibilityOptions.Script160Compat)
+            if (scriptOptions.ScriptCompatibilityOption == SqlScriptOptions.ScriptCompatibilityOptions.Script170Compat)
+            {
+                scriptingOptions.TargetServerVersion = SqlServerVersion.Version170;
+            }
+            else if (this.scriptOptions.ScriptCompatibilityOption == SqlScriptOptions.ScriptCompatibilityOptions.Script160Compat)
             {
                 scriptingOptions.TargetServerVersion = SqlServerVersion.Version160;
             }

@@ -153,7 +153,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string scopeSchemaName = string.Empty;
             string scopeBatch = string.Empty;
             bool isScopeBatchDirty = false;
-            bool isScriptForYukon = sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90;
+            bool isScriptForYukon = sp.TargetServerVersion == SqlServerVersion.Version90;
 
             if (this.Properties.Get("ScopeObjectName").Value != null)
             {

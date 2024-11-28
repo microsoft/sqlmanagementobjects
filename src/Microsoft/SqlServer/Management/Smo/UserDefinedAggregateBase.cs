@@ -269,14 +269,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_UDA, "", SqlString(fullName));
                 sb.Append(sp.NewLine);
             }
 
             sb.AppendFormat("DROP AGGREGATE {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 fullName);
             sb.Append(sp.NewLine);
 

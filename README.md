@@ -12,28 +12,18 @@ SMO packages on nuget.org include:
 
 ### Microsoft.SqlServer.SqlManagementObjects
 
-This package is the primary development SDK for SMO. It provides both NetFx and NetStandard binaries. Capabilities of the NetStandard binaries may be limited by that platform, such as the lack of WMI support.
-Version suffixes for this package include "preview" and "msdata". The preview suffix indicates the package was built using System.Data and System.Data.SqlClient as its SQL client driver for NetFx.
-The msdata suffix indicate the package uses Microsoft.Data.SqlClient as its SQL client driver for NetFx.
+This package is the primary development SDK for SMO. It provides both NetFx and .Net binaries. Capabilities of the NetStandard binaries may be limited by that platform, such as the lack of WMI support.
+
 The binaries are strong named and Authenticode signed.
 
 ### Microsoft.SqlServer.SqlManagementObjects.Loc
 
 This package has resource DLLs with localized strings corresponding to the DLLs in Microsoft.SqlServer.SqlManagementObjects.
 
-### Microsoft.SqlServer.SqlManagementObjects.SSMS
-
-This package has NetFx binaries that continue to use System.Data.SqlClient as their SQL client driver.
-It is mainly intended for use by Sql Server Management Studio and Sql Server Data Tools until such time as those tools can upgrade to Microsoft.Data.SqlClient.
-If you are building SSMS 18 extensions that depend on SMO, use this package instead of Microsoft.SqlServer.SqlManagementObjects.
-
 ## Microsoft.SqlServer.Management.SmoMetadataProvider
 
 SmoMetadataProvider provides completion support for TSQL language services in Azure Data Studio and the Sql Server extension for VS Code.
 
-## Microsoft.SqlServer.Management.SmoMetadataProvider.SSMS
-
-SmoMetadataProvider.SSMS provides completion support for the TSQL language service in Sql Server Management Studio.
 
 ## Versioning
 

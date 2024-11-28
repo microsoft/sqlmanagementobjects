@@ -353,7 +353,7 @@ namespace Microsoft.SqlServer.Management.Smo
             CheckObjectState();
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            bool isTargetServerVersionSQl13OrLater = VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersionInternal);
+            bool isTargetServerVersionSQl13OrLater = VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersion);
             if (sp.IncludeScripts.ExistenceCheck)
             {
                 TableViewBase table = (TableViewBase)ParentColl.ParentInstance;

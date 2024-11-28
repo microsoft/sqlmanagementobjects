@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Microsoft.SqlServer.Management.Common;
@@ -27,6 +28,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         //So a token like this $(SecretStore:SmoBaselineVerification_SqlToolsWasbKey/Secret) would
         //retrieve the value for a secret with the full name of SSMS_TEST_SECRET_PREFIX + SmoBaselineVerification_SqlToolsWasbKey/Secret
         private static readonly Regex SecretStoreRegex = new Regex(@"(\$\(SecretStore:(?<SecretName>.*?)\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        // Regex to identify storage account key secrets. The matched value must be an ARM resource identifier of the storage account whose key is needed
+        private static readonly Regex AccessKeyRegex = new Regex(@"(\$\(AccessKey:(?<StorageAccountResourceId>.*?)\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// Matches cluster domain names, which is in the form of
@@ -439,9 +442,26 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     .Replace(TOKEN_InstallDataDirectory, svr.InstallDataDirectory);
             }
 
+            var accessKeys = new Dictionary<string, string>();
+            ret = AccessKeyRegex.Replace(ret, match =>
+            {
+                if (azureKeyVaultHelper == null)
+                {
+                    throw new ArgumentNullException(nameof(azureKeyVaultHelper));
+                }
+                var resourceId = match.Groups["StorageAccountResourceId"].Value;
+                if (!accessKeys.ContainsKey(resourceId))
+                {
+                    accessKeys.Add(resourceId, azureKeyVaultHelper.GetStorageAccountAccessKey(resourceId));
+                }
+                return accessKeys[resourceId];
+            });
+
+
             //Replace all of the secret store tokens with their retrieved values
-            //Note we prefix the secret name with a common test prefix before retrieving it
-            foreach (Match match in SecretStoreRegex.Matches(ret))
+            //Note we prefix the secret name with a common test prefix before retrieving it.
+            // AkvHelper caches secrets
+            ret = SecretStoreRegex.Replace(ret, match =>
             {
                 if (azureKeyVaultHelper == null)
                 {
@@ -457,8 +477,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 {
                     secretValue = azureKeyVaultHelper.GetDecryptedSecret(secretName);
                 }
-                ret = ret.Replace(match.Value, secretValue);
-            }
+                return secretValue;
+            });
 
             if (trueServerName.Contains(@"\"))
             {

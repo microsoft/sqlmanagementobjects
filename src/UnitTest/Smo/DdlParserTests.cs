@@ -166,5 +166,19 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
 
             Assert.That(actualResult, NUnit.Framework.Is.False, string.Format("Parsing DDL Header succeed while it should fail with syntax : {0}.", objectText));
         }
+
+        /// <summary>
+        /// Tests create function query containing WITH EXEC(UTE) AS CALLER, returns valid.
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Unit")]
+        [DataTestMethod]
+        [DataRow("EXEC", 87)]
+        [DataRow("EXECUTE", 90)]
+        public void ParseDdlHeader_Create_Function_Query_Containing_With_Exec_Or_Execute(string execStatement, int index)
+        {
+            string objectText = $"CREATE FUNCTION [dbo].testfunc (@value VARCHAR (5)) RETURNS INT WITH {execStatement} AS CALLER AS BEGIN return 1 END";
+            Assert.That(_SMO.DdlTextParser.ParseDdlHeader(objectText), NUnit.Framework.Is.EqualTo(index), $"Parsing DDL Header failed while it should succeed with syntax : WITH {execStatement} AS CALLER.");
+        }
     }
 }

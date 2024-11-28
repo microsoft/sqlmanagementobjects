@@ -79,10 +79,6 @@ public const int MajorVersion = $(AssemblyMajorVersion)%3B
         <_Parameter1>%(AssemblyMetadata.Identity)</_Parameter1>
         <_Parameter2>%(AssemblyMetadata.Value)</_Parameter2>
       </AssemblyAttribute>
-      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo" Condition="%(InternalsVisibleTo.Identity) != ''">
-        <_Parameter1>%(InternalsVisibleTo.Identity)</_Parameter1>
-        <_Parameter1 Condition="$(SignAssembly) == 'true'">%(InternalsVisibleTo.Identity), PublicKey=%(InternalsVisibleTo.Key)</_Parameter1>
-      </AssemblyAttribute>
     </ItemGroup>
   </Target>
   <Target Name="FixTraceDefine" BeforeTargets="CoreCompile">

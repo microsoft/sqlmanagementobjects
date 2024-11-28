@@ -195,11 +195,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     serverOptions.RemoveAll((server) => server.Item1.Contains("AzureSterlingV12_SqlOnDemand"));
                 }
 
+                // Cover only MI->MI scenarios for baseline tests
+                //
                 if (db.DatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
                 {
-                    // Only generate baseline script options when database engine edition is managed instance
-                    //
                     serverOptions.RemoveAll((server) => server.Item1.Contains("SqlManagedInstance"));
+                }
+
+                if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+                {
+                    return serverOptions.Where((server) => server.Item1.Contains("SqlManagedInstance"));
                 }
             }
             // DW is only supported for scripting to DW

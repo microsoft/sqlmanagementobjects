@@ -107,17 +107,22 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         /// <param name="namePrefix"></param>
         /// <param name="indexProperties"></param>
         /// <returns></returns>
-        public static Microsoft.SqlServer.Management.Smo.Index CreateIndex(this TableViewTableTypeBase tableView,
+        public static Management.Smo.Index CreateIndex(this TableViewTableTypeBase tableView,
             string namePrefix,
             IndexProperties indexProperties = null)
         {
             if (indexProperties == null)
             {
+                var isClustered = !(tableView is Table t) || !t.Parent.IsFabricDatabase;
                 //If caller doesn't specify index properties use defaults
-                indexProperties = new IndexProperties();
+                indexProperties = new IndexProperties()
+                {
+                    IndexType = isClustered ? IndexType.ClusteredIndex : IndexType.NonClusteredIndex,
+                    IsClustered = isClustered
+                };
             }
 
-            var index = new Microsoft.SqlServer.Management.Smo.Index(tableView, SmoObjectHelpers.GenerateUniqueObjectName(namePrefix));
+            var index = new Management.Smo.Index(tableView, SmoObjectHelpers.GenerateUniqueObjectName(namePrefix));
             if (indexProperties.Columns == null)
             {
                 //Default to using first column if none were specified

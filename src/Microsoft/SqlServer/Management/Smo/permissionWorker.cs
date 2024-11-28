@@ -74,9 +74,9 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         //assumes only on permission is set
-        internal bool IsValidPermissionForVersion(SqlServerVersionInternal ver)
+        internal bool IsValidPermissionForVersion(SqlServerVersion ver)
         {
-            if (ver >= SqlServerVersionInternal.Version90)
+            if (ver >= SqlServerVersion.Version90)
             {
                 return true;
             }

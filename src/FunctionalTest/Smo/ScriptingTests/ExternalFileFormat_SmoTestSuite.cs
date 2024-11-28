@@ -40,7 +40,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// server have the same values for their properties/scripts as expected.
         /// </summary>
         [VSTest.TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, MaxMajor = 15)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestArea(SqlTestArea.Polybase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
@@ -113,7 +113,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             const string DateFormat = "MM-dd-yyyy";
             const int FirstRow =  10;
 
-            string[] dataCompression = { "org.apache.hadoop.io.compress.DefaultCodec", "org.apache.hadoop.io.compress.GzipCodec" };
+            const string compressionDefaultCodec = "org.apache.hadoop.io.compress.DefaultCodec";
+            const string compressionGzipCodec = "org.apache.hadoop.io.compress.GzipCodec";
 
             string[] externalFileFormatNames = { "eff1", "eff100", "eff[]1", "eff'1", "eff--1", "eff(1", "eff)1" };
 
@@ -134,12 +135,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[4], ExternalFileFormatType.DelimitedText, string.Empty, string.Empty, string.Empty, string.Empty, false, string.Empty);
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[5], ExternalFileFormatType.DelimitedText, string.Empty, string.Empty, string.Empty, string.Empty, true, string.Empty);
 
-                    if (azureDatabaseEdition == AzureDatabaseEdition.DataWarehouse)
+                    var isDwOr2022OrLater = azureDatabaseEdition == AzureDatabaseEdition.DataWarehouse || database.Parent.VersionMajor >= 16;
+                    if (isDwOr2022OrLater)
                     {
                         VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[5], ExternalFileFormatType.DelimitedText, string.Empty, string.Empty, string.Empty, string.Empty, null, string.Empty, (int?)FirstRow);
                     }
 
-                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[6], ExternalFileFormatType.DelimitedText, string.Empty, string.Empty, string.Empty, string.Empty, null, dataCompression[0]);
+                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[6], ExternalFileFormatType.DelimitedText, string.Empty, string.Empty, string.Empty, string.Empty, null, compressionGzipCodec);
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[0],
                         ExternalFileFormatType.DelimitedText,
                         string.Empty,
@@ -147,8 +149,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         StringDelimiter,
                         DateFormat,
                         false,
-                        dataCompression[0],
-                        azureDatabaseEdition == AzureDatabaseEdition.DataWarehouse ? (int?)FirstRow : null);
+                        compressionGzipCodec,
+                        isDwOr2022OrLater ? (int?)FirstRow : null);
 
                     // positive unit tests for ORC file format type
                     // supported DDL options are: (1) no optional properties; (2) data compression property
@@ -156,7 +158,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     // 1. no optional properties
                     // 2. data compression
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[1], ExternalFileFormatType.Orc, string.Empty, string.Empty, string.Empty, string.Empty, null, string.Empty);
-                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[0], ExternalFileFormatType.Orc, string.Empty, string.Empty, string.Empty, string.Empty, null, dataCompression[0]);
+                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[0], ExternalFileFormatType.Orc, string.Empty, string.Empty, string.Empty, string.Empty, null, compressionDefaultCodec);
 
                     // positive unit tests for PARQUET file format type
                     // supported DDL options are: (1) no optional properties; (2) data compression property
@@ -164,7 +166,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     // 1. no optional properties
                     // 2. data compression
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[1], ExternalFileFormatType.Parquet, string.Empty, string.Empty, string.Empty, string.Empty, null, string.Empty);
-                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[0], ExternalFileFormatType.Parquet, string.Empty, string.Empty, string.Empty, string.Empty, null, dataCompression[1]);
+                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[0], ExternalFileFormatType.Parquet, string.Empty, string.Empty, string.Empty, string.Empty, null, compressionGzipCodec);
 
                     // positive unit tests for the RCFILE file format type
                     // supported DDL options are: (1) serde method - required; (2) data compression property - optional
@@ -172,7 +174,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     // 1. serde method (required)
                     // 2. serde method (required) and data compression
                     VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[2], ExternalFileFormatType.RcFile, ExternalFileFormatSerdeMethod, string.Empty, string.Empty, string.Empty, null, string.Empty);
-                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[3], ExternalFileFormatType.RcFile, ExternalFileFormatSerdeMethod, string.Empty, string.Empty, string.Empty, null, dataCompression[0]);
+                    VerifyPositiveExternalFileFormatCreateDropHelper(database, externalFileFormatNames[3], ExternalFileFormatType.RcFile, ExternalFileFormatSerdeMethod, string.Empty, string.Empty, string.Empty, null, compressionDefaultCodec);
                 },
                 azureDatabaseEdition);
         }
@@ -345,7 +347,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             scriptTemplate.Append(string.Format(ExternalFileFormatScriptCreateTemplate, fullyFormatedNameForScripting, this.GetSqlKeywordForFileFormatType(externalFileFormat.FormatType)));
 
             // process optional parameters for each file format type and add them to the T-SQL script
-            ProcessOptionalProperties(externalFileFormat, scriptTemplate, db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand);
+            var isSql2022OrLater = db.Parent.VersionMajor >= 16;
+            ProcessOptionalProperties(externalFileFormat, scriptTemplate, db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand, isSql2022OrLater);
             TraceHelper.TraceInformation(createExternalFileFormatScripts);
             TraceHelper.TraceInformation(scriptTemplate.ToString());
             Assert.That(createExternalFileFormatScripts, Does.Contain(scriptTemplate.ToString()));
@@ -525,6 +528,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             // const definitions
             const string ExternalFileFormatTestName = "External File Format Testing";
+            var isSql2022OrLater = db.Parent.VersionMajor >= 16;
 
             //
             // Step 1. Create external file format with no required properties.
@@ -584,7 +588,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
             Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse ||
+                db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ||
+                isSql2022OrLater)
             {
                 //
                 // Step 7. Create external file format with conflicting properties - format type is RcFile and FirstRow.
@@ -649,7 +655,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
             Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse ||
+                db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ||
+                isSql2022OrLater)
             {
                 //
                 // Step 13. Create external file format with conflicting properties - format type is Orc and FirstRow.
@@ -715,7 +723,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
             Assert.Throws<FailedOperationException>(externalFileFormat.Create);
 
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse || db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse ||
+                db.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ||
+                isSql2022OrLater)
             {
                 //
                 // Step 19. Create external file format with conflicting properties - format type is Parquet and FirstRow.
@@ -869,12 +879,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="externalFileFormat"></param>
         /// <param name="script"></param>
         /// /// <param name="isSqlDwOrServerless">True if SQL DW or Serverless DB.</param>
-        private void ProcessOptionalProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDwOrServerless)
+        private void ProcessOptionalProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDwOrServerless, bool isSql2022OrLater)
         {
             switch (externalFileFormat.FormatType)
             {
                 case ExternalFileFormatType.DelimitedText:
-                    ValidateDelimitedTextProperties(externalFileFormat, script, isSqlDwOrServerless);
+                    ValidateDelimitedTextProperties(externalFileFormat, script, isSqlDwOrServerless, isSql2022OrLater);
                     break;
                 case ExternalFileFormatType.Orc:
                 case ExternalFileFormatType.Parquet:
@@ -897,7 +907,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="externalFileFormat">External file format.</param>
         /// <param name="script">The external file format T-SQL script.</param>
         /// <param name="isSqlDwOrServerless">True if SQL DW or Serverless DB.</param>
-        private void ValidateDelimitedTextProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDwOrServerless)
+        private void ValidateDelimitedTextProperties(ExternalFileFormat externalFileFormat, StringBuilder script, bool isSqlDwOrServerless, bool isSql2022OrLater)
         {
             // check for optional properties
             StringBuilder formatOptions = new StringBuilder();
@@ -907,7 +917,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             VerifyOptionalFormatParameters(externalFileFormat.StringDelimiter, "STRING_DELIMITER = N'{0}'", formatOptions);
             VerifyOptionalFormatParameters(externalFileFormat.DateFormat, "DATE_FORMAT = N'{0}'", formatOptions);
 
-            if (isSqlDwOrServerless && externalFileFormat.FirstRow > 1)
+            if ((isSqlDwOrServerless || isSql2022OrLater) && externalFileFormat.FirstRow > 1)
             {
                 if (formatOptions.Length > 0)
                 {

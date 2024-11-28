@@ -252,7 +252,7 @@ namespace Microsoft.SqlServer.Management.Common
             }
             DatabaseName = sc.Database;
             var connectionStringBuilder = new SqlConnectionStringBuilder(sc.ConnectionString);
-
+            Authentication = (SqlConnectionInfo.AuthenticationMethod)Enum.Parse(typeof(SqlConnectionInfo.AuthenticationMethod), connectionStringBuilder.Authentication.ToString());
             // Rather than keep track of the SqlCredential separately, we'll just merge the user name and password into our
             // connectionstring, which we store as a SecureString. There are too many random pieces of code that grab our ConnectionString
             // property directly to create a SqlConnection to try to make them all aware of SqlCredential too. 

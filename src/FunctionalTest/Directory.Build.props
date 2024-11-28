@@ -6,7 +6,8 @@
   </PropertyGroup>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GacVersion)' != 'true'">$(NetfxVersion);net6.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GacVersion)' == 'true'">$(NetfxVersion)</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

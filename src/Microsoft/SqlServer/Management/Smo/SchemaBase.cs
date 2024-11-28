@@ -80,7 +80,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptDrop(StringCollection dropQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             // need to see if it is an app role, defaults to false
             StringBuilder sb = new StringBuilder();
@@ -93,7 +93,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.Append(string.Format(SmoApplication.DefaultCulture,
                     Scripts.INCLUDE_EXISTS_SCHEMA90, "", FormatFullNameForScripting(sp, false)));
@@ -101,14 +101,14 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             //if 7.0, 8.0
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 throw new InvalidVersionSmoOperationException(this.ServerVersion);
             }
             else //9.0
             {
                 sb.Append("DROP SCHEMA " +
-                    ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty) +
+                    ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty) +
                     FormatFullNameForScripting(sp, true));
             }
 
@@ -123,7 +123,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+            ThrowIfBelowVersion90(sp.TargetServerVersion,
                 ExceptionTemplates.SchemaDownlevel(
                     FormatFullNameForScripting(sp, true),
                     GetSqlServerName(sp)
@@ -187,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptAlter(StringCollection query, ScriptingPreferences sp)
         {
             //if 7.0, 8.0
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 throw new InvalidVersionSmoOperationException(this.ServerVersion);
             }

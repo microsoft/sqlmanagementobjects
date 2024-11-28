@@ -19,7 +19,7 @@
     <property name="RowTerminator" type="nvarchar" size="10" access="read">ISNULL(eff.row_terminator,N'')</property>
     <property name="Encoding" type="nvarchar" size="10" access="read">ISNULL(eff.encoding,N'')</property>
     <property name="DataCompression" type="nvarchar" size="255">ISNULL(eff.data_compression,N'')</property>
-    <version datawarehouse_enabled='true' cloud_min_major='12'>
+    <version datawarehouse_enabled='true' cloud_min_major='12' min_major='16'>
       <property name="FirstRow" type="int" read_only_after_creation ="true">ISNULL(eff.first_row, 0)</property>
     </version>
   </properties>

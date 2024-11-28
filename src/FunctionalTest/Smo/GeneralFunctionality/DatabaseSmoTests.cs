@@ -221,6 +221,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestMethod]
         [TestCategory("Legacy")]    /* slow test, not for PR validation */
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_SpaceAvailable_Is_Zero_For_Hyperscale()
         {
             ExecuteTest(
@@ -302,6 +303,7 @@ END");
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_miscellaneous_methods_produce_correct_sql()
         {
             ExecuteWithDbDrop(db =>
@@ -597,6 +599,7 @@ END");
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_transaction_counts()
         {
             ExecuteWithDbDrop((db) =>
@@ -619,6 +622,7 @@ END");
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabaseEdge)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_FullTextCatalogs()
         {
             ExecuteWithDbDrop((db) =>
@@ -638,7 +642,7 @@ END");
         }
 
         [TestMethod]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabase, DatabaseEngineEdition.SqlDataWarehouse)]
         public void Database_EnumMatchingSPs_returns_correct_URNs()
         {
             ExecuteTest(() =>
@@ -732,6 +736,7 @@ END");
         }
 
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_IsMember_returns_correct_value()
         {
             ExecuteFromDbPool(db =>
@@ -744,6 +749,7 @@ END");
         [TestMethod]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 13)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_PlanGuide_methods()
         {
             ExecuteFromDbPool(db =>
@@ -1039,11 +1045,13 @@ END");
         }
 
         [TestMethod]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabase, DatabaseEngineEdition.SqlDataWarehouse)]
         public void Database_Size_succeeds_with_CaptureSql_on()
         {
             ExecuteFromDbPool(db =>
             {
+                var table = db.CreateTable("anything");
+                table.InsertDataToTable(10);
                 var expectedSize = db.Size;
                 db.Refresh();
                 db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.CaptureSql;

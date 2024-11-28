@@ -21,6 +21,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -253,6 +254,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             // (e.g. we just grant it the dbmanager role)
             ExecuteWithMasterDb((master) =>
             {
+                if (SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.NotSpecified && SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.SqlPassword)
+                {
+                    Trace.TraceWarning($"Skipping DBManager test on {SqlConnectionStringBuilder.DataSource} because SQL logins are not available");
+                    return;
+                }
                 // Create a new database which the low-priv user won't be able to connect to, yet it would be able to "see" it
                 var db = ServerContext.CreateDatabaseWithRetry("DbManagerOnly");
                 try
@@ -333,6 +339,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             ExecuteWithDbDrop((db) =>
             {
+                if (ServerContext.LoginMode == ServerLoginMode.Integrated)
+                {
+                    Trace.TraceInformation($"Skipping SqlException test because SQL Auth is not enabled on {ServerContext.Name}");
+                    return;
+                }
                 var pwd = SqlTestRandom.GeneratePassword();
                 _SMO.Login login = null;
                 SqlConnection sqlConn = null;
@@ -349,10 +360,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     var connStr =
                         new SqlConnectionStringBuilder(this.ServerContext.ConnectionContext.ConnectionString)
                         {
+                            IntegratedSecurity=false,
                             Pooling = false,
                             UserID = user.Name,
                             // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="not secret")]
-                            Password = pwd
+                            Password = pwd,
+                            Authentication = SqlAuthenticationMethod.SqlPassword
                         };
 
                     using (sqlConn = new SqlConnection(connStr.ToString()))
@@ -389,6 +402,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests altering a database through SMO for all server versions
         /// </summary>
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoDatabaseScriptAlter_AllServers()
         {
             this.ExecuteWithDbDrop(
@@ -433,8 +447,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     var keepTryingLowerCompatLevel = true;
 
                     // Assumption: compat levels are incremented by 10 at every release of SQL Server
-                    // We stop going back at '70', since that's really ancient stuff.
-                    for (byte cl = masterCompatLevel; keepTryingLowerCompatLevel && cl >= 70; cl -= 10)
+                    // We stop going back at '90', since that's really ancient stuff.
+                    for (byte cl = masterCompatLevel; keepTryingLowerCompatLevel && cl >= 90; cl -= 10)
                     {
                         _SMO.Database db = null;
 
@@ -704,6 +718,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteWithDbDrop(
                 database =>
                 {
+                    if (ServerContext.LoginMode == ServerLoginMode.Integrated)
+                    {
+                        Trace.TraceInformation($"Skipping DbOwner_FileGroup test on {ServerContext.Name} because the server doesn't support SQL auth");
+                        return;
+                    }
                     string password = SqlTestRandom.GeneratePassword();
                     var dboLogin = database.Parent.CreateLogin(GenerateUniqueSmoObjectName("login"),
                         _SMO.LoginType.SqlLogin, password);
@@ -1158,6 +1177,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteWithDbDrop(
                 database =>
                 {
+                    if (SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.NotSpecified && SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.SqlPassword)
+                    {
+                        Trace.TraceWarning($"Skipping CanChangeOwner test on {SqlConnectionStringBuilder.DataSource} because SQL logins are not available");
+                        return;
+                    }
                     string originalOwner = database.Owner;
                     var login = database.Parent.CreateLogin(GenerateUniqueSmoObjectName("login"), _SMO.LoginType.SqlLogin, SqlTestRandom.GeneratePassword());
                     try
@@ -1190,6 +1214,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteWithDbDrop(
                 database =>
                 {
+                    if (SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.NotSpecified && SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.SqlPassword)
+                    {
+                        Trace.TraceWarning($"Skipping CanChangeOwner test on {SqlConnectionStringBuilder.DataSource} because SQL logins are not available");
+                        return;
+                    }
                     string originalOwner = database.Owner;
                     var login = database.Parent.CreateLogin(GenerateUniqueSmoObjectName("login"), _SMO.LoginType.SqlLogin, SqlTestRandom.GeneratePassword());
                     database.CreateUser(GenerateUniqueSmoObjectName("user"), login.Name);
@@ -1222,6 +1251,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteWithDbDrop(
                 database =>
                 {
+                    if (SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.NotSpecified && SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.SqlPassword)
+                    {
+                        Trace.TraceWarning($"Skipping ChangeOwner test on {SqlConnectionStringBuilder.DataSource} because SQL logins are not available");
+                        return;
+                    }
                     string originalOwner = database.Owner;
                     var login = database.Parent.CreateLogin(GenerateUniqueSmoObjectName("login"), _SMO.LoginType.SqlLogin, SqlTestRandom.GeneratePassword());
                     database.CreateUser(GenerateUniqueSmoObjectName("user"), login.Name);
@@ -1300,8 +1334,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(MinMajor = 14, DatabaseEngineType = DatabaseEngineType.Standalone)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
+        //[SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.Express)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Database_CheckTables_sets_LastGoodDbCheckTime()
         {
             ExecuteWithDbDrop((db) =>

@@ -5,11 +5,6 @@
     <TargetFrameworks>$(NetfxVersion);netstandard2.0;net6.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Label="GAC build settings" Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
-      <STracePackageVersion>150.1600.82</STracePackageVersion>
-	  <!--Note that STRACE and $(UseStrace) are currently not defined as they add a dependency to SqlTDiagm for Microsoft.SqlServer.Smo 
-	  which didn't previously exist, and breaks some tests in dsmaindev.
-	  If we can avoid adding that dependency back altogether, it'd be great.
-	  -->
       <DefineConstants>$(DefineConstants);NATIVEBATCHPARSER</DefineConstants> 
   </PropertyGroup>
   <!--
@@ -19,9 +14,10 @@
     Refer to the SMO loc wiki or generic MSBuild+Retail loc wiki https://aka.ms/retailloc to understand the meaning of each element.
   -->
   <PropertyGroup>
+    <NeutralLanguage Condition="'$(NeutralLanguage)'==''">en-US</NeutralLanguage>
     <PostBuildLocalization>true</PostBuildLocalization>
-    <!-- This metadata resolves to de;es;fr;it;ja;ko;pt-BR;ru;zh-Hans;zh-Hant. -->
-    <LanguageSet>AzureKatal_Languages</LanguageSet>
+    <!-- This metadata resolves to de;es;fr;it;ja;ko;pt-BR;ru;zh-Hans;zh-Hant;cz;pl;tr. -->
+    <LanguageSet>VS_Main_Languages</LanguageSet>
   </PropertyGroup>
   <ItemGroup>
     <LocalizeFile Include="$(TargetPath)">

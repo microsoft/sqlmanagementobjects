@@ -89,7 +89,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     o = prop.Value;
 
                     int val = true == (bool)o ? 1 : 0;
-                    if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         query.Add(string.Format(SmoApplication.DefaultCulture, "EXEC master.dbo.sp_MSset_oledb_prop {0}, {1}, {2}",
                                     MakeSqlString(this.Name), MakeSqlString(REG_PROPS[i][1]), val));

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -24,23 +25,36 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
         public enum ScriptCompatibilityOptions
         {
             [DisplayNameKey("OnlyScript90CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(9)]
             Script90Compat,
             [DisplayNameKey("OnlyScript100CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(10)]
             Script100Compat,
             [DisplayNameKey("OnlyScript105CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(10, 50)]
             Script105Compat,
             [DisplayNameKey("OnlyScript110CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(11)]
             Script110Compat,
             [DisplayNameKey("OnlyScript120CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(12)]
             Script120Compat,
             [DisplayNameKey("OnlyScript130CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(13)]
             Script130Compat,
             [DisplayNameKey("OnlyScript140CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(14)]
             Script140Compat,
             [DisplayNameKey("OnlyScript150CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(15)]
             Script150Compat,
             [DisplayNameKey("OnlyScript160CompatibleFeatures")]
-            Script160Compat
+            [CompatibilityLevelSupportedVersion(16)]
+            Script160Compat,
+            // VBUMP
+            [DisplayNameKey("OnlyScript170CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(17)]
+            Script170Compat,
         }
 
         /// <summary>
@@ -82,11 +96,11 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             [DisplayNameKey("SqlAzureArcManagedInstanceEdition")]
             SqlAzureArcManagedInstanceEdition,
 
-           /*
-            * NOTE: If you're adding new value here,
-            * please update appropriate enums in ConnectionEnums.cs, Enumerations.cs
-            * and src\Microsoft\SqlServer\Management\ConnectionInfo\StringConnectionInfo.strings
-            */
+            /*
+             * NOTE: If you're adding new value here,
+             * please update appropriate enums in ConnectionEnums.cs, Enumerations.cs
+             * and src\Microsoft\SqlServer\Management\ConnectionInfo\StringConnectionInfo.strings
+             */
         }
 
         /// <summary>
@@ -179,6 +193,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
         private TypeOfDataToScriptOptions typeOfDataToScript = TypeOfDataToScriptOptions.SchemaOnly;
         private ScriptStatisticsOptions scriptStatistics = ScriptStatisticsOptions.ScriptStatsNone;
         private int sqlServerVersion = 0;  // used to determine what options should be shown
+        private int sqlServerVersionMinor = 0;
         private BooleanTypeOptions scriptUnsupportedStatments = BooleanTypeOptions.False;
 
         // defaults and props to make read/only
@@ -195,54 +210,26 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
         public SqlScriptOptions(Version version)
         {
             sqlServerVersion = version.Major;
-            if (sqlServerVersion < 8)
+            sqlServerVersionMinor = version.Minor;
+            if (sqlServerVersion < 9)
             {
-                throw new ArgumentOutOfRangeException("version");
+                throw new ArgumentOutOfRangeException(nameof(version));
             }
 
-            if (sqlServerVersion == 9)
+            var compatOption = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(sqlServerVersion, sqlServerVersionMinor);
+            if (compatOption != null)
             {
-                this.compatMode = ScriptCompatibilityOptions.Script90Compat;
-            }
-            else if (sqlServerVersion == 10)
-            {
-                this.compatMode = (version.Minor == 0) ?
-                    ScriptCompatibilityOptions.Script100Compat :
-                    ScriptCompatibilityOptions.Script105Compat;
-            }
-            else if (sqlServerVersion == 11)
-            {
-                this.compatMode = ScriptCompatibilityOptions.Script110Compat;
-            }
-            else if (sqlServerVersion == 12)
-            {
-                this.compatMode = ScriptCompatibilityOptions.Script120Compat;
-            }
-            else if (sqlServerVersion == 13)
-            {
-                this.compatMode = ScriptCompatibilityOptions.Script130Compat;
-            }
-            else if (sqlServerVersion == 14)
-            {
-                this.compatMode = ScriptCompatibilityOptions.Script140Compat;
-            }
-            else if (sqlServerVersion == 15)
-            {
-                this.compatMode = ScriptCompatibilityOptions.Script150Compat;
-            }
-            else if (sqlServerVersion == 16)
-            {
-                compatMode = ScriptCompatibilityOptions.Script160Compat;
+                this.compatMode = compatOption.Value;
             }
             // VBUMP
             else
             {
-                SqlScriptPublishModelTraceHelper.Assert(false, "Unexpected server version. Setting Compatibility Mode to 16.0!");
-                this.compatMode = ScriptCompatibilityOptions.Script160Compat;
+                SqlScriptPublishModelTraceHelper.Assert(false, "Unexpected server version. Setting Compatibility Mode to 17.0!");
+                compatMode = ScriptCompatibilityOptions.Script170Compat;
             }
 
             // setup the SqlAzure read/only properites and their default values
-            readonlyProperties.Add(nameof(ScriptUseDatabase), BooleanTypeOptions.False);            
+            readonlyProperties.Add(nameof(ScriptUseDatabase), BooleanTypeOptions.False);
         }
 
         /// <summary>
@@ -303,7 +290,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     values.Remove(ScriptDatabaseEngineType.SingleInstance);
                 }
             }
-            if (context.PropertyDescriptor.PropertyType == typeof(ScriptDatabaseEngineEdition))
+            else if (context.PropertyDescriptor.PropertyType == typeof(ScriptDatabaseEngineEdition))
             {
                 // if the target engine type is SQL Server on prem
                 // remove any SQL Azure related engine editions
@@ -351,7 +338,23 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     throw new ArgumentException(SR.ERROR_UnexpectedDatabaseEngineTypeDetected(this.TargetDatabaseEngineType.ToString()));
                 }
             }
-
+            else if (context.PropertyDescriptor.PropertyType == typeof(ScriptCompatibilityOptions))
+            {
+                // Only check specific engine versions for standalone (non-Azure) instances,
+                // since Azure supports all the latest SQL versions despite presenting a
+                // server version of 12.0.
+                if (engineType == ScriptDatabaseEngineType.SingleInstance)
+                {
+                    var options = values.Cast<ScriptCompatibilityOptions>().ToList();
+                    options = CompatibilityLevelSupportedVersionAttribute.FilterUnsupportedOptions(options, sqlServerVersion, sqlServerVersionMinor);
+                    values = new ArrayList(options);
+                }
+                else
+                {
+                    // Remove 170 since it's currently only for standalone instances
+                    values.Remove(ScriptCompatibilityOptions.Script170Compat);
+                }
+            }
             return values;
         }
 
@@ -928,7 +931,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     // if we don't have a handler we are done
                     if (this.ReadOnlyPropertyChanged != null)
                     {
-                        this.ReadOnlyPropertyChanged(this, new ReadOnlyPropertyChangedEventArgs("TargetDatabaseEngineEdition"));
+                        this.ReadOnlyPropertyChanged(this, new ReadOnlyPropertyChangedEventArgs(nameof(TargetDatabaseEngineEdition)));
                     }
                 }
             }
@@ -1180,5 +1183,102 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             }
         }
 
+        /// <summary>
+        /// Attribute for storing the minimum supported engine version for script compatibility levels.
+        /// This is needed because version v105 shares a major version with v100, which throws off the
+        /// enum offset for <see cref="ScriptCompatibilityOptions"/>. So, we can't do something easy
+        /// like adding the minimum supported version to all the enum values to get their actual version.
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Field)]
+        public class CompatibilityLevelSupportedVersionAttribute : Attribute
+        {
+            public int MinimumMajorVersion { get; private set; }
+            public int MinimumMinorVersion { get; private set; }
+
+            public CompatibilityLevelSupportedVersionAttribute(int majorVersion, int minorVersion = 0)
+            {
+                MinimumMajorVersion = majorVersion;
+                MinimumMinorVersion = minorVersion;
+            }
+
+            /// <summary>
+            /// Gets the matching <see cref="ScriptCompatibilityOptions"/> value for the specified engine version.
+            /// </summary>
+            /// <param name="majorVersion">The major version number of the engine version.</param>
+            /// <param name="minorVersion">The minor version number of the engine version.</param>
+            /// <returns>The corresponding compatibility option value, or null if none match the provided version.</returns>
+            public static ScriptCompatibilityOptions? GetOptionForVersion(int majorVersion, int minorVersion = 0)
+            {
+                ScriptCompatibilityOptions? result = null;
+                var allOptions = Enum.GetValues(typeof(ScriptCompatibilityOptions));
+                foreach (ScriptCompatibilityOptions compatOption in allOptions)
+                {
+                    var attr = GetAttributeForOption(compatOption);
+                    if (attr != null)
+                    {
+                        if (attr.MinimumMajorVersion == majorVersion && attr.MinimumMinorVersion == minorVersion)
+                        {
+                            result = compatOption;
+                            break;
+                        }
+                    }
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Filters the <see cref="ScriptCompatibilityOptions"/> from the provided list that
+            /// are not supported for the specified engine version.
+            /// </summary>
+            /// <param name="options">List of options to check.</param>
+            /// <param name="majorVersion">The major version number of the engine version.</param>
+            /// <param name="minorVersion">The minor version number of the engine version.</param>
+            /// <returns>The same list of options with unsupported options removed.</returns>
+            public static List<ScriptCompatibilityOptions> FilterUnsupportedOptions(List<ScriptCompatibilityOptions> options, int majorVersion, int minorVersion)
+            {
+                if (options != null)
+                {
+                    // Start for loop from the end so we can remove elements as we go without
+                    // throwing off the list ordering.
+                    for (var i = options.Count - 1; i >= 0; i--)
+                    {
+                        var attr = GetAttributeForOption(options[i]);
+                        if (attr != null)
+                        {
+                            if (attr.MinimumMajorVersion > majorVersion ||
+                                (attr.MinimumMajorVersion == majorVersion && attr.MinimumMinorVersion > minorVersion))
+                            {
+                                options.RemoveAt(i);
+                            }
+                        }
+                    }
+                }
+                return options;
+            }
+
+            /// <summary>
+            /// Gets the <see cref="CompatibilityLevelSupportedVersionAttribute"/> associated with the specified <see cref="ScriptCompatibilityOptions"/> value.
+            /// </summary>
+            /// <param name="option">The compatibility option to retrieve an attribute for.</param>
+            /// <returns>The associated version attribute, or null if none are set for the provided option.</returns>
+            public static CompatibilityLevelSupportedVersionAttribute GetAttributeForOption(ScriptCompatibilityOptions option)
+            {
+                var enumType = typeof(ScriptCompatibilityOptions);
+                var attrType = typeof(CompatibilityLevelSupportedVersionAttribute);
+                var attributes =
+                    enumType.GetMember(option.ToString())
+                    .First(m => m.DeclaringType == enumType)
+                    .GetCustomAttributes(attrType, false);
+
+                if (attributes == null || attributes.Length == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return (CompatibilityLevelSupportedVersionAttribute)attributes[0];
+                }
+            }
+        }
     }
 }

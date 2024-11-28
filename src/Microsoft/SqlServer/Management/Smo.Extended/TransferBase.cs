@@ -1309,9 +1309,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
             foreach (DependencyCollectionNode node in depList)
             {
-                if ((this.Options.TargetServerVersionInternal < SqlServerVersionInternal.Version100 &&
+                if ((this.Options.TargetServerVersion < SqlServerVersion.Version100 &&
                      this.Database.CompatibilityLevel >= CompatibilityLevel.Version90 &&
-                     !CanScriptDownlevel(node.Urn, this.Options.TargetServerVersionInternal))
+                     !CanScriptDownlevel(node.Urn, this.Options.TargetServerVersion))
                     || !CanScriptCrossPlatform(node.Urn, preferences))
                 {
                     incompatibleNodes.Add(node);
@@ -1421,7 +1421,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="urn"></param>
         /// <param name="targetVersion"></param>
         /// <returns></returns>
-        private bool CanScriptDownlevel(Urn urn, SqlServerVersionInternal targetVersion)
+        private bool CanScriptDownlevel(Urn urn, SqlServerVersion targetVersion)
         {
             Sdk.Sfc.TraceHelper.Assert(null != urn, "null == urn");
 
@@ -1446,7 +1446,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 StoredProcedure o = (StoredProcedure)smoObject;
                 if (ContainsUnsupportedType(o.Parameters, targetVersion) ||
-                    ((o.ImplementationType == ImplementationType.SqlClr) && (targetVersion < SqlServerVersionInternal.Version90)))
+                    ((o.ImplementationType == ImplementationType.SqlClr) && (targetVersion < SqlServerVersion.Version90)))
                 {
                     return false;
                 }
@@ -1457,7 +1457,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 UserDefinedFunction o = (UserDefinedFunction)smoObject;
                 if (ContainsUnsupportedType(o.Parameters, targetVersion) ||
                    ((o.DataType != null) && (o.FunctionType == UserDefinedFunctionType.Scalar) && IsUnsupportedType(o.DataType.SqlDataType, targetVersion)) ||
-                   ((o.ImplementationType == ImplementationType.SqlClr) && (targetVersion < SqlServerVersionInternal.Version90)))
+                   ((o.ImplementationType == ImplementationType.SqlClr) && (targetVersion < SqlServerVersion.Version90)))
                 {
                     return false;
                 }
@@ -1467,7 +1467,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (smoObject is UserDefinedDataType)
             {
                 // do we need to check for other base types?
-                if ((((UserDefinedDataType)smoObject).SystemType == "xml") && (targetVersion < SqlServerVersionInternal.Version90))
+                if ((((UserDefinedDataType)smoObject).SystemType == "xml") && (targetVersion < SqlServerVersion.Version90))
                 {
                     return false;
                 }
@@ -1476,9 +1476,9 @@ namespace Microsoft.SqlServer.Management.Smo
             return true;
         }
 
-        private bool IsUnsupportedType(SqlDataType type, SqlServerVersionInternal targetVersion)
+        private bool IsUnsupportedType(SqlDataType type, SqlServerVersion targetVersion)
         {
-            if (targetVersion == SqlServerVersionInternal.Version80)
+            if (targetVersion == SqlServerVersion.Version80)
             {
                 switch (type)
                 {
@@ -1496,7 +1496,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         return false;
                 }
             }
-            else //SqlServerVersionInternal.Version90
+            else //SqlServerVersion.Version90
             {
                 switch (type)
                 {
@@ -1514,7 +1514,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         }
 
-        private bool ContainsUnsupportedType(ParameterCollectionBase parms, SqlServerVersionInternal targetVersion)
+        private bool ContainsUnsupportedType(ParameterCollectionBase parms, SqlServerVersion targetVersion)
         {
             foreach (Parameter p in parms)
             {
@@ -1526,7 +1526,7 @@ namespace Microsoft.SqlServer.Management.Smo
             return false;
         }
 
-        private bool ContainsUnsupportedType(ColumnCollection cols, SqlServerVersionInternal targetVersion)
+        private bool ContainsUnsupportedType(ColumnCollection cols, SqlServerVersion targetVersion)
         {
             foreach (Column col in cols)
             {

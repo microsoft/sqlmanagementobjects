@@ -23,6 +23,8 @@ ServerSQL15 = SQL Server 2016
 ServerSQL2017 = SQL Server 2017
 ServerSQLv150 = SQL Server 2019
 ServerSQLv160 = SQL Server 2022
+ServerSQLv170 = Azure SQL
+#VBUMP
 EngineCloud = Microsoft Azure SQL Database
 EngineCloudMI = Microsoft Azure SQL Managed Instance
 EngineSingleton = SQL Server
@@ -314,6 +316,9 @@ Database_IsDbOwnerDesc=Specifies whether the current user is a member of the DbO
 
 Database_IsDbSecurityAdminName=Is Database Security Admin
 Database_IsDbSecurityAdminDesc=Specifies whether the current user is a member of the DbSecurityAdmin database role.
+
+Database_IsFabricDatabaseName=Is Database Fabric Native
+Database_IsFabricDatabaseDesc=Specifies whether the database is part of a Fabric workspace, not a member of a logical server.
 
 Database_IsFullTextEnabledName=Is Full-Text Enabled
 Database_IsFullTextEnabledDesc=Specifies whether the database is enabled for full-text search.

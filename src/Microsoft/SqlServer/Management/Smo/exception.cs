@@ -89,13 +89,13 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected SmoException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
-
+#endif
         private void Init()
         {
             Data.Add("HelpLink.ProdVer", ProdVer);
@@ -229,13 +229,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private MissingObjectException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("ObjectDoesNotExist");
@@ -302,6 +303,7 @@ namespace Microsoft.SqlServer.Management.Smo
             this.propertyName = propertyName;
             Init();
         }
+#if !NETCOREAPP
 
         private PropertyNotSetException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -309,7 +311,7 @@ namespace Microsoft.SqlServer.Management.Smo
             propertyName = (string)info.GetString("propertyName");
             Init();
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -406,6 +408,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Data["HelpLink.EvtData1"] = propertyObject.Name;
             Init();
         }
+#if !NETCOREAPP
 
         private WrongPropertyValueException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -413,7 +416,7 @@ namespace Microsoft.SqlServer.Management.Smo
             property= (Property)info.GetValue("property", typeof(Property));
             Init();
         }
-
+#endif
 
 
         /// <summary>
@@ -423,7 +426,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
- #if NETFRAMEWORK
+#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
 #endif
@@ -524,6 +527,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Data["HelpLink.EvtData1"] = propertyName;
         }
 
+#if !NETCOREAPP
 
         private PropertyTypeMismatchException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -532,7 +536,7 @@ namespace Microsoft.SqlServer.Management.Smo
             receivedType = info.GetString("receivedType");
             expectedType = info.GetString("expectedType");
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -634,13 +638,14 @@ namespace Microsoft.SqlServer.Management.Smo
 
             Data["HelpLink.EvtData1"] = propertyName;
         }
+#if !NETCOREAPP
 
         private UnknownPropertyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             propertyName = info.GetString("propertyName");
         }
-
+#endif
 
         /// <summary>
         /// Serialization helper method.
@@ -744,13 +749,14 @@ namespace Microsoft.SqlServer.Management.Smo
             Data["HelpLink.EvtData1"] = propertyName;
         }
 
+#if !NETCOREAPP
 
         private PropertyReadOnlyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             propertyName = info.GetString("propertyName");
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -848,13 +854,14 @@ namespace Microsoft.SqlServer.Management.Smo
             Data["HelpLink.EvtData1"] = propertyName;
 
         }
+#if !NETCOREAPP
 
         private PropertyWriteException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             propertyName = info.GetString("propertyName");
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -956,6 +963,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Data["HelpLink.EvtData1"] = opName;
         }
 
+#if !NETCOREAPP
 
         private InvalidSmoOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -963,7 +971,7 @@ namespace Microsoft.SqlServer.Management.Smo
             opName = info.GetString("opName");
             state = (SqlSmoState)info.GetValue("state", typeof(SqlSmoState));
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1069,13 +1077,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             this.version = version;
         }
+#if !NETCOREAPP
 
         private InvalidVersionSmoOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             version = (ServerVersion)info.GetValue("version", typeof(ServerVersion));
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1187,6 +1196,7 @@ namespace Microsoft.SqlServer.Management.Smo
             this.colname = colname;
             this.serverVersion = serverVersion;
         }
+#if !NETCOREAPP
 
         private CollectionNotAvailableException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -1194,7 +1204,7 @@ namespace Microsoft.SqlServer.Management.Smo
             colname = info.GetString("colname");
             serverVersion = (ServerVersion)info.GetValue("serverVersion", typeof(ServerVersion));
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1311,6 +1321,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Init();
             Data["HelpLink.EvtData1"] = propertyName;
         }
+#if !NETCOREAPP
 
         private PropertyCannotBeRetrievedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -1320,7 +1331,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // failed object will not be saved, because it belongs to the tree
             Init();
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1423,13 +1434,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private InternalSmoErrorException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("InternalSmoErrorException");
@@ -1480,6 +1492,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             SetHelpContext("FailedOperationExceptionText");
         }
+#if !NETCOREAPP
 
         private FailedOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -1487,7 +1500,7 @@ namespace Microsoft.SqlServer.Management.Smo
             reason = info.GetString("reason");
             SetHelpContext("FailedOperationExceptionText");
         }
-
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1658,12 +1671,13 @@ namespace Microsoft.SqlServer.Management.Smo
         public UnsupportedObjectNameException(string message, Exception innerException) : base(message, innerException)
         {
         }
+#if !NETCOREAPP
 
         private UnsupportedObjectNameException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
-
+#endif
         /// <summary>
         /// Gets the type of exeption from the
         /// T:Microsoft.SqlServer.Management.Smo.SmoExceptionType enumeration.
@@ -1715,6 +1729,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Init();
             errorCode = retcode;
         }
+#if !NETCOREAPP
 
         private ServiceRequestException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -1722,6 +1737,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Init();
             errorCode = info.GetUInt32("errorCode");
         }
+#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1872,13 +1888,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private UnsupportedVersionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("UnsupportedVersion");
@@ -1919,13 +1936,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private UnsupportedEngineTypeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("UnsupportedEngineType");
@@ -1963,13 +1981,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private UnsupportedEngineEditionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("UnsupportedEngineEdition");
@@ -2021,13 +2040,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private UnsupportedFeatureException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("UnsupportedFeatureException");
@@ -2069,13 +2089,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private SfcDependencyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("SfcDependencyException");
@@ -2113,13 +2134,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private InvalidScriptingOptionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("InvalidScriptingOptionException");
@@ -2168,13 +2190,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private ScriptWriterException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("ScriptWriterException");
@@ -2231,13 +2254,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Init();
         }
+#if !NETCOREAPP
 
         private UnsupportedCompatLevelException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Init();
         }
-
+#endif
         private void Init()
         {
             SetHelpContext("UnsupportedCompatLevelException");

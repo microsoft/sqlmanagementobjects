@@ -20,6 +20,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
     /// </summary>
     [TestClass]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+    [UnsupportedFeature(SqlFeature.NoDropCreate)]
     public class DifferencingTests : SmoTestBase
     {
         [TestMethod]
@@ -27,8 +28,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         {
             ExecuteFromDbPool("Differencing", db =>
             {
-                var table1 = db.CreateTable("tbl1", new ColumnProperties("col1"));
-                var table2 = db.CreateTable("tbl2", new ColumnProperties("colExtra"));
+                var table1 = db.CreateTable("tbl1", new ColumnProperties("col1") { Nullable  = false });
+                var table2 = db.CreateTable("tbl2", new ColumnProperties("colExtra") { Nullable = false });
                 var differencer = DifferencingService.Service.CreateDifferencer();
                 // ToList forces the enumeration to walk the whole graph before we move on to the Assert
                 var diff = differencer.CompareGraphs(table1, table2).ToList();

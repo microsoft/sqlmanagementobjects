@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.ComponentModel.Design;
 using System.Text;
 
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
@@ -25,8 +26,19 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
 
             while (e != null)
             {
-                msg.AppendFormat("{0} -> ", e.Message);
-                e = e.InnerException;
+                _ = msg.AppendFormat("{0} -> ", e.Message);
+                if (e is AggregateException ae)
+                {
+                    foreach (var ex in ae.InnerExceptions)
+                    {
+                        _ = msg.AppendLine(ex.BuildRecursiveExceptionMessage());
+                    }
+                    e = null;
+                }
+                else
+                {
+                    e = e.InnerException;
+                }
             }
             
             //Trim off the last ->

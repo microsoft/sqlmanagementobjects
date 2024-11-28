@@ -66,7 +66,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-                if (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80)
+                if (sp.TargetServerVersion > SqlServerVersion.Version80)
                 {
                     bool schemaOwned = true;
                     sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER AUTHORIZATION ON {0}", this.PermissionPrefix);

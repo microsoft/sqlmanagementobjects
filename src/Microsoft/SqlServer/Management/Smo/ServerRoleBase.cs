@@ -104,7 +104,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so"></param>
         internal override void ScriptAlter(StringCollection alterQuery, ScriptingPreferences sp)
         {
-            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersionInternal, ExceptionTemplates.CreateAlterNotSupported);
+            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersion, ExceptionTemplates.CreateAlterNotSupported);
 
             Property prop = this.Properties.Get("Owner");
 
@@ -124,7 +124,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="newName"></param>
         internal override void ScriptRename(StringCollection renameQuery, ScriptingPreferences sp, string newName)
         {
-            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersionInternal, ExceptionTemplates.CreateAlterNotSupported);
+            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersion, ExceptionTemplates.CreateAlterNotSupported);
 
             renameQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER SERVER ROLE {0} WITH NAME={1}",
                                           FormatFullNameForScripting(sp), MakeSqlBraket(newName)));
@@ -137,7 +137,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so"></param>
         internal override void ScriptDrop(StringCollection dropQuery, ScriptingPreferences sp)
         {
-            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersionInternal, ExceptionTemplates.CreateAlterNotSupported);
+            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersion, ExceptionTemplates.CreateAlterNotSupported);
             
             //Dropping role members
             StringBuilder strBuilder = new StringBuilder(string.Format(SmoApplication.DefaultCulture, Scripts.DECLARE_ROLE_MEMEBER, EscapeString(this.Name, '\'')));
@@ -187,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so"></param>
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersionInternal, ExceptionTemplates.CreateAlterNotSupported);
+            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersion, ExceptionTemplates.CreateAlterNotSupported);
 
             StringBuilder statement = new StringBuilder();
 
@@ -229,7 +229,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptAssociations(StringCollection rolesCmd, ScriptingPreferences sp)
         {
-            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfSourceOrDestBelowVersion110(sp.TargetServerVersion);
 
             // add server roles membership for those 
             // that this server role is a member of

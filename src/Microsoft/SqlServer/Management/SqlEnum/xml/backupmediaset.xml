@@ -15,7 +15,6 @@
 		<version min_major='10'>
 			<property name='IsCompressed' type='bit' cast='true'>bkpms.is_compressed</property>
 		</version>
-		<!--Specifying the minimum build number for now. Need to update version when vBump is done.-->
 		<version min_major='11'  min_build='9143'>
 			<property name='IsEncrypted' type='bit' cast='true'>bkpms.is_encrypted</property>
 		</version>

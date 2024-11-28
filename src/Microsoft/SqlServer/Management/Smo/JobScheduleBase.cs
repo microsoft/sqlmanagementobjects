@@ -129,8 +129,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             // Add the @schedule_uid parameter if the creation sproc supports it. SQL 2008
             // (Version100) supports it, but 2005 (Version90) only supported it for shared
             // schedules. SQL 2000 (Version80) did not support it at all.
-            if ((sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100) ||
-                 (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90 && isSharedSched))
+            if ((sp.TargetServerVersion >= SqlServerVersion.Version100) ||
+                 (sp.TargetServerVersion == SqlServerVersion.Version90 && isSharedSched))
             {
                 GetParameter(createQuery, sp, "ScheduleUid", "@schedule_uid=N'{0}'", ref count);
             }
@@ -243,7 +243,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             if (IsShared)
             {
                 // shared schedules cannot be scripted for 7.0 and 8.0
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+                ThrowIfBelowVersion90(sp.TargetServerVersion);
                 // if keepUnusedSchedule is true we keep the schedule in any
                 // case and don't drop it. (we don't detach the schedule form
                 // the job in this case below).
@@ -256,7 +256,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 if (sp.IncludeScripts.ExistenceCheck)
                 {

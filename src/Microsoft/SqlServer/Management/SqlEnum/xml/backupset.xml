@@ -67,7 +67,6 @@
 		<version min_major='10'>
 			<property name='CompressedBackupSize' type='numeric' size='20'>bkps.compressed_backup_size</property>
 		</version>
-		<!--Specifying the minimum build number for now. Need to update version when vBump is done.-->
 		<version min_major='11'  min_build='9143'>
 			<property name='KeyAlgorithm' type='nvarchar' size='32'>bkps.key_algorithm</property>
 			<property name='EncryptorThumbprint' type='varbinary' size='20'>bkps.encryptor_thumbprint</property>
