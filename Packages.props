@@ -53,6 +53,7 @@
     </ItemGroup>
     <ItemGroup>
         <!-- GlobalPackageReference packages are installed and processed by msbuild but are not referenced by the C# compiler -->
+        <GlobalPackageReference Condition="!Exists('c:\strawberry\perl\bin\perl.exe')" Include="StrawberryPerl" Version="5.28.0.1" GeneratePathProperty="true" />
         <GlobalPackageReference Include="Microsoft.TestPlatform" Version="17.6.0" GeneratePathProperty="true" />
     </ItemGroup>
 

@@ -8,7 +8,7 @@
   </ItemGroup>
   <PropertyGroup>
       <Perl Condition="Exists('c:\strawberry\perl\bin\perl.exe')">c:\strawberry\perl\bin\perl.exe</Perl>
-      <Perl Condition="'$(Perl)' == ''">$(EnlistmentRoot)\packages\StrawberryPerl.5.28.0.1\bin\perl.exe</Perl>
+      <Perl Condition="'$(Perl)' == ''">$(PkgStrawberryPerl)\bin\perl.exe</Perl>
     </PropertyGroup>
   <ItemDefinitionGroup>
     <!-- the defaults are for sqlenum -->
