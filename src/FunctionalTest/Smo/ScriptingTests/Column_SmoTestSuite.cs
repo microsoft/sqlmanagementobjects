@@ -97,7 +97,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             var i = 0;
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.BigInt);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.HierarchyId);
+            if (!database.IsFabricDatabase)
+            {
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Geography);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Geometry);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.HierarchyId);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Image);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.NText);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Text);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Timestamp);
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Variant);
+            }
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Binary(1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Bit);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Char(1));
@@ -105,35 +115,29 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Decimal(1, 1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Numeric(1, 1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Float);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.Geography);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.Geometry);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.Image);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Int);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Money);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.NChar(1));
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.NText);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.NVarChar(1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.NVarCharMax);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Real);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.SmallDateTime);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.SmallInt);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.SmallMoney);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.Text);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.Timestamp);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.TinyInt);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.UniqueIdentifier);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.VarBinary(8));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.VarBinaryMax);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.VarChar(2));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.VarCharMax);
-            yield return new ColumnProperties($"col{i++}", _SMO.DataType.Variant);
+
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.SysName);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Date);
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.Time(1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.DateTimeOffset(1));
             yield return new ColumnProperties($"col{i++}", _SMO.DataType.DateTime2(1));
 
-            if (database.Parent.IsJsonDataTypeEnabled && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+            if (database.Parent.IsJsonDataTypeEnabled && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse && !database.IsFabricDatabase)
             {
                 yield return new ColumnProperties($"col{i++}", _SMO.DataType.Json);
             }
@@ -163,6 +167,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDataWarehouse)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Column_Create_Masked_Column_And_Alter()
         {
             ExecuteFromDbPool(
@@ -217,6 +222,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
+        [SqlRequiredFeature(SqlFeature.AzureLedger)]
         public void DroppedLedgerColumn_is_not_scripted()
         {
             this.ExecuteFromDbPool(

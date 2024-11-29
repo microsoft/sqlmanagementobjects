@@ -118,7 +118,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // perform check for existing object
             string checkString;
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 checkString = Scripts.INCLUDE_EXISTS_TRIGGER90;
             }
@@ -155,13 +155,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.AppendLine(GetIfNotExistString( /* forCreate = */ false, sp));
             }
 
             sb.AppendFormat(SmoApplication.DefaultCulture, "DROP TRIGGER {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 sFullScriptingName);
             queries.Add(sb.ToString());
         }
@@ -249,7 +249,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 objInsteadOf = Properties.Get("InsteadOf").Value;
             }
-            else if (SqlServerVersionInternal.Version70 != sp.TargetServerVersionInternal) // Sphinx server does not support this property
+            else
             {
                 objInsteadOf = Properties["InsteadOf"].Value;
             }
@@ -282,11 +282,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool bInsteadOf = GetInsteafOfValue(sp);
 
-            //INSTEAD OF triggers are not supported on 7.0
-            if (SqlServerVersionInternal.Version70 == sp.TargetServerVersionInternal && true == bInsteadOf)
-            {
-                throw new SmoException(ExceptionTemplates.TriggerNotSupported(sp.TargetServerVersionInternal.ToString()));
-            }
+
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -377,7 +373,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             sbTmp.AppendFormat(SmoApplication.DefaultCulture, "{0} TRIGGER {1}", Scripts.ALTER, sTriggerName);
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
-                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersionInternal,
+                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
                                 ExceptionTemplates.CreateOrAlterDownlevel(
                                     "Trigger",
                                     GetSqlServerName(sp)));
@@ -394,7 +390,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (!IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType)
                         && bTransactSql)
                     {
-                        if (ServerVersion.Major >= 13 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130)
+                        if (ServerVersion.Major >= 13 && sp.TargetServerVersion >= SqlServerVersion.Version130)
                         {
                             // script Hekaton properties
                             if (IsSupportedProperty("IsNativelyCompiled", sp))
@@ -410,7 +406,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         AppendWithOption(sbTmp, "IsEncrypted", "ENCRYPTION", ref bNeedsComma);
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         AddScriptExecuteAs(sbTmp, sp, this.Properties, ref bNeedsComma);
                     }
@@ -421,15 +417,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        if (SqlServerVersionInternal.Version70 == sp.TargetServerVersionInternal)
-                        {
-                            // use 7.0 syntax
-                            sbTmp.Append(" FOR ");
-                        }
-                        else
-                        {
-                            sbTmp.Append(" AFTER ");
-                        }
+                        sbTmp.Append(" AFTER ");
                     }
 
                     int nCount = 0;

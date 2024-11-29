@@ -122,7 +122,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // 3. The scripting preferences 'ExtendedProperty' option is true and both source and target server versions are lower than 15 or not Azure
             if (!IsSupportedProperty("IsClassified", sp) ||
                 (State != SqlSmoState.Creating && State != SqlSmoState.Existing) ||
-                (sp != null && sp.IncludeScripts.ExtendedProperties && !VersionUtils.IsSql15Azure12OrLater(this.DatabaseEngineType, this.ServerVersion) && !VersionUtils.IsTargetVersionSql15Azure12OrLater(sp.TargetDatabaseEngineType, sp.TargetServerVersionInternal)))
+                (sp != null && sp.IncludeScripts.ExtendedProperties && !VersionUtils.IsSql15Azure12OrLater(this.DatabaseEngineType, this.ServerVersion) && !VersionUtils.IsTargetVersionSql15Azure12OrLater(sp.TargetDatabaseEngineType, sp.TargetServerVersion)))
             {
                 return;
             }
@@ -509,7 +509,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         throw new WrongPropertyValueException(ExceptionTemplates.NoDataMaskingOnComputedColumns);
                     }
-                    if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 &&
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90 &&
                         this.ServerVersion.Major >= 9)
                     {
                         if (GetPropValueOptional("IsPersisted", false))
@@ -1008,7 +1008,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             dropQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} DROP COLUMN {1}{2}",
                 sTableName,
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 sColumnName));
         }
 
@@ -1058,8 +1058,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // For better user experience, we script collation for memory optimized table or user-defined table types at all times.            
             bool scriptCollation = (sp.IncludeScripts.Collation || this.IsParentMemoryOptimized() || this.IsEncrypted);
 
-            if (SqlServerVersionInternal.Version70 != sp.TargetServerVersionInternal
-                    && this.ServerVersion.Major > 7
+            if (ServerVersion.Major > 7
                     && scriptCollation
                     && CompatibilityLevel.Version70 < GetCompatibilityLevel()
                     && UserDefinedDataType.IsSystemType(this, sp) //check is system because TypeAllowsCollation checks only the name , not the schema
@@ -1164,7 +1163,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // mark the column as persisted if needed
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 Property propPersisted = Properties.Get("IsPersisted");
                 if (propPersisted.Dirty)

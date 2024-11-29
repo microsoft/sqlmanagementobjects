@@ -198,6 +198,7 @@ namespace Microsoft.SqlServer.Management.Common
 #if MICROSOFTDATA
             HostNameInCertificate = serverConnection.HostNameInCertificate;
 #endif
+            Authentication = serverConnection.Authentication;
         }
 
         public string ApplicationName

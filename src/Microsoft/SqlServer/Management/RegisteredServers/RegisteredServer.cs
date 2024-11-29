@@ -150,8 +150,13 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                             // the user wants to connect to. (We go straight to the property bag to
                             // avoid infinite recursion on the this.ServerName property checking
                             // the connection string.)
-                            builder["server"] = this.Properties["ServerName"].Value as string;
+                            builder["server"] = Properties[nameof(ServerName)].Value as string;
                             builder["integrated security"] = "true";
+                            // If the user set "trust server certificate" to true on the central connection, add it to all connections from that server
+                            if (Parent.GetDomain().GetConnection() is ServerConnection server && server.TrustServerCertificate)
+                            {
+                                builder["trust server certificate"] = "true";
+                            }
                             secureConnectionString = EncryptionUtility.EncryptString(builder.ConnectionString);
                         }
                     }

@@ -3,6 +3,19 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 172.52.0
+
+- Add 170 compat support
+- Update NetFx binaries to net472
+- Remove obsolete formatter-based serialization constructors from non-Netfx Exceptions
+- Added new `DateLastModified` property on Error Logs returned by `EnumErrorLogs()`. Its value is the same as the existing `CreateDate`,
+  (which has been incorrectly namd for years) only properly stampted with the date/time offset information to allow easier 
+  interoperability between client and servers in different time zones. `CreateDate` is essentially deprecated, and new applications
+  should start using `DateLastModified` instead.
+- Fixed an issue in the `EnumErrorLogs()` where `CreateDate` field could be `NULL` depending on the configuration of the machine 
+  on which SQL Server was running on.
+- Regex for the EXECUTE statement was updated to also match the shortened form 'EXEC'
+
 ## 171.30.0
 
 - <b>BREAKING</b>: Move Transfer interfaces to Smo.Extended and remove unused/non-implemented interfaces. This is a breaking change that requires recompilation of apps that use Transfer.

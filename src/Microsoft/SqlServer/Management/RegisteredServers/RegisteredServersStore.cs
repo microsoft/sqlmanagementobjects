@@ -771,6 +771,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// 
         /// </summary>
         [SfcIgnore]
+        [Obsolete]
         public ServerGroup SqlServerCompactEditionServerGroup
         {
             get
@@ -1281,7 +1282,6 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
         // These are the GUIDs used by the downlevel registered servers file
         private const string DatabaseEngineServerTypeGuid = "8c91a03d-f9b4-46c0-a305-b5dcc79ff907";
-        private const string SqlServerCompactEditionServerTypeGuid = "6b04a4a7-9b37-4028-ac2d-f0a39e50fb57";
         private const string AnalysisServicesServerTypeGuid = "1396ffcb-10d7-4f8c-aaef-4696d541f554";
         private const string IntegrationServicesServerTypeGuid = "19d20860-9e9a-4aff-a80d-f72b41b5e931";
         private const string ReportingServicesServerTypeGuid = "3a0f2e46-847b-4332-9b7e-fc78e43a49b0";

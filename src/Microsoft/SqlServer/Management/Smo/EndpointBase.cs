@@ -602,7 +602,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -726,7 +726,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptDrop(StringCollection dropQuery, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
             // format full table name for scripting

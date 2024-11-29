@@ -125,14 +125,14 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             GetStringParameter( sb, sp, "OutputFileName", "@output_file_name=N'{0}'" , ref count);
             GetEnumParameter(sb, sp, "JobStepFlags", "@flags={0}", typeof(JobStepFlags), ref count);
 
-            if (ServerVersion.Major >= 9 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 GetStringParameter(sb, sp, "ProxyName", "@proxy_name=N'{0}'", ref count);
             }
 
             // If we're targeting a pre-90 server, we can't have
             // jobstep flags that don't exist before 90.
-            if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion < SqlServerVersion.Version90)
             {
                 Property prop = Properties.Get("JobStepFlags");
 

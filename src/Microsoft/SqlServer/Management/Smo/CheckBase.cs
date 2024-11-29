@@ -208,7 +208,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             fullCheckName = MakeSqlString(fullCheckName);
 
-            if (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80)
+            if (sp.TargetServerVersion > SqlServerVersion.Version80)
             {
                 return string.Format(SmoApplication.DefaultCulture,
                     Scripts.INCLUDE_EXISTS_CHECK90, forCreate ? "NOT" : "", fullCheckName, MakeSqlString(tableName));
@@ -275,7 +275,7 @@ namespace Microsoft.SqlServer.Management.Smo
             CheckObjectState();
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            var inlineIfExists = sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlDatabase || VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersionInternal);
+            var inlineIfExists = sp.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlDatabase || VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersion);
 
             if (sp.IncludeScripts.ExistenceCheck)
             {

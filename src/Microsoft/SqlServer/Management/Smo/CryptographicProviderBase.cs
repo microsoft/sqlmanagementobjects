@@ -110,7 +110,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so">Scripting Options</param>
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
-            SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersion);
             string dllPath = (string)this.GetPropValue("DllPath");
             if (string.IsNullOrEmpty(dllPath))
             {
@@ -154,7 +154,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so">Scripting Options</param>
         internal override void ScriptAlter(StringCollection queries, ScriptingPreferences sp)
         {
-            SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersion);
             Property dllPath = Properties.Get("DllPath");
             if (dllPath.Dirty)
             {
@@ -196,7 +196,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so">Scripting Options</param>
         internal override void ScriptDrop(StringCollection queries, ScriptingPreferences sp)
         {
-            SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            SqlSmoObject.ThrowIfBelowVersion100(sp.TargetServerVersion);
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
             if (sp.IncludeScripts.ExistenceCheck)

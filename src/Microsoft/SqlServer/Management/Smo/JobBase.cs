@@ -827,7 +827,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)
+            if (sp.TargetServerVersion <= SqlServerVersion.Version80)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture,
                                 "EXEC msdb.dbo.sp_delete_job {0}",

@@ -48,16 +48,16 @@ namespace Microsoft.SqlServer.Management.XEvent
         {
             Init();
         }
+#if !NETCOREAPP
 
         /// <summary>
         /// Base constructor
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected XEventException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
-
+#endif
         /// <summary>
         /// Initializes instance properties
         /// </summary>

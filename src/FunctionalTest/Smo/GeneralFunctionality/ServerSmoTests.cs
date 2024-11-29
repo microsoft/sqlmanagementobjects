@@ -85,6 +85,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
 
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Server_DetachDatabase_and_AttachDatabase_error_handling()
         {
             ExecuteTest(() =>
@@ -111,6 +112,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
 
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Server_EnumMembers_returns_valid_list()
         {
             ExecuteFromDbPool((db) =>

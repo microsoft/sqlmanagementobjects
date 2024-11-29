@@ -131,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void ScriptTrigger(StringCollection queries, ScriptingPreferences sp, ScriptHeaderType scriptHeaderType)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+            ThrowIfBelowVersion90(sp.TargetServerVersion,
                 ExceptionTemplates.DdlTriggerDownlevel(
                     FormatFullNameForScripting(sp, true),
                     GetSqlServerName(sp)));
@@ -285,7 +285,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             sbSpExec.AppendFormat(SmoApplication.DefaultCulture, "{0} TRIGGER {1}", Scripts.ALTER, sTriggerName);
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
-                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersionInternal,
+                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
                                 ExceptionTemplates.CreateOrAlterDownlevel(
                                     "DDL Trigger",
                                     GetSqlServerName(sp)));
@@ -309,7 +309,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         sbSpExec.Append(" ");
                         if (this is ServerDdlTrigger)

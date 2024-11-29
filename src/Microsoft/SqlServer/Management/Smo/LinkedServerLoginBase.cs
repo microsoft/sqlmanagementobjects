@@ -142,7 +142,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (sp.IncludeScripts.ExistenceCheck)
             {
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture,
                                 Scripts.INCLUDE_EXISTS_LINKED_SERVER_LOGIN90,

@@ -19,6 +19,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
     /// </summary>
     [TestClass]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+    [UnsupportedFeature(SqlFeature.NoDropCreate)]
     public class DataClassificationSmoTests : SmoObjectTestBase
     {
         /// <summary>

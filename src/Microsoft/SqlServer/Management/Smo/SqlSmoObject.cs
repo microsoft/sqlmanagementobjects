@@ -400,7 +400,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            if ((sp != null && sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80) ||
+            if ((sp != null && sp.TargetServerVersion > SqlServerVersion.Version80) ||
                 (sp == null && this.IsVersion90AndAbove()))
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER AUTHORIZATION ON {0}", this.PermissionPrefix);
@@ -2795,22 +2795,15 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 //7.0, 8.0 only support permissions on database, object and column
                 //also verify that the permission code exists on the repective server version
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 &&
+                if (sp.TargetServerVersion < SqlServerVersion.Version90 &&
                     ((pi.ObjectClass != ObjectClass.ObjectOrColumn && pi.ObjectClass != ObjectClass.Database) ||
-                    !pi.PermissionTypeInternal.IsValidPermissionForVersion(sp.TargetServerVersionInternal)))
+                    !pi.PermissionTypeInternal.IsValidPermissionForVersion(sp.TargetServerVersion)))
                 {
                     continue;
                 }
 
                 // Cannot grant, deny, or revoke permissions to dbo, information_schema, sys
                 if (pi.Grantee == "dbo" || pi.Grantee == "information_schema" || pi.Grantee == "sys")
-                {
-                    continue;
-                }
-                //7.0 doesn't support references on views
-                if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70 &&
-                    (this is View) &&
-                    true == ((ObjectPermissionSet)(pi.PermissionTypeInternal)).References)
                 {
                     continue;
                 }
@@ -4382,14 +4375,6 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             yield return nameof(Server.Configuration.ContainmentEnabled);
 
-                        }
-                    }
-                    break;
-                case nameof(ExternalFileFormat):
-                    {
-                        if (databaseEngineEdition != DatabaseEngineEdition.SqlOnDemand && databaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
-                        {
-                            yield return nameof(ExternalFileFormat.FirstRow);
                         }
                     }
                     break;
@@ -6325,19 +6310,6 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Throws an UnsupportedVersionException if either the source or destination server is below 8.0 (SQL 2000)
-        /// </summary>
-        /// <param name="targetVersion"></param>
-        internal void ThrowIfSourceOrDestBelowVersion80(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
-        {
-            //Source
-            ThrowIfBelowVersion80(exceptionMessage);
-
-            //Dest
-            ThrowIfBelowVersion80(targetVersion, exceptionMessage);
-        }
-
-        /// <summary>
         /// Throws an exception if the ServerVersion major version for this object is below 9.0 (SQL 2005)
         /// </summary>
         protected void ThrowIfBelowVersion90(string exceptionMessage = null)
@@ -6352,7 +6324,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 9.0 (SQL 2005)
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal void ThrowIfSourceOrDestBelowVersion90(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal void ThrowIfSourceOrDestBelowVersion90(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
             ThrowIfBelowVersion90(exceptionMessage);
@@ -6398,7 +6370,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 10.0 (SQL 2008)
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal void ThrowIfSourceOrDestBelowVersion100(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal void ThrowIfSourceOrDestBelowVersion100(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
             ThrowIfBelowVersion100(exceptionMessage);
@@ -6434,7 +6406,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 11.0 (SQL 2012)
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal void ThrowIfSourceOrDestBelowVersion110(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal void ThrowIfSourceOrDestBelowVersion110(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
             ThrowIfBelowVersion110(exceptionMessage);
@@ -6470,7 +6442,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 12.0 (SQL 2014)
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal void ThrowIfSourceOrDestBelowVersion120(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal void ThrowIfSourceOrDestBelowVersion120(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
             ThrowIfBelowVersion120(exceptionMessage);
@@ -6529,7 +6501,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 13.0 (SQL 2016)
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal void ThrowIfSourceOrDestBelowVersion130(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal void ThrowIfSourceOrDestBelowVersion130(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
             ThrowIfBelowVersion130(exceptionMessage);
@@ -6700,11 +6672,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="targetVersion"></param>
         /// <param name="exceptionMessage"></param>
         internal static void ThrowIfCloudAndBelowVersion120(DatabaseEngineType targetDatabaseEngineType,
-            SqlServerVersionInternal targetVersion, string exceptionMessage)
+            SqlServerVersion targetVersion, string exceptionMessage)
         {
             if (targetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
             {
-                ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version120, exceptionMessage);
+                ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version120, exceptionMessage);
             }
         }
 
@@ -6714,9 +6686,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion90(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfBelowVersion90(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version90, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version90, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6724,9 +6696,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion100(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfBelowVersion100(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version100, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version100, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6734,9 +6706,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion105(SqlServerVersionInternal targetVersion, string exceptionMessage)
+        internal static void ThrowIfBelowVersion105(SqlServerVersion targetVersion, string exceptionMessage)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version105, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version105, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6744,9 +6716,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion110(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfBelowVersion110(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version110, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version110, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6754,9 +6726,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion120(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfBelowVersion120(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version120, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version120, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6764,9 +6736,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion130(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfBelowVersion130(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version130, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version130, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6774,9 +6746,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfBelowVersion80(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfBelowVersion80(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version80, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version80, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         /// <summary>
@@ -6785,7 +6757,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="targetVersion"></param>
         /// <param name="upperLimit"></param>
         /// <param name="exceptionText"></param>
-        private static void ThrowIfBelowVersionLimit(SqlServerVersionInternal targetVersion, SqlServerVersionInternal upperLimit, string exceptionText)
+        private static void ThrowIfBelowVersionLimit(SqlServerVersion targetVersion, SqlServerVersion upperLimit, string exceptionText)
         {
             if (targetVersion < upperLimit)
             {
@@ -6918,9 +6890,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that create or alter is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
-        internal static void ThrowIfCreateOrAlterUnsupported(SqlServerVersionInternal targetVersion, string exceptionMessage = null)
+        internal static void ThrowIfCreateOrAlterUnsupported(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
-            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersionInternal.Version130, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version130, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
         }
 
         internal static string GetSqlServerName(ScriptingPreferences sp)
@@ -6932,31 +6904,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return LocalizableResources.EngineCloudMI;
             }
-            switch (sp.TargetServerVersion)
-            {
-                case SqlServerVersion.Version80:
-                    return LocalizableResources.ServerShiloh;
-                case SqlServerVersion.Version90:
-                    return LocalizableResources.ServerYukon;
-                case SqlServerVersion.Version100:
-                    return LocalizableResources.ServerKatmai;
-                case SqlServerVersion.Version105:
-                    return LocalizableResources.ServerKilimanjaro;
-                case SqlServerVersion.Version110:
-                    return LocalizableResources.ServerDenali;
-                case SqlServerVersion.Version120:
-                    return LocalizableResources.ServerSQL14;
-                case SqlServerVersion.Version130:
-                    return LocalizableResources.ServerSQL15;
-                case SqlServerVersion.Version140:
-                    return LocalizableResources.ServerSQL2017;
-                case SqlServerVersion.Version150:
-                    return LocalizableResources.ServerSQLv150;
-                case SqlServerVersion.Version160:
-                    return LocalizableResources.ServerSQLv160;
-                default:
-                    return string.Empty;
-            }
+            return TypeConverters.SqlServerVersionTypeConverter.ConvertToString(sp.TargetServerVersion);
         }
 
         internal static string GetSqlServerName(SqlSmoObject srv)
@@ -6999,6 +6947,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     return LocalizableResources.ServerSQLv150;
                 case 16:
                     return LocalizableResources.ServerSQLv160;
+                case 17:
+                    return LocalizableResources.ServerSQLv170;
+                    // VBUMP
                 default:
                     return string.Empty;
             }
@@ -7036,7 +6987,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Gets the sqlserver public name for the current connection, e.g: will transfer "SQLTOOLS2008-2" to "SQL Server 2008".
+        /// Gets the sqlserver public name for the current connection, e.g: "SQL Server 2008".
         /// </summary>
         /// <returns></returns>
         public string GetSqlServerVersionName()
@@ -7594,7 +7545,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 objName = string.Format(SmoApplication.DefaultCulture, "{0}.{1}", ((ScriptSchemaObjectBase)ParentColl.ParentInstance).FormatFullNameForScripting(sp),
                                                 ((Column)this).FormatFullNameForScripting(sp));
             }
-            else if (this is UserDefinedDataType && sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)
+            else if (this is UserDefinedDataType && sp.TargetServerVersion <= SqlServerVersion.Version80)
             {
                 objName = MakeSqlBraket(((UserDefinedDataType)this).GetName(sp));
             }
@@ -7608,7 +7559,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             //get prefix based on server version
-            string prefix = sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80 ? "dbo" : "sys";
+            string prefix = sp.TargetServerVersion <= SqlServerVersion.Version80 ? "dbo" : "sys";
 
             //format the schema
             //we don't take into consideration sp.IncludeScripts.SchemaQualify because 'sp' are the scriting preferences
@@ -7821,30 +7772,30 @@ namespace Microsoft.SqlServer.Management.Smo
             CollationVersion collationVersion = this.GetServerObject().GetCollationVersion(collationName);
 
             CollationVersion soVersion = CollationVersion.Version150;
-            switch (sp.TargetServerVersionInternal)
+            switch (sp.TargetServerVersion)
             {
-                case SqlServerVersionInternal.Version80:
+                case SqlServerVersion.Version80:
                     soVersion = CollationVersion.Version80;
                     break;
-                case SqlServerVersionInternal.Version90:
+                case SqlServerVersion.Version90:
                     soVersion = CollationVersion.Version90;
                     break;
-                case SqlServerVersionInternal.Version100:
+                case SqlServerVersion.Version100:
                         soVersion = CollationVersion.Version100;
                         break;
-                case SqlServerVersionInternal.Version105:
+                case SqlServerVersion.Version105:
                         soVersion = CollationVersion.Version105;
                         break;
-                case SqlServerVersionInternal.Version110:
+                case SqlServerVersion.Version110:
                         soVersion = CollationVersion.Version110;
                         break;
-                case SqlServerVersionInternal.Version120:
+                case SqlServerVersion.Version120:
                         soVersion = CollationVersion.Version120;
                         break;
-                case SqlServerVersionInternal.Version130:
+                case SqlServerVersion.Version130:
                         soVersion = CollationVersion.Version130;
                         break;
-                case SqlServerVersionInternal.Version140:
+                case SqlServerVersion.Version140:
                     soVersion = CollationVersion.Version140;
                     break;
             }

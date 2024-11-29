@@ -485,15 +485,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 queries.Add(sDDL);
 
                 // will script calls to sp_indexoption only if we are executing directly
-                if (sp.ScriptForCreateDrop && (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70 ||
-                    sp.TargetServerVersionInternal == SqlServerVersionInternal.Version80))
+                if (sp.ScriptForCreateDrop && (sp.TargetServerVersion == SqlServerVersion.Version80))
                 {
                     ScriptSpIndexoptions(queries, sp);
                 }
             }
 
             // Index can not be created in a disabled state.Disabling of index is valid for SQL Server 2005 onwards.
-            if (ScriptConstraintWithName(sp) && this.ServerVersion.Major > 8 && (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80) && !dropExistingIndex)
+            if (ScriptConstraintWithName(sp) && this.ServerVersion.Major > 8 && (sp.TargetServerVersion > SqlServerVersion.Version80) && !dropExistingIndex)
             {
                 bool bCheck = (this.properties.Get("IsDisabled").Value != null) ? (bool)this.properties.Get("IsDisabled").Value : false;
                 if (bCheck)
@@ -996,7 +995,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)
+            if (sp.TargetServerVersion <= SqlServerVersion.Version80)
             {
                 ScriptSpIndexoptions(alterQuery, sp);
             }
@@ -1393,8 +1392,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sp.SetTargetServerInfo(this);
 
                 if (this.ServerVersion.Major == 8 ||
-                    sp.TargetServerVersionInternal == SqlServerVersionInternal.Version80 ||
-                    sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70)
+                    sp.TargetServerVersion == SqlServerVersion.Version80)
                 {
                     Reorganize80Impl(allIndexes);
                 }
@@ -2505,7 +2503,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (((parentType.Name == "Table") || (parentType.Name == "View"))
                 && (version.Major > 9)
-                && (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version90)
+                && (sp.TargetServerVersion > SqlServerVersion.Version90)
                 && (sp.Storage.DataCompression))
             {
                 return new string[] { "HasCompressedPartitions" };

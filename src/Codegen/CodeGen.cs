@@ -177,6 +177,7 @@ public class CodeGen
         v14_0 = 256,
         v15_0 = 512,
         v16_0 = 1024,
+        v17_0 = 2048,
     }
 
     private static KeyValuePair<ServerVersion, int>[] m_SingletonSupportedVersion =
@@ -198,6 +199,8 @@ public class CodeGen
         // - we rarely seem to rely on min_build/max_build attributes.
         new KeyValuePair<ServerVersion, int>(new ServerVersion(15,0,ushort.MaxValue), (int)SingletonSupportedVersionFlags.v15_0),
         new KeyValuePair<ServerVersion, int>(new ServerVersion(16,0,ushort.MaxValue), (int)SingletonSupportedVersionFlags.v16_0),
+        new KeyValuePair<ServerVersion, int>(new ServerVersion(17,0,ushort.MaxValue), (int)SingletonSupportedVersionFlags.v17_0),
+        //VBUMP
     };
 
     /// <summary>
@@ -762,7 +765,7 @@ public class CodeGen
 
         CodeWriter f = new CodeWriter(sFilename);
 
-        f.WriteCodeLine("/*\r\n**** This file has been automaticaly generated. Do not attempt to modify manually! ****\r\n*/");
+        f.WriteCodeLine("/*\r\n**** This file has been automatically generated. Do not attempt to modify manually! ****\r\n*/");
         f.WriteCodeLine("/*\r\n**** The generated file is compatible with SFC attribute (metadata) requirement ****\r\n*/");
         f.WriteCodeLine("using System;");
         f.WriteCodeLine("using System.Collections;");
@@ -1142,6 +1145,7 @@ public class CodeGen
         int v14 = 0;
         int v15 = 0;
         int v16 = 0;
+        int v17 = 0;
         int cv10 = 0;
         int cv11 = 0;
         int cv12 = 0;
@@ -1430,6 +1434,28 @@ public class CodeGen
                 }
             }
             v16 = id;
+
+            foreach (ObjectPropertyEx op in listSingletonProperties.Values)
+            {
+                int i = (int)listSingletonPropertiesVersion[op.Name];
+                if ((i & (int)SingletonSupportedVersionFlags.v7_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v8_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v9_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v10_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v10_50) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v11_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v12_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v13_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v14_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v15_0) == (int)SingletonSupportedVersionFlags.NOT_SET 
+                    && (i & (int)SingletonSupportedVersionFlags.v16_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v17_0) == (int)SingletonSupportedVersionFlags.v17_0)
+                {
+                    op.index = id;
+                    f.WriteCodeLine($"case \"{op.Name}\": return {id++};");
+                }
+            }
+            v17 = id;
             // VBUMP
 
             f.DecrementIndent();
@@ -1446,7 +1472,7 @@ public class CodeGen
         if (bWithVersion)
         {
             // VBUMP
-            f.WriteCodeLine("static int [] versionCount = new int [] {{ {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10} }};", v7, v8, v9, v10, v10_50, v11, v12, v13, v14, v15, v16);
+            f.WriteCodeLine("static int [] versionCount = new int [] {{ {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11} }};", v7, v8, v9, v10, v10_50, v11, v12, v13, v14, v15, v16, v17);
             f.WriteCodeLine("static int [] cloudVersionCount = new int [] {{ {0}, {1}, {2} }};", cv10, cv11, cv12);
             f.WriteCodeLine("static int sqlDwPropertyCount = {0};", datawarehousePropertyCount);
             f.WriteCodeLine("public override int Count");
@@ -1526,7 +1552,7 @@ public class CodeGen
             f.WriteCodeLine("public override int Count");
             f.IncrementIndent();
             // VBUMP
-            f.WriteCodeLine("get {{ return {0}; }}", v16);
+            f.WriteCodeLine("get {{ return {0}; }}", v17);
             f.DecrementIndent();
         }
 
@@ -1805,6 +1831,27 @@ public class CodeGen
             {
                 f.WriteCodeLine($"new StaticMetadata(\"{op.Name}\", {op.Expensive.ToString().ToLower(CultureInfo.InvariantCulture)}, {op.ReadOnly.ToString().ToLower(CultureInfo.InvariantCulture)}, typeof({op.Type})),");
             }
+        }
+
+        foreach (ObjectProperty op in listSingletonProperties.Values)
+        {
+            int i = (int)listSingletonPropertiesVersion[op.Name];
+            if ((i & (int)SingletonSupportedVersionFlags.v7_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v8_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v9_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v10_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v10_50) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v11_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v12_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v13_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v14_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v15_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v16_0) == (int)SingletonSupportedVersionFlags.NOT_SET
+                    && (i & (int)SingletonSupportedVersionFlags.v17_0) == (int)SingletonSupportedVersionFlags.v17_0)
+            {
+                f.WriteCodeLine($"new StaticMetadata(\"{op.Name}\", {op.Expensive.ToString().ToLower(CultureInfo.InvariantCulture)}, {op.ReadOnly.ToString().ToLower(CultureInfo.InvariantCulture)}, typeof({op.Type})),");
+            }
+
             // VBUMP
         }
 

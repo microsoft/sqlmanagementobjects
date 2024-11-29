@@ -73,7 +73,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (this.State != SqlSmoState.Creating &&
                 this.IsEncrypted)
             {
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion90(sp.TargetServerVersion,
                     ExceptionTemplates.EncryptedViewsFunctionsDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
@@ -148,7 +148,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // perform check for existing object
             string checkString;
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 checkString = Scripts.INCLUDE_EXISTS_VIEW90;
             }
@@ -194,7 +194,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool supportsIfExists = (sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                 ? !sp.TargetEngineIsAzureSqlDw() : 
-                  sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130;
+                  sp.TargetServerVersion >= SqlServerVersion.Version130;
 
             if (sp.IncludeScripts.ExistenceCheck && !supportsIfExists)
             {
@@ -290,7 +290,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             sbForSpExec.AppendFormat(SmoApplication.DefaultCulture, "{0} VIEW {1} ", Scripts.ALTER, sFullScriptingName); 
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
-                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersionInternal,
+                            ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
                                 ExceptionTemplates.CreateOrAlterDownlevel(
                                     "View",
                                     GetSqlServerName(sp)));
@@ -331,7 +331,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
 
                     bool bNeedsComma = false;
-                    if (this.ServerVersion.Major > 7 && sp.TargetServerVersionInternal > SqlServerVersionInternal.Version70)
+                    if (this.ServerVersion.Major > 7)
                     {
 
                         AppendWithOption(sbForSpExec, "IsSchemaBound", "SCHEMABINDING", ref bNeedsComma);
@@ -342,7 +342,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         AppendWithOption(sbForSpExec, "IsEncrypted", "ENCRYPTION", ref bNeedsComma);
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         AppendWithOption(sbForSpExec, "ReturnsViewMetadata", "VIEW_METADATA", ref bNeedsComma);
                     }
@@ -520,8 +520,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // on 7.0 we do not have permissions on views
-            if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version70 ||
-                this.ServerVersion.Major == 7)
+            if (ServerVersion.Major == 7)
             {
                 return;
             }

@@ -102,7 +102,7 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
                 var queries = ServerContext.ExecutionManager.RecordQueryText(ServerContext.JobServer.CycleErrorLog).Cast<string>();
                 Assert.That(queries, Is.EqualTo(new string[] { "EXEC msdb.dbo.sp_cycle_agent_errorlog" }), "CycleErrorLog");
                 var data = ServerContext.JobServer.EnumErrorLogs();
-                Assert.That(data.Columns.Cast<DataColumn>().Select(c => c.ColumnName), Is.EquivalentTo(new string[] { "Urn", "Name", "ArchiveNo", "CreateDate", "Size" }), "EnumErrorLogs table columns");
+                Assert.That(data.Columns.Cast<DataColumn>().Select(c => c.ColumnName), Is.EquivalentTo(new string[] { "Urn", "Name", "ArchiveNo", "CreateDate", "DateLastModified", "Size" }), "EnumErrorLogs table columns");
                 foreach (var dataRow in data.Rows.Cast<DataRow>())
                 {
                     var urn = new Urn((string)dataRow["Urn"]);

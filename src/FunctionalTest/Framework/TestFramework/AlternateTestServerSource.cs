@@ -65,8 +65,17 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                     descriptor.DatabaseEngineEdition = serverConnection.DatabaseEngineEdition;
                     descriptor.MajorVersion = serverConnection.ServerVersion.Major;
                     descriptor.DatabaseEngineType = serverConnection.DatabaseEngineType;
-                    // This JSON input should only be used for SQL2022 and newer
-                    descriptor.EnabledFeatures = new[] { SqlFeature.Hekaton, SqlFeature.AzureLedger, SqlFeature.SqlClr };
+                    var realEdition = Convert.ToInt32(serverConnection.ExecuteScalar("select serverproperty('EngineEdition')"));
+                    // 12 is the Fabric Native edition. We can't use TSQL to drop or create the database.
+                    if (realEdition == 12)
+                    {
+                        descriptor.EnabledFeatures = new[] { SqlFeature.NoDropCreate };
+                    }
+                    else
+                    {
+                        // This JSON input should only be used for SQL2022 and newer
+                        descriptor.EnabledFeatures = new[] { SqlFeature.Hekaton, SqlFeature.AzureLedger, SqlFeature.SqlClr };
+                    }
                 }
                 return descriptor;
             }).ToList();

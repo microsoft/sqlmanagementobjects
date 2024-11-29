@@ -93,7 +93,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     throw new SmoException(ExceptionTemplates.CannotCreateExtendedPropertyWithoutSchema);
                 }
-                string type = sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 ? "SCHEMA" : "USER";
+                string type = sp.TargetServerVersion >= SqlServerVersion.Version90 ? "SCHEMA" : "USER";
                 string name = o.Schema;
 
                 SetTypeNamePair(0, type, name);
@@ -134,7 +134,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         ScriptSchemaObjectBase o = objParent as ScriptSchemaObjectBase;
                         if (null != o)
                         {
-                            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                             {
                                 SetTypeNamePair(0, "SCHEMA", o.Schema);
                                 SetTypeNamePair(1, "TYPE", objParent.InternalName);
@@ -357,7 +357,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Database db = this.Parent as Database;
             string prefix = string.Empty;
 
-            if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion < SqlServerVersion.Version90)
             {
                 prefix = "dbo";
             }

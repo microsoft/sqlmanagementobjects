@@ -7,7 +7,10 @@ using System.Linq;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using Azure.Identity;
+using Azure.ResourceManager;
+using Azure.ResourceManager.Storage;
 using Azure.Security.KeyVault.Secrets;
+using Microsoft.SqlServer.ADO.Identity;
 namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 {
     /// <summary>
@@ -24,11 +27,15 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <summary>
         /// The Azure application id associated with the service principal
         /// </summary>
-        public string AzureApplicationId { get; set; }
+        public string AzureApplicationId { get; set; } = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
         /// <summary>
         /// The Azure tenant id associated with the service principal
         /// </summary>
-        public string AzureTenantId { get; set; }
+        public string AzureTenantId { get; set; } = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
+        /// <summary>
+        /// Set this to the client id of a user assigned managed identity
+        /// </summary>
+        public string AzureManagedIdentityClientId { get; set; } = Environment.GetEnvironmentVariable("AZURE_IDENTITY_CLIENT_ID");
         /// <summary>
         /// The name of the Azure key vault where test secrets are stored.
         /// </summary>
@@ -39,6 +46,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         public static readonly string SSMS_TEST_SECRET_PREFIX = "SQLA-SSMS-Test-";
 
         private SecretClient secretClient = null;
+        private ArmClient armClient = null;
 
         /// <summary>
         /// Constructs a new AzureKeyVaultHelper that relies on an instance of Azure.Identity.DefaultAzureCredential to access the given vault.
@@ -50,6 +58,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             KeyVaultName = keyVaultName;
             CertificateThumbprints = Enumerable.Empty<string>();
         }
+
         /// <summary>
         /// Converts the secretName to an AKV resource URL and retrieves its decrypted value
         /// If the value exists as an environment variable, the environment variable value is used.
@@ -78,16 +87,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 // It's ok if multiple threads race to construct this secretClient instance
                 if (secretClient == null)
                 {
-                    Azure.Core.TokenCredential credential = new DefaultAzureCredential();
-                    foreach (var thumbprint in CertificateThumbprints ?? Enumerable.Empty<string>())
-                    {
-                        var certificate = FindCertificate(thumbprint);
-                        if (certificate != null)
-                        {
-                            credential = new ClientCertificateCredential(AzureTenantId, AzureApplicationId, certificate);
-                        }
-                        break;
-                    }
+                    var credential = GetCredential();
                     secretClient = new SecretClient(new Uri($"https://{KeyVaultName}.vault.azure.net"), credential);
                 }
                 var secretIdentifier = $"https://{KeyVaultName}.vault.azure.net/secrets/{lookupName}";
@@ -108,6 +108,33 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 }
             }
             return secret;
+        }
+
+        private Azure.Core.TokenCredential GetCredential()
+        {
+            // prefer managed identity then local user on dev machine over the certificate
+            var credentials = new List<Azure.Core.TokenCredential>() { new ManagedIdentityCredential(AzureManagedIdentityClientId), new DefaultAzureCredential(new DefaultAzureCredentialOptions { ExcludeManagedIdentityCredential = true, TenantId = AzureTenantId }) };
+            foreach (var thumbprint in CertificateThumbprints ?? Enumerable.Empty<string>())
+            {
+                var certificate = FindCertificate(thumbprint);
+                if (certificate != null)
+                {
+                    credentials.Add(new ClientCertificateCredential(AzureTenantId, AzureApplicationId, certificate));
+                }
+            }
+            credentials.Add(new AzureDevOpsFederatedTokenCredential(new AzureDevOpsFederatedTokenCredentialOptions() { TenantId = AzureTenantId, ClientId = AzureApplicationId }));
+            return new ChainedTokenCredential(credentials.ToArray());
+        }
+
+        public string GetStorageAccountAccessKey(string storageAccountResourceId)
+        {
+            TraceHelper.TraceInformation($"Fetching storage access key for {storageAccountResourceId}");
+            if (armClient == null)
+            {
+                armClient = new ArmClient(GetCredential());
+            }
+            var storageAccount = armClient.GetStorageAccountResource(new Azure.Core.ResourceIdentifier(storageAccountResourceId));
+            return storageAccount.GetKeys().First().Value;
         }
 
         private static X509Certificate2 FindCertificate(string thumbprint)

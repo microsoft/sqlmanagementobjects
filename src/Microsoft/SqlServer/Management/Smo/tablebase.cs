@@ -598,7 +598,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             if (isEdgeTable || isNodeTable)
             {
-                if (sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone && ((int)sp.TargetServerVersionInternal < (int)SqlServerVersionInternal.Version140))
+                if (sp.TargetDatabaseEngineType == DatabaseEngineType.Standalone && ((int)sp.TargetServerVersion < (int)SqlServerVersion.Version140))
                 {
                     throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersionException);
                 }
@@ -666,7 +666,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     ansiPaddingStatus = this.Parent.DatabaseOptions.AnsiPaddingEnabled;
                 }
 
-                bool bConsiderAnsiQI = (((int)SqlServerVersionInternal.Version80 <= (int)sp.TargetServerVersionInternal) &&
+                bool bConsiderAnsiQI = (((int)SqlServerVersion.Version80 <= (int)sp.TargetServerVersion) &&
                     (ServerVersion.Major > 7));
 
                 if (bConsiderAnsiQI)
@@ -755,7 +755,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (sp.IncludeScripts.ExistenceCheck)
                 {
                     // perform check for existing object
-                    if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_TABLE90, "NOT", SqlString(sFullTableName));
                     }
@@ -932,7 +932,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // for that table.
                 if (sp.Data.OptimizerData &&
                     this.ServerVersion.Major >= 9 &&
-                    sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 &&
+                    sp.TargetServerVersion >= SqlServerVersion.Version90 &&
                     !isMemoryOptimized &&
                     !isSqlDw &&
                     this.DatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand)
@@ -1659,7 +1659,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // it out
             //
             bool fDataCompression = ((sp.TargetDatabaseEngineEdition != Cmn.DatabaseEngineEdition.SqlDataWarehouse)
-                && (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100)
+                && (sp.TargetServerVersion >= SqlServerVersion.Version100)
                 && (this.ServerVersion.Major >= 10)
                 && !sp.TargetEngineIsAzureStretchDb()
                 && sp.Storage.DataCompression
@@ -1669,7 +1669,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Xml compression options
             //
             bool fXmlCompression = (sp.TargetDatabaseEngineEdition != Cmn.DatabaseEngineEdition.SqlDataWarehouse)
-                && (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version160)
+                && (sp.TargetServerVersion >= SqlServerVersion.Version160)
                 && (this.ServerVersion.Major >= 16 )
                 && !sp.TargetEngineIsAzureStretchDb()
                 && sp.Storage.XmlCompression
@@ -2092,7 +2092,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp">Preferences for scripting.</param>
         private void GenerateGraphScript(StringBuilder sb, ScriptingPreferences sp)
         {
-            if (sp.TargetEngineIsAzureSqlDw() || (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version140 && sp.TargetDatabaseEngineType == Cmn.DatabaseEngineType.Standalone))
+            if (sp.TargetEngineIsAzureSqlDw() || (sp.TargetServerVersion < SqlServerVersion.Version140 && sp.TargetDatabaseEngineType == Cmn.DatabaseEngineType.Standalone))
             {
                 return;
             }
@@ -3122,10 +3122,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            var inlineIfExists = sp.IncludeScripts.ExistenceCheck && (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase || sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130);
+            var inlineIfExists = sp.IncludeScripts.ExistenceCheck && (sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase || sp.TargetServerVersion >= SqlServerVersion.Version130);
             if (!inlineIfExists)
             {
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_TABLE90, "", SqlString(sFullTableName));
                 }
@@ -4570,13 +4570,13 @@ namespace Microsoft.SqlServer.Management.Smo
         internal static string[] GetScriptFields2(Type parentType, Cmn.ServerVersion version, Cmn.DatabaseEngineType databaseEngineType, Cmn.DatabaseEngineEdition databaseEngineEdition, bool defaultTextMode, ScriptingPreferences sp)
         {
             if ((version.Major > 9)
-                && (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version90)
+                && (sp.TargetServerVersion > SqlServerVersion.Version90)
                 && (sp.Storage.DataCompression))
             {
                 return new string[] { "HasCompressedPartitions" };
             }
             else if((version.Major >= 16)
-                && (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version160)
+                && (sp.TargetServerVersion >= SqlServerVersion.Version160)
                 && (sp.Storage.XmlCompression))
             {
                 return new string[] { "HasCompressedPartitions", "HasXmlCompressedPartitions"};
@@ -4692,7 +4692,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             //Change tracking isn't enabled for Azure before v12
             if (IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType) &&
-                !VersionUtils.IsSql12OrLater(sp.TargetServerVersionInternal, this.ServerVersion))
+                !VersionUtils.IsSql12OrLater(sp.TargetServerVersion, this.ServerVersion))
             {
                 return;
             }
@@ -4795,7 +4795,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     if (sp.IncludeScripts.ExistenceCheck)
                     {
-                        if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                        if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                         {
                             sbSystemVersioning.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_TABLE90, "", SqlString(sFullTableName));
                         }

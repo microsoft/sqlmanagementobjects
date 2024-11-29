@@ -44,6 +44,7 @@ drop table #fulltext_log_tmp
 		<property name="Name" type="sysname" cast='true' access='read'>er.ArchiveNo</property>
 		<property name="ArchiveNo" type="int" access='read'>er.ArchiveNo</property>
 		<property name="CreateDate" type="datetime" access='read'>CONVERT(datetime, er.CreateDate, 101)</property>
+		<property name="DateLastModified" type="datetimeoffset">TODATETIMEOFFSET(CONVERT(datetime, er.CreateDate, 101),DATEDIFF(minute, SYSUTCDATETIME(), SYSDATETIME()))</property>		
 		<property name="Size" type="int" access='read'>er.Size</property>
 		
 		<property name="CatalogId" type="int" hidden='true'>er.ctlgid</property>		

@@ -336,6 +336,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [SupportedServerVersionRange(MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Verify_Create_Spatial_Index()
         {
             this.ExecuteFromDbPool(
@@ -702,6 +703,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Index_ResumableRebuildOperation_Azure()
         {
             // Test SMO Resumable Index rebuild through both the index, and resumable index objects.
@@ -861,6 +863,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlDataWarehouse)]
         [SupportedServerVersionRange(MinMajor = 15)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Index_ResumableCreateOperation_SQL2018AndAfterOnPrem()
         {
             this.ExecuteFromDbPool(
@@ -938,6 +941,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Index_ResumableCreateConstraintOperation()
         {
             this.ExecuteFromDbPool(
@@ -1430,6 +1434,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Index_TestIsOptimizedForSequentialKeyPropertyForRegularIndex()
         {
             this.ExecuteWithDbDrop(
@@ -1449,6 +1454,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Index_TestIsOptimizedForSequentialKeyPropertyForKeyConstraint()
         {
             this.ExecuteFromDbPool(
@@ -1472,6 +1478,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void Index_TestIsOptimizedForSequentialKeyPropertyForUnsupportedIndexType()
         {
             this.ExecuteWithDbDrop(

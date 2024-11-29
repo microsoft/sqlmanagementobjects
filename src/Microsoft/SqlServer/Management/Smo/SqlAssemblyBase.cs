@@ -181,7 +181,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (sp.IncludeScripts.ExistenceCheck) // do we need to perform existing object check?
             {
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version100)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_ASSEMBLY100, "NOT", SqlString(GetName(sp)));
                 }
@@ -332,10 +332,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
 
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version100)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_ASSEMBLY100, "", SqlString(GetName(sp)));
                 }
@@ -348,7 +348,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // DROP ASSEMBLY
             sb.AppendFormat("DROP ASSEMBLY {0}{1}",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 fullName);
             sb.Append(sp.NewLine);
 

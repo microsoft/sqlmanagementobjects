@@ -482,7 +482,7 @@ namespace Microsoft.SqlServer.Management.Smo
             tc.Assert(null != query, "String collection should not be null");
 
             // Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             bool isDistributed = false;
@@ -537,7 +537,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             //Script Availability group options
             //Since there are no required options, this section is conditional on any option explicitly set before creation
-            string groupOptions = this.ScriptCreateGroupOptions(sp.TargetServerVersionInternal, propName => IsSupportedProperty(propName));
+            string groupOptions = this.ScriptCreateGroupOptions(sp.TargetServerVersion, propName => IsSupportedProperty(propName));
 
             if (!string.IsNullOrEmpty(groupOptions))
             {
@@ -688,7 +688,7 @@ namespace Microsoft.SqlServer.Management.Smo
             tc.Assert(null != alterQuery, "String collection should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             var propertyNames =
@@ -722,7 +722,7 @@ namespace Microsoft.SqlServer.Management.Smo
             tc.Assert(null != dropQuery, "String collection for the drop query should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             StringBuilder script = new StringBuilder();
@@ -931,9 +931,9 @@ namespace Microsoft.SqlServer.Management.Smo
             return this.Properties.IsDirty(this.Properties.LookupID(property, PropertyAccessPurpose.Read));
         }
 
-        private AvailabilityGroupAutomatedBackupPreference GetEffectiveAutomatedBackupPreference(SqlServerVersionInternal targetVersion)
+        private AvailabilityGroupAutomatedBackupPreference GetEffectiveAutomatedBackupPreference(SqlServerVersion targetVersion)
         {
-            if(targetVersion >= SqlServerVersionInternal.Version130) 
+            if(targetVersion >= SqlServerVersion.Version130) 
             {
                 Property prop = GetPropertyOptional(BasicAvailabilityGroupPropertyName);
 
@@ -970,7 +970,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
 
-        private string ScriptGroupOption(bool scriptAll, string propertyName, SqlServerVersionInternal targetServerVersion)
+        private string ScriptGroupOption(bool scriptAll, string propertyName, SqlServerVersion targetServerVersion)
         {
             var script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             var prop = GetPropertyOptional(propertyName);
@@ -1059,7 +1059,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="targetVersion">The version of SQL against which we are scripting the properties</param>
         /// <param name="isValidGroupOptionProperty">A function that checks whether the property is supposed to be scripted or not.</param>
         /// <returns>A properly formatted string with the T-SQL to use to specify the AG options (may be empty, if nothing is to be scripted)</returns>
-        private string ScriptCreateGroupOptions(SqlServerVersionInternal targetVersion, Func<string, bool> isValidGroupOptionProperty) =>
+        private string ScriptCreateGroupOptions(SqlServerVersion targetVersion, Func<string, bool> isValidGroupOptionProperty) =>
             string.Join(
                 Globals.comma + Globals.newline,
                 from propertyName in CreatableGroupPropertyNames
@@ -1070,7 +1070,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private string ScriptAlterOneOption(string propertyName, ScriptingPreferences sp)
         {
-            var groupOptionScript = this.ScriptGroupOption(scriptAll: false, propertyName:  propertyName, targetServerVersion: sp.TargetServerVersionInternal);
+            var groupOptionScript = this.ScriptGroupOption(scriptAll: false, propertyName:  propertyName, targetServerVersion: sp.TargetServerVersion);
 
             if (string.IsNullOrEmpty(groupOptionScript))
             {

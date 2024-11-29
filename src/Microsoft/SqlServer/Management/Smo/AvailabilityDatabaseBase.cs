@@ -223,7 +223,7 @@ end catch
              */
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
             
             StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -277,7 +277,7 @@ end catch
             //REMOVE DATABASE database_name <,..n> 
 
             //Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);

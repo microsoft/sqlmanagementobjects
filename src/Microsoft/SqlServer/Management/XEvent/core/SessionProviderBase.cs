@@ -17,23 +17,19 @@ namespace Microsoft.SqlServer.Management.XEvent
     {
         private const string SessionStart = "STATE=START";
         private const string SessionStop = "STATE=STOP";
-        // the string used to modify/access the session
-        private readonly string eventSessionScript;
-        // a function that takes a session name and returns the script needed to create the session with that name
-        private readonly Func<string,string> createSessionScript;
+        // string that specifies if the scope is Database or Server that would be used for scripting the session
+        private readonly string ScopeName;
         private Session session = null;
 
         /// <summary>
         /// Constructs a new SessionProviderBase for the given session. 
         /// </summary>
         /// <param name="session"></param>
-        /// <param name="eventSessionScript"></param>
-        /// <param name="createSessionScript">A function that takes a session name as input and returns a sql script to create a session</param>
-        protected SessionProviderBase(Session session, string eventSessionScript, Func<string,string> createSessionScript)
+        /// <param name="scopeName">Holds a value of either "DATABASE" or "SERVER"</param>
+        protected SessionProviderBase(Session session, string scopeName)
         {
             this.session = session;
-            this.eventSessionScript = eventSessionScript;
-            this.createSessionScript = createSessionScript;
+            this.ScopeName = scopeName;
         }
 
         /// <summary>
@@ -42,7 +38,7 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// <returns>Session Create script.</returns>
         public ISfcScript GetCreateScript()
         {
-            return this.CreateScript(ProviderConstants.Create + this.eventSessionScript);
+            return this.CreateScript(ProviderConstants.Create + GetBaseScript());
         }
 
         /// <summary>
@@ -60,7 +56,7 @@ namespace Microsoft.SqlServer.Management.XEvent
             this.session.Events.AppendAlterScripts(addEventScript, dropEventScript);
             this.session.Targets.AppendAlterScripts(addTargetScript, dropTargetScript);
 
-            string alterScriptPrefix = ProviderConstants.Alter + this.eventSessionScript;
+            string alterScriptPrefix = ProviderConstants.Alter + GetBaseScript();
 
             if (dropEventScript.Length > 0)
             {
@@ -94,9 +90,13 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// <returns>Session Drop script.</returns>
         public ISfcScript GetDropScript()
         {
-            string script = ProviderConstants.Drop + this.eventSessionScript;
+            string script = ProviderConstants.Drop + GetBaseScript();
             return new SfcTSqlScript(script);
         }
+
+        private string GetBaseScript() => GetBaseScript(session.Name);
+
+        private string GetBaseScript(string sessionName) => $"EVENT SESSION {SfcTsqlProcFormatter.MakeSqlBracket(sessionName)} ON {ScopeName} ";
 
         /// <summary>
         ///  Backend specfic validations to Alter the session.
@@ -145,7 +145,7 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// </summary>
         public void Start()
         {
-            string sql = ProviderConstants.Alter + this.eventSessionScript + SessionStart;
+            string sql = ProviderConstants.Alter + GetBaseScript() + SessionStart;
             ((ISfcDomain)this.session.Parent).GetExecutionEngine().Execute(new SfcTSqlScript(sql));
         }
 
@@ -154,7 +154,7 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// </summary>
         public void Stop()
         {
-            string sql = ProviderConstants.Alter + this.eventSessionScript + SessionStop;
+            string sql = ProviderConstants.Alter + GetBaseScript() + SessionStop;
             ((ISfcDomain)this.session.Parent).GetExecutionEngine().Execute(new SfcTSqlScript(sql));
         }
 
@@ -203,9 +203,9 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// <returns>Session Create script.</returns>
         private ISfcScript GetCreateScript(string sessionName)
         {
-            string statement = this.createSessionScript(sessionName);
+            string statement = ProviderConstants.Create + GetBaseScript(sessionName);
 
-            return this.CreateScript(statement);
+            return CreateScript(statement);
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                 if (sessionAlterScripts.Length == 0)
                 {
                     sessionAlterScripts.Append(ProviderConstants.Alter);
-                    sessionAlterScripts.AppendLine(this.eventSessionScript);
+                    sessionAlterScripts.AppendLine(GetBaseScript());
                 }
 
                 sessionAlterScripts.Append(" WITH (");

@@ -142,7 +142,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private readonly static string sDot = @"(?<dot>\.)";
         private readonly static string sPharanthesis = @"(?<parant_open>\()|(?<parant_close>\))";
         private readonly static string sParam = @"(?:(?<param>@[\w_@#][\w\d_$$@#]*)((\s)|(" + sSingleLineCommentSql + ")|(" + sNestedMultiLineCommentOptimized + "))*(AS){0,1})"; // Read about identifiers above (M00_IDENT)
-        private readonly static string sExec = @"(?<exec>\bEXECUTE\b)";
+        private readonly static string sExec = @"(?<exec>\bEXEC(UTE){0,1}\b)";
         private readonly static string sReturns = @"(?<returns>\bRETURNS\b)";
         private readonly static string sReturnsTable = @"(?<returns_table>\bRETURNS\s+TABLE\b)";
         private readonly static string sReturn = @"(?<return>\bRETURN\b)";

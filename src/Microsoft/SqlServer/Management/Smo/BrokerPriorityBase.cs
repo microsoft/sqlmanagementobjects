@@ -39,7 +39,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
 
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion100(sp.TargetServerVersion);
 
             // retrieve the DDL 
             GetDDL(queries, sp, true);
@@ -121,7 +121,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
 
         internal override void ScriptDrop(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion100(sp.TargetServerVersion);
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
@@ -147,7 +147,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
 
         internal override void ScriptAlter(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion100(sp.TargetServerVersion);
             if (IsObjectDirty())
             {
                 GetDDL(queries, sp, false);

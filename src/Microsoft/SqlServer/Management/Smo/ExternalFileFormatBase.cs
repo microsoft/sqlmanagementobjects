@@ -15,8 +15,6 @@ namespace Microsoft.SqlServer.Management.Smo
     ///</summary>
     public partial class ExternalFileFormat : NamedSmoObject, Common.ICreatable, Common.IDroppable, IScriptable
     {
-        const string FirstRowName = "FirstRow";
-
         internal ExternalFileFormat(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)
         {
@@ -152,7 +150,6 @@ namespace Microsoft.SqlServer.Management.Smo
             dropQuery.Add(sb.ToString());
         }
 
-        const string FormatTypePropertyName = "FormatType";
         /// <summary>
         /// Constructs the T-SQL string to create an external file format object.
         /// </summary>
@@ -177,12 +174,12 @@ namespace Microsoft.SqlServer.Management.Smo
             ExternalFileFormatType externalFileFormatType = ExternalFileFormatType.DelimitedText;
 
             // validate required property exists
-            ValidateProperty(FormatTypePropertyName, sp);
+            ValidateProperty(nameof(FormatType), sp);
 
             // validate the external file format type is supported and set
-            if (IsSupportedProperty(FormatTypePropertyName, sp))
+            if (IsSupportedProperty(nameof(FormatType), sp))
             {
-                externalFileFormatType = (ExternalFileFormatType)this.GetPropValue(FormatTypePropertyName);
+                externalFileFormatType = (ExternalFileFormatType)this.GetPropValue(nameof(FormatType));
                 if (!Enum.IsDefined(typeof(ExternalFileFormatType), externalFileFormatType))
                 {
                     throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(externalFileFormatType.ToString()));
@@ -296,40 +293,37 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder formatOptions = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             List<string> defaultValues = new List<string> { null, string.Empty };
 
-            const string UseTypeDefaultPropertyName = "UseTypeDefault";
-
-
             // check if the serde method property was set
             // if yes, add it to the script
-            ValidateOptionalProperty("SerDeMethod", "SERDE_METHOD = {0}", defaultValues, script, sp);
+            ValidateOptionalProperty(nameof(SerDeMethod), "SERDE_METHOD = {0}", defaultValues, script, sp);
 
             // validate and process the field terminator file format option
-            ValidateOptionalProperty("FieldTerminator", "FIELD_TERMINATOR = {0}", defaultValues, formatOptions, sp);
+            ValidateOptionalProperty(nameof(FieldTerminator), "FIELD_TERMINATOR = {0}", defaultValues, formatOptions, sp);
 
             // validate and process the string delimiter file format option
-            ValidateOptionalProperty("StringDelimiter", "STRING_DELIMITER = {0}", defaultValues, formatOptions, sp);
+            ValidateOptionalProperty(nameof(StringDelimiter), "STRING_DELIMITER = {0}", defaultValues, formatOptions, sp);
 
             // validate and process the date format file format option
-            ValidateOptionalProperty("DateFormat", "DATE_FORMAT = {0}", defaultValues, formatOptions, sp);
+            ValidateOptionalProperty(nameof(DateFormat), "DATE_FORMAT = {0}", defaultValues, formatOptions, sp);
 
             // validate and process the first row optional file format property
             // for delimited text default value is 1, and for the rest the default value is 0.
             if (externalFileFormatType == ExternalFileFormatType.DelimitedText)
             {
-                ValidateOptionalProperty(FirstRowName, "FIRST_ROW = {0}", new List<int> { 1 }, formatOptions, sp, quotePropertyValue: false);
+                ValidateOptionalProperty(nameof(FirstRow), "FIRST_ROW = {0}", new List<int> { 1 }, formatOptions, sp, quotePropertyValue: false);
             } else
             {
-                ValidateOptionalProperty(FirstRowName, "FIRST_ROW = {0}", new List<int> { 0 }, formatOptions, sp, quotePropertyValue: false);
+                ValidateOptionalProperty(nameof(FirstRow), "FIRST_ROW = {0}", new List<int> { 0 }, formatOptions, sp, quotePropertyValue: false);
             }
 
             // validate and process the use type default file format option
-            if (IsSupportedProperty(UseTypeDefaultPropertyName, sp))
+            if (IsSupportedProperty(nameof(UseTypeDefault), sp))
             {
-                var prop = this.GetPropertyOptional(UseTypeDefaultPropertyName);
+                var prop = this.GetPropertyOptional(nameof(UseTypeDefault));
                 // property is ignored if it's null or has default value
                 if(!prop.IsNull && (externalFileFormatType == ExternalFileFormatType.DelimitedText || !IsPropertyDefaultValue<bool>(prop, (bool)prop.Value, new List<bool> { false })))
                 {
-                    bool externalFileFormatUseTypeDefault = (bool)this.GetPropValueOptional(UseTypeDefaultPropertyName);
+                    bool externalFileFormatUseTypeDefault = (bool)this.GetPropValueOptional(nameof(UseTypeDefault));
                     if (formatOptions.Length > 0)
                     {
                         formatOptions.Append(", ");
@@ -347,7 +341,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // validate and process the data compression optional file format property
-            ValidateOptionalProperty("DataCompression", "DATA_COMPRESSION = {0}", defaultValues, script, sp);
+            ValidateOptionalProperty(nameof(DataCompression), "DATA_COMPRESSION = {0}", defaultValues, script, sp);
         }
 
         /// <summary>
@@ -392,7 +386,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // check for the Orc and Parquet supported optional properties - DataCompression
             // validate and process the data compression optional file format property
-            ValidateOptionalProperty("DataCompression", "DATA_COMPRESSION = {0}", defaultValues, script, sp);
+            ValidateOptionalProperty(nameof(DataCompression), "DATA_COMPRESSION = {0}", defaultValues, script, sp);
         }
 
         /// <summary>
@@ -425,14 +419,14 @@ namespace Microsoft.SqlServer.Management.Smo
             // check for the optional properties - SerDeMethod and DataCompression
             // the SerDeMethod property is required for the RcFile format
             // if it is not set, throw an exception
-            ValidateProperty("SerDeMethod", sp);
+            ValidateProperty(nameof(SerDeMethod), sp);
 
             // check if the serde method property was set
             // if yes, add it to the script
-            ValidateOptionalProperty("SerDeMethod", "SERDE_METHOD = {0}", defaultValues, script, sp);
+            ValidateOptionalProperty(nameof(SerDeMethod), "SERDE_METHOD = {0}", defaultValues, script, sp);
 
             // validate and process the data compression optional file format property
-            ValidateOptionalProperty("DataCompression", "DATA_COMPRESSION = {0}", defaultValues, script, sp);
+            ValidateOptionalProperty(nameof(DataCompression), "DATA_COMPRESSION = {0}", defaultValues, script, sp);
         }
         #endregion
 
@@ -444,18 +438,18 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             var fields = new string[]
             {
-                "DataCompression",
-                "DateFormat",
-                "Encoding",
-                "FieldTerminator",
-                "FirstRow",
-                FormatTypePropertyName,
-                "ID",
-                "Name",
-                "RowTerminator",
-                "SerDeMethod",
-                "StringDelimiter",
-                "UseTypeDefault",
+                nameof(DataCompression),
+                nameof(DateFormat),
+                nameof(Encoding),
+                nameof(FieldTerminator),
+                nameof(FirstRow),
+                nameof(FormatType),
+                nameof(ID),
+                nameof(Name),
+                nameof(RowTerminator),
+                nameof(SerDeMethod),
+                nameof(StringDelimiter),
+                nameof(UseTypeDefault),
             };
 
             var list = GetSupportedScriptFields(typeof(DatabaseScopedConfiguration.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);

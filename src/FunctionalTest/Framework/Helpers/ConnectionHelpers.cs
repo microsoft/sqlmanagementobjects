@@ -19,6 +19,7 @@ using System.Xml;
 using System.IO;
 using System.Diagnostics;
 using System.Xml.XPath;
+using Microsoft.SqlServer.ADO.Identity;
 
 namespace Microsoft.SqlServer.Test.Manageability.Utils
 {
@@ -27,6 +28,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
     /// </summary>
     public static class ConnectionHelpers
     {
+#if MICROSOFTDATA
+        static ConnectionHelpers()
+        {
+            _ = SqlAuthenticationProvider.SetProvider(SqlAuthenticationMethod.ActiveDirectoryServicePrincipal, new AzureDevOpsSqlAuthenticationProvider());
+            _ = SqlAuthenticationProvider.SetProvider(SqlAuthenticationMethod.ActiveDirectoryDefault, new AzureDevOpsSqlAuthenticationProvider());
+        }
+#endif
         private class ConnectionData
         {
             public AzureKeyVaultHelper AzureKeyVaultHelper;
@@ -56,10 +64,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 {
                     serverConnections.AzureKeyVaultHelper = new AzureKeyVaultHelper(akvElement.Element("VaultName").Value)
                     {
-                        AzureApplicationId = akvElement.Element("AzureApplicationId")?.Value,
-                        AzureTenantId = akvElement.Element("AzureTenantId")?.Value,
                         CertificateThumbprints = akvElement.Elements("Thumbprint").Select(s => s.Value).ToArray()
                     };
+                    serverConnections.AzureKeyVaultHelper.AzureApplicationId = akvElement.Element("AzureApplicationId")?.Value ?? serverConnections.AzureKeyVaultHelper.AzureApplicationId;
+                    serverConnections.AzureKeyVaultHelper.AzureTenantId = akvElement.Element("AzureTenantId")?.Value ?? serverConnections.AzureKeyVaultHelper.AzureTenantId;
                 }
                 descriptors = TestServerDescriptor.GetServerDescriptors(connectionDocument, serverConnections.AzureKeyVaultHelper);
             }

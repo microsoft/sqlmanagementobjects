@@ -131,7 +131,7 @@ class ModelGen
     {
         // Not all of these namespaces are needed for all classes but it's easier to just have them -- as long as they don't clash
         _modelFile.WriteCodeLines(
-            "//**** This file has been automaticaly generated. Do not attempt to modify manually! ****",
+            "//**** This file has been automatically generated. Do not attempt to modify manually! ****",
             "using System;",
             "using System.Collections;",
             "using System.Net;",

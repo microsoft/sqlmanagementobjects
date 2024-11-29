@@ -7,16 +7,14 @@ using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
 
-
-
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
 
     /// <summary>
     /// Test suite for testing ColumnMasterKey properties and scripting
     /// </summary>
-    //##[TestSuite(LabRunCategory.Gql, FeatureCoverage.Manageability)]
     [TestClass]
+    [UnsupportedFeature(SqlFeature.NoDropCreate)]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
     public class ColumnMasterKey_SmoTestSuite : SmoObjectTestBase
     {

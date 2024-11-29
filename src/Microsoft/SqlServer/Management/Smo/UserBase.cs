@@ -167,17 +167,17 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90
                 && this.ServerVersion.Major >= 9)
             {
-                if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+                if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_USER90, "", SqlString(this.Name));
                     sb.Append(sp.NewLine);
                 }
 
                 sb.AppendFormat(SmoApplication.DefaultCulture, "DROP USER {0}{1}",
-                    (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                    (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                     FormatFullNameForScripting(sp));
             }
             else
@@ -339,7 +339,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90
                 && this.ServerVersion.Major >= 9)
             {
                 StringBuilder sbOption = new StringBuilder();
@@ -654,7 +654,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     && authenticationType == AuthenticationType.Database)
                 )
             {
-                ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+                ThrowIfBelowVersion110(sp.TargetServerVersion);
             }
         }
 
@@ -1000,7 +1000,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 ref bool optionAdded)
         {
 
-            if (!VersionUtils.IsSql11OrLater(sp.TargetServerVersionInternal, this.ServerVersion))
+            if (!VersionUtils.IsSql11OrLater(sp.TargetServerVersion, this.ServerVersion))
             {
                 return;
             }
@@ -1160,7 +1160,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             ValidateVersionAndEngineTypeForScripting(sp);
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90
                 && this.Parent.Parent.ConnectionContext.ServerVersion.Major >= 9)
             {
                 ValidateAlterInputs();
@@ -1271,7 +1271,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // on 8.0 and below we do not have permissions on Users
-            if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80 ||
+            if (sp.TargetServerVersion <= SqlServerVersion.Version80 ||
                 this.ServerVersion.Major <= 8)
             {
                 return;
@@ -1287,7 +1287,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns>The DDL string to add the user to the given role.</returns>
         private string ScriptAddToRole(System.String role, ScriptingPreferences sp)
         {
-            if (VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersionInternal)
+            if (VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersion)
                 && sp.TargetDatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
             {
                 return string.Format(SmoApplication.DefaultCulture,

@@ -189,7 +189,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             // Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
             this.ValidateIPAddresses();
 
@@ -355,7 +355,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             // Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -408,7 +408,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // REMOVE LISTENER 'dnsName'
 
             // Ensure target server version is >= 11, and database engine is not azure
-            ThrowIfBelowVersion110(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion110(sp.TargetServerVersion);
             ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.UnsupportedEngineTypeException);
 
             StringBuilder script = new StringBuilder(Globals.INIT_BUFFER_SIZE);

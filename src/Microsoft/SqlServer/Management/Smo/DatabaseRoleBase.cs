@@ -68,7 +68,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder strBuilder = new StringBuilder(string.Format(SmoApplication.DefaultCulture, Scripts.DECLARE_ROLE_MEMEBER, EscapeString(this.Name, '\'')));
 
             // Check if exists check should be included
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 strBuilder.Append((sp.TargetServerVersion >= SqlServerVersion.Version90) ? Scripts.INCLUDE_EXISTS_ROLE_MEMBERS90 : Scripts.INCLUDE_EXISTS_ROLE_MEMBERS80);
             }
@@ -89,7 +89,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 // Add the actual drop script
                 strBuilder.Append(
-                    VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersionInternal)
+                    VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersion)
                     ? Scripts.DROP_DATABASEROLE_MEMBERS_110
                     : (sp.TargetServerVersion >= SqlServerVersion.Version90)
                         ? Scripts.DROP_DATABASEROLE_MEMBERS_90
@@ -105,25 +105,25 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
 
                 strBuilder.Append(string.Format(SmoApplication.DefaultCulture,
-                    sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 ? Scripts.INCLUDE_EXISTS_DBROLE80 : Scripts.INCLUDE_EXISTS_DBROLE90,
+                    sp.TargetServerVersion < SqlServerVersion.Version90 ? Scripts.INCLUDE_EXISTS_DBROLE80 : Scripts.INCLUDE_EXISTS_DBROLE90,
                                                         "", FormatFullNameForScripting(sp, false)));
                 strBuilder.Append(sp.NewLine);
             }
 
 
             //if 7.0, 8.0
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 strBuilder.Append("EXEC dbo.sp_droprole @rolename = " + FormatFullNameForScripting(sp, false));
             }
             else // > 9.0
             {
                 strBuilder.Append("DROP ROLE " +
-                    ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty) +
+                    ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty) +
                     FormatFullNameForScripting(sp, true));
             }
 
@@ -140,7 +140,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void CreateDdl(StringBuilder sb, ScriptingPreferences sp, string owner)
         {
             //if 7.0, 8.0
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 sb.Append("EXEC dbo.sp_addrole @rolename = " + FormatFullNameForScripting(sp, false));
                 if (sp.IncludeScripts.Owner)
@@ -183,7 +183,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.IncludeScripts.ExistenceCheck)
             {
                 statement.AppendFormat(SmoApplication.DefaultCulture,
-                    sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 ? Scripts.INCLUDE_EXISTS_DBROLE80 : Scripts.INCLUDE_EXISTS_DBROLE90,
+                    sp.TargetServerVersion < SqlServerVersion.Version90 ? Scripts.INCLUDE_EXISTS_DBROLE80 : Scripts.INCLUDE_EXISTS_DBROLE90,
                     "NOT", FormatFullNameForScripting(sp, false));
                 statement.Append(sp.NewLine);
             }
@@ -321,7 +321,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns>The DDL string to add this database role to the given database role.</returns>
         private string ScriptAddToRole(System.String role, ScriptingPreferences sp)
         {
-	    if (VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersionInternal)
+	    if (VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersion)
             && sp.TargetDatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
 	    {
 		return string.Format(SmoApplication.DefaultCulture,
@@ -568,7 +568,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // on 8.0 and below we do not have permissions on database roles
-            if (sp.TargetServerVersionInternal <= SqlServerVersionInternal.Version80 ||
+            if (sp.TargetServerVersion <= SqlServerVersion.Version80 ||
                 this.ServerVersion.Major <= 8)
             {
                 return;

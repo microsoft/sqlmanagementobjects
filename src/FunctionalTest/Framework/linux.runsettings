@@ -2,7 +2,7 @@
 <!-- File name extension must be .runsettings -->
 <RunSettings>
   <TestRunParameters>
-    <Parameter name="SqlTestTargetServersFilter" value="SQL2017Linux;Sqlv150Linux" />
+    <Parameter name="SqlTestTargetServersFilter" value="Sqlv160Linux;Sqlv150Linux" />
   </TestRunParameters>
   <DataCollectionRunSettings>
     <DataCollectors>

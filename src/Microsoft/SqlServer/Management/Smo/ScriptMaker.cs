@@ -1518,7 +1518,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 // throw an error when trying to use Create or alter syntax on old SQL versions
                                 if (Preferences.TargetDatabaseEngineType == DatabaseEngineType.Standalone)
                                 {
-                                    SqlSmoObject.ThrowIfBelowVersion130(this.Preferences.TargetServerVersionInternal, ExceptionTemplates.CreateOrAlterNotSupportedVersion);
+                                    SqlSmoObject.ThrowIfBelowVersion130(this.Preferences.TargetServerVersion, ExceptionTemplates.CreateOrAlterNotSupportedVersion);
                                 }
                                 var existenceCheck = Preferences.IncludeScripts.ExistenceCheck;
                                 Preferences.IncludeScripts.ExistenceCheck = false;

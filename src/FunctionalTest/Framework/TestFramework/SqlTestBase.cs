@@ -43,6 +43,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             }
 
             var dll = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), an.Name + ".dll");
+            if (dll.EndsWith(".resources.dll", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
             Trace.TraceInformation($"Trying to load dll:{dll}");
             try
             {
@@ -290,6 +294,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                 () =>
                 {
                     Database db;
+                    ServerContext.SetDefaultInitFields(typeof(Database), nameof(Database.UserAccess), nameof(Database.ReadOnly));
                     if (ServerContext.ConnectionContext.DatabaseEngineType == DatabaseEngineType.Standalone ||
                     ServerContext.ConnectionContext.SqlConnectionObject.Database == "master"
                     || ServerContext.ConnectionContext.SqlConnectionObject.Database == "")
@@ -494,15 +499,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                             db = ServerContext.Databases.Cast<Database>().First(d => d.Name != "master");
                             db.DropAllObjects();
                             Trace.TraceInformation("Resetting database state for reuse");
-                            db.UserAccess = DatabaseUserAccess.Multiple;
-                            db.ReadOnly = false;
-                            db.AutoUpdateStatisticsEnabled = true;
-                            if (db.ChangeTrackingEnabled)
+                            if (db.UserAccess != DatabaseUserAccess.Multiple || db.ReadOnly || !db.AutoUpdateStatisticsEnabled || db.ChangeTrackingEnabled)
                             {
-                                db.ChangeTrackingAutoCleanUp = false;
-                                db.ChangeTrackingEnabled = false;
+                                db.UserAccess = DatabaseUserAccess.Multiple;
+                                db.ReadOnly = false;
+                                db.AutoUpdateStatisticsEnabled = true;
+                                if (db.ChangeTrackingEnabled)
+                                {
+                                    db.ChangeTrackingAutoCleanUp = false;
+                                    db.ChangeTrackingEnabled = false;
+                                }
+                                db.Alter();
                             }
-                            db.Alter();
                             
                             db.ExecutionManager.ConnectionContext.Disconnect();
                             db.ExecutionManager.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteSql;

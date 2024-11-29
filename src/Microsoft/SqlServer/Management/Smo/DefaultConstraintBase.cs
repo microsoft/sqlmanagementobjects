@@ -229,7 +229,7 @@ $@"IF {notOrEmpty} EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID
             // Existence of parent table is not checked when ALTER TABLE DROP CONSTRAINT IF EXISTS syntax is used.
             // Check is added here to keep behavior same as in previous versions.
             //
-            bool isTargetServerVersionSQl13OrLater = VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersionInternal);
+            bool isTargetServerVersionSQl13OrLater = VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersion);
             if (sp.IncludeScripts.ExistenceCheck && isTargetServerVersionSQl13OrLater)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_TABLE90, "", SqlString(tablename));

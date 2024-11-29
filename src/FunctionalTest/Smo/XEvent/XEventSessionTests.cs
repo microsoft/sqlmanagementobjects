@@ -127,6 +127,7 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
         }
 
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         [SqlTestArea(SqlTestArea.ExtendedEvents)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [DataRow("Latin1_General_100_CI_AS", CatalogCollationType.SQLLatin1GeneralCP1CIAS)]
@@ -295,6 +296,20 @@ ADD EVENT sqlos.wait_info_external(
     WHERE ([wait_type]<>(388)))
 ".FixNewLines();
 
+            // Dictionary adding new events in collection in different sequences
+            var expectedAlterString2 = $@"ALTER EVENT SESSION [{name}] ON {createSessionOnString} 
+DROP EVENT sqlos.wait_completed, 
+DROP EVENT sqlos.wait_info_external, 
+DROP EVENT sqlos.wait_info
+ALTER EVENT SESSION [{name}] ON {createSessionOnString} 
+ADD EVENT sqlos.wait_completed(
+    WHERE ([wait_type]<>({waitTypeDic["ABR"]}))), 
+ADD EVENT sqlos.wait_info_external(
+    WHERE ([wait_type]<>(388))), 
+ADD EVENT sqlos.wait_info(
+    WHERE ([wait_type]<>({waitTypeDic[388]})))
+".FixNewLines();
+
             // Creating Event
             var eventInfo = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_completed");
             var eventInfo1 = store.ObjectInfoSet.Get<EventInfo>("sqlos.wait_info");
@@ -318,7 +333,8 @@ ADD EVENT sqlos.wait_info_external(
                 var evt2 = session.AddEvent(eventInfo2);
                 evt2.Predicate = new PredCompareExpr(PredCompareExpr.ComparatorType.NE, operand, new PredValue(388));
                 session.Alter();
-                Assert.That(session.ScriptAlter().ToString(), Is.EqualTo(expectedAlterString), "Generated Alter script is not same as expected string!");
+                Assert.That(session.ScriptAlter().ToString(), Is.EqualTo(expectedAlterString).Or.EqualTo(expectedAlterString2),
+                    "Generated Alter script is not same as expected string!");
                 session.Drop();
             });
         }

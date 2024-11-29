@@ -241,7 +241,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     withClause.Length = withClause.Length - Globals.commaspace.Length;
 
                     sb.Append("WITH ");
-                    if (preferences.TargetServerVersionInternal != SqlServerVersionInternal.Version80)
+                    if (preferences.TargetServerVersion != SqlServerVersion.Version80)
                     {
                         sb.AppendFormat(SmoApplication.DefaultCulture, "({0})", withClause.ToString());
                     }
@@ -357,8 +357,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     // server version 140 or Azure Sql DB, as otherwise the property will throw an error.
                     // Can be omitted if unset.
                     //
-                    if (((forRebuild && preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version140) ||
-                        (preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version150 && !this.TableCreate && !this.preferences.ScriptForAlter) ||
+                    if (((forRebuild && preferences.TargetServerVersion >= SqlServerVersion.Version140) ||
+                        (preferences.TargetServerVersion >= SqlServerVersion.Version150 && !this.TableCreate && !this.preferences.ScriptForAlter) ||
                         (index.DatabaseEngineType == Cmn.DatabaseEngineType.SqlAzureDatabase && !this.TableCreate && !this.preferences.ScriptForAlter)) &&
                         (VersionUtils.IsSql14OrLater(index.ServerVersion) || index.DatabaseEngineType ==  Cmn.DatabaseEngineType.SqlAzureDatabase) &&
                         index.ResumableIndexOperation)
@@ -370,7 +370,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                     }
 
-                    if (preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    if (preferences.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         bool forCreateIndex = !forRebuild && !this.TableCreate && !this.preferences.ScriptForAlter;
                         if (!forRebuild || rebuildPartitionNumber == -1)
@@ -546,7 +546,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (propValue.HasValue)
                 {
-                    return propValue.Value ? "ON" : (preferences.TargetServerVersionInternal == SqlServerVersionInternal.Version80) ? null : "OFF";
+                    return propValue.Value ? "ON" : (preferences.TargetServerVersion == SqlServerVersion.Version80) ? null : "OFF";
                 }
                 else
                 {
@@ -556,7 +556,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected void ScriptIndexOption(StringBuilder sb, string optname, object propValue)
             {
-                bool withEqual = preferences.TargetServerVersionInternal != SqlServerVersionInternal.Version80;
+                bool withEqual = preferences.TargetServerVersion != SqlServerVersion.Version80;
 
                 if (propValue != null)
                 {
@@ -988,7 +988,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 index.ScriptIncludeHeaders(sb, preferences, Index.UrnSuffix);
 
-                if (this.preferences.TargetServerVersionInternal < SqlServerVersionInternal.Version130 ||
+                if (this.preferences.TargetServerVersion < SqlServerVersion.Version130 ||
                     this.index.IsMemoryOptimizedIndex)
                 {
                     this.ScriptExistenceCheck(sb, false);
@@ -1008,7 +1008,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 this.ScriptDropHeaderDdl(sb);
 
-                if (this.preferences.TargetServerVersionInternal > SqlServerVersionInternal.Version80)
+                if (this.preferences.TargetServerVersion > SqlServerVersion.Version80)
                 {
                     this.ScriptDropOptions(sb);
                 }
@@ -1023,7 +1023,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected virtual void ScriptDropHeaderDdl(StringBuilder sb)
             {
-                if (this.preferences.TargetServerVersionInternal <= SqlServerVersionInternal.Version80)
+                if (this.preferences.TargetServerVersion <= SqlServerVersion.Version80)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, "DROP INDEX {0}.{1}",
                                         this.parent.FormatFullNameForScripting(this.preferences),
@@ -1039,7 +1039,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, "DROP INDEX {0}{1} ON {2}",
                                         (this.preferences.IncludeScripts.ExistenceCheck &&
-                                         this.preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                                         this.preferences.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                                         index.FormatFullNameForScripting(this.preferences),
                                         this.parent.FormatFullNameForScripting(this.preferences));
                 }
@@ -1078,7 +1078,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            if ((this.preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version100))
+                            if ((this.preferences.TargetServerVersion >= SqlServerVersion.Version100))
                             {
                                 partitionOption.AppendFormat(SmoApplication.DefaultCulture, "PARTITION = ALL");
                             }
@@ -1101,7 +1101,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         withClause.Length = withClause.Length - Globals.commaspace.Length;
 
                         sb.Append(" WITH ");
-                        if (preferences.TargetServerVersionInternal != SqlServerVersionInternal.Version80)
+                        if (preferences.TargetServerVersion != SqlServerVersion.Version80)
                         {
                             sb.AppendFormat(SmoApplication.DefaultCulture, "({0})", withClause.ToString());
                         }
@@ -1283,7 +1283,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (this.preferences.IncludeScripts.ExistenceCheck)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture,
-                        (this.preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 ?
+                        (this.preferences.TargetServerVersion >= SqlServerVersion.Version90 ?
                         Scripts.INCLUDE_EXISTS_INDEX90 : Scripts.INCLUDE_EXISTS_INDEX80),
                         not ? "NOT" : string.Empty,
                                 SqlString(this.parent.FormatFullNameForScripting(preferences)),
@@ -1634,7 +1634,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return;
                 }
 
-                if ((preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                if ((preferences.TargetServerVersion >= SqlServerVersion.Version90)
                     && !preferences.TargetEngineIsAzureStretchDb())
                  {
                     if (this.parent is UserDefinedTableType)
@@ -1725,7 +1725,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER TABLE {0} DROP CONSTRAINT {1}{2}",
                                     this.parent.FormatFullNameForScripting(this.preferences),
                                     (this.preferences.IncludeScripts.ExistenceCheck &&
-                                    this.preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                                    this.preferences.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                                     this.index.FormatFullNameForScripting(this.preferences));
             }
 
@@ -1897,7 +1897,7 @@ namespace Microsoft.SqlServer.Management.Smo
             private void ScriptIncludedColumns(StringBuilder sb, List<IndexedColumn> includedColumns)
             {
                 if (0 < includedColumns.Count &&
-                    preferences.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+                    preferences.TargetServerVersion >= SqlServerVersion.Version90)
                 {
                     sb.Append(preferences.NewLine);
                     sb.Append("INCLUDE ( ");
@@ -2061,12 +2061,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion90(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion90(preferences.TargetServerVersion);
                 index.ThrowIfCompatibilityLevelBelow90();
                 //Azure v12 (Sterling) and above support XML indices
                 if (preferences.TargetDatabaseEngineType == Cmn.DatabaseEngineType.SqlAzureDatabase)
                 {
-                    ThrowIfBelowVersion120(preferences.TargetServerVersionInternal);
+                    ThrowIfBelowVersion120(preferences.TargetServerVersion);
                 }
 
                 if (parent is View)
@@ -2190,7 +2190,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion100(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion100(preferences.TargetServerVersion);
                 index.ThrowIfCompatibilityLevelBelow100();
 
                 if (this.parent is View)
@@ -2251,12 +2251,12 @@ namespace Microsoft.SqlServer.Management.Smo
                                 spatialGridType = " GEOGRAPHY_GRID ";
                                 break;
                             case SpatialIndexType.GeometryAutoGrid:
-                                ThrowIfBelowVersion110(this.preferences.TargetServerVersionInternal,
+                                ThrowIfBelowVersion110(this.preferences.TargetServerVersion,
                                     ExceptionTemplates.SpatialAutoGridDownlevel(this.index.FormatFullNameForScripting(this.preferences, true), GetSqlServerName(this.preferences)));
                                 spatialGridType = " GEOMETRY_AUTO_GRID ";
                                 break;
                             case SpatialIndexType.GeographyAutoGrid:
-                                ThrowIfBelowVersion110(this.preferences.TargetServerVersionInternal,
+                                ThrowIfBelowVersion110(this.preferences.TargetServerVersion,
                                     ExceptionTemplates.SpatialAutoGridDownlevel(this.index.FormatFullNameForScripting(this.preferences, true), GetSqlServerName(this.preferences)));
                                 spatialGridType = " GEOGRAPHY_AUTO_GRID ";
                                 break;
@@ -2522,7 +2522,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion110(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion110(preferences.TargetServerVersion);
 
                 this.CheckConstraintProperties();
                 this.CheckRegularIndexProperties();
@@ -2578,7 +2578,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion120(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion120(preferences.TargetServerVersion);
 
                 this.CheckRequiredProperties();
                 this.CheckConflictingProperties();
@@ -2696,7 +2696,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion120(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion120(preferences.TargetServerVersion);
 
                 this.CheckConflictingProperties();
 
@@ -2793,7 +2793,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion130(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion130(preferences.TargetServerVersion);
 
                 this.CheckConflictingProperties();
             }
@@ -2854,7 +2854,7 @@ namespace Microsoft.SqlServer.Management.Smo
             protected override void Validate()
             {
                 // SXI is supported from version 110 (Denali)
-                ThrowIfBelowVersion110(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion110(preferences.TargetServerVersion);
 
                 // ParentXmlIndex is not supported for SXI
                 if (!string.IsNullOrEmpty(index.GetPropValueOptional("ParentXmlIndex", string.Empty)))
@@ -3153,7 +3153,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion110(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion110(preferences.TargetServerVersion);
 
                 // ParentXmlIndex is mandatory
                 if (string.IsNullOrEmpty(index.GetPropValueOptional("ParentXmlIndex", string.Empty)))
@@ -3223,7 +3223,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Clustered Columnstore were first introduced in SQL 14
             protected override void Validate()
             {
-                ThrowIfBelowVersion120(preferences.TargetServerVersionInternal);
+                ThrowIfBelowVersion120(preferences.TargetServerVersion);
 
                 this.CheckConstraintProperties();
                 this.CheckClusteredProperties();

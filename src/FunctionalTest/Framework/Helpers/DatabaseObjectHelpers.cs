@@ -18,6 +18,7 @@ using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using SMO = Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.XEventDbScoped;
 using Microsoft.SqlServer.Management.XEvent;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Test.Manageability.Utils
 {
@@ -224,7 +225,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 tableProperties.ApplyProperties(table);
             }
 
-            if (columnProperties == null ||columnProperties.Any() == false)
+            if (columnProperties == null || !columnProperties.Any())
             {
                 if (tableProperties == null || !tableProperties.IsEdge)
                 {
@@ -232,7 +233,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     // case of edge tables columns will only be added to this collection if
                     // they are provided.
                     //
-                    table.Columns.Add(new Column(table, "col_1", new DataType(SqlDataType.Int)));
+                    table.Columns.Add(new Column(table, "col_1", new DataType(SqlDataType.Int))
+                    {
+                        // fabric tables need a non-nullable column
+                        Nullable = !database.IsFabricDatabase
+                    });
                 }
             }
             else
@@ -250,7 +255,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                         });
                 }
             }
-
             // Append indexes during creation if there are any.
             //
             if (indexProperties != null && indexProperties.Any())
@@ -717,7 +721,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             database.Parent.SetDefaultInitFields(typeof(UserDefinedFunction), true);
             database.Parent.SetDefaultInitFields(typeof(StoredProcedure), true);
             var tableFields = Table.GetScriptFields(typeof(Database), database.Parent.ServerVersion, database.DatabaseEngineType, database.DatabaseEngineEdition, false);
-            database.Parent.SetDefaultInitFields(typeof(Table), nameof(Table.IsSystemObject), nameof(Table.IsDroppedLedgerTable));
+            database.Parent.SetDefaultInitFields(typeof(Table), nameof(Table.IsSystemObject), nameof(Table.IsDroppedLedgerTable), nameof(Table.Replicated));
             database.Parent.SetDefaultInitFields(typeof(Table), tableFields);
             database.Parent.SetDefaultInitFields(typeof(View), nameof(View.LedgerViewType), nameof(View.IsDroppedLedgerView), nameof(View.IsSystemObject));
             database.Parent.SetDefaultInitFields(typeof(SMO.Broker.BrokerService), nameof(SMO.Broker.BrokerService.IsSystemObject));
@@ -752,7 +756,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             database.DropAll<SearchPropertyList>(() => database.SearchPropertyLists);
             database.DropAll<SensitivityClassification>(() => database.SensitivityClassifications);
             database.DropAll<SymmetricKey>(() => database.SymmetricKeys);
-            database.DropAll<User>(() => database.Users);
             database.DropAll<AsymmetricKey>(() => database.AsymmetricKeys);
             database.DropAll<Certificate>(() => database.Certificates);
             var lockedSchemas = new HashSet<string>();
@@ -766,7 +769,14 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             {
                 _ = lockedSchemas.Add(schema);
             }
-            database.DropAll<Schema>(() => database.Schemas, s => !lockedSchemas.Contains(s.Name));
+            try
+            {
+                database.DropAll<Schema>(() => database.Schemas, s => !lockedSchemas.Contains(s.Name));
+            }
+            catch (AggregateException ex)
+            {
+                Trace.TraceWarning(ex.BuildRecursiveExceptionMessage());
+            }
             // Maybe IsFixedRole should also be used for IsSystemObject
             database.DropAll<DatabaseRole>(() => database.Roles, r => !r.IsFixedRole && r.Name != "public");
             database.DropAll<ExtendedProperty>(() => database.ExtendedProperties);
@@ -800,11 +810,28 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 var col = collection();
                 col.ClearAndInitialize("", Enumerable.Empty<string>());
                 predicate = predicate ?? ((o) => true);
+                var exceptions = new List<Exception>();
                 foreach (var obj in col.Cast<T>().Where(o => !o.IsSystemObjectInternal() && predicate(o)).ToList())
                 {
-                    obj.Drop();
+                    try
+                    {
+                        obj.Drop();
+                    }
+                    // 3763 applies to objects being replicated
+                    catch (SqlException sqlEx) when (sqlEx.Number == 3763)
+                    {
+                        Trace.TraceWarning(sqlEx.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
+                    }
                 }
                 col.ResetCollection();
+                if (exceptions.Count > 0)
+                {
+                    throw new AggregateException($"Unable to drop all objects of type {typeof(T)}", exceptions);
+                }
             }
         }
         private static IEnumerable<IList<SqlSmoObject>> GetDatabaseObjects(Database database)
@@ -813,7 +840,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             Func<View, bool> viewPredicate = (view) => true;
             if (database.Parent.IsSupportedProperty(typeof(Table), nameof(Table.LedgerType)))
             {
-                tablePredicate = t => !t.IsDroppedLedgerTable && t.LedgerType != LedgerTableType.HistoryTable;
+                tablePredicate = t => !t.IsDroppedLedgerTable && t.LedgerType != LedgerTableType.HistoryTable && !t.Replicated;
                 viewPredicate = v => !v.IsDroppedLedgerView && v.LedgerViewType != LedgerViewType.LedgerView;
             }
             yield return database.Tables.Cast<Table>().Where(tablePredicate).Cast<SqlSmoObject>().ToList();

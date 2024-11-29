@@ -58,16 +58,16 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             Init ();
         }
+#if !NETCOREAPP
 
         /// <summary>
         /// Base constructor
         /// </summary>
-        [SuppressMessage ("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected RegisteredServerException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
         }
-
+#endif
         /// <summary>
         /// Initializes instance properties
         /// </summary>

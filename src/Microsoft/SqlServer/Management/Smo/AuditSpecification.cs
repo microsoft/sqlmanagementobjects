@@ -378,7 +378,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp"></param>
         internal override void ScriptCreate(StringCollection query, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion100(sp.TargetServerVersion);
             string type = this.GetType().InvokeMember("ParentType",
                 System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.Static |
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetProperty,
@@ -483,7 +483,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp"></param>
         internal override void ScriptDrop(StringCollection query, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion100(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion100(sp.TargetServerVersion);
             string type = this.GetType().InvokeMember("ParentType",
                 System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.Static |
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetProperty,

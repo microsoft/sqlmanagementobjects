@@ -60,7 +60,7 @@ namespace Microsoft.SqlServer.Management.Smo
             /// <summary>
             /// This is the number of properties available for each version of the Standalone SQL engine
             /// </summary>
-            static int[] versionCount = new int[] { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 }; //7.0, 8.0, 9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0
+            static int[] versionCount = new int[] { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 }; //7.0, 8.0, 9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0
 
             /// <summary>
             /// This is the number of properties available for each version of the Cloud SQL engine

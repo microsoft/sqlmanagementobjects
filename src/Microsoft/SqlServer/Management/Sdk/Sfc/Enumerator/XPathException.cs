@@ -164,7 +164,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         public XPathException(string msg, Exception e) : base(msg, e)
         {
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -172,7 +172,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(info, context)
         {
         }
-        
+#endif
         /// <summary>
         /// TODO
         /// </summary>

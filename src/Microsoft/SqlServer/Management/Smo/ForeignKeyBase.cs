@@ -274,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Smo
             sb.Append(SqlString(FormatFullNameForScripting(sp)));
             sb.Append("'");
 
-            if (sp.TargetServerVersionInternal > SqlServerVersionInternal.Version80)
+            if (sp.TargetServerVersion > SqlServerVersion.Version80)
             {
                 return string.Format(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_FOREIGN_KEY90, forCreate ? "NOT" : "", sb.ToString(), MakeSqlString(tableName));
             }
@@ -317,7 +317,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.Append(" CASCADE");
                     break;
                 case ForeignKeyAction.SetNull:
-                    if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal) //only supported on Yukon
+                    if (SqlServerVersion.Version90 > sp.TargetServerVersion) //only supported on Yukon
                     {
                         throw new WrongPropertyValueException(this.Properties.Get(propertyName));
                     }
@@ -325,7 +325,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.Append(action); sb.Append(" SET NULL");
                     break;
                 case ForeignKeyAction.SetDefault:
-                    if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal) //only supported on Yukon
+                    if (SqlServerVersion.Version90 > sp.TargetServerVersion) //only supported on Yukon
                     {
                         throw new WrongPropertyValueException(this.Properties.Get(propertyName));
                     }
@@ -346,7 +346,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string sTableName = table.FormatFullNameForScripting(sp);
             string sForeignKeyName = FormatFullNameForScripting(sp);
             StringBuilder stmt = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            bool isTargetServerVersionSQl13OrLater = VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersionInternal);
+            bool isTargetServerVersionSQl13OrLater = VersionUtils.IsTargetServerVersionSQl13OrLater(sp.TargetServerVersion);
 
             if (sp.IncludeScripts.ExistenceCheck)
             {

@@ -82,7 +82,7 @@ namespace Microsoft.SqlServer.Management.Smo.Mail
 
         internal override void ScriptCreate(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             StringBuilder sqlStmt = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -147,7 +147,7 @@ namespace Microsoft.SqlServer.Management.Smo.Mail
 
         internal override void ScriptDrop(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             StringBuilder sqlStmt = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 

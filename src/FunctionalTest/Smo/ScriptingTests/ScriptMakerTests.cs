@@ -234,18 +234,20 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void ScriptMaker_Verify_CreateOrAlter_ExtendedProperty()
         {
             ExecuteFromDbPool((db) =>
             {
-                Table table = new Table(db, "trgTbl" + Guid.NewGuid());
+                var table = new Table(db, "trgTbl" + Guid.NewGuid());
                 table.Columns.Add(new Column(table, "col_1", new DataType(SqlDataType.Int)));
                 table.Create();
 
-                Trigger trigger = new Trigger(table, "trgA");
-                trigger.TextBody = "SET NOCOUNT ON";
-                trigger.TextHeader = string.Format("CREATE TRIGGER {0} ON {1}.{2} AFTER UPDATE AS", trigger.Name, table.Schema, SmoObjectHelpers.SqlBracketQuoteString(table.Name));
-
+                var trigger = new Trigger(table, "trgA")
+                {
+                    TextBody = "SET NOCOUNT ON",
+                };
+                trigger.TextHeader = $"CREATE TRIGGER {trigger.Name} ON {table.Schema}.{SmoObjectHelpers.SqlBracketQuoteString(table.Name)} AFTER UPDATE AS";
                 trigger.Create();
 
                 var extendedProperty = new ExtendedProperty(trigger, "Test", "Test");
@@ -259,10 +261,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 var triggerName = SmoObjectHelpers.SqlBracketQuoteString(trigger.Name);
                 var tableName = SmoObjectHelpers.SqlBracketQuoteString(table.Name);
 
-                SmoTestBase.ValidateUrnScripting(db, new[] { trigger.Urn, extendedProperty.Urn},
+                SmoTestBase.ValidateUrnScripting(db, new[] { trigger.Urn, extendedProperty.Urn },
                     new[]
                     {
-                        "SET ANSI_NULLS ON", 
+                        "SET ANSI_NULLS ON",
                         "SET QUOTED_IDENTIFIER ON",
                         string.Format("CREATE OR ALTER TRIGGER [dbo].{0} ON [dbo].{1} AFTER UPDATE AS\r\nSET NOCOUNT ON", triggerName,tableName),
                         string.Format("ALTER TABLE [dbo].{0} ENABLE TRIGGER {1}", tableName,triggerName),
@@ -306,6 +308,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void ScriptMaker_Verify_CreateOrAlter_scripts_Table_as_Create()
         {
             ExecuteFromDbPool(TestContext.FullyQualifiedTestClassName, (db) =>

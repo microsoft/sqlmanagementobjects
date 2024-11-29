@@ -5,7 +5,7 @@
     <TestCaseFilter>TestCategory!=Legacy</TestCaseFilter>
   </RunConfiguration>
   <TestRunParameters>
-    <Parameter name="SqlTestTargetServersFilter" value="Sql2016Express;Sql2017Express;Sqlv150Express;Sqlv160Express" />
+    <Parameter name="SqlTestTargetServersFilter" value="Sql2016Express;Sql2017Express;Sqlv150Express;Sqlv160Express;Sqlv170Express" />
   </TestRunParameters>
   <DataCollectionRunSettings>
     <DataCollectors>

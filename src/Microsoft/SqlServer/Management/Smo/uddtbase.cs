@@ -106,7 +106,7 @@ END
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 #region Version 90
                 if (this.State == SqlSmoState.Existing)
@@ -372,9 +372,9 @@ END
                 if (0 == string.Compare(sType, "xml", StringComparison.OrdinalIgnoreCase))
                 {
                     // throw an exception if the target server is less than 9.0
-                    SqlSmoObject.ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+                    SqlSmoObject.ThrowIfBelowVersion90(sp.TargetServerVersion);
 
-                    if (true == sp.DataType.XmlNamespaces && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 &&
+                    if (true == sp.DataType.XmlNamespaces && sp.TargetServerVersion >= SqlServerVersion.Version90 &&
                         oObj.ServerVersion.Major >= 9)
                     {
                         // set the xml collection name if supplied
@@ -480,7 +480,7 @@ END
             // we will not script UDT for downlevel servers
             if (sqlDataType == SqlDataType.UserDefinedType)
             {
-                ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+                ThrowIfBelowVersion90(sp.TargetServerVersion);
             }
 
             if (!DataType.IsDataTypeSupportedOnCloud(sqlDataType))
@@ -551,8 +551,7 @@ END
 
             // script only the name of the type if we don't have the schema
             // or we're on 8.0
-            if (SqlServerVersionInternal.Version80 == sp.TargetServerVersionInternal ||
-                SqlServerVersionInternal.Version70 == sp.TargetServerVersionInternal ||
+            if (SqlServerVersion.Version80 == sp.TargetServerVersion ||
                 oObj.ServerVersion.Major < 9 ||
                 null == sTypeSchema)
             {
@@ -609,12 +608,12 @@ END
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 AddExistsCheck(sb, "", sp);
             }
 
-            if (SqlServerVersionInternal.Version90 > sp.TargetServerVersionInternal)
+            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, "EXEC dbo.sp_droptype @typename={0}",
                     FormatFullNameForScripting(sp, false));
@@ -622,7 +621,7 @@ END
             else
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, "DROP TYPE {0}{1}",
-                    (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                    (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                     FormatFullNameForScripting(sp));
             }
 
@@ -631,7 +630,7 @@ END
 
         private void AddExistsCheck(StringBuilder sb, string prefix, ScriptingPreferences sp)
         {
-            if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90 || !sp.IncludeScripts.SchemaQualify)
+            if (sp.TargetServerVersion < SqlServerVersion.Version90 || !sp.IncludeScripts.SchemaQualify)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_UDDT80,
                                 prefix, FormatFullNameForScripting(sp, false));
@@ -878,7 +877,7 @@ END
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // on 8.0 we do not have permissions on uddts
-            if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version80 ||
+            if (sp.TargetServerVersion == SqlServerVersion.Version80 ||
                 this.ServerVersion.Major == 8)
             {
                 return;

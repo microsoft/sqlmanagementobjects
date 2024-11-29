@@ -203,7 +203,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (sp.IncludeScripts.ExistenceCheck)
             {
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion < SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_FT_INDEX,
                                 SqlString(tableName), "=");
@@ -219,7 +219,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Property property1;
 
             // Target version >= 9
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 // CREATE FULLTEXT INDEX ON <tablename>
                 sb.AppendFormat(SmoApplication.DefaultCulture, "CREATE FULLTEXT INDEX ON {0}", tableName);
@@ -256,7 +256,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                         // LANGUAGE <language_string> is only supported on Shiloh or bigger
                         if (this.ServerVersion.Major >= 8 && //current server bigger than 7 and
-                            sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version80) //scripting for server bigger than 7
+                            sp.TargetServerVersion >= SqlServerVersion.Version80) //scripting for server bigger than 7
                         {
                             object propLan = col.GetPropValueOptional("Language");
                             if (propLan != null)
@@ -272,7 +272,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                         // STATISTICAL SEMANTICS is only supported on Denali or higher
                         if (this.ServerVersion.Major >= 11 &&                                       // current server bigger than 11 AND
-                            sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version110)  //scripting for server bigger than 11
+                            sp.TargetServerVersion >= SqlServerVersion.Version110)  //scripting for server bigger than 11
                         {
                             object propSemantic = col.GetPropValueOptional("StatisticalSemantics");
                             if (propSemantic != null)
@@ -311,7 +311,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 sb.AppendFormat(SmoApplication.DefaultCulture, "KEY INDEX [{0}]", SqlBraket(columnName));
 
-                if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion == SqlServerVersion.Version90)
                 {
                     // ON <fulltext_catalog_name>
                     if ((null != (property1 = this.Properties.Get("CatalogName")).Value) && (property1.Value.ToString().Length > 0))
@@ -459,7 +459,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
 
                     // including SEARCH PROPERTY LIST [ = ] property_list_name in WITH clause
-                    if (VersionUtils.IsSql11OrLater(sp.TargetServerVersionInternal, this.ServerVersion))
+                    if (VersionUtils.IsSql11OrLater(sp.TargetServerVersion, this.ServerVersion))
                     {
 
                         String searchPropertyListName = this.Properties.Get("SearchPropertyListName").Value as String;
@@ -528,7 +528,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 // Change tracking
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version80)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version80)
                 {
                     if (null != (property1 = this.Properties.Get("ChangeTracking")).Value)
                     {
@@ -564,7 +564,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Property property1;
 
             // Target version >= 9
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -575,7 +575,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.AppendFormat(SmoApplication.DefaultCulture,
                             "ALTER FULLTEXT INDEX ON {0} SET CHANGE_TRACKING ",
                             table.FullQualifiedName);
-                    if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version100)
                     {
                         sb.Append("= ");
                     }
@@ -596,7 +596,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Target version < 9
             else
             {
-                if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version80)
+                if (sp.TargetServerVersion >= SqlServerVersion.Version80)
                 {
                     if (null != (property1 = this.Properties.Get("ChangeTracking")).Value && property1.Dirty)
                     {
@@ -645,7 +645,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
             {
                 StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -734,7 +734,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (VersionUtils.IsSql11OrLater(sp.TargetServerVersionInternal, this.ServerVersion))
+            if (VersionUtils.IsSql11OrLater(sp.TargetServerVersion, this.ServerVersion))
             {
                 StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
                 Property searchPropertyListProperty = this.Properties.Get("SearchPropertyListName");
@@ -816,7 +816,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string tableName = table.FormatFullNameForScripting(sp);
             if (sp.IncludeScripts.ExistenceCheck)
             {
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion < SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_FT_INDEX, SqlString(tableName), "<>");
                 }
@@ -829,7 +829,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // Target version >= 9
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, "DROP FULLTEXT INDEX ON {0}", tableName);
             }
@@ -905,7 +905,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 string tableName = table.FormatFullNameForScripting(sp);
 
-                if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion < SqlServerVersion.Version90)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_FT_INDEX, SqlString(tableName), "<>");
                 }
@@ -917,7 +917,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp != null && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp != null && sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture,
                     "ALTER FULLTEXT INDEX ON {0} DISABLE", table.FullQualifiedName);

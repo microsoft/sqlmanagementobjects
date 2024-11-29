@@ -51,7 +51,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     var result = new SqlTestResult();
 
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName);
+                    Table table = database.CreateTable(this.TestContext.TestName);
 
                     //read-only properties
                     result &= SqlTestHelpers.TestReadProperty(table, "RowCount", (long)0);
@@ -85,7 +85,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     var result = new SqlTestResult();
 
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName);
+                    Table table = database.CreateTable(this.TestContext.TestName);
 
                     //read-only properties
                     result &= SqlTestHelpers.TestReadProperty(table, "IsVarDecimalStorageFormatEnabled", false);
@@ -120,7 +120,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     var result = new SqlTestResult();
 
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName);
+                    Table table = database.CreateTable(this.TestContext.TestName);
 
                     //read-only properties
                     result &= SqlTestHelpers.TestReadProperty(table, "IsVarDecimalStorageFormatEnabled", false);
@@ -164,7 +164,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     SqlTestResult result = new SqlTestResult();
 
-                    _SMO.Table table = database.CreateTable(TestContext.TestName);
+                    Table table = database.CreateTable(TestContext.TestName);
 
                     // Read only table properties.
                     //
@@ -182,6 +182,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoTableAlter_AzureSterlingV12()
         {
             ExecuteFromDbPool(
@@ -201,7 +202,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     }
                     try
                     {
-                        _SMO.Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                        Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
                         try
                         {
                             table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
@@ -246,7 +247,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     database.ChangeTrackingEnabled = true;
                     database.Alter();
 
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                    Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
                     table.CreateIndex(this.TestContext.TestName,
                         new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
                     table.ChangeTrackingEnabled = true;
@@ -271,7 +272,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     database.ChangeTrackingEnabled = true;
                     database.Alter();
 
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                    Table table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
                     table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
                     table.ChangeTrackingEnabled = true;
                     table.Alter();
@@ -285,10 +286,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="obj">Smo object.</param>
         /// <param name="objVerify">Smo object used for verification of drop.</param>
         /// </summary>
-        protected override void VerifyIsSmoObjectDropped(_SMO.SqlSmoObject obj, _SMO.SqlSmoObject objVerify)
+        protected override void VerifyIsSmoObjectDropped(SqlSmoObject obj, SqlSmoObject objVerify)
         {
-            _SMO.Table table = (_SMO.Table)obj;
-            _SMO.Database database = (_SMO.Database)objVerify;
+            Table table = (Table)obj;
+            Database database = (Database)objVerify;
 
             database.Tables.Refresh();
             _NU.Assert.IsNull(database.Tables[table.Name],
@@ -308,14 +309,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 this.TestContext.FullyQualifiedTestClassName,
                 database =>
                 {
-                    _SMO.Table table = new _SMO.Table(database, GenerateSmoObjectName("tbl"));
-                    _SMO.Column column = new _SMO.Column(table, GenerateSmoObjectName("col"),
-                                                         new _SMO.DataType(_SMO.SqlDataType.Int));
-                    table.Columns.Add(column);
+                    var table = database.CreateTableDefinition("tbl");
 
                     const string tableScriptDropIfExistsTemplate = "DROP TABLE IF EXISTS [{0}].[{1}]";
                     string tableScriptDropIfExists = string.Format(tableScriptDropIfExistsTemplate,
-                                                        table.Schema, table.Name);
+                                                        table.Schema, table.Name.SqlEscapeClosingBracket());
 
                     VerifySmoObjectDropIfExists(table, database, tableScriptDropIfExists);
                 });
@@ -374,14 +372,14 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         new ColumnProperties("c2", _SMO.DataType.DateTime2(1))
                     };
 
-                   _SMO.Table nonTemporalTable = DatabaseObjectHelpers.CreateTable(
+                    Table nonTemporalTable = DatabaseObjectHelpers.CreateTable(
                        database: db,
                        tableNamePrefix: "NonTemporalTbl_VerifyTemporalRetentionPeriod",
                        schemaName: "dbo",
                        columnProperties: columns);
 
-                    _UT.Assert.AreEqual<int>(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
+                    _UT.Assert.AreEqual(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
 
                     // Scripting should not contain anything related to retention
                     //
@@ -398,24 +396,24 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     // Check that temporal properties are still at defaults post-alter
                     //
-                    _UT.Assert.AreEqual<int>(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
-                    _UT.Assert.AreEqual<string>(string.Empty, nonTemporalTable.HistoryTableName, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableName]");
-                    _UT.Assert.AreEqual<int>(0, nonTemporalTable.HistoryTableID, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableID]");
-                    _UT.Assert.AreEqual<bool>(false, nonTemporalTable.IsSystemVersioned, "Non-temporal tables should have default values for temporal properties. Property: [IsSystemVersioned]");
+                    _UT.Assert.AreEqual(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
+                    _UT.Assert.AreEqual(string.Empty, nonTemporalTable.HistoryTableName, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableName]");
+                    _UT.Assert.AreEqual(0, nonTemporalTable.HistoryTableID, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableID]");
+                    _UT.Assert.AreEqual(false, nonTemporalTable.IsSystemVersioned, "Non-temporal tables should have default values for temporal properties. Property: [IsSystemVersioned]");
 
                     // Contact the server and check the values SMO has are correct for this table
                     //
                     bool tableExists;
                     bool serverReturnedIsSystemVersioned;
                     int serverReturnedRetentionPeriod;
-                    _SMO.TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
+                    TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
 
                     tableExists = GetTableTemporalProperties(db.Name, nonTemporalTable.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                     _NU.Assert.IsTrue(tableExists, "Table not found on the SQL Server as expected.");
                     _NU.Assert.IsFalse(serverReturnedIsSystemVersioned, "Table should not be marked as system-versioned temporal table.");
-                    _UT.Assert.AreEqual<int>(0, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(0, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
                 }
             );
         }
@@ -441,14 +439,14 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         new ColumnProperties("c2", _SMO.DataType.DateTime2(1))
                     };
 
-                    _SMO.Table nonTemporalTable = DatabaseObjectHelpers.CreateTable(
+                    Table nonTemporalTable = DatabaseObjectHelpers.CreateTable(
                         database: db,
                         tableNamePrefix: "NonTemporalTbl_VerifyTemporalRetentionPeriod",
                         schemaName: "dbo",
                         columnProperties: columns);
 
-                    _UT.Assert.AreEqual<int>(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
+                    _UT.Assert.AreEqual(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
 
                     // Scripting should not contain anything related to retention
                     //
@@ -465,24 +463,24 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     // Check that temporal properties are still at defaults post-alter
                     //
-                    _UT.Assert.AreEqual<int>(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
-                    _UT.Assert.AreEqual<string>(string.Empty, nonTemporalTable.HistoryTableName, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableName]");
-                    _UT.Assert.AreEqual<int>(0, nonTemporalTable.HistoryTableID, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableID]");
-                    _UT.Assert.AreEqual<bool>(false, nonTemporalTable.IsSystemVersioned, "Non-temporal tables should have default values for temporal properties. Property: [IsSystemVersioned]");
+                    _UT.Assert.AreEqual(0, nonTemporalTable.HistoryRetentionPeriod, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriod]");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, nonTemporalTable.HistoryRetentionPeriodUnit, "Non-temporal tables should have default values for temporal properties. Property: [HistoryRetentionPeriodUnit]");
+                    _UT.Assert.AreEqual(string.Empty, nonTemporalTable.HistoryTableName, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableName]");
+                    _UT.Assert.AreEqual(0, nonTemporalTable.HistoryTableID, "Non-temporal tables should have default values for temporal properties. Property: [HistoryTableID]");
+                    _UT.Assert.AreEqual(false, nonTemporalTable.IsSystemVersioned, "Non-temporal tables should have default values for temporal properties. Property: [IsSystemVersioned]");
 
                     // Contact the server and check the values SMO has are correct for this table
                     //
                     bool tableExists;
                     bool serverReturnedIsSystemVersioned;
                     int serverReturnedRetentionPeriod;
-                    _SMO.TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
+                    TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
 
                     tableExists = GetTableTemporalProperties(db.Name, nonTemporalTable.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                     _NU.Assert.IsTrue(tableExists, "Table not found on the SQL Server as expected.");
                     _NU.Assert.IsFalse(serverReturnedIsSystemVersioned, "Table should not be marked as system-versioned temporal table.");
-                    _UT.Assert.AreEqual<int>(0, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(0, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Undefined, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
                 }
             );
         }
@@ -493,23 +491,24 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyTemporalRetentionPeriod_DefaultValues()
         {
             ExecuteFromDbPool(
                this.TestContext.FullyQualifiedTestClassName,
                db =>
                {
-                   _SMO.Table t = CreateSimpleTemporalTable(db);
+                   Table t = CreateSimpleTemporalTable(db);
 
                    // Validate table actually got created
                    //
                    int res = (int)db.ExecutionManager.ConnectionContext.ExecuteScalar(string.Format(CultureInfo.InvariantCulture, "SELECT COUNT(*) FROM SYS.TABLES WHERE NAME = '{0}'", Microsoft.SqlServer.Management.Sdk.Sfc.Urn.EscapeString(t.Name)));
-                   _UT.Assert.AreEqual<int>(1, res, "Temporal table not created in the database.");
+                   _UT.Assert.AreEqual(1, res, "Temporal table not created in the database.");
 
                    // Check defaults for the retention policy for the non-temporal tables
                    //
-                   _UT.Assert.AreEqual<int>(-1, t.HistoryRetentionPeriod, "Invalid default value for the retention period");
-                   _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Infinite, t.HistoryRetentionPeriodUnit, "Invalid default value for the retention period unit");
+                   _UT.Assert.AreEqual(-1, t.HistoryRetentionPeriod, "Invalid default value for the retention period");
+                   _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Infinite, t.HistoryRetentionPeriodUnit, "Invalid default value for the retention period unit");
                });
         }
 
@@ -520,12 +519,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyTemporalRetentionPeriod_ScriptRoundTrip()
         {
             ExecuteWithDbDrop(
                  db =>
                  {
-                     _SMO.Scripter scripter = new _SMO.Scripter(db.Parent);
+                     Scripter scripter = new Scripter(db.Parent);
                      scripter.Options.ScriptData = true;
                      scripter.Options.ScriptDrops = false;
                      scripter.Options.WithDependencies = true;
@@ -536,12 +536,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                      scripter.Options.NonClusteredIndexes = true;
                      scripter.Options.ScriptBatchTerminator = false;
 
-                     _SMO.Table t = CreateSimpleTemporalTable(db);
+                     Table t = CreateSimpleTemporalTable(db);
                      string tableName = t.Name;
 
-                     System.Collections.Generic.IEnumerable<string> scripts = scripter.EnumScript(new _SMO.SqlSmoObject[] { t });
+                     IEnumerable<string> scripts = scripter.EnumScript(new SqlSmoObject[] { t });
 
-                     _SMO.Table historyTable = db.Tables[t.HistoryTableName, t.HistoryTableSchema];
+                     Table historyTable = db.Tables[t.HistoryTableName, t.HistoryTableSchema];
                      t.Drop();
                      historyTable.Drop();
 
@@ -562,13 +562,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                      bool serverReturnedIsSystemVersioned;
                      bool serverReturnedTableExists;
                      int serverReturnedRetentionPeriod;
-                     _SMO.TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
+                     TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
 
                      serverReturnedTableExists = GetTableTemporalProperties(db.Name, t.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                      _NU.Assert.IsTrue(serverReturnedTableExists, "Table not found on the SQL Server as expected.");
                      _NU.Assert.IsTrue(serverReturnedIsSystemVersioned, "Table should be marked as system-versioned temporal table.");
-                     _UT.Assert.AreEqual<int>(-1, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                     _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Infinite, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                     _UT.Assert.AreEqual(-1, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                     _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Infinite, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
              });
         }
 
@@ -578,13 +578,14 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyTemporalRetentionPeriod_ScriptRoundTrip_Retention()
         {
             ExecuteFromDbPool(
                  this.TestContext.FullyQualifiedTestClassName,
                  db =>
                  {
-                     _SMO.Scripter scripter = new _SMO.Scripter(db.Parent);
+                     Scripter scripter = new Scripter(db.Parent);
                      scripter.Options.ScriptData = true;
                      scripter.Options.ScriptDrops = false;
                      scripter.Options.WithDependencies = true;
@@ -595,7 +596,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                      scripter.Options.NonClusteredIndexes = true;
                      scripter.Options.ScriptBatchTerminator = false;
 
-                     _SMO.Table t = CreateSimpleTemporalTable(db);
+                     Table t = CreateSimpleTemporalTable(db);
                      string tableName = t.Name;
 
                      // Configure the retention to non-default values
@@ -604,9 +605,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                      t.HistoryRetentionPeriodUnit = _SMO.TemporalHistoryRetentionPeriodUnit.Year;
                      t.Alter();
 
-                     System.Collections.Generic.IEnumerable<string> scripts = scripter.EnumScript(new _SMO.SqlSmoObject[] { t });
+                     IEnumerable<string> scripts = scripter.EnumScript(new SqlSmoObject[] { t });
                      db.Tables.Refresh();
-                     _SMO.Table historyTable = db.Tables[t.HistoryTableName, t.HistoryTableSchema];
+                     Table historyTable = db.Tables[t.HistoryTableName, t.HistoryTableSchema];
                      t.Drop();
                      historyTable.Drop();
 
@@ -633,13 +634,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                      bool serverReturnedIsSystemVersioned;
                      bool serverReturnedTableExists;
                      int serverReturnedRetentionPeriod;
-                     _SMO.TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
+                     TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
 
                      serverReturnedTableExists = GetTableTemporalProperties(db.Name, t.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                      _NU.Assert.IsTrue(serverReturnedTableExists, "Table not found on the SQL Server as expected.");
                      _NU.Assert.IsTrue(serverReturnedIsSystemVersioned, "Table should be marked as system-versioned temporal table.");
-                     _UT.Assert.AreEqual<int>(10, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                     _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Year, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                     _UT.Assert.AreEqual(10, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                     _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Year, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
               });
         }
 
@@ -648,13 +649,14 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyTemporalRetentionPeriod_InvalidRetentionValues()
         {
             ExecuteFromDbPool(
                this.TestContext.FullyQualifiedTestClassName,
                db =>
                {
-                   _SMO.Table t = CreateSimpleTemporalTable(db);
+                   Table t = CreateSimpleTemporalTable(db);
 
                    // Try to change retention period to invalid value, while keeping INFINITE retention.
                    // This should not work as the value we allow for this field is -1, 0, 1, 2...
@@ -666,7 +668,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                        t.Alter();
                        _NU.Assert.Fail("It should not be possible to set history retention period to a value less than -1.");
                    }
-                   catch ( _SMO.SmoException e )
+                   catch (SmoException e )
                    {
                        _NU.Assert.IsTrue(e.InnerException.Message.Contains("History retention period value was not specified correctly"));
                    }
@@ -682,7 +684,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                        t.Alter();
                        _NU.Assert.Fail("It should not be possible to set history retention period unit to a value 'undefined'");
                    }
-                   catch ( _SMO.SmoException e )
+                   catch (SmoException e )
                    {
                        _NU.Assert.IsTrue(e.InnerException.Message.Contains("History retention"));
                    }
@@ -697,13 +699,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                    bool serverReturnedIsSystemVersioned;
                    bool serverReturnedTableExists;
                    int serverReturnedRetentionPeriod;
-                   _SMO.TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
+                   TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
 
                    serverReturnedTableExists = GetTableTemporalProperties(db.Name, t.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                    _NU.Assert.IsTrue(serverReturnedTableExists, "Table not found on the SQL Server as expected.");
                    _NU.Assert.IsTrue(serverReturnedIsSystemVersioned, "Table should be marked as system-versioned temporal table.");
-                   _UT.Assert.AreEqual<int>(-1, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                   _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Infinite, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                   _UT.Assert.AreEqual(-1, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                   _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Infinite, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
              });
         }
 
@@ -713,6 +715,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyTemporalRetentionPeriod_AlterTable()
         {
             ExecuteFromDbPool(
@@ -722,9 +725,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     bool serverReturnedTableExists;
                     bool serverReturnedIsSystemVersioned;
                     int serverReturnedRetentionPeriod;
-                    _SMO.TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
+                    TemporalHistoryRetentionPeriodUnit serverReturnedRetentionPeriodUnit;
 
-                    _SMO.Scripter scripter = new _SMO.Scripter(db.Parent);
+                    Scripter scripter = new Scripter(db.Parent);
                     scripter.Options.ScriptData = true;
                     scripter.Options.ScriptDrops = false;
                     scripter.Options.WithDependencies = true;
@@ -735,13 +738,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     scripter.Options.NonClusteredIndexes = true;
                     scripter.Options.ScriptBatchTerminator = false;
 
-                    string primaryKeyName = "PK_temporal_current_" + new System.Random().Next().ToString();
-                    string tableName = "CurrentTable_" + new System.Random().Next().ToString();
-                    _SMO.Table t = new _SMO.Table(db, tableName);
+                    string primaryKeyName = "PK_temporal_current_" + new Random().Next().ToString();
+                    string tableName = "CurrentTable_" + new Random().Next().ToString();
+                    Table t = new Table(db, tableName);
 
-                    _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                    _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-                    _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+                    Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+                    Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+                    Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
                     t.Columns.Add(c1);
                     t.Columns.Add(c2);
@@ -750,7 +753,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     _SMO.Index index = new _SMO.Index(t, primaryKeyName);
                     index.IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey;
 
-                    index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+                    index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
                     t.Indexes.Add(index);
 
                     c2.Nullable = false;
@@ -769,7 +772,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     // Add a column to this table and make sure retention fields are still at expected values
                     //
-                    _SMO.Column c4 = new _SMO.Column(t, "c4", _SMO.DataType.Int);
+                    Column c4 = new Column(t, "c4", _SMO.DataType.Int);
                     t.Columns.Add(c4);
                     t.Alter();
                     db.Tables.Refresh();
@@ -784,8 +787,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     serverReturnedTableExists = GetTableTemporalProperties(db.Name, t.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                     _NU.Assert.IsTrue(serverReturnedTableExists, "Table not found on the SQL Server as expected.");
                     _NU.Assert.IsTrue(serverReturnedIsSystemVersioned, "Table should be marked as system-versioned temporal table.");
-                    _UT.Assert.AreEqual<int>(3, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Day, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(3, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Day, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
 
                     // Drop the column from this table and make sure retention fields are still at expected values
                     //
@@ -802,8 +805,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     serverReturnedTableExists = GetTableTemporalProperties(db.Name, t.Name, out serverReturnedIsSystemVersioned, out serverReturnedRetentionPeriod, out serverReturnedRetentionPeriodUnit);
                     _NU.Assert.IsTrue(serverReturnedTableExists, "Table not found on the SQL Server as expected.");
                     _NU.Assert.IsTrue(serverReturnedIsSystemVersioned, "Table should be marked as system-versioned temporal table.");
-                    _UT.Assert.AreEqual<int>(3, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
-                    _UT.Assert.AreEqual<_SMO.TemporalHistoryRetentionPeriodUnit>(_SMO.TemporalHistoryRetentionPeriodUnit.Day, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(3, serverReturnedRetentionPeriod, "Unexpected value for the history retention period, -1 expected as the table does not have retention policy defined");
+                    _UT.Assert.AreEqual(_SMO.TemporalHistoryRetentionPeriodUnit.Day, serverReturnedRetentionPeriodUnit, "Unexpected value for the history retention period unit, 'Infinite' expected as the table does not have retention policy defined");
                 }
             );
         }
@@ -819,6 +822,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(MinMajor = 13)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyCreateTemporalSystemTimeTable()
         {
             var consistencyCheckValues = new List<bool>() { true, false };
@@ -841,16 +845,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                                 foreach ( bool endColHidden in isPeriodEndColumnHidden )
                                 {
                                     string primaryKeyName = "PK_temporal_current_" + new Random().Next().ToString();
-                                    _SMO.Table t = new _SMO.Table(db, "CurrentTable_" + new Random().Next().ToString());
-                                    _SMO.Table t_history = new _SMO.Table(db, "HistoryTable_" + new Random().Next().ToString());
+                                    Table t = new Table(db, "CurrentTable_" + new Random().Next().ToString());
+                                    Table t_history = new Table(db, "HistoryTable_" + new Random().Next().ToString());
 
-                                    _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                                    _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-                                    _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+                                    Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+                                    Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+                                    Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
-                                    _SMO.Column c1_hist = new _SMO.Column(t_history, "c1", _SMO.DataType.Int);
-                                    _SMO.Column c2_hist = new _SMO.Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
-                                    _SMO.Column c3_hist = new _SMO.Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
+                                    Column c1_hist = new Column(t_history, "c1", _SMO.DataType.Int);
+                                    Column c2_hist = new Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
+                                    Column c3_hist = new Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
 
                                     t.Columns.Add(c1);
                                     t.Columns.Add(c2);
@@ -863,7 +867,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                                     _SMO.Index index = new _SMO.Index(t, primaryKeyName);
                                     index.IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey;
 
-                                    index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+                                    index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
                                     t.Indexes.Add(index);
 
                                     c2.Nullable = false;
@@ -954,12 +958,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     // Add Hekaton support
                     //
-                    _SMO.FileGroup memoryOptimizedFg = new _SMO.FileGroup(database, String.Format("{0}_hkfg", database.Name),
+                    FileGroup memoryOptimizedFg = new FileGroup(database, String.Format("{0}_hkfg", database.Name),
                             Microsoft.SqlServer.Management.Smo.FileGroupType.MemoryOptimizedDataFileGroup);
 
                     memoryOptimizedFg.Create();
 
-                    _SMO.DataFile dataFile = new _SMO.DataFile(memoryOptimizedFg, String.Format("{0}_hkfg", database.Name))
+                    DataFile dataFile = new DataFile(memoryOptimizedFg, String.Format("{0}_hkfg", database.Name))
                     {
                         FileName =
                             PathWrapper.Combine(PathWrapper.GetDirectoryName(database.FileGroups[0].Files[0].FileName),
@@ -974,16 +978,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     foreach ( bool withDefaultHistoryTable in defaultHistoryTableValues )
                     {
                         string primaryKeyName = "PK_temporal_current_" + new Random().Next().ToString();
-                        _SMO.Table t = new _SMO.Table(database, "CurrentTable_" + new Random().Next().ToString());
-                        _SMO.Table t_history = new _SMO.Table(database, "HistoryTable_" + new Random().Next().ToString());
+                        Table t = new Table(database, "CurrentTable_" + new Random().Next().ToString());
+                        Table t_history = new Table(database, "HistoryTable_" + new Random().Next().ToString());
 
-                        _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                        _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-                        _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+                        Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+                        Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+                        Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
-                        _SMO.Column c1_hist = new _SMO.Column(t_history, "c1", _SMO.DataType.Int);
-                        _SMO.Column c2_hist = new _SMO.Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
-                        _SMO.Column c3_hist = new _SMO.Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
+                        Column c1_hist = new Column(t_history, "c1", _SMO.DataType.Int);
+                        Column c2_hist = new Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
+                        Column c3_hist = new Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
 
                         t.IsMemoryOptimized = true;
                         t.Durability = _SMO.DurabilityType.SchemaAndData;
@@ -1003,7 +1007,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             BucketCount = 100,
                         };
 
-                        index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+                        index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
                         t.Indexes.Add(index);
 
                         c2.Nullable = false;
@@ -1095,13 +1099,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             database.DatabaseOptions.AutoClose = false;
                             database.Alter();
 
-                            _SMO.FileGroup memoryOptimizedFg = new _SMO.FileGroup(database,
+                            FileGroup memoryOptimizedFg = new FileGroup(database,
                                 String.Format("{0}_hkfg", database.Name),
                                 _SMO.FileGroupType.MemoryOptimizedDataFileGroup);
 
                             memoryOptimizedFg.Create();
 
-                            _SMO.DataFile dataFile = new _SMO.DataFile(memoryOptimizedFg, String.Format("{0}_hkfg", database.Name))
+                            DataFile dataFile = new DataFile(memoryOptimizedFg, String.Format("{0}_hkfg", database.Name))
                             {
                                 FileName =
                                     PathWrapper.Combine(PathWrapper.GetDirectoryName(database.FileGroups[0].Files[0].FileName),
@@ -1114,16 +1118,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                         string primaryKeyName = "PK_temporal_current_" + new Random().Next().ToString();
 
-                        _SMO.Table t = new _SMO.Table(database, "CurrentTable");
-                        _SMO.Table t_history = new _SMO.Table(database, "HistoryTable");
+                        Table t = new Table(database, "CurrentTable");
+                        Table t_history = new Table(database, "HistoryTable");
 
-                        _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                        _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-                        _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+                        Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+                        Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+                        Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
-                        _SMO.Column c1_hist = new _SMO.Column(t_history, "c1", _SMO.DataType.Int);
-                        _SMO.Column c2_hist = new _SMO.Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
-                        _SMO.Column c3_hist = new _SMO.Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
+                        Column c1_hist = new Column(t_history, "c1", _SMO.DataType.Int);
+                        Column c2_hist = new Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
+                        Column c3_hist = new Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
 
                         t.Columns.Add(c1);
                         t.Columns.Add(c2);
@@ -1147,7 +1151,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                         index.IndexType = isInMemory ? _SMO.IndexType.NonClusteredHashIndex : _SMO.IndexType.ClusteredIndex;
 
-                        index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+                        index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
                         t.Indexes.Add(index);
 
                         c2.Nullable = false;
@@ -1191,7 +1195,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         _NU.Assert.IsTrue(string.IsNullOrEmpty(t.HistoryTableName), "There should be no history table");
                         _NU.Assert.IsTrue(string.IsNullOrEmpty(t.HistoryTableSchema),
                             "There should be no history table schema");
-                        _UT.Assert.AreEqual<int>(0, t.HistoryTableID,
+                        _UT.Assert.AreEqual(0, t.HistoryTableID,
                             "History table ID should be 0 for a non-system versioned table");
                         _NU.Assert.IsTrue(t.HasSystemTimePeriod, "Period should still be present on the table");
 
@@ -1213,7 +1217,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         _NU.Assert.IsFalse(t.HasSystemTimePeriod, "Period should not be present on the table");
                         _NU.Assert.IsTrue(t.TemporalType == _SMO.TableTemporalType.None);
 
-                        foreach ( _SMO.Column c in t.Columns )
+                        foreach (Column c in t.Columns )
                         {
                             c.Refresh();
                             _NU.Assert.IsTrue(c.GeneratedAlwaysType == _SMO.GeneratedAlwaysType.None,
@@ -1229,7 +1233,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         _NU.Assert.IsFalse(t.IsSystemVersioned, "Table should not be system-versioned");
                         _NU.Assert.IsTrue(t.HasSystemTimePeriod, "Period should be present on the table");
                         _NU.Assert.IsTrue(t.TemporalType == _SMO.TableTemporalType.None);
-                        _UT.Assert.AreEqual<int>(0, t.HistoryTableID,
+                        _UT.Assert.AreEqual(0, t.HistoryTableID,
                             "Unexpected history table ID for the non-temporal table");
                         _NU.Assert.IsTrue(String.IsNullOrEmpty(t.HistoryTableName), "Non-empty history table name");
                         _NU.Assert.IsTrue(String.IsNullOrEmpty(t.HistoryTableSchema), "Non-empty history table schema");
@@ -1244,7 +1248,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         t.Refresh();
                         _NU.Assert.IsTrue(String.IsNullOrEmpty(t.HistoryTableName), "Non-empty history table name");
                         _NU.Assert.IsTrue(String.IsNullOrEmpty(t.HistoryTableSchema), "Non-empty history table schema");
-                        _UT.Assert.AreEqual<int>(0, t.HistoryTableID,
+                        _UT.Assert.AreEqual(0, t.HistoryTableID,
                             "History table ID should be 0 for a non-system versioned table");
                     });
             }
@@ -1256,6 +1260,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(MinMajor = 13)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void InvalidTemporalHistoryTableSpecs()
         {
             ExecuteFromDbPool(
@@ -1264,16 +1269,16 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                {
                    string primaryKeyName = "PK_temporal_current_" + new Random().Next().ToString();
 
-                   _SMO.Table t = new _SMO.Table(database, "CurrentTable");
-                   _SMO.Table t_history = new _SMO.Table(database, "HistoryTable");
+                   Table t = new Table(database, "CurrentTable");
+                   Table t_history = new Table(database, "HistoryTable");
 
-                   _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                   _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-                   _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+                   Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+                   Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+                   Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
-                   _SMO.Column c1_hist = new _SMO.Column(t_history, "c1", _SMO.DataType.Int);
-                   _SMO.Column c2_hist = new _SMO.Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
-                   _SMO.Column c3_hist = new _SMO.Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
+                   Column c1_hist = new Column(t_history, "c1", _SMO.DataType.Int);
+                   Column c2_hist = new Column(t_history, "SysStart", _SMO.DataType.DateTime2(5));
+                   Column c3_hist = new Column(t_history, "SysEnd", _SMO.DataType.DateTime2(5));
 
                    t.Columns.Add(c1);
                    t.Columns.Add(c2);
@@ -1286,7 +1291,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                    _SMO.Index index = new _SMO.Index(t, primaryKeyName);
                    index.IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey;
 
-                   index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+                   index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
                    t.Indexes.Add(index);
 
                    c2.Nullable = false;
@@ -1359,13 +1364,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             DatabaseObjectHelpers.CreateMemoryOptimizedFileGroup(database, database.Name + "_hkfg");
                         }
 
-                        _SMO.Table t = new _SMO.Table(database, "TestTableNegative");
-                        _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-                        _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-                        _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(7));
-                        _SMO.Column c4 = new _SMO.Column(t, "SysEnd2", _SMO.DataType.Int);
-                        _SMO.Column c5 = new _SMO.Column(t, "SysEnd3", _SMO.DataType.Int);
-                        _SMO.Column c6 = new _SMO.Column(t, "SysStart2", _SMO.DataType.DateTime2(7));
+                        Table t = new Table(database, "TestTableNegative");
+                        Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+                        Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+                        Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(7));
+                        Column c4 = new Column(t, "SysEnd2", _SMO.DataType.Int);
+                        Column c5 = new Column(t, "SysEnd3", _SMO.DataType.Int);
+                        Column c6 = new Column(t, "SysStart2", _SMO.DataType.DateTime2(7));
 
                         c2.Nullable = false;
                         c3.Nullable = false;
@@ -1420,7 +1425,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                                 BucketCount = 100,
                             };
 
-                            index.IndexedColumns.Add(new _SMO.IndexedColumn(index, c1.Name));
+                            index.IndexedColumns.Add(new IndexedColumn(index, c1.Name));
                             t.Indexes.Add(index);
                         }
 
@@ -1428,8 +1433,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                         _NU.Assert.IsFalse(t.IsSystemVersioned, "System versioning should be off");
                         _NU.Assert.IsFalse(t.HasSystemTimePeriod, "Period should not be created.");
-                        _UT.Assert.AreEqual<string>(String.Empty, t.HistoryTableName, "Invalid history table name");
-                        _UT.Assert.AreEqual<string>(String.Empty, t.HistoryTableSchema, "Invalid history table schema");
+                        _UT.Assert.AreEqual(String.Empty, t.HistoryTableName, "Invalid history table name");
+                        _UT.Assert.AreEqual(String.Empty, t.HistoryTableSchema, "Invalid history table schema");
 
                         // cannot drop a period when there's no period
                         AttemptDroppingPeriod(t, false, "Cannot drop a period when there's no period");
@@ -1462,6 +1467,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void VerifyTemporalHiddenColumns_AzureSterlingV12_And_After()
         {
             ExecuteFromDbPool(
@@ -1480,8 +1486,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SqlRequiredFeature(SqlFeature.SqlClr)]
         public void VerifyCorrectScriptingOrderWithTemporalTables()
         {
-            _SMO.Table[] listOfTables = null;
-            System.Collections.Generic.IEnumerable<string> scripts = null;
+            Table[] listOfTables = null;
+            IEnumerable<string> scripts = null;
 
             // Extract the test script
             //
@@ -1502,19 +1508,19 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     {
                         database.ExecuteNonQuery(script);
                     }
-                    catch ( _SMO.FailedOperationException se )
+                    catch (FailedOperationException se )
                     {
                         //Throw a new exception here since FailedOperationExceptions have a couple nested exceptions, so to
                         //avoid having to iterate through them ourselves and append the messages we let the test framework
                         //handle that
-                        throw new _SMO.FailedOperationException(String.Format("Failed to execute script {0}", scriptName), se);
+                        throw new FailedOperationException(String.Format("Failed to execute script {0}", scriptName), se);
                     }
 
                     database.Refresh();
 
                     // Now script all the tables including dependent objects
                     //
-                    _SMO.Scripter scripter = new _SMO.Scripter(database.Parent);
+                    Scripter scripter = new Scripter(database.Parent);
                     scripter.Options.ScriptData = true;
                     scripter.Options.ScriptDrops = false;
                     scripter.Options.WithDependencies = true;
@@ -1525,7 +1531,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     scripter.Options.NonClusteredIndexes = true;
                     scripter.Options.ScriptBatchTerminator = false;
 
-                    listOfTables = new _SMO.Table[database.Tables.Count];
+                    listOfTables = new Table[database.Tables.Count];
                     database.Tables.CopyTo(listOfTables, 0);
                     scripts = scripter.EnumScript(listOfTables);
 
@@ -1549,7 +1555,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         database2.Refresh();
                         database2.Tables.Refresh();
 
-                        _SMO.Table t;
+                        Table t;
 
                         t = database2.Tables["Person_Temporal_History"];
                         _NU.Assert.IsTrue(t != null, "Table Person_Temporal_History does not exist");
@@ -1616,12 +1622,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     {
                         database.ExecuteNonQuery(script);
                     }
-                    catch (_SMO.FailedOperationException se)
+                    catch (FailedOperationException se)
                     {
                         //Throw a new exception here since FailedOperationExceptions have a couple nested exceptions, so to
                         //avoid having to iterate through them ourselves and append the messages we let the test framework
                         //handle that
-                        throw new _SMO.FailedOperationException(String.Format("Failed to execute script {0}", scriptName), se);
+                        throw new FailedOperationException(String.Format("Failed to execute script {0}", scriptName), se);
                     }
 
                     database.Refresh();
@@ -1650,376 +1656,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
         #endregion
 
-        #region Ledger Tests
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerExpectedFailures()
-        {
-            ExecuteFromDbPool(
-                db =>
-                {
-                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
-                    var t = new Table(db, ledgerTableName);
-                    t.Columns.Add(new Column(t, "c1", DataType.Int));
-
-                    // try to create ledger table without LedgerType defined
-                    t.IsLedger = true;
-                    Assert.Throws<FailedOperationException>(t.Create, "LedgerType not set, ledger creation should fail.");
-
-                    // try with system versioned property set as well
-                    t.IsSystemVersioned = true;
-                    Assert.Throws<FailedOperationException>(t.Create, "LedgerType not set, ledger creation should fail.");
-
-                    // try creating a ledger table with a custom view name but no schema defined
-                    t.LedgerType = LedgerTableType.UpdatableLedgerTable;
-                    t.LedgerViewName = "test_view_name";
-                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view name is specified, so too must be the ledger view schema");
-
-                    // try creating a ledger table with a custom view schema but no view name defined
-                    t.LedgerViewName = string.Empty;
-                    t.LedgerViewSchema = "test_schema";
-                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view schema is specified, so too must be the ledger view name");
-
-                    // try creating a ledger table with a custom view column name but the view itself not named
-                    t.LedgerViewSchema = string.Empty;
-                    t.LedgerViewOperationTypeColumnName = "col_name";
-                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view name is not specified, neither can the ledger view column names be");
-                }
-            );
-        }
-
-        [DataTestMethod]
-        [DataRow(false, false, false, false, false)]    // append-only, no optional definitions
-        [DataRow(false, false, true, false, false)]     // append-only, define view
-        [DataRow(false, false, true, false, true)]      // append-only, define view with different schema
-        [DataRow(false, false, true, true, false)]      // append-only, define view with view columns
-        [DataRow(false, false, true, true, true)]       // append-only, define view with view columns and different schema
-        [DataRow(true, false, false, false, false)]     // updatable, no optional definitions
-        [DataRow(true, false, true, false, false)]      // updatable, define view
-        [DataRow(true, false, true, false, true)]       // updatable, define view with different schema
-        [DataRow(true, false, true, true, false)]       // updatable, define view with view columns
-        [DataRow(true, false, true, true, true)]        // updatable, define view with view columns and different schema
-        [DataRow(true, true, false, false, false)]      // updatable, define history table
-        [DataRow(true, true, false, false, true)]       // updatable, define history table with different schema
-        [DataRow(true, true, true, true, true)]         // updatable, define history table and view with view columns and different schema
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_LedgerTableScripting(bool systemVersioned, bool defineHistoryTable, bool defineLedgerView, bool defineLedgerViewColumns, bool differentSchema)
-        {
-            ExecuteFromDbPool(
-                db =>
-                {
-                    var s = new Schema(db, SmoObjectHelpers.GenerateUniqueObjectName("ledger_schema"));
-                    s.Create();
-
-                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
-                    var t = new Table(db, ledgerTableName);
-
-                    t.Columns.Add(new Column(t, "c1", DataType.Char(10)));
-
-                    t.IsLedger = true;
-                    t.IsSystemVersioned = systemVersioned;
-                    t.LedgerType = systemVersioned ? LedgerTableType.UpdatableLedgerTable : LedgerTableType.AppendOnlyLedgerTable;
-                    
-                    if (defineHistoryTable)
-                    {
-                        t.HistoryTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_history");
-                        t.HistoryTableSchema = differentSchema ? s.Name : t.Schema;
-                    }
-
-                    if (defineLedgerView)
-                    {
-                        t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
-                        t.LedgerViewSchema = differentSchema ? s.Name : t.Schema;
-                    }
-
-                    if (defineLedgerViewColumns && defineLedgerView)
-                    {
-                        t.LedgerViewTransactionIdColumnName = "trans_id_col_name";
-                        t.LedgerViewSequenceNumberColumnName = "seq_num_col_name";
-                        t.LedgerViewOperationTypeColumnName = "op_type_col_name";
-                        t.LedgerViewOperationTypeDescColumnName = "op_type_desc_col_name";
-                    }
-
-                    // create the table
-                    t.Create();
-
-                    var t_fields = new string[] {
-                        nameof(Table.LedgerType),
-                        nameof(Table.LedgerViewName),
-                        nameof(Table.LedgerViewSchema),
-                        nameof(Table.IsDroppedLedgerTable),
-                        nameof(Table.LedgerViewTransactionIdColumnName),
-                        nameof(Table.LedgerViewSequenceNumberColumnName),
-                        nameof(Table.LedgerViewOperationTypeColumnName),
-                        nameof(Table.LedgerViewOperationTypeDescColumnName),
-                        nameof(Table.HistoryTableName),
-                        nameof(Table.HistoryTableSchema)};
-                    db.Tables.ClearAndInitialize("", t_fields);
-
-                    var tab = db.Tables[ledgerTableName];
-                    var view = db.Views[tab.LedgerViewName, tab.LedgerViewSchema];
-
-                    // Set the expected script based on the inputs
-                    var systemVersionedScript =
-                        systemVersioned
-                        ? $"SYSTEM_VERSIONING = ON (HISTORY_TABLE = [{SqlSmoObject.EscapeString(tab.HistoryTableSchema, ']')}].[{SqlSmoObject.EscapeString(tab.HistoryTableName, ']')}]), {Environment.NewLine}"
-                        : string.Empty;
-
-                    var appendOnlyScript = !systemVersioned ? $"APPEND_ONLY = ON, " : string.Empty;
-
-                    // set generated always columns for the table
-                    var generatedAlwaysColumns = string.Empty;
-                    if (systemVersioned)
-                    {
-                        // add all 4 expected generated always columns for updatable
-                        generatedAlwaysColumns =
-                            $"\t[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,{Environment.NewLine}" +
-                            $"\t[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,{Environment.NewLine}" +
-                            $"\t[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,{Environment.NewLine}" +
-                            $"\t[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL{Environment.NewLine}";
-                    } else
-                    {
-                        // add the 2 start generated always columns for append-only
-                        generatedAlwaysColumns =
-                            $"\t[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,{Environment.NewLine}" +
-                            $"\t[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL{Environment.NewLine}";
-                    }
-
-                    var expectedScript = new string[]
-                    {
-                        "SET ANSI_NULLS ON",
-                        "SET QUOTED_IDENTIFIER ON",
-                        $"CREATE TABLE [{tab.Schema}].[{SqlSmoObject.EscapeString(tab.Name, ']')}]({Environment.NewLine}" +
-                        $"\t[c1] [char](10) COLLATE {db.Collation} NULL,{Environment.NewLine}" +
-                        generatedAlwaysColumns +
-                        $") ON [PRIMARY]{Environment.NewLine}WITH{Environment.NewLine}({Environment.NewLine}" +
-                        systemVersionedScript +
-                        $"LEDGER = ON ({appendOnlyScript}LEDGER_VIEW = [{SqlSmoObject.EscapeString(tab.LedgerViewSchema, ']')}].[{SqlSmoObject.EscapeString(tab.LedgerViewName, ']')}] (" +
-                        $"TRANSACTION_ID_COLUMN_NAME = [{tab.LedgerViewTransactionIdColumnName}], " +
-                        $"SEQUENCE_NUMBER_COLUMN_NAME = [{tab.LedgerViewSequenceNumberColumnName}], " + 
-                        $"OPERATION_TYPE_COLUMN_NAME = [{tab.LedgerViewOperationTypeColumnName}], " +
-                        $"OPERATION_TYPE_DESC_COLUMN_NAME = [{tab.LedgerViewOperationTypeDescColumnName}]" +
-                        $")){Environment.NewLine}){Environment.NewLine}"
-                    };
-                    var generatedScript = tab.Script();
-                    Assert.That(expectedScript, _NU.Is.EqualTo(generatedScript));
-                }
-            );
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerAppendOnly()
-        {
-            CreateAndVerifyLedgerTable(systemVersioned: false, temporal: false);
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerAppendOnlyWithOptionalColumnsDefined()
-        {
-            CreateAndVerifyLedgerTable(systemVersioned: false, temporal: false, defineOptionalColumns: true);
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerSystemVersioned()
-        {
-            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: false);
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerSystemVersionedWithOptionalColumnsDefined()
-        {
-            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: false, defineOptionalColumns: true);
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerTemporal()
-        {
-            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true);
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerTemporalWithOptionalColumnsDefined()
-        {
-            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true, defineOptionalColumns: true);
-        }
-
-        [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        public void SmoTable_CreateLedgerHistoryTable()
-        {
-            ExecuteFromDbPool(
-               db =>
-               {
-                   var table = new Table(db, "historytable") { LedgerType = LedgerTableType.HistoryTable };
-                   var c1 = new Column(table, "c1", DataType.Int);
-                   table.Columns.Add(c1);
-
-                   // Verify that ledger history table can't be created.
-                   Assert.Throws<FailedOperationException>(table.Create, "Ledger history table can't be created.");
-               });
-        }
-
-        private void CreateAndVerifyLedgerTable(bool systemVersioned, bool temporal, bool defineOptionalColumns = false)
-        {
-            ExecuteFromDbPool(
-                db =>
-                {
-                    Assert.That(temporal && !systemVersioned, Is.False, "temporal and append only are incompatible ledger types");
-
-                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
-                    var t = new Table(db, ledgerTableName);
-
-                    var c1 = new Column(t, "c1", DataType.Int);
-                    t.Columns.Add(c1);
-
-                    // generated always columns that exist no matter what type of ledger table you have
-                    if (defineOptionalColumns)
-                    {
-                        var c2 = new Column(t, "TransactionStart", DataType.BigInt) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsTransactionIdStart };
-                        var c3 = new Column(t, "SequenceStart", DataType.BigInt) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsSequenceNumberStart };
-                        t.Columns.Add(c2);
-                        t.Columns.Add(c3);
-                    }
-
-                    // LEDGER = ON cannot be specified with PERIOD FOR SYSTEM_TIME and APPEND_ONLY = ON
-                    // APPEND_ONLY = ON cannot be specified with generated always end columns
-                    //
-                    if (systemVersioned)
-                    {
-                        // System-versioned ledger tables can either be temporal or not. The difference in definition
-                        // is whether a period for system time and the SysStart and SysEnd columns are defined
-                        //
-                        if (temporal)
-                        {
-                            var c4 = new Column(t, "SysStart", DataType.DateTime2(5)) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsRowStart };
-                            var c5 = new Column(t, "SysEnd", DataType.DateTime2(5)) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsRowEnd };
-                            t.Columns.Add(c4);
-                            t.Columns.Add(c5);
-                            t.AddPeriodForSystemTime(periodStartColumn: c4.Name, periodEndColumn: c5.Name, addPeriod: true);
-
-                            string primaryKeyName = SmoObjectHelpers.GenerateUniqueObjectName("pk_ledger_table");
-                            var index = new _SMO.Index(t, primaryKeyName) { IndexKeyType = IndexKeyType.DriPrimaryKey };
-                            index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
-                            t.Indexes.Add(index);
-                            t.DataConsistencyCheck = true;
-                        }
-
-                        // TransactionStart & SequenceStart are NOT Null columns
-                        // TransactionEnd & SequenceEnd can be NULL
-                        //
-                        if (defineOptionalColumns)
-                        {
-                            var c6 = new Column(t, "TransactionEnd", DataType.BigInt) { Nullable = true, GeneratedAlwaysType = GeneratedAlwaysType.AsTransactionIdEnd };
-                            var c7 = new Column(t, "SequenceEnd", DataType.BigInt) { Nullable = true, GeneratedAlwaysType = GeneratedAlwaysType.AsSequenceNumberEnd };
-                            t.Columns.Add(c6);
-                            t.Columns.Add(c7);
-                        }
-
-                        t.IsSystemVersioned = true;
-                        t.LedgerType = LedgerTableType.UpdatableLedgerTable;
-                    }
-                    else
-                    {
-                        // Append-only ledger tables have system versioning turned off
-                        //
-                        t.IsSystemVersioned = false;
-                        t.LedgerType = LedgerTableType.AppendOnlyLedgerTable;
-                    }
-
-                    t.IsLedger = true;
-                    t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
-                    t.LedgerViewSchema = t.Schema;
-                    if (defineOptionalColumns)
-                    {
-                        t.LedgerViewTransactionIdColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewTransactionIdColumnName");
-                        t.LedgerViewSequenceNumberColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewSequenceNumberColumnName");
-                        t.LedgerViewOperationTypeColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeColumnName");
-                        t.LedgerViewOperationTypeDescColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeDescColumnName");
-                    }
-
-                    t.Create();
-
-                    var t_fields = new string[] {
-                        nameof(Table.LedgerType),
-                        nameof(Table.LedgerViewName),
-                        nameof(Table.LedgerViewSchema),
-                        nameof(Table.IsDroppedLedgerTable),
-                        nameof(Table.LedgerViewTransactionIdColumnName),
-                        nameof(Table.LedgerViewSequenceNumberColumnName),
-                        nameof(Table.LedgerViewOperationTypeColumnName),
-                        nameof(Table.LedgerViewOperationTypeDescColumnName) };
-                    db.Tables.ClearAndInitialize("", t_fields);
-
-                    var v_fields = new string[] { nameof(View.LedgerViewType), nameof(View.IsDroppedLedgerView) };
-                    db.Views.ClearAndInitialize("", v_fields);
-
-                    var tab = db.Tables[ledgerTableName];
-
-                    // Default history table can't be given for ledger, we need to determine which one got auto-created
-                    //
-                    var t_history = db.Tables[tab.HistoryTableName, tab.HistoryTableSchema];
-                    var l_view = db.Views[tab.LedgerViewName, tab.LedgerViewSchema];
-
-                    int l_view_id = l_view.ID;
-                    int table_id = t.ID;
-
-                    // Validate metadata stuff is propagated to SMO correctly
-                    // if the optional columns aren't defined, they are defaulted to hidden, which is checked as well
-                    //
-                    ValidateLedgerTables(current: tab, history: t_history, ledger_view: l_view, systemVersioned, temporal, !defineOptionalColumns);
-
-                    ValidateLedgerScriptProperties(tab.Script(), systemVersioned, temporal);
-
-                    t.Drop();
-                    db.Tables.ClearAndInitialize("", t_fields);
-                    db.Views.ClearAndInitialize("", v_fields);
-
-                    // get the dropped ledger table
-                    var dropped_ledger = db.Tables.ItemById(table_id);
-                    Assert.That(dropped_ledger.IsDroppedLedgerTable, Is.True, "Table should be marked as a dropped ledger table");
-                    Assert.That(dropped_ledger.Name, Does.Contain("MSSQL_DroppedLedgerTable"), "Table name should have been updated to include dropped identifier");
-
-                    // get the dropped ledger view
-                    var dropped_ledger_view = db.Views.ItemById(l_view_id);
-                    Assert.That(dropped_ledger_view.IsDroppedLedgerView, Is.True, "View should be marked as a dropped ledger view");
-                    Assert.That(dropped_ledger_view.Name, Does.Contain("MSSQL_DroppedLedgerView"), "View name should have been updated to include dropped identifier");
-
-                    // get the dropped ledger history table
-                    if (systemVersioned)
-                    {
-                        var dropped_history = db.Tables.ItemById(dropped_ledger.HistoryTableID);
-                        Assert.That(dropped_history.Name, Does.Contain("MSSQL_DroppedLedgerHistory"), "History table name should have been updated to include dropped identifier");
-                    }
-                }
-            );
-        }
-
-        #endregion
 
         #region GraphDB Tests
 
@@ -2045,7 +1681,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable:true,
                             isNode: true,
@@ -2081,13 +1717,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table tableNoColumns = CreateGraphTable(
+                        Table tableNoColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
                             tableName: "edge_no_columns");
 
-                        _SMO.Table tableWithColumns = CreateGraphTable(
+                        Table tableWithColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2130,9 +1766,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -2168,15 +1804,15 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table tableNoColumns = CreateGraphTable(
+                        Table tableNoColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
                             tableName: "edge_no_columns");
 
-                        _SMO.Table tableWithColumns = CreateGraphTable(
+                        Table tableWithColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2219,7 +1855,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -2259,7 +1895,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -2300,9 +1936,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table tableNoColumnsEdge = CreateGraphTable(
+                        Table tableNoColumnsEdge = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2311,7 +1947,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "no_col_edge_edge",
                             indexColumnName: EdgeId);
 
-                        _SMO.Table tableNoColumnsFrom = CreateGraphTable(
+                        Table tableNoColumnsFrom = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2320,7 +1956,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "no_col_edge_from",
                             indexColumnName: FromId);
 
-                        _SMO.Table tableNoColumnsTo = CreateGraphTable(
+                        Table tableNoColumnsTo = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2329,7 +1965,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "no_col_edge_to",
                             indexColumnName: ToId);
 
-                        _SMO.Table tableWithColumnsEdge = CreateGraphTable(
+                        Table tableWithColumnsEdge = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2338,7 +1974,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "col_edge_edge",
                             indexColumnName: EdgeId);
 
-                        _SMO.Table tableWithColumnsFrom = CreateGraphTable(
+                        Table tableWithColumnsFrom = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2347,7 +1983,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "col_edge_from",
                             indexColumnName: FromId);
 
-                        _SMO.Table tableWithColumnsTo = CreateGraphTable(
+                        Table tableWithColumnsTo = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2418,9 +2054,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table tableNoColumns1 = CreateGraphTable(
+                        Table tableNoColumns1 = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2429,7 +2065,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "no_col_edge_edge",
                             indexColumnName: EdgeId);
 
-                        _SMO.Table tableNoColumns2 = CreateGraphTable(
+                        Table tableNoColumns2 = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2438,7 +2074,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "no_col_edge_from",
                             indexColumnName: FromId);
 
-                        _SMO.Table tableNoColumns3 = CreateGraphTable(
+                        Table tableNoColumns3 = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2447,7 +2083,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "no_col_edge_to",
                             indexColumnName: ToId);
 
-                        _SMO.Table tableWithColumns1 = CreateGraphTable(
+                        Table tableWithColumns1 = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2456,7 +2092,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "col_edge_edge",
                             indexColumnName: EdgeId);
 
-                        _SMO.Table tableWithColumns2 = CreateGraphTable(
+                        Table tableWithColumns2 = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2465,7 +2101,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             indexName: "col_edge_from",
                             indexColumnName: FromId);
 
-                        _SMO.Table tableWithColumns3 = CreateGraphTable(
+                        Table tableWithColumns3 = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -2536,7 +2172,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: true,
@@ -2581,13 +2217,13 @@ AS NODE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table tableNoColumns = CreateGraphTable(
+                        Table tableNoColumns = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
                             tableName: "edge_no_columns");
 
-                        _SMO.Table tableWithColumns = CreateGraphTable(
+                        Table tableWithColumns = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2641,7 +2277,7 @@ AS EDGE ON [PRIMARY]";
                     ExecuteWithGraphTF(database, () =>
                     {
 
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: true,
@@ -2689,7 +2325,7 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: true,
@@ -2742,9 +2378,9 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table tableNoColumnsEdge = CreateGraphTable(
+                        Table tableNoColumnsEdge = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2753,7 +2389,7 @@ AS EDGE ON [PRIMARY]";
                             indexName: "no_col_edge_edge",
                             indexColumnName: EdgeId);
 
-                        _SMO.Table tableNoColumnsFrom = CreateGraphTable(
+                        Table tableNoColumnsFrom = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2762,7 +2398,7 @@ AS EDGE ON [PRIMARY]";
                             indexName: "no_col_edge_from",
                             indexColumnName: FromId);
 
-                        _SMO.Table tableNoColumnsTo = CreateGraphTable(
+                        Table tableNoColumnsTo = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2771,7 +2407,7 @@ AS EDGE ON [PRIMARY]";
                             indexName: "no_col_edge_to",
                             indexColumnName: ToId);
 
-                        _SMO.Table tableWithColumnsEdge = CreateGraphTable(
+                        Table tableWithColumnsEdge = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2781,7 +2417,7 @@ AS EDGE ON [PRIMARY]";
                             indexColumnName: EdgeId,
                             indexKeyListIncludesTableColumn: true);
 
-                        _SMO.Table tableWithColumnsFrom = CreateGraphTable(
+                        Table tableWithColumnsFrom = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2791,7 +2427,7 @@ AS EDGE ON [PRIMARY]";
                             indexColumnName: FromId,
                             indexKeyListIncludesTableColumn: true);
 
-                        _SMO.Table tableWithColumnsTo = CreateGraphTable(
+                        Table tableWithColumnsTo = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2937,9 +2573,9 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table tableNoColumnsEdge = CreateGraphTable(
+                        Table tableNoColumnsEdge = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2949,7 +2585,7 @@ AS EDGE ON [PRIMARY]";
                             indexColumnName: EdgeId,
                             indexType: _SMO.IndexType.NonClusteredColumnStoreIndex);
 
-                        _SMO.Table tableNoColumnsFrom = CreateGraphTable(
+                        Table tableNoColumnsFrom = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2959,7 +2595,7 @@ AS EDGE ON [PRIMARY]";
                             indexColumnName: FromId,
                             indexType: _SMO.IndexType.NonClusteredColumnStoreIndex);
 
-                        _SMO.Table tableNoColumnsTo = CreateGraphTable(
+                        Table tableNoColumnsTo = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2969,7 +2605,7 @@ AS EDGE ON [PRIMARY]";
                             indexColumnName: ToId,
                             indexType: _SMO.IndexType.NonClusteredColumnStoreIndex);
 
-                        _SMO.Table tableWithColumnsEdge = CreateGraphTable(
+                        Table tableWithColumnsEdge = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2980,7 +2616,7 @@ AS EDGE ON [PRIMARY]";
                             indexType: _SMO.IndexType.NonClusteredColumnStoreIndex,
                             indexKeyListIncludesTableColumn: true);
 
-                        _SMO.Table tableWithColumnsFrom = CreateGraphTable(
+                        Table tableWithColumnsFrom = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -2991,7 +2627,7 @@ AS EDGE ON [PRIMARY]";
                             indexType: _SMO.IndexType.NonClusteredColumnStoreIndex,
                             indexKeyListIncludesTableColumn: true);
 
-                        _SMO.Table tableWithColumnsTo = CreateGraphTable(
+                        Table tableWithColumnsTo = CreateGraphTable(
                             database: database,
                             createTable: false,
                             isNode: false,
@@ -3141,7 +2777,7 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -3159,7 +2795,7 @@ AS NODE ON [PRIMARY]";
 )
 AS NODE ON [PRIMARY]";
 
-                        _SMO.Column c2 = new _SMO.Column(table, "c2", _SMO.DataType.Int);
+                        Column c2 = new Column(table, "c2", _SMO.DataType.Int);
                         table.Columns.Add(c2);
 
                         table.Alter();
@@ -3192,14 +2828,14 @@ AS NODE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table edgeWithColumns = CreateGraphTable(
+                        Table edgeWithColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
                             tableName: "edge_with_table",
                             columnName: "c1");
 
-                        _SMO.Table edgeWithoutColumns = CreateGraphTable(
+                        Table edgeWithoutColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -3224,7 +2860,7 @@ AS EDGE ON [PRIMARY]";
                         string EdgeWithoutColumnsAfterDrop = @"CREATE TABLE [dbo]." + edgeWithoutColumns.Name.SqlBracketQuoteString() + @"
 AS EDGE ON [PRIMARY]";
 
-                        _SMO.Column c2 = new _SMO.Column(edgeWithColumns, "c2", _SMO.DataType.Int);
+                        Column c2 = new Column(edgeWithColumns, "c2", _SMO.DataType.Int);
                         edgeWithColumns.Columns.Add(c2);
 
                         edgeWithColumns.Alter();
@@ -3237,7 +2873,7 @@ AS EDGE ON [PRIMARY]";
 
                         ValidateScript(edgeWithColumns.Script(), EdgeWithColumnsAfterDrop);
 
-                        _SMO.Column c3 = new _SMO.Column(edgeWithoutColumns, "c3", _SMO.DataType.Int);
+                        Column c3 = new Column(edgeWithoutColumns, "c3", _SMO.DataType.Int);
 
                         edgeWithoutColumns.Columns.Add(c3);
                         edgeWithoutColumns.Alter();
@@ -3269,7 +2905,7 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -3282,8 +2918,8 @@ AS EDGE ON [PRIMARY]";
                             IndexKeyType = _SMO.IndexKeyType.None,
                         };
 
-                        idx.IndexedColumns.Add(new _SMO.IndexedColumn(idx, NodeId));
-                        idx.IndexedColumns.Add(new _SMO.IndexedColumn(idx, "c1"));
+                        idx.IndexedColumns.Add(new IndexedColumn(idx, NodeId));
+                        idx.IndexedColumns.Add(new IndexedColumn(idx, "c1"));
 
                         table.Indexes.Add(idx);
 
@@ -3324,15 +2960,15 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        ((_SMO.Database)database).AnsiPaddingEnabled = true;
+                        ((Database)database).AnsiPaddingEnabled = true;
 
-                        _SMO.Table tableNoColumns = CreateGraphTable(
+                        Table tableNoColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
                             tableName: "edge_no_columns");
 
-                        _SMO.Table tableWithColumns = CreateGraphTable(
+                        Table tableWithColumns = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -3421,7 +3057,7 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table nodeTable = CreateGraphTable(
+                        Table nodeTable = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -3430,7 +3066,7 @@ AS EDGE ON [PRIMARY]";
                             indexName: "idx",
                             indexColumnName: NodeId);
 
-                        _SMO.Table edgeTable = CreateGraphTable(
+                        Table edgeTable = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -3480,7 +3116,7 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table nodeTable = CreateGraphTable(
+                        Table nodeTable = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -3491,7 +3127,7 @@ AS EDGE ON [PRIMARY]";
                             indexType: _SMO.IndexType.NonClusteredColumnStoreIndex,
                             indexKeyListIncludesTableColumn: true);
 
-                        _SMO.Table edgeTable = CreateGraphTable(
+                        Table edgeTable = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: false,
@@ -3560,7 +3196,7 @@ AS EDGE ON [PRIMARY]";
 
                         string databaseUrn = database.Urn;
 
-                        var urnList = new List<Management.Sdk.Sfc.Urn>
+                        var urnList = new List<Urn>
                         {
                             CreateUrn(databaseUrn, nodeTableName, "idx"),
                             CreateUrn(databaseUrn, nodeTableName, "idx2"),
@@ -3637,9 +3273,9 @@ AS EDGE ON [PRIMARY]";
         /// <param name="tableName">The table name.</param>
         /// <param name="indexName">The index name.</param>
         /// <returns>The urn.</returns>
-        private Management.Sdk.Sfc.Urn CreateUrn(string databaseUrn, string tableName, string indexName)
+        private Urn CreateUrn(string databaseUrn, string tableName, string indexName)
         {
-            return new Management.Sdk.Sfc.Urn(
+            return new Urn(
                 String.Format("{0}/Table[@Name='{1}' and @Schema='dbo']/Index[@Name='{2}']",
                 databaseUrn,
                 tableName.SqlEscapeSingleQuote(),
@@ -3652,7 +3288,7 @@ AS EDGE ON [PRIMARY]";
         /// </summary>
         /// <param name="database">The Database to execute against.</param>
         /// <param name="action">The action.</param>
-        private void ExecuteWithGraphTF(_SMO.Database database, Action action)
+        private void ExecuteWithGraphTF(Database database, Action action)
         {
             try
             {
@@ -3672,7 +3308,7 @@ AS EDGE ON [PRIMARY]";
         /// </summary>
         /// <param name="database">The SMO database to execute the query.</param>
         /// <param name="toEnable">TRUE to turn on the TF, FALSE to turn off the TF.</param>
-        private void ToggleGraphTraceFlag(_SMO.Database database, bool toEnable)
+        private void ToggleGraphTraceFlag(Database database, bool toEnable)
         {
             if ( toEnable )
             {
@@ -3701,15 +3337,15 @@ AS EDGE ON [PRIMARY]";
         /// <param name="indexType">The optional index type, defaults to non-clustered index.</param>
         /// <param name="indexKeyListIncludesTableColumn">True indicates the index key column list contains 'columnName'.</param>
         /// <returns></returns>
-        private _SMO.Table CreateGraphTable(
-            _SMO.Database database,
+        private Table CreateGraphTable(
+            Database database,
             bool createTable,
             bool isNode,
             string tableName,
             string columnName = null,
             string indexName = null,
             string indexColumnName = null,
-            _SMO.IndexType indexType = _SMO.IndexType.NonClusteredIndex,
+            IndexType indexType = _SMO.IndexType.NonClusteredIndex,
             bool indexKeyListIncludesTableColumn = false)
         {
             IndexProperties[] indexProperties = new IndexProperties[]
@@ -3798,7 +3434,7 @@ AS EDGE ON [PRIMARY]";
         /// <param name="indexName">The index name.</param>
         /// <param name="additionalColumnName">An additional key column name.</param>
         /// <returns>The index.</returns>
-        private _SMO.Index CreatePseudoColumnIndex(_SMO.Table table, string pseudoColumnName, string indexName, string additionalColumnName = "")
+        private _SMO.Index CreatePseudoColumnIndex(Table table, string pseudoColumnName, string indexName, string additionalColumnName = "")
         {
             _SMO.Index idx = new _SMO.Index(table, indexName)
             {
@@ -3806,11 +3442,11 @@ AS EDGE ON [PRIMARY]";
                 IndexKeyType = Management.Smo.IndexKeyType.None,
             };
 
-            idx.IndexedColumns.Add(new _SMO.IndexedColumn(idx, pseudoColumnName));
+            idx.IndexedColumns.Add(new IndexedColumn(idx, pseudoColumnName));
 
             if ( additionalColumnName != String.Empty )
             {
-                idx.IndexedColumns.Add(new _SMO.IndexedColumn(idx, additionalColumnName));
+                idx.IndexedColumns.Add(new IndexedColumn(idx, additionalColumnName));
             }
 
             return idx;
@@ -3824,7 +3460,7 @@ AS EDGE ON [PRIMARY]";
         /// <param name="additionalColumn">An additional column if desired.</param>
         /// <param name="indexType">The type of index to create.</param>
         /// <returns>The index properties.</returns>
-        private IndexProperties CreatePseudoColumnIndexProperties(string pseudoColumnName, string indexName, string additionalColumn= "", _SMO.IndexType indexType = _SMO.IndexType.NonClusteredIndex)
+        private IndexProperties CreatePseudoColumnIndexProperties(string pseudoColumnName, string indexName, string additionalColumn= "", IndexType indexType = _SMO.IndexType.NonClusteredIndex)
         {
             IndexProperties indexProperties = new IndexProperties()
             {
@@ -3849,7 +3485,7 @@ AS EDGE ON [PRIMARY]";
         /// Verifies the pre-created columns for edge tables.
         /// </summary>
         /// <param name="table">The SMO table.</param>
-        private void ValidateEdgeTableInternalColumns(_SMO.Table table)
+        private void ValidateEdgeTableInternalColumns(Table table)
         {
             _NU.Assert.That(table.IsEdge, _NU.Is.True, "Edge property must be set for edge tables.");
             _NU.Assert.That(table.Columns[0].GraphType, _NU.Is.EqualTo(_SMO.GraphType.GraphId), "The first edge column must be the graph identifier column.");
@@ -3866,7 +3502,7 @@ AS EDGE ON [PRIMARY]";
         /// Verifies the pre-created columns for node tables.
         /// </summary>
         /// <param name="table">The SMO table.</param>
-        private void ValidateNodeTableInternalColumns(_SMO.Table table)
+        private void ValidateNodeTableInternalColumns(Table table)
         {
             _NU.Assert.That(table.IsNode, _NU.Is.True, "Node property must be set for node tables.");
             _NU.Assert.That(table.Columns[0].GraphType, _NU.Is.EqualTo(_SMO.GraphType.GraphId), "The graph type of the column is incorrect, this is a product bug.");
@@ -3880,15 +3516,15 @@ AS EDGE ON [PRIMARY]";
         /// <param name="historyTable">history table</param>
         /// <param name="startColumnIsHidden">is period start column marked as hidden</param>
         /// <param name="endColumnIsHidden">is period end column marked as hidden</param>
-        private void DuplicateTemporalTablePairAndValidate(_SMO.Table currentTable, _SMO.Table historyTable, bool startColumnIsHidden = false, bool endColumnIsHidden = false)
+        private void DuplicateTemporalTablePairAndValidate(Table currentTable, Table historyTable, bool startColumnIsHidden = false, bool endColumnIsHidden = false)
         {
             // script both tables and try to recreate them using different names
             string newHistoryTableName = historyTable.Name + "_NewHist";
             string newCurrentTableName = currentTable.Name + "_NewCurr";
             string primaryKeyName = String.Empty;
 
-            System.Collections.Specialized.StringCollection ddlHistoryTable = historyTable.Script();
-            System.Collections.Specialized.StringCollection ddlCurrentTable = currentTable.Script(new _SMO.ScriptingOptions() { DriAll = true });
+            StringCollection ddlHistoryTable = historyTable.Script();
+            StringCollection ddlCurrentTable = currentTable.Script(new ScriptingOptions() { DriAll = true });
 
             // determine the primary key name for the current table. We have to give
             // a new name for the primary key of the new current table
@@ -3942,7 +3578,7 @@ AS EDGE ON [PRIMARY]";
         /// 9. 'Start column' name must match 'SystemTimePeriodStartColumn' property of a current table
         /// 10. 'End column' name must match 'SystemTimePeriodEndColumn' property of a current table
         /// </summary>
-        private void ValidateSystemVersionedTables(Table current, Table history, bool startColumnIsHidden = false, bool endColumnIsHidden = false, bool isLedger = false)
+        internal static void ValidateSystemVersionedTables(Table current, Table history, bool startColumnIsHidden = false, bool endColumnIsHidden = false, bool isLedger = false)
         {
             Assert.IsTrue(current.HasSystemTimePeriod, "Table should have a period defined.");
             Assert.IsTrue(current.IsSystemVersioned, "Table should be a system-versioned table.");
@@ -3952,8 +3588,8 @@ AS EDGE ON [PRIMARY]";
             Assert.AreEqual(history.ID, current.HistoryTableID, "Invalid history table ID.");
 
             // count generated always columns
-            _SMO.Column sysStart = null;
-            _SMO.Column sysEnd = null;
+            Column sysStart = null;
+            Column sysEnd = null;
 
             Assert.Multiple(() =>
             {
@@ -3998,172 +3634,15 @@ AS EDGE ON [PRIMARY]";
             Assert.AreEqual(sysEnd.Name, current.SystemTimePeriodEndColumn, "Unexpected start column");
         }
 
-        /// <summary>
-        /// This method validates that metadata retrieved by SMO about ledger tables is correct. The following is checked:
-        /// 
-        ///  1. Ledger view properties match ledger table view properties
-        ///  2. History table properties match Ledger table properties
-        ///  3. Ledger Table Type property matches with the table definition
-        ///  4. Ledger History Table Type property is LedgerHistoryTable
-        ///  5. Append only ledger tables do not have a history table
-        ///  6. If the ledger table is also temporal, verifies the temporal properties in ValidateSystemVersionedTables
-        ///  7. All ledger tables must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdStart
-        ///  8. Updatable ledger tables must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdEnd
-        ///  9. All ledger tables must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberStart
-        /// 10. Updatable ledger tables must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberEnd
-        /// 11. All ledger tables have at least one user-defined column
-        /// </summary>
-        /// <param name="current">the current ledger table to be verified</param>
-        /// <param name="history">the history table for the ledger table to be verified (can be null)</param>
-        /// <param name="ledger_view">the view for the ledger table to be verified.</param>
-        /// <param name="systemVersioned">whether the table is system-versioned or append-only</param>
-        /// <param name="temporal">whether the table is temporal or not</param>
-        /// <param name="genAlwaysHidden">whether the generated always columns are hidden</param>
-        private void ValidateLedgerTables(Table current, Table history, View ledger_view, bool systemVersioned, bool temporal, bool genAlwaysHidden)
+        
+
+        private void VerifyTemporalHiddenColumnsInternal(Database database)
         {
+            Table t = new Table(database, "CurrentTable");
 
-            // Validate ledger view properties
-            Assert.AreEqual(current.LedgerViewName, ledger_view.Name, "Invalid ledger view name");
-            Assert.AreEqual(LedgerViewType.LedgerView, ledger_view.LedgerViewType, "Ledger view is not marked as ledger");
-
-            if (systemVersioned)
-            {
-                _UT.Assert.AreEqual(history.Name, current.HistoryTableName, "Invalid history table name");
-                _UT.Assert.AreEqual(history.Schema, current.HistoryTableSchema, "Invalid history table schema");
-                _UT.Assert.AreEqual(history.ID, current.HistoryTableID, "Invalid history table ID");
-                _UT.Assert.AreEqual(LedgerTableType.UpdatableLedgerTable, current.LedgerType, "Invalid ledger table type property");
-                _UT.Assert.AreEqual(LedgerTableType.HistoryTable, history.LedgerType, "Invalid ledger history table type property");
-            }
-            else
-            {
-                Assert.That(history, Is.Null, "Append-only ledger tables do not have a history table");
-                Assert.AreEqual(current.HistoryTableID, 0, "Append-only ledger tables do not have a history table");
-                Assert.AreEqual(LedgerTableType.AppendOnlyLedgerTable, current.LedgerType, "Invalid ledger table type property");
-            }
-
-            if (temporal)
-            {
-                ValidateSystemVersionedTables(current, history, isLedger: true);
-                _UT.Assert.AreEqual(TableTemporalType.SystemVersioned, current.TemporalType, "Invalid temporal type property");
-                _UT.Assert.AreEqual(TableTemporalType.HistoryTable, history.TemporalType, "Invalid temporal history table type property");
-            }
-
-            Column trxStart = null;
-            Column trxEnd = null;
-            Column seqStart = null;
-            Column seqEnd = null;
-            Column userCol = null;
-
-            // Validate columns
-            Assert.Multiple(() =>
-            {
-                // columns collection needs to be reinitialized to include generated always columns that weren't explicitly defined
-                // in table creation
-                current.Columns.ClearAndInitialize("", null);
-
-                foreach (Column c in current.Columns)
-                {
-                    switch (c.GeneratedAlwaysType)
-                    {
-                        case GeneratedAlwaysType.AsTransactionIdStart:
-                            Assert.That(trxStart, Is.Null, $"More than one column marked as 'AsTransactionIdStart'");
-                            trxStart = c;
-                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsTransactionIdStart' generated always column {c.InternalName} must be hidden.");
-                            break;
-                        case GeneratedAlwaysType.AsTransactionIdEnd:
-                            Assert.That(trxEnd, Is.Null, $"More than one column marked as 'AsTransactionIdEnd'");
-                            trxEnd = c;
-                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsTransactionIdEnd' generated always column {c.InternalName} must be hidden.");
-                            break;
-                        case GeneratedAlwaysType.AsSequenceNumberStart:
-                            Assert.That(seqStart, Is.Null, $"More than one column marked as 'AsSequenceNumberStart'");
-                            seqStart = c;
-                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsSequenceNumberStart' generated always column {c.InternalName} must be hidden.");
-                            break;
-                        case GeneratedAlwaysType.AsSequenceNumberEnd:
-                            Assert.That(seqEnd, Is.Null, $"More than one column marked as 'AsSequenceNumberEnd'");
-                            seqEnd = c;
-                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsSequenceNumberEnd' generated always column {c.InternalName} must be hidden.");
-                            break;
-                        case GeneratedAlwaysType.AsRowStart:
-                        case GeneratedAlwaysType.AsRowEnd:
-                            Assert.That(temporal, Is.True, "Only temporal ledger tables have 'AsRowStart' and 'AsRowEnd' columns");
-                            break;
-                        case GeneratedAlwaysType.None:
-                            // assert there's at least one user column
-                            userCol = c;
-                            break;
-                    }
-                }
-            });
-
-            Assert.That(userCol, Is.Not.Null, "Ledger table must have at least one user column defined");
-            Assert.That(trxStart, Is.Not.Null, "Ledger table must have a transaction start column");
-            Assert.That(seqStart, Is.Not.Null, "Ledger table must have a sequence number start column");
-
-            // System versioned ledger tables
-            if (systemVersioned)
-            {
-                Assert.That(trxEnd, Is.Not.Null, "Expected to find end transaction id column in system-versioned ledger table.");
-                Assert.That(seqEnd, Is.Not.Null, "Expected to find end sequence number column in system-versioned ledger table.");
-            }
-        }
-
-        /// <summary>
-        /// Helper for validating ledger table scripting.
-        /// </summary>
-        /// <param name="generatedScript">The script generated for the table</param>
-        /// <param name="systemVersioned">Whether the table is system-versioned or append only</param>
-        /// <param name="temporal">Whether the table is temporal or not</param>
-        private void ValidateLedgerScriptProperties(StringCollection generatedScript, bool systemVersioned, bool temporal)
-        {
-            // ledger specific
-            string LedgerClause = "LEDGER = ON";
-            string LedgerViewClause = "LEDGER_VIEW";
-
-            // append only specific
-            string AppendOnlyClause = "APPEND_ONLY";
-
-            // system versioned specific
-            string SystemVersionedClause = "SYSTEM_VERSIONING";
-            string HistoryTableClause = "HISTORY_TABLE";
-
-            // temporal specific
-            string TemporalPeriodClause = "PERIOD FOR SYSTEM_TIME";
-
-            // first 2 paramaters of the generated script contain "SET ANSI_NULLS ON" "SET QUOTED_IDENTIFIER ON", the third parameter contains the table script
-            //
-            Assert.That(generatedScript[2], Does.Contain(LedgerClause), "Did not find expected scripted setting LEDGER = ON");
-            Assert.That(generatedScript[2], Does.Contain(LedgerViewClause), "Did not find expected scripted setting LEDGER_VIEW");
-            
-            if (systemVersioned)
-            {
-                Assert.That(generatedScript[2], Does.Contain(SystemVersionedClause), "SYSTEM_VERSIONING tag is expected in a system versioned ledger table");
-                Assert.That(generatedScript[2], Does.Contain(HistoryTableClause), "HISTORY_TABLE tag is expected in a system versioned ledger table");
-                Assert.That(generatedScript[2], Does.Not.Contain(AppendOnlyClause), "APPEND_ONLY tag is NOT expected in a system versioned ledger table");
-            }
-            else
-            {
-                Assert.That(generatedScript[2], Does.Contain(AppendOnlyClause), "APPEND_ONLY tag is expected in an append only ledger table");
-                Assert.That(generatedScript[2], Does.Not.Contain(SystemVersionedClause), "SYSTEM_VERSIONING tag is NOT expected in an append only ledger table");
-                Assert.That(generatedScript[2], Does.Not.Contain(TemporalPeriodClause), "PERIOD FOR SYSTEM_TIMNE tag is NOT expected in an append only ledger table");
-                Assert.That(generatedScript[2], Does.Not.Contain(HistoryTableClause), "HISTORY_TABLE tag is NOT expected in an append only ledger table");
-            }
-            if (temporal)
-            {
-                Assert.That(generatedScript[2], Does.Contain(SystemVersionedClause), $"{SystemVersionedClause} SYSTEM_VERSIONING tag is expected in a temporal ledger table");
-                Assert.That(generatedScript[2], Does.Contain(TemporalPeriodClause), "PERIOD FOR SYSTEM_TIME tag is expected in a temporal ledger table");
-                Assert.That(generatedScript[2], Does.Not.Contain(AppendOnlyClause), "APPEND_ONLY tag is NOT expected in a temporal ledger table");
-            }
-        }
-
-        private void VerifyTemporalHiddenColumnsInternal(_SMO.Database database)
-        {
-            _SMO.Table t = new _SMO.Table(database, "CurrentTable");
-
-            _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-            _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-            _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+            Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+            Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+            Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
             t.Columns.Add(c1);
             t.Columns.Add(c2);
@@ -4172,7 +3651,7 @@ AS EDGE ON [PRIMARY]";
             _SMO.Index index = new _SMO.Index(t, "pk_current");
             index.IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey;
 
-            index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+            index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
             t.Indexes.Add(index);
 
             c2.Nullable = false;
@@ -4205,8 +3684,8 @@ AS EDGE ON [PRIMARY]";
             // try to create non-temporal table that has hidden columns
             // should not work
             //
-            _SMO.Table t2 = new _SMO.Table(database, "InvalidTable");
-            _SMO.Column t2_c = new _SMO.Column(t2, "c1", _SMO.DataType.Int);
+            Table t2 = new Table(database, "InvalidTable");
+            Column t2_c = new Column(t2, "c1", _SMO.DataType.Int);
             t2_c.IsHidden = true;
             t2.Columns.Add(t2_c);
 
@@ -4222,7 +3701,7 @@ AS EDGE ON [PRIMARY]";
         /// Adds PERIOD for system time to the given table and validates if the operation's
         /// outcome was as expected
         /// </summary>
-        private void AttemptCreatingPeriod(_SMO.Table t, string startCol, string endCol, bool shouldSucceed, string errorMessage)
+        private void AttemptCreatingPeriod(Table t, string startCol, string endCol, bool shouldSucceed, string errorMessage)
         {
             try
             {
@@ -4232,7 +3711,7 @@ AS EDGE ON [PRIMARY]";
                     _NU.Assert.Fail(String.Format("Adding PERIOD should not have succeeded. Table: {0}, start column: {1}, end column: {2}", t.Name, startCol, endCol));
                 }
             }
-            catch ( _SMO.SmoException e )
+            catch (SmoException e )
             {
                 if ( shouldSucceed )
                 {
@@ -4245,7 +3724,7 @@ AS EDGE ON [PRIMARY]";
         /// DROPs PERIOD for system time and validates if the operation's
         /// outcome was as expected
         /// </summary>
-        private void AttemptDroppingPeriod(_SMO.Table t, bool shouldSucceed, string errorMessage)
+        private void AttemptDroppingPeriod(Table t, bool shouldSucceed, string errorMessage)
         {
             try
             {
@@ -4255,7 +3734,7 @@ AS EDGE ON [PRIMARY]";
                     _NU.Assert.Fail(String.Format("Dropping PERIOD should not succeeded. Table: {0}", t.Name));
                 }
             }
-            catch ( _SMO.SmoException e )
+            catch (SmoException e )
             {
                 if ( shouldSucceed )
                 {
@@ -4268,7 +3747,7 @@ AS EDGE ON [PRIMARY]";
         /// Helper method that validates the existance of a given table on a server
         /// and retrieves various temporal-specific properties if table is found
         /// </summary>
-        private bool GetTableTemporalProperties(string database, string tablename, out bool isSystemVersioned, out int retentionPeriod, out _SMO.TemporalHistoryRetentionPeriodUnit retentionUnit)
+        private bool GetTableTemporalProperties(string database, string tablename, out bool isSystemVersioned, out int retentionPeriod, out TemporalHistoryRetentionPeriodUnit retentionUnit)
         {
             string strTemporalType = "temporal_type";
             string strRetentionPeriod = "history_retention_period";
@@ -4363,15 +3842,15 @@ AS EDGE ON [PRIMARY]";
             return retValue;
         }
 
-        private _SMO.Table CreateSimpleTemporalTable(_SMO.Database db)
+        private Table CreateSimpleTemporalTable(Database db)
         {
-            string primaryKeyName = "PK_temporal_current_" + new System.Random().Next().ToString();
-            string tableName = "CurrentTable_" + new System.Random().Next().ToString();
-            _SMO.Table t = new _SMO.Table(db, tableName);
+            string primaryKeyName = "PK_temporal_current_" + new Random().Next().ToString();
+            string tableName = "CurrentTable_" + new Random().Next().ToString();
+            Table t = new Table(db, tableName);
 
-            _SMO.Column c1 = new _SMO.Column(t, "c1", _SMO.DataType.Int);
-            _SMO.Column c2 = new _SMO.Column(t, "SysStart", _SMO.DataType.DateTime2(5));
-            _SMO.Column c3 = new _SMO.Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
+            Column c1 = new Column(t, "c1", _SMO.DataType.Int);
+            Column c2 = new Column(t, "SysStart", _SMO.DataType.DateTime2(5));
+            Column c3 = new Column(t, "SysEnd", _SMO.DataType.DateTime2(5));
 
             t.Columns.Add(c1);
             t.Columns.Add(c2);
@@ -4380,7 +3859,7 @@ AS EDGE ON [PRIMARY]";
             _SMO.Index index = new _SMO.Index(t, primaryKeyName);
             index.IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey;
 
-            index.IndexedColumns.Add(new _SMO.IndexedColumn(index, "c1"));
+            index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
             t.Indexes.Add(index);
 
             c2.Nullable = false;
@@ -4414,7 +3893,7 @@ AS EDGE ON [PRIMARY]";
                 {
                     ExecuteWithGraphTF(database, () =>
                     {
-                        _SMO.Table table = CreateGraphTable(
+                        Table table = CreateGraphTable(
                             database: database,
                             createTable: true,
                             isNode: true,
@@ -4437,7 +3916,7 @@ AS NODE ON [PRIMARY]
                         //
                         VerifySmoCollectionCount(table.Columns, 3, "The two graph internal columns and the user defined column should be present.");
 
-                        _SMO.Scripter scripter = new _SMO.Scripter(database.Parent);
+                        Scripter scripter = new Scripter(database.Parent);
                         scripter.Options.ScriptData = true;
                         scripter.Options.WithDependencies = true;
                         scripter.Options.ScriptSchema = true;
@@ -4496,13 +3975,13 @@ AS NODE ON [PRIMARY]
                 this.TestContext.FullyQualifiedTestClassName,
                 (database) =>
                 {
-                     if (database.Parent.IsJsonDataTypeEnabled)
+                     if (database.Parent.IsJsonDataTypeEnabled && !database.IsFabricDatabase)
                     { 
                         string jsonString = @"[\
 ]";
                         string queryMatch = @"INSERT \[.*\]\.\[.*\] \(\[jsonColumn\]\) VALUES \(CAST\(N'\[\]' AS Json\)\)";
 
-                        var table = new _SMO.Table(database, "jsonTable");
+                        var table = new _SMO.Table(database, "jsonTable" + Guid.NewGuid().ToString());
                         var jsonColumn = new _SMO.Column(table, "jsonColumn", new _SMO.DataType(_SMO.SqlDataType.Json));
                         table.Columns.Add(jsonColumn);
                         table.Create();
@@ -4552,9 +4031,9 @@ AS NODE ON [PRIMARY]
                 this.TestContext.FullyQualifiedTestClassName,
                 (database) =>
                 {
-                    if (database.Parent.IsJsonDataTypeEnabled && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+                    if (database.Parent.IsJsonDataTypeEnabled && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse && !database.IsFabricDatabase)
                     {
-                        var table = new _SMO.Table(database, "jsonTable");
+                        var table = new _SMO.Table(database, "jsonTable" + Guid.NewGuid().ToString());
                         try
                         {
                             var jsonColumn = new _SMO.Column(table, "jsonColumn", new _SMO.DataType(_SMO.SqlDataType.Json));
@@ -4595,17 +4074,18 @@ AS NODE ON [PRIMARY]
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void When_table_has_sparse_column_HasSparseColumn_is_true()
         {
             ExecuteWithDbDrop(
                 db =>
                 {
-                    var table = new _SMO.Table(db, "myTable");
-                    var sparseColumn = new _SMO.Column(table, "sparseColumn",
-                    new _SMO.DataType(_SMO.SqlDataType.NVarChar, 10)) {IsSparse = true, Nullable = true};
-                    var sparseColumn1 = new _SMO.Column(table, "sparseColumn1",
-                    new _SMO.DataType(_SMO.SqlDataType.NVarChar, 10)) { IsSparse = true, Nullable = true };
-                    var column = new _SMO.Column(table, "normalColumn", new _SMO.DataType(_SMO.SqlDataType.Int))
+                    var table = new Table(db, "myTable");
+                    var sparseColumn = new Column(table, "sparseColumn",
+                    new DataType(_SMO.SqlDataType.NVarChar, 10)) {IsSparse = true, Nullable = true};
+                    var sparseColumn1 = new Column(table, "sparseColumn1",
+                    new DataType(_SMO.SqlDataType.NVarChar, 10)) { IsSparse = true, Nullable = true };
+                    var column = new Column(table, "normalColumn", new DataType(_SMO.SqlDataType.Int))
                     {
                         IsSparse = false,
                         Nullable = false,
@@ -4616,7 +4096,7 @@ AS NODE ON [PRIMARY]
                     table.Columns.Add(column);
                     table.Create();
                     var index = new _SMO.Index(table, "sparseIndex") {IndexType = _SMO.IndexType.NonClusteredIndex};
-                    var indexedColumn = new _SMO.IndexedColumn(index, "sparseColumn");
+                    var indexedColumn = new IndexedColumn(index, "sparseColumn");
                     index.IndexedColumns.Add(indexedColumn);
                     index.Create();
                     _NU.Assert.That(table.HasSparseColumn, _NU.Is.True, "Table should have sparse column");
@@ -4661,7 +4141,7 @@ AS NODE ON [PRIMARY]
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlManagedInstance)]
         public void SmoTable_RowCount_property_is_read_correctly_for_pooled_ServerConnection()
         {
             ExecuteFromDbPool(
@@ -4774,6 +4254,7 @@ GO
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoTable_enable_and_disable_all_indexes()
         {
             ExecuteFromDbPool(db =>
@@ -5269,6 +4750,7 @@ set nocount off;
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoTable_SwitchPartition_supports_all_variations()
         {
             ExecuteFromDbPool(db =>
@@ -5348,7 +4830,7 @@ set nocount off;
 
 
         [TestMethod]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabase)]
         public void SmoTable_DBCC_methods()
         {
             ExecuteFromDbPool(db =>
@@ -5389,6 +4871,7 @@ set nocount off;
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoTable_DataTable_methods()
         {
             ExecuteFromDbPool(db =>
@@ -5430,6 +4913,7 @@ set nocount off;
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         public void SmoTable_Rename()
         {
             ExecuteFromDbPool(db =>
@@ -5471,6 +4955,514 @@ set nocount off;
                 var messages = recorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
                 Assert.That(messages, Has.None.Contains("indexes"), "Should have no index queries during a table or view Create");
             });
+        }
+    }
+
+    [TestClass]
+    [SqlRequiredFeature(SqlFeature.AzureLedger)]
+    public class LedgerTableTests : SqlTestBase
+    {
+        #region Ledger Tests
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerExpectedFailures()
+        {
+            ExecuteFromDbPool(
+                db =>
+                {
+                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
+                    var t = new Table(db, ledgerTableName);
+                    t.Columns.Add(new Column(t, "c1", DataType.Int));
+
+                    // try to create ledger table without LedgerType defined
+                    t.IsLedger = true;
+                    Assert.Throws<FailedOperationException>(t.Create, "LedgerType not set, ledger creation should fail.");
+
+                    // try with system versioned property set as well
+                    t.IsSystemVersioned = true;
+                    Assert.Throws<FailedOperationException>(t.Create, "LedgerType not set, ledger creation should fail.");
+
+                    // try creating a ledger table with a custom view name but no schema defined
+                    t.LedgerType = LedgerTableType.UpdatableLedgerTable;
+                    t.LedgerViewName = "test_view_name";
+                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view name is specified, so too must be the ledger view schema");
+
+                    // try creating a ledger table with a custom view schema but no view name defined
+                    t.LedgerViewName = string.Empty;
+                    t.LedgerViewSchema = "test_schema";
+                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view schema is specified, so too must be the ledger view name");
+
+                    // try creating a ledger table with a custom view column name but the view itself not named
+                    t.LedgerViewSchema = string.Empty;
+                    t.LedgerViewOperationTypeColumnName = "col_name";
+                    Assert.Throws<FailedOperationException>(t.Create, "If ledger view name is not specified, neither can the ledger view column names be");
+                }
+            );
+        }
+
+        [DataTestMethod]
+        [DataRow(false, false, false, false, false)]    // append-only, no optional definitions
+        [DataRow(false, false, true, false, false)]     // append-only, define view
+        [DataRow(false, false, true, false, true)]      // append-only, define view with different schema
+        [DataRow(false, false, true, true, false)]      // append-only, define view with view columns
+        [DataRow(false, false, true, true, true)]       // append-only, define view with view columns and different schema
+        [DataRow(true, false, false, false, false)]     // updatable, no optional definitions
+        [DataRow(true, false, true, false, false)]      // updatable, define view
+        [DataRow(true, false, true, false, true)]       // updatable, define view with different schema
+        [DataRow(true, false, true, true, false)]       // updatable, define view with view columns
+        [DataRow(true, false, true, true, true)]        // updatable, define view with view columns and different schema
+        [DataRow(true, true, false, false, false)]      // updatable, define history table
+        [DataRow(true, true, false, false, true)]       // updatable, define history table with different schema
+        [DataRow(true, true, true, true, true)]         // updatable, define history table and view with view columns and different schema
+        public void SmoTable_LedgerTableScripting(bool systemVersioned, bool defineHistoryTable, bool defineLedgerView, bool defineLedgerViewColumns, bool differentSchema)
+        {
+            ExecuteFromDbPool(
+                db =>
+                {
+                    var s = new Schema(db, SmoObjectHelpers.GenerateUniqueObjectName("ledger_schema"));
+                    s.Create();
+
+                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
+                    var t = new Table(db, ledgerTableName);
+
+                    t.Columns.Add(new Column(t, "c1", DataType.Char(10)));
+
+                    t.IsLedger = true;
+                    t.IsSystemVersioned = systemVersioned;
+                    t.LedgerType = systemVersioned ? LedgerTableType.UpdatableLedgerTable : LedgerTableType.AppendOnlyLedgerTable;
+
+                    if (defineHistoryTable)
+                    {
+                        t.HistoryTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_history");
+                        t.HistoryTableSchema = differentSchema ? s.Name : t.Schema;
+                    }
+
+                    if (defineLedgerView)
+                    {
+                        t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
+                        t.LedgerViewSchema = differentSchema ? s.Name : t.Schema;
+                    }
+
+                    if (defineLedgerViewColumns && defineLedgerView)
+                    {
+                        t.LedgerViewTransactionIdColumnName = "trans_id_col_name";
+                        t.LedgerViewSequenceNumberColumnName = "seq_num_col_name";
+                        t.LedgerViewOperationTypeColumnName = "op_type_col_name";
+                        t.LedgerViewOperationTypeDescColumnName = "op_type_desc_col_name";
+                    }
+
+                    // create the table
+                    t.Create();
+
+                    var t_fields = new string[] {
+                        nameof(Table.LedgerType),
+                        nameof(Table.LedgerViewName),
+                        nameof(Table.LedgerViewSchema),
+                        nameof(Table.IsDroppedLedgerTable),
+                        nameof(Table.LedgerViewTransactionIdColumnName),
+                        nameof(Table.LedgerViewSequenceNumberColumnName),
+                        nameof(Table.LedgerViewOperationTypeColumnName),
+                        nameof(Table.LedgerViewOperationTypeDescColumnName),
+                        nameof(Table.HistoryTableName),
+                        nameof(Table.HistoryTableSchema)};
+                    db.Tables.ClearAndInitialize("", t_fields);
+
+                    var tab = db.Tables[ledgerTableName];
+                    var view = db.Views[tab.LedgerViewName, tab.LedgerViewSchema];
+
+                    // Set the expected script based on the inputs
+                    var systemVersionedScript =
+                        systemVersioned
+                        ? $"SYSTEM_VERSIONING = ON (HISTORY_TABLE = [{SqlSmoObject.EscapeString(tab.HistoryTableSchema, ']')}].[{SqlSmoObject.EscapeString(tab.HistoryTableName, ']')}]), {Environment.NewLine}"
+                        : string.Empty;
+
+                    var appendOnlyScript = !systemVersioned ? $"APPEND_ONLY = ON, " : string.Empty;
+
+                    // set generated always columns for the table
+                    var generatedAlwaysColumns = string.Empty;
+                    if (systemVersioned)
+                    {
+                        // add all 4 expected generated always columns for updatable
+                        generatedAlwaysColumns =
+                            $"\t[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,{Environment.NewLine}" +
+                            $"\t[ledger_end_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id END HIDDEN NULL,{Environment.NewLine}" +
+                            $"\t[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL,{Environment.NewLine}" +
+                            $"\t[ledger_end_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number END HIDDEN NULL{Environment.NewLine}";
+                    }
+                    else
+                    {
+                        // add the 2 start generated always columns for append-only
+                        generatedAlwaysColumns =
+                            $"\t[ledger_start_transaction_id] [bigint] GENERATED ALWAYS AS transaction_id START HIDDEN NOT NULL,{Environment.NewLine}" +
+                            $"\t[ledger_start_sequence_number] [bigint] GENERATED ALWAYS AS sequence_number START HIDDEN NOT NULL{Environment.NewLine}";
+                    }
+
+                    var expectedScript = new string[]
+                    {
+                        "SET ANSI_NULLS ON",
+                        "SET QUOTED_IDENTIFIER ON",
+                        $"CREATE TABLE [{tab.Schema}].[{SqlSmoObject.EscapeString(tab.Name, ']')}]({Environment.NewLine}" +
+                        $"\t[c1] [char](10) COLLATE {db.Collation} NULL,{Environment.NewLine}" +
+                        generatedAlwaysColumns +
+                        $") ON [PRIMARY]{Environment.NewLine}WITH{Environment.NewLine}({Environment.NewLine}" +
+                        systemVersionedScript +
+                        $"LEDGER = ON ({appendOnlyScript}LEDGER_VIEW = [{SqlSmoObject.EscapeString(tab.LedgerViewSchema, ']')}].[{SqlSmoObject.EscapeString(tab.LedgerViewName, ']')}] (" +
+                        $"TRANSACTION_ID_COLUMN_NAME = [{tab.LedgerViewTransactionIdColumnName}], " +
+                        $"SEQUENCE_NUMBER_COLUMN_NAME = [{tab.LedgerViewSequenceNumberColumnName}], " +
+                        $"OPERATION_TYPE_COLUMN_NAME = [{tab.LedgerViewOperationTypeColumnName}], " +
+                        $"OPERATION_TYPE_DESC_COLUMN_NAME = [{tab.LedgerViewOperationTypeDescColumnName}]" +
+                        $")){Environment.NewLine}){Environment.NewLine}"
+                    };
+                    var generatedScript = tab.Script();
+                    Assert.That(expectedScript, _NU.Is.EqualTo(generatedScript));
+                }
+            );
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerAppendOnly()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: false, temporal: false);
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerAppendOnlyWithOptionalColumnsDefined()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: false, temporal: false, defineOptionalColumns: true);
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerSystemVersioned()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: false);
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerSystemVersionedWithOptionalColumnsDefined()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: false, defineOptionalColumns: true);
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerTemporal()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true);
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerTemporalWithOptionalColumnsDefined()
+        {
+            CreateAndVerifyLedgerTable(systemVersioned: true, temporal: true, defineOptionalColumns: true);
+        }
+
+        [TestMethod]
+        public void SmoTable_CreateLedgerHistoryTable()
+        {
+            ExecuteFromDbPool(
+               db =>
+               {
+                   var table = new Table(db, "historytable") { LedgerType = LedgerTableType.HistoryTable };
+                   var c1 = new Column(table, "c1", DataType.Int);
+                   table.Columns.Add(c1);
+
+                   // Verify that ledger history table can't be created.
+                   Assert.Throws<FailedOperationException>(table.Create, "Ledger history table can't be created.");
+               });
+        }
+
+        private void CreateAndVerifyLedgerTable(bool systemVersioned, bool temporal, bool defineOptionalColumns = false)
+        {
+            ExecuteFromDbPool(
+                db =>
+                {
+                    Assert.That(temporal && !systemVersioned, Is.False, "temporal and append only are incompatible ledger types");
+
+                    string ledgerTableName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_table");
+                    var t = new Table(db, ledgerTableName);
+
+                    var c1 = new Column(t, "c1", DataType.Int);
+                    t.Columns.Add(c1);
+
+                    // generated always columns that exist no matter what type of ledger table you have
+                    if (defineOptionalColumns)
+                    {
+                        var c2 = new Column(t, "TransactionStart", DataType.BigInt) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsTransactionIdStart };
+                        var c3 = new Column(t, "SequenceStart", DataType.BigInt) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsSequenceNumberStart };
+                        t.Columns.Add(c2);
+                        t.Columns.Add(c3);
+                    }
+
+                    // LEDGER = ON cannot be specified with PERIOD FOR SYSTEM_TIME and APPEND_ONLY = ON
+                    // APPEND_ONLY = ON cannot be specified with generated always end columns
+                    //
+                    if (systemVersioned)
+                    {
+                        // System-versioned ledger tables can either be temporal or not. The difference in definition
+                        // is whether a period for system time and the SysStart and SysEnd columns are defined
+                        //
+                        if (temporal)
+                        {
+                            var c4 = new Column(t, "SysStart", DataType.DateTime2(5)) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsRowStart };
+                            var c5 = new Column(t, "SysEnd", DataType.DateTime2(5)) { Nullable = false, GeneratedAlwaysType = GeneratedAlwaysType.AsRowEnd };
+                            t.Columns.Add(c4);
+                            t.Columns.Add(c5);
+                            t.AddPeriodForSystemTime(periodStartColumn: c4.Name, periodEndColumn: c5.Name, addPeriod: true);
+
+                            string primaryKeyName = SmoObjectHelpers.GenerateUniqueObjectName("pk_ledger_table");
+                            var index = new _SMO.Index(t, primaryKeyName) { IndexKeyType = IndexKeyType.DriPrimaryKey };
+                            index.IndexedColumns.Add(new IndexedColumn(index, "c1"));
+                            t.Indexes.Add(index);
+                            t.DataConsistencyCheck = true;
+                        }
+
+                        // TransactionStart & SequenceStart are NOT Null columns
+                        // TransactionEnd & SequenceEnd can be NULL
+                        //
+                        if (defineOptionalColumns)
+                        {
+                            var c6 = new Column(t, "TransactionEnd", DataType.BigInt) { Nullable = true, GeneratedAlwaysType = GeneratedAlwaysType.AsTransactionIdEnd };
+                            var c7 = new Column(t, "SequenceEnd", DataType.BigInt) { Nullable = true, GeneratedAlwaysType = GeneratedAlwaysType.AsSequenceNumberEnd };
+                            t.Columns.Add(c6);
+                            t.Columns.Add(c7);
+                        }
+
+                        t.IsSystemVersioned = true;
+                        t.LedgerType = LedgerTableType.UpdatableLedgerTable;
+                    }
+                    else
+                    {
+                        // Append-only ledger tables have system versioning turned off
+                        //
+                        t.IsSystemVersioned = false;
+                        t.LedgerType = LedgerTableType.AppendOnlyLedgerTable;
+                    }
+
+                    t.IsLedger = true;
+                    t.LedgerViewName = SmoObjectHelpers.GenerateUniqueObjectName("ledger_view");
+                    t.LedgerViewSchema = t.Schema;
+                    if (defineOptionalColumns)
+                    {
+                        t.LedgerViewTransactionIdColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewTransactionIdColumnName");
+                        t.LedgerViewSequenceNumberColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewSequenceNumberColumnName");
+                        t.LedgerViewOperationTypeColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeColumnName");
+                        t.LedgerViewOperationTypeDescColumnName = SmoObjectHelpers.GenerateUniqueObjectName("LedgerViewOperationTypeDescColumnName");
+                    }
+
+                    t.Create();
+
+                    var t_fields = new string[] {
+                        nameof(Table.LedgerType),
+                        nameof(Table.LedgerViewName),
+                        nameof(Table.LedgerViewSchema),
+                        nameof(Table.IsDroppedLedgerTable),
+                        nameof(Table.LedgerViewTransactionIdColumnName),
+                        nameof(Table.LedgerViewSequenceNumberColumnName),
+                        nameof(Table.LedgerViewOperationTypeColumnName),
+                        nameof(Table.LedgerViewOperationTypeDescColumnName) };
+                    db.Tables.ClearAndInitialize("", t_fields);
+
+                    var v_fields = new string[] { nameof(View.LedgerViewType), nameof(View.IsDroppedLedgerView) };
+                    db.Views.ClearAndInitialize("", v_fields);
+
+                    var tab = db.Tables[ledgerTableName];
+
+                    // Default history table can't be given for ledger, we need to determine which one got auto-created
+                    //
+                    var t_history = db.Tables[tab.HistoryTableName, tab.HistoryTableSchema];
+                    var l_view = db.Views[tab.LedgerViewName, tab.LedgerViewSchema];
+
+                    int l_view_id = l_view.ID;
+                    int table_id = t.ID;
+
+                    // Validate metadata stuff is propagated to SMO correctly
+                    // if the optional columns aren't defined, they are defaulted to hidden, which is checked as well
+                    //
+                    ValidateLedgerTables(current: tab, history: t_history, ledger_view: l_view, systemVersioned, temporal, !defineOptionalColumns);
+
+                    ValidateLedgerScriptProperties(tab.Script(), systemVersioned, temporal);
+
+                    t.Drop();
+                    db.Tables.ClearAndInitialize("", t_fields);
+                    db.Views.ClearAndInitialize("", v_fields);
+
+                    // get the dropped ledger table
+                    var dropped_ledger = db.Tables.ItemById(table_id);
+                    Assert.That(dropped_ledger.IsDroppedLedgerTable, Is.True, "Table should be marked as a dropped ledger table");
+                    Assert.That(dropped_ledger.Name, Does.Contain("MSSQL_DroppedLedgerTable"), "Table name should have been updated to include dropped identifier");
+
+                    // get the dropped ledger view
+                    var dropped_ledger_view = db.Views.ItemById(l_view_id);
+                    Assert.That(dropped_ledger_view.IsDroppedLedgerView, Is.True, "View should be marked as a dropped ledger view");
+                    Assert.That(dropped_ledger_view.Name, Does.Contain("MSSQL_DroppedLedgerView"), "View name should have been updated to include dropped identifier");
+
+                    // get the dropped ledger history table
+                    if (systemVersioned)
+                    {
+                        var dropped_history = db.Tables.ItemById(dropped_ledger.HistoryTableID);
+                        Assert.That(dropped_history.Name, Does.Contain("MSSQL_DroppedLedgerHistory"), "History table name should have been updated to include dropped identifier");
+                    }
+                }
+            );
+        }
+
+        #endregion
+        /// <summary>
+        /// This method validates that metadata retrieved by SMO about ledger tables is correct. The following is checked:
+        /// 
+        ///  1. Ledger view properties match ledger table view properties
+        ///  2. History table properties match Ledger table properties
+        ///  3. Ledger Table Type property matches with the table definition
+        ///  4. Ledger History Table Type property is LedgerHistoryTable
+        ///  5. Append only ledger tables do not have a history table
+        ///  6. If the ledger table is also temporal, verifies the temporal properties in ValidateSystemVersionedTables
+        ///  7. All ledger tables must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdStart
+        ///  8. Updatable ledger tables must have one and only one column that has property GeneratedAlwaysType = AsTransactionIdEnd
+        ///  9. All ledger tables must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberStart
+        /// 10. Updatable ledger tables must have one and only one column that has property GeneratedAlwaysType = AsSequenceNumberEnd
+        /// 11. All ledger tables have at least one user-defined column
+        /// </summary>
+        /// <param name="current">the current ledger table to be verified</param>
+        /// <param name="history">the history table for the ledger table to be verified (can be null)</param>
+        /// <param name="ledger_view">the view for the ledger table to be verified.</param>
+        /// <param name="systemVersioned">whether the table is system-versioned or append-only</param>
+        /// <param name="temporal">whether the table is temporal or not</param>
+        /// <param name="genAlwaysHidden">whether the generated always columns are hidden</param>
+        private void ValidateLedgerTables(Table current, Table history, View ledger_view, bool systemVersioned, bool temporal, bool genAlwaysHidden)
+        {
+
+            // Validate ledger view properties
+            Assert.AreEqual(current.LedgerViewName, ledger_view.Name, "Invalid ledger view name");
+            Assert.AreEqual(LedgerViewType.LedgerView, ledger_view.LedgerViewType, "Ledger view is not marked as ledger");
+
+            if (systemVersioned)
+            {
+                _UT.Assert.AreEqual(history.Name, current.HistoryTableName, "Invalid history table name");
+                _UT.Assert.AreEqual(history.Schema, current.HistoryTableSchema, "Invalid history table schema");
+                _UT.Assert.AreEqual(history.ID, current.HistoryTableID, "Invalid history table ID");
+                _UT.Assert.AreEqual(LedgerTableType.UpdatableLedgerTable, current.LedgerType, "Invalid ledger table type property");
+                _UT.Assert.AreEqual(LedgerTableType.HistoryTable, history.LedgerType, "Invalid ledger history table type property");
+            }
+            else
+            {
+                Assert.That(history, Is.Null, "Append-only ledger tables do not have a history table");
+                Assert.AreEqual(current.HistoryTableID, 0, "Append-only ledger tables do not have a history table");
+                Assert.AreEqual(LedgerTableType.AppendOnlyLedgerTable, current.LedgerType, "Invalid ledger table type property");
+            }
+
+            if (temporal)
+            {
+                Table_SmoTestSuite.ValidateSystemVersionedTables(current, history, isLedger: true);
+                _UT.Assert.AreEqual(TableTemporalType.SystemVersioned, current.TemporalType, "Invalid temporal type property");
+                _UT.Assert.AreEqual(TableTemporalType.HistoryTable, history.TemporalType, "Invalid temporal history table type property");
+            }
+
+            Column trxStart = null;
+            Column trxEnd = null;
+            Column seqStart = null;
+            Column seqEnd = null;
+            Column userCol = null;
+
+            // Validate columns
+            Assert.Multiple(() =>
+            {
+                // columns collection needs to be reinitialized to include generated always columns that weren't explicitly defined
+                // in table creation
+                current.Columns.ClearAndInitialize("", null);
+
+                foreach (Column c in current.Columns)
+                {
+                    switch (c.GeneratedAlwaysType)
+                    {
+                        case GeneratedAlwaysType.AsTransactionIdStart:
+                            Assert.That(trxStart, Is.Null, $"More than one column marked as 'AsTransactionIdStart'");
+                            trxStart = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsTransactionIdStart' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsTransactionIdEnd:
+                            Assert.That(trxEnd, Is.Null, $"More than one column marked as 'AsTransactionIdEnd'");
+                            trxEnd = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsTransactionIdEnd' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsSequenceNumberStart:
+                            Assert.That(seqStart, Is.Null, $"More than one column marked as 'AsSequenceNumberStart'");
+                            seqStart = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsSequenceNumberStart' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsSequenceNumberEnd:
+                            Assert.That(seqEnd, Is.Null, $"More than one column marked as 'AsSequenceNumberEnd'");
+                            seqEnd = c;
+                            Assert.AreEqual(c.IsHidden, genAlwaysHidden, $"'AsSequenceNumberEnd' generated always column {c.InternalName} must be hidden.");
+                            break;
+                        case GeneratedAlwaysType.AsRowStart:
+                        case GeneratedAlwaysType.AsRowEnd:
+                            Assert.That(temporal, Is.True, "Only temporal ledger tables have 'AsRowStart' and 'AsRowEnd' columns");
+                            break;
+                        case GeneratedAlwaysType.None:
+                            // assert there's at least one user column
+                            userCol = c;
+                            break;
+                    }
+                }
+            });
+
+            Assert.That(userCol, Is.Not.Null, "Ledger table must have at least one user column defined");
+            Assert.That(trxStart, Is.Not.Null, "Ledger table must have a transaction start column");
+            Assert.That(seqStart, Is.Not.Null, "Ledger table must have a sequence number start column");
+
+            // System versioned ledger tables
+            if (systemVersioned)
+            {
+                Assert.That(trxEnd, Is.Not.Null, "Expected to find end transaction id column in system-versioned ledger table.");
+                Assert.That(seqEnd, Is.Not.Null, "Expected to find end sequence number column in system-versioned ledger table.");
+            }
+        }
+
+        /// <summary>
+        /// Helper for validating ledger table scripting.
+        /// </summary>
+        /// <param name="generatedScript">The script generated for the table</param>
+        /// <param name="systemVersioned">Whether the table is system-versioned or append only</param>
+        /// <param name="temporal">Whether the table is temporal or not</param>
+        private void ValidateLedgerScriptProperties(StringCollection generatedScript, bool systemVersioned, bool temporal)
+        {
+            // ledger specific
+            string LedgerClause = "LEDGER = ON";
+            string LedgerViewClause = "LEDGER_VIEW";
+
+            // append only specific
+            string AppendOnlyClause = "APPEND_ONLY";
+
+            // system versioned specific
+            string SystemVersionedClause = "SYSTEM_VERSIONING";
+            string HistoryTableClause = "HISTORY_TABLE";
+
+            // temporal specific
+            string TemporalPeriodClause = "PERIOD FOR SYSTEM_TIME";
+
+            // first 2 paramaters of the generated script contain "SET ANSI_NULLS ON" "SET QUOTED_IDENTIFIER ON", the third parameter contains the table script
+            //
+            Assert.That(generatedScript[2], Does.Contain(LedgerClause), "Did not find expected scripted setting LEDGER = ON");
+            Assert.That(generatedScript[2], Does.Contain(LedgerViewClause), "Did not find expected scripted setting LEDGER_VIEW");
+
+            if (systemVersioned)
+            {
+                Assert.That(generatedScript[2], Does.Contain(SystemVersionedClause), "SYSTEM_VERSIONING tag is expected in a system versioned ledger table");
+                Assert.That(generatedScript[2], Does.Contain(HistoryTableClause), "HISTORY_TABLE tag is expected in a system versioned ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(AppendOnlyClause), "APPEND_ONLY tag is NOT expected in a system versioned ledger table");
+            }
+            else
+            {
+                Assert.That(generatedScript[2], Does.Contain(AppendOnlyClause), "APPEND_ONLY tag is expected in an append only ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(SystemVersionedClause), "SYSTEM_VERSIONING tag is NOT expected in an append only ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(TemporalPeriodClause), "PERIOD FOR SYSTEM_TIMNE tag is NOT expected in an append only ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(HistoryTableClause), "HISTORY_TABLE tag is NOT expected in an append only ledger table");
+            }
+            if (temporal)
+            {
+                Assert.That(generatedScript[2], Does.Contain(SystemVersionedClause), $"{SystemVersionedClause} SYSTEM_VERSIONING tag is expected in a temporal ledger table");
+                Assert.That(generatedScript[2], Does.Contain(TemporalPeriodClause), "PERIOD FOR SYSTEM_TIME tag is expected in a temporal ledger table");
+                Assert.That(generatedScript[2], Does.Not.Contain(AppendOnlyClause), "APPEND_ONLY tag is NOT expected in a temporal ledger table");
+            }
         }
     }
 }

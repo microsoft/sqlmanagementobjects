@@ -115,6 +115,7 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
         }
 
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
         /// <summary>
         /// Regression test for https://github.com/microsoft/sqlmanagementobjects/issues/123
         /// </summary>
@@ -123,7 +124,7 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
             ExecuteWithDbDrop(db =>
             {
                 var table = db.CreateTable("markfordrop", new[] {
-                    new ColumnProperties("col1"), new ColumnProperties("col2") });
+                    new ColumnProperties("col1") { Nullable  = false }, new ColumnProperties("col2") { Nullable  = false } });
                 table.Columns["col1"].MarkForDrop(true);
                 table.Alter();
                 table.Columns.ClearAndInitialize(string.Empty, Enumerable.Empty<string>());

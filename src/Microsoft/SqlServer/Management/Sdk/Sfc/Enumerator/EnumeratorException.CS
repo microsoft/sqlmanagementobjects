@@ -1,19 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+using System;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Runtime.Serialization;
-
     /// <summary>
     /// base class for all enumerator exceptions
     /// </summary>
     [ComVisible(false)]
     [Serializable]
 
-    public class EnumeratorException : Microsoft.SqlServer.Management.Common.SqlServerManagementException
+    public class EnumeratorException : Common.SqlServerManagementException
     {
         /// <summary>
         /// TODO
@@ -36,6 +36,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
         }
 
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -43,7 +44,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(info, context)
         {
         }
-    
+#endif
         /// <summary>
         /// TODO
         /// </summary>
@@ -86,7 +87,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 1;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -95,6 +96,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 1;
         }
+#endif
     }
 
     /// <summary>
@@ -127,7 +129,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 2;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -136,6 +138,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 2;
         }
+#endif
     }
 
     /// <summary>
@@ -168,7 +171,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 3;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -177,6 +180,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 3;
         }
+#endif
     }
 
     /// <summary>
@@ -209,7 +213,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 4;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -218,6 +222,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 4;
         }
+#endif
     }
 
     /// <summary>
@@ -268,7 +273,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.HResult = 5;
             m_type = type.ToString();
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -278,7 +283,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.HResult = 5;
             m_type = info.GetString("m_type");
         }
-        
+#endif
         /// <summary>
         /// TODO
         /// </summary>
@@ -321,7 +326,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 7;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -330,6 +335,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 7;
         }
+#endif
     }
 
     /// <summary>
@@ -362,7 +368,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 8;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -371,7 +377,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 8;
         }
-        
+#endif
         /// <summary>
         /// TODO
         /// </summary>
@@ -424,7 +430,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 9;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -433,7 +439,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 9;
         }
-        
+#endif
     }
 
     /// <summary>
@@ -466,7 +472,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 10;
         }
-
+#if !NETCOREAPP
         /// <summary>
         /// TODO
         /// </summary>
@@ -475,5 +481,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 10;
         }
+#endif
     }
 }

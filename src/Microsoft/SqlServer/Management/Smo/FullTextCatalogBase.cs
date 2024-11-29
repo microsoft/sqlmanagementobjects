@@ -134,13 +134,13 @@ namespace Microsoft.SqlServer.Management.Smo
             Property property;
 
             // Target version >= 9
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 // CREATE FULLTEXT CATALOG <catalog_name>
                 sb.AppendFormat(SmoApplication.DefaultCulture, "CREATE FULLTEXT CATALOG {0} ", fullName);
 
                 // ON FILEGROUP <filegroup>
-                if (sp.TargetServerVersionInternal == SqlServerVersionInternal.Version90)
+                if (sp.TargetServerVersion == SqlServerVersion.Version90)
                 {
                     if (ServerVersion.Major >= 9 &&
                     sp.Storage.FileGroup)
@@ -224,7 +224,7 @@ namespace Microsoft.SqlServer.Management.Smo
             bool altered = false;
 
             // Target version >= 9
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90 && ServerVersion.Major >= 9)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90 && ServerVersion.Major >= 9)
             {
                 // For now, only one property, Owner, is supported by this method.
                 // If adding more properties, put them in front of Owner and
@@ -301,7 +301,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // Target version < 9
-            if (sp.TargetServerVersionInternal < SqlServerVersionInternal.Version90) // pre-Yukon server
+            if (sp.TargetServerVersion < SqlServerVersion.Version90) // pre-Yukon server
             {
                 sb.Length = 0; // Reset the content
 
@@ -327,7 +327,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // Target version >= 9
-            if (sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, "DROP FULLTEXT CATALOG {0}", fullName);
             }

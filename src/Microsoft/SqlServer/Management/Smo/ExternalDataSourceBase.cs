@@ -210,6 +210,8 @@ namespace Microsoft.SqlServer.Management.Smo
             const string CredentialPropertyName = nameof(Credential);
             const string DatabaseNamePropertyName = nameof(DatabaseName);
             const string ShardMapNamePropertyName = nameof(ShardMapName);
+            const string ConnectionOptionsPropertyName = nameof(ConnectionOptions);
+            const string PushdownOptionPropertyName = nameof(PushdownOption);
 
             // check SQL Server version supports external data source
             this.ThrowIfNotSupported(typeof(ExternalDataSource), sp);
@@ -356,45 +358,30 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            // check if the Credential property is supported and set, then add it to the script
-            if (IsSupportedProperty(CredentialPropertyName, sp))
-            {
-                if (!this.GetPropertyOptional(CredentialPropertyName).IsNull)
-                {
-                    string credential = Convert.ToString(this.GetPropValueOptional(CredentialPropertyName), SmoApplication.DefaultCulture);
-                    if (!string.IsNullOrEmpty(credential))
-                    {
-                        sb.Append(", ");
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "CREDENTIAL = {0}", MakeSqlBraket(credential));
-                    }
-                }
-            }
+            var appendComma = true;
+            AppendNamedPropertyToScript(sb, CredentialPropertyName, "CREDENTIAL", sp, ref appendComma);
 
-            if (IsSupportedProperty(DatabaseNamePropertyName, sp))
-            {
-                Property databaseNameProperty = this.GetPropertyOptional(DatabaseNamePropertyName);
-                if (!databaseNameProperty.IsNull)
-                {
-                    string databaseName = Convert.ToString(databaseNameProperty.Value, SmoApplication.DefaultCulture);
-                    if (!string.IsNullOrEmpty(databaseName))
-                    {
-                        sb.Append(", ");
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "DATABASE_NAME = {0}", Util.MakeSqlString(databaseName));
-                    }
-                }
-            }
+            AppendStringPropertyToScript(sb, DatabaseNamePropertyName, "DATABASE_NAME", sp, ref appendComma);
 
-            if (IsSupportedProperty(ShardMapNamePropertyName, sp))
+            AppendStringPropertyToScript(sb, ShardMapNamePropertyName, "SHARD_MAP_NAME", sp, ref appendComma);
+
+            AppendStringPropertyToScript(sb, ConnectionOptionsPropertyName, "CONNECTION_OPTIONS", sp, ref appendComma);
+
+            if (IsSupportedProperty(PushdownOptionPropertyName, sp)
+                && !GetPropertyOptional(PushdownOptionPropertyName).IsNull)
             {
-                Property shardMapNameProperty = this.GetPropertyOptional(ShardMapNamePropertyName);
-                if (!shardMapNameProperty.IsNull)
+                var pushdownOption = (ExternalDataSourcePushdownOption)GetPropValueOptional(PushdownOptionPropertyName);
+                if (!Enum.IsDefined(typeof(ExternalDataSourcePushdownOption), pushdownOption))
                 {
-                    string shardMapName = Convert.ToString(shardMapNameProperty.Value, SmoApplication.DefaultCulture);
-                    if (!string.IsNullOrEmpty(shardMapName))
-                    {
-                        sb.Append(", ");
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "SHARD_MAP_NAME = {0}", Util.MakeSqlString(shardMapName));
-                    }
+                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(pushdownOption.ToString()));
+                }
+                // The default pushdown option is ON, so only script it out if it's different
+                // from the default
+                if (pushdownOption != ExternalDataSourcePushdownOption.On)
+                {
+                    var pushdownConverter = SmoManagementUtil.GetTypeConverter(typeof(ExternalDataSourcePushdownOption));
+                    var pushdownStr = pushdownConverter.ConvertToInvariantString(pushdownOption);
+                    sb.Append($", PUSHDOWN = {pushdownStr}");
                 }
             }
 
@@ -422,19 +409,18 @@ namespace Microsoft.SqlServer.Management.Smo
              * [LOCATION = 'protocol:ip_address:port']
              * ,[RESOURCE_MANAGER_LOCATION = 'ip_address:port']
              * ,[CREDENTIAL = 'credential']
+             * ,[CONNECTION_OPTIONS = 'connection_options']
+             * ,[PUSHDOWN = { ON | OFF }]
              */
 
-            const string DataSourceTypePropertyName = "DataSourceType";
-            const string LocationPropertyName = "Location";
-            const string ResourceManagerLocationPropertyName = "ResourceManagerLocation";
-            const string CredentialPropertyName = "Credential";
-            const string DatabaseNamePropertyName = "DatabaseName";
-            const string ShardMapNamePropertyName = "ShardMapName";
-
-            string location = string.Empty;
-            string resourceManagerLocation = string.Empty;
-            string credential = string.Empty;
-            bool addComma = false;
+            const string DataSourceTypePropertyName = nameof(DataSourceType);
+            const string LocationPropertyName = nameof(Location);
+            const string ResourceManagerLocationPropertyName = nameof(ResourceManagerLocation);
+            const string CredentialPropertyName = nameof(Credential);
+            const string DatabaseNamePropertyName = nameof(DatabaseName);
+            const string ShardMapNamePropertyName = nameof(ShardMapName);
+            const string ConnectionOptionsPropertyName = nameof(ConnectionOptions);
+            const string PushdownOptionPropertyName = nameof(PushdownOption);
 
             // check SQL Server version supports external data source
             this.ThrowIfNotSupported(typeof(ExternalDataSource), sp);
@@ -503,57 +489,52 @@ namespace Microsoft.SqlServer.Management.Smo
             sb.AppendFormat(SmoApplication.DefaultCulture,
                 "ALTER EXTERNAL DATA SOURCE {0} SET ", fullyFormattedName);
 
-            // check if the Location property is supported and set, then add it to the script
-            if (IsSupportedProperty(LocationPropertyName, sp))
-            {
-                Property locationProperty = this.GetPropertyOptional(LocationPropertyName);
-                if (!locationProperty.IsNull)
-                {
-                    location = Convert.ToString(this.GetPropValueOptional(LocationPropertyName), SmoApplication.DefaultCulture);
-                    if (!string.IsNullOrEmpty(location))
-                    {
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "LOCATION = {0}", Util.MakeSqlString(location));
-                        addComma = true;
-                    }
-                }
-            }
-            
+            var addComma = false;
+            var location = AppendStringPropertyToScript(sb, LocationPropertyName, "LOCATION", sp, ref addComma);
+
             // check if the ResourceManagerLocation property is supported and set, then add it to the script
-            if (IsSupportedProperty(ResourceManagerLocationPropertyName, sp))
+            var resourceManagerLocation = string.Empty;
+            if (IsSupportedProperty(ResourceManagerLocationPropertyName, sp)
+                && !GetPropertyOptional(ResourceManagerLocationPropertyName).IsNull)
             {
-                if (!this.GetPropertyOptional(ResourceManagerLocationPropertyName).IsNull)
+                resourceManagerLocation = Convert.ToString(this.GetPropValueOptional(ResourceManagerLocationPropertyName), SmoApplication.DefaultCulture);
+                if (!string.IsNullOrEmpty(resourceManagerLocation))
                 {
-                    resourceManagerLocation = Convert.ToString(this.GetPropValueOptional(ResourceManagerLocationPropertyName), SmoApplication.DefaultCulture);
-                    if (!string.IsNullOrEmpty(resourceManagerLocation))
-                    {
-                        ValidateResourceManagerLocation(resourceManagerLocation, location);
+                    ValidateResourceManagerLocation(resourceManagerLocation, location);
                         
-                        if (addComma)
-                        {
-                            sb.Append(", ");
-                        }
-
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "RESOURCE_MANAGER_LOCATION = {0}", Util.MakeSqlString(resourceManagerLocation));
-                        addComma = true;
+                    if (addComma)
+                    {
+                        sb.Append(", ");
                     }
+
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "RESOURCE_MANAGER_LOCATION = {0}", Util.MakeSqlString(resourceManagerLocation));
+                    addComma = true;
                 }
             }
 
-            // check if the Credential property is supported and set, then add it to the script
-            if (IsSupportedProperty(CredentialPropertyName, sp))
+            var credential = AppendNamedPropertyToScript(sb, CredentialPropertyName, "CREDENTIAL", sp, ref addComma);
+
+            AppendStringPropertyToScript(sb, ConnectionOptionsPropertyName, "CONNECTION_OPTIONS", sp, ref addComma);
+
+            if (IsSupportedProperty(PushdownOptionPropertyName, sp)
+                && !GetPropertyOptional(PushdownOptionPropertyName).IsNull)
             {
-                if (!this.GetPropertyOptional(CredentialPropertyName).IsNull)
+                var pushdownOption = (ExternalDataSourcePushdownOption)GetPropValueOptional(PushdownOptionPropertyName);
+                if (!Enum.IsDefined(typeof(ExternalDataSourcePushdownOption), pushdownOption))
                 {
-                    credential = Convert.ToString(this.GetPropValueOptional(CredentialPropertyName), SmoApplication.DefaultCulture);
-                    if (!string.IsNullOrEmpty(credential))
+                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(pushdownOption.ToString()));
+                }
+                // The default pushdown option is ON, so only script it out if it's different
+                // from the default
+                if (pushdownOption != ExternalDataSourcePushdownOption.On)
+                {
+                    var pushdownConverter = SmoManagementUtil.GetTypeConverter(typeof(ExternalDataSourcePushdownOption));
+                    if (addComma)
                     {
-                        if (addComma)
-                        {
-                            sb.Append(", ");
-                        }
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "CREDENTIAL = {0}", MakeSqlBraket(credential));
-                        addComma = true;
+                        sb.Append(", ");
                     }
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "PUSHDOWN = {0}", pushdownConverter.ConvertToInvariantString(pushdownOption));
+                    addComma = true;
                 }
             }
 
@@ -633,6 +614,61 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.UnsupportedResourceManagerLocationProperty, "ResourceManagerLocation"));
             }
         }
+
+        /// <summary>
+        /// Appends a property and its value to a sql script in the provided string builder. Property value will be wrapped in string quotes.
+        /// </summary>
+        /// <param name="sb">StringBuilder that contains the sql script to append to.</param>
+        /// <param name="propName">Name of the property.</param>
+        /// <param name="sqlPropName">The T-SQL name for the property to use in the script.</param>
+        /// <param name="sp">Scripting preferences to use when checking if the property is supported.</param>
+        /// <param name="addComma">Whether to add a comma and space to the beginning of the appended script text.</param>
+        /// <returns>A string representing the property's value.</returns>
+        private string AppendStringPropertyToScript(StringBuilder sb, string propName, string sqlPropName, ScriptingPreferences sp, ref bool addComma)
+            => AppendPropertyToScript(sb, propName, sqlPropName, sp, useBrackets: false, ref addComma);
+
+        /// <summary>
+        /// Appends a property and its value to a sql script in the provided string builder. Property value will be wrapped in square brackets.
+        /// </summary>
+        /// <param name="sb">StringBuilder that contains the sql script to append to.</param>
+        /// <param name="propName">Name of the property.</param>
+        /// <param name="sqlPropName">The T-SQL name for the property to use in the script.</param>
+        /// <param name="sp">Scripting preferences to use when checking if the property is supported.</param>
+        /// <param name="addComma">Whether to add a comma and space to the beginning of the appended script text.</param>
+        /// <returns>A string representing the property's value.</returns>
+        private string AppendNamedPropertyToScript(StringBuilder sb, string propName, string sqlPropName, ScriptingPreferences sp, ref bool addComma)
+            => AppendPropertyToScript(sb, propName, sqlPropName, sp, useBrackets: true, ref addComma);
+
+        /// <summary>
+        /// Appends a property and its value to a sql script in the provided string builder.
+        /// </summary>
+        /// <param name="sb">StringBuilder that contains the sql script to append to.</param>
+        /// <param name="propName">Name of the property.</param>
+        /// <param name="sqlPropName">The T-SQL name for the property to use in the script.</param>
+        /// <param name="sp">Scripting preferences to use when checking if the property is supported.</param>
+        /// <param name="useBrackets">Whether to wrap the property value in string quotes or square brackets.</param>
+        /// <param name="addComma">Whether to add a comma and space to the beginning of the appended script text.</param>
+        /// <returns>A string representing the property's value.</returns>
+        private string AppendPropertyToScript(StringBuilder sb, string propName, string sqlPropName, ScriptingPreferences sp, bool useBrackets, ref bool addComma)
+        {
+            string propertyValue = string.Empty;
+            if (IsSupportedProperty(propName, sp)
+                && !GetPropertyOptional(propName).IsNull)
+            {
+                propertyValue = Convert.ToString(GetPropValueOptional(propName), SmoApplication.DefaultCulture);
+                if (!string.IsNullOrEmpty(propertyValue))
+                {
+                    if (addComma)
+                    {
+                        sb.Append(", ");
+                    }
+                    var propertyStr = useBrackets ? MakeSqlBraket(propertyValue) : Util.MakeSqlString(propertyValue);
+                    sb.Append($"{sqlPropName.ToUpper()} = {propertyStr}");
+                    addComma = true;
+                }
+            }
+            return propertyValue;
+        }
         #endregion
 
         internal static string[] GetScriptFields(Type parentType,
@@ -643,14 +679,16 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             var fields = new string[]
             {
-                "Credential",
-                "DatabaseName",
-                "DataSourceType",
-                "ID",
-                "Location",
-                "Name",
-                "ResourceManagerLocation",
-                "ShardMapName"
+                nameof(Credential),
+                nameof(DatabaseName),
+                nameof(DataSourceType),
+                nameof(ID),
+                nameof(Location),
+                nameof(Name),
+                nameof(ResourceManagerLocation),
+                nameof(ShardMapName),
+                nameof(ConnectionOptions),
+                nameof(PushdownOption)
             };
 
             var list = GetSupportedScriptFields(typeof(DatabaseScopedConfiguration.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);

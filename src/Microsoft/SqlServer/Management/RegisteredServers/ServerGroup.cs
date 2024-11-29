@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Xml;
 using System.Reflection;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using XmlTextReader = System.Xml.XmlTextReader;
+
 #if !STRACE
 using STrace = System.Diagnostics.Trace;
 #endif
@@ -16,11 +18,11 @@ using STrace = System.Diagnostics.Trace;
 namespace Microsoft.SqlServer.Management.RegisteredServers
 {
     /// <summary>
-    /// 
+    /// Represents a group of servers in the Registered Servers store.
     /// </summary>
     public sealed partial class ServerGroup : ServerGroupParent, ISfcValidate, ISfcCreatable, ISfcAlterable, ISfcDroppable, ISfcRenamable, IRenamable, ISfcMovable
     {
-#region Script generation
+        #region Script generation
         static readonly SfcTsqlProcFormatter scriptCreateAction = new SfcTsqlProcFormatter();
         static readonly SfcTsqlProcFormatter scriptAlterAction = new SfcTsqlProcFormatter();
         static readonly SfcTsqlProcFormatter scriptDropAction = new SfcTsqlProcFormatter();
@@ -57,9 +59,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             scriptMoveAction.Arguments.Add(new SfcTsqlProcFormatter.SprocArg("new_parent_id", true));
         }
 
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
         /// <summary>
         /// 
         /// </summary>
@@ -94,9 +96,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             this.Parent = parent;
         }
 
-#endregion
+        #endregion
 
-#region Child Collections
+        #region Child Collections
         private RegisteredServerCollection registeredServers;
         /// <summary>
         /// 
@@ -151,9 +153,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 return serverGroups;
             }
         }
-#endregion
+        #endregion
 
-#region SFC Boiler Plate
+        #region SFC Boiler Plate
         internal const string typeName = "ServerGroup";
         /// <summary>
         /// 
@@ -549,13 +551,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     {
                         result = RegSvrStrings.ReportingServicesServerGroupDisplayName;
                     }
-                    else if (this == store.SqlServerCompactEditionServerGroup)
-                    {
-                        result = RegSvrStrings.SqlServerCompactServerGroupDisplayName;
-                    }
                     else
                     {
-                        STrace.Assert(false, "unexpected group");
+                        Debug.Assert(false, "unexpected group");
                     }
                 }
 
@@ -580,9 +578,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     throw new RegisteredServerException(RegSvrStrings.NoSuchCollection(elementType));
             }
         }
-#endregion
+        #endregion
 
-#region ISfcValidate implementation
+        #region ISfcValidate implementation
 
         /// <summary>
         /// 
@@ -627,9 +625,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         }
 
 
-#endregion
+        #endregion
 
-#region Create
+        #region Create
 
         /// <summary>
         /// 
@@ -691,10 +689,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             }
         }
 
-#endregion
+        #endregion
 
 
-#region Alter
+        #region Alter
         /// <summary>
         /// 
         /// </summary>
@@ -719,9 +717,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             string script = scriptAlterAction.GenerateScript(this);
             return new SfcTSqlScript(script);
         }
-#endregion
+        #endregion
 
-#region Drop
+        #region Drop
 
         /// <summary>
         /// 
@@ -756,9 +754,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             }
         }
 
-#endregion
+        #endregion
 
-#region Rename
+        #region Rename
         /// <summary>
         /// Renames the object on the server.
         /// </summary>
@@ -807,9 +805,9 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             return new SfcTSqlScript(script);
         }
 
-#endregion
+        #endregion
 
-#region Move
+        #region Move
 
         /// <summary>
         /// Moves the ServerGroup to be a child of another ServerGroup.
@@ -859,7 +857,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             return new SfcTSqlScript(moveScript);
         }
 
-#endregion
+        #endregion
 
         private RegisteredServersStore GetStore()
         {
@@ -964,7 +962,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             }
         }
 
-#region ISfcDiscoverObject Members
+        #region ISfcDiscoverObject Members
         /// <summary>
         /// 
         /// </summary>
@@ -987,7 +985,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             return;
         }
 
-#endregion
+        #endregion
 
 
         /// <summary>
@@ -1388,7 +1386,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             SfcApplication.Events.OnObjectDropped(obj, new SfcObjectDroppedEventArgs(obj.Urn, obj));
         }
     }
-    
+
     /// <summary>
     ///   Specifies identifiers to indicate the return value of a dialog box.
     ///   This is used only as a private variable and does not need to come from Windows.Forms

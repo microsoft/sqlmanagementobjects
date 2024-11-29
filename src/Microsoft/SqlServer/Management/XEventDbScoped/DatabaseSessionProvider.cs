@@ -13,9 +13,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped
     /// </summary>
     internal class DatabaseSessionProvider : SessionProviderBase
     {
-        public DatabaseSessionProvider(Session session) : base(session, 
-            "EVENT SESSION " + SfcTsqlProcFormatter.MakeSqlBracket(session.Name) + " ON DATABASE ",
-            sessionName => String.Format(CultureInfo.InvariantCulture, "CREATE EVENT SESSION {0} ON DATABASE ", SfcTsqlProcFormatter.MakeSqlBracket(sessionName)))
+        public DatabaseSessionProvider(Session session) : base(session, "DATABASE")
         {
         }
     }

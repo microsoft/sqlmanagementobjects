@@ -17,7 +17,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <returns></returns>
         public static bool IsImmutable(this Table table)
         {
-            return table.IsSupportedProperty(nameof(Table.LedgerType)) && table.LedgerType != LedgerTableType.None;
+            return table.Replicated || table.IsSystemObject || (table.IsSupportedProperty(nameof(Table.LedgerType)) && table.LedgerType != LedgerTableType.None);
         }
     }
 }

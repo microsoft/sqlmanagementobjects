@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Diagnostics;
+
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
@@ -34,18 +36,41 @@ namespace Microsoft.SqlServer.Test.SMO.MetadataProvider
         {
             ExecuteWithDbDrop((db) =>
             {
+                if (SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.NotSpecified && SqlConnectionStringBuilder.Authentication != SqlAuthenticationMethod.SqlPassword)
+                {
+                    Trace.TraceWarning($"Skipping connected provider test on {SqlConnectionStringBuilder.DataSource} because SQL logins are not available");
+                    return;
+                }
                 var pwd = SqlTestRandom.GeneratePassword();
                 var user = db.CreateUser("containeduser" + Guid.NewGuid(), string.Empty, pwd);
-                var connStr = new SqlConnectionStringBuilder(this.ServerContext.ConnectionContext.ConnectionString)
+                var userName = user.Name;
+                try
                 {
-                    InitialCatalog = db.Name,
-                    UserID = user.Name,
-                    Password = pwd
-                };
-                var sqlConn = new SqlConnection(connStr.ToString());
-                var dbScopedConn = new ServerConnection(sqlConn);
-                Assert.DoesNotThrow(() => SmoMetadataProvider.CreateConnectedProvider(dbScopedConn),
-                    "CreateConnectedProvider should succeed");
+                    var connStr = new SqlConnectionStringBuilder(ServerContext.ConnectionContext.ConnectionString)
+                    {
+                        InitialCatalog = db.Name,
+                        UserID = user.Name,
+                        Password = pwd,
+                        Authentication = SqlAuthenticationMethod.NotSpecified
+                    };
+                    using (var sqlConn = new SqlConnection(connStr.ToString()))
+                    {
+                        var dbScopedConn = new ServerConnection(sqlConn);
+                        Assert.DoesNotThrow(() => SmoMetadataProvider.CreateConnectedProvider(dbScopedConn),
+                            "CreateConnectedProvider should succeed");
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        user.Drop();
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceWarning("Unable to drop user {0}. {1}", userName, ex);
+                    }
+                }
             });
         }
     }

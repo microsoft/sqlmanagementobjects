@@ -94,40 +94,33 @@ namespace Microsoft.SqlServer.Management.Smo
 
 		// returns wrapper class
 		public Database this[string name]
-		{
-			get
-			{
-                
-    
+        {
+            get
+            {
+
+
                 try
-                 {
-                     
-                
-    
-	    			    return  GetObjectByName(name) as Database;
-                    
-                
+                {
 
-                 }
-                catch (Microsoft.SqlServer.Management.Common.ConnectionFailureException cfe)
-                {                  
-                    if (cfe.InnerException is SqlException)
-                    {
-                        if ((cfe.InnerException as SqlException).Number == 4060)
-                        {                           
-                            Microsoft.SqlServer.Management.Diagnostics.TraceHelper.LogExCatch(cfe);
-                            // this exception occurs if the user doesn't have access to 
-                            //  the database with the input name
-                            //  in such a case the expected behavior is to return null  
-                            return null;
-                        }
-                    }
-                    throw cfe;
+
+
+                    return GetObjectByName(name) as Database;
+
+
+
                 }
-                
+                catch (Microsoft.SqlServer.Management.Common.ConnectionFailureException cfe) when (cfe.InnerException is SqlException sqlEx && sqlEx.Number == 4060)
+                {
+                    Microsoft.SqlServer.Management.Diagnostics.TraceHelper.LogExCatch(cfe);
+                    // this exception occurs if the user doesn't have access to 
+                    //  the database with the input name
+                    //  in such a case the expected behavior is to return null  
+                    return null;
+                }
 
-			}
-		}
+
+            }
+        }
 
 
 		public void CopyTo(Database[] array, int index)

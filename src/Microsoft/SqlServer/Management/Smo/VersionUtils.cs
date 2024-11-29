@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="targetDatabaseEngineType">target database engine type</param>
         /// <param name="targetServerVersion">target server version</param>
-        static internal bool IsTargetVersionSql15Azure12OrLater(DatabaseEngineType targetDatabaseEngineType, SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetVersionSql15Azure12OrLater(DatabaseEngineType targetDatabaseEngineType, SqlServerVersion targetServerVersion)
         {
             return targetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || IsTargetServerVersionSQl15OrLater(targetServerVersion);
         }
@@ -30,7 +30,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="targetDatabaseEngineType">target database engine type</param>
         /// <param name="targetServerVersion">target server version</param>
-        static internal bool IsTargetVersionSql16Azure12OrLater(DatabaseEngineType targetDatabaseEngineType, SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetVersionSql16Azure12OrLater(DatabaseEngineType targetDatabaseEngineType, SqlServerVersion targetServerVersion)
         {
             return targetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || IsTargetServerVersionSQl16OrLater(targetServerVersion);
         }
@@ -55,39 +55,39 @@ namespace Microsoft.SqlServer.Management.Smo
             return currentDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || IsSql16OrLater(currentServerVersion);
         }
 
-        static internal bool IsSql15OrLater(SqlServerVersionInternal targetServerVersion, ServerVersion currentServerVersion)
+        static internal bool IsSql15OrLater(SqlServerVersion targetServerVersion, ServerVersion currentServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version150 && currentServerVersion.Major >= 15;
+            return targetServerVersion >= SqlServerVersion.Version150 && currentServerVersion.Major >= 15;
         }
 
-        static internal bool IsSql16OrLater(SqlServerVersionInternal targetServerVersion, ServerVersion currentServerVersion)
+        static internal bool IsSql16OrLater(SqlServerVersion targetServerVersion, ServerVersion currentServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version160 && currentServerVersion.Major >= 16;
+            return targetServerVersion >= SqlServerVersion.Version160 && currentServerVersion.Major >= 16;
         }
 
-        static internal bool IsTargetServerVersionSQl15OrLater(SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetServerVersionSQl15OrLater(SqlServerVersion targetServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version150;
+            return targetServerVersion >= SqlServerVersion.Version150;
         }
 
-        static internal bool IsTargetServerVersionSQl16OrLater(SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetServerVersionSQl16OrLater(SqlServerVersion targetServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version160;
+            return targetServerVersion >= SqlServerVersion.Version160;
         }
 
         static public bool IsSql15OrLater(ServerVersion currentServerVersion)
         {
-            return IsSql15OrLater(SqlServerVersionInternal.Version150, currentServerVersion);
+            return IsSql15OrLater(SqlServerVersion.Version150, currentServerVersion);
         }
 
         static public bool IsSql16OrLater(ServerVersion currentServerVersion)
         {
-            return IsSql16OrLater(SqlServerVersionInternal.Version160, currentServerVersion);
+            return IsSql16OrLater(SqlServerVersion.Version160, currentServerVersion);
         }
 
-        static internal bool IsSql14OrLater(SqlServerVersionInternal targetServerVersion, ServerVersion currentServerVersion)
+        static internal bool IsSql14OrLater(SqlServerVersion targetServerVersion, ServerVersion currentServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version140 && currentServerVersion.Major >= 14;
+            return targetServerVersion >= SqlServerVersion.Version140 && currentServerVersion.Major >= 14;
         }
 
         /// <summary>
@@ -97,17 +97,17 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns>true if the version is 140 or higher</returns>
         static public bool IsSql14OrLater(ServerVersion currentServerVersion)
         {
-            return IsSql14OrLater(SqlServerVersionInternal.Version140, currentServerVersion);
+            return IsSql14OrLater(SqlServerVersion.Version140, currentServerVersion);
         }
 
-        static internal bool IsTargetServerVersionSQl14OrLater(SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetServerVersionSQl14OrLater(SqlServerVersion targetServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version140;
+            return targetServerVersion >= SqlServerVersion.Version140;
         }
 
-        static internal bool IsSql13OrLater(SqlServerVersionInternal targetServerVersion, ServerVersion currentServerVersion)
+        static internal bool IsSql13OrLater(SqlServerVersion targetServerVersion, ServerVersion currentServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version130 && currentServerVersion.Major >= 13;
+            return targetServerVersion >= SqlServerVersion.Version130 && currentServerVersion.Major >= 13;
         }
 
         /// <summary>
@@ -118,18 +118,18 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns>true if the ServerVersion is 130 or higher</returns>
         static public bool IsSql13OrLater(ServerVersion currentServerVersion)
         {
-            return IsSql13OrLater(SqlServerVersionInternal.Version130, currentServerVersion);
+            return IsSql13OrLater(SqlServerVersion.Version130, currentServerVersion);
         }
 
-        static internal bool IsTargetServerVersionSQl13OrLater(SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetServerVersionSQl13OrLater(SqlServerVersion targetServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version130;
+            return targetServerVersion >= SqlServerVersion.Version130;
         }
 
         
-        static internal bool IsSql12OrLater(SqlServerVersionInternal targetServerVersion, ServerVersion currentServerVersion)
+        static internal bool IsSql12OrLater(SqlServerVersion targetServerVersion, ServerVersion currentServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version120 && currentServerVersion.Major >= 12;
+            return targetServerVersion >= SqlServerVersion.Version120 && currentServerVersion.Major >= 12;
         }
 
         /// <summary>
@@ -140,17 +140,17 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns>true if the ServerVersion is 120 or higher</returns>
         static public bool IsSql12OrLater(ServerVersion currentServerVersion)
         {
-            return IsSql12OrLater(SqlServerVersionInternal.Version120, currentServerVersion);
+            return IsSql12OrLater(SqlServerVersion.Version120, currentServerVersion);
         }
 
-        static internal bool IsTargetServerVersionSQl12OrLater(SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetServerVersionSQl12OrLater(SqlServerVersion targetServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version120;
+            return targetServerVersion >= SqlServerVersion.Version120;
         }
 
-        static internal bool IsSql11OrLater(SqlServerVersionInternal targetServerVersion, ServerVersion currentServerVersion)
+        static internal bool IsSql11OrLater(SqlServerVersion targetServerVersion, ServerVersion currentServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version110 && currentServerVersion.Major >= 11;
+            return targetServerVersion >= SqlServerVersion.Version110 && currentServerVersion.Major >= 11;
         }
 
         /// <summary>
@@ -160,12 +160,12 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         static public bool IsSql11OrLater(ServerVersion currentServerVersion)
         {
-            return IsSql11OrLater(SqlServerVersionInternal.Version110, currentServerVersion);
+            return IsSql11OrLater(SqlServerVersion.Version110, currentServerVersion);
         }
 
-        static internal bool IsTargetServerVersionSQl11OrLater(SqlServerVersionInternal targetServerVersion)
+        static internal bool IsTargetServerVersionSQl11OrLater(SqlServerVersion targetServerVersion)
         {
-            return targetServerVersion >= SqlServerVersionInternal.Version110;
+            return targetServerVersion >= SqlServerVersion.Version110;
         }
 
         /// <summary>
@@ -180,14 +180,14 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                 {
-                    if (!IsTargetServerVersionSQl12OrLater(sp.TargetServerVersionInternal))
+                    if (!IsTargetServerVersionSQl12OrLater(sp.TargetServerVersion))
                     {
                         return false;
                     }
                 }
                 else
                 {
-                    if (!IsTargetServerVersionSQl13OrLater(sp.TargetServerVersionInternal))
+                    if (!IsTargetServerVersionSQl13OrLater(sp.TargetServerVersion))
                     {
                         return false;
                     }
@@ -271,51 +271,51 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        static internal SqlServerVersionInternal Sql110TargetServerVersion
+        static internal SqlServerVersion Sql110TargetServerVersion
         {
             get
             {
-                return SqlServerVersionInternal.Version110;
+                return SqlServerVersion.Version110;
             }
         }
 
-        static internal SqlServerVersionInternal Sql120TargetServerVersion
+        static internal SqlServerVersion Sql120TargetServerVersion
         {
             get
             {
-                return SqlServerVersionInternal.Version120;
+                return SqlServerVersion.Version120;
             }
         }
 
-        static internal SqlServerVersionInternal Sql130TargetServerVersion
+        static internal SqlServerVersion Sql130TargetServerVersion
         {
             get
             {
-                return SqlServerVersionInternal.Version130;
+                return SqlServerVersion.Version130;
             }
         }
 
-        static internal SqlServerVersionInternal Sql140TargetServerVersion
+        static internal SqlServerVersion Sql140TargetServerVersion
         {
             get
             {
-                return SqlServerVersionInternal.Version140;
+                return SqlServerVersion.Version140;
             }
         }
 
-        static internal SqlServerVersionInternal Sql150TargetServerVersion
+        static internal SqlServerVersion Sql150TargetServerVersion
         {
             get
             {
-                return SqlServerVersionInternal.Version150;
+                return SqlServerVersion.Version150;
             }
         }
 
-        static internal SqlServerVersionInternal Sql160TargetServerVersion
+        static internal SqlServerVersion Sql160TargetServerVersion
         {
             get
             {
-                return SqlServerVersionInternal.Version160;
+                return SqlServerVersion.Version160;
             }
         }
 

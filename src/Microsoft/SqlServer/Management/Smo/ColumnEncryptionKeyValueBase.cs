@@ -106,7 +106,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Check if this feature is supported on the SQL Server
             if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
             {
-                ThrowIfBelowVersion130(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion130(sp.TargetServerVersion,
                     ExceptionTemplates.ColumnEncryptionKeyDownlevel(
                         fullyFormattedCekName,
                         GetSqlServerName(sp)
@@ -175,7 +175,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Check if this feature is supported on the SQL Server
             if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
             {
-                ThrowIfBelowVersion130(sp.TargetServerVersionInternal,
+                ThrowIfBelowVersion130(sp.TargetServerVersion,
                     ExceptionTemplates.ColumnEncryptionKeyDownlevel(
                         fullyFormattedCekName,
                         GetSqlServerName(sp)

@@ -35,12 +35,14 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         /// <summary>
         ///
         /// </summary>
         protected ConnectionException(SerializationInfo info, StreamingContext context): base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -69,10 +71,12 @@ namespace Microsoft.SqlServer.Management.Common
         public ConnectionCannotBeChangedException(String message, Exception innerException) : base(message, innerException)
         {
         }
+#if !NETCOREAPP
         private ConnectionCannotBeChangedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -102,10 +106,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private InvalidPropertyValueException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -135,10 +141,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private ConnectionFailureException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -168,10 +176,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private ExecutionFailureException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -201,10 +211,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private NotInTransactionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -234,10 +246,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private InvalidArgumentException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
     /// <summary>
     ///
@@ -266,10 +280,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private PropertyNotSetException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -299,14 +315,16 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         /// <summary>
         /// Serialization constructor
         /// </summary>
         /// <param name="si"></param>
         /// <param name="sc"></param>
-        private PropertyNotAvailableException(SerializationInfo si, StreamingContext sc)
+        private PropertyNotAvailableException(SerializationInfo si, StreamingContext sc) : base(si, sc) 
         {
         }
+#endif
     }
 
     /// <summary>
@@ -336,6 +354,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         /// <summary>
         /// Serialization constructor
         /// </summary>
@@ -344,6 +363,7 @@ namespace Microsoft.SqlServer.Management.Common
         private ChangePasswordFailureException(SerializationInfo si, StreamingContext sc) : base(si,sc)
         {
         }
+#endif
     }
 
     /// <summary>
@@ -373,10 +393,12 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
+#if !NETCOREAPP
         private DisconnectedConnectionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
 

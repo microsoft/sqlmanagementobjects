@@ -104,7 +104,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptDrop(StringCollection queries, ScriptingPreferences sp)
         {
-            ThrowIfBelowVersion90(sp.TargetServerVersionInternal);
+            ThrowIfBelowVersion90(sp.TargetServerVersion);
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -112,14 +112,14 @@ namespace Microsoft.SqlServer.Management.Smo
 
             ScriptIncludeHeaders(sb, sp, UrnSuffix);
 
-            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal < SqlServerVersionInternal.Version130)
+            if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.AppendLine(GetIfNotExistStatement(sp, ""));
             }
 
             sb.AppendFormat(SmoApplication.DefaultCulture,
                 "DROP TRIGGER {0}{1} ON ALL SERVER",
-                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersionInternal >= SqlServerVersionInternal.Version130) ? "IF EXISTS " : string.Empty,
+                (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty,
                 sFullScriptingName);
             queries.Add(sb.ToString());
         }
