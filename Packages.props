@@ -23,7 +23,7 @@
         <PackageReference Update="Azure.ResourceManager.Storage" Version="1.1.1" />
         <PackageReference Update="Azure.Security.KeyVault.Secrets" Version="4.4.0" />
         <PackageReference Update="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-        <PackageReference Update="Microsoft.Data.SqlClient" Version="[$(SqlClientPackageVersion),6)" />
+        <PackageReference Update="Microsoft.Data.SqlClient" Version="[$(SqlClientPackageVersion),7)" />
         <PackageReference Update="Microsoft.Data.Tools.StringResourceTool" Version="3.2.0" />
         <PackageReference Update="Microsoft.Identity.Client" Version="4.61.3" />
         <PackageReference Update="Microsoft.Identity.Client.Desktop" Version="4.61.3" />
