@@ -46,6 +46,7 @@ jobs:
         echo "SAPASSWORD=$SAPASSWORD" >> $GITHUB_ENV
         docker run -m 2GB -e ACCEPT_EULA=1 -d --name sql -p:1433:1433 -e SA_PASSWORD=$SAPASSWORD mcr.microsoft.com/mssql/server:${{ matrix.sqlImage }}-latest
         sleep 30
+        docker logs sql
     - name: Run tests against Linux SQL
       run: |
         cat tests/ToolsConnectionInfo.xml
