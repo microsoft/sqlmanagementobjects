@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v2
+    - uses: actions/setup-dotnet@v4
       with:
         global-json-file: global.json
     - run: |
@@ -30,6 +30,9 @@ jobs:
         sqlImage: ['2017','2019']
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
     - name: Download build files
       uses: actions/download-artifact@v4.1.7
       with: 
