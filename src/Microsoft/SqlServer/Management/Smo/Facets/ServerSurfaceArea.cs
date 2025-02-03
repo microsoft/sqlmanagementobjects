@@ -4,9 +4,7 @@
 
 using System;
 using System.ComponentModel;
-using Microsoft.SqlServer.Management.Diagnostics;
 using Microsoft.SqlServer.Management.Facets;
-using Dmf = Microsoft.SqlServer.Management.Dmf;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo

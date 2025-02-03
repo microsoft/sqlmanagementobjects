@@ -6712,6 +6712,16 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Checks if the target version is smaller than 17.0, and if so
+        /// throw an exception indicating that this is not supported.
+        /// </summary>
+        /// <param name="targetVersion"></param>
+        internal static void ThrowIfBelowVersion170(SqlServerVersion targetVersion, string exceptionMessage = null)
+        {
+            ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version170, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+        }
+
+        /// <summary>
         /// Checks if the target version is smaller than 11.0, and if so
         /// throw an exception indicating that this is not supported.
         /// </summary>

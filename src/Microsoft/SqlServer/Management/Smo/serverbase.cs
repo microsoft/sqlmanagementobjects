@@ -14,9 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Reflection;
-#if !NETSTANDARD2_0
 using System.Management;
-#endif
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -4379,7 +4377,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.parent = parent;
         }
 
-#if !NETSTANDARD2_0
         /// <summary>
         /// Internal WMI connection object. It is used
         /// by all objects on this server to recieve
@@ -4429,7 +4426,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.connectionOptions.Username = username;
             this.connectionOptions.Password = password;
         }
-#endif
 
         /// <summary>
         /// Returns current selection of server events.

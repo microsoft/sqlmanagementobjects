@@ -19,7 +19,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <param name="retries">Number of times to retry calling the method</param>
         /// <param name="retryDelayMs">Delay between retry attempts in milliseconds</param>
         /// <param name="retryMessage">Base message to display in logs for each failure attempt</param>
-        public static void RetryWhenExceptionThrown(Action method, int retries = 3, int retryDelayMs = 1000, string retryMessage = "")
+        public static void RetryWhenExceptionThrown(Action method, int retries = 3, int retryDelayMs = 1000, string retryMessage = "") => RetryWhenExceptionThrown(method, DefaultWhen, retries, retryDelayMs, retryMessage);
+
+        /// <summary>
+        /// Will retry calling a method a number of times with a delay between each one if
+        /// an exception is thrown while calling the specified method. 
+        /// </summary>
+        /// <param name="method">Method to invoke</param>
+        /// <param name="whenFunc">Exception "when" handler to decide when a retry is ok</param>
+        /// <param name="retries">Number of times to retry calling the method</param>
+        /// <param name="retryDelayMs">Delay between retry attempts in milliseconds</param>
+        /// <param name="retryMessage">Base message to display in logs for each failure attempt</param>
+        public static void RetryWhenExceptionThrown(Action method, Func<Exception, bool> whenFunc, int retries = 3, int retryDelayMs = 1000, string retryMessage = "")
         {
             if (string.IsNullOrWhiteSpace(retryMessage))
             {
@@ -32,7 +43,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                     method();
                     break;
                 }
-                catch (Exception e)
+                catch (Exception e) when (whenFunc(e))
                 {
                     if (retries-- > 0)
                     {
@@ -47,6 +58,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             } while (true);
         }
 
+        private static bool DefaultWhen(Exception e) => true;
+        
         /// <summary>
         /// Will retry calling a method a number of times with a delay between each one if
         /// an exception is thrown while calling the specified method. This will return

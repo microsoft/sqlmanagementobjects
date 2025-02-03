@@ -406,14 +406,10 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 throw new InvalidConfigurationFileEnumeratorException(SfcStrings.FailedToLoadResFile(strFile));
             }
-#if NETSTANDARD2_0
-            this.Reader = new XmlTextReader(m_fs, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit });
-#else
             this.Reader = new XmlTextReader(m_fs)
             {
                 DtdProcessing = DtdProcessing.Prohibit
             };
-#endif
 
             if ( XmlUtility.SelectNextElement(this.Reader) )
             {

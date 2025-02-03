@@ -311,7 +311,7 @@ namespace Microsoft.SqlServer.Management.Smo
             propertyName = (string)info.GetString("propertyName");
             Init();
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -319,15 +319,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
         private void Init()
         {
@@ -416,7 +415,7 @@ namespace Microsoft.SqlServer.Management.Smo
             property= (Property)info.GetValue("property", typeof(Property));
             Init();
         }
-#endif
+
 
 
         /// <summary>
@@ -426,15 +425,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("property", this.property);
             base.GetObjectData(info, context);
         }
+#endif
 
         private void Init()
         {
@@ -536,16 +534,13 @@ namespace Microsoft.SqlServer.Management.Smo
             receivedType = info.GetString("receivedType");
             expectedType = info.GetString("expectedType");
         }
-#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
         /// <param name="info">T:System.Runtime.Serialization.SerializationInfo object that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
@@ -553,6 +548,7 @@ namespace Microsoft.SqlServer.Management.Smo
             info.AddValue("expectedType", this.expectedType);
             base.GetObjectData(info, context);
         }
+#endif
 
 
         /// <summary>
@@ -645,22 +641,20 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             propertyName = info.GetString("propertyName");
         }
-#endif
 
         /// <summary>
         /// Serialization helper method.
         /// </summary>
         /// <param name="info">T:System.Runtime.Serialization.SerializationInfo object that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Gets the type of exception from the
@@ -756,7 +750,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             propertyName = info.GetString("propertyName");
         }
-#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -764,15 +757,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
         private void Init()
         {
@@ -861,7 +853,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             propertyName = info.GetString("propertyName");
         }
-#endif
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -869,15 +860,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
 
         private void Init()
@@ -971,7 +961,7 @@ namespace Microsoft.SqlServer.Management.Smo
             opName = info.GetString("opName");
             state = (SqlSmoState)info.GetValue("state", typeof(SqlSmoState));
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -979,16 +969,15 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("opName", this.opName);
             info.AddValue("state", this.state);
             base.GetObjectData(info, context);
         }
+#endif
 
 
         /// <summary>
@@ -1084,7 +1073,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             version = (ServerVersion)info.GetValue("version", typeof(ServerVersion));
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1092,15 +1081,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("version", this.version);
             base.GetObjectData(info, context);
         }
+#endif
 
 
         /// <summary>
@@ -1204,7 +1192,7 @@ namespace Microsoft.SqlServer.Management.Smo
             colname = info.GetString("colname");
             serverVersion = (ServerVersion)info.GetValue("serverVersion", typeof(ServerVersion));
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1212,16 +1200,15 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a violation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("colname", this.colname);
             info.AddValue("serverVersion", this.serverVersion);
             base.GetObjectData(info, context);
         }
+#endif
 
 
         /// <summary>
@@ -1331,7 +1318,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // failed object will not be saved, because it belongs to the tree
             Init();
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1339,16 +1326,15 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
             info.AddValue("reason", this.reason);
             base.GetObjectData(info, context);
         }
+#endif
 
 
         private void Init()
@@ -1500,7 +1486,7 @@ namespace Microsoft.SqlServer.Management.Smo
             reason = info.GetString("reason");
             SetHelpContext("FailedOperationExceptionText");
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1508,15 +1494,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("reason", this.reason);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Called by the T:Microsoft.SqlServer.Management.Smo.SqlServerManagementException.
@@ -1737,7 +1722,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Init();
             errorCode = info.GetUInt32("errorCode");
         }
-#endif
+
         /// <summary>
         /// Serialization helper method.
         /// </summary>
@@ -1745,15 +1730,14 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that contains the data needed to serialize or deserialize an object.</param>
         /// <param name="context">T:System.Runtime.Serialization.StreamingContext that
         /// contains the source and destination of a given serialized stream.</param>
-#if NETFRAMEWORK
         //Adding security permissions,as there was a voilation while implementing ISerializable
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("errorCode", this.errorCode);
             base.GetObjectData(info, context);
         }
+#endif
 
         private void Init()
         {

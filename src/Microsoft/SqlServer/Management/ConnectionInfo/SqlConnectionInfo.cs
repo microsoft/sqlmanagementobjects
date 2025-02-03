@@ -86,6 +86,7 @@ namespace Microsoft.SqlServer.Management.Common
         private string additionalParameters = null;
 #if MICROSOFTDATA
         private string hostNameInCertificate = null;
+        private string serverCertificate = null;
 #endif
         private bool trustServerCertificate = false;
         private AuthenticationMethod m_Authentication = AuthenticationMethod.NotSpecified;
@@ -151,6 +152,7 @@ namespace Microsoft.SqlServer.Management.Common
             AccessToken = conn.AccessToken;
 #if MICROSOFTDATA
             HostNameInCertificate = conn.HostNameInCertificate;
+            ServerCertificate = conn.ServerCertificate;
 #endif
         }
 
@@ -197,6 +199,7 @@ namespace Microsoft.SqlServer.Management.Common
             StrictEncryption = serverConnection.StrictEncryption;
 #if MICROSOFTDATA
             HostNameInCertificate = serverConnection.HostNameInCertificate;
+            ServerCertificate = serverConnection.ServerCertificate;
 #endif
             Authentication = serverConnection.Authentication;
         }
@@ -455,6 +458,19 @@ namespace Microsoft.SqlServer.Management.Common
             set
             {
                 hostNameInCertificate = value;
+                ConnectionParmsChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets Path to Server Certificate to be used for Certificate validation.
+        /// </summary>
+        public string ServerCertificate
+        {
+            get => serverCertificate;
+            set
+            {
+                serverCertificate = value;
                 ConnectionParmsChanged();
             }
         }

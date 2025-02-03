@@ -41,7 +41,7 @@ namespace Microsoft.SqlServer.Management.Common
             Init();
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP // This overload is obsolete and will be removed in a future version of .NET
         protected SqlServerManagementException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

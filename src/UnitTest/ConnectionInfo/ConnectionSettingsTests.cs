@@ -94,6 +94,31 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             Assert.That(connectionStringBuilder.HostNameInCertificate, Is.EqualTo(String.Empty),
                 "Setting HostNameInCertificate to empty string should be handled.");
         }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void SqlConnectionInfo_supports_ServerCertificate()
+        {
+            string testPath = "C:\\Path\\";
+            var connectionInfo = new SqlConnectionInfo("myserver")
+            {
+                EncryptConnection = true,
+                ServerCertificate = testPath
+            };
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionInfo.ConnectionString);
+            Assert.That(connectionStringBuilder.ServerCertificate, Is.EqualTo(testPath),
+                "ServerCertificate should be set to provided value.");
+
+            connectionInfo.ServerCertificate = null;
+            connectionStringBuilder = new SqlConnectionStringBuilder(connectionInfo.ConnectionString);
+            Assert.That(connectionStringBuilder.ServerCertificate, Is.EqualTo(String.Empty),
+                "Setting ServerCertificate to null should be handled.");
+
+            connectionInfo.ServerCertificate = String.Empty;
+            connectionStringBuilder = new SqlConnectionStringBuilder(connectionInfo.ConnectionString);
+            Assert.That(connectionStringBuilder.ServerCertificate, Is.EqualTo(String.Empty),
+                "Setting ServerCertificate to empty string should be handled.");
+        }
 #endif
 
         [TestMethod]

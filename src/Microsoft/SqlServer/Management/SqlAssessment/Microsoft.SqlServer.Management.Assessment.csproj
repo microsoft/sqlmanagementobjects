@@ -6,9 +6,6 @@
     <RootNamespace>Microsoft.SqlServer.Management.Assessment</RootNamespace>
     <AssemblyName>Microsoft.SqlServer.Management.Assessment</AssemblyName>
     <SqlAssessmentSrcRoot>$(MsBuildThisFileDirectory)</SqlAssessmentSrcRoot>
-    <!-- Currently the assessment package doesn't have a netcoreapp3.1 binary, so use netstandard -->
-    <AssessmentRuntimeFramework>$(TargetFramework)</AssessmentRuntimeFramework>
-    <AssessmentRuntimeFramework Condition="'$(TargetGroup)' == 'netcore'">netstandard2.0</AssessmentRuntimeFramework>
   </PropertyGroup>
   
   <PropertyGroup>

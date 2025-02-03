@@ -11,7 +11,6 @@ using System.Text;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Smo
 {

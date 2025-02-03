@@ -6,7 +6,7 @@
   </AkvAccess>
   <!-- SAPASSWORD has to be set as environment variable in the github action -->
   <ConnectionString name="localhost"
-            connectionString="Data Source=.;Initial Catalog=master;User ID=sa;Trust Server Certificate=true"
+            connectionString="Data Source=.;Initial Catalog=master;User ID=sa"
             databaseenginetype="Standalone"
             enabled_features='Hekaton, SqlClr'
             passwordCredential='SAPASSWORD'

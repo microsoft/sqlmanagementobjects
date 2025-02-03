@@ -632,7 +632,7 @@
   <Import Project="$(BuildPropsDir)\DdlEvents.targets" />
   <PropertyGroup>
       <CodeGenPlatform Condition="'$(TargetGroup)' == 'netfx'">$(TargetFramework)</CodeGenPlatform>
-      <CodeGenPlatform Condition="'$(TargetGroup)' != 'netfx'">net6.0</CodeGenPlatform>
+      <CodeGenPlatform Condition="'$(TargetGroup)' != 'netfx'">net8.0</CodeGenPlatform>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="$(BrokerEnumSrc)\Microsoft.SqlServer.ServiceBrokerEnum.csproj" />

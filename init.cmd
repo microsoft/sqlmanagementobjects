@@ -32,7 +32,7 @@ doskey slngen19=slngen -vs "C:\Program Files (x86)\Microsoft Visual Studio\2019\
 
 REM == Common test command:
 doskey rtests=pushd %BASEDIR%bin\debug\net472$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
-doskey netcoretests=pushd %BASEDIR%bin\debug\net6.0$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
+doskey netcoretests=pushd %BASEDIR%bin\debug\net8.0$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
 
 title git %BASEDIR%
 

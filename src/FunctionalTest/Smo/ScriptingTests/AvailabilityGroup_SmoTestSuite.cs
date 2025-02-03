@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabaseEdge)]
     public class AvailabilityGroup_SmoTestSuite : SmoObjectTestBase
     {
-#region Property Tests
+        #region Property Tests
 
         /// <summary>
         /// Test ClusterType getter/setter on unsupported server versions.
@@ -71,9 +71,93 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             });
         }
 
-#endregion
+        #endregion
 
-#region Scripting Tests
+        #region Scripting Tests
+
+        /// <summary>
+        /// Validate the scripting of ReadonlyRoutingConnectionUrl property when targeting SQL 2022 or lower. 
+        /// </summary>
+        /// <remarks>The reason this test exists is because starting with SQL 2025, the scripting is slightly
+        /// different and more aligned with the scripting of the ReadwriteRoutingConnectionUrl property.
+        /// </remarks>
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 14, MaxMajor = 16)]
+        [DataTestMethod]
+        [DataRow("tcp://dummy.com", true,  "READ_ONLY_ROUTING_URL = N'tcp://dummy.com'")]
+        [DataRow(null,              false, "READ_ONLY_ROUTING_URL")]
+        [DataRow("",                false, "READ_ONLY_ROUTING_URL")]
+        public void AvailabilityGroup_Scripting_ReadonlyRoutingUrl160OrLower(string readonlyRoutingConnectionUrl, bool contains, string expectedSubString)
+        {
+            ExecuteTest(server =>
+            {
+                TraceHelper.TraceInformation($"Creating AG object for server '{server.Name}'...");
+                var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server, readonlyRoutingConnectionUrl: readonlyRoutingConnectionUrl);
+
+                Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                    contains ? Does.Contain(expectedSubString) : Does.Not.Contain(expectedSubString),
+                    "Unexpected scripting of READ_ONLY_ROUTING_URL");
+            });
+        }
+
+        /// <summary>
+        /// Validate the scripting of ReadonlyRoutingConnectionUrl property when targeting SQL 2025 or higher. 
+        /// </summary>
+        /// <remarks>The test is very similar to <seealso cref="AvailabilityGroup_Scripting_ReadonlyRoutingUrl160OrLower"/>,
+        /// and only differs in the handling of the empty string value.
+        /// </remarks>
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [DataTestMethod]
+        [DataRow("tcp://dummy.com", true, "READ_ONLY_ROUTING_URL = N'tcp://dummy.com'")]
+        [DataRow("",                true, "READ_ONLY_ROUTING_URL = NONE")]
+        [DataRow(null,              false,"READ_ONLY_ROUTING_URL")]
+        public void AvailabilityGroup_Scripting_ReadonlyRoutingUrl170OrHigher(string readonlyRoutingConnectionUrl, bool contains, string expectedSubString)
+        {
+            ExecuteTest(server =>
+            {
+                TraceHelper.TraceInformation($"Creating AG object for server '{server.Name}'...");
+                var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server, readonlyRoutingConnectionUrl: readonlyRoutingConnectionUrl);
+
+                Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                    contains ? Does.Contain(expectedSubString) : Does.Not.Contain(expectedSubString),
+                    "Unexpected scripting of READ_ONLY_ROUTING_URL");
+            });
+        }
+
+        /// <summary>
+        /// Validate the scripting of ReadwriteRoutingConnectionUrl property when targeting SQL 2025 or higher. 
+        /// </summary>
+        /// <remarks>This property did not exist in SQL 2022 and below. The structure of the test mimics very closely
+        /// <seealso cref="AvailabilityGroup_Scripting_ReadonlyRoutingUrl170OrHigher"/>
+        /// <para>
+        /// Another interesting note is that, READ_WRITE_ROUTING_URL is not new in SQL 2025... however, it was decided
+        /// not to expose it in SMO for older versions at least for now. 
+        /// </para>
+        /// </remarks>
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [DataTestMethod]
+        [DataRow("tcp://dummy.com",true, "READ_WRITE_ROUTING_URL = N'tcp://dummy.com'")]
+        [DataRow("",               true, "READ_WRITE_ROUTING_URL = NONE")]
+        [DataRow(null,             false,"READ_WRITE_ROUTING_URL")]
+        [DataRow("NONE",           true, "READ_WRITE_ROUTING_URL = NONE")]
+        [DataRow("<NULL>",         true, "READ_WRITE_ROUTING_URL = NONE")]  /* special value that really means to assign null to the property */
+        public void AvailabilityGroup_Scripting_ReadwriteRoutingUrl(string readwriteRoutingConnectionUrl, bool contains, string expectedSubString)
+        {
+            ExecuteTest(server =>
+            {
+                TraceHelper.TraceInformation($"Creating AG object for server '{server.Name}'...");
+                var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server, readwriteRoutingConnectionUrl: readwriteRoutingConnectionUrl);
+
+                Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                    contains ? Does.Contain(expectedSubString) : Does.Not.Contain(expectedSubString),
+                    "Unexpected scripting of READ_WRITE_ROUTING_URL");
+            });
+        }
 
         /// <summary>
         /// Test creating an AG of various ClusterTypes on supported server versions.

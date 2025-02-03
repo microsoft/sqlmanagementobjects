@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if  !NETCOREAPP
 using Microsoft.SqlServer.Smo.UnSafeInternals;
 #endif
 
@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     {
         internal static void EnterMonitor(object lockObject)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             ManagementUtil.EnterMonitor(lockObject);
 #else
             Monitor.Enter(lockObject);
@@ -29,7 +29,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         internal static void ExitMonitor(object lockObject)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             ManagementUtil.ExitMonitor(lockObject);
 #else
             Monitor.Exit(lockObject);
@@ -38,7 +38,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         internal static Object CreateInstance(Assembly assembly, string objectType)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             return ManagementUtil.CreateInstance(assembly, objectType);
 #else
             return assembly.CreateInstance(objectType,
@@ -54,7 +54,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         internal static Assembly LoadAssemblyFromFile(String fileName)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             return ManagementUtil.LoadAssemblyFromFile(fileName);
 #else
             return Assembly.LoadFile(fileName);
@@ -63,7 +63,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         internal static Stream LoadResourceFromAssembly(Assembly assembly, String resourceFileName)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             return ManagementUtil.LoadResourceFromAssembly(assembly, resourceFileName);
 #else
             Stream stream = assembly.GetManifestResourceStream(assembly.GetName().Name + "." + resourceFileName);
@@ -74,7 +74,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         internal static string GetAssemblyName(Assembly assembly)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             return ManagementUtil.GetAssemblyName(assembly);
 #else
             return assembly.GetName().Name;
@@ -89,7 +89,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         internal static TypeConverter GetTypeConverter(Type t)
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             return ManagementUtil.GetTypeConverter(t);
 #else
             return TypeDescriptor.GetConverter(t);

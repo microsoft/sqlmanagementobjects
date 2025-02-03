@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo.SqlEnum;
 using System;

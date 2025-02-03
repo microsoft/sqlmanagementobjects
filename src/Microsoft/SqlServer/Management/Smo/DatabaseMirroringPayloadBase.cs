@@ -3,7 +3,6 @@
 
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-using Cmn = Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Smo
 {

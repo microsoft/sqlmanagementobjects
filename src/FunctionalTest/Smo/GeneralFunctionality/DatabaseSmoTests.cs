@@ -361,7 +361,64 @@ END");
             });
         }
 
-
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
+        [DataRow(true)]
+        [DataRow(false)]
+        [DataRow(null)]
+        public void Database_PrefetchObjects_does_not_fetch_extended_properties_unless_requested(bool? fetchExtendedProperties)
+        {
+            ExecuteFromDbPool(db =>
+            {
+                // make sure we have a table
+                _ = db.CreateTable("Prefetch");
+                
+                {
+                    fetchExtendedProperties = db.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase;
+                }
+                var scriptingOptions = fetchExtendedProperties.HasValue ? 
+                  new ScriptingOptions { ExtendedProperties = fetchExtendedProperties.Value } : null;
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                {
+                    eventRecorder.Start();
+                    if (scriptingOptions != null)
+                    {
+                        db.PrefetchObjects(typeof(Table), scriptingOptions);
+                    }
+                    else
+                    {
+                        db.PrefetchObjects(typeof(Table));
+                    }
+                    eventRecorder.Stop();
+                    var messages = string.Join(Environment.NewLine, eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString()));
+                    messages = messages.Replace(@"CAST(
+ case 
+    when tbl.is_ms_shipped = 1 then 1
+    when (
+        select 
+            major_id 
+        from 
+            sys.extended_properties 
+        where 
+            major_id = tbl.object_id and 
+            minor_id = 0 and 
+            class = 1 and 
+            name = N'microsoft_database_tools_support') 
+        is not null then 1
+    else 0
+end          
+             AS bit) AS [IsSystemObject],".FixNewLines(), "");
+                    if (fetchExtendedProperties ?? true)
+                    {
+                        Assert.That(messages, Does.Contain("extended_properties"), "PrefetchObjects(Table, ScriptingOptions) should fetch extended properties");
+                    }
+                    else
+                    {
+                        Assert.That(messages, Does.Not.Contain("extended_properties"), "PrefetchObjects(Table, ScriptingOptions) should not fetch extended properties");
+                    }
+                }
+            });
+        }
         /// <summary>
         /// This is the set of child object types that don't have a Database.PrefetchObjectsImpl implementation.
         /// As of Dec 2019 it's not clear what criteria to use to choose which child collections should

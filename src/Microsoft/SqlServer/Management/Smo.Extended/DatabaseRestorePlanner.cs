@@ -9,9 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
-#if NETSTANDARD2_0
-using Microsoft.SqlServer.SmoExtended;
-#endif
+
 namespace Microsoft.SqlServer.Management.Smo
 {
     /// <summary>

@@ -389,9 +389,10 @@ namespace Microsoft.SqlServer.Management.Smo
         November,
         December
     }
-    
+
     /// <summary>
-    /// the possible values returned by SERVERPROPERTY['EngineEdition']
+    /// The possible values returned by SERVERPROPERTY('EngineEdition').
+    /// See <see href="https://learn.microsoft.com/sql/t-sql/functions/serverproperty-transact-sql" /> for more details
     /// </summary>
     public enum Edition
     {
@@ -401,27 +402,62 @@ namespace Microsoft.SqlServer.Management.Smo
            make sure to update both enums with any changes
         **/
         Unknown = 0,
-        ///The server is Personal or standard
-        PersonalOrDesktopEngine = 1,
-        ///The server is Standard
-        Standard = 2,
-        ///The server is Enterprise
-        EnterpriseOrDeveloper = 3,
-        ///The server is Express
-        Express = 4,
-        ///The server is SqlDatabase (Azure)
+        /// <summary>
+        /// Personal or Desktop Engine (Not available in SQL Server 2005 (9.x) and later versions.)
+        /// </summary>
+        PersonalOrDesktopEngine = 0x000001,
+
+        /// <summary>
+        /// Standard (For Standard, Web, and Business Intelligence.)
+        /// </summary>
+        Standard = 0x000002,
+
+        /// <summary>
+        /// Enterprise (For Evaluation, Developer, and Enterprise editions.)
+        /// </summary>
+        EnterpriseOrDeveloper = 0x000003,
+
+        /// <summary>
+        /// Express (For Express, Express with Tools, and Express with Advanced Services)
+        /// </summary>
+        Express = 0x000004,
+
+        /// <summary>
+        /// Azure SQL Database
+        /// </summary>
         SqlDatabase = 0x000005,
-        ///The server is a DataWarehouse
+
+        /// <summary>
+        /// Azure Synapse dedicated SQL pool (formerly DataWarehouse)
+        /// </summary>
         SqlDataWarehouse = 0x000006,
-        ///The server is a StretchDatabase
+        /// <summary>
+        /// Azure Synapse dedicated SQL pool (formerly DataWarehouse)
+        /// </summary>
+        AzureSynapseDedicatedSqlPool = 0x000006,
+        /// <summary>
+        /// Stretch Database
+        /// </summary>
         SqlStretchDatabase = 0x000007,
-        ///The server is a SQL Managed Instance
+
+        /// <summary>
+        /// Azure SQL Managed Instance
+        /// </summary>
         SqlManagedInstance = 0x000008,
-        ///The server is a SQL Edge Instance
+
+        /// <summary>
+        /// Azure SQL Edge (For all editions of Azure SQL Edge)
+        /// </summary>
         SqlDatabaseEdge = 0x000009,
-        ///The server is an Azure Arc Managed SQL Instance
+
+        /// <summary>
+        /// Azure Arc Managed SQL Instance
+        /// </summary>
         SqlAzureArcManagedInstance = 0x00000A,
-        ///The server is SQL SqlOnDemand
+
+        /// <summary>
+        /// Azure Synapse serverless SQL pool (SQL OnDemand)
+        /// </summary>
         SqlOnDemand = 0x00000B,
         /*
          * NOTE: If you're adding new value here,

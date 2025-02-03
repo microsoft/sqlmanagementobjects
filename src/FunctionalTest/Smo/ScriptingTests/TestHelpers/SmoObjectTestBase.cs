@@ -163,7 +163,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         }
 
         /// <summary>
-        /// Verify CreateOrAlter method for object when not existing, this calls CreateOrAlter() by itself - the caller shouldn't do that.
+        /// Verify CreateOrAlter method for object, when it doesn't exist. This method calls CreateOrAlter() by itself, which shouldn't be done by the caller.
         /// Test steps:
         /// 1. Verify scripting is ending with expected script text using ScriptCreateOrAlter() before the object was created.
         /// 2. Create the object using CreateOrAlter().
@@ -196,7 +196,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="obj">Smo object.</param>
         /// <param name="expectedScriptText">Expected part of script statement.</param>
         /// </summary>
-        protected void VerifySmoObjectCreateOrAlterForAlter(_SMO.Database database ,_SMO.SqlSmoObject obj, string expectedScriptText)
+        protected void VerifySmoObjectCreateOrAlterForAlter(_SMO.Database database, _SMO.SqlSmoObject obj, string expectedScriptText)
         {
             // 1. Alter the object
             //

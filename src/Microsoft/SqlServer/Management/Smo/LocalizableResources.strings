@@ -23,7 +23,7 @@ ServerSQL15 = SQL Server 2016
 ServerSQL2017 = SQL Server 2017
 ServerSQLv150 = SQL Server 2019
 ServerSQLv160 = SQL Server 2022
-ServerSQLv170 = Azure SQL
+ServerSQLv170 = SQL Server 2025
 #VBUMP
 EngineCloud = Microsoft Azure SQL Database
 EngineCloudMI = Microsoft Azure SQL Managed Instance
@@ -4007,6 +4007,9 @@ AvailabilityReplica_EndpointUrlDesc=Gets or sets the Endpoint Url for the Availa
 
 AvailabilityReplica_ReadonlyRoutingConnectionUrlName=Readonly Routing Connection Url
 AvailabilityReplica_ReadonlyRoutingConnectionUrlDesc=Gets or sets the url for readonly routing connection.
+
+AvailabilityReplica_ReadwriteRoutingConnectionUrlName=Readwrite Routing Connection Url
+AvailabilityReplica_ReadwriteRoutingConnectionUrlDesc=Gets or sets the url for readwrite routing connection.
 
 AvailabilityReplica_ConnectionModeInPrimaryRoleName=Connection Mode In Primary Role.
 AvailabilityReplica_ConnectionModeInPrimaryRoleDesc=Gets or sets the allowable connection modes when the replica is a primary.

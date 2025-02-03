@@ -175,11 +175,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         Console.ReadLine();
                     }
 #endif
-#if NETSTANDARD2_0
-                    XmlTextReader reader = new XmlTextReader(fs, new XmlReaderSettings {DtdProcessing = DtdProcessing.Prohibit});
-#else
-                    XmlTextReader reader = new XmlTextReader(fs){DtdProcessing = DtdProcessing.Prohibit};
-#endif
+                    var reader = new XmlTextReader(fs) { DtdProcessing = DtdProcessing.Prohibit };
                     reader.MoveToContent();
                     XmlUtility.SelectNextElement(reader);
 

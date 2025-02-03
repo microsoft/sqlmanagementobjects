@@ -83,5 +83,24 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
            TraceHelper.TraceInformation("Found expected exception {0} with error message '{1}'", e.GetType().Name, errorMessage);
             return true;
         }
+
+        /// <summary>
+        /// Returns the first InnerException of the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static T FirstInstanceOf<T>(this Exception e) where T : Exception
+        {
+            while (e != null)
+            {
+                if (e is T t)
+                {
+                    return t;
+                }
+                e = e.InnerException;
+            }
+            return null;
+        }
     }
 }

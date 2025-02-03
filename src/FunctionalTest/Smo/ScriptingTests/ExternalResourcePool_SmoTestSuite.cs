@@ -10,7 +10,6 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using smo = Microsoft.SqlServer.Management.Smo;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -26,7 +25,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         private const int DefaultMaxCpuPercent = 100;
         private const int DefaultMaxMemoryPercent = 20;
         private const int DefaultMaxProcesses = 0;
-        private const smo.AffinityType DefaultAffinityType = smo.AffinityType.Auto;
+        private const Management.Smo.AffinityType DefaultAffinityType = Management.Smo.AffinityType.Auto;
 
         #region Test methods
 
@@ -54,10 +53,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     try
                     {
-                        smo.ExternalResourcePool pool = new smo.ExternalResourcePool(server.ResourceGovernor, poolName);
+                        Management.Smo.ExternalResourcePool pool = new Management.Smo.ExternalResourcePool(server.ResourceGovernor, poolName);
                         CreatePoolAndVerify(server, pool);
 
-                        AlterPoolAndVerify(server, pool, 21, 22, 23, smo.AffinityType.Manual, new int[] { 0 });
+                        AlterPoolAndVerify(server, pool, 21, 22, 23, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
                         // Revert back to default properties (tests the ability to change from manual to auto affinity type)
                         AlterPoolAndVerify(server, pool);
@@ -95,8 +94,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     try
                     {
-                        smo.ExternalResourcePool pool = new smo.ExternalResourcePool(server.ResourceGovernor, poolName);
-                        CreatePoolAndVerify(server, pool, 21, 22, 23, smo.AffinityType.Manual, new int[] { 0 });
+                        Management.Smo.ExternalResourcePool pool = new Management.Smo.ExternalResourcePool(server.ResourceGovernor, poolName);
+                        CreatePoolAndVerify(server, pool, 21, 22, 23, Management.Smo.AffinityType.Manual, new int[] { 0 });
                     }
                     finally
                     {
@@ -133,14 +132,14 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     string poolName = GenerateUniqueSmoObjectName("rp");
 
-                    smo.ExternalResourcePool defaultPool = server.ResourceGovernor.ExternalResourcePools[DefaultName];
+                    Management.Smo.ExternalResourcePool defaultPool = server.ResourceGovernor.ExternalResourcePools[DefaultName];
                     Assert.IsNotNull(defaultPool);
 
                     try
                     {
-                        AlterPoolAndVerify(server, defaultPool, 21, 22, 23, smo.AffinityType.Manual, new int[] { 0 });
+                        AlterPoolAndVerify(server, defaultPool, 21, 22, 23, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
-                        smo.ExternalResourcePool pool = new smo.ExternalResourcePool(server.ResourceGovernor, poolName);
+                        Management.Smo.ExternalResourcePool pool = new Management.Smo.ExternalResourcePool(server.ResourceGovernor, poolName);
                         CreatePoolAndVerify(server, pool);
                     }
                     finally
@@ -182,20 +181,20 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     try
                     {
-                        smo.ExternalResourcePool pool = new smo.ExternalResourcePool(server.ResourceGovernor, poolName)
+                        Management.Smo.ExternalResourcePool pool = new Management.Smo.ExternalResourcePool(server.ResourceGovernor, poolName)
                         {
                             MaximumCpuPercentage = 21,
                             MaximumMemoryPercentage = 22,
                             MaximumProcesses = 23,
                         };
 
-                        pool.ExternalResourcePoolAffinityInfo.AffinityType = smo.AffinityType.Manual;
+                        pool.ExternalResourcePoolAffinityInfo.AffinityType = Management.Smo.AffinityType.Manual;
                         pool.ExternalResourcePoolAffinityInfo.Cpus.SetAffinityToRange(0, 0, true);
 
                         // Step 1:
                         // Create scripts for create, create if not exists
                         TraceHelper.TraceInformation("Scripting create external resource pool {0}", poolName);
-                        smo.ScriptingOptions so = new smo.ScriptingOptions();
+                        Management.Smo.ScriptingOptions so = new Management.Smo.ScriptingOptions();
                         string createExternalPoolScript = GetScript(pool, so);
 
                         TraceHelper.TraceInformation("Scripting create if not exists external pool {0}", poolName);
@@ -211,7 +210,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         server.ResourceGovernor.ExternalResourcePools.Refresh();
                         Assert.IsTrue(server.ResourceGovernor.ExternalResourcePools.Contains(poolName), "Can't read external resource pool information back");
                         pool = server.ResourceGovernor.ExternalResourcePools[poolName];
-                        VerifyPoolValues(server, pool, 21, 22, 23, smo.AffinityType.Manual, new int[] { 0 });
+                        VerifyPoolValues(server, pool, 21, 22, 23, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
                         // Step 3:
                         // Create the pool with IncludeIfNotExists option
@@ -227,7 +226,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         // Step 4:
                         // Create scripts for drop, drop if exists
                         TraceHelper.TraceInformation("Scripting drop external resource pool {0}", poolName);
-                        so = new smo.ScriptingOptions();
+                        so = new Management.Smo.ScriptingOptions();
                         so.ScriptDrops = true;
                         string dropExternalPoolScript = GetScript(pool, so);
 
@@ -293,26 +292,26 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     try
                     {
-                        smo.ExternalResourcePool pool = new smo.ExternalResourcePool(server.ResourceGovernor, poolName);
+                        Management.Smo.ExternalResourcePool pool = new Management.Smo.ExternalResourcePool(server.ResourceGovernor, poolName);
                         CreatePoolAndVerify(server, pool);
 
-                        smo.ExternalResourcePoolAffinityInfo affinityInfo = pool.ExternalResourcePoolAffinityInfo;
+                        Management.Smo.ExternalResourcePoolAffinityInfo affinityInfo = pool.ExternalResourcePoolAffinityInfo;
                         Assert.IsNotNull(affinityInfo);
 
-                        affinityInfo.AffinityType = smo.AffinityType.Manual;
+                        affinityInfo.AffinityType = Management.Smo.AffinityType.Manual;
                         affinityInfo.Cpus.SetAffinityToRange(0, 0, true);
 
                         TraceHelper.TraceInformation("Altering external pool affinity with affinityType = {0}", affinityInfo.AffinityType);
                         affinityInfo.Alter();
                         affinityInfo.Refresh();
 
-                        VerifyPoolAffinity(affinityInfo, smo.AffinityType.Manual, new int[] { 0 });
+                        VerifyPoolAffinity(affinityInfo, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
                         pool.Refresh();
-                        VerifyPoolAffinity(pool.ExternalResourcePoolAffinityInfo, smo.AffinityType.Manual, new int[] { 0 });
+                        VerifyPoolAffinity(pool.ExternalResourcePoolAffinityInfo, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
                         // Revert back to default values
-                        affinityInfo.AffinityType = smo.AffinityType.Auto;
+                        affinityInfo.AffinityType = Management.Smo.AffinityType.Auto;
                         TraceHelper.TraceInformation("Altering external pool affinity with affinityType = {0}", affinityInfo.AffinityType);
                         affinityInfo.Alter();
                         server.ResourceGovernor.ExternalResourcePools.Refresh();
@@ -356,28 +355,28 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     try
                     {
-                        smo.ExternalResourcePool pool = new smo.ExternalResourcePool(server.ResourceGovernor, poolName);
+                        Management.Smo.ExternalResourcePool pool = new Management.Smo.ExternalResourcePool(server.ResourceGovernor, poolName);
                         CreatePoolAndVerify(server, pool);
 
-                        smo.ExternalResourcePoolAffinityInfo affinityInfo = pool.ExternalResourcePoolAffinityInfo;
+                        Management.Smo.ExternalResourcePoolAffinityInfo affinityInfo = pool.ExternalResourcePoolAffinityInfo;
                         Assert.IsNotNull(affinityInfo);
 
-                        affinityInfo.AffinityType = smo.AffinityType.Manual;
+                        affinityInfo.AffinityType = Management.Smo.AffinityType.Manual;
                         affinityInfo.Cpus.SetAffinityToRange(0, 0, true);
 
                         TraceHelper.TraceInformation("Scripting alter external pool affinity to non-default values");
-                        smo.ScriptingOptions so = new smo.ScriptingOptions();
+                        Management.Smo.ScriptingOptions so = new Management.Smo.ScriptingOptions();
                         string alterAffinityScript = GetScript(affinityInfo, so);
 
                         TraceHelper.TraceInformation("Executing alter script");
                         server.ConnectionContext.ExecuteNonQuery(alterAffinityScript);
 
                         affinityInfo.Refresh();
-                        VerifyPoolAffinity(affinityInfo, smo.AffinityType.Manual, new int[] { 0 });
+                        VerifyPoolAffinity(affinityInfo, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
                         // Revert back to default values
                         TraceHelper.TraceInformation("Scripting alter external pool affinity back to default values");
-                        affinityInfo.AffinityType = smo.AffinityType.Auto;
+                        affinityInfo.AffinityType = Management.Smo.AffinityType.Auto;
                         alterAffinityScript = GetScript(affinityInfo, so);
 
                         TraceHelper.TraceInformation("Executing alter script");
@@ -413,7 +412,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteTest(
                 server =>
                 {
-                    smo.ExternalResourcePool pool = server.ResourceGovernor.ExternalResourcePools[DefaultName];
+                    Management.Smo.ExternalResourcePool pool = server.ResourceGovernor.ExternalResourcePools[DefaultName];
                     Assert.IsNotNull(pool);
 
                     TraceHelper.TraceInformation("Verify the default external resource pool has default values");
@@ -422,11 +421,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     pool.MaximumCpuPercentage = 21;
                     pool.MaximumMemoryPercentage = 22;
                     pool.MaximumProcesses = 23;
-                    pool.ExternalResourcePoolAffinityInfo.AffinityType = smo.AffinityType.Manual;
+                    pool.ExternalResourcePoolAffinityInfo.AffinityType = Management.Smo.AffinityType.Manual;
                     pool.ExternalResourcePoolAffinityInfo.Cpus.GetByID(0).AffinityMask = true;
 
                     TraceHelper.TraceInformation("Change the default pool's values to non-default");
-                    VerifyPoolValues(server, pool, 21, 22, 23, smo.AffinityType.Manual, new int[] { 0 });
+                    VerifyPoolValues(server, pool, 21, 22, 23, Management.Smo.AffinityType.Manual, new int[] { 0 });
 
                     TraceHelper.TraceInformation("Refresh the pool");
                     pool.Refresh();
@@ -447,8 +446,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 server =>
                 {
                     string rpName = GenerateUniqueSmoObjectName("rp");
-                    smo.ResourceGovernor rg = server.ResourceGovernor;
-                    smo.ExternalResourcePool rp = new smo.ExternalResourcePool(rg, rpName);
+                    Management.Smo.ResourceGovernor rg = server.ResourceGovernor;
+                    Management.Smo.ExternalResourcePool rp = new Management.Smo.ExternalResourcePool(rg, rpName);
 
                     try
                     {
@@ -474,10 +473,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="obj">Smo object.</param>
         /// <param name="objVerify">Smo object used for verification of drop.</param>
         /// </summary>
-        protected override void VerifyIsSmoObjectDropped(smo.SqlSmoObject obj, smo.SqlSmoObject objVerify)
+        protected override void VerifyIsSmoObjectDropped(Management.Smo.SqlSmoObject obj, Management.Smo.SqlSmoObject objVerify)
         {
-            smo.ExternalResourcePool rp = (smo.ExternalResourcePool)obj;
-            smo.ResourceGovernor rg = (smo.ResourceGovernor)objVerify;
+            Management.Smo.ExternalResourcePool rp = (Management.Smo.ExternalResourcePool)obj;
+            Management.Smo.ResourceGovernor rg = (Management.Smo.ResourceGovernor)objVerify;
 
             rg.ExternalResourcePools.Refresh();
             Assert.IsNull(rg.ExternalResourcePools[rp.Name],
@@ -494,15 +493,15 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="maxProcesses">Requested max processes</param>
         /// <param name="affinityType">Requested affinity type</param>
         /// <param name="affinitizedCpuIds">Reqested CPU ids to affinitize</param>
-        private void CreatePoolAndVerify(smo.Server server,
-                                        smo.ExternalResourcePool pool,
+        private void CreatePoolAndVerify(Management.Smo.Server server,
+                                        Management.Smo.ExternalResourcePool pool,
                                         int? maxCpuPercent = null,
                                         int? maxMemoryPercent = null,
                                         long? maxProcesses = null,
-                                        smo.AffinityType? affinityType = null,
+                                        Management.Smo.AffinityType? affinityType = null,
                                         int[] affinitizedCpuIds = null)
         {
-            if ((!affinityType.HasValue || affinityType == smo.AffinityType.Auto) != (affinitizedCpuIds == null))
+            if ((!affinityType.HasValue || affinityType == Management.Smo.AffinityType.Auto) != (affinitizedCpuIds == null))
             {
                 throw new ArgumentException("affinityType == auto iff affinitizedCpuIds == null");
             }
@@ -556,15 +555,15 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="maxProcesses">Requested max processes</param>
         /// <param name="affinityType">Requested affinity type</param>
         /// <param name="affinitizedCpuIds">Reqested CPU ids to affinitize</param>
-        private void AlterPoolAndVerify(smo.Server server,
-                                        smo.ExternalResourcePool pool,
+        private void AlterPoolAndVerify(Management.Smo.Server server,
+                                        Management.Smo.ExternalResourcePool pool,
                                         int maxCpuPercent = DefaultMaxCpuPercent,
                                         int maxMemoryPercent = DefaultMaxMemoryPercent,
                                         long maxProcesses = DefaultMaxProcesses,
-                                        smo.AffinityType affinityType = DefaultAffinityType,
+                                        Management.Smo.AffinityType affinityType = DefaultAffinityType,
                                         int[] affinitizedCpuIds = null)
         {
-            if ((affinityType == smo.AffinityType.Auto) != (affinitizedCpuIds == null))
+            if ((affinityType == Management.Smo.AffinityType.Auto) != (affinitizedCpuIds == null))
             {
                 throw new ArgumentException("affinityType == auto iff affinitizedCpuIds == null");
             }
@@ -600,12 +599,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="maxProcesses">Expected max memory value. If null, the default value is validated</param>
         /// <param name="affinityType">Expected affinity type value. If null, the default value is validated</param>
         /// <param name="affinitizedCpuIds">Expected affinitized cpu ids. If null or empty, no cpu ids are expected to be affinitized</param>
-        private void VerifyPoolValues(smo.Server server,
-                                      smo.ExternalResourcePool pool,
+        private void VerifyPoolValues(Management.Smo.Server server,
+                                      Management.Smo.ExternalResourcePool pool,
                                       int? maxCpuPercent = null,
                                       int? maxMemoryPercent = null,
                                       long? maxProcesses = null,
-                                      smo.AffinityType? affinityType = null,
+                                      Management.Smo.AffinityType? affinityType = null,
                                       int[] affinitizedCpuIds = null)
         {
             maxCpuPercent = maxCpuPercent ?? DefaultMaxCpuPercent;
@@ -626,7 +625,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 Assert.IsFalse(pool.IsSystemObject, "IsSystemObject value is not correct");
             }
 
-            Assert.AreEqual(smo.SqlSmoState.Existing, pool.State, "State value is not correct");
+            Assert.AreEqual(Management.Smo.SqlSmoState.Existing, pool.State, "State value is not correct");
             Assert.AreEqual(maxCpuPercent, pool.MaximumCpuPercentage, "MaximumCpuPercentage value is not correct.");
             Assert.AreEqual(maxMemoryPercent, pool.MaximumMemoryPercentage, "MaximumMemoryPercentage value is not correct.");
             Assert.AreEqual(maxProcesses, pool.MaximumProcesses, "MaximumProcesses value is not correct.");
@@ -643,9 +642,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="affinityInfo">The pool affinity to validate</param>
         /// <param name="affinityType">Expected affinity type value. If null, the default value is validated</param>
         /// <param name="affinitizedCpuIds">Expected affinitized cpu ids. If null or empty, no cpu ids are expected to be affinitized</param>
-        private void VerifyPoolAffinity(smo.ExternalResourcePoolAffinityInfo affinityInfo, smo.AffinityType? affinityType = null, int[] affinitizedCpuIds = null)
+        private void VerifyPoolAffinity(Management.Smo.ExternalResourcePoolAffinityInfo affinityInfo, Management.Smo.AffinityType? affinityType = null, int[] affinitizedCpuIds = null)
         {
-            if ((!affinityType.HasValue || affinityType == smo.AffinityType.Auto) != (affinitizedCpuIds == null))
+            if ((!affinityType.HasValue || affinityType == Management.Smo.AffinityType.Auto) != (affinitizedCpuIds == null))
             {
                 throw new ArgumentException("affinityType == auto iff affinitizedCpuIds == null");
             }
@@ -655,7 +654,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
             TraceHelper.TraceInformation("Verifying external pool {0} with values affinityType = {1}", affinityInfo.Parent.Name, affinityType);
 
-            Assert.AreEqual<smo.AffinityType>(affinityType.Value, affinityInfo.AffinityType, "External resource pool affinity type is not correct.");
+            Assert.AreEqual<Management.Smo.AffinityType>(affinityType.Value, affinityInfo.AffinityType, "External resource pool affinity type is not correct.");
             VerifyCpuAffinity(affinityInfo, affinitizedCpuIds);
             VerifyCpuAffinityInNumaNode(affinityInfo, affinitizedCpuIds);
         }
@@ -665,17 +664,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         /// <param name="affinityInfo">The pool affinity to validate</param>
         /// <param name="affinitizedCpuIds">CPU ids that are expected to be affinitized</param>
-        private void VerifyCpuAffinity(smo.ExternalResourcePoolAffinityInfo affinityInfo, int[] affinitizedCpuIds)
+        private void VerifyCpuAffinity(Management.Smo.ExternalResourcePoolAffinityInfo affinityInfo, int[] affinitizedCpuIds)
         {
             // Check that all the cpu ids in the CPU collection have the expected affinity mask
-            foreach (smo.Cpu cpu in affinityInfo.Cpus)
+            foreach (Management.Smo.Cpu cpu in affinityInfo.Cpus)
             {
                 bool expectedAffinity = affinitizedCpuIds.Contains(cpu.ID);
                 Assert.AreEqual(expectedAffinity, cpu.AffinityMask, "Affinity mask of cpu id {0} is incorrect", cpu.ID);
             }
 
             // Check that all the ids in AffitinizedCPUs are expected to be affinitized
-            foreach (smo.Cpu cpu in affinityInfo.Cpus.AffitinizedCPUs)
+            foreach (Management.Smo.Cpu cpu in affinityInfo.Cpus.AffitinizedCPUs)
             {
                 Assert.IsTrue(affinitizedCpuIds.Contains(cpu.ID), "Cpu id {0} is not expected to be affinitized", cpu.ID);
             }
@@ -692,7 +691,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         /// <param name="affinityInfo">The pool affinity to validate</param>
         /// <param name="affinitizedCpuIds">CPU ids that are expected to be affinitized</param>
-        private void VerifyCpuAffinityInNumaNode(smo.ExternalResourcePoolAffinityInfo affinityInfo, int[] affinitizedCpuIds)
+        private void VerifyCpuAffinityInNumaNode(Management.Smo.ExternalResourcePoolAffinityInfo affinityInfo, int[] affinitizedCpuIds)
         {
             List<int> affinitizedNumaNodes =  new List<int>();
 
@@ -708,35 +707,35 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             }
 
             // Check that all the numa nodes in the NumaNodes collection have the expected affinify
-            foreach (smo.NumaNode numaNode in affinityInfo.NumaNodes)
+            foreach (Management.Smo.NumaNode numaNode in affinityInfo.NumaNodes)
             {
-                smo.NumaNodeAffinity expectedNumaNodeAffinity;
+                Management.Smo.NumaNodeAffinity expectedNumaNodeAffinity;
                 if (affinitizedNumaNodes.Contains(numaNode.ID))
                 {
                     if (affinityInfo.NumaNodes[numaNode.ID].Cpus.Count == 1)
                     {
-                        expectedNumaNodeAffinity = smo.NumaNodeAffinity.Full;
+                        expectedNumaNodeAffinity = Management.Smo.NumaNodeAffinity.Full;
                     }
                     else
                     {
-                        expectedNumaNodeAffinity = smo.NumaNodeAffinity.Partial;
+                        expectedNumaNodeAffinity = Management.Smo.NumaNodeAffinity.Partial;
                     }
                 }
                 else
                 {
-                    expectedNumaNodeAffinity = smo.NumaNodeAffinity.None;
+                    expectedNumaNodeAffinity = Management.Smo.NumaNodeAffinity.None;
                 }
 
-                Assert.AreEqual<smo.NumaNodeAffinity>(expectedNumaNodeAffinity, numaNode.AffinityMask, "affinity of numa node {0} is incorrect", numaNode.ID);
+                Assert.AreEqual<Management.Smo.NumaNodeAffinity>(expectedNumaNodeAffinity, numaNode.AffinityMask, "affinity of numa node {0} is incorrect", numaNode.ID);
 
-                foreach (smo.Cpu cpu in numaNode.Cpus)
+                foreach (Management.Smo.Cpu cpu in numaNode.Cpus)
                 {
                     bool expectedAffinity = affinitizedCpuIds.Contains(cpu.ID);
                     Assert.AreEqual(expectedAffinity, cpu.AffinityMask, "Affinity mask of cpu id {0} is incorrect", cpu.ID);
                 }
             }
 
-            foreach (smo.Cpu cpu in affinityInfo.Cpus)
+            foreach (Management.Smo.Cpu cpu in affinityInfo.Cpus)
             {
                 if (cpu.AffinityMask)
                 {
@@ -751,7 +750,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="scriptable">The object to script</param>
         /// <param name="so">Scripting Options</param>
         /// <returns>A T-SQL query for performing the requested operation</returns>
-        private string GetScript(smo.IScriptable scriptable, smo.ScriptingOptions so)
+        private string GetScript(Management.Smo.IScriptable scriptable, Management.Smo.ScriptingOptions so)
         {
             StringCollection col = scriptable.Script(so);
             StringBuilder sb = new StringBuilder();

@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Text;
-using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo
 {

@@ -48,7 +48,7 @@ namespace Microsoft.SqlServer.Test.SMO.Agent
 
         [TestMethod]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
-        [SupportedServerVersionRange(MinMajor = 16, Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(MinMajor = 16, MaxMajor = 16, Edition = DatabaseEngineEdition.Enterprise)]
         public void JobServer_EnumPerformanceCounters_returns_agent_counters()
         {
             ExecuteTest(() =>

@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-#if !NETSTANDARD2_0
 using System;
 using System.ComponentModel;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
@@ -296,4 +294,3 @@ namespace Microsoft.SqlServer.Management.Common
 #endregion
     }
 }
-#endif

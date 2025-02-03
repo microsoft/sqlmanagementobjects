@@ -2,7 +2,7 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetfxVersion);netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Label="GAC build settings" Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
       <DefineConstants>$(DefineConstants);NATIVEBATCHPARSER</DefineConstants> 

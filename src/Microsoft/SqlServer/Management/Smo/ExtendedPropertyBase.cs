@@ -2,14 +2,11 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Collections;
 using System.Collections.Specialized;
-using System.Data;
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
 using Cmn = Microsoft.SqlServer.Management.Common;
-using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Smo
 {

@@ -2,9 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-#if !NETSTANDARD2_0
-using System.Security.Permissions;
-#endif
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587

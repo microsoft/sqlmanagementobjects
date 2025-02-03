@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Collections;
 using System.Collections.Specialized;
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc;

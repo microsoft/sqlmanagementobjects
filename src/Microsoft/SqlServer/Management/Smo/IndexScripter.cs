@@ -2793,9 +2793,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void Validate()
             {
-                ThrowIfBelowVersion130(preferences.TargetServerVersion);
-
-                this.CheckConflictingProperties();
+                if (preferences.TargetDatabaseEngineType == Cmn.DatabaseEngineType.Standalone)
+                {
+                    ThrowIfBelowVersion130(preferences.TargetServerVersion);
+                }
+                CheckConflictingProperties();
             }
 
             protected override void ScriptIndexHeader(StringBuilder sb)
@@ -2807,6 +2809,11 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 sb.AppendFormat(Scripts.INDEX_NAME, SqlBraket(index.Name));
                 sb.Append(Globals.space);
+                if (index.IsUnique)
+                {
+                    sb.Append(Scripts.UNIQUE);
+                    sb.Append(Globals.space);
+                }
                 sb.Append(index.IsClustered ? Scripts.CLUSTERED : Scripts.NONCLUSTERED);
                 sb.Append(Globals.space);
             }
@@ -2820,7 +2827,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void ScriptIndexOptions(StringBuilder sb)
             {
-                // Other index options are not supported for user defined table type Indexes
+                var ignoreDuplicateKeys = index.GetPropValueOptional<bool>(nameof(Index.IgnoreDuplicateKeys));
+                if (ignoreDuplicateKeys == true)
+                {
+                    ScriptIndexOption(sb, "IGNORE_DUP_KEY", GetOnOffValue(ignoreDuplicateKeys));
+                }
             }
 
             protected override void ScriptIndexRebuildOptions(StringBuilder withClause, int rebuildPartitionNumber)

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.0.52" />
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <VersionInfoFile Condition="'$(VersionInfoFile)'==''">AssemblyVersionInfo.cs</VersionInfoFile>
   </PropertyGroup>
   <ItemGroup Condition="'$(ExcludeVersionInfo)'==''">
-    <Compile Include="$(IntermediateOutputPath)$(VersionInfoFile)"/>
+    <Compile Include="$(IntermediateOutputPath)$(VersionInfoFile)" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <SqlStringResource>
@@ -26,8 +25,7 @@
   <ItemGroup Condition="'@(SqlStringResource)' != ''">
     <PackageReference Include="Microsoft.Data.Tools.StringResourceTool" PrivateAssets="all" />
   </ItemGroup>
-  <Target Name="GenAssemblyVersionInfoCs"
-      BeforeTargets="CoreCompile">
+  <Target Name="GenAssemblyVersionInfoCs" BeforeTargets="CoreCompile">
     <PropertyGroup>
         <Namespace Condition="'$(RootNamespace)' != ''">$(RootNamespace)</Namespace>
         <Namespace Condition="'$(Namespace)'==''">$(AssemblyName)</Namespace>
@@ -51,27 +49,15 @@ public const int MajorVersion = $(AssemblyMajorVersion)%3B
     </AssemblyVersionInfoContents>
     </PropertyGroup>
        <!-- Get the last version number we built with (if any) -->
-    <ReadLinesFromFile
-      Condition="Exists('$(IntermediateOutputPath)\LastVersionNumber')"
-      File="$(IntermediateOutputPath)\LastVersionNumber">
-      <Output TaskParameter="Lines" PropertyName="LastVersionNumber"/>
+    <ReadLinesFromFile Condition="Exists('$(IntermediateOutputPath)\LastVersionNumber')" File="$(IntermediateOutputPath)\LastVersionNumber">
+      <Output TaskParameter="Lines" PropertyName="LastVersionNumber" />
     </ReadLinesFromFile>
 
     <!-- Write ThisAssembly.cs if this is a new version number, or it is missing -->
-    <WriteLinesToFile
-      Condition="('$(LastVersionNumber)'!='$(VersionDigest)') or !Exists('$(IntermediateOutputPath)$(VersionInfoFile)')"
-      File="$(IntermediateOutputPath)$(VersionInfoFile)"
-      Lines="$(AssemblyVersionInfoContents)"
-      Overwrite="true"
-      Encoding="Unicode"/>
+    <WriteLinesToFile Condition="('$(LastVersionNumber)'!='$(VersionDigest)') or !Exists('$(IntermediateOutputPath)$(VersionInfoFile)')" File="$(IntermediateOutputPath)$(VersionInfoFile)" Lines="$(AssemblyVersionInfoContents)" Overwrite="true" Encoding="Unicode" />
 
     <!-- Write the new version number (if it has changed) -->
-    <WriteLinesToFile
-      Condition="'$(LastVersionNumber)'!='$(VersionDigest)'"
-      File="$(IntermediateOutputPath)\LastVersionNumber"
-      Lines="$(VersionDigest)"
-      Overwrite="true"
-      Encoding="Unicode"/>
+    <WriteLinesToFile Condition="'$(LastVersionNumber)'!='$(VersionDigest)'" File="$(IntermediateOutputPath)\LastVersionNumber" Lines="$(VersionDigest)" Overwrite="true" Encoding="Unicode" />
   </Target>
   <Target Name="GetAdditionalAssemblyAttributes" AfterTargets="GetAssemblyAttributes">
     <ItemGroup>

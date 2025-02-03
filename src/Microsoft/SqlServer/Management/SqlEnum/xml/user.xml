@@ -24,7 +24,7 @@
 		<property name="Name" type="sysname" mode="design">u.name</property>
     <version min_major='7' max_major='8'>
 			<property name="ID" type="int" cast = 'true' access='Read'>u.uid</property>
-			<property name="Login" type="sysname" read_only_after_creation="true" mode="design">ISNULL(suser_sname(u.sid),N'')</property>
+			<property name="Login" type="sysname" mode="design">ISNULL(suser_sname(u.sid),N'')</property>
 			<property name="IsSystemObject" type="bit" access='Read'
 				cast = 'true'>CASE WHEN u.uid = 1 OR u.uid = 16382 OR u.uid = 16383 THEN 1 ELSE 0 END</property>
 			<property name="LoginType" type="int" report_type="LoginType" access='read'>CASE WHEN 0 &lt;&gt; u.isntuser THEN 0 WHEN 0 &lt;&gt; u.isntgroup THEN 1 ELSE 2 END</property>
@@ -64,14 +64,14 @@
       <property name="Certificate" type="sysname" read_only_after_creation="true">ISNULL(cert.name,N'')</property>
     </version>
     <version min_major='9'>
-      <property name="Login" type="sysname" read_only_after_creation="true" mode="design">ISNULL(suser_sname(u.sid),N'')</property>
+      <property name="Login" type="sysname" mode="design">ISNULL(suser_sname(u.sid),N'')</property>
     </version>    
     <version min_major='9' max_major='10'>
       <property name="UserType" type="int" report_type="UserType" read_only_after_creation="true" mode="design">CASE WHEN N'C' = u.type THEN 1 WHEN N'K' = u.type THEN 2 WHEN N'S' = u.type AND suser_sname(u.sid) IS NULL THEN 3 ELSE 0 END</property>
       <property name="AuthenticationType" type="int" report_type="AuthenticationType" access='Read'>CASE WHEN N'U' = u.type or N'G' = u.type THEN 3 WHEN N'S' = u.type and suser_sname(u.sid) IS NOT NULL THEN 1 ELSE 0 END</property>
     </version>
     <version cloud_min_major='10' datawarehouse_enabled='true'>
-      <property name="Login" type="sysname" read_only_after_creation="true" expensive='true'>0</property>
+      <property name="Login" type="sysname" expensive='true'>0</property>
       <property name="Sid1" type="nvarchar" size ="85" access='Read' hidden='true'>ISNULL(convert(nvarchar(85), u.sid, 1),N'')</property>
     </version>
     <version cloud_min_major='12' datawarehouse_enabled='true'>

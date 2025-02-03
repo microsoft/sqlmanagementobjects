@@ -1156,7 +1156,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-    internal override void ScriptAlter(StringCollection query, ScriptingPreferences sp)
+        internal override void ScriptAlter(StringCollection query, ScriptingPreferences sp)
         {
             ValidateVersionAndEngineTypeForScripting(sp);
 
@@ -1168,24 +1168,30 @@ namespace Microsoft.SqlServer.Management.Smo
                 StringBuilder sbOption = new StringBuilder();
                 bool optionAdded = false;
 
-                Property p = this.GetPropertyOptional("DefaultSchema");
+                var p = this.GetPropertyOptional(nameof(DefaultSchema));
                 if (!p.IsNull && p.Dirty
                     && p.Value.ToString().Length > 0)
                 {
                     AddComma(sbOption, ref optionAdded);
-                    sbOption.Append("DEFAULT_SCHEMA=");
-                    sbOption.Append(MakeSqlBraket(p.Value.ToString()));
+                    sbOption.Append($"DEFAULT_SCHEMA={MakeSqlBraket(p.Value.ToString())}");
                 }
                 else
                 {
-                    LoginType lType = GetPropValueOptional("LoginType", LoginType.SqlLogin);
+                    var lType = GetPropValueOptional(nameof(LoginType), LoginType.SqlLogin);
                     // Windows group are supported for NULL setting of default schema for version > 11
                     if (lType == LoginType.WindowsGroup && this.ServerVersion.Major >= 11)
                     {
-                        query.Add(string.Format(SmoApplication.DefaultCulture,
-                                    "ALTER USER {0} WITH DEFAULT_SCHEMA=NULL",
-                                    FormatFullNameForScripting(sp)));
+                        AddComma(sbOption, ref optionAdded);
+                        sbOption.Append("DEFAULT_SCHEMA==NULL");
                     }
+                }
+
+                var loginPropertyInfo = this.GetPropertyOptional(nameof(Login));
+                if (!loginPropertyInfo.IsNull && loginPropertyInfo.Dirty
+                    && loginPropertyInfo.Value.ToString().Length > 0)
+                {
+                    AddComma(sbOption, ref optionAdded);
+                    sbOption.Append($"LOGIN={MakeSqlBraket(loginPropertyInfo.Value.ToString())}");
                 }
 
                 this.AddDefaultLanguageOptionToScript(sbOption, sp, ref optionAdded);
@@ -1195,12 +1201,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (sbOption.Length > 0)
                 {
                     ScriptIncludeHeaders(sb, sp, UrnSuffix);
-
-                    sb.Append("ALTER USER ");
-                    sb.Append(FormatFullNameForScripting(sp));
-
-                    sb.Append(" WITH ");
-                    sb.Append(sbOption.ToString());
+                    sb.Append($"ALTER USER {FormatFullNameForScripting(sp)} WITH {sbOption}");
 
                     query.Add(sb.ToString());
                 }

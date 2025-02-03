@@ -758,12 +758,6 @@ namespace Microsoft.SqlServer.Management.Smo
             switch (dataType)
             {
 
-#if NETSTANDARD2_0
-                // CLR UDTs are not supported on .NET Core, so we cannot output the human readable string value 
-                // of the hierarchy id.  Instead, we treat the hierarchy id as a binary, the same we treat all 
-                // other other CLR UDTs on .NET Core.
-                case SqlDataType.HierarchyId:
-#endif
                 case SqlDataType.UserDefinedType:
                 case SqlDataType.Geometry:
                 case SqlDataType.Geography:
@@ -907,11 +901,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
 
                 case SqlDataType.UniqueIdentifier:
-#if !NETSTANDARD2_0
-                // For the full .NET Framework, instantiate the CLR UDT to output the human readable string 
-                // value of the hierarchy id.
                 case SqlDataType.HierarchyId:
-#endif
                     formattedValue = SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString());
                     break;
                 case SqlDataType.Xml:
