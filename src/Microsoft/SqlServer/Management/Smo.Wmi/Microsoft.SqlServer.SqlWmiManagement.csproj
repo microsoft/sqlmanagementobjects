@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.SqlWmiManagement</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <DefineConstants Condition="'$(INCLUDE_PERF_COUNT)'!=''">$(DefineConstants);INCLUDE_PERF_COUNT</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Management" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlStringResource Include="WmiMgmt.strings">
+      <OutResxFileName>WmiMgmtImpl</OutResxFileName>
+      <OutCodeFileName>WmiMgmtImpl</OutCodeFileName>
+      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+      <OutClassName>WmiMgmtImpl</OutClassName>
+    </SqlStringResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(DmfCommonSrc)\Microsoft.SqlServer.Dmf.Common.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
+    <ProjectReference Include="$(WmiEnumSrc)\Microsoft.SqlServer.WmiEnum.csproj" />
+    <ProjectReference Include="$(SmoSrc)\microsoft.sqlserver.smo.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="WmiCollectionTemplate.cs" />
+  </ItemGroup>
+  <!-- These collection files used to be generated from a template. Now that they are unlikely to change we are checking them in.
+       Should there ever be a need to change the template or add a new collection, uncomment this section to recreate the source files
+       during a build. Put the generated files in the Collections folder and re-comment this section. 
+  -->
+  <!--
+  <ItemGroup Label="WMIObjects">
+    <MappedType Include="Service">
+      <Parent>ManagedComputer</Parent>
+      <OutputFile>ServiceCollection.cs</OutputFile>
+    </MappedType>
+    <MappedType Include="ClientProtocol">
+      <Parent>ManagedComputer</Parent>
+      <OutputFile>ClientProtocolCollection.cs</OutputFile>
+    </MappedType>
+    <MappedType Include="ServerProtocol">
+      <Parent>ServerInstance</Parent>
+      <OutputFile>ServerProtocolCollection.cs</OutputFile>
+      <AdditionalOptions>/DSERVER_PROTOCOL</AdditionalOptions>
+    </MappedType>
+    <MappedType Include="ServerInstance">
+      <Parent>ManagedComputer</Parent>
+      <OutputFile>ServerInstanceCollection.cs</OutputFile>
+    </MappedType>
+    <MappedType Include="ServerIPAddress">
+      <Parent>ServerProtocol</Parent>
+      <OutputFile>ServerIPAddressCollection.cs</OutputFile>
+    </MappedType>
+    <MappedType Include="ServerAlias">
+      <Parent>ManagedComputer</Parent>
+      <OutputFile>ServiceAliasCollection.cs</OutputFile>
+    </MappedType>
+  </ItemGroup>
+  <Target Name="GenerateWMIObjects" DependsOnTargets="PrepareForBuild" BeforeTargets="CoreCompile" Inputs="$(MSBuildThisFileFullPath);WmiCollectionTemplate.cs" Outputs="$(OutDir)%(MappedType.OutputFile)">
+    <Exec Command="@cl.exe /C /EP /DMAPPED_TYPE=%(MappedType.Identity) /DNAMESPACE_NAME=Microsoft.SqlServer.Management.Smo.Wmi /DKEY_TYPE=string /DSEALED %(MappedType.AdditionalOptions) WmiCollectionTemplate.cs /DParent=%(MappedType.Parent) &gt; $(OutDir)%(MappedType.OutputFile)" /> 
+    <ItemGroup>
+      <Compile Include="$(OutDir)%(MappedType.OutputFile)" />
+    </ItemGroup>
+  </Target>
+  -->
+</Project>

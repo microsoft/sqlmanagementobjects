@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="RegisteredServer" impl_type="RegisteredServer" min_major='10' cloud_min_major='10'>
+	<settings>
+                <parent_link>
+                  <link parent="ID" local="ServerGroupID" />
+                </parent_link>
+		<property_link table='msdb.dbo.sysmanagement_shared_registered_servers' alias='rs'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='ID' type='int' access='Read'>rs.server_id</property>
+		<property name='ServerGroupID' type='int' access='Read'>ISNULL(rs.server_group_id, 0)</property>
+		<property name='Name' type='sysname'>rs.name</property>
+		<property name='Description' type='nvarchar' size = 'max'>rs.description</property>
+		<property name='ServerName' type='nvarchar' size = 'max'>rs.server_name</property>
+		<property name='ServerType' type='int' >rs.server_type</property>
+    <property name='CredentialPersistenceType' type='int' >0</property>
+    <property name='ConnectionStringWithEncryptedPassword' type='sysname' >N''</property>
+  </properties>
+</EnumObject>

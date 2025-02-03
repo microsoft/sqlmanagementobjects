@@ -1,0 +1,191 @@
+######## Begin NamedSmoObject
+NamedSmoObject_NameName=Name     
+NamedSmoObject_NameDesc=Gets or sets the name of the object.(inherited from NamedSmoObject) 
+
+ScriptSchemaObjectBase_SchemaName=Schema
+ScriptSchemaObjectBase_SchemaDesc=Gets or sets the schema.(inherited from ScriptSchemaObjectBase)    
+######## End NamedSmoObject
+
+####### Begin MessageType
+MessageType_Name=Message Type
+MessageType_Desc=Name of the Service Broker message type. This defines the formats of messages that are allowed in conversations.
+
+MessageType_IDName=ID
+MessageType_IDDesc=Gets the ID value that uniquely identifies the message type.
+
+MessageType_MessageTypeValidationName=Message type validation
+MessageType_MessageTypeValidationDesc=Specifies whether Service Broker validates that messages of this type are empty, well-formed XML, or comply with an XML schema.
+
+MessageType_OwnerName=Owner
+MessageType_OwnerDesc=The database principal that owns the message type.
+
+MessageType_ValidationXmlSchemaCollectionName=XML schema collection
+MessageType_ValidationXmlSchemaCollectionDesc=The collection of XML schemas used to validate messages of this type.
+
+MessageType_ValidationXmlSchemaCollectionSchemaName=XML schema collection database schema
+MessageType_ValidationXmlSchemaCollectionSchemaDesc=Name of the database schema that contains the XML schema collection.
+
+MessageType_IsSystemObjectName=Is System Object  
+MessageType_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+#######End MessageType
+
+######Begin ServiceContract
+ServiceContract_Name = Service Contract
+ServiceContract_Desc = Name of the Service Broker contract. This defines the message types that are allowed in conversations.
+
+ServiceContract_OwnerName = Owner
+ServiceContract_OwnerDesc = The database principal that owns the service contract.
+
+ServiceContract_IDName=ID
+ServiceContract_IDDesc=Gets the ID value that uniquely identifies the service contract.
+
+ServiceContract_IsSystemObjectName=Is System Object  
+ServiceContract_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+
+######End ServiceContract
+
+######Begin ServiceQueue
+ServiceQueue_Name = Service Queue
+ServiceQueue_Desc = Name of the queue, which receives Service Broker messages.
+
+ServiceQueue_IDName=ID
+ServiceQueue_IDDesc=Gets the ID value that uniquely identifies the service queue.
+
+ServiceQueue_ActivationExecutionContextName= Activation execution context
+ServiceQueue_ActivationExecutionContextDesc= Indicates whether the activation EXECUTE AS clause specified OWNER, SELF, or a specific database principal.
+
+ServiceQueue_CreateDateName = Create date
+ServiceQueue_CreateDateDesc = Date when the queue was created.
+
+ServiceQueue_DateLastModifiedName = Last modified date
+ServiceQueue_DateLastModifiedDesc = Date when the queue was last altered.
+
+ServiceQueue_ExecutionContextPrincipalName = Execution context principal
+ServiceQueue_ExecutionContextPrincipalDesc = The database principal under which the activation stored procedure runs.
+
+ServiceQueue_FileGroupName = File group
+ServiceQueue_FileGroupDesc = File group on which the queue is located
+
+ServiceQueue_IsActivationEnabledName = Is activation enabled
+ServiceQueue_IsActivationEnabledDesc = Specifies whether activation is enabled is queue
+
+ServiceQueue_IsEnqueueEnabledName = Is enqueue enabled
+ServiceQueue_IsEnqueueEnabledDesc = Specifies whether an activation stored procedure is run to receive messages from the queue.
+
+ServiceQueue_IsRetentionEnabledName = Is retention enabled
+ServiceQueue_IsRetentionEnabledDesc = Specifies whether messages are retained until the conversation ends, or deleted when the receive commits.
+
+ServiceQueue_IsPoisonMessageHandlingEnabledName = Is poison message handling enabled
+ServiceQueue_IsPoisonMessageHandlingEnabledDesc = Specifies whether poison message handling is enabled for the queue.
+
+ServiceQueue_MaxReadersName = Maximum readers
+ServiceQueue_MaxReadersDesc = The maximum number of copies of the activation stored procedure that can be run concurrently.
+
+ServiceQueue_ProcedureDatabaseName= Procedure database
+ServiceQueue_ProcedureDatabaseDesc= Name of the database that contains the activation stored procedure.
+
+ServiceQueue_ProcedureNameName=Procedure name
+ServiceQueue_ProcedureNameDesc= Name of the activation stored procedure used to process messages in this queue.
+
+ServiceQueue_ProcedureSchemaName=Procedure schema
+ServiceQueue_ProcedureSchemaDesc= Name of the schema that contains the stored procedure
+
+ServiceQueue_RowCountName= Message count
+ServiceQueue_RowCountDesc= The number of messages in the queue.
+
+ServiceQueue_IsSystemObjectName=Is System Object  
+ServiceQueue_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+
+ServiceQueue_SchemaName = Schema
+ServiceQueue_SchemaDesc = Gets or sets the schema.(inherited from ScriptSchemaObjectBase) 
+######EndServiceQueue
+
+######Begin BrokerService
+BrokerService_Name = Broker Service
+BrokerService_Desc = Name of the service. This is an address that is used in Service Broker conversations.
+
+BrokerService_IDName=ID
+BrokerService_IDDesc=Gets the ID value that uniquely identifies the broker service.
+
+BrokerService_OwnerName = Owner
+BrokerService_OwnerDesc = The database principal that owns the Service Broker service.
+
+BrokerService_QueueNameName = Queue name
+BrokerService_QueueNameDesc = Name of the queue that is used to receive messages sent to the service.
+
+BrokerService_QueueSchemaName = Queue schema
+BrokerService_QueueSchemaDesc = Name of the schema to which the queue belongs
+
+BrokerService_IsSystemObjectName=Is System Object  
+BrokerService_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+
+######End BrokerService
+
+######Begin ServiceRoute
+ServiceRoute_Name = Service Route
+ServiceRoute_Desc = Name of the route. This specifies the network address of a Service Broker service.
+
+ServiceRoute_IDName=ID
+ServiceRoute_IDDesc=Gets the ID value that uniquely identifies the service route.
+
+ServiceRoute_AddressName=Address
+ServiceRoute_AddressDesc= The network address of the instance of the Database Engine that is hosting the Service Broker service.
+
+ServiceRoute_BrokerInstanceName = Broker instance
+ServiceRoute_BrokerInstanceDesc = The unique identifier that Service Broker assigned to the database that hosts the service.
+
+ServiceRoute_ExpirationDateName = Expiration date
+ServiceRoute_ExpirationDateDesc = The date and time when the route expires.
+
+ServiceRoute_MirrorAddressName= Mirror address
+ServiceRoute_MirrorAddressDesc = The network address of a mirrored copy of the Service Broker service that is addressed by this route.
+
+ServiceRoute_OwnerName = Owner
+ServiceRoute_OwnerDesc = The database principal that owns the service route.
+
+ServiceRoute_RemoteServiceName = Remote service
+ServiceRoute_RemoteServiceDesc = The Service Broker service whose address is specified by the service route.
+#####End ServiceRoutes
+
+######Begin RemoteServiceBinding
+RemoteServiceBinding_Name = Remote Service Binding
+RemoteServiceBinding_Desc = Name of the remote service binding. This defines the security credentials that are used to communicate with a remote service.
+
+RemoteServiceBinding_IDName=ID
+RemoteServiceBinding_IDDesc=Gets the ID value that uniquely identifies the remote service binding.
+
+RemoteServiceBinding_OwnerName = Owner
+RemoteServiceBinding_OwnerDesc = The database principal that owns the remote service binding.
+
+RemoteServiceBinding_CertificateUserName = Certificate user
+RemoteServiceBinding_CertificateUserDesc = User that holds the certificate associated with remote service binding
+
+RemoteServiceBinding_IsAnonymousName = Is anonymous
+RemoteServiceBinding_IsAnonymousDesc = Specifies whether connections to the remote service are anonymous and do not send local conversation security credentials.
+
+RemoteServiceBinding_RemoteServiceName = Remote Service
+RemoteServiceBinding_RemoteServiceDesc = The remote service for which the remote service binding provides connection security credentials.
+######End RemoteServicebinding
+
+
+######## Begin BrokerPriority
+BrokerPriority_Name=Broker Priority
+BrokerPriority_Desc=Name of the Servie Broker priority.
+
+BrokerPriority_IDName=ID
+BrokerPriority_IDDesc=Gets the ID value that uniquely identifies the broker priority.
+
+BrokerPriority_ContractNameName=Contract name
+BrokerPriority_ContractNameDesc=Name of a contract if the conversation priority applies to a conversation.
+
+BrokerPriority_LocalServiceNameName=Local service name
+BrokerPriority_LocalServiceNameDesc=Name of local service if the conversation priority applies to a conversation endpoint.
+
+BrokerPriority_RemoteServiceNameName=Remote service schema
+BrokerPriority_RemoteServiceNameDesc=Specifies the name of remote service if the conversation priority applies to a conversation endpoint.
+
+BrokerPriority_PriorityLevelName=Priority level
+BrokerPriority_PriorityLevelDesc=Priority level assigned to the priority.
+
+######## End BrokerPriority
+

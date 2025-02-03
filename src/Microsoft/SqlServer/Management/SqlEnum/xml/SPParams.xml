@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<EnumObject type="Param" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<version min_major='7' max_major='8'>
+			<property_link table='syscolumns' alias='param'>param.number = &lt;msparam&gt;1&lt;/msparam&gt;</property_link>
+		</version>
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link table='sys.all_parameters' alias='param'/>
+		</version>
+	</settings>
+	<properties>
+		<include file='parameter.xml'/>
+			
+		<version min_major='7' max_major='8'>
+			<property name="IsOutputParameter" type="bit"
+			cast='true' mode="design">CASE param.isoutparam WHEN 1 THEN param.isoutparam WHEN 0 THEN CASE param.name WHEN '' THEN 1 ELSE 0 END END</property>
+		</version>
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="IsOutputParameter" type="bit" mode="design">param.is_output</property>
+			<property name="IsCursorParameter" type="bit" mode="design">param.is_cursor_ref</property>
+		</version>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="IsReadOnly" type="bit" mode="design">param.is_readonly</property>
+		</version>
+		<property name="Number" type="int" hidden='true'>1</property>
+	</properties>
+</EnumObject>

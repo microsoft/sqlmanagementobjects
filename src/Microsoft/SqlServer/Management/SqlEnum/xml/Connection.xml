@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ServerOption" impl_type="SqlObject" min_major='7'>
+	<settings>
+	</settings>
+	<properties>
+		<property name="DisableDefaultConstraintCheck" type="bit" cast='true'>@@OPTIONS &amp; 1</property>
+		<property name="ImplicitTransactions" type="bit" cast='true'>@@OPTIONS &amp; 2</property>
+		<property name="CursorCloseOnCommit" type="bit" cast='true'>@@OPTIONS &amp; 4</property>
+		<property name="AnsiWarnings" type="bit" cast='true'>@@OPTIONS &amp; 8</property>
+		<property name="AnsiPadding" type="bit" cast='true'>@@OPTIONS &amp; 16</property>
+		<property name="AnsiNulls" type="bit" cast='true'>@@OPTIONS &amp; 32</property>
+		<property name="ArithAbort" type="bit" cast='true'>@@OPTIONS &amp; 64</property>
+		<property name="ArithIgnore" type="bit" cast='true'>@@OPTIONS &amp; 128</property>
+		<property name="QuotedIdentifier" type="bit" cast='true'>@@OPTIONS &amp; 256</property>
+		<property name="NoCount" type="bit" cast='true'>@@OPTIONS &amp; 512</property>
+		<property name="AnsiNullDefaultOn" type="bit" cast='true'>@@OPTIONS &amp; 1024</property>
+		<property name="AnsiNullDefaultOff" type="bit" cast='true'>@@OPTIONS &amp; 2048</property>
+		<property name="ConcatNullYieldsNull" type="bit" cast='true'>@@OPTIONS &amp; 4096</property>
+		<property name="NumericRoundAbort" type="bit" cast='true'>@@OPTIONS &amp; 8192</property>
+		<property name="AbortTransactionOnError" type="bit" cast='true'>@@OPTIONS &amp; 16384</property>
+	</properties>
+</EnumObject>

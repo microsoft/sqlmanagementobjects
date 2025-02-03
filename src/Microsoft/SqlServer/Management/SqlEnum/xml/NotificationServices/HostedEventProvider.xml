@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='HostedEventProvider' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_hosted_event_provider" alias="hep" />
+		<prefix>
+CREATE TABLE #tmp_hosted_event_provider(
+    ProviderId int,
+    ProviderName nvarchar(255),
+    ProviderClassName nvarchar(255),
+    AssemblyName nvarchar(260),
+    SystemName nvarchar(255),
+    StartTime datetime,
+    Interval int,
+    Timeout int,
+    ActivationState tinyint
+)
+INSERT #tmp_hosted_event_provider EXEC [SchemaPrefix].NSGetProviders 'HostedOnly'
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_hosted_event_provider
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">hep.ProviderName</property>
+        <property name="Id" type="int">hep.ProviderId</property>
+		<property name="ClassName" type="nvarchar" size="255">hep.ProviderClassName</property>
+		<property name="AssemblyName" type="nvarchar" size="260">hep.AssemblyName</property>
+		<property name="SystemName" type="nvarchar" size="255">hep.SystemName</property>
+		<property name="StartTime" type="datetime">hep.StartTime</property>
+		<property name="Interval" type="int">hep.Interval</property>
+		<property name="Timeout" type="int">hep.Timeout</property>
+		<property name="ActivationState" type="tinyint" report_type="NSActivationState" access="Read">hep.ActivationState</property>
+	</properties>
+</EnumObject>

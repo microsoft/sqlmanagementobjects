@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<EnumObject type="SPHelpJobStepLog" impl_type="SqlObject" min_major='9'>
+	<settings>
+		<parent_link>
+			<link parent='JobID' local='JobID' />
+			<link parent='ID' local='StepID' />
+		</parent_link>
+		<request_parent_select>
+			<field name='JobID' />
+		</request_parent_select>
+		<property_link table="#jobstep_outputlog_tmp tjsol" />
+		<prefix>
+			<link_multiple no='1' expression="
+create table #jobstep_outputlog_tmp(job_id uniqueidentifier, job_name sysname, step_id int, step_name sysname, step_uid uniqueidentifier, date_created datetime, date_modified datetime, log_size int, log nvarchar(max))
+declare @JobID uniqueidentifier
+declare @OldJobID uniqueidentifier
+select @OldJobID = null
+
+declare crs cursor local fast_forward
+	for ( {0} ) 
+open crs 
+fetch crs into @JobID
+while @@fetch_status &gt;= 0 
+begin 
+		if (@OldJobID IS NULL) OR (@OldJobID &lt;&gt; @JobID)
+		begin
+			insert #jobstep_outputlog_tmp (job_id,job_name,step_id,step_name,step_uid,date_created,date_modified,log_size,log) exec msdb.dbo.sp_help_jobsteplog @job_id = @JobID
+			select @OldJobID = @JobID
+		end
+		fetch crs into @JobID
+end 
+close crs
+deallocate crs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+			drop table #jobstep_outputlog_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="JobID" type="uniqueidentifier" access="read">tjsol.job_id</property>
+		<property name="JobName" type="sysname" access="read">tjsol.job_name</property>
+		<property name="StepID" type="int" access="read">tjsol.step_id</property>
+		<property name="StepName" type="sysname" access="read">tjsol.step_name</property>
+		<property name="StepUID" type="uniqueidentifier" access="read">tjsol.step_uid</property>				
+		<property name="DateCreated" type="datetime" access="read">tjsol.date_created</property>
+		<property name="DateModified" type="datetime" access="read">tjsol.date_modified</property>
+		<property name="LogSize" type="int" access="read">tjsol.log_size</property>
+		<property name="Log" type="nvarchar" size="max" access="read">tjsol.log</property>
+	</properties>
+</EnumObject>

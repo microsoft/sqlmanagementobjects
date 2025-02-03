@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+  <Import Project="$(EnlistmentRoot)\src\TestReferences.proj" />
+  <ItemGroup>
+    <ProjectReference Include="$(SqlScriptPublishSrc)\Microsoft.SqlServer.Management.SqlScriptPublish.csproj" />
+  </ItemGroup>
+</Project>

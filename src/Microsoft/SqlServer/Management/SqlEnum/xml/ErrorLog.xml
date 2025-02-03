@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ErrorLog" impl_type="SqlObject" min_major='9'>
+    <settings>
+        <property_link table="#err_log_tmp er" />
+
+        <prefix>
+            create table #err_log_tmp(ArchiveNo int, CreateDate nvarchar(44), Size int)
+            insert #err_log_tmp exec master.dbo.sp_enumerrorlogs
+        </prefix>
+
+        <postfix>
+            drop table #err_log_tmp
+        </postfix>
+    </settings>
+
+    <properties>
+        <property name="Urn" type="nvarchar" size="600">
+            <link_multiple no='3' expression="{0} + '/{2}[@ArchiveNo=''' + CAST({1} AS sysname) + ''']'">
+                <link_field type='parent' field="Urn" />
+                <link_field type='local' field="ArchiveNo" />
+                <link_field field="NType" />				
+            </link_multiple>
+        </property>
+    
+        <property name="Name" type="sysname" cast='true'>er.ArchiveNo</property>
+        <property name="ArchiveNo" type="int">er.ArchiveNo</property>
+        <property name="CreateDate" type="datetime">CONVERT(datetime, er.CreateDate, 101)</property>
+		<!-- The er.CreateDate really is a DateLastModified without any offset/TZ info. It's a public property, so we cannot
+		     really change it now (in 2024), but at least we can expose a true DateLastModified properly typed for applications
+			 to start consuming.
+		 -->
+        <property name="DateLastModified" type="datetimeoffset">TODATETIMEOFFSET(CONVERT(datetime, er.CreateDate, 101),DATEDIFF(minute, SYSUTCDATETIME(), SYSDATETIME()))</property>
+        <property name="Size" type="int">er.Size</property>
+    </properties>
+</EnumObject>

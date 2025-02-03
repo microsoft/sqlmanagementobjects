@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='SubscriptionField' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="SubscriptionClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="SubscriptionClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_subscription_field" alias="sf" />
+		<prefix>
+CREATE TABLE #tmp_subscription_field(
+    SubscriptionFieldId int,
+    SubscriptionClassId int,
+    FieldName nvarchar(255),
+    FieldType nvarchar(255),
+    FieldTypeMods nvarchar(255)
+)
+INSERT #tmp_subscription_field EXEC [SchemaPrefix].NSGetSubscriptionFields
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_subscription_field
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="ID" type="int">sf.SubscriptionFieldId</property>
+        <property name="SubscriptionClassId" type="int" hidden="true">sf.SubscriptionClassId</property>
+		<property name="Name" type="nvarchar" size="255">sf.FieldName</property>
+		<property name="Type" type="nvarchar" size="255">sf.FieldType</property>
+		<property name="TypeModifier" type="nvarchar" size="255">sf.FieldTypeMods</property>
+	</properties>
+</EnumObject>

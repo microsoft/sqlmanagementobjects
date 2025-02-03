@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<EnumObject min_major='7' cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+			<property_link fields='#ClassName#MethodName#AssemblyName#ExecutionContext#ExecutionContextPrincipal#ReturnsNullOnNullInput#' 
+						left_join='sys.assembly_modules' alias='am{0}'>am{0}.object_id = {0}.object_id</property_link>
+			<property_link fields='#AssemblyName#' 
+						left_join='sys.assemblies' alias='asmbl{0}'>asmbl{0}.assembly_id = am{0}.assembly_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='sql_module_link.xml' alias='{0}'/>
+
+		<version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>		
+			<property name="AssemblyName" type="sysname" mode="design">case when am{0}.object_id is null then N'' else asmbl{0}.name end</property>
+			<property name="ClassName" type="sysname" mode="design">case when am{0}.object_id is null then N'' else am{0}.assembly_class end</property>
+			<property name="MethodName" type="sysname" mode="design">case when am{0}.object_id is null then N'' else am{0}.assembly_method end</property>
+
+			<property name="ReturnsNullOnNullInput" type="bit" cast='true' mode="design">
+				<link_multiple no='1' expression="case when am{0}.object_id is null then {{0}} else am{0}.null_on_null_input end">
+					<link_field type='local' field="SqlReturnsNullOnNullInput" />
+				</link_multiple>
+			</property>
+			<property name="ExecutionContext" type="int" report_type="ExecutionContext" mode="deploy">
+				<link_multiple no='1' expression="case when am{0}.object_id is null then {{0}} else case isnull(am{0}.execute_as_principal_id, -1) when -1 then 1 when -2 then 2 else 3 end end">
+					<link_field type='local' field="SqlExecutionContext" />
+				</link_multiple>
+			</property>
+			<property name="ExecutionContextPrincipal" type="sysname" mode="deploy">
+				<link_multiple no='1' expression="case when am{0}.object_id is null then {{0}} else ISNULL(user_name(am{0}.execute_as_principal_id), N'') end">
+					<link_field type='local' field="SqlExecutionContextPrincipal" />
+				</link_multiple>
+			</property>
+			<property name="ExecutionContextLogin" type="sysname">
+				<link_multiple no='1' expression="case when am{0}.object_id is null then {{0}} else ISNULL(user_name(am{0}.execute_as_principal_id), N'') end">
+					<link_field type='local' field="SqlExecutionContextPrincipal" />
+				</link_multiple>
+			</property>
+			<property name="ExecutionContextUser" type="sysname">
+				<link_multiple no='1' expression="case when am{0}.object_id is null then {{0}} else ISNULL(user_name(am{0}.execute_as_principal_id), N'') end">
+					<link_field type='local' field="SqlExecutionContextPrincipal" />
+				</link_multiple>
+			</property>
+		</version>
+
+    <version cloud_min_major='10' cloud_max_major='11'>
+      <property name="ReturnsNullOnNullInput" type="bit" cast='true'>
+        <link_multiple no='1' expression="{{0}}">
+          <link_field type='local' field="SqlReturnsNullOnNullInput" />
+        </link_multiple>
+      </property>
+      <property name="ExecutionContext" type="int" report_type="ExecutionContext">
+        <link_multiple no='1' expression="{{0}}">
+          <link_field type='local' field="SqlExecutionContext" />
+        </link_multiple>
+      </property>
+      <property name="ExecutionContextPrincipal" type="sysname">
+        <link_multiple no='1' expression="{{0}}">
+          <link_field type='local' field="SqlExecutionContextPrincipal" />
+        </link_multiple>
+      </property>
+      <property name="ExecutionContextLogin" type="sysname">
+        <link_multiple no='1' expression="{{0}}">
+          <link_field type='local' field="SqlExecutionContextPrincipal" />
+        </link_multiple>
+      </property>
+      <property name="ExecutionContextUser" type="sysname">
+        <link_multiple no='1' expression="{{0}}">
+          <link_field type='local' field="SqlExecutionContextPrincipal" />
+        </link_multiple>
+      </property>
+    </version>
+    
+	</properties>
+</EnumObject>

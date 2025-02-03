@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='7'   cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link fields='#Schema#Owner#' 
+					join='sysusers AS s{0}'>s{0}.uid = {0}.uid</property_link>
+		</version>
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link fields = '#Schema#' 
+					join='sys.schemas AS s{0}'>s{0}.schema_id = {0}.schema_id</property_link>
+      <property_link fields = '#Owner#'
+          left_join='sys.database_principals AS s1{0}'>s1{0}.principal_id = ISNULL({0}.principal_id, (TYPEPROPERTY(QUOTENAME(SCHEMA_NAME({0}.schema_id)) + '.' + QUOTENAME({0}.name), 'OwnerId')))</property_link>
+		</version>
+	</settings>
+	<properties>
+		<property name="Name" type="sysname" mode="design">{0}.name</property>
+		<property name="Schema" type="sysname" mode="design">s{0}.name</property>
+    <version min_major='7' max_major='8'>
+      <property name="Owner" type="sysname" mode="design">s{0}.name</property>
+    </version>
+    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Owner" type="sysname" mode="design">ISNULL(s1{0}.name, N'')</property>
+      <property name="IsSchemaOwned" type="bit" access="Read" cast="true" mode="design">case when {0}.principal_id is null then 1 else 0 end</property>
+    </version>
+	</properties>
+</EnumObject>

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<EnumObject type="ResourcePool" impl_type="SqlObject" min_major='10' >
+  <settings>
+    <property_link table="sys.resource_governor_resource_pools AS p"/>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml'/>
+     <property name="ID" type="int" cast='true'>p.pool_id</property>
+     <property name="Name" type="sysname">p.name</property>
+     <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when p.pool_id &lt; 256 then 1 else 0 end</property>
+     <property name="MinimumCpuPercentage" type="int">p.min_cpu_percent</property>
+     <property name="MaximumCpuPercentage" type="int">p.max_cpu_percent</property>
+     <property name="MinimumMemoryPercentage" type="int">p.min_memory_percent</property>
+     <property name="MaximumMemoryPercentage" type="int">p.max_memory_percent</property>
+     <version min_major='11' cloud_min_major='11'>
+       <property name="CapCpuPercentage" type="int">p.cap_cpu_percent</property>
+     </version>
+    <version min_major='12' cloud_min_major='12'>
+      <property name="MinimumIopsPerVolume" type="int">p.min_iops_per_volume</property>
+      <property name="MaximumIopsPerVolume" type="int">p.max_iops_per_volume</property>
+    </version>
+    <include file='inc_policy_health_state.xml'/>
+  </properties>
+</EnumObject>	
+

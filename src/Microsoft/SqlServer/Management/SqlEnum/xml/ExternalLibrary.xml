@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalLibrary" impl_type="SqlObject" min_major='14'>
+    <settings>
+        <property_link table='sys.external_libraries AS library' />
+        <property_link fields='#Owner#' join='sys.database_principals AS princip'>princip.principal_id = library.principal_id</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">library.name</property>
+        <property name="ID" type="int" access='Read'>library.external_library_id</property>
+        <property name="Owner" type="sysname">princip.name</property>            
+        <property name="ExternalLibraryLanguage"  type="sysname">library.language</property>
+    </properties>
+
+    <!-- extended properties support --> 
+    <property name="ExtPropClass" type="int" hidden='true'>5</property>
+        <property name="ExtPropMajorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+            <link_field type='local' field="ID" />
+        </link_multiple>
+    </property>
+    <property name="ExtPropMinorID" type="int" hidden='true'>0</property>	
+</EnumObject>

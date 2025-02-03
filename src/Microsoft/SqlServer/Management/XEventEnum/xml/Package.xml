@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<EnumObject type="Package" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.dm_xe_packages' alias='packages'>packages.capabilities &amp; 1 = 0 OR packages.capabilities IS NULL</property_link>
+  </settings>
+  <properties>
+    <!-- UName (unique name) is used as part of Urn -->
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='4' expression="{0} + '/{1}[@Name=' + quotename({2},'''') + ' and @ModuleID=' + quotename({3},'''') +']'">
+        <link_field type='parent' field="Urn" />
+        <link_field field="NType" />
+        <link_field type='local' field="Name" />
+        <link_field type='local' field="ModuleID" />        
+      </link_multiple>
+    </property>
+
+    <property name='ID' type='uniqueidentifier'>packages.guid</property>
+    <property name='Name' type='nvarchar' size='60'>packages.name</property>
+    <property name='Description' type='nvarchar' size='512'>packages.description</property>
+    <property name='Capabilities' type='int'>ISNULL(packages.capabilities, 0)</property>
+    <property name='CapabilitiesDesc' type='nvarchar' size ='256'>packages.capabilities_desc</property>
+    <property name='ModuleID' type='uniqueidentifier' cast='true'>packages.module_guid</property>
+    <property name='ModuleAddress' type='varbinary' size = '8'>packages.module_address</property>    
+  </properties>
+</EnumObject>

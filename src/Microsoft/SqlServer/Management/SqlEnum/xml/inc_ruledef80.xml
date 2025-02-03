@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="RuleDefault" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link table="dbo.sysobjects obj">
+				<link_multiple no = '1' expression="obj.xtype={0} and obj.name not like N'#%%' and 0=(obj.category &amp; 0x0800)">
+					<link_field type='local' field="XType" />
+				</link_multiple>
+			</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn_schema.xml' />
+		<include alias='obj' file='inc_object.xml' />
+		<!-- TypeSelection is used for inc_sql_module_main -->
+		<property name="TypeSelection" type="sysname" hidden='true'>
+			<link_multiple no = '1' expression="obj.type = {0} and not(obj.parent_object_id > 0)">
+				<link_field type='local' field="XType" />
+			</link_multiple>
+		</property>
+		<include file='inc_sql_module_main.xml' />
+		<include file='inc_sql_module_JustText.xml' />
+		<include file='inc_text.xml' />
+	</properties>
+</EnumObject>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <TargetFolder Condition="'$(TargetFolder)'==''">bin</TargetFolder>
+  </PropertyGroup>
+  <PropertyGroup Label="GAC build settings" Condition="'$(GacVersion)' == 'true'">
+    <BaseOutputPath Condition="'$(BaseOutputPath)'==''">$(EnlistmentRoot)\$(TargetFolder)\gac</BaseOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
+    <EnableLocalization>false</EnableLocalization>
+  </PropertyGroup>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <!-- This props file is included before Microsoft.Common.Props sets $(Configuration) so we need our own default -->
+    <Configuration Condition="'$(Configuration)'==''">Debug</Configuration>
+    <BaseOutputPath Condition="'$(BaseOutputPath)'==''">$(EnlistmentRoot)\$(TargetFolder)</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)\$(Configuration)</OutputPath>
+    <!-- put obj files in a mirror tree off the root to keep the src folder tree cleaner -->
+    <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
+    <!-- Workspace used by the loc tool -->
+    <BuildPropsDir>$(EnlistmentRoot)\SmoBuild\</BuildPropsDir>
+    <TargetGroup Condition="'$(TargetFramework)'=='net6.0' or '$(TargetFramework)'=='net8.0'">netcore</TargetGroup>
+    <TargetGroup Condition="'$(TargetGroup)'==''">netfx</TargetGroup>
+    <CSharpProps Condition="'$(TargetGroup)'== 'netfx'">CSharp.NetFx.props</CSharpProps>
+    <CSharpProps Condition="'$(TargetGroup)'== 'netcore'">CSharp.NetCore.props</CSharpProps>
+    <!-- CA1416 warns if a method is only usable on Windows -->
+    <!-- 1668 is CSC complaining about the LIB environment variable having bogus paths, which come from VS -->
+    <NoWarn>$(NoWarn);NU5125;MSB3026;CA1416;CS1668;NU1903</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RestorePackagesPath>$(EnlistmentRoot)\packages</RestorePackagesPath>
+    <ExcludeRestorePackageImports>false</ExcludeRestorePackageImports>
+    <!-- MICROSOFTDATA is defined for builds using Microsoft.Data.SqlClient. NetCore always uses it. 
+         GAC builds NEVER reference Microsoft.Data.SqlClient.
+     -->
+    <UseMicrosoftData Condition="'$(GacVersion)'=='true' and '$(TargetGroup)'=='netfx'">false</UseMicrosoftData>
+    <DefineConstants Condition="'$(UseMicrosoftData)' != 'false'" >$(DefineConstants);MICROSOFTDATA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
+     <UseNativeBatchParser>true</UseNativeBatchParser>
+     <!-- APTCA_ENABLED turns on the AllowPartiallyTrustedCallers attribute for DMF etc.
+          That attribute is required to run in SQLCLR -->
+    <DefineConstants>$(DefineConstants);APTCA_ENABLED</DefineConstants>
+  </PropertyGroup>
+  <!-- The default PDB type is now "portable" which is fine for most uses. However, we need full PDBs in 2 cases:
+  1. For SSMS and SQL engine builds which are indexed and need to be debuggable by pre-vs2019 
+  2. Debug net472 builds which are used for code coverage
+  -->
+  <PropertyGroup Condition="'$(Configuration)|$(TargetGroup)' == 'Release|netfx'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|$(NetFxVersion)|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <BatchParserSrc>$(EnlistmentRoot)\src\Microsoft\Data\Tools.Sql.BatchParser</BatchParserSrc>
+    <BrokerEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Smo.Broker</BrokerEnumSrc>
+    <CodeGenSrc>$(EnlistmentRoot)\src\Codegen</CodeGenSrc>
+    <ConnectionInfoSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo</ConnectionInfoSrc>
+    <DmfSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Dmf</DmfSrc>
+    <DmfCommonSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Dmf.Common</DmfCommonSrc>
+    <HadrDataSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\HadrData</HadrDataSrc>
+    <HadrModelSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\HadrModel</HadrModelSrc>
+    <NotebookSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Smo.Notebook</NotebookSrc>
+    <PolicyEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\PolicyEnum</PolicyEnumSrc>
+    <RegisteredServersSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\RegisteredServers</RegisteredServersSrc>
+    <RegSvrEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Smo.RegSvrEnum</RegSvrEnumSrc>
+    <SmoSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Smo</SmoSrc>
+    <SfcSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc</SfcSrc>
+    <SmoExtendedSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Smo.Extended</SmoExtendedSrc>
+    <SmoMetadataProviderSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\SmoMetadataProvider</SmoMetadataProviderSrc>
+    <SqlAssessmentSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\SqlAssessment</SqlAssessmentSrc>
+    <SqlClrSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\SqlClrProvider</SqlClrSrc>
+    <SqlEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\SqlEnum</SqlEnumSrc>
+    <SqlScriptPublishSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\SqlScriptPublish</SqlScriptPublishSrc>
+    <TestFrameworkSrc>$(EnlistmentRoot)\src\FunctionalTest\Framework</TestFrameworkSrc>
+    <WmiEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Smo.WmiEnum</WmiEnumSrc>
+    <XEventSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\XEvent</XEventSrc>
+    <XEventDbScopedSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\XEventDbScoped</XEventDbScopedSrc>
+    <XEventDbScopedEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\XEventDbScopedEnum</XEventDbScopedEnumSrc>
+    <XEventEnumSrc>$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\XEventEnum</XEventEnumSrc>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
+    <SqlParserPackageVersion>172.1.1</SqlParserPackageVersion>
+    <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
+    <SqlClientPackageVersion>5.1.6</SqlClientPackageVersion>
+  </PropertyGroup>
+  <Import Project="$(BuildPropsDir)\StrongName.props" Condition="Exists('$(BuildPropsDir)\StrongName.props')" />
+  <Import Project="$(BuildPropsDir)\Version.props" />
+  <Import Project="$(BuildPropsDir)\$(CSharpProps)" />
+  <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
+  <Import Project="$(BuildPropsDir)\SqlClientReference.props" />  
+</Project>

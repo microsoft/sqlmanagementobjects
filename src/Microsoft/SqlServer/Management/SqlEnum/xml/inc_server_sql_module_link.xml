@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" ?>
+<EnumObject min_major='7'>
+	<settings>
+		<version min_major='9'>
+            <!-- 
+            here we have to fetch from both sys.server_sql_modules and sys.system_sql_modules
+            because user objects are stored in the former, and system objects are 
+            stored in the latter
+            -->   
+			<property_link 
+                fields = '#Recompile#IsEncrypted#Definition#'
+				left_join='sys.server_sql_modules AS sm{0}'>sm{0}.object_id = {0}.object_id</property_link>
+            <property_link 
+                fields = '#Recompile#IsEncrypted#Definition#'
+				left_join='sys.system_sql_modules AS ssm{0}'>ssm{0}.object_id = {0}.object_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<version min_major='7' max_major='8'>
+			<include file='inc_sql_module.xml' alias='{0}'/>
+		</version>
+		<version min_major='9'>
+			<property name="AnsiNullsStatus" type="bit" cast='true'>ISNULL(sm{0}.uses_ansi_nulls, ssm{0}.uses_ansi_nulls)</property>
+			<property name="QuotedIdentifierStatus" type="bit" cast='true'>ISNULL(sm{0}.uses_quoted_identifier, ssm{0}.uses_quoted_identifier)</property>
+			<property name="IsSchemaBound" type="bit" cast='true'>OBJECTPROPERTYEX({0}.object_id, N'IsSchemaBound')</property>
+		
+			<include file='inc_sql_module.xml' alias='sm{0}'/>
+		</version>
+	</properties>
+</EnumObject>

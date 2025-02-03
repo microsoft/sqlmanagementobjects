@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<EnumObject type="parameter" impl_type="SqlObject" min_major='7' cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<post_process fields='#DefaultValue#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessParam' 
+			triggered_fields='#IDText#DatabaseName#ParamName#ParentSysObj#Number#' />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname" mode="design">param.name</property>
+	
+		<version min_major='7' max_major='8'>
+			<property name="ID" type="int" access="Read" cast = 'true'>param.colid</property>
+			<property name="ParentID" type="int" hidden='true'>param.id</property>
+			<property name="DefaultValue" type='nvarchar' size = '4000' mode="design">null</property>
+		</version>
+		<version min_major='8' max_major='8'>
+			<!-- extended properties support : commented out: sysproperties is not accessible to regular users
+			<property name="ExtPropClass" type="int" hidden='true'>5</property>
+			-->
+			<property name="ObjectTypeName" type="sysname" hidden='true'>N'PARAMETER'</property>
+			<include file ="inc_level2SupportProperties.xml"/>
+		</version>
+		<version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="ID" type="int">param.parameter_id</property>
+			<property name="ParentID" type="int" hidden='true'>param.object_id</property>			
+			<property name="DefaultValue" type='nvarchar' size = '4000' mode="design">param.default_value</property>
+      <property name="HasDefaultValue" type='bit'>param.has_default_value</property>
+      <!-- extended properties support -->
+      <property name="ExtPropClass" type="int" hidden='true'>2</property>
+    </version>
+    
+		<include alias = 'param' file='inc_type.xml' />
+		
+		<!-- default value properties -->
+    	<property name="IDText" type='int' hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="DatabaseName" type='sysname' hidden='true'>db_name()</property>
+		<property name="ParamName" type='sysname' hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="Name" />
+			</link_multiple>
+		</property>
+		<property name="ParentSysObj" type='bit' hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="IsSystemObject" />
+			</link_multiple>
+		</property>
+
+
+    <!-- extended properties support -->
+		<property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ParentID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+        
+	</properties>
+</EnumObject>

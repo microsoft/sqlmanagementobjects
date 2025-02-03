@@ -1,0 +1,1277 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <RootNamespace>Microsoft.SqlServer.Management.Smo.SqlEnum</RootNamespace>
+    <DefineConstants>$(DefineConstants);EXCLUDE_ASSEMBLY_VERSION_INFO</DefineConstants>
+    <SqlEnumSourcesFiles>$(MSBuildProjectDirectory)</SqlEnumSourcesFiles>
+    <ClsCompliant>true</ClsCompliant>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Dmf" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.DTEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.ReplEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Replication" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.ServiceBrokerEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SmoExtended" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlWmiManagement" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SMO" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoInternal" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(TestPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.WmiEnum" Key="$(RealPublicKey)"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EventsFileName Include="DdlEvents.cs" />
+  </ItemGroup>
+  <Import Project="$(BuildPropsDir)\DdlEvents.targets" />
+  <ItemGroup>
+    <SqlStringResource Include="StringSqlEnumerator.strings" />
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AditionalParameters.xml">
+      <LogicalName>AditionalParameters.xml</LogicalName>
+      <Link>xml\AditionalParameters.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AffinityInfo.xml">
+      <LogicalName>AffinityInfo.xml</LogicalName>
+      <Link>xml\AffinityInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AgentPerfInfo.xml">
+      <LogicalName>AgentPerfInfo.xml</LogicalName>
+      <Link>xml\AgentPerfInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AgentSubsystems.xml">
+      <LogicalName>AgentSubsystems.xml</LogicalName>
+      <Link>xml\AgentSubsystems.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_alert.xml">
+      <LogicalName>agent_alert.xml</LogicalName>
+      <Link>xml\agent_alert.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_alertsystem.xml">
+      <LogicalName>agent_alertsystem.xml</LogicalName>
+      <Link>xml\agent_alertsystem.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_alert_categories.xml">
+      <LogicalName>agent_alert_categories.xml</LogicalName>
+      <Link>xml\agent_alert_categories.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_ErrorLog.xml">
+      <LogicalName>agent_ErrorLog.xml</LogicalName>
+      <Link>xml\agent_ErrorLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_ErrorLogText.xml">
+      <LogicalName>agent_ErrorLogText.xml</LogicalName>
+      <Link>xml\agent_ErrorLogText.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_jobalert.xml">
+      <LogicalName>agent_jobalert.xml</LogicalName>
+      <Link>xml\agent_jobalert.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_jobhistory.xml">
+      <LogicalName>agent_jobhistory.xml</LogicalName>
+      <Link>xml\agent_jobhistory.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_jobschedule.xml">
+      <LogicalName>agent_jobschedule.xml</LogicalName>
+      <Link>xml\agent_jobschedule.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_jobtargetservers.xml">
+      <LogicalName>agent_jobtargetservers.xml</LogicalName>
+      <Link>xml\agent_jobtargetservers.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_job_categories.xml">
+      <LogicalName>agent_job_categories.xml</LogicalName>
+      <Link>xml\agent_job_categories.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_operator.xml">
+      <LogicalName>agent_operator.xml</LogicalName>
+      <Link>xml\agent_operator.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_operator_categories.xml">
+      <LogicalName>agent_operator_categories.xml</LogicalName>
+      <Link>xml\agent_operator_categories.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_targetserver.xml">
+      <LogicalName>agent_targetserver.xml</LogicalName>
+      <Link>xml\agent_targetserver.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_targetservergroup.xml">
+      <LogicalName>agent_targetservergroup.xml</LogicalName>
+      <Link>xml\agent_targetservergroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\agent_targetservermember.xml">
+      <LogicalName>agent_targetservermember.xml</LogicalName>
+      <Link>xml\agent_targetservermember.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AlertNotification.xml">
+      <LogicalName>AlertNotification.xml</LogicalName>
+      <Link>xml\AlertNotification.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ApplicationRole.xml">
+      <LogicalName>ApplicationRole.xml</LogicalName>
+      <Link>xml\ApplicationRole.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\asymmetrickey.xml">
+      <LogicalName>asymmetrickey.xml</LogicalName>
+      <Link>xml\asymmetrickey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Audit.xml">
+      <LogicalName>Audit.xml</LogicalName>
+      <Link>xml\Audit.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AvailabilityDatabase.xml">
+      <LogicalName>AvailabilityDatabase.xml</LogicalName>
+      <Link>xml\AvailabilityDatabase.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AvailabilityGroup.xml">
+      <LogicalName>AvailabilityGroup.xml</LogicalName>
+      <Link>xml\AvailabilityGroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AvailabilityGroupListener.xml">
+      <LogicalName>AvailabilityGroupListener.xml</LogicalName>
+      <Link>xml\AvailabilityGroupListener.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AvailabilityGroupListenerIPAddress.xml">
+      <LogicalName>AvailabilityGroupListenerIPAddress.xml</LogicalName>
+      <Link>xml\AvailabilityGroupListenerIPAddress.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AvailabilityReplica.xml">
+      <LogicalName>AvailabilityReplica.xml</LogicalName>
+      <Link>xml\AvailabilityReplica.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\AvailableMedia.xml">
+      <LogicalName>AvailableMedia.xml</LogicalName>
+      <Link>xml\AvailableMedia.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\BackupDevice.xml">
+      <LogicalName>BackupDevice.xml</LogicalName>
+      <Link>xml\BackupDevice.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\backupfile.xml">
+      <LogicalName>backupfile.xml</LogicalName>
+      <Link>xml\backupfile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\backupmediafamily.xml">
+      <LogicalName>backupmediafamily.xml</LogicalName>
+      <Link>xml\backupmediafamily.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\backupmediaset.xml">
+      <LogicalName>backupmediaset.xml</LogicalName>
+      <Link>xml\backupmediaset.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\backupset.xml">
+      <LogicalName>backupset.xml</LogicalName>
+      <Link>xml\backupset.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\BoundColumn.xml">
+      <LogicalName>BoundColumn.xml</LogicalName>
+      <Link>xml\BoundColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\CdromDrive.xml">
+      <LogicalName>CdromDrive.xml</LogicalName>
+      <Link>xml\CdromDrive.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\certificate.xml">
+      <LogicalName>certificate.xml</LogicalName>
+      <Link>xml\certificate.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Check.xml">
+      <LogicalName>Check.xml</LogicalName>
+      <Link>xml\Check.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\EdgeConstraint.xml">
+      <LogicalName>EdgeConstraint.xml</LogicalName>
+      <Link>xml\EdgeConstraint.xml</Link>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\EdgeConstraintClause.xml">
+      <LogicalName>EdgeConstraintClause.xml</LogicalName>
+      <Link>xml\EdgeConstraintClause.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\CloudDependency.sql">
+      <LogicalName>CloudDependency.sql</LogicalName>
+      <Link>xml\CloudDependency.sql</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ClusterMemberState.xml">
+      <LogicalName>ClusterMemberState.xml</LogicalName>
+      <Link>xml\ClusterMemberState.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ClusterSubnet.xml">
+      <LogicalName>ClusterSubnet.xml</LogicalName>
+      <Link>xml\ClusterSubnet.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Collation.xml">
+      <LogicalName>Collation.xml</LogicalName>
+      <Link>xml\Collation.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Column.xml">
+      <LogicalName>Column.xml</LogicalName>
+      <Link>xml\Column.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ColumnEncryptionKey.xml">
+      <LogicalName>ColumnEncryptionKey.xml</LogicalName>
+      <Link>xml\ColumnEncryptionKey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ColumnEncryptionKeyValue.xml">
+      <LogicalName>ColumnEncryptionKeyValue.xml</LogicalName>
+      <Link>xml\ColumnEncryptionKeyValue.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ColumnMasterKey.xml">
+      <LogicalName>ColumnMasterKey.xml</LogicalName>
+      <Link>xml\ColumnMasterKey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseScopedCredential.xml">
+      <LogicalName>DatabaseScopedCredential.xml</LogicalName>
+      <Link>xml\DatabaseScopedCredential.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SensitivityClassification.xml">
+      <LogicalName>SensitivityClassification.xml</LogicalName>
+      <Link>xml\SensitivityClassification.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\WorkloadManagementWorkloadClassifier.xml">
+      <LogicalName>WorkloadManagementWorkloadClassifier.xml</LogicalName>
+      <Link>xml\WorkloadManagementWorkloadClassifier.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ComputedText.xml">
+      <LogicalName>ComputedText.xml</LogicalName>
+      <Link>xml\ComputedText.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Configuration.xml">
+      <LogicalName>Configuration.xml</LogicalName>
+      <Link>xml\Configuration.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ConfigurationValue.xml">
+      <LogicalName>ConfigurationValue.xml</LogicalName>
+      <Link>xml\ConfigurationValue.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Connection.xml">
+      <LogicalName>Connection.xml</LogicalName>
+      <Link>xml\Connection.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Credential.xml">
+      <LogicalName>Credential.xml</LogicalName>
+      <Link>xml\Credential.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\CryptographicProvider.xml">
+      <LogicalName>CryptographicProvider.xml</LogicalName>
+      <Link>xml\CryptographicProvider.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Database.xml">
+      <LogicalName>Database.xml</LogicalName>
+      <Link>xml\Database.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseAuditSpecification.xml">
+      <LogicalName>DatabaseAuditSpecification.xml</LogicalName>
+      <Link>xml\DatabaseAuditSpecification.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseAuditSpecificationDetail.xml">
+      <LogicalName>DatabaseAuditSpecificationDetail.xml</LogicalName>
+      <Link>xml\DatabaseAuditSpecificationDetail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseDdlTrigger.xml">
+      <LogicalName>DatabaseDdlTrigger.xml</LogicalName>
+      <Link>xml\DatabaseDdlTrigger.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseDdlTriggerEvent.xml">
+      <LogicalName>DatabaseDdlTriggerEvent.xml</LogicalName>
+      <Link>xml\DatabaseDdlTriggerEvent.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseDiagram.xml">
+      <LogicalName>DatabaseDiagram.xml</LogicalName>
+      <Link>xml\DatabaseDiagram.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseEncryptionKey.xml">
+      <LogicalName>DatabaseEncryptionKey.xml</LogicalName>
+      <Link>xml\DatabaseEncryptionKey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseLocks.xml">
+      <LogicalName>DatabaseLocks.xml</LogicalName>
+      <Link>xml\DatabaseLocks.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseMappings.xml">
+      <LogicalName>DatabaseMappings.xml</LogicalName>
+      <Link>xml\DatabaseMappings.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseMasterKey.xml">
+      <LogicalName>DatabaseMasterKey.xml</LogicalName>
+      <Link>xml\DatabaseMasterKey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseMirroringWitnessRole.xml">
+      <LogicalName>DatabaseMirroringWitnessRole.xml</LogicalName>
+      <Link>xml\DatabaseMirroringWitnessRole.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseOptions.xml">
+      <LogicalName>DatabaseOptions.xml</LogicalName>
+      <Link>xml\DatabaseOptions.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseReplicaState.xml">
+      <LogicalName>DatabaseReplicaState.xml</LogicalName>
+      <Link>xml\DatabaseReplicaState.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseRole.xml">
+      <LogicalName>DatabaseRole.xml</LogicalName>
+      <Link>xml\DatabaseRole.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseRoleMember.xml">
+      <LogicalName>DatabaseRoleMember.xml</LogicalName>
+      <Link>xml\DatabaseRoleMember.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DbExtendedProperty.xml">
+      <LogicalName>DbExtendedProperty.xml</LogicalName>
+      <Link>xml\DbExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Default.xml">
+      <LogicalName>Default.xml</LogicalName>
+      <Link>xml\Default.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DefaultColumn.xml">
+      <LogicalName>DefaultColumn.xml</LogicalName>
+      <Link>xml\DefaultColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DefaultConstrain.xml">
+      <LogicalName>DefaultConstrain.xml</LogicalName>
+      <Link>xml\DefaultConstrain.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DefaultDataType.xml">
+      <LogicalName>DefaultDataType.xml</LogicalName>
+      <Link>xml\DefaultDataType.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DiskFile.xml">
+      <LogicalName>DiskFile.xml</LogicalName>
+      <Link>xml\DiskFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DistributionColumn.xml">
+      <LogicalName>DistributionColumn.xml</LogicalName>
+      <Link>xml\DistributionColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Drive.xml">
+      <LogicalName>Drive.xml</LogicalName>
+      <Link>xml\Drive.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\database_mirroring_endpoint.xml">
+      <LogicalName>database_mirroring_endpoint.xml</LogicalName>
+      <Link>endpoint\database_mirroring_endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\endpoint.xml">
+      <LogicalName>endpoint.xml</LogicalName>
+      <Link>endpoint\endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\http_endpoint.xml">
+      <LogicalName>http_endpoint.xml</LogicalName>
+      <Link>endpoint\http_endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\service_broker_endpoint.xml">
+      <LogicalName>service_broker_endpoint.xml</LogicalName>
+      <Link>endpoint\service_broker_endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\soap_endpoint.xml">
+      <LogicalName>soap_endpoint.xml</LogicalName>
+      <Link>endpoint\soap_endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\soap_endpoint_method.xml">
+      <LogicalName>soap_endpoint_method.xml</LogicalName>
+      <Link>endpoint\soap_endpoint_method.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\tcp_endpoint.xml">
+      <LogicalName>tcp_endpoint.xml</LogicalName>
+      <Link>endpoint\tcp_endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\endpoint\via_endpoint.xml">
+      <LogicalName>via_endpoint.xml</LogicalName>
+      <Link>endpoint\via_endpoint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ErrorLog.xml">
+      <LogicalName>ErrorLog.xml</LogicalName>
+      <Link>xml\ErrorLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ErrorLogText.xml">
+      <LogicalName>ErrorLogText.xml</LogicalName>
+      <Link>xml\ErrorLogText.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\ExtendedProperty.xml">
+      <LogicalName>ExtendedProperty.xml</LogicalName>
+      <Link>extendedproperty\ExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\inc_level2SupportProperties.xml">
+      <LogicalName>inc_level2SupportProperties.xml</LogicalName>
+      <Link>extendedproperty\inc_level2SupportProperties.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\inc_shilohExtendedProperty.xml">
+      <LogicalName>inc_shilohExtendedProperty.xml</LogicalName>
+      <Link>extendedproperty\inc_shilohExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\Level0ExtendedProperty.xml">
+      <LogicalName>Level0ExtendedProperty.xml</LogicalName>
+      <Link>extendedproperty\Level0ExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\Level1ExtendedProperty.xml">
+      <LogicalName>Level1ExtendedProperty.xml</LogicalName>
+      <Link>extendedproperty\Level1ExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\Level2ExtendedProperty.xml">
+      <LogicalName>Level2ExtendedProperty.xml</LogicalName>
+      <Link>extendedproperty\Level2ExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\extendedproperty\Level2IndexExtendedProperty.xml">
+      <LogicalName>Level2IndexExtendedProperty.xml</LogicalName>
+      <Link>extendedproperty\Level2IndexExtendedProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalDataSource.xml">
+      <LogicalName>ExternalDataSource.xml</LogicalName>
+      <Link>xml\ExternalDataSource.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalFileFormat.xml">
+      <LogicalName>ExternalFileFormat.xml</LogicalName>
+      <Link>xml\ExternalFileFormat.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalLanguage.xml">
+      <LogicalName>ExternalLanguage.xml</LogicalName>
+      <Link>xml\ExternalLanguage.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalLanguageFile.xml">
+      <LogicalName>ExternalLanguageFile.xml</LogicalName>
+      <Link>xml\ExternalLanguageFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalLibrary.xml">
+      <LogicalName>ExternalLibrary.xml</LogicalName>
+      <Link>xml\ExternalLibrary.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalLibraryFile.xml">
+      <LogicalName>ExternalLibraryFile.xml</LogicalName>
+      <Link>xml\ExternalLibraryFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalResourcePool.xml">
+      <LogicalName>ExternalResourcePool.xml</LogicalName>
+      <Link>xml\ExternalResourcePool.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalStream.xml">
+      <LogicalName>ExternalStream.xml</LogicalName>
+      <Link>xml\ExternalStream.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalStreamingJob.xml">
+      <LogicalName>ExternalStreamingJob.xml</LogicalName>
+      <Link>xml\ExternalStreamingJob.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ExternalResourcePoolAffinityInfo.xml">
+      <LogicalName>ExternalResourcePoolAffinityInfo.xml</LogicalName>
+      <Link>xml\ExternalResourcePoolAffinityInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\File.xml">
+      <LogicalName>File.xml</LogicalName>
+      <Link>xml\File.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FileGroup.xml">
+      <LogicalName>FileGroup.xml</LogicalName>
+      <Link>xml\FileGroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FixedDrive.xml">
+      <LogicalName>FixedDrive.xml</LogicalName>
+      <Link>xml\FixedDrive.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FKColumn.xml">
+      <LogicalName>FKColumn.xml</LogicalName>
+      <Link>xml\FKColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ForeignKey.xml">
+      <LogicalName>ForeignKey.xml</LogicalName>
+      <Link>xml\ForeignKey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextCatalog.xml">
+      <LogicalName>FullTextCatalog.xml</LogicalName>
+      <Link>xml\FullTextCatalog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextFile.xml">
+      <LogicalName>FullTextFile.xml</LogicalName>
+      <Link>xml\FullTextFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextIndex.xml">
+      <LogicalName>FullTextIndex.xml</LogicalName>
+      <Link>xml\FullTextIndex.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextIndexColumn.xml">
+      <LogicalName>FullTextIndexColumn.xml</LogicalName>
+      <Link>xml\FullTextIndexColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextLanguage.xml">
+      <LogicalName>FullTextLanguage.xml</LogicalName>
+      <Link>xml\FullTextLanguage.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FulltextSemanticLanguage.xml">
+      <LogicalName>FulltextSemanticLanguage.xml</LogicalName>
+      <Link>xml\FulltextSemanticLanguage.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextService.xml">
+      <LogicalName>FullTextService.xml</LogicalName>
+      <Link>xml\FullTextService.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\FullTextStopList.xml">
+      <LogicalName>FullTextStopList.xml</LogicalName>
+      <Link>xml\FullTextStopList.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\fulltext_ErrorLog.xml">
+      <LogicalName>fulltext_ErrorLog.xml</LogicalName>
+      <Link>xml\fulltext_ErrorLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\fulltext_ErrorLogText.xml">
+      <LogicalName>fulltext_ErrorLogText.xml</LogicalName>
+      <Link>xml\fulltext_ErrorLogText.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\include\mixed_module_link.xml">
+      <LogicalName>mixed_module_link.xml</LogicalName>
+      <Link>include\mixed_module_link.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\include\parameter.xml">
+      <LogicalName>parameter.xml</LogicalName>
+      <Link>include\parameter.xml</Link>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\include\sql_module_link.xml">
+      <LogicalName>sql_module_link.xml</LogicalName>
+      <Link>include\sql_module_link.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_column_reference.xml">
+      <LogicalName>inc_column_reference.xml</LogicalName>
+      <Link>xml\inc_column_reference.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_constraint.xml">
+      <LogicalName>inc_constraint.xml</LogicalName>
+      <Link>xml\inc_constraint.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_DbFile.xml">
+      <LogicalName>inc_DbFile.xml</LogicalName>
+      <Link>xml\inc_DbFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_ddl_trigger_event.xml">
+      <LogicalName>inc_ddl_trigger_event.xml</LogicalName>
+      <Link>xml\inc_ddl_trigger_event.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_fulltext.xml">
+      <LogicalName>inc_fulltext.xml</LogicalName>
+      <Link>xml\inc_fulltext.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_hadr_policy_health_state.xml">
+      <LogicalName>inc_hadr_policy_health_state.xml</LogicalName>
+      <Link>xml\inc_hadr_policy_health_state.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_hadr_setting.xml">
+      <LogicalName>inc_hadr_setting.xml</LogicalName>
+      <Link>xml\inc_hadr_setting.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_IndexFrag.xml">
+      <LogicalName>inc_IndexFrag.xml</LogicalName>
+      <Link>xml\inc_IndexFrag.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_named_object.xml">
+      <LogicalName>inc_named_object.xml</LogicalName>
+      <Link>xml\inc_named_object.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_object.xml">
+      <LogicalName>inc_object.xml</LogicalName>
+      <Link>xml\inc_object.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_objprop_table_view.xml">
+      <LogicalName>inc_objprop_table_view.xml</LogicalName>
+      <Link>xml\inc_objprop_table_view.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_policy_health_state.xml">
+      <LogicalName>inc_policy_health_state.xml</LogicalName>
+      <Link>xml\inc_policy_health_state.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_ruledef80.xml">
+      <LogicalName>inc_ruledef80.xml</LogicalName>
+      <Link>xml\inc_ruledef80.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_server.xml">
+      <LogicalName>inc_server.xml</LogicalName>
+      <Link>xml\inc_server.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_server_sql_module_link.xml">
+      <LogicalName>inc_server_sql_module_link.xml</LogicalName>
+      <Link>xml\inc_server_sql_module_link.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_sql_module.xml">
+      <LogicalName>inc_sql_module.xml</LogicalName>
+      <Link>xml\inc_sql_module.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_sql_module_JustText.xml">
+      <LogicalName>inc_sql_module_JustText.xml</LogicalName>
+      <Link>xml\inc_sql_module_JustText.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_storage.xml">
+      <LogicalName>inc_storage.xml</LogicalName>
+      <Link>xml\inc_storage.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_system_object.xml">
+      <LogicalName>inc_system_object.xml</LogicalName>
+      <Link>xml\inc_system_object.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_system_table_view_sp_udf.xml">
+      <LogicalName>inc_system_table_view_sp_udf.xml</LogicalName>
+      <Link>xml\inc_system_table_view_sp_udf.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_text.xml">
+      <LogicalName>inc_text.xml</LogicalName>
+      <Link>xml\inc_text.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_type.xml">
+      <LogicalName>inc_type.xml</LogicalName>
+      <Link>xml\inc_type.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_type_reference.xml">
+      <LogicalName>inc_type_reference.xml</LogicalName>
+      <Link>xml\inc_type_reference.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_urn.xml">
+      <LogicalName>inc_urn.xml</LogicalName>
+      <Link>xml\inc_urn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_urn_collate_default.xml">
+      <LogicalName>inc_urn_collate_default.xml</LogicalName>
+      <Link>xml\inc_urn_collate_default.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_urn_message.xml">
+      <LogicalName>inc_urn_message.xml</LogicalName>
+      <Link>xml\inc_urn_message.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_urn_schema.xml">
+      <LogicalName>inc_urn_schema.xml</LogicalName>
+      <Link>xml\inc_urn_schema.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_urn_single.xml">
+      <LogicalName>inc_urn_single.xml</LogicalName>
+      <Link>xml\inc_urn_single.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\inc_urn_soapmethod.xml">
+      <LogicalName>inc_urn_soapmethod.xml</LogicalName>
+      <Link>xml\inc_urn_soapmethod.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Index.xml">
+      <LogicalName>Index.xml</LogicalName>
+      <Link>xml\Index.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexedColumn.xml">
+      <LogicalName>IndexedColumn.xml</LogicalName>
+      <Link>xml\IndexedColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexedXmlPath.xml">
+      <LogicalName>IndexedXmlPath.xml</LogicalName>
+      <Link>xml\IndexedXmlPath.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexedXmlPathNamespace.xml">
+      <LogicalName>IndexedXmlPathNamespace.xml</LogicalName>
+      <Link>xml\IndexedXmlPathNamespace.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexFragDetail.xml">
+      <LogicalName>IndexFragDetail.xml</LogicalName>
+      <Link>xml\IndexFragDetail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexFragFast.xml">
+      <LogicalName>IndexFragFast.xml</LogicalName>
+      <Link>xml\IndexFragFast.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexFragSampled.xml">
+      <LogicalName>IndexFragSampled.xml</LogicalName>
+      <Link>xml\IndexFragSampled.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Information.xml">
+      <LogicalName>Information.xml</LogicalName>
+      <Link>xml\Information.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Job.xml">
+      <LogicalName>Job.xml</LogicalName>
+      <Link>xml\Job.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\JobServer.xml">
+      <LogicalName>JobServer.xml</LogicalName>
+      <Link>xml\JobServer.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\JobStep.xml">
+      <LogicalName>JobStep.xml</LogicalName>
+      <Link>xml\JobStep.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\JobStepOutputLog.xml">
+      <LogicalName>JobStepOutputLog.xml</LogicalName>
+      <Link>xml\JobStepOutputLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\KatmaiDependency.sql">
+      <LogicalName>KatmaiDependency.sql</LogicalName>
+      <Link>xml\KatmaiDependency.sql</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\KeyEncryption.xml">
+      <LogicalName>KeyEncryption.xml</LogicalName>
+      <Link>xml\KeyEncryption.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Language.xml">
+      <LogicalName>Language.xml</LogicalName>
+      <Link>xml\Language.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LinkedServer.xml">
+      <LogicalName>LinkedServer.xml</LogicalName>
+      <Link>xml\LinkedServer.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LinkedServerCatalog.xml">
+      <LogicalName>LinkedServerCatalog.xml</LogicalName>
+      <Link>xml\LinkedServerCatalog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LinkedServerLogin.xml">
+      <LogicalName>LinkedServerLogin.xml</LogicalName>
+      <Link>xml\LinkedServerLogin.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LinkedServerTable.xml">
+      <LogicalName>LinkedServerTable.xml</LogicalName>
+      <Link>xml\LinkedServerTable.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LinkedServerView.xml">
+      <LogicalName>LinkedServerView.xml</LogicalName>
+      <Link>xml\LinkedServerView.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Lock.xml">
+      <LogicalName>Lock.xml</LogicalName>
+      <Link>xml\Lock.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LogFile.xml">
+      <LogicalName>LogFile.xml</LogicalName>
+      <Link>xml\LogFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Login.xml">
+      <LogicalName>Login.xml</LogicalName>
+      <Link>xml\Login.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\LogMarkHistory.xml">
+      <LogicalName>LogMarkHistory.xml</LogicalName>
+      <Link>xml\LogMarkHistory.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Mail.xml">
+      <LogicalName>Mail.xml</LogicalName>
+      <Link>xml\Mail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MailAccount.xml">
+      <LogicalName>MailAccount.xml</LogicalName>
+      <Link>xml\MailAccount.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MailProfile.xml">
+      <LogicalName>MailProfile.xml</LogicalName>
+      <Link>xml\MailProfile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MailProfileAccounts.xml">
+      <LogicalName>MailProfileAccounts.xml</LogicalName>
+      <Link>xml\MailProfileAccounts.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MailProfilePrincipals.xml">
+      <LogicalName>MailProfilePrincipals.xml</LogicalName>
+      <Link>xml\MailProfilePrincipals.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MailServer.xml">
+      <LogicalName>MailServer.xml</LogicalName>
+      <Link>xml\MailServer.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Mail_ErrorLog.xml">
+      <LogicalName>Mail_ErrorLog.xml</LogicalName>
+      <Link>xml\Mail_ErrorLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MaintenancePlan.xml">
+      <LogicalName>MaintenancePlan.xml</LogicalName>
+      <Link>xml\MaintenancePlan.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MaintenancePlanDeprecated.xml">
+      <LogicalName>MaintenancePlanDeprecated.xml</LogicalName>
+      <Link>xml\MaintenancePlanDeprecated.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MaintenanceSubPlan.xml">
+      <LogicalName>MaintenanceSubPlan.xml</LogicalName>
+      <Link>xml\MaintenanceSubPlan.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MaintSubPlanLog.xml">
+      <LogicalName>MaintSubPlanLog.xml</LogicalName>
+      <Link>xml\MaintSubPlanLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MaintSubPlanLogDetail.xml">
+      <LogicalName>MaintSubPlanLogDetail.xml</LogicalName>
+      <Link>xml\MaintSubPlanLogDetail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\MasterKeyEncryption.xml">
+      <LogicalName>MasterKeyEncryption.xml</LogicalName>
+      <Link>xml\MasterKeyEncryption.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Member.xml">
+      <LogicalName>Member.xml</LogicalName>
+      <Link>xml\Member.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\NTGroup.xml">
+      <LogicalName>NTGroup.xml</LogicalName>
+      <Link>xml\NTGroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\NTLogin.xml">
+      <LogicalName>NTLogin.xml</LogicalName>
+      <Link>xml\NTLogin.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\NumberedSPParams.xml">
+      <LogicalName>NumberedSPParams.xml</LogicalName>
+      <Link>xml\NumberedSPParams.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\NumberedStoredProcedure.xml">
+      <LogicalName>NumberedStoredProcedure.xml</LogicalName>
+      <Link>xml\NumberedStoredProcedure.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\OLEDBProvider.xml">
+      <LogicalName>OLEDBProvider.xml</LogicalName>
+      <Link>xml\OLEDBProvider.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\OLEDBProviderSetting.xml">
+      <LogicalName>OLEDBProviderSetting.xml</LogicalName>
+      <Link>xml\OLEDBProviderSetting.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\OLEDBProvProp.xml">
+      <LogicalName>OLEDBProvProp.xml</LogicalName>
+      <Link>xml\OLEDBProvProp.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\OperatorJobNotification.xml">
+      <LogicalName>OperatorJobNotification.xml</LogicalName>
+      <Link>xml\OperatorJobNotification.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\OperatorNotification.xml">
+      <LogicalName>OperatorNotification.xml</LogicalName>
+      <Link>xml\OperatorNotification.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\OrderColumn.xml">
+      <LogicalName>OrderColumn.xml</LogicalName>
+      <Link>xml\OrderColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PartitionFunction.xml">
+      <LogicalName>PartitionFunction.xml</LogicalName>
+      <Link>xml\PartitionFunction.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PartitionFunctionParameter.xml">
+      <LogicalName>PartitionFunctionParameter.xml</LogicalName>
+      <Link>xml\PartitionFunctionParameter.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PartitionFunctionRangeValue.xml">
+      <LogicalName>PartitionFunctionRangeValue.xml</LogicalName>
+      <Link>xml\PartitionFunctionRangeValue.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PartitionScheme.xml">
+      <LogicalName>PartitionScheme.xml</LogicalName>
+      <Link>xml\PartitionScheme.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PartitionSchemeFileGroup.xml">
+      <LogicalName>PartitionSchemeFileGroup.xml</LogicalName>
+      <Link>xml\PartitionSchemeFileGroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PartitionSchemeParameter.xml">
+      <LogicalName>PartitionSchemeParameter.xml</LogicalName>
+      <Link>xml\PartitionSchemeParameter.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PerfInfo.xml">
+      <LogicalName>PerfInfo.xml</LogicalName>
+      <Link>xml\PerfInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\ColumnPerm.xml">
+      <LogicalName>ColumnPerm.xml</LogicalName>
+      <Link>perm\ColumnPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\dbfixedroleperm.xml">
+      <LogicalName>dbfixedroleperm.xml</LogicalName>
+      <Link>perm\dbfixedroleperm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\DBObjectPerm.xml">
+      <LogicalName>DBObjectPerm.xml</LogicalName>
+      <Link>perm\DBObjectPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\DBPerm.xml">
+      <LogicalName>DBPerm.xml</LogicalName>
+      <Link>perm\DBPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\inc_perm.xml">
+      <LogicalName>inc_perm.xml</LogicalName>
+      <Link>perm\inc_perm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\ShilohYukonPerm.xml">
+      <LogicalName>ShilohYukonPerm.xml</LogicalName>
+      <Link>perm\ShilohYukonPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\SrvObjectPerm.xml">
+      <LogicalName>SrvObjectPerm.xml</LogicalName>
+      <Link>perm\SrvObjectPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\SrvYukonObjectPerm.xml">
+      <LogicalName>SrvYukonObjectPerm.xml</LogicalName>
+      <Link>perm\SrvYukonObjectPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\SrvYukonPerm.xml">
+      <LogicalName>SrvYukonPerm.xml</LogicalName>
+      <Link>perm\SrvYukonPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\TablePerm.xml">
+      <LogicalName>TablePerm.xml</LogicalName>
+      <Link>perm\TablePerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\YukonObjectPerm.xml">
+      <LogicalName>YukonObjectPerm.xml</LogicalName>
+      <Link>perm\YukonObjectPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\perm\YukonSchemaObjectPerm.xml">
+      <LogicalName>YukonSchemaObjectPerm.xml</LogicalName>
+      <Link>perm\YukonSchemaObjectPerm.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PhysicalPartition.xml">
+      <LogicalName>PhysicalPartition.xml</LogicalName>
+      <Link>xml\PhysicalPartition.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PlanGuide.xml">
+      <LogicalName>PlanGuide.xml</LogicalName>
+      <Link>xml\PlanGuide.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PrimaryChildren.xml">
+      <LogicalName>PrimaryChildren.xml</LogicalName>
+      <Link>xml\PrimaryChildren.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\PrimaryFile.xml">
+      <LogicalName>PrimaryFile.xml</LogicalName>
+      <Link>xml\PrimaryFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Process.xml">
+      <LogicalName>Process.xml</LogicalName>
+      <Link>xml\Process.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ProxyAccount.xml">
+      <LogicalName>ProxyAccount.xml</LogicalName>
+      <Link>xml\ProxyAccount.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ProxyAccountPrincipals.xml">
+      <LogicalName>ProxyAccountPrincipals.xml</LogicalName>
+      <Link>xml\ProxyAccountPrincipals.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\QueryStoreOptions.xml">
+      <LogicalName>QueryStoreOptions.xml</LogicalName>
+      <Link>xml\QueryStoreOptions.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RemoteDrive.xml">
+      <LogicalName>RemoteDrive.xml</LogicalName>
+      <Link>xml\RemoteDrive.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RemoteMaintenancePlan.xml">
+      <LogicalName>RemoteMaintenancePlan.xml</LogicalName>
+      <Link>xml\RemoteMaintenancePlan.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RemotePlanLog.xml">
+      <LogicalName>RemotePlanLog.xml</LogicalName>
+      <Link>xml\RemotePlanLog.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RemotePlanLogDetail.xml">
+      <LogicalName>RemotePlanLogDetail.xml</LogicalName>
+      <Link>xml\RemotePlanLogDetail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RemoteSubPlan.xml">
+      <LogicalName>RemoteSubPlan.xml</LogicalName>
+      <Link>xml\RemoteSubPlan.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RemovableDrive.xml">
+      <LogicalName>RemovableDrive.xml</LogicalName>
+      <Link>xml\RemovableDrive.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ReplicaClusterNode.xml">
+      <LogicalName>ReplicaClusterNode.xml</LogicalName>
+      <Link>xml\ReplicaClusterNode.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ResourceGovernor.xml">
+      <LogicalName>ResourceGovernor.xml</LogicalName>
+      <Link>xml\ResourceGovernor.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ResourcePool.xml">
+      <LogicalName>ResourcePool.xml</LogicalName>
+      <Link>xml\ResourcePool.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ResourcePoolAffinityInfo.xml">
+      <LogicalName>ResourcePoolAffinityInfo.xml</LogicalName>
+      <Link>xml\ResourcePoolAffinityInfo.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ResourcePoolScheduler.xml">
+      <LogicalName>ResourcePoolScheduler.xml</LogicalName>
+      <Link>xml\ResourcePoolScheduler.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\restorefile.xml">
+      <LogicalName>restorefile.xml</LogicalName>
+      <Link>xml\restorefile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\restorefilegroup.xml">
+      <LogicalName>restorefilegroup.xml</LogicalName>
+      <Link>xml\restorefilegroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\restorehistory.xml">
+      <LogicalName>restorehistory.xml</LogicalName>
+      <Link>xml\restorehistory.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\restore_plan.xml">
+      <LogicalName>restore_plan.xml</LogicalName>
+      <Link>xml\restore_plan.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\resumableindex.xml">
+      <LogicalName>resumableindex.xml</LogicalName>
+      <Link>xml\resumableindex.xml</Link>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Rule.xml">
+      <LogicalName>Rule.xml</LogicalName>
+      <Link>xml\Rule.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RuleColumn.xml">
+      <LogicalName>RuleColumn.xml</LogicalName>
+      <Link>xml\RuleColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\RuleDataType.xml">
+      <LogicalName>RuleDataType.xml</LogicalName>
+      <Link>xml\RuleDataType.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Schedule.xml">
+      <LogicalName>Schedule.xml</LogicalName>
+      <Link>xml\Schedule.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Schema.xml">
+      <LogicalName>Schema.xml</LogicalName>
+      <Link>xml\Schema.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\sdt.xml">
+      <LogicalName>sdt.xml</LogicalName>
+      <Link>xml\sdt.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SearchProperty.xml">
+      <LogicalName>SearchProperty.xml</LogicalName>
+      <Link>xml\SearchProperty.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SearchPropertyList.xml">
+      <LogicalName>SearchPropertyList.xml</LogicalName>
+      <Link>xml\SearchPropertyList.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SecurityPolicy.xml">
+      <LogicalName>SecurityPolicy.xml</LogicalName>
+      <Link>xml\SecurityPolicy.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SecurityPredicate.xml">
+      <LogicalName>SecurityPredicate.xml</LogicalName>
+      <Link>xml\SecurityPredicate.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\DatabaseScopedConfiguration.xml">
+      <LogicalName>DatabaseScopedConfiguration.xml</LogicalName>
+      <Link>xml\DatabaseScopedConfiguration.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\sequence.xml">
+      <LogicalName>sequence.xml</LogicalName>
+      <Link>xml\sequence.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Server.xml">
+      <LogicalName>Server.xml</LogicalName>
+      <Link>xml\Server.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServerAuditSpecification.xml">
+      <LogicalName>ServerAuditSpecification.xml</LogicalName>
+      <Link>xml\ServerAuditSpecification.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServerAuditSpecificationDetail.xml">
+      <LogicalName>ServerAuditSpecificationDetail.xml</LogicalName>
+      <Link>xml\ServerAuditSpecificationDetail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServerDdlTrigger.xml">
+      <LogicalName>ServerDdlTrigger.xml</LogicalName>
+      <Link>xml\ServerDdlTrigger.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServerDdlTriggerEvent.xml">
+      <LogicalName>ServerDdlTriggerEvent.xml</LogicalName>
+      <Link>xml\ServerDdlTriggerEvent.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServerProxyAccount.xml">
+      <LogicalName>ServerProxyAccount.xml</LogicalName>
+      <Link>xml\ServerProxyAccount.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServerRole.xml">
+      <LogicalName>ServerRole.xml</LogicalName>
+      <Link>xml\ServerRole.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ServiceMasterKey.xml">
+      <LogicalName>ServiceMasterKey.xml</LogicalName>
+      <Link>xml\ServiceMasterKey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Settings.xml">
+      <LogicalName>Settings.xml</LogicalName>
+      <Link>xml\Settings.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SharedSchedule.xml">
+      <LogicalName>SharedSchedule.xml</LogicalName>
+      <Link>xml\SharedSchedule.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ShilohDependency.sql">
+      <LogicalName>ShilohDependency.sql</LogicalName>
+      <Link>xml\ShilohDependency.sql</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SmartAdmin.xml">
+      <LogicalName>SmartAdmin.xml</LogicalName>
+      <Link>xml\SmartAdmin.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SPParams.xml">
+      <LogicalName>SPParams.xml</LogicalName>
+      <Link>xml\SPParams.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SQL11Dependency.sql">
+      <LogicalName>SQL11Dependency.sql</LogicalName>
+      <Link>xml\SQL11Dependency.sql</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SQL13Dependency.sql">
+      <LogicalName>SQL13Dependency.sql</LogicalName>
+      <Link>xml\SQL13Dependency.sql</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SqlAssembly.xml">
+      <LogicalName>SqlAssembly.xml</LogicalName>
+      <Link>xml\SqlAssembly.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SqlAssemblyFile.xml">
+      <LogicalName>SqlAssemblyFile.xml</LogicalName>
+      <Link>xml\SqlAssemblyFile.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SqlBoot.xml">
+      <LogicalName>SqlBoot.xml</LogicalName>
+      <Link>xml\SqlBoot.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Statistic.xml">
+      <LogicalName>Statistic.xml</LogicalName>
+      <Link>xml\Statistic.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\StatisticColumn.xml">
+      <LogicalName>StatisticColumn.xml</LogicalName>
+      <Link>xml\StatisticColumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\StoredProcedure.xml">
+      <LogicalName>StoredProcedure.xml</LogicalName>
+      <Link>xml\StoredProcedure.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\symmetrickey.xml">
+      <LogicalName>symmetrickey.xml</LogicalName>
+      <Link>xml\symmetrickey.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\synonym.xml">
+      <LogicalName>synonym.xml</LogicalName>
+      <Link>xml\synonym.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\sysmessage.xml">
+      <LogicalName>sysmessage.xml</LogicalName>
+      <Link>xml\sysmessage.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\table.xml">
+      <LogicalName>table.xml</LogicalName>
+      <Link>xml\table.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\TapeDevice.xml">
+      <LogicalName>TapeDevice.xml</LogicalName>
+      <Link>xml\TapeDevice.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\temp_table.xml">
+      <LogicalName>temp_table.xml</LogicalName>
+      <Link>xml\temp_table.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Text.xml">
+      <LogicalName>Text.xml</LogicalName>
+      <Link>xml\Text.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\transaction.xml">
+      <LogicalName>transaction.xml</LogicalName>
+      <Link>xml\transaction.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Trigger.xml">
+      <LogicalName>Trigger.xml</LogicalName>
+      <Link>xml\Trigger.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Uddt.xml">
+      <LogicalName>Uddt.xml</LogicalName>
+      <Link>xml\Uddt.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UDF.xml">
+      <LogicalName>UDF.xml</LogicalName>
+      <Link>xml\UDF.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\udfcolumn.xml">
+      <LogicalName>udfcolumn.xml</LogicalName>
+      <Link>xml\udfcolumn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UDFParams.xml">
+      <LogicalName>UDFParams.xml</LogicalName>
+      <Link>xml\UDFParams.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\User.xml">
+      <LogicalName>User.xml</LogicalName>
+      <Link>xml\User.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UserDefinedAggregate.xml">
+      <LogicalName>UserDefinedAggregate.xml</LogicalName>
+      <Link>xml\UserDefinedAggregate.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UserDefinedAggregateParameter.xml">
+      <LogicalName>UserDefinedAggregateParameter.xml</LogicalName>
+      <Link>xml\UserDefinedAggregateParameter.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UserDefinedTableType.xml">
+      <LogicalName>UserDefinedTableType.xml</LogicalName>
+      <Link>xml\UserDefinedTableType.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UserDefinedType.xml">
+      <LogicalName>UserDefinedType.xml</LogicalName>
+      <Link>xml\UserDefinedType.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\usermessage.xml">
+      <LogicalName>usermessage.xml</LogicalName>
+      <Link>xml\usermessage.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\UserOption.xml">
+      <LogicalName>UserOption.xml</LogicalName>
+      <Link>xml\UserOption.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\View.xml">
+      <LogicalName>View.xml</LogicalName>
+      <Link>xml\View.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\WorkloadGroup.xml">
+      <LogicalName>WorkloadGroup.xml</LogicalName>
+      <Link>xml\WorkloadGroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\WorkloadManagementWorkloadGroup.xml">
+      <LogicalName>WorkloadManagementWorkloadGroup.xml</LogicalName>
+      <Link>xml\WorkloadManagementWorkloadGroup.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\XmlNamespace.xml">
+      <LogicalName>XmlNamespace.xml</LogicalName>
+      <Link>xml\XmlNamespace.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\XmlSchemaCollection.xml">
+      <LogicalName>XmlSchemaCollection.xml</LogicalName>
+      <Link>xml\XmlSchemaCollection.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\XmlType.xml">
+      <LogicalName>XmlType.xml</LogicalName>
+      <Link>xml\XmlType.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\XStoredProcedure.xml">
+      <LogicalName>XStoredProcedure.xml</LogicalName>
+      <Link>xml\XStoredProcedure.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\YukonDependency.sql">
+      <LogicalName>YukonDependency.sql</LogicalName>
+      <Link>xml\YukonDependency.sql</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Yukonuserownedobject.xml">
+      <LogicalName>Yukonuserownedobject.xml</LogicalName>
+      <Link>xml\Yukonuserownedobject.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\YukonuserownedobjectSchema.xml">
+      <LogicalName>YukonuserownedobjectSchema.xml</LogicalName>
+      <Link>xml\YukonuserownedobjectSchema.xml</Link>
+    </EmbeddedResource>
+    <None Include="xml\*.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)'=='netfx'">
+    <Reference Include="System.Data"/>
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\SqlClrProvider\Microsoft.SqlServer.SqlClrProvider.csproj"/>
+  </ItemGroup>
+</Project>

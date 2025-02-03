@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="File" impl_type="SqlObject" min_major='7'>
+	<settings main_table="#SmoPrimayChildren s">
+		<prefix>
+			declare @command nvarchar(300)
+			select @command = 'dbcc checkprimaryfile (N''' + @fileName + ''' , 3)'
+			create table #SmoPrimayChildren(status INT,fileid INT,name sysname,filename nvarchar(512))
+			insert #SmoPrimayChildren exec (@command)
+		</prefix>
+		<postfix>  
+			drop table  #SmoPrimayChildren		
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Name" type="nvarchar" size='255'>s.name</property>
+		<property name="ID" type="int" access="Read">s.fileid</property>
+		<property name="IsFile" type="bit" access="Read" cast='true'>case when (s.status &amp; 0x40) = 0 then 1 else 0 end</property>
+		<property name="FileName" type="nvarchar" size="512" access="Read">RTRIM(s.filename)</property>
+	</properties>
+</EnumObject>

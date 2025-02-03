@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServerProxyAccount" impl_type="ServerProxyAccount" min_major='8' >
+    <settings>
+		<version min_major='8' max_major='8'>
+    		<property_link>@account_name is not null</property_link>
+			<prefix fields="#IsEnabled#"> 
+				declare @SysAdminOnly int
+				exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'SysAdminOnly', @SysAdminOnly OUTPUT
+                set @SysAdminOnly = (case when 0 = @SysAdminOnly then 1 else 0 end)
+			</prefix>
+			<prefix> 
+create table #tmpProxyAccountName ( domain sysname, username sysname)
+insert into #tmpProxyAccountName exec master.dbo.xp_sqlagent_proxy_account N'GET'
+
+declare @account_name nvarchar(255)
+set @account_name = (select domain + N'\' + username as [UserName] from #tmpProxyAccountName)
+if (@account_name is null)
+begin
+  set @account_name=N''
+end
+			</prefix>
+			<postfix> 
+drop table #tmpProxyAccountName
+			</postfix>
+            </version>
+		<version min_major='9' >
+    		<property_link>@account_name is not null</property_link>
+			<prefix fields="#IsEnabled#"> 
+				declare @SysAdminOnly int
+                set @SysAdminOnly = (select count(*) from sys.credentials c where c.name = N'##xp_cmdshell_proxy_account##')
+			</prefix>
+			<prefix> 
+declare @account_name nvarchar(4000)
+set @account_name = (select top 1 credential_identity from sys.credentials c where c.name = N'##xp_cmdshell_proxy_account##')
+if (@account_name is null)
+begin
+  set @account_name=N''
+end
+			</prefix>
+            </version>
+    </settings>
+   <properties>
+       <property name="Urn" type="nvarchar" size="600">
+           <link_multiple no='1' expression="{0} + '/ServerProxyAccount'">
+               <link_field type='parent' field="Urn" />
+           </link_multiple>
+       </property>
+           <property name="IsEnabled" type="bit" cast='true'>@SysAdminOnly</property>
+    	   <property name="WindowsAccount" type="nvarchar" size='4000'>@account_name</property>
+    </properties>
+</EnumObject>
