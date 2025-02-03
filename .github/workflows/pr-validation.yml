@@ -45,9 +45,12 @@ jobs:
         export SAPASSWORD=$(date +%s|sha256sum|base64|head -c 32)
         echo "SAPASSWORD=$SAPASSWORD" >> $GITHUB_ENV
         docker run -m 2GB -e ACCEPT_EULA=1 -d --name sql -p:1433:1433 -e SA_PASSWORD=$SAPASSWORD mcr.microsoft.com/mssql/server:${{ matrix.sqlImage }}-latest
-        sleep 10
+        sleep 30
     - name: Run tests against Linux SQL
-      run: dotnet test tests/Microsoft.SqlServer.Test.Smo.dll --logger "trx;LogFilePrefix=SmoTests" --filter "TestCategory!=Staging&TestCategory!=Legacy"
+      run: |
+        cat tests/ToolsConnectionInfo.xml
+        docker ps -a
+        dotnet test tests/Microsoft.SqlServer.Test.Smo.dll --logger "trx;LogFilePrefix=SmoTests;verbosity=diag" --filter "TestCategory!=Staging&TestCategory!=Legacy"
       env: 
         DOTNET_ROLL_FORWARD: LatestMajor
     - name: Upload test results
