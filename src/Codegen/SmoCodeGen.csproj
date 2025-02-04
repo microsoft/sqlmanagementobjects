@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <EnableDefaultItems>false</EnableDefaultItems>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -9,9 +9,6 @@
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DefineConstants>$(DefineConstants);SMOCODEGEN;NATIVEBATCHPARSER</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetGroup)'!='netfx'">
-      <DefineConstants >$(DefineConstants);NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(ConnectionInfoSrc)\ConnectionEnums.cs" />
@@ -80,7 +77,6 @@
     <Compile Include="$(SfcSrc)\NetCoreExtension.cs" />
     <Compile Include="$(SfcSrc)\SmoManagementUtil.cs" />
     <Compile Include="$(SfcSrc)\TraceHelper.cs" />
-    <Compile Include="$(SfcSrc)\XmlTextReader.cs" />
     <Compile Include="$(SqlEnumSrc)\ConditionedSql.cs" />
     <Compile Include="$(SqlEnumSrc)\DatabaseLevel.cs" />
     <Compile Include="$(SqlEnumSrc)\DatabaseOption.cs" />

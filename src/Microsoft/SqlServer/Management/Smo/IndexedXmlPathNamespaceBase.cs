@@ -3,13 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-
-using System.Collections.Specialized;
 using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Sdk.Sfc;
-using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-using Dmf = Microsoft.SqlServer.Management.Dmf;
-using Facets = Microsoft.SqlServer.Management.Facets;
 
 namespace Microsoft.SqlServer.Management.Smo
 {

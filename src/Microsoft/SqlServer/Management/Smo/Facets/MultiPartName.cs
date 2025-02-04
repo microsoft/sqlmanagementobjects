@@ -4,8 +4,6 @@
 
 using System;
 using System.ComponentModel;
-
-using System.Reflection;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Dmf;
 using Microsoft.SqlServer.Management.Facets;

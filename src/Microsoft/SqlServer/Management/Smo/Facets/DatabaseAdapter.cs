@@ -3,13 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-
-using System.Reflection;
 using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Diagnostics;
-using Microsoft.SqlServer.Management.Dmf;
 using Microsoft.SqlServer.Management.Facets;
-using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo

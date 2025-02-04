@@ -10,7 +10,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     using Microsoft.SqlServer.Management.Diagnostics;
 #else
 #endif
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
     using System.Security.Permissions;
     using Microsoft.SqlServer.Smo.UnSafeInternals;
 #endif
@@ -416,7 +416,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         // The following call stack might expose a way to circumvent security protection.
         // $ISSUE 122248: Our parameters always come from a closed metadata definition system in Katmai. If this changes revisit.
         [SuppressMessage("Microsoft.Security", "CA2106:SecureAsserts")]
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
         [FileIOPermission(SecurityAction.Assert, Unrestricted = true)]
 #endif
         static Assembly LoadAssembly(string fullName)
@@ -490,7 +490,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         // The following call stack might expose a way to circumvent security protection.
         // $ISSUE 122248: Our parameters always come from a closed metadata definition system in Katmai. If this changes revisit.
         [SuppressMessage("Microsoft.Security", "CA2106:SecureAsserts")]
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
         [ReflectionPermission(SecurityAction.Assert, Unrestricted=true)]
 #endif
         static Object CreateObjectInstance(Assembly assembly, string objectType)

@@ -6,9 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-using System.Text;
-using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-
 namespace Microsoft.SqlServer.Management.Smo
 {
     /// <summary>

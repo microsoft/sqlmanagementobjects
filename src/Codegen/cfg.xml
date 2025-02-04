@@ -2000,7 +2000,8 @@
       <property name="CreateDate" generate="true" />
       <property name="DateLastModified" generate="true" />
       <property name="EndpointUrl" generate="true" />
-      <property name="ReadonlyRoutingConnectionUrl" generate="true" />
+      <property name="ReadonlyRoutingConnectionUrl" generate="false" />
+      <property name="ReadwriteRoutingConnectionUrl" generate="false" />
       <property name="ConnectionModeInPrimaryRole" generate="true" />
       <property name="ConnectionModeInSecondaryRole" generate="true" />
       <property name="AvailabilityMode" generate="true" />

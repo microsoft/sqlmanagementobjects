@@ -17,7 +17,6 @@
     <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.SmoExtended" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum.Tests" Condition="$(DefineConstants.Contains(NETSTANDARD2_0))" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.SqlWmiManagement" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SMO" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoInternal" Key="$(RealPublicKey)"/>

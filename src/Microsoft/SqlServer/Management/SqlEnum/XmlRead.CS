@@ -13,7 +13,7 @@ namespace Microsoft.SqlServer.Management.Smo
     using System.Collections.Specialized;
     using Microsoft.SqlServer.Management.Common;
     using System.Runtime.InteropServices;
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
     using Microsoft.SqlServer.Smo.UnSafeInternals;
 #endif
     using Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -26,11 +26,7 @@ namespace Microsoft.SqlServer.Management.Smo
     [ComVisible(false)]
     internal class XmlRead
     {
-#if !NETSTANDARD2_0
         private XmlTextReader m_reader;
-#else
-        private Microsoft.SqlServer.Management.Sdk.Sfc.XmlTextReader m_reader;
-#endif
 
         private String m_alias;
         private bool m_closed;
@@ -56,11 +52,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         ///get the XmlTextReader</summary>
-#if !NETSTANDARD2_0
         protected XmlTextReader Reader
-#else
-        protected Microsoft.SqlServer.Management.Sdk.Sfc.XmlTextReader Reader
-#endif
         {
             get { return m_reader; }
             set { m_reader = value; }
@@ -498,11 +490,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void LoadInternal()
         {
 
-#if NETSTANDARD2_0
-            this.Reader = new Microsoft.SqlServer.Management.Sdk.Sfc.XmlTextReader(m_fs, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit });
-#else
             this.Reader = new XmlTextReader(m_fs) { DtdProcessing = DtdProcessing.Prohibit };
-#endif
             if ( XmlUtility.SelectNextElement(this.Reader) )
             {
                 if( !XmlUtility.IsElement(this.Reader, "EnumObject") )

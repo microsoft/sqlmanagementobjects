@@ -16,9 +16,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     ///</summary>
     [ComVisible(false)]
     public class Enumerator
-#if !NETSTANDARD2_0
                 : MarshalByRefObject
-#endif
 
     {
         ///<summary>

@@ -46,6 +46,7 @@ namespace Microsoft.SqlServer.Management.Common
         private bool strictEncryption;
 #if MICROSOFTDATA
         private string hostNameInCertificate;
+        private string serverCertificate;
 #endif
         private string additionalParameters = null;
         private SqlConnectionInfo.AuthenticationMethod m_Authentication;
@@ -140,6 +141,7 @@ namespace Microsoft.SqlServer.Management.Common
             cs.strictEncryption = StrictEncryption;
 #if MICROSOFTDATA
             cs.hostNameInCertificate = hostNameInCertificate;
+            cs.serverCertificate = serverCertificate;
 #endif
             cs.additionalParameters = additionalParameters;
             cs.m_TrustServerCertificate = m_TrustServerCertificate;
@@ -224,6 +226,7 @@ namespace Microsoft.SqlServer.Management.Common
             }
 #if MICROSOFTDATA
             hostNameInCertificate = sci.HostNameInCertificate;
+            serverCertificate = sci.ServerCertificate;
 #endif
             m_TrustServerCertificate = sci.TrustServerCertificate;
 
@@ -268,6 +271,7 @@ namespace Microsoft.SqlServer.Management.Common
 #if MICROSOFTDATA
             StrictEncryption = connectionStringBuilder.Encrypt == SqlConnectionEncryptOption.Strict;
             hostNameInCertificate = connectionStringBuilder.HostNameInCertificate;
+            serverCertificate = connectionStringBuilder.ServerCertificate;
 #endif
             TrustServerCertificate = connectionStringBuilder.TrustServerCertificate;
             // Assigning ConnectionString must be the last line of this method
@@ -907,6 +911,20 @@ namespace Microsoft.SqlServer.Management.Common
                 hostNameInCertificate = value;
             }
         }
+
+        /// <summary>
+        /// The path to server certificate to be used for certificate validation.
+        /// </summary>
+        public string ServerCertificate
+        {
+            get => serverCertificate;
+            set
+            {
+                ThrowIfUpdatesAreBlocked();
+                ThrowIfConnectionStringIsSet();
+                serverCertificate = value;
+            }
+        }
 #endif
 
         /// <summary>
@@ -1100,7 +1118,7 @@ namespace Microsoft.SqlServer.Management.Common
                 }
                 if (NetworkProtocol != NetworkProtocol.NotSpecified)
                 {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
                     //NetworkLibrary property not implemented in .NetCore
                     sbConnectionString.NetworkLibrary = GetNetworkProtocolString();
 #endif
@@ -1166,6 +1184,10 @@ namespace Microsoft.SqlServer.Management.Common
                 if (!string.IsNullOrEmpty(hostNameInCertificate))
                 {
                     sbConnectionString.HostNameInCertificate = hostNameInCertificate;
+                }
+                if (!string.IsNullOrEmpty(serverCertificate))
+                {
+                    sbConnectionString.ServerCertificate = serverCertificate;
                 }
 #endif
                 sbConnectionString.TrustServerCertificate = TrustServerCertificate;

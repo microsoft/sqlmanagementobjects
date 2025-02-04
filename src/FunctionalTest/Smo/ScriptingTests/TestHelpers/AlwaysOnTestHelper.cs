@@ -16,29 +16,81 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Creates and returns a default AG object for testing.
         /// </summary>
         /// <returns>An AG with a single primary replica</returns>
-        public static AvailabilityGroup CreateDefaultAGObject(Management.Smo.Server server, int secondaryReplicaCount = 2)
+        public static AvailabilityGroup CreateDefaultAGObject(
+            Management.Smo.Server server,
+            int secondaryReplicaCount = 2,
+            string readonlyRoutingConnectionUrl = null,
+            string readwriteRoutingConnectionUrl = null)
         {
             var ag = new AvailabilityGroup(server, "ag1");
 
             // Add the replica itself. This will be the primary.
-            ag.AvailabilityReplicas.Add(new AvailabilityReplica(ag, server.NetNameWithInstance())
+            var primary = new AvailabilityReplica(ag, server.NetNameWithInstance())
             {
                 EndpointUrl = "tcp:" + server.NetName + ":5022",
                 FailoverMode = AvailabilityReplicaFailoverMode.Automatic,
                 AvailabilityMode = AvailabilityReplicaAvailabilityMode.SynchronousCommit
-            });
+            };
 
-            for (int i = 0; i < secondaryReplicaCount; i++)
+            if (readonlyRoutingConnectionUrl != null)
             {
-                string serverName = string.Format("secondary{0}", i + 1);
+                // Special value: it really means to assign null to the property!
+                if (readonlyRoutingConnectionUrl == "<NULL>")
+                {
+                    readonlyRoutingConnectionUrl = null;
+                }
+
+                primary.ReadonlyRoutingConnectionUrl = readonlyRoutingConnectionUrl;
+            }
+
+            if (readwriteRoutingConnectionUrl != null && primary.IsSupportedProperty(nameof(primary.ReadwriteRoutingConnectionUrl)))
+            {
+                // Special value: it really means to assign null to the property!
+                if (readwriteRoutingConnectionUrl == "<NULL>")
+                {
+                    readwriteRoutingConnectionUrl = null;
+                }
+
+                primary.ReadwriteRoutingConnectionUrl = readwriteRoutingConnectionUrl;
+            }
+
+            ag.AvailabilityReplicas.Add(primary);
+
+            for (var i = 0; i < secondaryReplicaCount; i++)
+            {
+                var serverName = $"secondary{i+1}";
 
                 // Add fake secondary. Since we only have scripting tests it doesn't matter that they're fake.
-                ag.AvailabilityReplicas.Add(new AvailabilityReplica(ag, serverName)
+                var replica = new AvailabilityReplica(ag, serverName)
                 {
                     EndpointUrl = string.Format("tcp:{0}:5022", serverName),
                     FailoverMode = AvailabilityReplicaFailoverMode.Automatic,
                     AvailabilityMode = AvailabilityReplicaAvailabilityMode.SynchronousCommit
-                });
+                };
+
+                if (readonlyRoutingConnectionUrl != null)
+                {
+                    // Special value: it really means to assign null to the property!
+                    if (readonlyRoutingConnectionUrl == "<NULL>")
+                    {
+                        readonlyRoutingConnectionUrl = null;
+                    }
+
+                    replica.ReadonlyRoutingConnectionUrl = readonlyRoutingConnectionUrl;
+                }
+
+                if (readwriteRoutingConnectionUrl != null && primary.IsSupportedProperty(nameof(replica.ReadwriteRoutingConnectionUrl)))
+                {
+                    // Special value: it really means to assign null to the property!
+                    if (readwriteRoutingConnectionUrl == "<NULL>")
+                    {
+                        readwriteRoutingConnectionUrl = null;
+                    }
+
+                    replica.ReadwriteRoutingConnectionUrl = readwriteRoutingConnectionUrl;
+                }
+
+                ag.AvailabilityReplicas.Add(replica);
             }
 
             return ag;

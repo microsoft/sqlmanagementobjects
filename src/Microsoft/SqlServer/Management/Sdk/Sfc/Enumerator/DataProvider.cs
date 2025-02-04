@@ -14,9 +14,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     using System.Data;
     using System.Globalization;
 
-#if !NETSTANDARD2_0
     using Microsoft.SqlServer.Management.Sdk.Sfc;
-#endif
 
     ///<summary>
     ///exeposes the results as a tsql as a DataTable or a data reader

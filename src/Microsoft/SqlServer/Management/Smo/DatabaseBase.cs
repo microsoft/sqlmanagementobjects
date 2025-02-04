@@ -1551,13 +1551,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // Only add the alter command if Autocreate is true. Setting autocreate to false will automatically
             // set incremental to false.
-            // We don't want to enable incremental statistics yet for cloud.
             if (!propAutoCreateStatistics.IsNull
                 && (bool)propAutoCreateStatistics.Value
                 && propAutoCreateStatisticsIncremental != null // We set this to null if Incremental is not supported (backwards compat).
                 && !propAutoCreateStatisticsIncremental.IsNull
-                && propAutoCreateStatisticsIncremental.Dirty
-                && !IsCloudAtSrcOrDest(this.DatabaseEngineType, sp.TargetDatabaseEngineType))
+                && propAutoCreateStatisticsIncremental.Dirty)
             {
                 // If we didn't already generate the parent fragment before, do it now.
                 if (!generateScript )
@@ -4462,9 +4460,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 throw new ArgumentNullException(nameof(scriptingPreferences));
             }
-            ScriptingPreferences sp = (ScriptingPreferences)scriptingPreferences.Clone();
-            sp.IncludeScripts.ExtendedProperties = true;
-            PrefetchObjectsImpl(objectType, sp);
+            PrefetchObjectsImpl(objectType, scriptingPreferences);
         }
 
         /// <summary>

@@ -3,11 +3,21 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+# 172.61.0
+
+- Remove major version restriction on Microsoft.Data.SqlClient dependency Fixes [Issue 188](https://github.com/microsoft/sqlmanagementobjects/issues/188)
+- Remove net6 binaries
+- Allow login information to be updated for an existing user
+- Enabled AutoCreateStatisticsIncremental property configuration for Azure SQL database
+- Change `Database.PrefetchObjects` to omit `ExtendedProperties` when passed a `ScriptingOptions` object that omits them. Fixes [Issue 177](https://github.com/microsoft/sqlmanagementobjects/issues/177)
+
 ## 172.52.0
 
+- Add `ServerRole` support for Azure SQL database
 - Add 170 compat support
 - Update NetFx binaries to net472
 - Remove obsolete formatter-based serialization constructors from non-Netfx Exceptions
+- Add ConnectionOptions and Pushdown to `CREATE` and `ALTER` scripts for external data sources
 - Added new `DateLastModified` property on Error Logs returned by `EnumErrorLogs()`. Its value is the same as the existing `CreateDate`,
   (which has been incorrectly namd for years) only properly stampted with the date/time offset information to allow easier 
   interoperability between client and servers in different time zones. `CreateDate` is essentially deprecated, and new applications

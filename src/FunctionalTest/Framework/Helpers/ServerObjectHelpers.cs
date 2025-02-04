@@ -435,11 +435,19 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     Trace.TraceError(message);
                     throw new InternalTestFailureException(message, e);
                 }
-            }, retries: 3, retryDelayMs: 30000,
+            }, whenFunc: RetryWhenExceptionThrown,  retries: 3, retryDelayMs: 30000,
             retryMessage: "Creating Initial DB failed");
             return db;
         }
 
+        // We already have a 10 minute timeout for commands, so something is really wrong on the server if it takes this long.
+        // A retry would likely just make things worse.
+        private static bool RetryWhenExceptionThrown(Exception e)
+        {
+            var sqlException = e.FirstInstanceOf<SqlException>();
+            return sqlException != null && !sqlException.BuildRecursiveExceptionMessage().Contains("Execution Timeout");
+        }
+        
         /// <summary>
         /// Creates a snapshot of the specified DB
         /// </summary>

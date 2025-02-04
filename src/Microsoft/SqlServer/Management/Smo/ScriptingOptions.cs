@@ -2351,10 +2351,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 case 15:
                     sqlSvrVersion = SqlServerVersion.Version150;
                     break;
-                case int n when n >= 16:
+                case 16:
                     sqlSvrVersion = SqlServerVersion.Version160;
                     break;
+                case int n when n >= 17:
+                    sqlSvrVersion = SqlServerVersion.Version170;
+                    break;
                 default:
+                    // VBUMP
                     throw new SmoException(ExceptionTemplates.InvalidVersion(majorVersion.ToString()));
             }
             return sqlSvrVersion;

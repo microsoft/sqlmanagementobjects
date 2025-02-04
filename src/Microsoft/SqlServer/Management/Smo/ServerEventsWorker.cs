@@ -1,35 +1,27 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Management;
+using System.Text;
+using Microsoft.SqlServer.Management.Smo.Broker;
+using ManagementPropertyData = System.Management.PropertyData;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics;
-    using System.Text;
-    using System.Globalization;
-#if !NETSTANDARD2_0
-    using System.Management;
-    using ManagementPropertyData = System.Management.PropertyData;
-#endif
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.SqlServer.Management.Smo.Broker;
-    using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
 
 
     /// <summary>
     /// Handler prototype for all server events.
     /// </summary>
-#if !NETSTANDARD2_0
     public delegate void ServerEventHandler(object sender, ServerEventArgs e);
-#else
-    public delegate void ServerEventHandler(object sender, object e);
-#endif
 
-#if !NETSTANDARD2_0
     /// <summary>
     /// Argument class used by ServerEventHandler.
     /// </summary>
@@ -76,7 +68,6 @@ namespace Microsoft.SqlServer.Management.Smo
         private EventType eventType;
     #endregion
     }
-#endif
 
     /// <summary>
     /// Class that handles subscribing and routing
@@ -108,10 +99,8 @@ namespace Microsoft.SqlServer.Management.Smo
             this.eventEnumType = eventEnumType;
             this.events = (EventSetBase)Activator.CreateInstance(eventSetType);
 
-#if !NETSTANDARD2_0
             // Create managed scope but do not connect yet
             this.managementScope = server.Events.ManagementScope;
-#endif
         }
         #endregion
 
@@ -142,7 +131,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="handler"></param>
         public void SubscribeToEvents(EventSetBase addEvents, ServerEventHandler eventHandler)
         {
-#if !NETSTANDARD2_0
             Debug.Assert(addEvents.GetType() == this.events.GetType(), "Must subscribe to correct type of events");
 
             try
@@ -188,12 +176,10 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 throw new FailedOperationException(ExceptionTemplates.CannotSubscribe, this, exception);
             }
-#endif
         }
 
         public void UnsubscribeFromEvents(EventSetBase removeEvents)
         {
-#if !NETSTANDARD2_0
             // For each event in event set remove a subscription
             for (int eventID = 0; eventID < removeEvents.NumberOfElements; ++eventID)
             {
@@ -217,12 +203,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     // else ... ignore the event, nothing to remove
                 }
             }
-#endif
         }
 
         public void StartEvents()
         {
-#if !NETSTANDARD2_0
             if (!this.eventsStarted)
             {
                 try
@@ -241,12 +225,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     throw new FailedOperationException(ExceptionTemplates.CannotStartSubscription, this, exception);
                 }
             }
-#endif
         }
 
         public void StopEvents()
         {
-#if !NETSTANDARD2_0
             if (this.eventsStarted)
             {
                 foreach (EventSubscription subscription in this.eventSubscriptions.Values)
@@ -255,13 +237,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 this.eventsStarted = false;
             }
-#endif
         }
 
         #region IDisposable Members
         public void Dispose()
         {
-#if !NETSTANDARD2_0
 
             Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "Removing all subscriptions");
 
@@ -276,7 +256,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // No need for finalizer, since it would be empty
             // All objects to release are external objects
-#endif
         }
         #endregion
         #endregion
@@ -285,9 +264,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         protected abstract SqlSmoObject Target { get; }
 
-#if !NETSTANDARD2_0
         protected abstract EventQuery CreateWqlQuery(string eventClass);
-#endif
 
         /// <summary>
         /// Search through all event handlers and check if 
@@ -372,7 +349,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void CreateSubscription(int eventID, string eventClass, object eventHandlerKey)
         {
-#if !NETSTANDARD2_0
             //
             // Create a WQL query 
             //
@@ -401,10 +377,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // Once everything succeeded, add subscription to our collection
             this.eventSubscriptions.Add(eventClass, subscription);
-#endif
         }
 
-#if !NETSTANDARD2_0
         /// <summary>
         /// This is the main event handler that recieves all WMI events
         /// and dispatches then to other event handlers based on 
@@ -549,7 +523,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             return SqlSmoObject.EscapeString(SqlSmoObject.EscapeString(parameter, '\\'), '\'');
         }
-#endif
 
         private EventHandlerList eventHandlers = new EventHandlerList();
         private Hashtable eventSubscriptions = new Hashtable();
@@ -557,9 +530,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private Type eventEnumType;      // An enum type used by this ServerEventWorker
         private EventSetBase events;             // Current set of events we are subscribed to
         private bool eventsStarted;      // Indicates if events should be started
-#if !NETSTANDARD2_0
         private ManagementScope managementScope;    // Our WMI connection
-#endif
 
         private static readonly object defaultEventHandlerKey = new object();
         #endregion
@@ -589,12 +560,10 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return this.target; }
         }
 
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             return CreateWqlQueryForServer(eventClass);
         }
-#endif
         #endregion
 
         #region Implementation
@@ -621,12 +590,10 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return this.target; }
         }
 
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             return CreateWqlQueryForDatabase(eventClass, this.target.Name);
         }
-#endif
         #endregion
 
         #region Implementation
@@ -655,13 +622,11 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return this.target.GetType().Name; }
         }
 
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             return CreateWqlQueryForSourceObject(eventClass,
                 this.target.ParentColl.ParentInstance.InternalName, this.target.Schema, this.target.Name, this.ObjectType);
         }
-#endif
         #endregion
 
         #region Implementation
@@ -679,7 +644,6 @@ namespace Microsoft.SqlServer.Management.Smo
         #endregion
 
         #region Overriden methods
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             bool targetObjectQuery = false;
@@ -712,7 +676,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 return base.CreateWqlQuery(eventClass);
             }
         }
-#endif
         #endregion
     }
 
@@ -726,7 +689,6 @@ namespace Microsoft.SqlServer.Management.Smo
         #endregion
 
         #region Overriden methods
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             bool targetObjectQuery = false;
@@ -759,7 +721,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 return base.CreateWqlQuery(eventClass);
             }
         }
-#endif
         #endregion
     }
 
@@ -813,7 +774,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return "Queue"; }
         }
 
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             ServiceQueue queue = (ServiceQueue)this.Target;
@@ -821,7 +781,6 @@ namespace Microsoft.SqlServer.Management.Smo
             return CreateWqlQueryForSourceObject(eventClass,
                 queue.Parent.Parent.Name, queue.Schema, queue.Name, this.ObjectType);
         }
-#endif
         #endregion
     }
 
@@ -841,7 +800,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return this.target; }
         }
 
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             return CreateWqlQueryForDatabaseObject(eventClass,
@@ -849,7 +807,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.target.Name,
                 "Assembly");
         }
-#endif
         #endregion
 
         #region Implementation
@@ -960,7 +917,6 @@ namespace Microsoft.SqlServer.Management.Smo
             return ConvertToEventClass(eventName);
         }
 
-#if !NETSTANDARD2_0
         protected override EventQuery CreateWqlQuery(string eventClass)
         {
             EventQuery query = null;
@@ -1034,7 +990,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             return query;
         }
-#endif
 
         #endregion
 
@@ -1087,7 +1042,6 @@ namespace Microsoft.SqlServer.Management.Smo
     /// </summary>
     public sealed class EventPropertyCollection : ICollection, IEnumerable, IEnumerable<EventProperty>
     {
-#if !NETSTANDARD2_0
         #region Constructors
         /// <summary>
         /// Internal constructor that fills in the collection from the
@@ -1112,7 +1066,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
         #endregion
-#endif
 
         #region Public interface
         public EventProperty this[int index]

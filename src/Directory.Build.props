@@ -20,19 +20,17 @@
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
     <!-- Workspace used by the loc tool -->
     <BuildPropsDir>$(EnlistmentRoot)\SmoBuild\</BuildPropsDir>
-    <TargetGroup Condition="'$(TargetFramework)'=='netstandard2.0'">netstandard</TargetGroup>
     <TargetGroup Condition="'$(TargetFramework)'=='net6.0' or '$(TargetFramework)'=='net8.0'">netcore</TargetGroup>
     <TargetGroup Condition="'$(TargetGroup)'==''">netfx</TargetGroup>
     <CSharpProps Condition="'$(TargetGroup)'== 'netfx'">CSharp.NetFx.props</CSharpProps>
     <CSharpProps Condition="'$(TargetGroup)'== 'netcore'">CSharp.NetCore.props</CSharpProps>
-    <CSharpProps Condition="'$(CSharpProps)'==''">CSharp.NetStandard.props</CSharpProps>
     <!-- CA1416 warns if a method is only usable on Windows -->
     <!-- 1668 is CSC complaining about the LIB environment variable having bogus paths, which come from VS -->
     <NoWarn>$(NoWarn);NU5125;MSB3026;CA1416;CS1668;NU1903</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RestorePackagesPath>$(EnlistmentRoot)\packages</RestorePackagesPath>
     <ExcludeRestorePackageImports>false</ExcludeRestorePackageImports>
-    <!-- MICROSOFTDATA is defined for builds using Microsoft.Data.SqlClient. NetStandard/NetCore always uses it. 
+    <!-- MICROSOFTDATA is defined for builds using Microsoft.Data.SqlClient. NetCore always uses it. 
          GAC builds NEVER reference Microsoft.Data.SqlClient.
      -->
     <UseMicrosoftData Condition="'$(GacVersion)'=='true' and '$(TargetGroup)'=='netfx'">false</UseMicrosoftData>
@@ -52,7 +50,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net472|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|$(NetFxVersion)|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -88,7 +86,7 @@
     <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
     <SqlParserPackageVersion>172.1.1</SqlParserPackageVersion>
     <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
-    <SqlClientPackageVersion>5.1.5</SqlClientPackageVersion>
+    <SqlClientPackageVersion>5.1.6</SqlClientPackageVersion>
   </PropertyGroup>
   <Import Project="$(BuildPropsDir)\StrongName.props" Condition="Exists('$(BuildPropsDir)\StrongName.props')" />
   <Import Project="$(BuildPropsDir)\Version.props" />

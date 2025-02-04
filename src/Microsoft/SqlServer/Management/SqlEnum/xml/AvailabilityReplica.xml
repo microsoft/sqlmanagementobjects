@@ -7,8 +7,11 @@
     <version min_major='11' max_major='12'>
       <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
     </version>
-    <version min_major='13'>
-      <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
+    <version min_major='13' max_major='16'>
+      <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
+    </version>
+    <version min_major='17'>
+      <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
     </version>
     <property_link fields="#Role#OperationalState#RollupRecoveryState#RollupSynchronizationState#ConnectionState#LastConnectErrorNumber#LastConnectErrorDescription#LastConnectErrorTimestamp#" left_join="#tmpar_availability_replica_states AS arstates">AR.replica_id = arstates.replica_id</property_link>
     <property_link fields="#RollupSynchronizationState#" left_join="#tmpar_replica_rollupstate AS arrollupstates">AR.replica_id = arrollupstates.replica_id</property_link>
@@ -20,9 +23,14 @@
         select group_id, replica_id, replica_server_name,create_date, modify_date, endpoint_url, read_only_routing_url, primary_role_allow_connections, secondary_role_allow_connections, availability_mode,failover_mode, session_timeout, backup_priority, owner_sid into #tmpar_availability_replicas from master.sys.availability_replicas
       </prefix>
     </version>
-    <version min_major='13'>
+    <version min_major='13' max_major='16'>
       <prefix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#">
         select group_id, replica_id, replica_server_name,create_date, modify_date, endpoint_url, read_only_routing_url, primary_role_allow_connections, secondary_role_allow_connections, availability_mode,failover_mode, session_timeout, backup_priority, owner_sid, seeding_mode into #tmpar_availability_replicas from master.sys.availability_replicas
+      </prefix>
+    </version>
+    <version min_major='17'>
+      <prefix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#">
+        select group_id, replica_id, replica_server_name,create_date, modify_date, endpoint_url, read_only_routing_url, read_write_routing_url, primary_role_allow_connections, secondary_role_allow_connections, availability_mode,failover_mode, session_timeout, backup_priority, owner_sid, seeding_mode into #tmpar_availability_replicas from master.sys.availability_replicas
       </prefix>
     </version>
     <prefix fields="#ReadonlyRoutingListDelimited#">
@@ -91,7 +99,7 @@
       DROP TABLE #ror_list_delimited
       DROP TABLE #tmp_availability_read_only_routing_lists
     </postfix>
-    <postfix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#">
+    <postfix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#">
       DROP TABLE #tmpar_availability_replicas
     </postfix>
     <postfix fields="#Role#OperationalState#RollupRecoveryState#RollupSynchronizationState#ConnectionState#LastConnectErrorNumber#LastConnectErrorDescription#LastConnectErrorTimestamp#">
@@ -151,6 +159,9 @@ END
     </version>
     <version min_major='13'>
       <property name="SeedingMode" type="tinyint" report_type="AvailabilityReplicaSeedingMode">ISNULL(AR.seeding_mode, 1)</property>
+    </version>
+    <version min_major='17'>
+      <property name="ReadwriteRoutingConnectionUrl" type="nvarchar">ISNULL(AR.read_write_routing_url, '')</property>
     </version>
   </properties>
 

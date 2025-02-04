@@ -121,7 +121,7 @@ namespace Microsoft.SqlServer.Management.Common
 
         private bool CallerHavePermissionToUseSQLCLR()
         {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
             if (!SqlContext.IsAvailable)
                 return true;
 

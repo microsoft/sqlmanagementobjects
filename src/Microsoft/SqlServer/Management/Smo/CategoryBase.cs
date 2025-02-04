@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Text;
 using Cmn = Microsoft.SqlServer.Management.Common;
 

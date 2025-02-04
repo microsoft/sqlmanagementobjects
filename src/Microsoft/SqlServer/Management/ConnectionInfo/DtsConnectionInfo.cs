@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Text;
 
-#if !NETSTANDARD2_0
 
 namespace Microsoft.SqlServer.Management.Common
 {
@@ -104,6 +103,4 @@ namespace Microsoft.SqlServer.Management.Common
         }
     }
 }
-
-#endif
 

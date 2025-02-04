@@ -1088,12 +1088,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             // from executiing TypeDescriptor while running inside SQLCLR. That means
             // the default values are not available when executing inside SQLCLR context.
             // That is fine, because default values are used only for Design Mode. 
-#if !NETSTANDARD2_0
             if (!SqlContext.IsAvailable && !string.IsNullOrEmpty(defaultValueAsString))
-#else
-            if (!string.IsNullOrEmpty(defaultValueAsString))
-
-#endif
             {
                 TypeConverter converter = TypeDescriptor.GetConverter(propertyType);
                 if (null != converter && converter.CanConvertFrom(typeof(string)))

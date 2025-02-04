@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetfxVersion);net6.0</TargetFrameworks>
+    <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
     <RootNamespace>Microsoft.SqlServer.SqlWmiManagement</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Label="Globals">

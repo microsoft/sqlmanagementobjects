@@ -4,8 +4,6 @@
 
 using System.Collections;
 using System.Collections.Specialized;
-using System.Net;
-using System.Reflection;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo

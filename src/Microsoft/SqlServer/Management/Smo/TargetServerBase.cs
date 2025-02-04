@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-
-using System.Collections;
-using System.Collections.Specialized;
-using System.Text;
-
 namespace Microsoft.SqlServer.Management.Smo.Agent
 {
     public partial class TargetServer : AgentObjectBase

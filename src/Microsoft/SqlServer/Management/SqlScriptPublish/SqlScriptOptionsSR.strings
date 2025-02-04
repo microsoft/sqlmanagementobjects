@@ -215,7 +215,7 @@ OnlyScript130CompatibleFeatures = SQL Server 2016
 OnlyScript140CompatibleFeatures = SQL Server 2017
 OnlyScript150CompatibleFeatures = SQL Server 2019
 OnlyScript160CompatibleFeatures = SQL Server 2022
-OnlyScript170CompatibleFeatures = Azure SQL 170 compatible
+OnlyScript170CompatibleFeatures = SQL Server 2025
 # VBUMP
 TargetEngineType = Script for the database engine type
 TargetEngineTypeDescription = Script only features compatible with the specified SQL Server database engine type.

@@ -3,10 +3,6 @@
 
 using System;
 using System.ComponentModel;
-
-using System.Data;
-using Microsoft.SqlServer.Management.Diagnostics;
-using Microsoft.SqlServer.Management.Dmf;
 using Microsoft.SqlServer.Management.Facets;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
 

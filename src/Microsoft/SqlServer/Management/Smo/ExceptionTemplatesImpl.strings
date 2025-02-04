@@ -310,6 +310,7 @@ WrongDHCPv6IPAddress(string objectName) = Cannot create {0} that uses IP v6 for 
 WrongMultiDHCPIPAddresses(string objectName) = Cannot create {0} that uses more than one DHCP IP addresses.
 GetDHCPAddressFailed(string listenerName, int count) = The listener '{0}' should have exactly one DHCP-leased IP address, but {1} were found.
 CannotAddDHCPIPAddress(string objectName, string propName) = Cannot create {0} when the {1} property is set to true. Set this property to false and try again.
+CannotRemoveDHCPIPAddress = Cannot remove DHCP address from the listener
 
 ;Exceptions related to Search Property List
 SearchPropertyListNameNotValid(int maxLength) = Property names must contain at least one character and must not exceed {0} characters.
@@ -419,6 +420,7 @@ SupportedOnlyBelow100 = This method or property is accessible only while working
 SupportedOnlyBelow90 = This method or property is accessible only while working against a version earlier than SQL Server 2005.
 SupportedOnlyOn150 = This method or property is accessible only while working against SQL Server 2019.
 SupportedOnlyOn160 = This method or property is accessible only while working against SQL Server 2022.
+SupportedOnlyOn170 = This method or property is accessible only while working against SQL Server 2025 or later.
 SupportedOnlyOn140 = This method or property is accessible only while working against SQL Server 2017 or later.
 SupportedOnlyOn130 = This method or property is accessible only while working against SQL Server 2016 or later.
 SupportedOnlyOn120 = This method or property is accessible only while working against SQL Server 2014 or later.

@@ -70,7 +70,8 @@ namespace Microsoft.SqlServer.Management.Common
     }
 
     /// <summary>
-    /// the possible values of server edition - match SERVERPROPERTY('EngineEdition')
+    /// The possible values returned by SERVERPROPERTY('EngineEdition').
+    /// See <see href="https://learn.microsoft.com/sql/t-sql/functions/serverproperty-transact-sql" /> for more details
     /// </summary>
     [CommonLocalizedPropertyResources("Microsoft.SqlServer.Management.Common.StringConnectionInfo")]
     [TypeConverter(typeof(CommonLocalizableEnumConverter))]
@@ -83,47 +84,69 @@ namespace Microsoft.SqlServer.Management.Common
         **/
         Unknown = 0x000000,
 
-        ///The server is Personal or standard
+        /// <summary>
+        /// Personal or Desktop Engine (Not available in SQL Server 2005 (9.x) and later versions.)
+        /// </summary>
         [CommonDisplayNameKey("PersonalEdition")]
         Personal = 0x000001,
 
-        ///The server is Standard
+        /// <summary>
+        /// Standard (For Standard, Web, and Business Intelligence.)
+        /// </summary>
         [CommonDisplayNameKey("StandardEdition")]
         Standard = 0x000002,
 
-        ///The server is Enterprise
+        /// <summary>
+        /// Enterprise (For Evaluation, Developer, and Enterprise editions.)
+        /// </summary>
         [CommonDisplayNameKey("EnterpriseEdition")]
         Enterprise = 0x000003,
 
-        ///The server is Express
+        /// <summary>
+        /// Express (For Express, Express with Tools, and Express with Advanced Services)
+        /// </summary>
         [CommonDisplayNameKey("ExpressEdition")]
         Express = 0x000004,
 
-        ///The server is SqlDatabase
+        /// <summary>
+        /// Azure SQL Database
+        /// </summary>
         [CommonDisplayNameKey("SqlAzureDatabaseEdition")]
         SqlDatabase = 0x000005,
 
-        ///The server is a DataWarehouse
+        /// <summary>
+        /// Azure Synapse dedicated SQL pool (formerly DataWarehouse)
+        /// </summary>
         [CommonDisplayNameKey("SqlDataWarehouseEdition")]
         SqlDataWarehouse = 0x000006,
 
-        ///The server is a StretchDatabase
+        /// <summary>
+        /// Stretch Database
+        /// </summary>
         [CommonDisplayNameKey("StretchEdition")]
         SqlStretchDatabase = 0x000007,
 
-        ///The server is a Sql Managed Instance
+        /// <summary>
+        /// Azure SQL Managed Instance
+        /// </summary>
         [CommonDisplayNameKey("SqlManagedInstanceEdition")]
         SqlManagedInstance = 0x000008,
 
-        ///The server is an Azure SQL Edge Edition
+        /// <summary>
+        /// Azure SQL Edge (For all editions of Azure SQL Edge)
+        /// </summary>
         [CommonDisplayNameKey("SqlDatabaseEdgeEdition")]
         SqlDatabaseEdge = 0x000009,
 
-        ///The server is an Azure Arc Managed SQL Instance Edition
+        /// <summary>
+        /// Azure Arc Managed SQL Instance
+        /// </summary>
         [CommonDisplayNameKey("SqlAzureArcManagedInstanceEdition")]
         SqlAzureArcManagedInstance = 0x00000A,
 
-        ///The server is Sql SqlOnDemand
+        /// <summary>
+        /// Azure Synapse serverless SQL pool (SQL OnDemand)
+        /// </summary>
         [CommonDisplayNameKey("SqlOnDemandEdition")]
         SqlOnDemand = 0x00000B,
 

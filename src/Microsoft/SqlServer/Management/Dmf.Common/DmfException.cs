@@ -311,8 +311,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             assembly = (string)info.GetValue("assembly", typeof(string));
         }
-#endif
-#if NETFRAMEWORK
 
         /// <summary>
         /// Serialization helper
@@ -428,8 +426,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             typeLeft = info.GetString("typeLeft");
             typeRight = info.GetString("typeRight");
         }
-#endif
-#if NETFRAMEWORK
+
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -552,8 +549,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             operatorName = info.GetString("operatorName");
             type = info.GetString("type");
         }
-#endif
-#if NETFRAMEWORK
+
         /// <summary>
         /// Serialization helper
         /// </summary>
@@ -678,15 +674,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             receivedType = info.GetString("receivedType");
             expectedType = info.GetString("expectedType");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -700,6 +694,8 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             base.GetObjectData(info, context);
         }
+#endif
+
         /// <summary>
         /// Exception Type
         /// </summary>
@@ -814,15 +810,13 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = functionName;
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -836,6 +830,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -940,15 +935,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             interfaceName = info.GetString("interfaceName");
             objectTypeName = info.GetString("objectTypeName");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -960,6 +953,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("objectTypeName", this.objectTypeName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -1052,16 +1046,14 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             adapter = (string)info.GetValue("adapter", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
         ///
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -1072,6 +1064,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("adapter", this.adapter);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -1164,15 +1157,12 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             facet = (string)info.GetValue("facet", typeof(string));
         }
-#endif
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -1183,7 +1173,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("facet", this.facet);
             base.GetObjectData(info, context);
         }
-
+#endif
         /// <summary>
         /// Initializes instance properties
         /// </summary>
@@ -1287,15 +1277,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             typeExpected = (string)info.GetValue("typeExpected", typeof(string));
             nameExpected = (string)info.GetValue("nameExpected", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -1310,6 +1298,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("nameExpected", this.nameExpected);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Constructor for Move exception
@@ -1470,15 +1459,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             inputString = (string)info.GetValue("inputString", typeof(string));
             typeName = (string)info.GetValue("typeName", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -1490,6 +1477,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("typeName", this.typeName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Constructor
@@ -1593,15 +1581,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             node = (String)info.GetValue("node", typeof(string));
             typeName = (string)info.GetValue("typeName", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -1613,6 +1599,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("typeName", this.typeName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Constructor
@@ -1703,20 +1690,20 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             reason = (string)info.GetValue("reason", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("reason", this.reason);
             base.GetObjectData(info, context);
         }
+#endif
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -1807,15 +1794,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             typeName = (string)info.GetValue("typeName", typeof(string));
             host = (string)info.GetValue("host", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -1827,6 +1812,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("host", this.host);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Constructor
@@ -1930,19 +1916,18 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -2029,15 +2014,13 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             subtype = (string)info.GetValue("subtype", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2047,6 +2030,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("subtype", this.subtype);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -2147,15 +2131,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.propertyName = (string)info.GetValue("propertyName", typeof(string));
             this.expression = (string)info.GetValue("expression", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2167,6 +2149,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("expression", this.expression);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -2272,15 +2255,14 @@ namespace Microsoft.SqlServer.Management.Dmf
         }
 
 
-
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
+
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2290,6 +2272,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -2363,15 +2346,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             typeName = (string)info.GetValue("typeName", typeof(string));
             host = (string)info.GetValue("host", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2382,6 +2363,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("host", this.host);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Constructor
@@ -2496,15 +2478,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             nodeType = info.GetString("nodeType");
             operand = info.GetString("operand");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2515,6 +2495,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("operand", this.operand);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -2608,15 +2589,13 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             opType = info.GetString("opType");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2626,6 +2605,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("opType", this.opType);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -2754,15 +2734,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.objectType = info.GetString("objectType");
             this.objectName = info.GetString("objectName");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2773,6 +2751,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("objectName", this.objectName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -2883,15 +2862,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.objectType = info.GetString("objectType");
             this.objectName = info.GetString("objectName");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -2902,6 +2879,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("objectName", this.objectName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -3011,15 +2989,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.objectType = info.GetString("objectType");
             this.objectName = info.GetString("objectName");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -3030,6 +3006,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("objectName", this.objectName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -3146,15 +3123,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.name2 = info.GetString("type2");
             this.name2 = info.GetString("name2");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -3168,6 +3143,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("name2", this.name2);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -3273,19 +3249,18 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -3347,19 +3322,18 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -3422,19 +3396,18 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -3505,15 +3478,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.failedObjectType = info.GetString("failedObjectType");
             SetHelpContext("FailedOperationExceptionText");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -3525,6 +3496,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("failedObjectType", this.failedObjectType);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// ctor
@@ -3677,15 +3649,13 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             propertyName = (string)info.GetValue("propertyName", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -3695,6 +3665,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -3791,15 +3762,13 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             propertyName = (string)info.GetValue("propertyName", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -3809,6 +3778,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("propertyName", this.propertyName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -3882,15 +3852,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             typeName = (string)info.GetValue("typeName", typeof(string));
             facet = (string)info.GetValue("facet", typeof(string));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -3901,6 +3869,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("facet", this.facet);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Constructor
@@ -4017,15 +3986,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             functionName = info.GetString("functionName");
             targetType = info.GetString("targetType");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
@@ -4036,6 +4003,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("targetType", this.targetType);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -4128,19 +4096,18 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -4224,15 +4191,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             receivedType = info.GetString("receivedType");
             expectedType = info.GetString("expectedType");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info != null)
@@ -4243,6 +4208,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             }
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -4339,19 +4305,18 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -4415,19 +4380,19 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(info, context)
         {
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
+
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Initializes instance properties
@@ -4509,15 +4474,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             maxLength = info.GetInt32("maxLength");
             currentLength = info.GetInt32("currentLength");
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
@@ -4525,6 +4488,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("currentLength", this.currentLength);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -4648,20 +4612,20 @@ namespace Microsoft.SqlServer.Management.Dmf
             }
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("objectSetName", this.objectSetName);
             info.AddValue("facetName", this.facetName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -4758,14 +4722,13 @@ namespace Microsoft.SqlServer.Management.Dmf
                 return ExceptionTemplatesSR.UnsupportedTargetSetForFacet(targetSetSkeleton, objectSetName, facetName);
             }
         }
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("targetSetSkeleton", this.targetSetSkeleton);
@@ -4773,6 +4736,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             info.AddValue("facetName", this.facetName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -4856,19 +4820,19 @@ namespace Microsoft.SqlServer.Management.Dmf
             }
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("objectSetName", this.objectSetName);
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type
@@ -4922,19 +4886,17 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
         }
-#if !NETCOREAPP
         /// <summary>
         /// 
         /// </summary>
@@ -5005,15 +4967,13 @@ namespace Microsoft.SqlServer.Management.Dmf
             configValue = (T)info.GetValue("configValue", typeof(T));
             runValue = (T)info.GetValue("runValue", typeof(T));
         }
-#endif
+
         /// <summary>
         /// Serialization helper
         /// </summary>
         /// <param name="info"></param>
         /// <param name="context"></param>
-#if NETFRAMEWORK
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("propertyName", this.propertyName);
@@ -5022,6 +4982,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             base.GetObjectData(info, context);
         }
+#endif
 
         /// <summary>
         /// Exception Type

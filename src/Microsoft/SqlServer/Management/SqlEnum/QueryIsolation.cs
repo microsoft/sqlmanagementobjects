@@ -49,7 +49,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string isolationValue = string.Empty;
             try
             {
-#if !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
                 // 2016-08-19 sgreen: Address for VSTS 8239489 - Functional parity between SMO on .NET Core and SMO on .NET Framework
                 using (var isolationKey = Registry.CurrentUser.OpenSubKey(string.Format(RegPathFormat, RegKeyName),  writable: false))
                 {

@@ -7,9 +7,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-#if !NETSTANDARD2_0
 using System.Security.Permissions;
-#endif
 
 namespace Microsoft.SqlServer.Management.Common
 {
@@ -38,7 +36,7 @@ namespace Microsoft.SqlServer.Management.Common
                 // without granting blanket UnmanagedCode permission to client assemblies.
                 // Decrypting SqlSecureStrings created by client assemblies is not dangerous,
                 // so no special permissions are demanded of clients to do so.
-#if  !NETSTANDARD2_0 && !NETCOREAPP
+#if !NETCOREAPP
                 new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Assert();
 #endif
 

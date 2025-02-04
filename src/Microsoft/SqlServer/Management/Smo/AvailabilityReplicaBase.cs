@@ -56,6 +56,7 @@ namespace Microsoft.SqlServer.Management.Smo
             AddAlterableReplicaProperty(ReadonlyRoutingListPropertyName, PropertyType.Alterable | PropertyType.PrimaryRoleProperty);
             AddAlterableReplicaProperty(ConnectionModeInSecondaryRolePropertyName, PropertyType.Alterable | PropertyType.SecondaryRoleProperty);
             AddAlterableReplicaProperty(ReadonlyRoutingConnectionUrlPropertyName, PropertyType.Alterable | PropertyType.SecondaryRoleProperty);
+            AddAlterableReplicaProperty(ReadwriteRoutingConnectionUrlPropertyName, PropertyType.Alterable | PropertyType.PrimaryRoleProperty);
         }
 
         #region Public Interface
@@ -170,6 +171,52 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return IsSupportedProperty(SeedingModePropertyName); }
         }
 
+        /// <summary>
+        /// Method to fetch and set the Property ReadonlyRoutingConnectionUrl value from replica 
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.Standalone)]
+        public System.String ReadonlyRoutingConnectionUrl
+        {
+            get
+            {
+                return (System.String)this.Properties.GetValueWithNullReplacement(nameof(ReadonlyRoutingConnectionUrl));
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value) || value.ToUpper() == "NONE")
+                {
+                    Properties.SetValueWithConsistencyCheck(nameof(ReadonlyRoutingConnectionUrl), string.Empty);
+                }
+                else
+                {
+                    Properties.SetValueWithConsistencyCheck(nameof(ReadonlyRoutingConnectionUrl), value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method to fetch and set the Property ReadwriteRoutingConnectionUrl value from replica 
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.Standalone)]
+        public System.String ReadwriteRoutingConnectionUrl
+        {
+            get
+            {
+                return (System.String)this.Properties.GetValueWithNullReplacement(nameof(ReadwriteRoutingConnectionUrl));
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value) || value.ToUpper() == "NONE")
+                {
+                    Properties.SetValueWithConsistencyCheck(nameof(ReadwriteRoutingConnectionUrl), string.Empty);
+                }
+                else
+                {
+                    Properties.SetValueWithConsistencyCheck(nameof(ReadwriteRoutingConnectionUrl), value);
+                }
+            }
+        }
+
         #region ICreatable Members
 
         /// <summary>
@@ -254,7 +301,7 @@ namespace Microsoft.SqlServer.Management.Smo
              * ADVANCED Availability Groups
              * ========================================================================================
              * 
-             * CREATE AVAILABILITY GROUP �group_name�
+             * CREATE AVAILABILITY GROUP  group_name 
              * REPLICA ON <replica_spec>[, ...n]
              * [;]
              * 
@@ -275,7 +322,7 @@ namespace Microsoft.SqlServer.Management.Smo
              *
              * <primary_role_option> ::= 
              *          ALLOW_CONNECTIONS = { READ_WRITE | ALL }
-             *          | READ_ONLY_ROUTING_LIST = { ( �<server_instance>� [ ,...n ] ) | NONE  }
+             *          | READ_ONLY_ROUTING_LIST = { (  <server_instance>  [ ,...n ] ) | NONE  }
              *
              * <secondary_role_option> ::= 
              *          ALLOW_CONNECTIONS = { NO | READ_ONLY | ALL }
@@ -285,7 +332,7 @@ namespace Microsoft.SqlServer.Management.Smo
              * BASIC Availability Groups
              * ========================================================================================
              * 
-             * CREATE AVAILABILITY GROUP �group_name�
+             * CREATE AVAILABILITY GROUP  group_name 
              * REPLICA ON <replica_spec>[, <replica_spec>]
              * [;]
              * 
@@ -365,13 +412,13 @@ namespace Microsoft.SqlServer.Management.Smo
              * ADVANCED Availability Groups
              * ========================================================================================
              * 
-             * ALTER AVAILABILITY GROUP �group_name�
+             * ALTER AVAILABILITY GROUP  group_name 
              * MODIFY REPLICA ON <replica_spec>
              * 
-             * <replica_spec> ::= �server_name� WITH (<replica_option>) -- only one replica option at a time
+             * <replica_spec> ::=  server_name  WITH (<replica_option>) -- only one replica option at a time
              * 
              * <replica_option> ::= 
-             *          ENDPOINT_URL = 'TCP://system-address:port� 
+             *          ENDPOINT_URL = 'TCP://system-address:port  
              *          | AVAILABILITY_MODE= { SYNCHRONOUS_COMMIT | ASYNCHRONOUS_COMMIT }
              *          | FAILOVER_MODE = { AUTOMATIC | MANUAL }
              *          | BACKUP_PRIORITY = <nnn>
@@ -381,7 +428,7 @@ namespace Microsoft.SqlServer.Management.Smo
              *
              * <primary_role_option> ::= 
              *          ALLOW_CONNECTIONS = { READ_WRITE | ALL }
-             *          | READ_ONLY_ROUTING_LIST = { ( �<server_instance>� [ ,...n ] ) | NONE  }
+             *          | READ_ONLY_ROUTING_LIST = { (  <server_instance>  [ ,...n ] ) | NONE  }
              *
              * <secondary_role_option> ::= 
              *          ALLOW_CONNECTIONS = { NO | READ_ONLY | ALL }
@@ -391,13 +438,13 @@ namespace Microsoft.SqlServer.Management.Smo
              * BASIC Availability Groups
              * ========================================================================================
              * 
-             * ALTER AVAILABILITY GROUP �group_name�
+             * ALTER AVAILABILITY GROUP  group_name 
              * MODIFY REPLICA ON <replica_spec>
              * 
-             * <replica_spec> ::= �server_name� WITH (<replica_option>) -- only one replica option at a time
+             * <replica_spec> ::=  server_name  WITH (<replica_option>) -- only one replica option at a time
              * 
              * <replica_option> ::= 
-             *          ENDPOINT_URL = 'TCP://system-address:port� 
+             *          ENDPOINT_URL = 'TCP://system-address:port  
              *          | SECONDARY_ROLE (ALLOW_CONNECTIONS = NO)
              *          | PRIMARY_ROLE (ALLOW_CONNECTIONS = ALL)
              *          | AVAILABILITY_MODE= { SYNCHRONOUS_COMMIT | ASYNCHRONOUS_COMMIT }
@@ -521,8 +568,8 @@ namespace Microsoft.SqlServer.Management.Smo
             //sanity checks
             tc.Assert(null != dropQuery, "String collection should not be null");
 
-            //ALTER AVAILABILITY GROUP �group_name�
-            //REMOVE REPLICA ON �server_name� 
+            //ALTER AVAILABILITY GROUP  group_name 
+            //REMOVE REPLICA ON  server_name  
 
             //Ensure target server version is >= 11, and database engine is not azure
             ThrowIfBelowVersion110(sp.TargetServerVersion);
@@ -618,11 +665,32 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
 
                         case ReadonlyRoutingConnectionUrlPropertyName:
-                            if (!string.IsNullOrEmpty(this.ReadonlyRoutingConnectionUrl))
+                            if (scriptingPreferences.TargetServerVersion >= SqlServerVersion.Version170)
                             {
-                                script.Append(ReadonlyRoutingConnectionUrlScript + Globals.space + Globals.EqualSign + Globals.space);
-                                script.Append(SqlSmoObject.MakeSqlString(this.ReadonlyRoutingConnectionUrl));
+                                script.Append($"{ReadonlyRoutingConnectionUrlScript} = ");
+
+                                script.Append(
+                                    string.IsNullOrEmpty(this.ReadonlyRoutingConnectionUrl)
+                                    ? NoneScript
+                                    : SqlSmoObject.MakeSqlString(this.ReadonlyRoutingConnectionUrl));
                             }
+                            else
+                            {
+                                if (!string.IsNullOrEmpty(this.ReadonlyRoutingConnectionUrl))
+                                {
+                                    script.Append($"{ReadonlyRoutingConnectionUrlScript} = ");
+                                    script.Append(SqlSmoObject.MakeSqlString(this.ReadonlyRoutingConnectionUrl));
+                                }
+                            }
+                            break;
+
+                        case ReadwriteRoutingConnectionUrlPropertyName:
+                            script.Append($"{ReadwriteRoutingConnectionUrlScript} = ");
+
+                            script.Append(
+                                string.IsNullOrEmpty(this.ReadwriteRoutingConnectionUrl)
+                                ? NoneScript
+                                : SqlSmoObject.MakeSqlString(this.ReadwriteRoutingConnectionUrl));
                             break;
 
                         case BackupPriorityPropertyName:
@@ -812,6 +880,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal static readonly string ReadonlyRoutingConnectionUrlScript = "READ_ONLY_ROUTING_URL";
         internal static readonly string ReadonlyRoutingListScript = "READ_ONLY_ROUTING_LIST";
+        internal static readonly string ReadwriteRoutingConnectionUrlScript = "READ_WRITE_ROUTING_URL";
         internal static readonly string NoneScript = "NONE";
 
         internal static readonly string AllowConnectionsScript = "ALLOW_CONNECTIONS";
@@ -824,19 +893,20 @@ namespace Microsoft.SqlServer.Management.Smo
 
         //Constants needed for the Alter script
         internal const string EndPointUrlPropertyName = "EndpointUrl";
-        internal const string AvailabilityModePropertyName = "AvailabilityMode";
-        internal const string FailoverModePropertyName = "FailoverMode";
-        internal const string ConnectionModeInPrimaryRolePropertyName = "ConnectionModeInPrimaryRole";
-        internal const string ConnectionModeInSecondaryRolePropertyName = "ConnectionModeInSecondaryRole";
-        internal const string SessionTimeoutPropertyName = "SessionTimeout";
-        internal const string BackupPriorityPropertyName = "BackupPriority";
-        internal const string SeedingModePropertyName = "SeedingMode";
-        internal const string ReadonlyRoutingConnectionUrlPropertyName = "ReadonlyRoutingConnectionUrl";
-        internal const string ReadonlyRoutingListPropertyName = "ReadonlyRoutingList";
+        internal const string AvailabilityModePropertyName = nameof(AvailabilityMode);
+        internal const string FailoverModePropertyName = nameof(FailoverMode);
+        internal const string ConnectionModeInPrimaryRolePropertyName = nameof(ConnectionModeInPrimaryRole);
+        internal const string ConnectionModeInSecondaryRolePropertyName = nameof(ConnectionModeInSecondaryRole);
+        internal const string SessionTimeoutPropertyName = nameof(SessionTimeout);
+        internal const string BackupPriorityPropertyName = nameof(BackupPriority);
+        internal const string SeedingModePropertyName = nameof(SeedingMode);
+        internal const string ReadonlyRoutingConnectionUrlPropertyName = nameof(ReadonlyRoutingConnectionUrl);
+        internal const string ReadonlyRoutingListPropertyName = nameof(ReadonlyRoutingList);
+        internal const string ReadwriteRoutingConnectionUrlPropertyName = nameof(ReadwriteRoutingConnectionUrl);
 
-        internal static readonly string[] RequiredPropertyNames = {EndPointUrlPropertyName, FailoverModePropertyName, AvailabilityModePropertyName};
+        internal static readonly string[] RequiredPropertyNames = { EndPointUrlPropertyName, FailoverModePropertyName, AvailabilityModePropertyName };
 
-        internal static readonly string[] ConfigurationOnlyModeProperties = {AvailabilityModePropertyName, EndPointUrlPropertyName};
+        internal static readonly string[] ConfigurationOnlyModeProperties = { AvailabilityModePropertyName, EndPointUrlPropertyName };
 
         #endregion
 
@@ -865,6 +935,7 @@ namespace Microsoft.SqlServer.Management.Smo
             ConnectionModeInPrimaryRolePropertyName,
             ReadonlyRoutingConnectionUrlPropertyName,
             ReadonlyRoutingListPropertyName,
+            ReadwriteRoutingConnectionUrlPropertyName,
             ConnectionModeInSecondaryRolePropertyName,
             SeedingModePropertyName
         };
@@ -1041,4 +1112,3 @@ namespace Microsoft.SqlServer.Management.Smo
         #endregion
     }
 }
-

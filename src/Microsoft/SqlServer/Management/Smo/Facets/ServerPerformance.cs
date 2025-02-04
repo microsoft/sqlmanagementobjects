@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel;
-using Dmf = Microsoft.SqlServer.Management.Dmf;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo

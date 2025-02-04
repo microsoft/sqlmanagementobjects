@@ -10,9 +10,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-#if !NETSTANDARD2_0
 using Microsoft.Win32;
-#endif
 
 // TODO: either provide a fully functional safe string formatting, or move this thing to Acme and let each domain roll their own implementation
 namespace Microsoft.SqlServer.Management.Sdk.Sfc

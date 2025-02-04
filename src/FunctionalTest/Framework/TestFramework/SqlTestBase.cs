@@ -753,7 +753,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                                     new ServerConnection(
                                         new SqlConnection(this.SqlConnectionStringBuilder.ConnectionString))
                                     {
-                                        StatementTimeout = 480
+                                        StatementTimeout = 600
                                     });
                             try
                             {

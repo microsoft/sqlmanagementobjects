@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-#if NETSTANDARD2_0 || NETCOREAPP
-using System;
+#if NETCOREAPP
 
 namespace Microsoft.SqlServer.Server
 {

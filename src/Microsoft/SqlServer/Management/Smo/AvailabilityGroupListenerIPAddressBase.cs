@@ -16,7 +16,7 @@ namespace Microsoft.SqlServer.Management.Smo
     /// <summary>
     /// this is the partial class of code-gen AvailabilityGroupListenerIPAddress
     /// </summary>
-    public partial class AvailabilityGroupListenerIPAddress : SqlSmoObject, ICreatable, IScriptable
+    public partial class AvailabilityGroupListenerIPAddress : SqlSmoObject, ICreatable, IDroppable, IScriptable
     {
         #region Ctor
 
@@ -160,6 +160,18 @@ namespace Microsoft.SqlServer.Management.Smo
 
         #endregion
 
+        #region IDroppable Members
+
+        /// <summary>
+        /// Drop an availability group listener IP address from the availability group listener.
+        /// </summary>
+        public void Drop()
+        {
+            this.DropImpl();
+        }
+
+        #endregion
+
         #region IScriptable Members
 
         /// <summary>
@@ -251,6 +263,56 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // Add statement terminator
             script.Append(Globals.statementTerminator);
+
+            query.Add(script.ToString());
+            return;
+        }
+
+        /// <summary>
+        /// Composes the remove ip address script for the availability group listener IP address object.
+        /// This requires the AG listener must exist.
+        /// </summary>
+        /// <param name="query">A string collection representing the script. Since no
+        /// batching is required, the collection will have only one string in the end.</param>
+        /// <param name="sp">Scripting preferences.</param>
+        internal override void ScriptDrop(StringCollection query, ScriptingPreferences sp)
+        {
+            // sanity checks
+            tc.Assert(query != null, "String collection for the drop query should not be null");
+
+            /*
+             * ALTER AVAILABILITY GROUP 'group_name'
+             * MODIFY LISTENER 'dnsName'
+             * (
+             *   REMOVE IP ('ip_address')
+             * )
+             */
+
+            // Ensure target server version is >= 17, and database engine is not azure
+            ThrowIfBelowVersion170(sp.TargetServerVersion);
+
+            // IsDHCP cannot be set to true, since no sensible script can be produced in this case.
+            if (this.IsDHCP)
+            {
+                throw new InvalidOperationException(ExceptionTemplates.CannotRemoveDHCPIPAddress);
+            }
+
+            // The IPAddress key must be set.
+            if (string.IsNullOrEmpty(this.IPAddress))
+            {
+                throw new PropertyNotSetException(IpAddressPropertyName);
+            }
+
+            var script = new StringBuilder(Globals.INIT_BUFFER_SIZE);
+            this.ScriptIncludeHeaders(script, sp, UrnSuffix);
+
+            var ag = this.Parent.Parent;
+            var agListener = this.Parent;
+
+            // Script the availability group name
+            script.Append($"{Scripts.ALTER} {AvailabilityGroup.AvailabilityGroupScript} {SqlSmoObject.MakeSqlBraket(ag.Name)}{Globals.newline}" +
+                $"{AvailabilityGroupListener.ModifyListenerScript} {SqlSmoObject.MakeSqlString(agListener.Name)}{Globals.newline}" +
+                $"({Scripts.REMOVE} {AvailabilityGroupListenerIPAddress.IPScript} ({SqlSmoObject.MakeSqlString(this.IPAddress)}){Globals.newline});");
 
             query.Add(script.ToString());
             return;

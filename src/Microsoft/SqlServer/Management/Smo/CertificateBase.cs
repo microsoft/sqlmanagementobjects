@@ -3,18 +3,11 @@
 
 using System;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
 using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Diagnostics;
-using Microsoft.SqlServer.Management.Facets;
-using Microsoft.SqlServer.Management.Sdk.Sfc;
-using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
-using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
 namespace Microsoft.SqlServer.Management.Smo
 {
     ///Specifies the source of the certificate, when loading.

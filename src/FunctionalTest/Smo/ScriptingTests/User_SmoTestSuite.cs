@@ -13,6 +13,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Test.Manageability.Utils;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -70,6 +71,79 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         login.DropIfExists();
                     }
                 });
+        }
+
+        /// <summary>
+        /// Verify Alter User generates the correct script for updating Login or Login and Default Schema, based on the multipleOptions parameter.
+        /// </summary>
+        /// <param name="multipleOptions">Should the test run alter for more than one option, ie Login and Default Schema vs only Login</param>
+        private void SmoAlter_UserWithLogin_Alter (bool multipleOptions = false)
+        {
+            this.ExecuteWithDbDrop(
+                database =>
+                {
+                    var server = database.Parent;
+                    var login = new _SMO.Login(server, "login" + (this.TestContext.TestName ?? "")) { LoginType = _SMO.LoginType.SqlLogin };
+                    var user = new _SMO.User(database, "user" + (this.TestContext.TestName ?? "")) { Login = login.Name };
+                    var newLogin = "newLogin";
+
+                    try
+                    {
+                        login.Create(Guid.NewGuid().ToString());
+                        user.Create();
+
+                        user.Login = newLogin;
+                        string expectedUserScriptAlterUserWithLogin;
+                        if (multipleOptions)
+                        {
+                            var newSchema = "newSchema";
+                            user.DefaultSchema = newSchema;
+                            expectedUserScriptAlterUserWithLogin = $"ALTER USER [{user.Name}] WITH DEFAULT_SCHEMA=[{newSchema}], LOGIN=[{newLogin}]";
+                        } 
+                        else
+                        {
+                            expectedUserScriptAlterUserWithLogin = $"ALTER USER [{user.Name}] WITH LOGIN=[{newLogin}]";
+                        }
+
+                        var script = database.ExecutionManager.RecordQueryText(user.Alter);
+
+                        // the constraints don't like carriage returns/line feeds. SMO seems to use both \r\n and \n 
+                        string actualScript = script.ToSingleString().FixNewLines().TrimEnd();
+                        
+                        // modify the script to remove the 'USE' statement from the first portion and retain only the text following the 'ALTER' command to verify it matches the expected string
+                        actualScript = actualScript.Contains("ALTER") ? actualScript.Substring(actualScript.IndexOf("ALTER")) : string.Empty;
+                        
+                        // the header has the current timestamp, so just skip most of it
+                        Assert.That(actualScript,
+                                    Does.EndWith(expectedUserScriptAlterUserWithLogin),
+                                    string.Format("Wrong ALTER script for {0}, actual script is not ending with expected script.", user.GetType().Name));
+                    }
+                    finally
+                    {
+                        user.DropIfExists();
+                        login.DropIfExists();
+                    }
+                });
+        }
+
+        /// <summary>
+        /// Tests scripting an alter to existing user's login information through SMO.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        public void SmoAlter_UserWithLogin_LoginOptionAlter()
+        {
+            SmoAlter_UserWithLogin_Alter();
+        }
+
+        /// <summary>
+        /// Tests scripting an alter to existing user's login information and default schema through SMO.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        public void SmoAlter_UserWithLogin_MultipleOptionsAlter()
+        {
+            SmoAlter_UserWithLogin_Alter(true);
         }
 
         #endregion
