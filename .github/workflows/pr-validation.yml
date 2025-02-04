@@ -27,7 +27,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        sqlImage: ['2017','2019']
+        sqlImage: ['2022','2019']
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v4
@@ -45,7 +45,7 @@ jobs:
         export SAPASSWORD=$(date +%s|sha256sum|base64|head -c 32)
         echo "SAPASSWORD=$SAPASSWORD" >> $GITHUB_ENV
         docker run -m 2GB -e ACCEPT_EULA=1 -d --name sql -p:1433:1433 -e SA_PASSWORD=$SAPASSWORD mcr.microsoft.com/mssql/server:${{ matrix.sqlImage }}-latest
-        sleep 30
+        sleep 10
         docker logs sql
     - name: Run tests against Linux SQL
       run: |
