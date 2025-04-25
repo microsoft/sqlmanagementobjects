@@ -23,14 +23,49 @@ namespace Microsoft.SqlServer.Management.Smo
     /// </summary>
     internal class DataEnumerator : IEnumerator<string>, IDisposable
     {
+        private class ColumnData
+        {
+            public ColumnData(SqlDataType dataType)
+            {
+                this.DataType = dataType;
+            }
+
+            public SqlDataType DataType { get; }
+
+            private int? numericPrecision = null;
+            public int NumericPrecision
+            {
+                get => numericPrecision ?? throw new InvalidOperationException("NumericPrecision not set");
+                set => numericPrecision = value;
+            }
+
+            private int? numericScale = null;
+            public int NumericScale
+            {
+                get => numericScale ?? throw new InvalidOperationException("NumericScale not set");
+                set => numericScale = value;
+            }
+
+            private string collation = null;
+            public string Collation
+            {
+                get => collation ?? throw new InvalidOperationException("Collation not set");
+                set => collation = value;
+            }
+
+            private int? maxLength = null;
+            public int MaxLength
+            {
+                get => maxLength ?? throw new InvalidOperationException("MaxLength not set");
+                set => maxLength = value;
+            }
+        }
+
         #region Private Fields
         private SqlDataReader reader;
         private SqlConnection conn;
         private Database database;
-        private Dictionary<string, SqlDataType> columnDataType;
-        private Dictionary<string, int> columnNumericPrecision;
-        private Dictionary<string, int> columnNumericScale;
-        private Dictionary<string, string> columnCollation;
+        private Dictionary<string, ColumnData> columnData;
         private string tableName;
         private string schemaQualifiedTableName;
         private ScriptingPreferences options;
@@ -53,10 +88,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal DataEnumerator(Table table, ScriptingPreferences options)
         {
             this.database = table.Parent;
-            this.columnNumericScale = new Dictionary<string, int>(this.database.StringComparer);
-            this.columnNumericPrecision = new Dictionary<string, int>(this.database.StringComparer);
-            this.columnCollation = new Dictionary<string, string>(this.database.StringComparer);
-            this.columnDataType = new Dictionary<string, SqlDataType>(this.database.StringComparer);
+            this.columnData = new Dictionary<string, ColumnData>(this.database.StringComparer);
             this.options = options;
             this.tableName = table.FormatFullNameForScripting(options);
 
@@ -271,9 +303,9 @@ namespace Microsoft.SqlServer.Management.Smo
                                 userOptions = this.database.GetServerObject().UserOptions;
                             }
 
-                            if (this.hasPersisted && 
-                                userOptions != null && 
-                                userOptions.IsSupportedProperty("AnsiPadding") && 
+                            if (this.hasPersisted &&
+                                userOptions != null &&
+                                userOptions.IsSupportedProperty("AnsiPadding") &&
                                 !userOptions.AnsiPadding)
                             {
                                 currentScriptString =
@@ -297,9 +329,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         userOptions = this.database.GetServerObject().UserOptions;
                     }
-                    if (this.hasPersisted && 
+                    if (this.hasPersisted &&
                         userOptions != null &&
-                        userOptions.IsSupportedProperty("AnsiPadding") 
+                        userOptions.IsSupportedProperty("AnsiPadding")
                         && !userOptions.AnsiPadding)
                     {
                         //setting ANSI_PADDING OFF if it was off before set on by us
@@ -450,26 +482,32 @@ namespace Microsoft.SqlServer.Management.Smo
         private void StoreDataTypeInformation(Column col)
         {
             //this stores information which later used while insert statement generation
-            this.columnDataType.Add(col.Name, col.UnderlyingSqlDataType);
+            if (!this.columnData.TryGetValue(col.Name, out ColumnData columnData))
+            {
+                columnData = new ColumnData(col.UnderlyingSqlDataType);
+                this.columnData.Add(col.Name, columnData);
+            }
 
             switch (col.UnderlyingSqlDataType)
             {
                 case SqlDataType.Decimal:
                 case SqlDataType.Numeric:
-                    this.columnNumericPrecision.Add(col.Name, col.DataType.NumericPrecision);
-                    this.columnNumericScale.Add(col.Name, col.DataType.NumericScale);
+                    columnData.NumericPrecision = col.DataType.NumericPrecision;
+                    columnData.NumericScale = col.DataType.NumericScale;
                     break;
                 case SqlDataType.Char:
                 case SqlDataType.VarChar:
                 case SqlDataType.VarCharMax:
                 case SqlDataType.Text:
-                    this.columnCollation.Add(col.Name, col.Collation);
+                    columnData.Collation = col.Collation;
+                    break;
+                case SqlDataType.Vector:
+                    columnData.MaxLength = col.DataType.MaximumLength;
                     break;
                 default:
                     break;
             }
         }
-
 
         /// <summary>
         /// Returns the current INSERT statement string for the current row in the
@@ -516,7 +554,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        SqlDataType dataType = this.columnDataType[columnName];
+                        SqlDataType dataType = this.columnData[columnName].DataType;
                         if (dataType == SqlDataType.Timestamp)
                         {
                             columnIndex++;
@@ -753,9 +791,9 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             string formattedValue = string.Empty;
 
-            SqlDataType dataType = this.columnDataType[columnName]; ;
+            var columnData = this.columnData[columnName];
 
-            switch (dataType)
+            switch (columnData.DataType)
             {
 
                 case SqlDataType.UserDefinedType:
@@ -800,27 +838,20 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.Decimal:
                     // we have to manually format the string by ToStringing the value first, and then converting 
                     // the potential (European formatted) comma to a period.
-                    formattedValue = String.Format(
-                        CultureInfo.InvariantCulture,
-                        "CAST({0} AS Decimal({1}, {2}))",
-                        String.Format(
+                    var decimalValue = String.Format(
                             GetUsCultureInfo(),
                             "{0}",
-                            this.reader.GetProviderSpecificValue(columnIndex).ToString()),
-                        this.columnNumericPrecision[columnName],
-                        this.columnNumericScale[columnName]);
+                            this.reader.GetProviderSpecificValue(columnIndex).ToString());
+                    formattedValue = $"CAST({decimalValue} AS Decimal({columnData.NumericPrecision}, {columnData.NumericScale}))";
                     break;
-
                 case SqlDataType.Numeric:
-                    formattedValue = String.Format(
-                        CultureInfo.InvariantCulture,
-                        "CAST({0} AS Numeric({1}, {2}))",
-                        String.Format(
+                    // we have to manually format the string by ToStringing the value first, and then converting 
+                    // the potential (European formatted) comma to a period.
+                    var numericValue = String.Format(
                             GetUsCultureInfo(),
                             "{0}",
-                            this.reader.GetProviderSpecificValue(columnIndex).ToString()),
-                        this.columnNumericPrecision[columnName],
-                        this.columnNumericScale[columnName]);
+                            this.reader.GetProviderSpecificValue(columnIndex).ToString());
+                    formattedValue = $"CAST({numericValue} AS Numeric({columnData.NumericPrecision}, {columnData.NumericScale}))";
                     break;
 
                 case SqlDataType.DateTime:
@@ -880,10 +911,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            formattedValue = string.Format(CultureInfo.InvariantCulture,
-                                "CONVERT(TEXT, {0} COLLATE {1})",
-                                SqlSmoObject.MakeSqlStringForInsert(providerValue),
-                                this.columnCollation[columnName]);
+                            formattedValue = $"CONVERT(TEXT, {SqlSmoObject.MakeSqlStringForInsert(providerValue)} COLLATE {columnData.Collation})";
                         }
                     }
                     else
@@ -923,21 +951,31 @@ namespace Microsoft.SqlServer.Management.Smo
                     formattedValue = String.Format(
                         CultureInfo.InvariantCulture,
                         "CAST({0} AS Json)", SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString()));
+                    break;
 
+                case SqlDataType.Vector:
+                    string sqlStringValue = SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString());
+                    // Temporary workaround to convert the length of the column to the dimensions for vector types
+                    // until sys.columns is updated to include the dimensions of the vector type.
+                    // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/3906463
+                    // dimensions = (length - 8) / 4
+                    // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
+                    int dimensions = (columnData.MaxLength - 8) / 4;
+                    formattedValue = $"CAST({sqlStringValue} AS Vector({dimensions}))";
                     break;
 
                 default:
-                    // We are explictly handling all types that we support. We will not attempt
+                    // We are explicitly handling all types that we support. We will not attempt
                     // to support types that we don't understand.
 
                     //
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "ERROR: Attempting to script data for type " + dataType);
+                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, $"ERROR: Attempting to script data for type {columnData.DataType}");
 
                     throw new InvalidSmoOperationException(
                         ExceptionTemplates.DataScriptingUnsupportedDataTypeException(
                             this.tableName,
                             columnName,
-                            dataType.ToString()));
+                            columnData.DataType.ToString()));
 
             }
 
@@ -1005,9 +1043,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
         }
 
-#endregion
+        #endregion
 
-#region Enum
+        #region Enum
         /// <summary>
         /// The enumeration for the different states of the Enumerator
         /// </summary>
@@ -1021,9 +1059,9 @@ namespace Microsoft.SqlServer.Management.Smo
             PersistedOFF,
             Finished
         }
-#endregion
+        #endregion
 
-#region Private Properties
+        #region Private Properties
         private SqlConnection Connection
         {
             get
@@ -1046,7 +1084,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return this.conn;
             }
         }
-#endregion
+        #endregion
     }
 }
 

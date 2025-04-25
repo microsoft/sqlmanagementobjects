@@ -31,6 +31,21 @@ Create a corresponding partial class in `%basedir%\src\Microsoft\SqlServer\Manag
 7. Add a UrnSuffix: `public static string UrnSuffix => "<ObjectType>";`
 8. If the object is scriptable on its own, not directly included as part of the script for its parent, reference its UrnSuffix in the scriptableTypes HashSet in ScriptMaker.cs.
 
+### DesignMode
+
+`DesignMode` (or `Design Mode`) is the label for an instance of the object hierarchy whose root `Server` object is using a `ServerConnection` that's in `Offline` mode. Any object added to a child collection in a `DesignMode` hierarchy is automatically set to the `Existing` state.
+
+
+When the connection is offline, many code paths get short circuited and skip running queries, leaving the objects in whatever state the caller has set them. Correct support for DesignMode in your object will enable it to be used for offline unit tests. In `DesignMode`, certain methods like `Alter` are blocked completely, but unit tests can call the internal `ScriptAlter` method and validate that correct scripts are generated based on the set of properties the unit test set. Such a unit test can detect bugs that affect non-DesignMode operation, such as a failure to properly check if a property has been set on the object before trying to reference its value. 
+
+If an object property is not explicitly set by a caller and that object doesn't have a `default` value set for it in [cfg.xml](/src/Codegen/cfg.xml), attempting to get the property value will result in an exception. Typically, readonly properties _should_ have a default value assigned. Default values for settable properties are optional, and may be limited to the properties that don't directly affect the `ScriptAlter` implementation of the object.
+
+To make an object available in `DesignMode`, add `is_design_mode="true"` attribute to its definition in `cfg.xml`. To mark a property explicitly as `DesignMode`-friendly, use `mode="design"` in its definition in the object XML file. Note that `mode="deploy"` no longer seems to have any effect and can be removed or changed to `mode="all"` if you want to make an existing property available for `DesignMode`.
+
+Adding an existing property to `DesignMode` is safe because it doesn't change its behavior at all in normal connected scenarios.
+
+It's not clear how decisions were made in the past to choose which objects and properties support DesignMode. Going forward, we recommend new code supports DesignMode and includes appropriate offline unit tests.
+
 ### Collections
 
 If your new object is part of a collection under a parent object, create a corresponding .cs file for your new collection. This can be done by adding an entry to [collections_codegen.proj](/src/codegen/README.md#collections_codegen.proj) and building that project. Then add the appropriate ```<Compile>``` tag to [Microsoft.SqlServer.Smo.csproj](/src/Microsoft/SqlServer/Management/Smo/Microsoft.SqlServer.Smo.csproj).

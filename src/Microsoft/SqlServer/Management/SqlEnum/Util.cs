@@ -35,14 +35,15 @@ namespace Microsoft.SqlServer.Management.Smo
             String strType;
             switch(strDBType)
             {
-                case "xml":goto case "text";
-                case "json": goto case "text";
-                case "nvarchar":goto case "text";
-                case "varchar":goto case "text";
-                case "sysname":goto case "text";
-                case "nchar":goto case "text";
-                case "char":goto case "text";
-                case "ntext":goto case "text";
+                case "xml":
+                case "json":
+                case "vector":
+                case "nvarchar":
+                case "varchar":
+                case "sysname":
+                case "nchar":
+                case "char":
+                case "ntext":
                 case "text":
                     strType = "System.String";
                     break;
@@ -58,7 +59,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "long":
                     strType = "System.Int32";
                     break;
-                case "real":goto case "float";
+                case "real":
                 case "float":
                     strType = "System.Double";
                     break;
@@ -90,11 +91,11 @@ namespace Microsoft.SqlServer.Management.Smo
                     strType = "System.Guid";
                     break;
                 case "numeric":
+                case "decimal":
                     strType = "System.Decimal";
                     break;
-                case "decimal": goto case "numeric";
-                case "binary":goto case "varbinary";
-                case "image":goto case "varbinary";
+                case "binary":
+                case "image":
                 case "varbinary":
                     strType = "System.Byte[]";
                     break;

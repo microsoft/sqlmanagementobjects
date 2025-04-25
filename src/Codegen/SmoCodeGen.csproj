@@ -77,6 +77,7 @@
     <Compile Include="$(SfcSrc)\NetCoreExtension.cs" />
     <Compile Include="$(SfcSrc)\SmoManagementUtil.cs" />
     <Compile Include="$(SfcSrc)\TraceHelper.cs" />
+    <Compile Include="$(SmoSrc)\QueryStoreEnums.cs" />
     <Compile Include="$(SqlEnumSrc)\ConditionedSql.cs" />
     <Compile Include="$(SqlEnumSrc)\DatabaseLevel.cs" />
     <Compile Include="$(SqlEnumSrc)\DatabaseOption.cs" />
@@ -128,6 +129,9 @@
     <SqlStringResource Include="$(ConnectionInfoSrc)\StringConnectionInfo.strings" namespace="Microsoft.SqlServer.Management.Common" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
     <SqlStringResource Include="$(SqlEnumSrc)\StringSqlEnumerator.strings" namespace="Microsoft.SqlServer.Management.Smo.SqlEnum" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
     <SqlStringResource Include="$(SfcSrc)\SfcStrings.strings" namespace="Microsoft.SqlServer.Management.Sdk.Sfc" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cfg.xml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />

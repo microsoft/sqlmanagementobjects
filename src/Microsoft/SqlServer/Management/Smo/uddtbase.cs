@@ -416,10 +416,17 @@ END
                     {
                         throw new PropertyNotSetException("Length");
                     }
-
-                    if ((Int32)oLength != 0)
+                    var length = (Int32)oLength;
+                    if (sType == "vector")
                     {
-                        if ((sType == "varchar" || sType == "nvarchar" || sType == "varbinary") && (Int32)oLength < 0)
+                        // Temporary workaround to convert the length of the column to the dimensions for vector types
+                        // until sys.columns is updated to include the dimensions of the vector type.
+                        // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
+                        sb.AppendFormat(SmoApplication.DefaultCulture, "({0})", (length - 8) / 4);
+                    }
+                    else if (length != 0)
+                    {
+                        if ((sType == "varchar" || sType == "nvarchar" || sType == "varbinary") && length < 0)
                         {
                             sb.Append("(max)");
                         }
@@ -787,7 +794,8 @@ END
                 0 == comparer.Compare(type, "binary") ||
                 0 == comparer.Compare(type, "varbinary") ||
                 0 == comparer.Compare(type, "nchar") ||
-                0 == comparer.Compare(type, "char"))
+                0 == comparer.Compare(type, "char") ||
+                0 == comparer.Compare(type, "vector"))
             {
                 return true;
             }

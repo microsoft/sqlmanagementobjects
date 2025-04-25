@@ -506,6 +506,7 @@
     <Compile Include="$(SmoSourceDir)\ResourcePoolBase.cs" />
     <Compile Include="$(SmoSourceDir)\ResumableIndexBase.cs" />
     <Compile Include="$(SmoSourceDir)\RuleBase.cs" />
+    <Compile Include="$(SmoSourceDir)\QueryStoreEnums.cs" />
     <Compile Include="$(SmoSourceDir)\QueryStoreOptions.cs" />
     <Compile Include="$(SmoSourceDir)\SchedulerBase.cs" />
     <Compile Include="$(SmoSourceDir)\Schemabase.cs" />

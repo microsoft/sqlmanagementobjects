@@ -141,6 +141,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             {
                 yield return new ColumnProperties($"col{i++}", _SMO.DataType.Json);
             }
+
+            if (database.Parent.ServerType != DatabaseEngineType.Standalone || database.Parent.VersionMajor > 17)
+            {
+                yield return new ColumnProperties($"col{i++}", _SMO.DataType.Vector(2));
+            }
         }
 
         [TestMethod]

@@ -9,152 +9,9 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
-//1591 is for verifying all public members have xml documentation. It's really heavy handed though - requiring
-//docs for things as specific as each enum value. Disabling since the documentation we have is enough. 
-#pragma warning disable 1591
 
 namespace Microsoft.SqlServer.Management.Smo
 {
-    /// <summary>
-    /// type converter for QueryStoreOperationMode
-    /// </summary>
-    public class QueryStoreOperationModeConverter : EnumToDisplayNameConverter
-    {
-        public QueryStoreOperationModeConverter()
-            : base(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreOperationMode))
-        { }
-    }
-
-    /// <summary>
-    /// type converter for QueryStoreCaptureMode
-    /// </summary>
-    public class QueryStoreCaptureModeConverter : EnumToDisplayNameConverter
-    {
-        public QueryStoreCaptureModeConverter()
-            : base(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreCaptureMode))
-        { }
-    }
-
-    /// <summary>
-    /// type converter for QueryStoreSizeBasedCleanupMode
-    /// </summary>
-    public class QueryStoreSizeBasedCleanupModeConverter : EnumToDisplayNameConverter
-    {
-        public QueryStoreSizeBasedCleanupModeConverter()
-            : base(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreSizeBasedCleanupMode))
-        { }
-
-        /// <summary>
-        /// Converts the given value object to the specified destination type.
-        /// </summary>
-        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
-        /// <param name="culture">An optional System.Globalization.CultureInfo. If not supplied, the current culture is assumed.</param>
-        /// <param name="value">The System.Object to convert.</param>
-        /// <param name="destinationType">The System.Type to convert the value to.</param>
-        /// <returns>An System.Object that represents the converted value.</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
-        {
-            if (destinationType == typeof(string) && value == null)
-            {
-                return string.Empty;
-            }
-            return base.ConvertTo(context, culture, value, destinationType);
-        }
-    }
-
-    /// <summary>
-    /// type converter for QueryStoreWaitStatsCaptureMode
-    /// </summary>
-    public class QueryStoreWaitStatsCaptureModeConverter : EnumToDisplayNameConverter
-    {
-        public QueryStoreWaitStatsCaptureModeConverter()
-            : base(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreWaitStatsCaptureMode))
-        { }
-
-        /// <summary>
-        /// Converts the given value object to the specified destination type.
-        /// </summary>
-        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
-        /// <param name="culture">An optional System.Globalization.CultureInfo. If not supplied, the current culture is assumed.</param>
-        /// <param name="value">The System.Object to convert.</param>
-        /// <param name="destinationType">The System.Type to convert the value to.</param>
-        /// <returns>An System.Object that represents the converted value.</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
-        {
-            if (destinationType == typeof(string) && value == null)
-            {
-                return string.Empty;
-            }
-            return base.ConvertTo(context, culture, value, destinationType);
-        }
-    }
-
-    /// <summary>
-    /// Operation Mode values for Query Store
-    /// </summary>
-    [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreOperationModeConverter))]
-    public enum QueryStoreOperationMode
-    {
-        [LocDisplayName("Off")]
-        [TsqlSyntaxString("OFF")]
-        Off = 0,
-        [LocDisplayName("ReadOnly")]
-        [TsqlSyntaxString("READ_ONLY")]
-        ReadOnly = 1,
-        [LocDisplayName("ReadWrite")]
-        [TsqlSyntaxString("READ_WRITE")]
-        ReadWrite = 2,
-        [LocDisplayName("Error")]
-        Error = 3,
-    }
-
-    /// <summary>
-    /// Capture Mode values for Query Store
-    /// </summary>
-    [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreCaptureModeConverter))]
-    public enum QueryStoreCaptureMode
-    {
-        [LocDisplayName("All")]
-        [TsqlSyntaxString("ALL")]
-        All = 1,
-        [LocDisplayName("Auto")]
-        [TsqlSyntaxString("AUTO")]
-        Auto = 2,
-        [LocDisplayName("None")]
-        [TsqlSyntaxString("NONE")]
-        None = 3,
-        [LocDisplayName("Custom")]
-        [TsqlSyntaxString("CUSTOM")]
-        Custom = 4,
-    }
-
-    /// <summary>
-    /// Size Based Cleanup Mode values for Query Store
-    /// </summary>
-    [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreSizeBasedCleanupModeConverter))]
-    public enum QueryStoreSizeBasedCleanupMode
-    {
-        [LocDisplayName("Off")]
-        [TsqlSyntaxString("OFF")]
-        Off = 0,
-        [LocDisplayName("Auto")]
-        [TsqlSyntaxString("AUTO")]
-        Auto = 1,
-    }
-
-    /// <summary>
-    /// Wait Statistics Capture Mode values for Query Store
-    /// </summary>
-    [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.QueryStoreWaitStatsCaptureModeConverter))]
-    public enum QueryStoreWaitStatsCaptureMode
-    {
-        [LocDisplayName("Off")]
-        [TsqlSyntaxString("OFF")]
-        Off = 0,
-        [LocDisplayName("On")]
-        [TsqlSyntaxString("ON")]
-        On = 1,
-    }
 
     /// <summary>
     /// QueryStore Options Smo Object.
@@ -198,7 +55,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // When doing an alter when database is in restoring state, we do not want to script query store options
             // Querying for this options in a restoring database will cause a null reference exception
-            if (this.Parent.Status == DatabaseStatus.Restoring)
+            if (!Parent.IsDesignMode &&  Parent.Status == DatabaseStatus.Restoring)
             {
                 // Make sure none of the properties are dirty though because if the user changed a value that would indicate that
                 // they are intending to actually modify those values but we can't do that when it's restoring
@@ -370,19 +227,21 @@ namespace Microsoft.SqlServer.Management.Smo
                         (long) maxStorageSizeInMBProp.Value));
                 }
 
-                QueryStoreCaptureMode newValue = (QueryStoreCaptureMode) queryCaptureModeProp.Value;
+                // In DesignMode, GetPropertyOptional doesn't get the default value so we check for null
+                QueryStoreCaptureMode? newValue = (QueryStoreCaptureMode?)queryCaptureModeProp.Value;
 
-                if (newValue == QueryStoreCaptureMode.Custom && !IsSupportedProperty("CapturePolicyExecutionCount", sp))
+                if (newValue == QueryStoreCaptureMode.Custom && !IsSupportedProperty(nameof(CapturePolicyExecutionCount), sp))
                 {
                     newValue = QueryStoreCaptureMode.Auto;
                 }
 
+
                 if (scriptAll || queryCaptureModeProp.Dirty)
                 {
                     sb.Append(string.Format(SmoApplication.DefaultCulture, "QUERY_CAPTURE_MODE = {0}, ",
-                        queryStoreCaptureModeTypeConverter.ConvertToInvariantString(newValue)));
-                }
+                        queryStoreCaptureModeTypeConverter.ConvertToInvariantString(newValue.Value)));
 
+                }
                 if (newValue == QueryStoreCaptureMode.Custom)
                 {
                     StringBuilder capturePolicy = new StringBuilder();
@@ -391,25 +250,25 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         capturePolicy.Append(string.Format(SmoApplication.DefaultCulture,
                             "STALE_CAPTURE_POLICY_THRESHOLD = {0} HOURS, ",
-                            (int) capturePolicyStaleThresholdInHrsProp.Value));
+                            (int)capturePolicyStaleThresholdInHrsProp.Value));
                     }
 
                     if (scriptAll || capturePolicyExecutionCountProp.Dirty)
                     {
                         capturePolicy.Append(string.Format(SmoApplication.DefaultCulture, "EXECUTION_COUNT = {0}, ",
-                            (int) capturePolicyExecutionCountProp.Value));
+                            (int)capturePolicyExecutionCountProp.Value));
                     }
 
                     if (scriptAll || capturePolicyTotalCompileCpuTimeInMSProp.Dirty)
                     {
                         capturePolicy.Append(string.Format(SmoApplication.DefaultCulture, "TOTAL_COMPILE_CPU_TIME_MS = {0}, ",
-                            (long) capturePolicyTotalCompileCpuTimeInMSProp.Value));
+                            (long)capturePolicyTotalCompileCpuTimeInMSProp.Value));
                     }
 
                     if (scriptAll || capturePolicyTotalExecutionCpuTimeInMSProp.Dirty)
                     {
                         capturePolicy.Append(string.Format(SmoApplication.DefaultCulture, "TOTAL_EXECUTION_CPU_TIME_MS = {0}, ",
-                            (long) capturePolicyTotalExecutionCpuTimeInMSProp.Value));
+                            (long)capturePolicyTotalExecutionCpuTimeInMSProp.Value));
                     }
 
                     if (capturePolicy.Length > 0)
@@ -534,6 +393,3 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 }
-
-
-#pragma warning restore 1591

@@ -25,7 +25,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
         [TestMethod]
         public void GetLcidFromCollationListTest()
         {
-            var server = new Microsoft.SqlServer.Management.Smo.Server();
+            var server = new Management.Smo.Server();
             var comparer = server.GetStringComparer("Japanese_BIN2");
             Assert.That(comparer, Is.Not.Null, "Cannot get valid LCID or comparer");
         }
@@ -87,7 +87,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             });
         }
 
-        private Management.Smo.Server GetDesignModeServer(int majorVersion, DatabaseEngineType databaseEngineType = DatabaseEngineType.Standalone,   DatabaseEngineEdition edition = DatabaseEngineEdition.Enterprise)
+        internal static Management.Smo.Server GetDesignModeServer(int majorVersion, DatabaseEngineType databaseEngineType = DatabaseEngineType.Standalone,   DatabaseEngineEdition edition = DatabaseEngineEdition.Enterprise)
         {
             var serverConnection = new ServerConnection() { 
                 ServerVersion = new ServerVersion(majorVersion, 0), 

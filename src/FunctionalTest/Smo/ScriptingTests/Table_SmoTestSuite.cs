@@ -4065,6 +4065,50 @@ AS NODE ON [PRIMARY]
 
         #endregion
 
+        #region Vector column tests
+        /// <summary>
+        /// This test verifies that JSON column is correctly scripted for insert statements.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        public void ScriptingInsertTableWithVectorColumnTest()
+        {
+            ExecuteFromDbPool(
+                this.TestContext.FullyQualifiedTestClassName,
+                (database) =>
+                {
+                    if (database.Parent.ServerType != DatabaseEngineType.Standalone || database.Parent.VersionMajor > 17)
+                    {
+                        string queryMatch = @"INSERT \[.*\]\.\[.*\] \(\[vectorColumn\]\) VALUES \(CAST\(N'\[0\.0000000e\+000,0\.0000000e\+000\]' AS Vector\(2\)\)\)";
+
+                        var table = new Table(database, "vectorTable");
+                        var vectorColumn = new Column(table, "vectorColumn", DataType.Vector(2));
+                        table.Columns.Add(vectorColumn);
+                        table.Create();
+
+                        string insertQuery = $"INSERT INTO {table.Name.SqlBracketQuoteString()} values('[0,0]')";
+
+                        database.ExecuteNonQuery(insertQuery);
+
+                        var scripter = new Scripter(database.Parent);
+                        scripter.Options.ScriptData = true;
+                        scripter.Options.ScriptSchema = true;
+
+                        IEnumerable<string> scripts = scripter.EnumScript(new Urn[] { table.Urn });
+                        Assert.That(scripts, Has.One.Matches(queryMatch).IgnoreCase, "Scripting of Vector tables is expected to generate a valid INSERT statement");
+
+                        table.DropIfExists();
+                        string tableCreateScript = (from string script in scripts where script.StartsWith("CREATE", StringComparison.InvariantCultureIgnoreCase) select script).First();
+                        database.ExecuteNonQuery(tableCreateScript);
+                        database.Tables.ClearAndInitialize(string.Empty, null);
+                        Assert.That(database.Tables, Has.One.Items.Matches<Table>(i => i.Name == table.Name), "Table should be created successfully.");
+                    }
+                });
+        }
+        #endregion // Vector column tests
+
         #endregion // Scripting Tests
 
         #region Sparse column tests

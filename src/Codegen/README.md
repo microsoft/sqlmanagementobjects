@@ -315,7 +315,9 @@ public void Deny(ObjectPermissionSet permission, System.String granteeName)
 
 #### Parent_has_setter
 
-#### Is_design_mode
+#### is_design_mode
+
+Set this property to `true` to allow your object to participate in `DesignMode`. Such objects can be unit tested with an offline connection. Most objects should have this set.
 
 #### Parent_mode
 
