@@ -1,12 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/*************************************************************
-*                                                            *
-*   Copyright (C) Microsoft Corporation. All rights reserved.*
-*                                                            *
-*************************************************************/
-
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -3,6 +3,11 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+# 172.64.0
+
+- Add DesignMode support to `QueryStoreOptions` class
+- Add Vector data type support
+
 # 172.61.0
 
 - Remove major version restriction on Microsoft.Data.SqlClient dependency Fixes [Issue 188](https://github.com/microsoft/sqlmanagementobjects/issues/188)

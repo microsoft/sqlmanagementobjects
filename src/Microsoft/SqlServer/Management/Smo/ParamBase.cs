@@ -229,6 +229,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.DateTimeOffset:
                 case SqlDataType.DateTime2:
                 case SqlDataType.Json:
+                case SqlDataType.Vector:
                     return MakeSqlString(defaultValue);
                 default:
                     return defaultValue;

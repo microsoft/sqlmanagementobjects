@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -124,5 +125,36 @@ Unexpected Collection Types :
             var script = database.Script();
             Assert.That(script.Cast<string>(), Is.EqualTo(new[] { "CREATE DATABASE [dbname]" }), "database.Script() in design mode");
         }
+
+
+        [TestCategory("Unit")]
+        [TestMethod]
+        public void Database_QueryStoreOptions_supports_DesignMode()
+        {
+            var server = ServerTests.GetDesignModeServer(16);
+            var db = new Database(server, "test");
+            var expectedReadonlyScript = new StringCollection() { "ALTER DATABASE [test] SET QUERY_STORE = ON", "ALTER DATABASE [test] SET QUERY_STORE (OPERATION_MODE = READ_ONLY)",};
+            var expectedCustomScript = new StringCollection() { "ALTER DATABASE [test] SET QUERY_STORE = ON", "ALTER DATABASE [test] SET QUERY_STORE (OPERATION_MODE = READ_ONLY, QUERY_CAPTURE_MODE = CUSTOM, QUERY_CAPTURE_POLICY = (STALE_CAPTURE_POLICY_THRESHOLD = 4 HOURS), MAX_PLANS_PER_QUERY = 210)" };
+            db.Create();
+            Assert.That(db.QueryStoreOptions, Is.Not.Null, "QueryStoreOptions should be supported on 16");
+            db.QueryStoreOptions.DesiredState = QueryStoreOperationMode.ReadOnly;
+            Assert.That(db.QueryStoreOptions.ActualState, Is.EqualTo(QueryStoreOperationMode.Off), "ActualState should have default value");
+            var sp = db.GetScriptingPreferencesForCreate();
+            var script = new StringCollection();
+            db.QueryStoreOptions.ScriptAlter(script, sp);
+            Assert.That(script, Is.EqualTo(expectedReadonlyScript), "Setting ReadOnly");
+            db.QueryStoreOptions.MaxPlansPerQuery = 210;
+            db.QueryStoreOptions.QueryCaptureMode = QueryStoreCaptureMode.Custom;
+            db.QueryStoreOptions.CapturePolicyStaleThresholdInHrs = 4;
+            
+            script = new StringCollection();
+            db.QueryStoreOptions.ScriptAlter(script, sp);
+            Assert.That(script, Is.EqualTo(expectedCustomScript), "Setting Custom capture mode");
+
+            Assert.That(db.QueryStoreOptions.MaxPlansPerQuery, Is.EqualTo(210), nameof(QueryStoreOptions.MaxPlansPerQuery));
+            // We could change QueryStoreOptions to override Alter or AlterImpl and set the value in design mode
+            Assert.That(db.QueryStoreOptions.ActualState, Is.EqualTo(QueryStoreOperationMode.Off), "ActualState should not be changed by Alter");
+        }
+
     }
 }

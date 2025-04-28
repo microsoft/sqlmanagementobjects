@@ -36,6 +36,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             { SqlDataType.Time, SqlServerVersion.Version100},
             { SqlDataType.UserDefinedTableType, SqlServerVersion.Version100},
             { SqlDataType.Json, SqlServerVersion.Version160},
+            { SqlDataType.Vector, SqlServerVersion.Version170 },
         };
 
         /// <summary>

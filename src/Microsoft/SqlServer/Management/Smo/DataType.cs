@@ -54,7 +54,8 @@ namespace Microsoft.SqlServer.Management.Smo
         HierarchyId = 41, //system clr type
         Geometry = 42, // A datatype used for planar 2-dimensional geometries.
         Geography = 43, // A geodetic datatype.
-        Json = 44 // A json datatype.
+        Json = 44, // A json datatype.
+        Vector = 45, // A vector datatype.
 
         // !!IMPORTANT!! If updating this with new types make sure to update IsDataTypeSupportedOnTargetVersion and/or IsSystemDataType with the new type!
         // You should also update the AllSqlDataTypeValues_SupportedOnAllApplicableVersions unit test with the new type and minimum version
@@ -117,6 +118,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.sqlDataType = sqlDataType;
                     this.name = GetSqlName(sqlDataType);
                     break;
+                case SqlDataType.Vector:
+                    this.sqlDataType = sqlDataType;
+                    this.name = GetSqlName(sqlDataType);
+                    // set a default of the max supported value for vector
+                    this.MaximumLength = 1998;
+                    break;
                 case SqlDataType.Numeric:
                 case SqlDataType.Decimal:
                     // set the default Precision and Scale values when not mentioned anything
@@ -164,6 +171,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.Image:
                 case SqlDataType.NText:
                 case SqlDataType.Text:
+                case SqlDataType.Vector:
                     this.sqlDataType = sqlDataType;
                     this.MaximumLength = precisionOrMaxLengthOrScale;
                     this.name = GetSqlName(sqlDataType);
@@ -809,6 +817,33 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DataType(SqlDataType.Json); }
         }
 
+        /// <summary>
+        /// Maximum value of dimensions we can handle. Note that this isn't necessarily the max
+        /// dimensions allowed by the engine since that can change - instead we have this handle
+        /// the highest value allowed and then the engine will throw an error later if it's too high.
+        /// </summary>
+        private const int MaxVectorDimensions = (int.MaxValue - 8) / 4;
+
+        /// <summary>
+        /// Creates a DataType of type SqlDataType.Vector
+        /// </summary>
+        /// <param name="dimensions">The number of dimensions for the vector</param>
+        /// <returns></returns>
+        public static DataType Vector(Int32 dimensions)
+        {
+            // Throw a clear error if the dimensions are out of range
+            if (dimensions < 1 || dimensions > MaxVectorDimensions)
+            {
+                throw new ArgumentOutOfRangeException(nameof(dimensions));
+            }
+            // Temporary workaround to convert the dimensions to maxlength for vector types
+            // until sys.columns is updated to include the dimensions of the vector type.
+            // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/3906463
+            // dimensions = (length - 8) / 4
+            // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
+            return new DataType(SqlDataType.Vector, (dimensions * 4) + 8);
+        }
+
         #endregion
 
         public override string ToString()
@@ -1178,8 +1213,12 @@ namespace Microsoft.SqlServer.Management.Smo
             numericScale = (Int32)sqlObject.GetPropValueOptional("NumericScale", 0);
 
             //get the enum for system data types
-            //special case for sysname, although it is a UDDT we treat it as a SDT
-            if (dt == st || "sysname" == dt)
+            // Special cases:
+            //    sysname - although it is a UDDT we treat it as a SDT
+            //    vector - underlying type is varbinary, so it is expected not to match
+            if (dt == st || 
+                "sysname" == dt ||
+                ("vector" == dt && "varbinary" == st))
             {
                 name = dt;
                 // it's a system type
@@ -1203,7 +1242,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     xmlDocumentConstraint = (XmlDocumentConstraint)sqlObject.GetPropValueOptional("XmlDocumentConstraint", XmlDocumentConstraint.Default);
                 }
             }
-            else if( st.Length > 0)
+            else if (st.Length > 0)
             {
                 // UserDefinedDataType
                 sqlDataType = SqlDataType.UserDefinedDataType;
@@ -1311,6 +1350,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     return "datetime2";
                 case SqlDataType.Json:
                     return "json";
+                case SqlDataType.Vector:
+                    return "vector";
             }
 
             return string.Empty;
@@ -1483,10 +1524,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "json":
                     sqlDataType = SqlDataType.Json;
                     break;
+                case "vector":
+                    sqlDataType = SqlDataType.Vector;
+                    break;
 
                 default:
-                    /*Removing Strace as in case of computed columns , there might
-                     * be a case when we donot provide DataTypeName  BUG 151436*/
                     break;
             }
             return sqlDataType;
@@ -1582,6 +1624,21 @@ namespace Microsoft.SqlServer.Management.Smo
             return false;
         }
 
+        private static bool IsSystemDataType170(SqlDataType dataType)
+        {
+            if (IsSystemDataType160(dataType))
+            {
+                return true;
+            }
+
+            switch (dataType)
+            {
+                case SqlDataType.Vector:
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// This function verify whether given data type is system type or not for given version, engine type/edition.
         /// </summary>
@@ -1604,12 +1661,16 @@ namespace Microsoft.SqlServer.Management.Smo
             // Since both of them are supposed to support all system data types, we simply
             // treat them as the latest SQL version.
             //
-            if (engineEdition == DatabaseEngineEdition.SqlManagedInstance || targetVersion >= SqlServerVersion.Version160)
+            if (engineEdition == DatabaseEngineEdition.SqlManagedInstance || targetVersion >= SqlServerVersion.Version170)
             {
                 // If a new type is added later on then a new IsSystemDataType method should be added
                 // with those new types - and that one set as the default. Also update IsSystemDataTypeOnAzure
                 // with the new IsSystemDataType method because Azure uses the latest types.
                 //
+                return IsSystemDataType170(dataType);
+            }
+            else if (targetVersion >= SqlServerVersion.Version160)
+            {
                 return IsSystemDataType160(dataType);
             }
             else if (targetVersion <= SqlServerVersion.Version80)
@@ -1686,14 +1747,20 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // If the data type is supported, check if it is a system data type
             //
-            return isSupported ? IsSystemDataType160(dataType) : false;
+            return isSupported ? IsSystemDataType170(dataType) : false;
         }
 
         internal static bool IsDataTypeSupportedOnSqlDw(SqlDataType dataType)
         {
-            // JSON data type is not supported on SQL DW.
-            //
-            return dataType != SqlDataType.Json;
+            switch (dataType)
+            {
+                // Put any data types that are not supported on SQL DW here
+                case SqlDataType.Json:
+                case SqlDataType.Vector:
+                    return false;
+                default:
+                    return true;
+            }
         }
 
         internal static void CheckColumnTypeSupportability(string parentName, string columnName, SqlDataType dataType, ScriptingPreferences sp)

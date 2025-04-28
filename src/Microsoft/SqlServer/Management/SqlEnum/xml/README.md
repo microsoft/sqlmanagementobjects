@@ -77,49 +77,56 @@ Used to selectively include/exclude other elements based on the version specifie
 
 Provides the definition of a property. This is used by codegen and during runtime to populate the Property value (usually from the value returned from the SQL query for the object)
 
-    report_type- Specifies the CLR type for this property. The value here will be prefixed with the SMO namespace, so it NEEDS to be used for any SMO types so that the correct SMO namespace is used (since engine builds its own from the same source)
+**report_type** - Specifies the CLR type for this property. The value here will be prefixed with the SMO namespace, so it NEEDS to be used for any SMO types so that the correct SMO namespace is used (since engine builds its own from the same source)
+
+**report_type2** - Specifies the CLR type for this property. The value will be used as is, so should be used for any non-SMO types
+
+**type** - Specifies the T-SQL type (varchar for example) which is then mapped to the appropriate CLR type for the property. See [Util.cs!DbTypeToClrType](/src/Microsoft/SqlServer/Management/SqlEnum/Util.cs) for the mapping
+
+**smo_class_name** - For post_process elements only. Specifies the name of the class that the post_process element is updating. Will be prefixed with the SMO namespace so NEEDS to be used for any SMO types so that the correct SMO namespace is used (since engine builds its own from the same source)
+
+**class_name** - For post_process elements only. Specifies the name of the class that the post_process element is updating. The value is used as is so should be used for any non-SMO types
+
+**cast** - This will make the generated t-SQL cast the property to the type specified with the type attribute (so type='bit' cast='true' will result in the T-SQL looking like CAST(myPropValue AS bit). Use this if the original type is not what you want.
+
+**mode** - The modes this property is available for. Maps to the PropertyMode enum, which is defined in [ObjectProperty.cs](/src/Microsoft/SqlServer/Management/Sdk/Sfc/Enumerator/ObjectProperty.cs). This will add the SfcPropertyFlags.Design or SfcPropertyFlags.Deploy attributes to the property. Properties that make sense in the design (offline) mode should have mode="design" set. For the most part, setting a mode isn't necessary, due to lack of use of the old SFC features based on it.
+
+Setting `mode="design"` can be valuable for readonly properties in order to allow them to have default values for unit testing. To set a default value for a property defined in the xml, it has to have a `default` attribute in the [cfg.xml](../../../../../Codegen/cfg.xml) file used by codegen.
+
+**expensive** - Marks the property as being expensive to fetch - which means that when it is accessed only that property will be fetched (default behavior is to fetch all properties whenever a non-initialized property value is requested). 
     
-    report_type2 -Specifies the CLR type for this property. The value will be used as is, so should be used for any non-SMO types
-    type- Specifies the T-SQL type (varchar for example) which is then mapped to the appropriate CLR type for the property. See $\Sql\mpu\shared\SMO\Enumerator\sql\src\Util.cs!DbTypeToClrType for the mapping
-    smo_class_name - For post_process elements only. Specifies the name of the class that the post_process element is updating. Will be prefixed with the SMO namespace so NEEDS to be used for any SMO types so that the correct SMO namespace is used (since engine builds its own from the same source)
+    This also marks properties that will NOT be pre-populated when calling Script(), so if the property is needed for scripting and is marked as expensive then the Script methods need to ensure that they use the appropriate Get methods that will fetch it if it hasn't been fetched already. 
+            
+            ○ NOTE : If this attribute is set then calls to Properties.Get (or any of the other methods which don't query for a property) will return NULL until the property is requested via one of the methods that do. See Ways to Retrieve Property in SMO for details on these methods. 
+**hidden** - Whether the property is hidden from the user. If this attribute exists (it doesn't matter what the value is) then the property will not have a 
+usage - What this property can be used for in SFC requests. Valid values are :
+            • Request (maps to ObjectPropertyUsages.Request)
+            • Filter (maps to ObjectPropertyUsages.Filter
+            • Order (maps to ObjectPropertyUsages.OrderBy)
     
-    class_name  - For post_process elements only. Specifies the name of the class that the post_process element is updating. The value is used as is so should be used for any non-SMO types
-    cast - This will make the generated t-SQL cast the property to the type specified with the type attribute (so type='bit' cast='true' will result in the T-SQL looking like CAST(myPropValue AS bit). Use this if the original type is not what you want.
-    mode - The modes this property is available for. Maps to the PropertyMode enum, which is defined in $\sql\mpu\shared\managementsdk\sfc\enumerator\core\src\ObjectProperty.cs. This will add the SfcPropertyFlags.Design or SfcPropertyFlags.Deploy attributes to the property. Doesn't appear to actually do anything except for mark the property as being usable for either the Design or Deploy modes of SFC SDK. 
-        Properties that make sense in the design (offline) mode should have mode="design" set. Properties available in the online mode (should be most SMO properties) should have mode="deploy". If both are true then mode="ALL" should be set. 
-    expensive - Marks the property as being expensive to fetch - which means that when it is accessed only that property will be fetched (default behavior is to fetch all properties whenever a non-initialized property value is requested). 
-        
-        This also marks properties that will NOT be pre-populated when calling Script(), so if the property is needed for scripting and is marked as expensive then the Script methods need to ensure that they use the appropriate Get methods that will fetch it if it hasn't been fetched already. 
-                
-                ○ NOTE : If this attribute is set then calls to Properties.Get (or any of the other methods which don't query for a property) will return NULL until the property is requested via one of the methods that do. See Ways to Retrieve Property in SMO for details on these methods. 
-    hidden - Whether the property is hidden from the user. If this attribute exists (it doesn't matter what the value is) then the property will not have a 
-    usage - What this property can be used for in SFC requests. Valid values are :
-                • Request (maps to ObjectPropertyUsages.Request)
-                • Filter (maps to ObjectPropertyUsages.Filter
-                • Order (maps to ObjectPropertyUsages.OrderBy)
-        
-        If both this and notusage DO NOT exist then the property defaults to :
-        
-                • Hidden = FALSE : ObjectPropertyUsages.All, which is an OR of all three values
-                • Hidden = TRUE : None of the above values (only Reserved1 is set)
-        
-        Only one attribute of usage or notusage is allowed - if both are specified then usage will be used and notusage ignored.
-        
-        NOTE : Any properties which are marked for PostProcessing will automatically have the Filter and OrderBy usages removed from the list of valid usages. This is because the values are calculated client-side so can't be used to generate the request query sent to the server. SqlObject.cs!Load (look for the computedProperties HashMap)
-    notusage - What this property CAN'T be used for in SFC requests. Valid values are :
-        
-                • request (maps to ObjectPropertyUsages.Request)
-                • filter (maps to ObjectPropertyUsages.Filter
-                • order (maps to ObjectPropertyUsages.OrderBy)
-        
-        If both this and notusage DO NOT exist then the property defaults to :
-        
-                • hidden = FALSE : ObjectPropertyUsages.All, which is an OR of all three values
-                • hidden = TRUE : None of the above values (only Reserved1 is set)
-        
-        Only one attribute of usage or notusage is allowed - if both are specified then usage will be used and notusage ignored.
-        
-        NOTE : Any properties which are marked for PostProcessing will automatically have the Filter and OrderBy usages removed from the list of valid usages. This is because the values are calculated client-side so can't be used to generate the request query sent to the server. SqlObject.cs!Load (look for the computedProperties HashMap)
+    If both this and notusage DO NOT exist then the property defaults to :
+    
+            • Hidden = FALSE : ObjectPropertyUsages.All, which is an OR of all three values
+            • Hidden = TRUE : None of the above values (only Reserved1 is set)
+    
+    Only one attribute of usage or notusage is allowed - if both are specified then usage will be used and notusage ignored.
+    
+    NOTE : Any properties which are marked for PostProcessing will automatically have the Filter and OrderBy usages removed from the list of valid usages. This is because the values are calculated client-side so can't be used to generate the request query sent to the server. SqlObject.cs!Load (look for the computedProperties HashMap)
+
+**notusage** - What this property CAN'T be used for in SFC requests. Valid values are :
+    
+            • request (maps to ObjectPropertyUsages.Request)
+            • filter (maps to ObjectPropertyUsages.Filter
+            • order (maps to ObjectPropertyUsages.OrderBy)
+    
+    If both this and notusage DO NOT exist then the property defaults to :
+    
+            • hidden = FALSE : ObjectPropertyUsages.All, which is an OR of all three values
+            • hidden = TRUE : None of the above values (only Reserved1 is set)
+    
+    Only one attribute of usage or notusage is allowed - if both are specified then usage will be used and notusage ignored.
+    
+    NOTE : Any properties which are marked for PostProcessing will automatically have the Filter and OrderBy usages removed from the list of valid usages. This is because the values are calculated client-side so can't be used to generate the request query sent to the server. SqlObject.cs!Load (look for the computedProperties HashMap)
 
 ### post_process
 

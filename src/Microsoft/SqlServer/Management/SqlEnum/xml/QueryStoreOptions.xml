@@ -6,15 +6,15 @@
   <properties>
     <include file='inc_urn_single.xml'/>
     <version min_major='13' cloud_min_major='12'>
-      <property name="ActualState" type="smallint" report_type="QueryStoreOperationMode" access="read">dqso.actual_state</property>
+      <property name="ActualState" type="smallint" report_type="QueryStoreOperationMode" access="read" mode="design">dqso.actual_state</property>
       <property name="DesiredState" type="smallint" report_type="QueryStoreOperationMode" mode="deploy">dqso.desired_state</property>
-      <property name="ReadOnlyReason" type="int" mode="read">dqso.readonly_reason</property>
+      <property name="ReadOnlyReason" type="int" access="read" mode="design">dqso.readonly_reason</property>
       <property name="CurrentStorageSizeInMB" type="bigint" mode="deploy">dqso.current_storage_size_mb</property>
       <property name="MaxStorageSizeInMB" type="bigint" mode="deploy">dqso.max_storage_size_mb</property>
       <property name="StaleQueryThresholdInDays" type="bigint" mode="deploy">dqso.stale_query_threshold_days</property>
       <property name="DataFlushIntervalInSeconds" type="bigint" mode="deploy">dqso.flush_interval_seconds</property>
       <property name="StatisticsCollectionIntervalInMinutes" type="bigint" mode="deploy">dqso.interval_length_minutes</property>
-      <property name="QueryCaptureMode" type="smallint" report_type="QueryStoreCaptureMode" mode="deploy">dqso.query_capture_mode</property>
+      <property name="QueryCaptureMode" type="smallint" report_type="QueryStoreCaptureMode" mode="All">dqso.query_capture_mode</property>
       <property name="SizeBasedCleanupMode" type="smallint" report_type="QueryStoreSizeBasedCleanupMode" mode="deploy">dqso.size_based_cleanup_mode</property>
       <property name="MaxPlansPerQuery" type="bigint" mode="deploy">dqso.max_plans_per_query</property>
     </version>

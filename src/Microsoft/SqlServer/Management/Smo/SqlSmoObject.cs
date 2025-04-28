@@ -8294,6 +8294,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.Json:
                     this.Properties.Get("DataType").Value = dataType.GetSqlName(SqlDataType.Json);
                     break;
+                case SqlDataType.Vector:
+                    this.Properties.Get("DataType").Value = dataType.GetSqlName(SqlDataType.Vector);
+                    this.Properties.Get("Length").Value = dataType.MaximumLength;
+                    break;
             }
         }
         #endregion

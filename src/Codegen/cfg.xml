@@ -46,7 +46,7 @@
       <property name="BuildNumber" generate="true" is_intrinsic="false" />
       <property name="IsCaseSensitive" generate="true" is_intrinsic="false" />
       <property name="IsFullTextInstalled" generate="true" is_intrinsic="false" />
-	  <property name="IsJsonDataTypeEnabled" generate="true" is_intrinsic="false" />
+      <property name="IsJsonDataTypeEnabled" generate="true" is_intrinsic="false" />
       <property name="MasterDBLogPath" generate="true" is_intrinsic="false" />
       <property name="MasterDBPath" generate="true" is_intrinsic="false" />
       <property name="ErrorLogPath" generate="true" is_intrinsic="false" />
@@ -2179,15 +2179,15 @@
     </object>
 
     <object class_name="QueryStoreOptions" urn="Server[@Name='']/Database/QueryStoreOptions" is_design_mode="true" parent_type="Database" singleton="true" has_constructors="false">
-      <property name="ActualState" generate="true" is_intrinsic="false"/>
+      <property name="ActualState" generate="true" is_intrinsic="false" default="Off" />
       <property name="DesiredState" generate="true" is_intrinsic="false"/>
-      <property name="ReadOnlyReason" generate="true" is_intrinsic="false"/>
+      <property name="ReadOnlyReason" generate="true" is_intrinsic="false" default="0" />
       <property name="CurrentStorageSizeInMB" generate="true" is_intrinsic="false"/>
       <property name="MaxStorageSizeInMB" generate="true" is_intrinsic="false"/>
       <property name="StaleQueryThresholdInDays" generate="true" is_intrinsic="false"/>
       <property name="DataFlushIntervalInSeconds" generate="true" is_intrinsic="false"/>
       <property name="StatisticsCollectionIntervalInMinutes" generate="true" is_intrinsic="false"/>
-      <property name="QueryCaptureMode" generate="true" is_intrinsic="false"/>
+      <property name="QueryCaptureMode" generate="true" is_intrinsic="false" default="None" />
       <property name="SizeBasedCleanupMode" generate="true" is_intrinsic="false"/>
       <property name="MaxPlansPerQuery" generate="true" is_intrinsic="false"/>
       <property name="WaitStatsCaptureMode" generate="true" is_intrinsic="false"/>
