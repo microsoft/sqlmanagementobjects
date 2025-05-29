@@ -5,14 +5,14 @@ using System;
 namespace Microsoft.SqlServer.ADO.Identity
 {
     /// <summary>
-    /// Options for an <see cref="AzureDevOpsFederatedTokenCredential"/>
+    /// Options for an AzurePipelinesCredential constructor parameters. Gets default values from environment variables./>
     /// </summary>
     public class AzureDevOpsFederatedTokenCredentialOptions
     {
         /// <summary>
         /// The client id of the identity the service connection is configured for
         /// </summary>
-        public string ClientId { get; set; } = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
+        public string ClientId { get; set; } = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? Environment.GetEnvironmentVariable("AZURESUBSCRIPTION_CLIENT_ID");
 
         /// <summary>
         /// A unique identifier for a single attempt of a single job. The value is unique to the current pipeline.
@@ -27,7 +27,7 @@ namespace Microsoft.SqlServer.ADO.Identity
         /// <summary>
         /// The ID of the service connection we'd like to use
         /// </summary>
-        public string ServiceConnectionId { get; set; } = Environment.GetEnvironmentVariable("SERVICE_CONNECTION_ID");
+        public string ServiceConnectionId { get; set; } = Environment.GetEnvironmentVariable("SERVICE_CONNECTION_ID") ?? Environment.GetEnvironmentVariable("AZURESUBSCRIPTION_SERVICE_CONNECTION_ID");
 
         /// <summary>
         /// The security token used by the running build.
@@ -47,6 +47,6 @@ namespace Microsoft.SqlServer.ADO.Identity
         /// <summary>
         /// The tenant id of the tenant in which we want a token
         /// </summary>
-        public string TenantId { get; set; } = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
+        public string TenantId { get; set; } = Environment.GetEnvironmentVariable("AZURESUBSCRIPTION_TENANT_ID");
     }
 }

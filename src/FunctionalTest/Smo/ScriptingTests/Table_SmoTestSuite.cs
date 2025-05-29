@@ -182,7 +182,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoTableAlter_AzureSterlingV12()
         {
             ExecuteFromDbPool(
@@ -491,7 +491,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyTemporalRetentionPeriod_DefaultValues()
         {
             ExecuteFromDbPool(
@@ -519,7 +519,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyTemporalRetentionPeriod_ScriptRoundTrip()
         {
             ExecuteWithDbDrop(
@@ -578,7 +578,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyTemporalRetentionPeriod_ScriptRoundTrip_Retention()
         {
             ExecuteFromDbPool(
@@ -649,7 +649,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyTemporalRetentionPeriod_InvalidRetentionValues()
         {
             ExecuteFromDbPool(
@@ -715,7 +715,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyTemporalRetentionPeriod_AlterTable()
         {
             ExecuteFromDbPool(
@@ -822,7 +822,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(MinMajor = 13)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyCreateTemporalSystemTimeTable()
         {
             var consistencyCheckValues = new List<bool>() { true, false };
@@ -1260,7 +1260,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(MinMajor = 13)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void InvalidTemporalHistoryTableSpecs()
         {
             ExecuteFromDbPool(
@@ -1467,7 +1467,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyTemporalHiddenColumns_AzureSterlingV12_And_After()
         {
             ExecuteFromDbPool(
@@ -1600,7 +1600,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyPartitionDependenciesDiscovered()
         {
             // Extract the test script
@@ -4118,7 +4118,7 @@ AS NODE ON [PRIMARY]
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void When_table_has_sparse_column_HasSparseColumn_is_true()
         {
             ExecuteWithDbDrop(
@@ -4298,7 +4298,7 @@ GO
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoTable_enable_and_disable_all_indexes()
         {
             ExecuteFromDbPool(db =>
@@ -4410,7 +4410,7 @@ set nocount off;
         public static Database CreateDbWithLotsOfTables(_SMO.Server serverContext, int tableCount = 20000, bool withData = false)
         {
             var timeout = serverContext.ConnectionContext.StatementTimeout;
-            serverContext.ConnectionContext.StatementTimeout = 900;
+            serverContext.ConnectionContext.StatementTimeout = Math.Max(900, timeout);
             var db = serverContext.CreateDatabaseDefinition("lotsoftables");
             var fileGroupName = "PRIMARY";
             var indexFileGroupName = "PRIMARY";
@@ -4443,7 +4443,7 @@ set nocount off;
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, HostPlatform = HostPlatformNames.Windows, Edition = DatabaseEngineEdition.Enterprise, MinMajor = 11)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoTable_enumerating_twenty_thousand_tables_with_scripting_properties_runs_quickly()
         {
             ExecuteTest(() =>
@@ -4794,7 +4794,7 @@ set nocount off;
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoTable_SwitchPartition_supports_all_variations()
         {
             ExecuteFromDbPool(db =>
@@ -4915,7 +4915,7 @@ set nocount off;
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoTable_DataTable_methods()
         {
             ExecuteFromDbPool(db =>
@@ -4957,7 +4957,7 @@ set nocount off;
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoTable_Rename()
         {
             ExecuteFromDbPool(db =>

@@ -125,7 +125,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         ExtendedProperties = true,
                         TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlDatabase,
                         TargetDatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
-                        TargetServerVersion = SqlServerVersion.Version130,
+                        TargetServerVersion = SqlServerVersion.Version170,
                         IncludeScriptingParametersHeader = true,
                         OptimizerData = true
                     });
@@ -136,16 +136,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlDataWarehouse,
                         TargetDatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
                         TargetServerVersion = SqlServerVersion.Version130,
-                        IncludeScriptingParametersHeader = true,
-                        OptimizerData = true
-                    });
-                yield return new Tuple<string, ScriptingOptions>(
-                    "SqlDatabaseEdge",
-                    new ScriptingOptions()
-                    {
-                        TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlDatabaseEdge,
-                        TargetDatabaseEngineType = DatabaseEngineType.Standalone,
-                        TargetServerVersion = SqlServerVersion.Version150,
                         IncludeScriptingParametersHeader = true,
                         OptimizerData = true
                     });
@@ -184,18 +174,11 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         public static IEnumerable<Tuple<string, ScriptingOptions>> TestSupportedServerScriptingOptions(Database db, TestScriptingContext testScriptingContext)
         {
             var serverOptions = TestServerScriptingOptions.ToList();
-            if (db.ServerVersion.Major < 15)
-            {
-                // Edge only supports scripting options for servers that are greater than version 15
-                //
-                serverOptions.RemoveAll((server) => server.Item1.Contains("SqlDatabaseEdge"));
-            }
-
             if (testScriptingContext == TestScriptingContext.Transfer)
             {
                 // Transfer scripting is not supported for SqlOnDemand and Managed Instance
                 //
-                serverOptions.RemoveAll((server) => server.Item1.Contains("AzureSterlingV12_SqlOnDemand") || server.Item1.Contains("SqlManagedInstance"));
+                _ = serverOptions.RemoveAll((server) => server.Item1.Contains("AzureSterlingV12_SqlOnDemand") || server.Item1.Contains("SqlManagedInstance"));
             }
 
             if (testScriptingContext == TestScriptingContext.Baseline)
@@ -204,14 +187,14 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     // Only generate baseline script options when database engine edition is on demand
                     //
-                    serverOptions.RemoveAll((server) => server.Item1.Contains("AzureSterlingV12_SqlOnDemand"));
+                    _ = serverOptions.RemoveAll((server) => server.Item1.Contains("AzureSterlingV12_SqlOnDemand"));
                 }
 
                 // Cover only MI->MI scenarios for baseline tests
                 //
                 if (db.DatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
                 {
-                    serverOptions.RemoveAll((server) => server.Item1.Contains("SqlManagedInstance"));
+                    _ = serverOptions.RemoveAll((server) => server.Item1.Contains("SqlManagedInstance"));
                 }
 
                 if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
@@ -219,15 +202,32 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     return serverOptions.Where((server) => server.Item1.Contains("SqlManagedInstance"));
                 }
             }
+            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase)
+            {
+                // Remove all on-prem versions less than latest
+                _ = serverOptions.RemoveAll(server => server.Item2.TargetDatabaseEngineType == DatabaseEngineType.Standalone && (int)server.Item2.TargetServerVersion < (int)SqlServerVersion.VersionLatest);
+            }
+            // VBUMP 
+            if (db.DatabaseEngineType == DatabaseEngineType.Standalone)
+            {
+                // only script to Azure when server is latest
+                var sqlServerVersion = ScriptingOptions.ConvertToSqlServerVersion(db.ServerVersion);
+                if (db.ServerVersion.Major < (int)SqlServerVersion.VersionLatest)
+                {
+                    _ = serverOptions.RemoveAll(server => server.Item2.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase);
+                }
+                // only script up to 3 versions: OldestSupported, same, and Latest.
+                // Allows basic coverage of downgrade and upgrade without allowing the baseline sizes to grow unbounded over time.
+                var versions = new List<int>() {
+                    (int)SqlServerVersion.VersionOldestSupported,
+                    (int)ScriptingOptions.ConvertToSqlServerVersion(db.ServerVersion.Major, db.ServerVersion.Minor),
+                    (int)SqlServerVersion.VersionLatest};
+                _ = serverOptions.RemoveAll(server => server.Item2.TargetDatabaseEngineType == DatabaseEngineType.Standalone && !versions.Contains((int)server.Item2.TargetServerVersion));
+            }
             // DW is only supported for scripting to DW
-            if (db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
-            {
-                return serverOptions.Where(s => s.Item2.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse);
-            }
-            else
-            {
-                return serverOptions.Where(s => s.Item2.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse);
-            }
+            return db.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse
+                ? serverOptions.Where(s => s.Item2.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
+                : serverOptions.Where(s => s.Item2.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse);
         }
 
         /// <summary>
@@ -236,12 +236,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="smoObject">The object to script</param>
         /// <param name="options">Optional : ScriptingOptions to pass to the Script call</param>
         /// <returns>A single string containing the full script</returns>
-        protected string ScriptSmoObject(IScriptable smoObject, ScriptingOptions options = null)
+        protected static string ScriptSmoObject(IScriptable smoObject, ScriptingOptions options = null)
         {
             var sb = new StringBuilder();
-            foreach (string line in options == null ? smoObject.Script() : smoObject.Script(options))
+            foreach (var line in options == null ? smoObject.Script() : smoObject.Script(options))
             {
-                sb.AppendLine(line);
+                sb = sb.AppendLine(line);
             }
             return sb.ToString();
         }

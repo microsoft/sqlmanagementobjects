@@ -115,7 +115,7 @@ namespace Microsoft.SqlServer.Test.SMO.RegressionTests
         }
 
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         /// <summary>
         /// Regression test for https://github.com/microsoft/sqlmanagementobjects/issues/123
         /// </summary>

@@ -31,14 +31,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// Tests that are currently in staging - they will not be ran as part of "official" test runs
         ///  until they've been validated as being stable
         /// </summary>
-        Staging
+        Staging,
+        /// <summary>
+        /// For tests that cover legacy functionality to skip during most runs
+        /// </summary>
+        Legacy
     }
 
     /// <summary>
     /// Helper attribute to mark test methods with different test categories which can be used to selectively
     /// group and run tests. 
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class SqlTestCategoryAttribute : TestCategoryBaseAttribute
     {
         private IList<SqlTestCategory> _categories;

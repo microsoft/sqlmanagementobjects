@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
     /// </summary>
     [TestClass]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
-    [UnsupportedFeature(SqlFeature.NoDropCreate)]
+    [UnsupportedFeature(SqlFeature.Fabric)]
     public class DifferencingTests : SmoTestBase
     {
         [TestMethod]

@@ -3139,6 +3139,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         [TsqlSyntaxString("EXTGOV_OPERATION_GROUP")]
         ExternalGovernanceOperationGroup,
+        /// <summary>
+        /// INFORMATION_PROTECTION_OPERATION_GROUP
+        /// </summary>
+        [TsqlSyntaxString("INFORMATION_PROTECTION_OPERATION_GROUP")]
+        InformationProtectionOperationGroup,
     }
 
     /// <summary>

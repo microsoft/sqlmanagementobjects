@@ -121,8 +121,8 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             // tell the server object to initialize the Database with some expensive properties in one query
             // these are "least common denominator" since we don't know the edition of the db
             var initFields = Server.GetDefaultInitFields(typeof(Smo.Database), smoServer.DatabaseEngineEdition);
-            initFields.AddRange(new string[] { "CompatibilityLevel", "IsMirroringEnabled", "Collation" });
-            smoServer.SetDefaultInitFields(typeof(Smo.Database), initFields); 
+            initFields.AddRange(new string[] { "CompatibilityLevel", "IsMirroringEnabled", "Collation", nameof(Database.AnsiPaddingEnabled), "DefaultSchema" });
+            smoServer.SetDefaultInitFields(typeof(Smo.Database), initFields);
         }
         #endregion
 

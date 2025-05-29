@@ -82,6 +82,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [VSTest.TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
         [SqlTestArea(SqlTestArea.Polybase)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyPositiveExternalDataSourceCreateAlterDropGQ()
         {
             this.ExecuteWithDbDrop("ExternalDataSourceSmo_",
@@ -641,6 +642,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [VSTest.TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
         [SqlTestArea(SqlTestArea.Polybase)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void VerifyNegativeExternalDataSourceCreateAlterDropGQ()
         {
             string[] externalDataSourceLocations = { "abc.xyz.com" };

@@ -649,21 +649,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 bool fAnsiNullsExists = false;
-                bool ansiPaddingStatus = false;
-
-                if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
-                {
-                    // save server settings first
-                    Server svr = (Server)GetServerObject();
-                    ansiPaddingStatus = svr.UserOptions.AnsiPadding;
-                }
+                bool ansiPaddingStatus = true;
 
                 // If parent database exists then take the setting from it.
-                // AnsiPadding is supported in 7.0, but the DatabaseOption for it is not supported
-                // in 7.0. It is because DATABASEPROPERTYEX cannot be applied to AnsiPaddingEnabled in 7.0.
-                if (Parent.State == SqlSmoState.Existing && ServerVersion.Major > 7)
+                if (Parent.State == SqlSmoState.Existing)
                 {
-                    ansiPaddingStatus = this.Parent.DatabaseOptions.AnsiPaddingEnabled;
+                    ansiPaddingStatus = this.Parent.AnsiPaddingEnabled;
                 }
 
                 bool bConsiderAnsiQI = (((int)SqlServerVersion.Version80 <= (int)sp.TargetServerVersion) &&
@@ -956,11 +947,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (!isMemoryOptimized && sp.IncludeScripts.Owner)
                 {
                     ScriptOwner(scqueries, sp);
-                }
-
-                if (IsSupportedProperty("RemoteDataArchiveEnabled", sp))
-                {
-                    ScriptRemoteDataArchive(scqueries, sp);
                 }
 
                 // Add scripts for classified columns
@@ -3477,11 +3463,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 ScriptOwner(alterQuery, sp);
             }
 
-            if (IsSupportedProperty("RemoteDataArchiveEnabled", sp))
-            {
-                ScriptRemoteDataArchive(alterQuery, sp);
-            }
-
             alterQuery.Add(ScriptDataRetention(sp).ToString());
         }
 
@@ -4001,7 +3982,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 indexPropagationList = null;
                 embeddedForeignKeyChecksList = null;
                 // During discovery the Indexes collection is expanded so let's optimize it
-                if (State == SqlSmoState.Existing)
+                if (State == SqlSmoState.Existing && !Indexes.initialized)
                 {
                     InitChildLevel(nameof(Index), new ScriptingPreferences(this), true);
                 }
@@ -4129,53 +4110,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Get remote table migration statistics. Null if Remote Data Archive is not enabled for table or the remote table provisioning is not complete
         /// </summary>
         /// <returns>Table Migration statistics if Remote Data Archive is enabled and the remote table is provisioned, else null</returns>
-        public RemoteTableMigrationStatistics GetRemoteTableMigrationStatistics()
-        {
-            try
-            {
-                CheckObjectState();
-                ThrowIfPropertyNotSupported("RemoteDataArchiveEnabled");
-
-                if (this.RemoteDataArchiveEnabled && this.RemoteTableProvisioned)
-                {
-
-                    StringCollection queries = new StringCollection();
-
-                    if (this.DatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
-                    {
-                        queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(this.Parent.Name)));
-                    }
-                    queries.Add(string.Format(CultureInfo.InvariantCulture, @"exec sp_spaceused @objname = N'[{0}].[{1}]', @mode = 'REMOTE_ONLY', @oneresultset = 1", Urn.EscapeString(this.Schema), Urn.EscapeString(this.Name)));
-
-                    DataSet ds = this.ExecutionManager.ExecuteWithResults(queries);
-                    double remoteTableSize = 0;
-                    long rowCount = 0;
-                    if (ds != null && ds.Tables != null && ds.Tables.Count > 0 && ds.Tables[0].Rows != null && ds.Tables[0].Rows.Count > 0)
-                    {
-                        string rowCountString = ds.Tables[0].Rows[0]["rows"].ToString();
-                        rowCount = Int64.Parse(rowCountString.Trim());
-
-                        string table_size = ds.Tables[0].Rows[0]["data"].ToString();
-                        if (table_size.ToUpperInvariant().IndexOf("KB") > -1)
-                        {
-                            string sizeInKB = table_size.Substring(0, table_size.ToUpperInvariant().IndexOf("KB"));
-                            remoteTableSize = Double.Parse(sizeInKB.Trim());
-                        }
-                    }
-                    return new RemoteTableMigrationStatistics(remoteTableSize, rowCount);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception e)
-            {
-                FilterException(e);
-
-                throw new FailedOperationException(ExceptionTemplates.GetRemoteTableMigrationStatistics, this, e);
-            }
-        }
+        public RemoteTableMigrationStatistics GetRemoteTableMigrationStatistics() => null;
+        
 
         /// <summary>
         /// Generate Data Retention clause.
@@ -4569,17 +4505,17 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         internal static string[] GetScriptFields2(Type parentType, Cmn.ServerVersion version, Cmn.DatabaseEngineType databaseEngineType, Cmn.DatabaseEngineEdition databaseEngineEdition, bool defaultTextMode, ScriptingPreferences sp)
         {
-            if ((version.Major > 9)
-                && (sp.TargetServerVersion > SqlServerVersion.Version90)
-                && (sp.Storage.DataCompression))
-            {
-                return new string[] { "HasCompressedPartitions" };
-            }
-            else if((version.Major >= 16)
+            if ((version.Major >= 16)
                 && (sp.TargetServerVersion >= SqlServerVersion.Version160)
                 && (sp.Storage.XmlCompression))
             {
-                return new string[] { "HasCompressedPartitions", "HasXmlCompressedPartitions"};
+                return new string[] { nameof(HasCompressedPartitions), nameof(HasXmlCompressedPartitions) };
+            }
+            else if ((version.Major > 9)
+                && (sp.TargetServerVersion > SqlServerVersion.Version90)
+                && (sp.Storage.DataCompression))
+            {
+                return new string[] { nameof(HasCompressedPartitions) };
             }
             else
             {
@@ -4622,7 +4558,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             if ((sp.ForDirectExecution || !sp.OldOptions.NoVardecimal) &&
-                this.Parent.IsVarDecimalStorageFormatSupported)
+                IsSupportedProperty(nameof(this.IsVarDecimalStorageFormatEnabled), sp))
             {
                 Property enableVarDecimal = Properties.Get("IsVarDecimalStorageFormatEnabled");
 
@@ -4931,76 +4867,6 @@ namespace Microsoft.SqlServer.Management.Smo
                         Util.EscapeString(this.m_systemTimePeriodInfo.m_StartColumnName, ']'),
                         Util.EscapeString(this.m_systemTimePeriodInfo.m_EndColumnName, ']')));
                 }
-            }
-        }
-
-        /// <summary>
-        /// Adds the appropriate ALTER TABLE ... statements to the StringCollection based on
-        /// the current state of Remote Data Archive Migration on the table.
-        /// </summary>
-        /// <param name="queries">The collection of statements to add to</param>
-        /// <param name="sp">The settings for generating the scripts</param>
-        private void ScriptRemoteDataArchive(StringCollection queries, ScriptingPreferences sp)
-        {
-            // Caller already checked RemoteDataArchiveEnabled is valid for sp
-
-            Property propRemoteDataArchiveEnabled = this.Properties.Get("RemoteDataArchiveEnabled");
-
-            bool remoteDataArchiveEnabled = false;
-            StringBuilder sbStatement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            if (!propRemoteDataArchiveEnabled.IsNull)
-            {
-                remoteDataArchiveEnabled = (bool)propRemoteDataArchiveEnabled.Value;
-
-                Property propRemoteDataArchiveMigrationState = this.Properties.Get("RemoteDataArchiveDataMigrationState");
-                Property propRemoteDataArchiveFilterPredicate = this.Properties.Get("RemoteDataArchiveFilterPredicate");
-
-                //While creating or scripting, script remote data archive only when it is enabled. (default is disabled so no reason to script it in that case)
-                if (((propRemoteDataArchiveEnabled.Dirty || propRemoteDataArchiveMigrationState.Dirty || propRemoteDataArchiveFilterPredicate.Dirty) && sp.ScriptForAlter) ||
-                    (remoteDataArchiveEnabled && !sp.ScriptForAlter))
-                {
-                    sbStatement.AppendFormat(SmoApplication.DefaultCulture, Globals.LParen);
-
-                    RemoteDataArchiveMigrationState currentMigrationState = (RemoteDataArchiveMigrationState)propRemoteDataArchiveMigrationState.Value;
-                    string migrationState;
-                    switch (currentMigrationState)
-                    {
-                        case RemoteDataArchiveMigrationState.PausedInbound:
-                        case RemoteDataArchiveMigrationState.PausedOutbound:
-                            migrationState = "PAUSED";
-                            break;
-                        case RemoteDataArchiveMigrationState.Outbound:
-                            migrationState = "OUTBOUND";
-                            break;
-                        case RemoteDataArchiveMigrationState.Inbound:
-                            migrationState = "INBOUND";
-                            break;
-                        default:
-                            migrationState = "PAUSED";
-                            break;
-                    }
-                    sbStatement.AppendFormat(SmoApplication.DefaultCulture, "MIGRATION_STATE = {0}", migrationState);
-                    if (!propRemoteDataArchiveFilterPredicate.IsNull)
-                    {
-                        if (currentMigrationState == RemoteDataArchiveMigrationState.Outbound || currentMigrationState == RemoteDataArchiveMigrationState.PausedOutbound)
-                        {
-                            string filterPredicate = (string)propRemoteDataArchiveFilterPredicate.Value;
-                            if (!string.IsNullOrEmpty(filterPredicate))
-                            {
-                                sbStatement.AppendFormat(SmoApplication.DefaultCulture, ", FILTER_PREDICATE = {0}", filterPredicate);
-                            }
-                        }
-                    }
-                    sbStatement.AppendFormat(SmoApplication.DefaultCulture, Globals.RParen);
-                }
-            }
-
-            if (sbStatement.Length > 0)
-            {
-                // ALTER TABLE statement is added only if any of the properties is changed
-                queries.Add(string.Format(SmoApplication.DefaultCulture,
-                    "ALTER TABLE {0} {1}(REMOTE_DATA_ARCHIVE = {2} {3})", this.FormatFullNameForScripting(sp),
-                    Scripts.SET, remoteDataArchiveEnabled ? Globals.On : Scripts.OFF_WITHOUT_DATA_RECOVERY, sbStatement.ToString()));
             }
         }
 

@@ -28,9 +28,6 @@
           fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#'
           left_join='#external_data AS edt'>edt.object_id = tbl.object_id</property_link>
     </version>
-    <version min_major='13'>
-      <property_link fields='#RemoteTableName#RemoteDataArchiveDataMigrationState#RemoteTableProvisioned#RemoteDataArchiveFilterPredicate#' left_join="#tmp_extended_remote_data_archive_tables AS rdat">rdat.object_id = tbl.object_id</property_link>
-    </version>
     <version datawarehouse_enabled='true'>
       <property_link fields='#RejectedRowLocation#' left_join="sys.external_tables as et">et.object_id = tbl.object_id</property_link>
       <property_link fields='#DwTableDistribution#' left_join="sys.pdw_table_distribution_properties as tdp">tdp.object_id = tbl.object_id</property_link>
@@ -46,11 +43,11 @@
     <!-- Change Tracking Properties for Table info is available in sys.change_tracking_tables-->
     <version min_major='10' cloud_min_major='12'>
       <property_link fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'
-        left_join="sys.change_tracking_tables AS ctt">ctt.object_id = tbl.object_id </property_link>
+        left_join="#change_tracking_tables AS ctt">ctt.object_id = tbl.object_id </property_link>
     </version>
     <version min_major='11'>
       <property_link fields = 'FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'
-        left_join='sys.filetables AS ft'>ft.object_id = tbl.object_id</property_link>
+        left_join='#file_tables AS ft'>ft.object_id = tbl.object_id</property_link>
     </version>
     <version min_major='15'>
       <property_link fields='#DataRetentionPeriod#DataRetentionPeriodUnit#DataRetentionEnabled#DataRetentionFilterColumnName#'
@@ -61,6 +58,26 @@
     <version min_major='16' cloud_min_major='12'>
       <property_link fields='#LedgerViewName#LedgerViewSchema#' left_join="#tmp_ledger_details AS ledgertbl">ledgertbl.table_object_id = tbl.object_id</property_link>
       <property_link fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#' left_join="#tmp_ledger_view_column_names AS ledgerviewcoltbl">ledgerviewcoltbl.table_object_id = tbl.object_id</property_link>
+    </version>
+    <version min_major='10' cloud_min_major='12'>
+        <prefix fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'>
+            create table #change_tracking_tables
+            (object_id int null, is_track_columns_updated_on bit null)
+            insert into #change_tracking_tables
+            select t.object_id, c.is_track_columns_updated_on
+            from sys.tables t
+            inner join sys.change_tracking_tables as c on c.object_id = t.object_id
+        </prefix>
+    </version>
+    <version min_major="11">
+        <prefix fields='FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'>
+            CREATE TABLE #file_tables
+            (object_id int not null, is_enabled bit null, directory_name nvarchar(256) null, filename_collation_name nvarchar(129) null)
+            insert into #file_tables
+            select t.object_id, f.is_enabled, f.directory_name, f.filename_collation_name
+            from sys.tables as t
+            inner join sys.filetables as f on t.object_id = f.object_id
+        </prefix>
     </version>
     <version min_major='16' cloud_min_major='12'>
       <prefix fields="#LedgerViewName#LedgerViewSchema#">
@@ -123,41 +140,6 @@
         where col.is_data_deletion_filter_column = 1'
       </prefix>
     </version>
-    <version min_major='13'>
-      <!-- We created this temp table to make Stretch related properties backward compatible. -->
-      <prefix fields='#RemoteTableName#RemoteDataArchiveDataMigrationState#RemoteTableProvisioned#RemoteDataArchiveFilterPredicate#'>
-        CREATE TABLE #tmp_extended_remote_data_archive_tables
-        (object_id int not null, remote_table_name nvarchar(128) null, filter_predicate nvarchar(max) null, migration_state tinyint null)
-
-        IF EXISTS(SELECT 1 FROM master.sys.syscolumns WHERE Name = N'remote_data_archive_migration_state' AND ID = Object_ID(N'sys.tables'))
-        EXECUTE(N'INSERT INTO #tmp_extended_remote_data_archive_tables SELECT rdat.object_id, rdat.remote_table_name,
-        SUBSTRING(rdat.filter_predicate, 2, LEN(rdat.filter_predicate) - 2) as filter_predicate,
-        CASE
-        WHEN tbl.remote_data_archive_migration_state_desc = N''PAUSED'' THEN 1
-        WHEN tbl.remote_data_archive_migration_state_desc = N''OUTBOUND'' THEN 3
-        WHEN tbl.remote_data_archive_migration_state_desc = N''INBOUND'' THEN 4
-        WHEN tbl.remote_data_archive_migration_state_desc = N''DISABLED'' THEN 0
-        ELSE 0
-        END AS migration_state
-        FROM sys.tables tbl LEFT JOIN sys.remote_data_archive_tables rdat ON rdat.object_id = tbl.object_id
-        WHERE rdat.object_id IS NOT NULL')
-        ELSE
-        EXECUTE(N'INSERT INTO #tmp_extended_remote_data_archive_tables SELECT rdat.object_id, rdat.remote_table_name,
-        SUBSTRING(rdat.filter_predicate, 2, LEN(rdat.filter_predicate) - 2) as filter_predicate,
-        CASE
-        WHEN rdat.is_migration_paused = 1 AND rdat.migration_direction_desc = N''OUTBOUND'' THEN 1
-        WHEN rdat.is_migration_paused = 1 AND rdat.migration_direction_desc = N''INBOUND'' THEN 2
-        WHEN rdat.is_migration_paused = 0 AND rdat.migration_direction_desc = N''OUTBOUND'' THEN 3
-        WHEN rdat.is_migration_paused = 0 AND rdat.migration_direction_desc = N''INBOUND'' THEN 4
-        ELSE 0
-        END AS migration_state
-        FROM sys.tables tbl LEFT JOIN sys.remote_data_archive_tables rdat ON rdat.object_id = tbl.object_id
-        WHERE rdat.object_id IS NOT NULL')
-      </prefix>
-      <postfix fields='#RemoteTableName#RemoteDataArchiveDataMigrationState#RemoteTableProvisioned#RemoteDataArchiveFilterPredicate#'>
-        DROP TABLE #tmp_extended_remote_data_archive_tables
-      </postfix>
-    </version>
     <!-- Since we have a postfix above, we can't introduce anymore prefix tags from here on in the file -->
     <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
       <postfix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
@@ -176,6 +158,16 @@
       <postfix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#'>
         DROP TABLE #tmp_ledger_view_column_names
       </postfix>
+    </version>
+    <version min_major='11'>
+        <postfix fields='FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'>
+            DROP TABLE #file_tables
+        </postfix>
+    </version>
+    <version min_major='10' cloud_min_major='12'>
+        <postfix fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'>
+            DROP TABLE #change_tracking_tables
+        </postfix>
     </version>
     <!--Hekaton memory usage properties have post processing calculations-->
     <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
@@ -514,13 +506,11 @@
     </version>
     <version min_major='13'>
       <!-- Halligan (Stretch DB) Properties -->
-      <property name="RemoteDataArchiveEnabled" type="bit" cast="true" read_only_after_creation="false">tbl.is_remote_data_archive_enabled</property>
-      <property name="RemoteDataArchiveDataMigrationState" type="tinyint" report_type="RemoteDataArchiveMigrationState" cast="true" read_only_after_creation="false">
-        ISNULL(rdat.migration_state, 0)
-      </property>
-      <property name="RemoteDataArchiveFilterPredicate" type="varchar" size="4000" cast="true" read_only_after_creation="false">rdat.filter_predicate</property>
-      <property name="RemoteTableName" type="sysname" cast="true" read_only_after_creation="true">rdat.remote_table_name</property>
-      <property name="RemoteTableProvisioned" type="bit" cast="true" read_only_after_creation="true">CASE WHEN rdat.remote_table_name IS NULL THEN 0 ELSE 1 END</property>
+      <property name="RemoteDataArchiveEnabled" type="bit" cast="true" read_only_after_creation="false">0</property>
+      <property name="RemoteDataArchiveDataMigrationState" type="tinyint" report_type="RemoteDataArchiveMigrationState" cast="true" read_only_after_creation="false">0</property>
+      <property name="RemoteDataArchiveFilterPredicate" type="varchar" size="4000" cast="true" read_only_after_creation="false">''</property>
+      <property name="RemoteTableName" type="sysname" cast="true" read_only_after_creation="true">N''</property>
+      <property name="RemoteTableProvisioned" type="bit" cast="true" read_only_after_creation="true">0</property>
     </version>
 
     <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>

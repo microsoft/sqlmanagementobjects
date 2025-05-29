@@ -69,7 +69,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                     // 12 is the Fabric Native edition. We can't use TSQL to drop or create the database.
                     if (realEdition == 12)
                     {
-                        descriptor.EnabledFeatures = new[] { SqlFeature.NoDropCreate };
+                        // For Fabric database, when connection string is specified, database shouldn't be dropped.
+                        descriptor.EnabledFeatures = new[] { SqlFeature.Fabric, SqlFeature.NoDropCreate};
                     }
                     else
                     {

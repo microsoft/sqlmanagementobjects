@@ -14,7 +14,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
     /// Test suite for testing ColumnMasterKey properties and scripting
     /// </summary>
     [TestClass]
-    [UnsupportedFeature(SqlFeature.NoDropCreate)]
+    [UnsupportedFeature(SqlFeature.Fabric)]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
     public class ColumnMasterKey_SmoTestSuite : SmoObjectTestBase
     {

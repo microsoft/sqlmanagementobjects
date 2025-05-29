@@ -155,6 +155,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestMethod]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_Drop_does_not_throw_when_Parent_is_user_database()
         {
             ExecuteWithDbDrop(db =>
@@ -221,7 +222,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestMethod]
         [TestCategory("Legacy")]    /* slow test, not for PR validation */
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_SpaceAvailable_Is_Zero_For_Hyperscale()
         {
             ExecuteTest(
@@ -244,7 +245,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestMethod]
         [TestCategory("Legacy")]    /* test prone to race condition (so it seems), not for PR validation */
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.Express)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)] // alter has to run on the master
+        [UnsupportedFeature(SqlFeature.Fabric)] // alter has to run on the master
         public void Database_enabling_encryption_creates_encryption_key()
         {
             ExecuteWithDbDrop(db =>
@@ -303,7 +304,7 @@ END");
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_miscellaneous_methods_produce_correct_sql()
         {
             ExecuteWithDbDrop(db =>
@@ -328,7 +329,6 @@ END");
                     Assert.That(commands, Has.Member($"UPDATE STATISTICS [dbo].{table.Name.SqlBracketQuoteString()}"), "UpdateIndexStatistics should include table t1");
                     Assert.That(commands, Has.Member($"UPDATE STATISTICS [dbo].{view.Name.SqlBracketQuoteString()}"), "UpdateIndexStatistics should include view v1");
                     PrefetchAllChildTypes(db);
-                    GetArchiveReports(db);
                     if (db.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase && db.DatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance)
                     {
                         CheckTablesDataOnlyAllRepairTypes(db);
@@ -341,7 +341,7 @@ END");
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)] // hyperscale doesn't support shrink
+        [UnsupportedFeature(SqlFeature.Fabric)] // hyperscale doesn't support shrink
         public void Database_shrink()
         {
             ExecuteFromDbPool((db) =>
@@ -469,23 +469,6 @@ end
                 Assert.That(() => db.PrefetchObjects(typeof(Table), (ScriptingOptions)null), Throws.InstanceOf<ArgumentNullException>(), "PrefetchObjects(Table, (ScriptingOptions)null)");
                 Assert.DoesNotThrow(db.PrefetchObjects, "PrefetchObjects()");
             });
-        }
-
-        private static void GetArchiveReports(_SMO.Database db)
-        {
-            if (db.IsSupportedProperty(nameof(db.RemoteDataArchiveEnabled)))
-            {
-
-                IEnumerable<RemoteDataArchiveMigrationStatusReport> statusReports = Enumerable.Empty<RemoteDataArchiveMigrationStatusReport>();
-                var commands = db.ExecutionManager.RecordQueryText(() => statusReports =
-                    db.GetRemoteDataArchiveMigrationStatusReports(
-                        DateTime.UtcNow.Subtract(TimeSpan.FromDays(1)), 2).ToList(), alsoExecute: true).Cast<string>();
-
-                Assert.That(statusReports, Is.Empty, "GetRemoteDataArchiveMigrationStatusReports should return empty list for non-archived DB");
-                var select = commands.Single(c => c.Contains("INNER JOIN"));
-                Assert.That(select, Contains.Substring("SELECT\nTOP (2) dbs.name as database_name,"), "GetRemoteDataArchiveMigrationStatusReports should select 2 rows");
-                Assert.That(select, Contains.Substring("FROM\nsys.dm_db_rda_migration_status rdams"), "GetRemoteDataArchiveMigrationStatusReports should query ys.dm_db_rda_migration_status");
-            }
         }
 
         private static void CheckTablesDataOnlyAllRepairTypes(_SMO.Database db)
@@ -656,7 +639,7 @@ end
 
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_transaction_counts()
         {
             ExecuteWithDbDrop((db) =>
@@ -678,8 +661,18 @@ end
         }
 
         [TestMethod]
+        [SqlRequiredFeature(SqlFeature.Fabric)]
+        public void Database_Fabric_CreateDrop()
+        {
+            ExecuteWithDbDrop((db) =>
+            {
+                Assert.That(db.IsFabricDatabase, Is.True, "IsFabricDatabase should be true");
+            });
+        }
+
+        [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabaseEdge)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_FullTextCatalogs()
         {
             ExecuteWithDbDrop((db) =>
@@ -793,7 +786,7 @@ end
         }
 
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_IsMember_returns_correct_value()
         {
             ExecuteFromDbPool(db =>
@@ -806,7 +799,7 @@ end
         [TestMethod]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 13)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_PlanGuide_methods()
         {
             ExecuteFromDbPool(db =>
@@ -942,7 +935,7 @@ end
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Script_HyperScale_DataBase()
         {
             string backupFile = null;
@@ -995,6 +988,11 @@ end
         {
             ExecuteFromDbPool(db =>
             {
+                if (db.CompatibilityLevel >= CompatibilityLevel.Version170)
+                {
+                    // needed to allow accelerated recovery to be disabled
+                    db.ExecuteNonQuery("ALTER DATABASE SCOPED CONFIGURATION SET OPTIMIZED_HALLOWEEN_PROTECTION = OFF");
+                }
                 db.AcceleratedRecoveryEnabled = true;
                 db.Alter();
                 db.Refresh();
@@ -1131,7 +1129,7 @@ end
 #if MICROSOFTDATA
         [TestMethod]
         [SupportedServerVersionRange(Edition=DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_enumerating_databases_does_not_login_to_each_database()
         {
             ExecuteTest(() =>

@@ -19,7 +19,7 @@ Sql2012;Sql2017;SQL2017Linux
 
      -->
 <ConnectionStrings>
-  <!-- AkvAccess specifies the Azure Key Vault where passwords for the connection strings are stored 
+  <!-- AkvAccess specifies the Azure Key Vault where passwords for the connection strings are stored and indirectly the Azure subscription that hosts the vault and Azure storage accounts.
       If AkvAccess is empty, secrets must be set as environment variables, or the passwords must be placed in plain text in this file directly as part of each connection string.
   -->
   <AkvAccess>
@@ -36,6 +36,17 @@ Sql2012;Sql2017;SQL2017Linux
   <VaultName></VaultName>
   </AkvAccess>
 
+    <Storage>
+        <!-- Contains the list of shares and blob containers where test files may be found -->
+        <Azure>
+            <!-- Container is the https path to a blob container/folder. Contents of containers are cached locally during test runs. -->
+            <Container></Container>
+        </Azure>
+        <Smb>
+            <!-- Share is the path to a file share. Contents of shares are not cached locally during test runs. -->
+            <Share></Share>
+        </Smb>
+    </Storage>
   <!-- If you don't have access to a SQL instance with the given platform and version/edition, remove the entry from the XML or 
   remove its name from the SqlTestTargetServersFilter parameter at test run time.
   Otherwise modify each connection string to use the appropriate server name, user name, and password.

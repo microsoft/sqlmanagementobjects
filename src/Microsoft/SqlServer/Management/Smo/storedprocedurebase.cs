@@ -392,8 +392,7 @@ namespace Microsoft.SqlServer.Management.Smo
             String sOwner = (String)this.Schema;
             ScriptInformativeHeaders(sp, sb);
 
-            object ansi, qi;
-            ScriptAnsiQI(this, sp, queries, sb, out ansi, out qi, skipSetOptions);
+            ScriptAnsiQI(this, sp, queries, sb, skipSetOptions);
 
             if (!sp.OldOptions.DdlHeaderOnly && !sp.OldOptions.DdlBodyOnly)
             {

@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Smo;
-
-using SMO = Microsoft.SqlServer.Management.Smo;
+using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 
 namespace Microsoft.SqlServer.Test.Manageability.Utils
 {
@@ -21,8 +21,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
     /// </summary>
     public static class TestServerPoolManager
     {
-        public const string DEFAULT_POOL_NAME = "DEFAULT";
-
         /// <summary>
         /// DB pools for tests to share and reuse. Note this is shared across all tests that inherit from this test base.
         /// Key - Pool Name
@@ -35,7 +33,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         private static IDictionary<string, IDictionary<string, Database>> DatabasePools =>
             databasePools ?? (databasePools = new Dictionary<string, IDictionary<string, Database>>());
 
-        private  static ConcurrentBag<Database> allDatabases = new ConcurrentBag<Database>();
+        private  static ConcurrentBag<(Database, IDatabaseHandler)> allDatabases = new ConcurrentBag<(Database, IDatabaseHandler)>();
         static TestServerPoolManager()
         {
             // Note we can't use the AssemblyCleanup attribute because that only runs on classes marked as
@@ -46,12 +44,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         }
 
         /// <summary>
-        /// Gets a database for the specified server from the specified pool
+        /// Gets a database for the specified test descriptor from the specified pool
         /// </summary>
         /// <param name="poolName">The name of the pool</param>
-        /// <param name="server">The server to get the database from</param>
+        /// <param name="databaseHandler">Handler to create database</param>
         /// <returns></returns>
-        public static Database GetDbFromPool(string poolName, SMO.Server server)
+        public static Database GetDbFromPool(string poolName, IDatabaseHandler databaseHandler)
+        {
+            var serverName = databaseHandler.TestDescriptor.Name;
+            return GetOrCreateDatabase(poolName, serverName, databaseHandler);
+        }
+
+        private static Database GetOrCreateDatabase(string poolName, string serverName, IDatabaseHandler handler)
         {
             if (!DatabasePools.ContainsKey(poolName))
             {
@@ -59,23 +63,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             }
 
             var pool = DatabasePools[poolName];
-            if (!pool.ContainsKey((server.Name)))
+            if (!pool.ContainsKey(serverName))
             {
-                pool[server.Name] = server.CreateDatabaseWithRetry();
-                allDatabases.Add(pool[server.Name]);
+                pool[serverName] = handler.HandleDatabaseCreation();
+                allDatabases.Add((pool[serverName], handler));
             }
 
-            return pool[server.Name];
-        }
-
-        /// <summary>
-        /// Gets a database for the specified server from the default pool
-        /// </summary>
-        /// <param name="server">The server to get the database for</param>
-        /// <returns></returns>
-        public static Database GetDbFromPool(SMO.Server server)
-        {
-            return GetDbFromPool(DEFAULT_POOL_NAME, server);
+            return pool[serverName];
         }
 
         /// <summary>
@@ -84,9 +78,17 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         private static void Cleanup()
         {
             // Clean up all the DBs in the pools
-            foreach(var database in allDatabases)
-            {
-                database.Parent.DropKillDatabaseNoThrow(database.Name);
+            foreach(var (database, handler) in allDatabases)
+            {   
+                try
+                {
+                    handler.HandleDatabaseDrop();
+                }
+                catch(Exception ex)
+                {
+                    // Log this but don't re-throw since we won't consider this a test failure
+                    Trace.TraceWarning($"Failed to drop database '{database.Name}' using handler '{handler.GetType().Name}': {ex.Message}");
+                }
             }
         }
     }

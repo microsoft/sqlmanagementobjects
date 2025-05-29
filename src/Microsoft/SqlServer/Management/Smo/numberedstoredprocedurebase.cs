@@ -8,7 +8,6 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
     [SfcElementType("Numbered")]
@@ -176,8 +175,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder();
             ScriptInformativeHeaders(sp, sb);
 
-            object ansi, qi;
-            ScriptAnsiQI(this.Parent, sp, queries, sb, out ansi, out qi);
+            ScriptAnsiQI(this.Parent, sp, queries, sb);
 
             if (!sp.OldOptions.DdlHeaderOnly && !sp.OldOptions.DdlBodyOnly)
             {
@@ -361,7 +359,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {

@@ -67,7 +67,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoDatabase_TemporalRetentionProperty_AzureSterlingV12()
         {
             this.ExecuteWithDbDrop(
@@ -210,6 +210,9 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// still in the Creating state
         /// </summary>
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+
         public void SmoDatabase_Verify_Properties_When_Creating()
         {
             this.ExecuteTest(
@@ -247,7 +250,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Trying_To_Access_AzureDB_With_DBManager_Role_Only_Does_Not_Throw()
         {
             // We use the ExecuteWithMasterDb() overload to get back "master", so we can create a "low-privileged" login/user
@@ -402,7 +405,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests altering a database through SMO for all server versions
         /// </summary>
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoDatabaseScriptAlter_AllServers()
         {
             this.ExecuteWithDbDrop(
@@ -550,7 +553,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
             Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void CatalogCollation_IsScriptedCorrectly()
         {
             this.ExecuteTest(server => TestCatalogCollationType(server, CatalogCollationType.DatabaseDefault));
@@ -1171,7 +1174,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_CanChangeOwner()
         {
             this.ExecuteWithDbDrop(
@@ -1208,7 +1211,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_CanChangeOwner_WithExistingUser()
         {
             this.ExecuteWithDbDrop(
@@ -1245,7 +1248,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_ChangeOwnerWithExistingUserAndNoOverride_ThrowsException()
         {
             this.ExecuteWithDbDrop(
@@ -1285,7 +1288,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_DBComparerTest()
         {
             this.ExecuteTest(
@@ -1336,7 +1339,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(MinMajor = 14, DatabaseEngineType = DatabaseEngineType.Standalone)]
         //[SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.Express)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_CheckTables_sets_LastGoodDbCheckTime()
         {
             ExecuteWithDbDrop((db) =>
@@ -1367,7 +1370,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_Rename_Does_Not_Break_Functionality()
         {
             ExecuteWithDbDrop((db) =>
@@ -1475,7 +1478,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_IsLedger_On()
         {
             this.ExecuteTest(
@@ -1512,7 +1515,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_IsLedger_OFF()
         {
             this.ExecuteTest(

@@ -127,7 +127,7 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
         }
 
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         [SqlTestArea(SqlTestArea.ExtendedEvents)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [DataRow("Latin1_General_100_CI_AS", CatalogCollationType.SQLLatin1GeneralCP1CIAS)]

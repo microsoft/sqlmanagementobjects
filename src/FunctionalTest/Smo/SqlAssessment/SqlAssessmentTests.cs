@@ -137,7 +137,7 @@ namespace Microsoft.SqlServer.Test.SMO.SqlAssessment
         /// </summary>
         [SqlTestCategory(SqlTestCategory.NoRegression)]
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_TestGetAssessmentResults()
         {
             ExecuteTest(testMethod: (Microsoft.SqlServer.Management.Smo.Server targetServer) =>

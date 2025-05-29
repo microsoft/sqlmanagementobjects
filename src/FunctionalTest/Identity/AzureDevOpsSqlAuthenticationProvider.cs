@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +54,7 @@ namespace Microsoft.SqlServer.ADO.Identity
             {
                 return new ManagedIdentityCredential(userId);
             }
-            ClientCertificateCredential clientCertificateCredential = null;
+            var credentials = new List<TokenCredential>();
             // if password is provided, assume it's a cert thumbprint
             if (!string.IsNullOrEmpty(password))
             {
@@ -62,7 +62,7 @@ namespace Microsoft.SqlServer.ADO.Identity
                 if (certificate != null)
                 {
                     Trace.TraceInformation($"Adding ClientCertificateCredential for thumbprint {password.Substring(0, 10)}");
-                    clientCertificateCredential = new ClientCertificateCredential(tenantId, userId, certificate);
+                    credentials.Add(new ClientCertificateCredential(tenantId, userId, certificate));
                 }
             }
             // if using ActiveDirectoryDefault, the AZURE_CLIENT_ID variable has to be set to use service principal authentication in Azure devops
@@ -71,9 +71,11 @@ namespace Microsoft.SqlServer.ADO.Identity
             {
                 options.ClientId = userId;
             }
-            var adoCredential = new AzureDevOpsFederatedTokenCredential(options);
-            var credential =  clientCertificateCredential == null ? (TokenCredential)adoCredential : new ChainedTokenCredential(clientCertificateCredential, adoCredential);
-            Trace.TraceInformation($"Adding AzureDevOpsFederatedTokenCredential for client id {options.ClientId ?? "<NULL>"}");
+            if (options.ServiceConnectionId != null)
+            {
+                credentials.Add(new AzurePipelinesCredential(options.TenantId, options.ClientId, options.ServiceConnectionId, options.SystemAccessToken));
+                Trace.TraceInformation($"Adding AzurePipelinesCredential for client id {options.ClientId ?? "<NULL>"}");
+            }
             if (authenticationMethod == SqlAuthenticationMethod.ActiveDirectoryDefault)
             {
                 Trace.TraceInformation($"Adding DefaultAzureCredential for tenant {tenantId}");
@@ -84,9 +86,14 @@ namespace Microsoft.SqlServer.ADO.Identity
                     userId = Environment.GetEnvironmentVariable("AZURE_IDENTITY_CLIENT_ID");
                 }
                 Trace.TraceInformation($"Adding ManagedIdentityCredential for client {userId ?? "<NULL>"}");
-                credential = new ChainedTokenCredential(new ManagedIdentityCredential(userId), new DefaultAzureCredential(defOptions), credential);
+                if (options.ServiceConnectionId == null)
+                {
+                    credentials.Insert(0, new ManagedIdentityCredential(userId));
+                }
+                credentials.Insert(0, new DefaultAzureCredential(defOptions));
+                return new ChainedTokenCredential(credentials.ToArray());
             }
-            return credential;
+            return credentials.Any() ? (TokenCredential)new ChainedTokenCredential(credentials.ToArray()) : new EnvironmentCredential();
         }
 
         private static X509Certificate2 FindCertificate(string thumbprint)
@@ -129,7 +136,7 @@ namespace Microsoft.SqlServer.ADO.Identity
         private class TokenData
         {
             public TokenCredential Credential { get; }
-            public AccessToken AccessToken { get; private set; } 
+            public AccessToken AccessToken { get; private set; }
                 = new AccessToken(string.Empty, DateTimeOffset.MinValue.AddMinutes(5)); // 5 minutes padding for expiration check
             private object SyncObj { get; } = new object();
             public TokenData(TokenCredential credential)

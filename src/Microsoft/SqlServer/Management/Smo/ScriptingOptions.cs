@@ -129,6 +129,11 @@ namespace Microsoft.SqlServer.Management.Smo
         [DisplayNameKey("ServerSQLv170")]
         Version170 = 11,
         // VBUMP
+        [DisplayNameKey("ServerSQLv170")]
+        VersionLatest = Version170,
+        [DisplayNameKey("ServerSQL15")]
+        // Set this to the oldest SQL Server version still under extended support
+        VersionOldestSupported = Version130
     }
 
     public static class TypeConverters

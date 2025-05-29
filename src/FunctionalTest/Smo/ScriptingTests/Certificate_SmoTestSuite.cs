@@ -50,6 +50,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests creating a certificate using ... FROM BINARY = 0x.... syntax
         /// </summary>
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void CreateCertificateFromBinary()
         {
             this.ExecuteWithDbDrop(

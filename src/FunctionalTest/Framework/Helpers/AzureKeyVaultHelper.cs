@@ -3,12 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security;
-using System.Security.Cryptography.X509Certificates;
 using Azure.Identity;
-using Azure.ResourceManager;
-using Azure.ResourceManager.Storage;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.SqlServer.ADO.Identity;
 namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
@@ -16,14 +12,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
     /// <summary>
     /// Retrieves a decrypted secret from Azure Key Vault or environment using certificate auth or client secret or managed identity
     /// </summary>
-    public class AzureKeyVaultHelper
+    public class AzureKeyVaultHelper : ICredential
     {
-        /// <summary>
-        /// The set of certificate thumbprints associated with the service principal.
-        /// If this collection is non-empty, AzureApplicationId and AzureTenantId must also be set to valid values.
-        /// Set these properties to use certificate-based authentication without relying on environment variables to specify the certificate.
-        /// </summary>
-        public IEnumerable<string> CertificateThumbprints { get; set; }
         /// <summary>
         /// The Azure application id associated with the service principal
         /// </summary>
@@ -39,14 +29,17 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <summary>
         /// The name of the Azure key vault where test secrets are stored.
         /// </summary>
-        public string KeyVaultName { get; private set; }
-        
-        private static readonly IDictionary<string,SecureString> secretCache = new Dictionary<string, SecureString>();
+        public string KeyVaultName { get; set; }
+
+        /// <summary>
+        /// The AzureStorageHelper instance used to access the storage account
+        /// </summary>
+        public AzureStorageHelper StorageHelper { get; set; }
+        private static readonly IDictionary<string, SecureString> secretCache = new Dictionary<string, SecureString>();
         private static readonly object syncObj = new object();
         public static readonly string SSMS_TEST_SECRET_PREFIX = "SQLA-SSMS-Test-";
 
         private SecretClient secretClient = null;
-        private ArmClient armClient = null;
 
         /// <summary>
         /// Constructs a new AzureKeyVaultHelper that relies on an instance of Azure.Identity.DefaultAzureCredential to access the given vault.
@@ -56,7 +49,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         {
             
             KeyVaultName = keyVaultName;
-            CertificateThumbprints = Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -101,7 +93,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                     Console.WriteLine(@"Got Exception fetching secret. Type:{0}, Inner:{1}, Outer:{2}", e.GetType(), e.InnerException, e);
                     throw;
                 }
-                // Note we aren't bothering to cache secrets we found from GetEnvironmentVariable since that API is already fast                
+                // Note we aren't bothering to cache secrets we found from GetEnvironmentVariable since that API is already fast
                 lock (syncObj)
                 {
                     secretCache[secretName] = secret.StringToSecureString();
@@ -110,71 +102,38 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             return secret;
         }
 
-        private Azure.Core.TokenCredential GetCredential()
+        /// <summary>
+        /// Returns a TokenCredential that implements Managed Identity, DefaultAzureCredential, and AzurePipelinesCredential in that order.
+        /// </summary>
+        /// <returns></returns>
+        public Azure.Core.TokenCredential GetCredential()
         {
+            TraceHelper.TraceInformation($"Getting credential for Azure in tenant {AzureTenantId}");
             // prefer managed identity then local user on dev machine over the certificate
             var credentials = new List<Azure.Core.TokenCredential>() { new ManagedIdentityCredential(AzureManagedIdentityClientId), new DefaultAzureCredential(new DefaultAzureCredentialOptions { ExcludeManagedIdentityCredential = true, TenantId = AzureTenantId }) };
-            foreach (var thumbprint in CertificateThumbprints ?? Enumerable.Empty<string>())
+            var options = new AzureDevOpsFederatedTokenCredentialOptions() { TenantId = AzureTenantId, ClientId = AzureApplicationId };
+            if (options.ServiceConnectionId != null)
             {
-                var certificate = FindCertificate(thumbprint);
-                if (certificate != null)
-                {
-                    credentials.Add(new ClientCertificateCredential(AzureTenantId, AzureApplicationId, certificate));
-                }
+                TraceHelper.TraceInformation($"Adding AzurePipelinesCredential for tenant id {options.TenantId} using service connection {options.ServiceConnectionId}");
+                credentials.Insert(0, new AzurePipelinesCredential(options.TenantId, options.ClientId, options.ServiceConnectionId, options.SystemAccessToken));
             }
-            credentials.Add(new AzureDevOpsFederatedTokenCredential(new AzureDevOpsFederatedTokenCredentialOptions() { TenantId = AzureTenantId, ClientId = AzureApplicationId }));
             return new ChainedTokenCredential(credentials.ToArray());
         }
 
+        /// <summary>
+        /// Returns the account access key for the given storage account resource id.
+        /// </summary>
+        /// <param name="storageAccountResourceId"></param>
+        /// <returns></returns>
         public string GetStorageAccountAccessKey(string storageAccountResourceId)
         {
             TraceHelper.TraceInformation($"Fetching storage access key for {storageAccountResourceId}");
-            if (armClient == null)
-            {
-                armClient = new ArmClient(GetCredential());
-            }
-            var storageAccount = armClient.GetStorageAccountResource(new Azure.Core.ResourceIdentifier(storageAccountResourceId));
-            return storageAccount.GetKeys().First().Value;
+            return new AzureStorageHelper(storageAccountResourceId, this).GetStorageAccountAccessKey(storageAccountResourceId);
         }
+    }
 
-        private static X509Certificate2 FindCertificate(string thumbprint)
-        {
-            X509Certificate2 certificate = null;
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-            {
-                var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-                try
-                {
-                    store.Open(OpenFlags.ReadOnly);
-                    X509Certificate2Collection certificateCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, validOnly: false);
-                    if (certificateCollection.Count == 0)
-                    {
-                        TraceHelper.TraceInformation("Couldn't find Smo cert {0} in local machine. Looking in current user", thumbprint);
-                        var userStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-                        userStore.Open(OpenFlags.ReadOnly);
-                        try
-                        {
-                            certificateCollection = userStore.Certificates.Find(X509FindType.FindByThumbprint,
-                                thumbprint, validOnly: false);
-                        }
-                        finally
-                        {
-                            userStore.Close();
-                        }
-                    }
-                    if (certificateCollection.Count != 0)
-                    {
-                        TraceHelper.TraceInformation("Found cert {0}", thumbprint);
-                        certificate = certificateCollection[0];
-                    }
-                }
-                finally
-                {
-                    store.Close();
-                }
-            }
-            return certificate;
-        }
-        
+    public interface ICredential
+    {
+        Azure.Core.TokenCredential GetCredential();
     }
 }

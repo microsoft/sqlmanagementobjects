@@ -222,5 +222,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             return serverVersion >= minVersion && serverVersion <= maxVersion;
         }
 
+        public override bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName)
+        {
+            if(this.DatabaseEngineType != DatabaseEngineType.Unknown && this.DatabaseEngineType != serverDescriptor.DatabaseEngineType)
+            {
+                return false;
+            }
+
+            var serverVersion = new Version(serverDescriptor.MajorVersion, 0);
+            Version minVersion = new Version(MinMajor, MinMinor, MinBuild, MinRevision);
+            Version maxVersion = new Version(MaxMajor, MaxMinor, MaxBuild, MaxRevision);
+
+            return serverVersion >= minVersion && serverVersion <= maxVersion;
+        }
     }
 }

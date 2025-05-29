@@ -85,7 +85,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
 
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Server_DetachDatabase_and_AttachDatabase_error_handling()
         {
             ExecuteTest(() =>
@@ -112,7 +112,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
 
         [TestMethod]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void Server_EnumMembers_returns_valid_list()
         {
             ExecuteFromDbPool((db) =>
@@ -160,7 +160,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Express)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
-        [UnsupportedFeature(SqlFeature.NoDropCreate)] // Requires GetDatabaseConnection to return a new connection
+        [UnsupportedFeature(SqlFeature.Fabric)] // Requires GetDatabaseConnection to return a new connection
         public void Server_KillAllProcesses_succeeds()
         {
             ExecuteFromDbPool((db) =>

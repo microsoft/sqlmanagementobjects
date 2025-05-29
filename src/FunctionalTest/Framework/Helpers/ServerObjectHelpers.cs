@@ -31,7 +31,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
     /// </summary>
     public static class ServerObjectHelpers
     {
-        static readonly Semaphore azureDbCreateLock = new Semaphore(3, 3);
+        private static readonly Semaphore azureDbCreateLock = new Semaphore(3, 3);
 
         /// <summary>
         /// Restores a database from the specified backup file. It's the callers responsibility to ensure the server
@@ -41,37 +41,53 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         /// <param name="server"></param>
         /// <param name="dbBackupFile">Path of backup file for restoring database</param>
         /// <param name="dbName">Name of restored database</param>
+        /// <param name="azureStorageHelper"></param>
         /// <returns>Restored database</returns>
-        internal static Database RestoreDatabaseFromBackup(this SMO.Server server, string dbBackupFile, string dbName)
+        internal static Database RestoreDatabaseFromBackup(this SMO.Server server, string dbBackupFile, string dbName, AzureStorageHelper azureStorageHelper)
         {
-            // we may be using a file already on the server with a local path
-            if (!File.Exists(dbBackupFile))
+
+            var isUrl = dbBackupFile.StartsWith("http", StringComparison.OrdinalIgnoreCase);
+            if (isUrl && azureStorageHelper == null)
             {
-                Trace.TraceWarning("DB Backup File '{0}' is not visible to the test", dbBackupFile);
+                throw new ArgumentNullException("AzureStorageHelper is required to restore from a URL");
+            }
+            // Check if the backup file exists
+            if (!isUrl && !File.Exists(dbBackupFile))
+            {
+                Trace.TraceWarning($"DB Backup File '{dbBackupFile}' is not visible to the test");
             }
 
-            // Get the default location where we should place the restored data files
-            string dataFilePath = String.IsNullOrEmpty(server.Settings.DefaultFile) ? server.MasterDBPath : server.Settings.DefaultFile;
-            if (String.IsNullOrWhiteSpace(dataFilePath))
+            if (dbBackupFile.IsPackageFileName())
             {
-                // We failed to get the path
+                return RestoreDatabaseFromPackageFile(server, dbBackupFile, dbName, azureStorageHelper);
+            }
+
+            // Handle traditional backup files
+            var dataFilePath = string.IsNullOrEmpty(server.Settings.DefaultFile) ? server.MasterDBPath : server.Settings.DefaultFile;
+            if (string.IsNullOrWhiteSpace(dataFilePath))
+            {
                 throw new InvalidOperationException("Could not get database file path for restoring from backup");
             }
 
-            // Get the default location where we should place the restored log files
-            string logFilePath = String.IsNullOrEmpty(server.Settings.DefaultLog) ? server.MasterDBLogPath : server.Settings.DefaultLog;
-            if (String.IsNullOrWhiteSpace(logFilePath))
+            var logFilePath = string.IsNullOrEmpty(server.Settings.DefaultLog) ? server.MasterDBLogPath : server.Settings.DefaultLog;
+            if (string.IsNullOrWhiteSpace(logFilePath))
             {
-                // We failed to get the path
                 throw new InvalidOperationException("Could not get database log file path for restoring from backup");
             }
 
+            Credential azureCredential = null;
             var restore = new Restore
             {
                 Database = dbName,
-                Action = RestoreActionType.Database
+                Action = RestoreActionType.Database,
             };
-            restore.Devices.AddDevice(dbBackupFile, DeviceType.File);
+            if (isUrl)
+            {
+                azureCredential = azureStorageHelper.EnsureCredential(server);
+                restore.CredentialName = azureCredential.Name;
+                restore.BlockSize = 512;
+            }
+            restore.Devices.AddDevice(dbBackupFile, isUrl ? DeviceType.Url : DeviceType.File);
             DataTable dt = restore.ReadFileList(server);
 
             //The files need to be moved to avoid collisions
@@ -79,16 +95,90 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             foreach (DataRow row in dt.Rows)
             {
                 //Type == L means it's a log file so put it in the log file location, all others go to data file location
-                string filePath = "L".Equals(row["Type"] as string, StringComparison.OrdinalIgnoreCase)
+                var filePath = "L".Equals(row["Type"] as string, StringComparison.OrdinalIgnoreCase)
                     ? logFilePath
                     : dataFilePath;
                 //Unique filename so new files don't collide either
-                string fileName = dbName + "_" + index + Path.GetExtension(row["PhysicalName"] as string);
-                restore.RelocateFiles.Add(new RelocateFile(row["LogicalName"] as string, Path.Combine(filePath, fileName)));
+                var fileName = dbName + "_" + index + Path.GetExtension(row["PhysicalName"] as string);
+                _ = restore.RelocateFiles.Add(new RelocateFile(row["LogicalName"] as string, Path.Combine(filePath, fileName)));
                 ++index;
             }
-            TraceHelper.TraceInformation(String.Format("Restoring database '{0}' from backup file '{1}'", dbName, dbBackupFile));
-            restore.SqlRestore(server);
+
+            TraceHelper.TraceInformation($"Restoring database '{dbName}' from backup file '{dbBackupFile}'");
+            try
+            {
+                restore.SqlRestore(server);
+            }
+            finally
+            {
+                azureCredential?.Drop();
+            }
+
+            server.Databases.Refresh();
+            return server.Databases[dbName];
+        }
+
+        private static Database RestoreDatabaseFromPackageFile(SMO.Server server, string dbBackupFile, string dbName, AzureStorageHelper azureStorageHelper)
+        {
+            TraceHelper.TraceInformation($"Restoring database '{dbName}' from package file '{dbBackupFile}' using sqlpackage.exe with a response file");
+
+            // Construct the sqlpackage.exe command
+            var action = dbBackupFile.EndsWith(".bacpac", StringComparison.OrdinalIgnoreCase) ? "Import" : "Publish";
+            var connStr = new SqlConnectionStringBuilder(server.ConnectionContext.ConnectionString) { InitialCatalog = dbName };
+            var sqlPackagePath = "sqlpackage.exe"; // Ensure sqlpackage.exe is in the PATH
+            var isUrl = dbBackupFile.StartsWith("http", StringComparison.OrdinalIgnoreCase);
+            if (isUrl)
+            {
+                dbBackupFile = azureStorageHelper.DownloadBlob(dbBackupFile);
+            }
+            // Create a temporary response file
+            var responseFilePath = Path.GetTempFileName();
+            try
+            {
+                // Write parameters to the response file
+                File.WriteAllLines(responseFilePath, new[]
+                {
+                    $"/Action:{action}",
+                    $"/SourceFile:\"{dbBackupFile}\"",
+                    $"/TargetConnectionString:\"{connStr.ConnectionString}\""
+                });
+
+                // Execute the command with the response file
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = sqlPackagePath,
+                    Arguments = $"@\"{responseFilePath}\"",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(processStartInfo))
+                {
+                    if (process == null)
+                    {
+                        throw new InvalidOperationException("Failed to start sqlpackage.exe process.");
+                    }
+                    // For some reason, trying to read StandardOut from sqlpackage causes it to hang when there's an error.
+                    var error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        Trace.TraceError($"*** sqlpackage.exe failed with exit code {process.ExitCode}.{Environment.NewLine}\t{error}");
+                        throw new InvalidOperationException($"Failed to restore database from package file '{dbBackupFile}': {error}");
+                    }
+                }
+            }
+            finally
+            {
+                if (isUrl)
+                {
+                    File.Delete(dbBackupFile);
+                }
+                File.Delete(responseFilePath);
+            }
 
             server.Databases.Refresh();
             return server.Databases[dbName];
@@ -109,7 +199,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = String.Format(
+                    cmd.CommandText = string.Format(
                         CultureInfo.InvariantCulture,
                         "SELECT count(*) FROM sys.databases WHERE name = {0}",
                         SmoObjectHelpers.SqlSingleQuoteString(databaseName));
@@ -193,6 +283,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 // No valid backup file location so default to creating our own
                 switch (dbAzureDatabaseEdition)
                 {
+                    // VBUMP update compat level on Azure
                     // We set ReadOnly to make sure we exercise code paths in Database.ScriptCreate based
                     // on the property being non-null
                     case SqlTestBase.AzureDatabaseEdition.NotApplicable:
@@ -224,7 +315,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                 Collation = "SQL_Latin1_General_CP1_CS_AS",
                                 CatalogCollation = CatalogCollationType.DatabaseDefault,
                                 MaxSizeInBytes = 0,
-                                CompatibilityLevel = CompatibilityLevel.Version160,
+                                CompatibilityLevel = CompatibilityLevel.Version170,
                                 ReadOnly = false
                             };
                             break;
@@ -238,7 +329,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                             {
                                 AzureEdition = dbAzureDatabaseEdition.ToString(),
                                 MaxSizeInBytes = 1024.0 * 1024.0 * 1024.0,
-                                CompatibilityLevel = CompatibilityLevel.Version160,
+                                CompatibilityLevel = CompatibilityLevel.Version170,
                                 ReadOnly = false
                             };
                             //1GB
@@ -273,12 +364,31 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         /// <param name="dbNamePrefix">The prefix to give the database name</param>
         /// <param name="dbAzureDatabaseEdition">The Azure edition to use when creating an Azure database</param>
         /// <param name="dbBackupFile">If specified the database backup file to use to create the server</param>
+        /// <param name="useEscapedCharacters"></param>
         /// <returns>The Database object representing the database on the server</returns>
         public static Database CreateDatabaseWithRetry(
             this SMO.Server server,
             string dbNamePrefix = "",
             SqlTestBase.AzureDatabaseEdition dbAzureDatabaseEdition = SqlTestBase.AzureDatabaseEdition.NotApplicable,
-            string dbBackupFile = ""
+            string dbBackupFile = "",
+            bool useEscapedCharacters = true
+        ) => CreateDatabaseWithRetry(server, new DatabaseParameters
+        {
+            NamePrefix = dbNamePrefix,
+            AzureDatabaseEdition = dbAzureDatabaseEdition,
+            BackupFile = dbBackupFile,
+            UseEscapedCharacters = useEscapedCharacters
+        });
+
+        /// <summary>
+        /// Creates a database with the specified parameters on the specified server.
+        /// </summary>
+        /// <param name="server">The server to create the database on</param>
+        /// <param name="dbParameters"></param>
+        /// <returns>The Database object representing the database on the server</returns>
+        public static Database CreateDatabaseWithRetry(
+            this SMO.Server server,
+            DatabaseParameters dbParameters
         )
         {
             Database db = null;
@@ -286,11 +396,15 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             RetryHelper.RetryWhenExceptionThrown(
             () =>
             {
-                string databaseName = SmoObjectHelpers.GenerateUniqueObjectName(dbNamePrefix);
+                var databaseName = SmoObjectHelpers.GenerateUniqueObjectName(dbParameters.NamePrefix, 
+                    includeClosingBracket: dbParameters.UseEscapedCharacters, 
+                    includeDoubleClosingBracket: dbParameters.UseEscapedCharacters, 
+                    includeSingleQuote: dbParameters.UseEscapedCharacters, 
+                    includeDoubleSingleQuote: dbParameters.UseEscapedCharacters);
                 try
                 {
-
-                    if (string.IsNullOrEmpty(dbBackupFile))
+                    // Bacpac files have to be applied after the database is created
+                    if (string.IsNullOrEmpty(dbParameters.BackupFile) || dbParameters.BackupFile.IsPackageFileName())
                     {
                         if (server.DatabaseEngineType != DatabaseEngineType.SqlAzureDatabase)
                         {
@@ -301,21 +415,16 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
 
                             TraceHelper.TraceInformation("Creating new database '{0}' on server '{1}'", databaseName,
                                 server.Name);
-                            // No valid backup file location so default to creating our own
-                            switch (dbAzureDatabaseEdition)
+                            switch (dbParameters.AzureDatabaseEdition)
                             {
                                 // We set ReadOnly to make sure we exercise code paths in Database.ScriptCreate based
                                 // on the property being non-null
                                 case SqlTestBase.AzureDatabaseEdition.NotApplicable:
                                     {
-                                        if (server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
-                                        {
-                                            db = new Database(server, databaseName);
-                                        }
-                                        else
-                                        {
-                                            db = new Database(server, databaseName) { ReadOnly = false, CompatibilityLevel = CompatibilityLevel.Version160 };
-                                        }
+                                        // VBUMP
+                                        db = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand
+                                            ? new Database(server, databaseName)
+                                            : new Database(server, databaseName) { ReadOnly = false, CompatibilityLevel = CompatibilityLevel.Version170 };
                                         break;
                                     }
                                 case SqlTestBase.AzureDatabaseEdition.DataWarehouse:
@@ -323,13 +432,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                         db = new Database(server, databaseName,
                                             DatabaseEngineEdition.SqlDataWarehouse)
                                         {
-                                            AzureEdition = dbAzureDatabaseEdition.ToString(),
+                                            AzureEdition = dbParameters.AzureDatabaseEdition.ToString(),
                                             // newer regions don't support DW100c but dw1000c times out too often
                                             AzureServiceObjective = "DW100c",
                                             MaxSizeInBytes = 1024.0 * 1024.0 * 1024.0 * 500,
                                             ReadOnly = false
                                         };
-                                        //500GB
                                         break;
                                     }
                                 case SqlTestBase.AzureDatabaseEdition.Hyperscale:
@@ -337,7 +445,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                         db = new Database(server, databaseName,
                                             DatabaseEngineEdition.SqlDatabase)
                                         {
-                                            AzureEdition = dbAzureDatabaseEdition.ToString(),
+                                            AzureEdition = dbParameters.AzureDatabaseEdition.ToString(),
                                             AzureServiceObjective = "HS_Gen5_2",
                                             // Shake out issues that only arise in case sensitive collations
                                             Collation = "SQL_Latin1_General_CP1_CS_AS",
@@ -355,12 +463,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                         db = new Database(server, databaseName,
                                             DatabaseEngineEdition.SqlDatabase)
                                         {
-                                            AzureEdition = dbAzureDatabaseEdition.ToString(),
+                                            AzureEdition = dbParameters.AzureDatabaseEdition.ToString(),
                                             MaxSizeInBytes = 1024.0 * 1024.0 * 1024.0,
                                             CompatibilityLevel = CompatibilityLevel.Version160,
                                             ReadOnly = false
                                         };
-                                        //1GB
                                         break;
                                     }
                                 case SqlTestBase.AzureDatabaseEdition.GeneralPurpose:
@@ -369,7 +476,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                         db = new Database(server, databaseName,
                                             DatabaseEngineEdition.SqlDatabase)
                                         {
-                                            AzureEdition = dbAzureDatabaseEdition.ToString(),
+                                            AzureEdition = dbParameters.AzureDatabaseEdition.ToString(),
                                             CompatibilityLevel = CompatibilityLevel.Version160,
                                             ReadOnly = false
                                         };
@@ -379,22 +486,26 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                     throw new InvalidOperationException(
                                         string.Format(
                                             "Can't recognize Azure SQL database edition '{0}' specified for current database",
-                                            dbAzureDatabaseEdition));
+                                            dbParameters.AzureDatabaseEdition));
                             }
+                        }
+                        if (!string.IsNullOrEmpty(dbParameters.Collation))
+                        {
+                            db.Collation = dbParameters.Collation;
                         }
                         // Reduce contention for Azure resources by limiting the number of simultaneous creates
                         if (server.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                         {
                             try
                             {
-                                azureDbCreateLock.WaitOne();
+                                _ = azureDbCreateLock.WaitOne();
                                 db.Create();
                                 // Give the db a few seconds to be ready for action
                                 Thread.Sleep(5000);
                             }
                             finally
                             {
-                                azureDbCreateLock.Release();
+                                _ = azureDbCreateLock.Release();
                             }
                         }
                         else
@@ -402,8 +513,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                             try
                             {
                                 db.Create();
-                            } 
-                            catch (SMO.SmoException se) when (se.BuildRecursiveExceptionMessage().Contains("Could not obtain exclusive lock on database 'model'") == true)
+                            }
+                            catch (SmoException se) when (se.BuildRecursiveExceptionMessage().Contains("Could not obtain exclusive lock on database 'model'"))
                             {
                                 server.HandleModelLock();
                                 throw;
@@ -415,13 +526,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                             }
                         }
                     }
-                    else
+                    if (!string.IsNullOrEmpty(dbParameters.BackupFile))
                     {
                         // Restore DB from the specified backup file
                         TraceHelper.TraceInformation("Restoring database '{0}' from backup file '{1}'",
                              databaseName,
-                             dbBackupFile);
-                        db = server.RestoreDatabaseFromBackup(dbBackupFile, databaseName);
+                             dbParameters.BackupFile);
+                        db = server.RestoreDatabaseFromBackup(dbParameters.BackupFile, databaseName, ConnectionHelpers.GetAzureKeyVaultHelper().StorageHelper);
                     }
                 }
                 catch (Exception e)
@@ -435,7 +546,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     Trace.TraceError(message);
                     throw new InternalTestFailureException(message, e);
                 }
-            }, whenFunc: RetryWhenExceptionThrown,  retries: 3, retryDelayMs: 30000,
+            }, whenFunc: RetryWhenExceptionThrown, retries: 3, retryDelayMs: 30000,
             retryMessage: "Creating Initial DB failed");
             return db;
         }
@@ -447,7 +558,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             var sqlException = e.FirstInstanceOf<SqlException>();
             return sqlException != null && !sqlException.BuildRecursiveExceptionMessage().Contains("Execution Timeout");
         }
-        
+
         /// <summary>
         /// Creates a snapshot of the specified DB
         /// </summary>
@@ -660,7 +771,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     var programname = (string)row[2];
                     var loginname = (string)row[3];
                     var status = (string)row[4];
-                    var requesttime = (DateTime) row[5];
+                    var requesttime = (DateTime)row[5];
                     Trace.TraceWarning($"Model is locked by spid {spid}: {loginname}@{hostname} using {programname}. Status: {status} Last query time:{requesttime}");
                     var dbcc = server.ExecutionManager.ExecuteWithResults($"DBCC INPUTBUFFER({spid})");
                     foreach (var r in dbcc.Tables[0].Rows.Cast<DataRow>())
@@ -670,7 +781,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                             Trace.TraceWarning($"\tQuery text: {eventInfo}");
                         }
                     }
-                    
+
                     if (status == "sleeping")
                     {
                         var closeSpid = Environment.GetEnvironmentVariable("SMOTEST_BREAKMODELLOCK");
@@ -680,7 +791,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                             server.KillProcess(spid);
                         }
                     }
-                    
+
                 }
             }
             catch { }

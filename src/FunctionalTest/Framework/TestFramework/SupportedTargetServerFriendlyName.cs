@@ -43,5 +43,9 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             throw new InvalidOperationException("The SupportedTargetServerFriendlyName attribute should never have IsSupported called without a TargetServerFriendlyName passed in");
         }
 
+        public override bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName)
+        {
+            return _targetServerFriendlyNames.Contains(targetServerFriendlyName);
+        }
     }
 }

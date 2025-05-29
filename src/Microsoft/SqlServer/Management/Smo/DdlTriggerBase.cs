@@ -199,8 +199,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool fAnsiNullsExists = false;
             bool fQuotedIdentifierExists = false;
-            bool fServerAnsiNulls = false;
-            bool fServerQuotedIdentifier = false;
 
             string sTriggerName = FormatFullNameForScripting(sp);
 
@@ -219,14 +217,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 fAnsiNullsExists = (null != Properties.Get("AnsiNullsStatus").Value);
                 fQuotedIdentifierExists = (null != Properties.Get("QuotedIdentifierStatus").Value);
-
-                if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
-                {
-                    // save server settings first
-                    Server svr = GetServerObject();
-                    fServerAnsiNulls = (bool)svr.UserOptions.AnsiNulls;
-                    fServerQuotedIdentifier = (bool)svr.UserOptions.QuotedIdentifier;
-                }
 
                 if (fAnsiNullsExists)
                 {
