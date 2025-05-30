@@ -8,7 +8,6 @@
     <NoWarn>$(NoWarn);NU1603</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
@@ -24,6 +23,7 @@
     <PackageReference Condition="'$(SqlClientReferenceImported)'!='true' or '$(UseMicrosoftData)' == 'false'" Include="Azure.Identity" />
     <PackageReference Include="Azure.ResourceManager" />
     <PackageReference Include="Azure.ResourceManager.Storage" />
+    <PackageReference Include="Azure.Storage.Blobs" />
   </ItemGroup>
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj" />
   <ItemGroup>

@@ -84,7 +84,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- these variables are referenced by packagebuild.proj for inclusion in nuspecs and used by packages.props -->
-    <SqlParserPackageVersion>172.18.0</SqlParserPackageVersion>
+    <SqlParserPackageVersion>172.20.0</SqlParserPackageVersion>
     <SqlClientPackage>Microsoft.Data.SqlClient</SqlClientPackage>
     <SqlClientPackageVersion>5.1.6</SqlClientPackageVersion>
   </PropertyGroup>

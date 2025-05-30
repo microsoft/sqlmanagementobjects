@@ -84,9 +84,9 @@ Included items must then not match any entries in the exclude list to remain inc
             </Sources>
 
             <Functions>
-              <!-- We are expressly ignoring hard-to-reach special cases and code specific to Design Mode -->
+              <!-- We are expressly ignoring hard-to-reach special cases -->
               <Exclude>
-                <Function>.*DesignMode.*</Function>
+                <Function>.*IsDesignMode</Function>
                 <Function>.*FilterException</Function>
                 <Function>.*GenerateStretchHeapWithClause.*</Function>
                 <Function>.*GetPropertyDefaultValue\(.*</Function>
@@ -115,11 +115,23 @@ Included items must then not match any entries in the exclude list to remain inc
                 <Function>.*TestMailProfile</Function>
                 <Function>.*TestNetSend</Function>
                 <Function>.*ThrowIfBelowVersion80SP3.*</Function>
+                <Function>.*ThrowIfBelowVersion90.*</Function>
+                <Function>.*ThrowIfBelowVersion100.*</Function>
+                <Function>.*ThrowIfBelowVersion110.*</Function>
+                <Function>.*ThrowIfBelowVersion110Prop.*</Function>
+                <Function>.*ThrowIfCloudAndVersionBelow12.*</Function>
+                <Function>.*ThrowIfCloudAndVersionBelow120.*</Function>
+                <Function>.*ThrowIfCompatibilityLevelBelow80.*</Function>
+                <Function>.*ThrowIfCompatibilityLevelBelow90.*</Function>
+                <Function>.*ThrowIfCompatibilityLevelBelow100.*</Function>
                 <Function>.*ThrowIfAboveVersion80.*</Function>
                 <Function>.*ThrowIfAboveVersion100.*</Function>
                 <Function>.*ThrowIfSourceOrDestBelowVersion80.*</Function>
                 <Function>.*ThrowIfSourceOrDestBelowVersion90.*</Function>
                 <Function>.*ThrowIfSourceOrDestBelowVersion100.*</Function>
+                <Function>.*ThrowIfSourceOrDestBelowVersion110.*</Function>
+                <Function>.*ThrowIfSourceOrDestBelowVersion120.*</Function>
+                <Function>.*ThrowIfSourceOrDestBelowVersion130.*</Function>
                 <Function>.*UpgradeFromSqlServer2005.*</Function>
               </Exclude>
             </Functions>

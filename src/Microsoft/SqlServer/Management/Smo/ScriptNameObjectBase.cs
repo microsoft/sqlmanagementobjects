@@ -236,11 +236,8 @@ namespace Microsoft.SqlServer.Management.Smo
             needsComma = true;
         }
 
-        internal void ScriptAnsiQI(SqlSmoObject o, ScriptingPreferences sp, StringCollection queries, StringBuilder sb, out object ansiNull, out object qi, bool skipSetOptions = false)
+        internal void ScriptAnsiQI(SqlSmoObject o, ScriptingPreferences sp, StringCollection queries, StringBuilder sb, bool skipSetOptions = false)
         {
-            ansiNull = null;
-            qi = null;
-
             bool fAnsiNullsExists = false;
             bool fQuotedIdentifierExists = false;
             if (!sp.OldOptions.DdlHeaderOnly && !sp.OldOptions.DdlBodyOnly)
@@ -256,10 +253,6 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (fAnsiNullsExists)
                 {
-                    if (this.DatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
-                    {
-                        ansiNull = svr.UserOptions.AnsiNulls;
-                    }
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.SET_ANSI_NULLS, (bool)o.Properties["AnsiNullsStatus"].Value ? Globals.On : Globals.Off);
                     queries.Add(sb.ToString());
                     sb.Length = 0;
@@ -267,10 +260,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (fQuotedIdentifierExists)
                 {
-                    if (this.DatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
-                    {
-                        qi = svr.UserOptions.QuotedIdentifier;
-                    }
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.SET_QUOTED_IDENTIFIER, (bool)o.Properties["QuotedIdentifierStatus"].Value ? Globals.On : Globals.Off);
                     queries.Add(sb.ToString());
                     sb.Length = 0;

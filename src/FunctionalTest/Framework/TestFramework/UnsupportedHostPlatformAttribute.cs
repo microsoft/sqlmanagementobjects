@@ -41,7 +41,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <returns></returns>
         public override bool IsSupported(SMO.Server server, TestServerDescriptor serverDescriptor, string targetServerFriendlyName)
         {
-            return _unsupportedHostPlatforms.Contains(serverDescriptor.HostPlatform) == false;
+            return !_unsupportedHostPlatforms.Contains(serverDescriptor.HostPlatform);
         }
 
         /// <summary>
@@ -52,7 +52,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <returns></returns>
         public override bool IsSupported(SMO.Server server)
         {
-            return _unsupportedHostPlatforms.Contains(server.HostPlatform) == false;
+            return !_unsupportedHostPlatforms.Contains(server.HostPlatform);
+        }
+
+        public override bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName)
+        {
+            return !_unsupportedHostPlatforms.Contains(serverDescriptor.HostPlatform);
         }
     }
 }

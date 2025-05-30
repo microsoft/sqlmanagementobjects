@@ -21,7 +21,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
     [TestClass]
     //[SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
-    [UnsupportedFeature(SqlFeature.NoDropCreate)]
+    [UnsupportedFeature(SqlFeature.Fabric)]
 
     public class SensitivityClassification_SmoTestSuite: SmoTestBase
     {

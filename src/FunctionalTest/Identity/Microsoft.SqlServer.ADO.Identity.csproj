@@ -5,6 +5,7 @@
     <IsPackable>true</IsPackable>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>Provides implementations of TokenCredential and SqlAuthenticationProvider suitable for use with federated service connection credentials in Azure Devops.</Description>
+    <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>$(BaseOutputPath)\Documentation\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>

@@ -26,6 +26,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// still in the Creating state
         /// </summary>
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.NoDropCreate)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void SmoDatabaseOptions_Verify_Properties_When_Creating()
         {
             this.ExecuteTest(

@@ -120,8 +120,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool fAnsiNullsExists = false;
             bool fQuotedIdentifierExists = false;
-            bool fServerAnsiNulls = false;
-            bool fServerQuotedIdentifier = false;
 
             // retrieve full scripting name
             string sFullScriptingName = FormatFullNameForScripting(sp);
@@ -137,14 +135,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 fAnsiNullsExists = (null != Properties.Get("AnsiNullsStatus").Value);
                 fQuotedIdentifierExists = (null != Properties.Get("QuotedIdentifierStatus").Value);
-
-                // save server settings first
-                Server svr = (Server)ParentColl.ParentInstance.ParentColl.ParentInstance;
-                if (this.DatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
-                {
-                    fServerAnsiNulls = (bool)svr.UserOptions.AnsiNulls;
-                    fServerQuotedIdentifier = (bool)svr.UserOptions.QuotedIdentifier;
-                }
 
                 if (fAnsiNullsExists)
                 {

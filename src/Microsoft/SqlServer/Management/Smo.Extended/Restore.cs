@@ -533,7 +533,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
             AddMediaPassword(targetVersion, sb, false, true);
 
-
+            if (BlockSize > 0)
+            {
+                _ = sb.Append($" BLOCKSIZE = {BlockSize}, ");
+            }
             RemoveLastComma(sb);
 
             return ExecuteSqlWithResults(srv, sb.ToString()).Tables[0];

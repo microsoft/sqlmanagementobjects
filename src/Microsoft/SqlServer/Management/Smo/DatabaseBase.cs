@@ -642,11 +642,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 ScriptChangeTracking(createQuery, sp);
             }
 
-            if (IsSupportedProperty("RemoteDataArchiveEnabled", sp))
-            {
-                ScriptRemoteDataArchive(createQuery, sp);
-            }
-
             if (sp.IncludeScripts.Owner)
             {
                 this.ScriptChangeOwner(createQuery, sp);
@@ -1731,79 +1726,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        /// <summary>
-        /// Adds the appropriate ALTER DATABASE ... statements to the StringCollection based on
-        /// the current state of Remote Data Archive on the database.
-        /// </summary>
-        /// <param name="queries">The collection of statements to add to</param>
-        /// <param name="sp">The settings for generating the scripts</param>
-        private void ScriptRemoteDataArchive(StringCollection queries, ScriptingPreferences sp)
-        {
-            // caller already verified RemoteDataArchieEnabled is supported
-            Property propRemoteDataArchiveEnabled = this.Properties.Get("RemoteDataArchiveEnabled");
-
-            bool remoteDataArchiveEnabled = false;
-            StringBuilder sbStatement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-            if (!propRemoteDataArchiveEnabled.IsNull)
-            {
-                remoteDataArchiveEnabled = (bool)propRemoteDataArchiveEnabled.Value;
-                //While creating or scripting, script remote data archive only when it is enabled. (default is disabled so no reason to script it in that case)
-                if ((propRemoteDataArchiveEnabled.Dirty && sp.ScriptForAlter) || (remoteDataArchiveEnabled && !sp.ScriptForAlter))
-                {
-                    Property propRemoteDataArchiveEndpoint = this.Properties.Get("RemoteDataArchiveEndpoint");
-                    Property propRemoteDataArchiveUsedFederatedServiceAccount = this.Properties.Get("RemoteDataArchiveUseFederatedServiceAccount");
-                    Property propRemoteDataArchiveCredential = this.Properties.Get("RemoteDataArchiveCredential");
-
-                    // this will be appended at the end before adding to a query
-                    sbStatement.AppendFormat(SmoApplication.DefaultCulture, "= {0} ", (bool)remoteDataArchiveEnabled ? Globals.On : Globals.Off);
-
-                    if(((propRemoteDataArchiveEndpoint.Dirty || propRemoteDataArchiveCredential.Dirty) && sp.ScriptForAlter) || !sp.ScriptForAlter)
-                    {
-                        //Append the SERVER option if remote data archive is enabled. It's only valid when REMOTE_DATA_ARCHIVE = ON (and is required in that case)
-                        if (remoteDataArchiveEnabled)
-                        {
-                            string remoteEndpoint = (propRemoteDataArchiveEndpoint.Value == null) ? string.Empty : propRemoteDataArchiveEndpoint.Value.ToString();
-                            if (string.IsNullOrEmpty(remoteEndpoint))
-                            {
-                                throw new ArgumentException(ExceptionTemplates.RemoteServerEndpointRequired);
-                            }
-
-                            bool remoteDataArchiveUseFederatedServiceAccount = !propRemoteDataArchiveUsedFederatedServiceAccount.IsNull ?
-                                (bool)propRemoteDataArchiveUsedFederatedServiceAccount.Value : false;
-
-                            if (!remoteDataArchiveUseFederatedServiceAccount)
-                            {
-                                string credential = (propRemoteDataArchiveCredential.Value == null) ? string.Empty : propRemoteDataArchiveCredential.Value.ToString();
-                                if (string.IsNullOrEmpty(credential))
-                                {
-                                    throw new ArgumentException(ExceptionTemplates.DatabaseScopedCredentialsRequired);
-                                }
-                            }
-
-                            sbStatement.AppendFormat(SmoApplication.DefaultCulture, Globals.LParen);
-                            sbStatement.AppendFormat(SmoApplication.DefaultCulture, "SERVER = N'{0}'", Util.EscapeString(propRemoteDataArchiveEndpoint.Value.ToString(), '\''));
-
-                            if (remoteDataArchiveUseFederatedServiceAccount)
-                            {
-                                sbStatement.AppendFormat(SmoApplication.DefaultCulture, ", FEDERATED_SERVICE_ACCOUNT = ON");
-                            }
-                            else
-                            {
-                                sbStatement.AppendFormat(SmoApplication.DefaultCulture, ", CREDENTIAL = [{0}]", SqlBraket(propRemoteDataArchiveCredential.Value.ToString()));
-                            }
-
-                            sbStatement.AppendFormat(SmoApplication.DefaultCulture, Globals.RParen);
-                        }
-                    }
-                }
-            }
-
-            if (sbStatement.Length > 0)
-            {
-                // ALTER DATABASE statement is added only if any of the properties is changed
-                queries.Add(string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE {0} SET REMOTE_DATA_ARCHIVE {1}", this.FormatFullNameForScripting(sp), sbStatement.ToString()));
-            }
-        }
 
         private void ContainmentRelatedValidation(ScriptingPreferences sp)
         {
@@ -1934,11 +1856,6 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.Data.ChangeTracking && IsSupportedProperty("ChangeTrackingEnabled", sp))
             {
                 ScriptChangeTracking(alterQuery, sp);
-            }
-
-            if(IsSupportedProperty("RemoteDataArchiveEnabled", sp))
-            {
-                ScriptRemoteDataArchive(alterQuery, sp);
             }
 
             if (this.IsSupportedObject<QueryStoreOptions>(sp))
@@ -6179,30 +6096,7 @@ SortedList list = new SortedList();
         /// </summary>
         /// <param name="credentialName">The name of the credential to use for re-authorization</param>
         /// <param name="withCopy">A boolean flag to indicate if the remote stretched database should be duplicated (true by default)</param>
-        public void ReauthorizeRemoteDataArchiveConnection(string credentialName, bool withCopy = true)
-        {
-            try
-            {
-                CheckObjectState();
-                ThrowIfPropertyNotSupported("RemoteDataArchiveEnabled");
-
-                if (string.IsNullOrEmpty(credentialName))
-                {
-                    throw new ArgumentNullException("credentialName");
-                }
-
-                StringCollection queries = new StringCollection();
-                AddDatabaseContext(queries, new ScriptingPreferences(this));
-                queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.SP_RDA_REAUTHORIZE_DB, MakeSqlString(credentialName), withCopy ? 1 : 0));
-                this.ExecutionManager.ExecuteNonQuery(queries);
-            }
-            catch (Exception e)
-            {
-                FilterException(e);
-
-                throw new FailedOperationException(ExceptionTemplates.ReauthorizeRemoteDataArchive, this, e);
-            }
-        }
+        public void ReauthorizeRemoteDataArchiveConnection(string credentialName, bool withCopy = true) =>  throw new NotSupportedException();
 
         /// <summary>
         /// Gets a list of remote data archive migration status reports
@@ -6210,122 +6104,14 @@ SortedList list = new SortedList();
         /// <param name="migrationStartTime">Data migration start time</param>
         /// <param name="statusReportCount">Number of reports to be retrieved</param>
         /// <returns>List of remote data archive migration status reports</returns>
-        public IEnumerable<RemoteDataArchiveMigrationStatusReport> GetRemoteDataArchiveMigrationStatusReports(DateTime migrationStartTime, int statusReportCount, string tableName = null)
-        {
-            try
-            {
-                CheckObjectState();
-                ThrowIfPropertyNotSupported("RemoteDataArchiveEnabled");
+        public IEnumerable<RemoteDataArchiveMigrationStatusReport> GetRemoteDataArchiveMigrationStatusReports(DateTime migrationStartTime, int statusReportCount, string tableName = null) => null;
 
-                StringCollection queries = new StringCollection();
-
-                queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(this.Name)));
-            
-                StatementBuilder sqlStatement = new StatementBuilder();
-
-                sqlStatement.AddFields("dbs.name as database_name");
-                sqlStatement.AddFields("tabs.name as table_name");
-                sqlStatement.AddFields("rdams.migrated_rows");
-                sqlStatement.AddFields("rdams.start_time_utc");
-                sqlStatement.AddFields("rdams.end_time_utc");
-                sqlStatement.AddFields("rdams.error_number");
-                sqlStatement.AddFields("rdams.error_severity");
-                sqlStatement.AddFields("rdams.error_state");
-                sqlStatement.AddFields("msgs.text as details");
-                sqlStatement.TopN = statusReportCount;
-                sqlStatement.AddFrom("sys.dm_db_rda_migration_status rdams");
-                sqlStatement.AddJoin("INNER JOIN sys.databases dbs ON rdams.database_id = dbs.database_id");
-                sqlStatement.AddJoin("INNER JOIN sys.tables tabs ON rdams.table_id = tabs.object_id");
-                sqlStatement.AddJoin("LEFT OUTER JOIN sys.messages msgs ON rdams.error_number = msgs.message_id");
-                if (string.IsNullOrEmpty(tableName))
-                {
-                    sqlStatement.AddWhere(string.Format(CultureInfo.InvariantCulture, @"start_time_utc > '{0}'", Urn.EscapeString(migrationStartTime.ToString("yyyy-MM-dd HH:mm:ss.fff"))));
-                }
-                else
-                {
-                    sqlStatement.AddWhere(string.Format(CultureInfo.InvariantCulture, @"start_time_utc > '{0}' AND tabs.name = '{1}'", Urn.EscapeString(migrationStartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")), Urn.EscapeString(tableName)));
-                }
-
-                queries.Add(sqlStatement.SqlStatement);
-
-                // execute the query
-                DataSet ds = this.ExecutionManager.ExecuteWithResults(queries);
-                IList<RemoteDataArchiveMigrationStatusReport> migrationReports = null;
-                if(ds != null && ds.Tables != null && ds.Tables.Count > 0)
-                {
-                    migrationReports = new List<RemoteDataArchiveMigrationStatusReport>();
-                    DataTable resultTable = ds.Tables[0];
-
-                    foreach(DataRow row in resultTable.Rows)
-                    {
-                        int intVal;
-                        int? errorNumber = (row["error_number"] != null) ? (Int32.TryParse(row["error_number"].ToString(), out intVal) ? intVal : (int?)null) : null;
-                        int? errorSeverity = (row["error_severity"] != null) ? (Int32.TryParse(row["error_severity"].ToString(), out intVal) ? intVal : (int?)null) : null;
-                        int? errorState = (row["error_state"] != null) ? (Int32.TryParse(row["error_state"].ToString(), out intVal) ? intVal : (int?)null) : null;
-                        string details = (row["details"] != null) ? row["details"].ToString() : string.Empty;
-
-                        RemoteDataArchiveMigrationStatusReport statusReport = new RemoteDataArchiveMigrationStatusReport((string)row["database_name"], (string)row["table_name"],
-                                                                                                                         (long)row["migrated_rows"], (DateTime)row["start_time_utc"],
-                                                                                                                         (DateTime)row["end_time_utc"], errorNumber, errorSeverity, errorState, details);
-                        migrationReports.Add(statusReport);
-                    }
-                }
-
-                return migrationReports;
-            }
-            catch (Exception e)
-            {
-                FilterException(e);
-
-                throw new FailedOperationException(ExceptionTemplates.GetRemoteDataArchiveMigrationStatusReports, this, e);
-            }
-        }
 
         /// <summary>
         /// Get remote database migration statistics. Null if Remote Data Archive is not enabled for database
         /// </summary>
         /// <returns>Database Migration statistics if Remote Data Archive is enabled, else null</returns>
-        public RemoteDatabaseMigrationStatistics GetRemoteDatabaseMigrationStatistics()
-        {
-            try
-            {
-                CheckObjectState();
-                ThrowIfPropertyNotSupported("RemoteDataArchiveEnabled");
-
-                if (this.RemoteDataArchiveEnabled)
-                {
-
-                    StringCollection queries = new StringCollection();
-
-                    queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(this.Name)));
-                    queries.Add(@"exec sp_spaceused @mode = 'REMOTE_ONLY', @oneresultset = 1");
-
-                    DataSet ds = this.ExecutionManager.ExecuteWithResults(queries);
-                    double remoteDatabaseSize = 0;
-                    if (ds != null && ds.Tables != null && ds.Tables.Count > 0 && ds.Tables[0].Rows != null && ds.Tables[0].Rows.Count > 0)
-                    {
-                        DataTable resultTable = ds.Tables[0];
-                        string databaseSize = resultTable.Rows[0]["database_size"].ToString();
-                        if (databaseSize.ToUpperInvariant().IndexOf("MB") > -1)
-                        {
-                            string sizeInMb = databaseSize.Substring(0, databaseSize.ToUpperInvariant().IndexOf("MB"));
-                            remoteDatabaseSize = Double.Parse(sizeInMb.Trim());
-                        }
-                    }
-                    return new RemoteDatabaseMigrationStatistics(remoteDatabaseSize);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception e)
-            {
-                FilterException(e);
-
-                throw new FailedOperationException(ExceptionTemplates.GetRemoteDatabaseMigrationStatistics, this, e);
-            }
-        }
+        public RemoteDatabaseMigrationStatistics GetRemoteDatabaseMigrationStatistics() => null;
 
         /// <summary>
         /// Populate the FileGroup collection and each Files collection in each FileGroup optimally.

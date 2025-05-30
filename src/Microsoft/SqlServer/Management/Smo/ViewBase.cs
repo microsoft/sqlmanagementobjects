@@ -232,8 +232,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool fAnsiNullsExists = false;
             bool fQuotedIdentifierExists = false;
-            bool fServerAnsiNulls = false;
-            bool fServerQuotedIdentifier = false;
 
             if (!sp.OldOptions.DdlHeaderOnly && !sp.OldOptions.DdlBodyOnly)
             {
@@ -247,14 +245,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 fAnsiNullsExists = ( null != Properties.Get("AnsiNullsStatus").Value);
                 fQuotedIdentifierExists = ( null != Properties.Get("QuotedIdentifierStatus").Value );
                 
-                if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
-                {
-                    // save server settings first
-                    Server svr = (Server)ParentColl.ParentInstance.ParentColl.ParentInstance;
-                    fServerAnsiNulls = (bool)svr.UserOptions.AnsiNulls;
-                    fServerQuotedIdentifier = (bool)svr.UserOptions.QuotedIdentifier;
-                }
-
                 if (fAnsiNullsExists)
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.SET_ANSI_NULLS,(bool)Properties["AnsiNullsStatus"].Value?Globals.On:Globals.Off);
@@ -478,7 +468,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (forDiscovery)
             {
                 // During discovery the Indexes collection is expanded so let's optimize it
-                if (State == SqlSmoState.Existing)
+                if (State == SqlSmoState.Existing && !Indexes.initialized)
                 {
                     InitChildLevel(nameof(Index), new ScriptingPreferences(this), true);
                 }

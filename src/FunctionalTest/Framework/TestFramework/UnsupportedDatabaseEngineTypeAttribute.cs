@@ -28,7 +28,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
 
         public override bool IsSupported(SMO.Server server, TestServerDescriptor serverDescriptor, string targetServerFriendlyName)
         {
-            return _unsupportedDatabaseEngineTypes.Contains(serverDescriptor.DatabaseEngineType) == false;
+            return !_unsupportedDatabaseEngineTypes.Contains(serverDescriptor.DatabaseEngineType);
         }
 
         /// <summary>
@@ -39,7 +39,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <returns></returns>
         public override bool IsSupported(SMO.Server server)
         {
-            return _unsupportedDatabaseEngineTypes.Contains(server.DatabaseEngineType) == false;
+            return !_unsupportedDatabaseEngineTypes.Contains(server.DatabaseEngineType);
+        }
+
+        public override bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName)
+        {
+            return !_unsupportedDatabaseEngineTypes.Contains(serverDescriptor.DatabaseEngineType);
         }
     }
 }

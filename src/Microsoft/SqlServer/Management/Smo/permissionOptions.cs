@@ -199,6 +199,11 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalMirror); }
         }
 
+        public static DatabasePermission AlterAnyExternalModel
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalModel); }
+        }
+
         public static DatabasePermission AlterAnyExternalStream
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyExternalStream); }
@@ -207,6 +212,11 @@ namespace Microsoft.SqlServer.Management.Smo
         public static DatabasePermission AlterAnyFulltextCatalog
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyFulltextCatalog); }
+        }
+
+        public static DatabasePermission AlterAnyInformationProtection
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.AlterAnyInformationProtection); }
         }
 
         public static DatabasePermission AlterAnyMask
@@ -362,6 +372,11 @@ namespace Microsoft.SqlServer.Management.Smo
         public static DatabasePermission CreateExternalLibrary
         {
             get { return new DatabasePermission(DatabasePermissionSetValue.CreateExternalLibrary); }
+        }
+
+        public static DatabasePermission CreateExternalModel
+        {
+            get { return new DatabasePermission(DatabasePermissionSetValue.CreateExternalModel); }
         }
 
         public static DatabasePermission CreateFulltextCatalog
@@ -884,6 +899,12 @@ namespace Microsoft.SqlServer.Management.Smo
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalMirror] = value; }
         }
 
+        public bool AlterAnyExternalModel
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalModel]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalModel] = value; }
+        }
+
         public bool AlterAnyExternalStream
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyExternalStream]; }
@@ -894,6 +915,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyFulltextCatalog]; }
             set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyFulltextCatalog] = value; }
+        }
+
+        public bool AlterAnyInformationProtection
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.AlterAnyInformationProtection]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.AlterAnyInformationProtection] = value; }
         }
 
         public bool AlterAnyMask
@@ -1080,6 +1107,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get { return this.Storage[(int)DatabasePermissionSetValue.CreateExternalLibrary]; }
             set { this.Storage[(int)DatabasePermissionSetValue.CreateExternalLibrary] = value; }
+        }
+
+        public bool CreateExternalModel
+        {
+            get { return this.Storage[(int)DatabasePermissionSetValue.CreateExternalModel]; }
+            set { this.Storage[(int)DatabasePermissionSetValue.CreateExternalModel] = value; }
         }
 
         public bool CreateFulltextCatalog

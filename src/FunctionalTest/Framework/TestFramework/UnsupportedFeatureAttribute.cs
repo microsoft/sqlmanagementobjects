@@ -49,5 +49,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         {
             throw new NotImplementedException();
         }
+
+        public override bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName)
+        {
+            return !serverDescriptor.EnabledFeatures.Any(f => f == feature);
+        }
     }
 }

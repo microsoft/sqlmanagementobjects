@@ -225,8 +225,10 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.AlterAnyExternalLanguage: return permissionSet.AlterAnyExternalLanguage;
                 case DatabasePermissionType.AlterAnyExternalLibrary: return permissionSet.AlterAnyExternalLibrary;
                 case DatabasePermissionType.AlterAnyExternalMirror: return permissionSet.AlterAnyExternalMirror;
+                case DatabasePermissionType.AlterAnyExternalModel: return permissionSet.AlterAnyExternalModel;
                 case DatabasePermissionType.AlterAnyExternalStream: return permissionSet.AlterAnyExternalStream;
                 case DatabasePermissionType.AlterAnyFulltextCatalog: return permissionSet.AlterAnyFulltextCatalog;
+                case DatabasePermissionType.AlterAnyInformationProtection: return permissionSet.AlterAnyInformationProtection;
                 case DatabasePermissionType.AlterAnyMask: return permissionSet.AlterAnyMask;
                 case DatabasePermissionType.AlterAnyMessageType: return permissionSet.AlterAnyMessageType;
                 case DatabasePermissionType.AlterAnyRemoteServiceBinding: return permissionSet.AlterAnyRemoteServiceBinding;
@@ -258,6 +260,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 case DatabasePermissionType.CreateDefault: return permissionSet.CreateDefault;
                 case DatabasePermissionType.CreateExternalLanguage: return permissionSet.CreateExternalLanguage;
                 case DatabasePermissionType.CreateExternalLibrary: return permissionSet.CreateExternalLibrary;
+                case DatabasePermissionType.CreateExternalModel: return permissionSet.CreateExternalModel;
                 case DatabasePermissionType.CreateFulltextCatalog: return permissionSet.CreateFulltextCatalog;
                 case DatabasePermissionType.CreateFunction: return permissionSet.CreateFunction;
                 case DatabasePermissionType.CreateMessageType: return permissionSet.CreateMessageType;

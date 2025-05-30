@@ -229,10 +229,6 @@
       <post_process fields = '#Owner#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwner' triggered_fields='#Sid1#'></post_process>
     </version>
 
-    <version min_major='13'>
-      <post_process fields = '#RemoteDataArchiveEndpoint#RemoteDataArchiveLinkedServer#RemoteDatabaseName#RemoteDataArchiveUseFederatedServiceAccount#RemoteDataArchiveCredential#'  class_name='Microsoft.SqlServer.Management.Smo.PostProcessRemoteDataArchiveDatabaseProperties' triggered_fields='#DatabaseName5#'/>
-    </version>
-
     <!--DB Scoped configurations have post processing calculations.-->
     <version min_major='13' cloud_min_major='12'>
       <post_process fields = '#MaxDop#MaxDopForSecondary#LegacyCardinalityEstimation#LegacyCardinalityEstimationForSecondary#ParameterSniffing#ParameterSniffingForSecondary#QueryOptimizerHotfixes#QueryOptimizerHotfixesForSecondary#'
@@ -710,15 +706,12 @@
     <version min_major='13'>
       <!-- Halligan (Stretch DB) properties -->
 
-      <property name="RemoteDataArchiveEnabled" type="bit" cast="true" read_only_after_creation="false">dtb.is_remote_data_archive_enabled</property>
-      <!--Value populated in post-processing since we have to query sys.servers (which is per-DB but doesn't map values to a DB)-->
-      <property name="RemoteDataArchiveEndpoint" type="nvarchar" size="4000" read_only_after_creation="false" expensive="true">NULL</property>
-      <property name="RemoteDataArchiveLinkedServer" type="sysname" read_only_after_creation="true" expensive="true">NULL</property>
-      <property name="RemoteDatabaseName" type="sysname" read_only_after_creation="true" expensive="true">NULL</property>
-      <property name="RemoteDataArchiveUseFederatedServiceAccount" type="bit" read_only_after_creation="false" expensive="true">0</property>
-      <property name="RemoteDataArchiveCredential" type="sysname" read_only_after_creation="false" expensive="true">NULL</property>
-      <!--Used for post-process trigger -->
-      <property name="DatabaseName5" type="sysname" hidden='true'>dtb.name</property>
+      <property name="RemoteDataArchiveEnabled" type="bit" cast="true" read_only_after_creation="false">0</property>
+      <property name="RemoteDataArchiveEndpoint" type="nvarchar" size="4000" read_only_after_creation="false" expensive="true">N''</property>
+      <property name="RemoteDataArchiveLinkedServer" type="sysname" read_only_after_creation="true" expensive="true">N''</property>
+      <property name="RemoteDatabaseName" type="sysname" read_only_after_creation="true" expensive="true">N''</property>
+      <property name="RemoteDataArchiveUseFederatedServiceAccount" type="bit" read_only_after_creation="false" cast="true" expensive="true">0</property>
+      <property name="RemoteDataArchiveCredential" type="sysname" read_only_after_creation="false" expensive="true">N''</property>
     </version>
 
     <version min_major='13' cloud_min_major='12'>

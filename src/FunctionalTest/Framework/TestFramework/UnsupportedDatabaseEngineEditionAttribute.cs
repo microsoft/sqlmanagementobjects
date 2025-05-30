@@ -53,7 +53,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <returns></returns>
         public override bool IsSupported(SMO.Server server)
         {
-            return _unsupportedDatabaseEngineEditions.Contains(server.DatabaseEngineEdition) == false;
+            return !_unsupportedDatabaseEngineEditions.Contains(server.DatabaseEngineEdition);
+        }
+
+        public override bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName)
+        {
+            return !_unsupportedDatabaseEngineEditions.Contains(serverDescriptor.DatabaseEngineEdition);
         }
     }
 }

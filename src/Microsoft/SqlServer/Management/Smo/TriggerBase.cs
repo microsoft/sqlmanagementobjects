@@ -288,8 +288,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             bool fAnsiNullsExists = false;
             bool fQuotedIdentifierExists = false;
-            bool fServerAnsiNulls = false;
-            bool fServerQuotedIdentifier = false;
 
             string sTriggerName = FormatFullNameForScripting(sp);
 
@@ -309,8 +307,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // save server settings first
                     Server svr = (Server)ParentColl.ParentInstance.ParentColl.ParentInstance.ParentColl.ParentInstance;
-                    fServerAnsiNulls = (bool)svr.UserOptions.AnsiNulls;
-                    fServerQuotedIdentifier = (bool)svr.UserOptions.QuotedIdentifier;
                 }
 
                 if (fAnsiNullsExists)

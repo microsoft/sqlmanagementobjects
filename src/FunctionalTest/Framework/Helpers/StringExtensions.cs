@@ -188,5 +188,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
 
             return input;
         }
+
+        /// <summary>
+        /// Checks if the file name is a DAC package
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static bool IsPackageFileName(this string fileName) => System.IO.Path.GetExtension(fileName ?? "").EndsWith("acpac", StringComparison.OrdinalIgnoreCase);
     }
 }

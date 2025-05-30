@@ -21,7 +21,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
     /// Data about a server used for Data Tools test runs
     /// </summary>
     [DebuggerDisplay("{Name}")]
-    public class TestServerDescriptor
+    public class TestServerDescriptor : TestDescriptor
     {
         /// <summary>
         /// Connection string for the connection
@@ -51,46 +51,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             }
         }
 
-        /// <summary>
-        /// Expected DatabaseEngineType
-        /// </summary>
-        public DatabaseEngineType DatabaseEngineType { get; set; }
-
-        /// <summary>
-        /// Enabled features on the server
-        /// </summary>
-        public IEnumerable<SqlFeature> EnabledFeatures { get; set; }
-
-        /// <summary>
-        /// The features that the server is reserved for.
-        /// </summary>
-        public IEnumerable<SqlFeature> ReservedFor { get; set; } = Enumerable.Empty<SqlFeature>();
-
-        /// <summary>
-        /// Expected HostPlatform
-        /// </summary>
-        public string HostPlatform { get; set; }
-
-        /// <summary>
-        /// Name used to identify the server in configuration
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Expected DatabaseEngineEdition. Will be Unknown if not provided in the XML
-        /// </summary>
-        public DatabaseEngineEdition DatabaseEngineEdition { get; set; }
-
-        /// <summary>
-        /// Major version number, eg 13 for SQL2016. 0 if not specified
-        /// </summary>
-        public int MajorVersion { get; set; }
+        public bool ReuseExistingDatabase { get; set; } = false;
 
         /// <summary>
         /// Returns the set of server connection strings allotted for the current test.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<TestServerDescriptor> GetServerDescriptors(XDocument connStringsDoc, AzureKeyVaultHelper azureKeyVaultHelper)
+        public static IEnumerable<TestDescriptor> GetTestDescriptors(XDocument connStringsDoc, AzureKeyVaultHelper azureKeyVaultHelper)
         {
             string targetServersEnvVar =
                 Environment.GetEnvironmentVariable("SqlTestTargetServersFilter", EnvironmentVariableTarget.Process) ??
@@ -106,10 +73,30 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             if (targetServers != null)
             {
                 TraceHelper.TraceInformation("Limiting tests to these servers based on environment: {0}", targetServersEnvVar);
-            }
-
-            return
-                connStringsDoc.XPathSelectElements(@"//ConnectionString")
+                }
+            
+            var workspaces = connStringsDoc.XPathSelectElements(@"//FabricWorkspaces/FabricWorkspace")
+                   .Select(workspaceElement => new FabricWorkspaceDescriptor
+                   {
+                       Name = workspaceElement.GetStringAttribute("name"),
+                       Environment = workspaceElement.GetStringAttribute("environment"),
+                       WorkspaceName = workspaceElement.GetStringAttribute("workspaceName"),
+                       DatabaseEngineType = workspaceElement.GetAttribute("databaseenginetype",
+                            (s) => (DatabaseEngineType)Enum.Parse(typeof(DatabaseEngineType), s)),
+                       DatabaseEngineEdition =
+                            workspaceElement.GetAttribute("db_engine_edition",
+                                (s) =>
+                                    s == null
+                                        ? DatabaseEngineEdition.Unknown
+                                        : (DatabaseEngineEdition)Enum.Parse(typeof(DatabaseEngineEdition), s)),
+                       Description = workspaceElement.GetStringAttribute("description"),
+                       EnabledFeatures = workspaceElement.GetAttribute("enabled_features", GetFeaturesFromString), // For now, all workspaces are Fabric
+                       MajorVersion = workspaceElement.GetAttribute("majorversion",
+                        (s) => string.IsNullOrEmpty(s) ? 0 : int.Parse(s)),
+                       DbNamePrefix = workspaceElement.GetStringAttribute("dbNamePrefix"),
+                   }).Where((d) => targetServers == null || targetServers.Contains(d.Name)).ToList();
+           
+            var servers = connStringsDoc.XPathSelectElements(@"//ConnectionString")
                     .Select(connStringElement => new TestServerDescriptor
                     {
                         ConnectionString = GetConnectionString(connStringElement, azureKeyVaultHelper),
@@ -130,6 +117,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                         ReservedFor = connStringElement.GetAttribute("reserved_for", GetFeaturesFromString)
                     }).Where((d) => targetServers == null || targetServers.Contains(d.Name)).ToList();
 
+            return servers.Cast<TestDescriptor>().Concat(workspaces);
         }
 
         private static string GetConnectionString(XElement connStringElement, AzureKeyVaultHelper azureKeyVaultHelper)

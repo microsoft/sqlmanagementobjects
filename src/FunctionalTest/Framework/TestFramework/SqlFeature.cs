@@ -43,5 +43,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// Mark a server as NoDropCreate if it doesn't support database create/drop
         /// </summary>
         NoDropCreate,
+
+        /// <summary>
+        /// Fabric Hosted
+        /// </summary>
+        Fabric,
     }
 }

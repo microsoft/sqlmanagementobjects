@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
@@ -18,6 +19,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 {
     [TestClass]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+    [UnsupportedFeature(SqlFeature.Fabric)]
     public class PermissionsEnumTests : SqlTestBase
     {
         [TestMethod]
@@ -46,6 +48,41 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 CompareEnumToServerPermissions(typeof(ObjectPermissionSetValue), @"select type, permission_name from sys.fn_builtin_permissions(DEFAULT) where class_desc <> 'SERVER' and class_desc <> 'DATABASE'");
             });
         }
+
+        /// <summary>
+        /// Simple test that verifies that the permission options are defined in the permission enum and permission set classes.
+        /// This is primarily used for code coverage purposes - the "*_enum_is_complete" tests above are more comprehensive.
+        /// </summary>
+        /// <param name="enumType">The permission set value type</param>
+        /// <param name="permissionType">The permission object type</param>
+        /// <param name="permissionSetType">The permission set object type</param>
+        /// <param name="valuesToSkip">What values to skip</param>
+        [TestMethod]
+        [DisconnectedTest]
+        [DataRow(typeof(DatabasePermissionSetValue), typeof(DatabasePermission), typeof(DatabasePermissionSet), new string[] { })]
+        [DataRow(typeof(ServerPermissionSetValue), typeof(ServerPermission), typeof(ServerPermissionSet), new string[] { nameof(ServerPermissionSetValue.AlterAnyExternalDataSource), nameof(ServerPermissionSetValue.AlterAnyExternalFileFormat) })]
+        [DataRow(typeof(ObjectPermissionSetValue), typeof(ObjectPermission), typeof(ObjectPermissionSet), new string[] { })]
+        public void PermEnum_PermissionOptions_AreDefined(Type enumType, Type permissionType, Type permissionSetType, IEnumerable<string> valuesToSkip)
+        {
+            foreach (var permissionEnumName in Enum.GetNames(enumType))
+            {
+                if (valuesToSkip.Contains(permissionEnumName))
+                {
+                    // If values are removed then they will sometimes still be kept in the enum but have their
+                    // corresponding permission and permission set properties removed.
+                    continue;
+                }
+                var permissionObj = permissionType.GetProperty(permissionEnumName, BindingFlags.Static | BindingFlags.Public);
+                Assert.That(permissionObj, Is.Not.Null, $"{permissionEnumName} is missing from {permissionType.Name}.");
+                Assert.That(permissionObj.GetValue(null), Is.Not.Null, $"{permissionEnumName} is null in {permissionType.Name}.");
+                var setObj = Activator.CreateInstance(permissionSetType);
+                var setObjProperty = permissionSetType.GetProperty(permissionEnumName);
+                Assert.That(setObjProperty, Is.Not.Null, $"{permissionEnumName} is null in {permissionSetType.Name}.");
+                Assert.That(setObjProperty.GetValue(setObj), Is.Not.Null, $"{permissionEnumName} is null in {permissionSetType.Name}.");
+                Assert.DoesNotThrow(() => setObjProperty.SetValue(setObj, null), $"Setting {permissionEnumName} in {permissionSetType.Name} should not throw");
+            }
+        }
+
         private void CompareEnumToServerPermissions(Type enumType, string permissionQuery)
         {
             var permissionTypes = GetAttributeValues<PermissionTypeAttribute>(enumType);

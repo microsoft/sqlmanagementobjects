@@ -421,6 +421,8 @@ END
                     {
                         // Temporary workaround to convert the length of the column to the dimensions for vector types
                         // until sys.columns is updated to include the dimensions of the vector type.
+                        // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/3906463
+                        // dimensions = (length - 8) / 4
                         // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
                         sb.AppendFormat(SmoApplication.DefaultCulture, "({0})", (length - 8) / 4);
                     }

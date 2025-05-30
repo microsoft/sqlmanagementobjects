@@ -349,6 +349,17 @@ namespace Microsoft.SqlServer.Management.Smo
         [PermissionName("ALTER ANY EXTERNAL MIRROR")]
         AlterAnyExternalMirror = 106,
 
+        [PermissionType("AAEM")]
+        [PermissionName("ALTER ANY EXTERNAL MODEL")]
+        AlterAnyExternalModel = 107,
+
+        [PermissionType("CREM")]
+        [PermissionName("CREATE EXTERNAL MODEL")]
+        CreateExternalModel = 108,
+
+        [PermissionType("ALIP")]
+        [PermissionName("ALTER ANY INFORMATION PROTECTION")]
+        AlterAnyInformationProtection = 109,
     }
 
     ///<summary>enum containing all possible ObjectPermissions</summary>

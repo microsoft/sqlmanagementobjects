@@ -45,6 +45,15 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// <returns></returns>
         public abstract bool IsSupported(SMO.Server server);
 
+        /// <summary>
+        /// Checks whether the specified server/workspace is "supported", that is whether it meets the
+        /// criteria of the dimension that is being defined.
+        /// </summary>
+        /// <param name="serverDescriptor"></param>
+        /// <param name="targetServerFriendlyName"></param>
+        /// <returns></returns>
+        public abstract bool IsSupported(TestDescriptor serverDescriptor, string targetServerFriendlyName);
+
     }
 
     /// <summary>
