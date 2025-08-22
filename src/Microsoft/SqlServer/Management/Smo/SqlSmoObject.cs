@@ -2976,8 +2976,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 parentColl.RemoveObject(this.key);
             }
 
-            // update object state to only if we are in execution mode
-            if (!this.ExecutionManager.Recording)
+            // update object state only if we are in execution mode, not just scripting
+            // Use ForDirectExecution to distinguish between actual drops vs script generation
+            if (sp.ForDirectExecution)
             {
                 // mark the object as being dropped
                 this.MarkDropped();
