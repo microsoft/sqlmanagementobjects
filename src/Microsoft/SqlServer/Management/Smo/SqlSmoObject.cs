@@ -2976,8 +2976,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 parentColl.RemoveObject(this.key);
             }
 
-            // update object state to only if we are in execution mode
-            if (!this.ExecutionManager.Recording)
+            // update object state only if we are in execution mode, not just scripting
+            // Use ForDirectExecution to distinguish between actual drops vs script generation
+            if (sp.ForDirectExecution)
             {
                 // mark the object as being dropped
                 this.MarkDropped();
@@ -3264,24 +3265,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                // Don't check object state during scripting operations as the object state
-                // is not relevant when generating scripts, and it prevents the issue where
-                // objects marked as dropped during scripting cannot be scripted again
-                if (!this.ExecutionManager.Recording)
-                {
-                    CheckObjectState();
-                }
+                CheckObjectState();
                 return m_bIgnoreForScripting;
             }
             set
             {
-                // Don't check object state during scripting operations as the object state
-                // is not relevant when generating scripts, and it prevents the issue where
-                // objects marked as dropped during scripting cannot be scripted again
-                if (!this.ExecutionManager.Recording)
-                {
-                    CheckObjectState();
-                }
+                CheckObjectState();
                 m_bIgnoreForScripting = value;
             }
         }

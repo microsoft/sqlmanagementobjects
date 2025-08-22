@@ -117,6 +117,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         {
             // Regression test for issue: "Cannot access properties or methods for the Microsoft.SqlServer.Management.Smo.Table '[dbo].[MyTable]', because it has been dropped."
             // When calling script operations multiple times with ScriptDrops=true, subsequent calls should not fail
+            // The fix ensures that objects are only marked as dropped during actual execution (ForDirectExecution=true), not during script generation
             ExecuteFromDbPool(db =>
             {
                 var table = db.CreateTable("test_table_multiple_script_calls");
