@@ -3264,12 +3264,24 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                CheckObjectState();
+                // Don't check object state during scripting operations as the object state
+                // is not relevant when generating scripts, and it prevents the issue where
+                // objects marked as dropped during scripting cannot be scripted again
+                if (!this.ExecutionManager.Recording)
+                {
+                    CheckObjectState();
+                }
                 return m_bIgnoreForScripting;
             }
             set
             {
-                CheckObjectState();
+                // Don't check object state during scripting operations as the object state
+                // is not relevant when generating scripts, and it prevents the issue where
+                // objects marked as dropped during scripting cannot be scripted again
+                if (!this.ExecutionManager.Recording)
+                {
+                    CheckObjectState();
+                }
                 m_bIgnoreForScripting = value;
             }
         }

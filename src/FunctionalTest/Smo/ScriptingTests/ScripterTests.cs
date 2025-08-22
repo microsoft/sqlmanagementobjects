@@ -107,5 +107,51 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 Assert.That(urnErrors, Is.EquivalentTo(new Urn[] { sp.Urn }), "CreateOrAlter should have errors when scripting pre-sql2016");
             });
         } 
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = Management.Common.DatabaseEngineType.Standalone)]
+        [SupportedServerVersionRange(DatabaseEngineType = Management.Common.DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Scripter_MultipleScriptCallsWithDrops_ShouldNotFailWithObjectDroppedException()
+        {
+            // Regression test for issue: "Cannot access properties or methods for the Microsoft.SqlServer.Management.Smo.Table '[dbo].[MyTable]', because it has been dropped."
+            // When calling script operations multiple times with ScriptDrops=true, subsequent calls should not fail
+            ExecuteFromDbPool(db =>
+            {
+                var table = db.CreateTable("test_table_multiple_script_calls");
+                var scripter = new Scripter(db.Parent);
+                
+                scripter.Options.IncludeDatabaseContext = true;
+                scripter.Options.ScriptSchema = true;
+                scripter.Options.ScriptData = false;
+
+                // First scripting call - this should work
+                scripter.Options.ScriptDrops = true;
+                scripter.Options.IncludeIfNotExists = true;
+                var dropScript1 = scripter.EnumScript(new[] { table.Urn }).ToArray();
+                Assert.That(dropScript1.Length, Is.GreaterThan(0), "First drop script should be generated");
+
+                scripter.Options.ScriptDrops = false; 
+                scripter.Options.IncludeIfNotExists = false;
+                var createScript1 = scripter.EnumScript(new[] { table.Urn }).ToArray();
+                Assert.That(createScript1.Length, Is.GreaterThan(0), "First create script should be generated");
+
+                // Second scripting call - this should not fail with "object has been dropped" error
+                scripter.Options.ScriptDrops = true;
+                scripter.Options.IncludeIfNotExists = true;
+                var dropScript2 = scripter.EnumScript(new[] { table.Urn }).ToArray();
+                Assert.That(dropScript2.Length, Is.GreaterThan(0), "Second drop script should be generated without error");
+
+                scripter.Options.ScriptDrops = false;
+                scripter.Options.IncludeIfNotExists = false; 
+                var createScript2 = scripter.EnumScript(new[] { table.Urn }).ToArray();
+                Assert.That(createScript2.Length, Is.GreaterThan(0), "Second create script should be generated without error");
+
+                // Verify the scripts are equivalent
+                Assert.That(dropScript2, Is.EqualTo(dropScript1), "Drop scripts should be identical");
+                Assert.That(createScript2, Is.EqualTo(createScript1), "Create scripts should be identical");
+            });
+        }
     }
 }
