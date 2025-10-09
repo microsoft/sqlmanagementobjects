@@ -161,6 +161,12 @@ else
                 {
                     edition = DatabaseEngineEdition.SqlDatabase;
                 }
+                // If edition is 1000 (Dynamics CRM), treat it as Standalone with Express edition
+                if ((int)edition == 1000)
+                {
+                    engineType = DatabaseEngineType.Standalone;
+                    edition = DatabaseEngineEdition.Express;
+                }
                 // If we're on Managed Instance, don't treat it as a "Sql Azure", but as "Standalone"
                 // Also, determine the underlying engine version.
                 //
