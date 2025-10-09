@@ -156,16 +156,19 @@ else
 
                 var engineType = (DatabaseEngineType)dataSet.Tables[0].Rows[0]["DatabaseEngineType"];
                 var edition = (DatabaseEngineEdition)dataSet.Tables[0].Rows[0]["DatabaseEngineEdition"];
-                // Treat unknown editions from Azure the same as Azure SQL database
-                if (engineType == DatabaseEngineType.SqlAzureDatabase && !validEditions.Contains(edition))
+                // Treat unknown editions appropriately based on engine type
+                if (!validEditions.Contains(edition))
                 {
-                    edition = DatabaseEngineEdition.SqlDatabase;
-                }
-                // If edition is 1000 (Dynamics CRM), treat it as Standalone with Express edition
-                if ((int)edition == 1000)
-                {
-                    engineType = DatabaseEngineType.Standalone;
-                    edition = DatabaseEngineEdition.Express;
+                    // If edition is 1000 (Dynamics CRM), treat it as Standalone with Express edition
+                    if ((int)edition == 1000)
+                    {
+                        engineType = DatabaseEngineType.Standalone;
+                        edition = DatabaseEngineEdition.Express;
+                    }
+                    else if (engineType == DatabaseEngineType.SqlAzureDatabase)
+                    {
+                        edition = DatabaseEngineEdition.SqlDatabase;
+                    }
                 }
                 // If we're on Managed Instance, don't treat it as a "Sql Azure", but as "Standalone"
                 // Also, determine the underlying engine version.
