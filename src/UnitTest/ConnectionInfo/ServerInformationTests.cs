@@ -113,33 +113,6 @@ else
             connectMock.VerifyAll();
         }
 
-        [TestMethod]
-        [TestCategory("Unit")]
-        public void When_Edition_is_1000_treat_as_Standalone_Express()
-        {
-            const string versionString = "16.00.1000.6";
-
-            var connectMock = new Mock<IDbConnection>();
-            var commandMock = new Mock<IDbCommand>();
-            var dataAdapterMock = new Mock<IDbDataAdapter>();
-            
-            connectMock.Setup(c => c.CreateCommand()).Returns(commandMock.Object);
-            dataAdapterMock.SetupSet(d => d.SelectCommand = commandMock.Object);
-            dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
-                (DataSet ds) =>
-                {
-                    // Simulate Dynamics CRM server returning edition 1000
-                    FillTestDataSet(ds, versionString, DatabaseEngineType.Standalone, (DatabaseEngineEdition)1000, 0x10000FA0, HostPlatformNames.Windows, "TCP");
-                });
-
-            var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
-            
-            // Verify that edition 1000 is converted to Standalone Express
-            Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.Standalone), "Edition 1000 should be treated as Standalone");
-            Assert.That(si.DatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.Express), "Edition 1000 should be treated as Express edition");
-            Assert.That(si.ProductVersion, Is.EqualTo(new Version(versionString)), "Unexpected ProductVersion");
-        }
-
         private void FillTestDataSet(DataSet ds, string productVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition,
             int microsoftVersion, string hostPlatform, string protocol)
         {

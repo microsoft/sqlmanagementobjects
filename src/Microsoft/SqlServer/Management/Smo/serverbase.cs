@@ -3047,7 +3047,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 // the Database can only be the same edition as the ServerConnection.
                 // If we are connected to logical master then Database can have a different edition, so
                 // add RealEngineEdition to the query so we get the edition from sys.database_service_objectives
-                if (DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase) {
+                // Only add RealEngineEdition for Azure SQL Database, not for unknown editions like Dynamics CRM (edition 1000)
+                if (DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase && DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase) {
                     yield return "RealEngineEdition";
                 }
             }
