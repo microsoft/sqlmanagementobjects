@@ -3351,27 +3351,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        /// <summary>
-        /// Returns the original DatabaseEngineEdition value before any conversion/mapping
-        /// </summary>
-        internal virtual DatabaseEngineEdition OriginalDatabaseEngineEdition
-        {
-            get
-            {
-                //Bubble up to the parent until we get to the root - at
-                //which point we'll fetch the value from the ExecutionManager.
-                SqlSmoObject parent = this.GetParentObject(throwIfParentIsCreating:false, throwIfParentNotExist:false);
-                if (parent != null)
-                {
-                    return parent.OriginalDatabaseEngineEdition;
-                }
-                else
-                {
-                    return this.ExecutionManager.GetOriginalDatabaseEngineEdition();
-                }
-            }
-        }
-
         private IRenewableToken accessToken = null;
 
         /// <summary>

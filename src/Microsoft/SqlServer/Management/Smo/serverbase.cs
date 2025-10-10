@@ -3049,7 +3049,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // add RealEngineEdition to the query so we get the edition from sys.database_service_objectives
                 // Only add RealEngineEdition for Azure SQL Database where the original edition was SqlDatabase
                 // (not for unknown editions like Dynamics CRM edition 1000 that get converted to SqlDatabase)
-                if (OriginalDatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase && DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase) {
+                if (this.ExecutionManager.GetOriginalDatabaseEngineEdition() == DatabaseEngineEdition.SqlDatabase && DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase) {
                     yield return "RealEngineEdition";
                 }
             }
