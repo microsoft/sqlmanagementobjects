@@ -1424,7 +1424,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 CheckObjectState();
 
-                DatabaseMapping[] mapping = null;
+                DatabaseMapping[] mapping = new DatabaseMapping[0];
                 if (!this.IsDesignMode)
                 {
                     Urn uMappings = this.Urn.ToString() + "/DatabaseMapping";
@@ -1434,18 +1434,13 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (dt.Rows.Count > 0)
                     {
                         mapping = new DatabaseMapping[dt.Rows.Count];
-                    }
-                    else
-                    {
-                        return null;
-                    }
-
-                    for (int iRow = 0; iRow < dt.Rows.Count; iRow++)
-                    {
-                        DataRow dr = dt.Rows[iRow];
-                        mapping[iRow] = new DatabaseMapping(Convert.ToString(dr["LoginName"], SmoApplication.DefaultCulture),
-                                                            Convert.ToString(dr["DBName"], SmoApplication.DefaultCulture),
-                                                            Convert.ToString(dr["UserName"], SmoApplication.DefaultCulture));
+                        for (int iRow = 0; iRow < dt.Rows.Count; iRow++)
+                        {
+                            DataRow dr = dt.Rows[iRow];
+                            mapping[iRow] = new DatabaseMapping(Convert.ToString(dr["LoginName"], SmoApplication.DefaultCulture),
+                                                                Convert.ToString(dr["DBName"], SmoApplication.DefaultCulture),
+                                                                Convert.ToString(dr["UserName"], SmoApplication.DefaultCulture));
+                        }
                     }
                 }
                 else
