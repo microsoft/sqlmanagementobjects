@@ -800,6 +800,11 @@ using System.Data.SqlClient;
             return this.ConnectionContext.DatabaseEngineEdition;
         }
 
+        internal DatabaseEngineEdition GetOriginalDatabaseEngineEdition()
+        {
+            return this.ConnectionContext.OriginalDatabaseEngineEdition;
+        }
+
         internal NetworkProtocol GetConnectionProtocol()
         {
             return this.ConnectionContext.ConnectionProtocol;

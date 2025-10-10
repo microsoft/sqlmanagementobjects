@@ -25,6 +25,7 @@ namespace Microsoft.SqlServer.Management.Common
         private readonly Version productVersion;
         private readonly DatabaseEngineType databaseEngineType;
         private readonly DatabaseEngineEdition databaseEngineEdition;
+        private readonly DatabaseEngineEdition originalDatabaseEngineEdition;
         private readonly string hostPlatform;
         private readonly NetworkProtocol connectionProtocol;
 
@@ -37,7 +38,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="dt"></param>
         /// <param name="databaseEngineEdition"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition)
-            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified)
+            : this(sv, productVersion, dt, databaseEngineEdition, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified)
         {
 
         }
@@ -49,15 +50,17 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="productVersion"></param>
         /// <param name="dt"></param>
         /// <param name="databaseEngineEdition"></param>
+        /// <param name="originalDatabaseEngineEdition"></param>
         /// <param name="hostPlatform"></param>
         /// <param name="connectionProtocol">net_transport value from dm_exec_connections for the current spid</param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition,
-            string hostPlatform, NetworkProtocol connectionProtocol)
+            DatabaseEngineEdition originalDatabaseEngineEdition, string hostPlatform, NetworkProtocol connectionProtocol)
         {
             this.serverVersion = sv;
             this.productVersion = productVersion;
             this.databaseEngineType = dt;
             this.databaseEngineEdition = databaseEngineEdition;
+            this.originalDatabaseEngineEdition = originalDatabaseEngineEdition;
             this.hostPlatform = hostPlatform;
             this.connectionProtocol = connectionProtocol;
         }
@@ -101,6 +104,14 @@ namespace Microsoft.SqlServer.Management.Common
         public DatabaseEngineEdition DatabaseEngineEdition
         {
             get { return databaseEngineEdition; }
+        }
+
+        /// <summary>
+        /// The original DatabaseEngineEdition value before any conversion/mapping
+        /// </summary>
+        public DatabaseEngineEdition OriginalDatabaseEngineEdition
+        {
+            get { return originalDatabaseEngineEdition; }
         }
 
         /// <summary>
@@ -156,6 +167,7 @@ else
 
                 var engineType = (DatabaseEngineType)dataSet.Tables[0].Rows[0]["DatabaseEngineType"];
                 var edition = (DatabaseEngineEdition)dataSet.Tables[0].Rows[0]["DatabaseEngineEdition"];
+                var originalEdition = edition; // Preserve the original edition value
                 // Treat unknown editions from Azure the same as Azure SQL database
                 if (engineType == DatabaseEngineType.SqlAzureDatabase && !validEditions.Contains(edition))
                 {
@@ -180,6 +192,7 @@ else
                     new Version((string)dataSet.Tables[0].Rows[0]["ProductVersion"]),
                     engineType,
                     edition,
+                    originalEdition,
                     (string)dataSet.Tables[1].Rows[0]["host_platform"],
                     connectionProtocol == DBNull.Value ? NetworkProtocol.NotSpecified : ProtocolFromNetTransport((string)connectionProtocol)
                     );

@@ -310,6 +310,14 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         /// <summary>
+        /// The original edition of the Database Engine before any conversion/mapping
+        /// </summary>
+        internal DatabaseEngineEdition OriginalDatabaseEngineEdition
+        {
+            get { return GetServerInformation().OriginalDatabaseEngineEdition; }
+        }
+
+        /// <summary>
         /// The host platform of the server (Linux/Windows/etc)
         /// </summary>
         public string HostPlatform
