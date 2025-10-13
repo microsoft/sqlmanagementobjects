@@ -113,6 +113,91 @@ else
             connectMock.VerifyAll();
         }
 
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void When_Edition_is_1000_from_Azure_server_it_is_converted_to_SqlDatabase()
+        {
+            // Test for Dynamics CRM scenario (edition 1000)
+            const string versionString = "16.00.1000.6";
+
+            var connectMock = new Mock<IDbConnection>();
+            var commandMock = new Mock<IDbCommand>();
+            var dataAdapterMock = new Mock<IDbDataAdapter>();
+            
+            connectMock.Setup(c => c.CreateCommand()).Returns(commandMock.Object);
+            dataAdapterMock.SetupSet(d => d.SelectCommand = commandMock.Object);
+            dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
+                (DataSet ds) =>
+                {
+                    // Simulate Dynamics CRM server returning edition 1000 with Azure engine type
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, (DatabaseEngineEdition)1000, 0x10000FA0, HostPlatformNames.Windows, "TCP");
+                });
+
+            var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
+            
+            // Verify that edition 1000 from Azure is converted to SqlDatabase
+            Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Engine type should remain SqlAzureDatabase");
+            Assert.That(si.DatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.SqlDatabase), "Edition 1000 from Azure should be converted to SqlDatabase");
+            Assert.That(si.OriginalDatabaseEngineEdition, Is.EqualTo((DatabaseEngineEdition)1000), "Original edition should be preserved as 1000");
+            Assert.That(si.ProductVersion, Is.EqualTo(new Version(versionString)), "Unexpected ProductVersion");
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void When_Edition_is_1000_from_Standalone_server_it_remains_unchanged()
+        {
+            // Test for edition 1000 from a standalone server (not Azure)
+            const string versionString = "16.00.1000.6";
+
+            var connectMock = new Mock<IDbConnection>();
+            var commandMock = new Mock<IDbCommand>();
+            var dataAdapterMock = new Mock<IDbDataAdapter>();
+            
+            connectMock.Setup(c => c.CreateCommand()).Returns(commandMock.Object);
+            dataAdapterMock.SetupSet(d => d.SelectCommand = commandMock.Object);
+            dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
+                (DataSet ds) =>
+                {
+                    // Simulate standalone server returning edition 1000
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.Standalone, (DatabaseEngineEdition)1000, 0x10000FA0, HostPlatformNames.Windows, "TCP");
+                });
+
+            var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
+            
+            // Verify that edition 1000 from standalone server is NOT converted
+            Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.Standalone), "Engine type should be Standalone");
+            Assert.That(si.DatabaseEngineEdition, Is.EqualTo((DatabaseEngineEdition)1000), "Edition 1000 from standalone should remain as 1000");
+            Assert.That(si.OriginalDatabaseEngineEdition, Is.EqualTo((DatabaseEngineEdition)1000), "Original edition should be 1000");
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void When_Edition_is_SqlDatabase_original_edition_matches_converted_edition()
+        {
+            // Test that genuine Azure SQL Database preserves original edition correctly
+            const string versionString = "12.00.6024.0";
+
+            var connectMock = new Mock<IDbConnection>();
+            var commandMock = new Mock<IDbCommand>();
+            var dataAdapterMock = new Mock<IDbDataAdapter>();
+            
+            connectMock.Setup(c => c.CreateCommand()).Returns(commandMock.Object);
+            dataAdapterMock.SetupSet(d => d.SelectCommand = commandMock.Object);
+            dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
+                (DataSet ds) =>
+                {
+                    // Simulate genuine Azure SQL Database (edition 5)
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x0C001788, HostPlatformNames.Windows, "TCP");
+                });
+
+            var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
+            
+            // Verify that SqlDatabase edition stays the same and original matches
+            Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Engine type should be SqlAzureDatabase");
+            Assert.That(si.DatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.SqlDatabase), "Edition should be SqlDatabase");
+            Assert.That(si.OriginalDatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.SqlDatabase), "Original edition should also be SqlDatabase (no conversion)");
+        }
+
         private void FillTestDataSet(DataSet ds, string productVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition,
             int microsoftVersion, string hostPlatform, string protocol)
         {
