@@ -3,6 +3,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
+
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
@@ -21,11 +23,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                 throw new ArgumentException($"The descriptor must be of type {nameof(FabricWorkspaceDescriptor)}.", nameof(descriptor));
             }
 
-            this.TestDescriptor = descriptor;
+            TestDescriptor = descriptor;
         }
         public override Database HandleDatabaseCreation(DatabaseParameters dbParameters)
         {
-            var fabricWorkspaceDescriptor = (FabricWorkspaceDescriptor)this.TestDescriptor;
+            var fabricWorkspaceDescriptor = (FabricWorkspaceDescriptor)TestDescriptor;
             string fabricDbName;
             var currentUtcTime = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
             var dbNamePrefix = $"{fabricWorkspaceDescriptor.DbNamePrefix}{currentUtcTime}-";
@@ -44,24 +46,34 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             //create fabric database using fabric-cli
             var connectionString = fabricWorkspaceDescriptor.CreateDatabase(fabricDbName);
             Trace.TraceInformation($"Created fabric database {fabricDbName}");
-            var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);            
-            this.ServerContext = InitializeServerContext(sqlConnectionStringBuilder);
-            // Fabric database InitialCatalog is slightly different from the database display name
-            // e.g. "SmoTestFabric-'']]]'{e2e334e4-043a-4f31-ad6c-b9649f886d2a}" is the display name
-            // but the InitialCatalog is "SmoTestFabric-'']]]'{e2e334e4-043a-4f31-ad6c-b9649f886d2a}-46ecae46-6627-43db-8c0d-53ae916a0a23"
-            var db = this.ServerContext.Databases[sqlConnectionStringBuilder.InitialCatalog];
-            this.DatabaseDisplayName = fabricDbName;
-
+            Database db;
+            try
+            {
+                var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+                ServerContext = InitializeServerContext(sqlConnectionStringBuilder);
+                // Fabric database InitialCatalog is slightly different from the database display name
+                // e.g. "SmoTestFabric-'']]]'{e2e334e4-043a-4f31-ad6c-b9649f886d2a}" is the display name
+                // but the InitialCatalog is "SmoTestFabric-'']]]'{e2e334e4-043a-4f31-ad6c-b9649f886d2a}-46ecae46-6627-43db-8c0d-53ae916a0a23"
+                var dbName = string.IsNullOrEmpty(sqlConnectionStringBuilder.InitialCatalog) ? fabricDbName : sqlConnectionStringBuilder.InitialCatalog;
+                db = ServerContext.Databases[dbName];
+                DatabaseDisplayName = fabricDbName;
+            }
+            catch
+            {
+                //clean up fabric database if we failed to connect to it
+                fabricWorkspaceDescriptor.DropDatabase(fabricDbName);
+                throw;
+            }
             return db;
         }
 
         public override void HandleDatabaseDrop()
         {
-           var fabricWorkspaceDescriptor = this.TestDescriptor as FabricWorkspaceDescriptor;
-           if (!string.IsNullOrEmpty(this.DatabaseDisplayName))
-           {
-               fabricWorkspaceDescriptor.DropDatabase(this.DatabaseDisplayName);
-           }
+            var fabricWorkspaceDescriptor = TestDescriptor as FabricWorkspaceDescriptor;
+            if (!string.IsNullOrEmpty(DatabaseDisplayName))
+            {
+                fabricWorkspaceDescriptor.DropDatabase(DatabaseDisplayName);
+            }
         }
     }
 }

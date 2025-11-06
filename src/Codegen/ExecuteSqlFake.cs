@@ -248,7 +248,15 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             throw new Exception();
         }
-        
+
+        /// <summary>
+        /// Returns true if the connection is a fabric connection
+        /// </summary>
+        /// <param name="con"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static bool IsFabricConnection(object con) => throw new Exception();
+
         /// <summary>
         /// Checks whether the specified database is accessible to the user. If an error occurs
         /// it will not throw - returning FALSE instead

@@ -1614,7 +1614,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public void Recreate()
         {
-            
+
             if (ParentColl.ParentInstance is UserDefinedTableType)
             {
                 throw new FailedOperationException(ExceptionTemplates.Recreate, this, null, ExceptionTemplates.UDTTIndexCannotBeModified);
@@ -2481,7 +2481,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 "SecondaryXmlIndexType",
                 "SpatialIndexType",
                 "IsOptimizedForSequentialKey",
-				nameof(HasXmlCompressedPartitions),
+                nameof(HasXmlCompressedPartitions),
+                nameof(VectorIndexMetric),
+                nameof(VectorIndexType)
             };
 
             List<string> list = GetSupportedScriptFields(typeof(Index.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);

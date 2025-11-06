@@ -59,7 +59,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 {
                     systemDataType = this.Find(typeSpec, false);
 #if NYI_DATATYPE_XML
-                    // We need to run some extra checks if the type is XML. This is 
+                    // We need to run some extra checks if the type is XML. This is
                     // because we don't represent the XML arguments ourselves, rather,
                     // we rely on SMO data type object on representing these.
                     if (typeSpec.SqlDataType == SqlDataType.Xml)
@@ -81,22 +81,24 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
         }
 
         /// <summary>
-        /// Retrieves and returns the base system data type for the specified 
+        /// Retrieves and returns the base system data type for the specified
         /// user-defined data type (i.e. type alias).
         /// </summary>
         /// <param name="smoUserDefinedDataType">User-defined data type SMO metadata object.</param>
         /// <returns>SystemDataType object if specified UDDT is valid; otherwise null.</returns>
         public ISystemDataType RetrieveSystemDataType(Smo.UserDefinedDataType smoUserDefinedDataType)
         {
+            // SMO_NEW_DATATYPE
+            // Add logic to retrieve the underlying system data type for the user-defined data type
             Debug.Assert(smoUserDefinedDataType != null, "SmoMetadataProvider Assert", "smoUserDefinedDataType != null");
 
             DataTypeSpec typeSpec = DataTypeSpec.GetDataTypeSpec(smoUserDefinedDataType.SystemType);
             Debug.Assert(typeSpec != null, "SmoMetadataProvider Assert", "typeSpec != null");
 
-            // IMPORTANT NOTE: 
-            // If the UDDT aliases a 'max' data type (i.e. varbinary(max), varchar(max) 
+            // IMPORTANT NOTE:
+            // If the UDDT aliases a 'max' data type (i.e. varbinary(max), varchar(max)
             // or nvarchar(max), SMO dows not set 'SystemType' field to the corresponding
-            // non-max value (e.g. varbinary instead of varbinary(max)). It seems, however, 
+            // non-max value (e.g. varbinary instead of varbinary(max)). It seems, however,
             // that the length field in this case is set to -1. We will rely on this behavior
             // to identify such cases. An assert is added below to ensure that this is the
             // correct assumption.
@@ -224,7 +226,8 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                     return DataTypeSpec.Json;
                 case Smo.SqlDataType.Vector:
                     return DataTypeSpec.Vector;
-
+                // SMO_NEW_DATATYPE
+                // Add SMO data type to DataTypeSpec mapping
                 default:
                     Debug.Assert(IsSmoUserDefinedDataType(sqlDataType) || (sqlDataType == Smo.SqlDataType.None),
                                  "SmoMetadataProvider Assert", string.Concat("Unrecognized SMO SqlDataType '", sqlDataType.ToString(), "'!"));

@@ -3,19 +3,36 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
     /// <summary>
+    /// The VectorBaseType specifies the base type of a vector data type.
+    /// </summary>
+    public enum VectorBaseType
+    {
+        /// <summary>
+        /// 16-bit floating point format
+        /// </summary>
+        Float16,
+
+        /// <summary>
+        /// 32-bit floating point format
+        /// </summary>
+        Float32
+    }
+
+    /// <summary>
     /// The SqlDataType specifies the type of the DataType object.
     /// </summary>
     public enum SqlDataType
     {
-        None    = 0, // Not set.
-        BigInt  = 1, //A 64-bit signed integer.
-        Binary  = 2, //A fixed-length stream of binary data ranging between 1 and 8,000 bytes.
+        None = 0, // Not set.
+        BigInt = 1, //A 64-bit signed integer.
+        Binary = 2, //A fixed-length stream of binary data ranging between 1 and 8,000 bytes.
         Bit = 3, //An unsigned numeric value that can be 0, 1, or a null reference.
         Char = 4, //A fixed-length stream of non-Unicode characters ranging between 1 and 8,000 characters.
         DateTime = 6,// Date and time data ranging in value from January 1, 1753 to December 31, 9999 to an accuracy of 3.33 milliseconds.
@@ -23,25 +40,25 @@ namespace Microsoft.SqlServer.Management.Smo
         Float = 8, //A floating point number within the range of -1.79E +308 through 1.79E +308.
         Image = 9, //A variable-length stream of binary data ranging from 0 to 231 -1 (or 2,147,483,647) bytes.
         Int = 10, //A 32-bit signed integer.
-        Money   = 11, //A currency value ranging from -263 (or -922,337,203,685,477.5808) to 2 63 -1 (or +922,337,203,685,477.5807) with an accuracy to a ten-thousandth of a currency unit.
-        NChar   = 12, //A fixed-length stream of Unicode characters ranging between 1 and 4,000 characters.
-        NText   = 13, //A variable-length stream of Unicode data with a maximum length of 230 - 1 (or 1,073,741,823) characters.
-        NVarChar    = 14, //A variable-length stream of Unicode characters ranging between 1 and 2^63 characters.
+        Money = 11, //A currency value ranging from -263 (or -922,337,203,685,477.5808) to 2 63 -1 (or +922,337,203,685,477.5807) with an accuracy to a ten-thousandth of a currency unit.
+        NChar = 12, //A fixed-length stream of Unicode characters ranging between 1 and 4,000 characters.
+        NText = 13, //A variable-length stream of Unicode data with a maximum length of 230 - 1 (or 1,073,741,823) characters.
+        NVarChar = 14, //A variable-length stream of Unicode characters ranging between 1 and 2^63 characters.
         NVarCharMax = 15, //NVARCHAR(MAX) type.
         Real = 16, //A floating point number within the range of -3.40E +38 through 3.40E +38.
         SmallDateTime = 17, //Date and time data ranging in value from January 1, 1900 to June 6, 2079 to an accuracy of one minute.
-        SmallInt     = 18, //A 16-bit signed integer.
-        SmallMoney  = 19, //A currency value ranging from -214,748.3648 to +214,748.3647 with an accuracy to a ten-thousandth of a currency unit.
+        SmallInt = 18, //A 16-bit signed integer.
+        SmallMoney = 19, //A currency value ranging from -214,748.3648 to +214,748.3647 with an accuracy to a ten-thousandth of a currency unit.
         Text = 20, //A variable-length stream of non-Unicode data with a maximum length of 231 -1 (or 2,147,483,647) characters.
-        Timestamp   = 21, //Automatically generated binary numbers, which are guaranteed to be unique within a database.
+        Timestamp = 21, //Automatically generated binary numbers, which are guaranteed to be unique within a database.
         TinyInt = 22, //An 8-bit unsigned integer.
-        UniqueIdentifier    = 23, //A globally unique identifier (or GUID).
+        UniqueIdentifier = 23, //A globally unique identifier (or GUID).
         UserDefinedDataType = 24, //User defined data type.
         UserDefinedType = 25, //SQL CLR User Defined Type.
-        VarBinary   = 28, //A variable-length stream of binary data ranging between 1 and 2^64 bytes.
-        VarBinaryMax    = 29, //VARBINARY(MAX) type.
+        VarBinary = 28, //A variable-length stream of binary data ranging between 1 and 2^64 bytes.
+        VarBinaryMax = 29, //VARBINARY(MAX) type.
         VarChar = 30, //A variable-length stream of non-Unicode characters ranging between 1 and 2^64 characters.
-        VarCharMax  = 31, //VARCHAR(MAX) type.
+        VarCharMax = 31, //VARCHAR(MAX) type.
         Variant = 32, //A special data type that can contain numeric, string, binary, or date data as well as the SQL Server values Empty and Null, which is assumed if no other type is declared.
         Xml = 33, //XML data type.
         SysName = 34, //XML data type.
@@ -57,9 +74,8 @@ namespace Microsoft.SqlServer.Management.Smo
         Json = 44, // A json datatype.
         Vector = 45, // A vector datatype.
 
-        // !!IMPORTANT!! If updating this with new types make sure to update IsDataTypeSupportedOnTargetVersion and/or IsSystemDataType with the new type!
-        // You should also update the AllSqlDataTypeValues_SupportedOnAllApplicableVersions unit test with the new type and minimum version
-        //
+        // SMO_NEW_DATATYPE
+        // New data types should be added to this enum
     }
 
     /// <summary>
@@ -81,8 +97,12 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sqlDataType"></param>
         public DataType(SqlDataType sqlDataType)
         {
-            switch(sqlDataType)
+            this.sqlDataType = sqlDataType;
+            this.name = GetSqlName(sqlDataType);
+            switch (sqlDataType)
             {
+                // SMO_NEW_DATATYPE
+                // Set reasonable default values based on the data type for when we only have the datatype info itself
                 case SqlDataType.BigInt:
                 case SqlDataType.Bit:
                 case SqlDataType.Char:
@@ -115,35 +135,25 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.SysName:
                 case SqlDataType.Date:
                 case SqlDataType.Json:
-                    this.sqlDataType = sqlDataType;
-                    this.name = GetSqlName(sqlDataType);
+                    // No default values needed to be set
                     break;
                 case SqlDataType.Vector:
-                    this.sqlDataType = sqlDataType;
-                    this.name = GetSqlName(sqlDataType);
                     // set a default of the max supported value for vector
-                    this.MaximumLength = 1998;
+                    // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
+                    this.VectorDimensions = 1998;
+                    // We don't set a default VectorBaseType here since it's optional - we'll let the engine decide
                     break;
                 case SqlDataType.Numeric:
                 case SqlDataType.Decimal:
-                    // set the default Precision and Scale values when not mentioned anything
-                    this.sqlDataType = sqlDataType;
-                    this.name = GetSqlName(sqlDataType);
                     this.NumericPrecision = 18;
                     this.NumericScale = 0;
                     break;
                 case SqlDataType.Float:
-                    // set the default Precision value when not mentioned anything
-                    this.sqlDataType = sqlDataType;
-                    this.name = GetSqlName(sqlDataType);
                     this.NumericPrecision = 53;
                     break;
                 case SqlDataType.Time:
                 case SqlDataType.DateTime2:
                 case SqlDataType.DateTimeOffset:
-                    // set the default Precision value when not mentioned anything
-                    this.sqlDataType = sqlDataType;
-                    this.name = GetSqlName(sqlDataType);
                     this.NumericScale = 7;
                     break;
                 default:
@@ -153,15 +163,21 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// Creates a new DataType object. The sqlDataType specifies the SQL Server data type.
-        /// MaxLength specifies the maximum length of the type. In case of Decimal or Numeric,
-        /// maxLength specifies the precision.
+        /// The singleNumericValue parameter specifies either the maximum length, precision, scale
+        /// or number of dimensions based on the data type.
         /// </summary>
-        /// <param name="sqlDataType"></param>
-        /// <param name="precisionOrMaxLengthOrScale"></param>
-        public DataType(SqlDataType sqlDataType, Int32 precisionOrMaxLengthOrScale)
+        /// <param name="sqlDataType">The data type</param>
+        /// <param name="singleNumericValue">The numeric value to use for the datatype</param>
+        public DataType(SqlDataType sqlDataType, Int32 singleNumericValue)
         {
-            switch(sqlDataType)
+            this.sqlDataType = sqlDataType;
+            this.name = GetSqlName(sqlDataType);
+            switch (sqlDataType)
             {
+                // SMO_NEW_DATATYPE
+                // To provide a constructor that allows creating a fully-defined datatype pick the appropriate constructor signature for what values
+                // you need and add the new datatype to that. For example, if you only need a single int value for your datatype then you'd add it
+                // here, but if you need more values you'd use one of the other constructors
                 case SqlDataType.Binary:
                 case SqlDataType.Char:
                 case SqlDataType.NChar:
@@ -171,29 +187,23 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.Image:
                 case SqlDataType.NText:
                 case SqlDataType.Text:
-                case SqlDataType.Vector:
-                    this.sqlDataType = sqlDataType;
-                    this.MaximumLength = precisionOrMaxLengthOrScale;
-                    this.name = GetSqlName(sqlDataType);
+                    this.MaximumLength = singleNumericValue;
                     break;
                 case SqlDataType.Decimal:
                 case SqlDataType.Numeric:
-                    this.sqlDataType = sqlDataType;
-                    this.NumericPrecision = precisionOrMaxLengthOrScale;
+                    this.NumericPrecision = singleNumericValue;
                     this.NumericScale = 0;
-                    this.name = GetSqlName(sqlDataType);
                     break;
                 case SqlDataType.Float:
-                    this.sqlDataType = sqlDataType;
-                    this.NumericPrecision = precisionOrMaxLengthOrScale;
-                    this.name = GetSqlName(sqlDataType);
+                    this.NumericPrecision = singleNumericValue;
                     break;
                 case SqlDataType.Time:
                 case SqlDataType.DateTimeOffset:
                 case SqlDataType.DateTime2:
-                    this.sqlDataType = sqlDataType;
-                    this.NumericScale = precisionOrMaxLengthOrScale;
-                    this.name = GetSqlName(sqlDataType);
+                    this.NumericScale = singleNumericValue;
+                    break;
+                case SqlDataType.Vector:
+                    this.VectorDimensions = singleNumericValue;
                     break;
                 default:
                     throw new SmoException(ExceptionTemplates.DataTypeUnsupported(sqlDataType.ToString()));
@@ -388,6 +398,11 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             if (this.numericScale != dt.numericScale)
+            {
+                return false;
+            }
+
+            if (this.vectorBaseType != dt.vectorBaseType)
             {
                 return false;
             }
@@ -818,31 +833,45 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Maximum value of dimensions we can handle. Note that this isn't necessarily the max
-        /// dimensions allowed by the engine since that can change - instead we have this handle
-        /// the highest value allowed and then the engine will throw an error later if it's too high.
+        /// Creates a DataType of type SqlDataType.Vector
         /// </summary>
-        private const int MaxVectorDimensions = (int.MaxValue - 8) / 4;
+        /// <param name="dimensions">The number of dimensions for the vector</param>
+        /// <param name="baseType">The optional base type for the Vector data type</param>
+        /// <returns></returns>
+        public static DataType Vector(Int32 dimensions, VectorBaseType? baseType)
+        {
+            // Throw a clear error if the dimensions are invalid
+            if (dimensions < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(dimensions));
+            }
+            return new DataType(SqlDataType.Vector, dimensions)
+            {
+                VectorBaseType = baseType == null ? string.Empty : baseType.Value.ToString().ToLowerInvariant()
+            };
+        }
 
         /// <summary>
         /// Creates a DataType of type SqlDataType.Vector
         /// </summary>
         /// <param name="dimensions">The number of dimensions for the vector</param>
+        /// <param name="baseType">The optional base type for the Vector data type</param>
         /// <returns></returns>
-        public static DataType Vector(Int32 dimensions)
+        public static DataType Vector(Int32 dimensions, string baseType = "")
         {
-            // Throw a clear error if the dimensions are out of range
-            if (dimensions < 1 || dimensions > MaxVectorDimensions)
+            // Throw a clear error if the dimensions are invalid
+            if (dimensions < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(dimensions));
             }
-            // Temporary workaround to convert the dimensions to maxlength for vector types
-            // until sys.columns is updated to include the dimensions of the vector type.
-            // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/3906463
-            // dimensions = (length - 8) / 4
-            // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
-            return new DataType(SqlDataType.Vector, (dimensions * 4) + 8);
+            return new DataType(SqlDataType.Vector, dimensions)
+            {
+                VectorBaseType = baseType ?? string.Empty
+            };
         }
+
+        // SMO_NEW_DATATYPE
+        // Add a new static method for the new datatype to enable easier creation
 
         #endregion
 
@@ -1085,6 +1114,29 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        System.Int32 vectorDimensions = 0;
+        /// <summary>
+        /// Maximum number of dimensions of the Vector data type, else 0.
+        /// </summary>
+        public Int32 VectorDimensions
+        {
+            get => vectorDimensions;
+            set => Set(ref vectorDimensions, value);
+        }
+
+        System.String vectorBaseType = string.Empty;
+        /// <summary>
+        /// The base type of the Vector data type (e.g., "float16", "float32").
+        /// </summary>
+        public string VectorBaseType
+        {
+            get => vectorBaseType;
+            set => Set(ref vectorBaseType, value);
+        }
+
+        // SMO_NEW_DATATYPE
+        // If the data type has a new property, add it here
+
         XmlDocumentConstraint xmlDocumentConstraint = XmlDocumentConstraint.Default;
         /// <summary>
         /// Specifies whether the XML data type is a fragment (content)
@@ -1104,6 +1156,15 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     parent.Properties.Get("XmlDocumentConstraint").Value = xmlDocumentConstraint;
                 }
+            }
+        }
+
+        private void Set<T>(ref T field, T value, [CallerMemberName] string property = "")
+        {
+            field = value;
+            if (parent != null)
+            {
+                parent.Properties.Get(property).Value = value;
             }
         }
 
@@ -1185,12 +1246,18 @@ namespace Microsoft.SqlServer.Management.Smo
             ret.numericPrecision = this.NumericPrecision;
             ret.numericScale = this.NumericScale;
             ret.maximumLength = this.MaximumLength;
-
+            ret.VectorDimensions = this.VectorDimensions;
+            ret.VectorBaseType = this.VectorBaseType;
+            // SMO_NEW_DATATYPE
+            // Copy over property value if a new property field was added
             return ret;
         }
 
         internal void ReadFromPropBag(SqlSmoObject sqlObject)
         {
+            // SMO_NEW_DATATYPE
+            // When initializing a datatype from a SqlSmoObject (usually its parent) add any special logic here to correctly populate
+            // the properties here with the corresponding values from the SqlSmoObject
             string dt = sqlObject.GetPropValueOptional("DataType", string.Empty) as string;
             string st = sqlObject.GetPropValueOptional("SystemType", string.Empty) as string;
 
@@ -1216,7 +1283,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Special cases:
             //    sysname - although it is a UDDT we treat it as a SDT
             //    vector - underlying type is varbinary, so it is expected not to match
-            if (dt == st || 
+            if (dt == st ||
                 "sysname" == dt ||
                 ("vector" == dt && "varbinary" == st))
             {
@@ -1234,6 +1301,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 else if (sqlDataType == SqlDataType.VarChar && maximumLength <= 0)
                 {
                     sqlDataType = SqlDataType.VarCharMax;
+                }
+                else if (sqlDataType == SqlDataType.Vector)
+                {
+                    vectorDimensions = (Int32)sqlObject.GetPropValueOptional("VectorDimensions", 0);
+                    vectorBaseType = sqlObject.GetPropValueOptional("VectorBaseType", string.Empty) as string;
                 }
                 else if (sqlDataType == SqlDataType.Xml)
                 {
@@ -1265,58 +1337,58 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         public string GetSqlName(SqlDataType sqldt)
         {
-            switch(sqldt)
+            switch (sqldt)
             {
                 case SqlDataType.BigInt:
-                    return  "bigint";
+                    return "bigint";
                 case SqlDataType.Binary:
-                    return  "binary";
+                    return "binary";
                 case SqlDataType.Bit:
-                    return  "bit";
+                    return "bit";
                 case SqlDataType.Char:
-                    return  "char";
+                    return "char";
                 case SqlDataType.DateTime:
-                    return  "datetime";
+                    return "datetime";
                 case SqlDataType.Decimal:
-                    return  "decimal";
+                    return "decimal";
                 case SqlDataType.Numeric:
                     return "numeric";
                 case SqlDataType.Float:
-                    return  "float";
+                    return "float";
                 case SqlDataType.Geography:
                     return "geography";
                 case SqlDataType.Geometry:
                     return "geometry";
                 case SqlDataType.Image:
-                    return  "image";
+                    return "image";
                 case SqlDataType.Int:
-                    return  "int";
+                    return "int";
                 case SqlDataType.Money:
-                    return  "money";
+                    return "money";
                 case SqlDataType.NChar:
-                    return  "nchar";
+                    return "nchar";
                 case SqlDataType.NText:
-                    return  "ntext";
+                    return "ntext";
                 case SqlDataType.NVarChar:
-                    return  "nvarchar";
+                    return "nvarchar";
                 case SqlDataType.NVarCharMax:
-                    return  "nvarchar";
+                    return "nvarchar";
                 case SqlDataType.Real:
-                    return  "real";
+                    return "real";
                 case SqlDataType.SmallDateTime:
-                    return  "smalldatetime";
+                    return "smalldatetime";
                 case SqlDataType.SmallInt:
-                    return  "smallint";
+                    return "smallint";
                 case SqlDataType.SmallMoney:
-                    return  "smallmoney";
+                    return "smallmoney";
                 case SqlDataType.Text:
-                    return  "text";
+                    return "text";
                 case SqlDataType.Timestamp:
-                    return  "timestamp";
+                    return "timestamp";
                 case SqlDataType.TinyInt:
-                    return  "tinyint";
+                    return "tinyint";
                 case SqlDataType.UniqueIdentifier:
-                    return  "uniqueidentifier";
+                    return "uniqueidentifier";
                 case SqlDataType.UserDefinedDataType:
                     return string.Empty;
                 case SqlDataType.UserDefinedTableType:
@@ -1352,6 +1424,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     return "json";
                 case SqlDataType.Vector:
                     return "vector";
+                // SMO_NEW_DATATYPE
+                // Add a new case for the new datatype to return its corresponding TSQL name
             }
 
             return string.Empty;
@@ -1527,7 +1601,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "vector":
                     sqlDataType = SqlDataType.Vector;
                     break;
-
+                // SMO_NEW_DATATYPE
+                // Add data type name -> enum mapping
                 default:
                     break;
             }
@@ -1646,14 +1721,19 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="targetVersion"></param>
         /// <param name="engineType"></param>
         /// <param name="engineEdition"></param>
+        /// <param name="isFabric"></param>
         /// <returns></returns>
-        internal static bool IsSystemDataType(SqlDataType dataType, SqlServerVersion targetVersion, DatabaseEngineType engineType, DatabaseEngineEdition engineEdition)
+        internal static bool IsSystemDataType(SqlDataType dataType, SqlServerVersion targetVersion, DatabaseEngineType engineType, DatabaseEngineEdition engineEdition, bool isFabric)
         {
+            // SMO_NEW_DATATYPE
+            // Update the below methods to return true for whenever the new datatype is supported so that it's seen as a system data type
+            // (instead of a user-defined type with the same name). Add a new compat level version method as needed if one doesn't exist.
+
             // SQL DB doesn't care about server version
             //
             if (engineType == DatabaseEngineType.SqlAzureDatabase)
             {
-                return IsSystemDataTypeOnAzure(dataType, engineEdition);
+                return IsSystemDataTypeOnAzure(dataType, engineEdition, isFabric);
             }
 
             // We don't want to check the SQL version for MI (its engine type is Standalone)
@@ -1697,8 +1777,12 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         internal static bool IsDataTypeSupportedOnTargetVersion(SqlDataType dataType, SqlServerVersion targetVersion, DatabaseEngineType engineType, DatabaseEngineEdition engineEdition)
         {
+            // SMO_NEW_DATATYPE
+            // Add version check logic for whether a data type is supported for the specified engine type and version
+
             //Check if it's a known system type and if so whether it's supported
-            if (IsSystemDataType(dataType, targetVersion, engineType, engineEdition))
+            // Assumption: Nobody is generating script for a source that is not a Fabric Warehouse intending to run it on a Fabric Warehouse
+            if (IsSystemDataType(dataType, targetVersion, engineType, engineEdition, isFabric: false))
             {
                 return true;
             }
@@ -1729,9 +1813,11 @@ namespace Microsoft.SqlServer.Management.Smo
             return dataType != SqlDataType.UserDefinedType;
         }
 
-        internal static bool IsSystemDataTypeOnAzure(SqlDataType dataType, DatabaseEngineEdition engineEdition)
+        internal static bool IsSystemDataTypeOnAzure(SqlDataType dataType, DatabaseEngineEdition engineEdition, bool isFabric)
         {
-            bool isSupported = true;
+            // SMO_NEW_DATATYPE
+            // Logic for whether a data type is supported on the specified engine type for Azure servers
+            var isSupported = true;
             switch (engineEdition)
             {
                 // By default, Azure engine type doesn't have restrictions on data types. However,
@@ -1741,13 +1827,19 @@ namespace Microsoft.SqlServer.Management.Smo
                 case DatabaseEngineEdition.SqlDataWarehouse:
                     isSupported = IsDataTypeSupportedOnSqlDw(dataType);
                     break;
+                case DatabaseEngineEdition.SqlOnDemand:
+                    if (isFabric)
+                    {
+                        isSupported = dataType != SqlDataType.Json && dataType != SqlDataType.Vector;
+                    }
+                    break;
                 default:
                     break;
             }
 
             // If the data type is supported, check if it is a system data type
             //
-            return isSupported ? IsSystemDataType170(dataType) : false;
+            return isSupported && IsSystemDataType170(dataType);
         }
 
         internal static bool IsDataTypeSupportedOnSqlDw(SqlDataType dataType)
@@ -1829,8 +1921,11 @@ namespace Microsoft.SqlServer.Management.Smo
             this.maximumLength = reader.ReadElementContentAsInt("MaximumLength", string.Empty);
             this.numericPrecision = reader.ReadElementContentAsInt("NumericPrecision", string.Empty);
             this.numericScale = reader.ReadElementContentAsInt("NumericScale", string.Empty);
+            this.vectorDimensions = reader.ReadElementContentAsInt("VectorDimensions", string.Empty);
+            this.vectorBaseType = reader.ReadElementContentAsString("VectorBaseType", string.Empty);
             this.xmlDocumentConstraint = (XmlDocumentConstraint)Enum.Parse(typeof(XmlDocumentConstraint), reader.ReadElementContentAsString("XmlDocumentConstraint", string.Empty));
-
+            // SMO_NEW_DATATYPE
+            // If a new data type property was added, read it from the XML here
             reader.ReadEndElement();
         }
 
@@ -1845,7 +1940,11 @@ namespace Microsoft.SqlServer.Management.Smo
             writer.WriteElementString("MaximumLength", this.MaximumLength.ToString(iFP));
             writer.WriteElementString("NumericPrecision", this.NumericPrecision.ToString(iFP));
             writer.WriteElementString("NumericScale", this.NumericScale.ToString(iFP));
+            writer.WriteElementString("VectorDimensions", this.VectorDimensions.ToString(iFP));
+            writer.WriteElementString("VectorBaseType", this.VectorBaseType);
             writer.WriteElementString("XmlDocumentConstraint", Enum.GetName(typeof(XmlDocumentConstraint), this.XmlDocumentConstraint));
+            // SMO_NEW_DATATYPE
+            // If a new data type property was added, write it to the XML here
         }
 
         #endregion

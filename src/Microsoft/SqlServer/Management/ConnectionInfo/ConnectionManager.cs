@@ -310,6 +310,26 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         /// <summary>
+        /// Returns true if the server is a part of Microsoft Fabric
+        /// </summary>
+        public bool IsFabricServer
+        {
+            get => m_isFabricServerOverride ?? GetServerInformation().IsFabricServer;
+            set
+            {
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_isFabricServerOverride != value)
+                {
+                    m_isFabricServerOverride = value;
+                    m_serverInformation = null;
+                }
+            }
+        }
+
+        /// <summary>
         /// The host platform of the server (Linux/Windows/etc)
         /// </summary>
         public string HostPlatform
@@ -386,8 +406,7 @@ namespace Microsoft.SqlServer.Management.Common
                         finally
                         {
                             // .Net core SqlDataAdapter isn't disposable
-                            var dispose = (object)dataAdapter as IDisposable;
-                            if (dispose != null)
+                            if ((object)dataAdapter is IDisposable dispose)
                             {
                                 dispose.Dispose();
                             }
@@ -401,10 +420,8 @@ namespace Microsoft.SqlServer.Management.Common
                 }
                 else //Not Connected because of Offline/Design Mode.
                 {
-                    //Design mode only understands Singleton engine type.
-                    //Cloud is not supported in designmode.
-                    m_serverInformation = new ServerInformation(m_serverVersionOverride,new Version(m_serverVersionOverride.Major, m_serverVersionOverride.Minor, m_serverVersionOverride.BuildNumber),  DatabaseEngineType.Standalone, DatabaseEngineEdition.Unknown, HostPlatformNames.Windows, NetworkProtocol.NotSpecified);
-                }            
+                    m_serverInformation = new ServerInformation(m_serverVersionOverride,new Version(m_serverVersionOverride.Major, m_serverVersionOverride.Minor, m_serverVersionOverride.BuildNumber),  m_databaseEngineTypeOverride ?? DatabaseEngineType.Standalone, m_databaseEngineEditionOverride ?? DatabaseEngineEdition.Unknown, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, m_isFabricServerOverride?? false);
+                }
             }
             return m_serverInformation;
         }
@@ -665,7 +682,7 @@ end;";
 
                 var builder = new SqlConnectionStringBuilder(this.ConnectionString);
 
-                throw new ConnectionFailureException(StringConnectionInfo.ConnectionFailure(builder.DataSource), e);
+                throw new ConnectionFailureException(StringConnectionInfo.ConnectionFailure($"{builder.DataSource}[{ConnectionString}]"), e);
             }
             finally
             {
@@ -995,9 +1012,11 @@ end;";
         /// This allows users to add a event hook to trace T-SQL statements.
         /// </summary>
         private StatementEventHandler statementEventHandler;
+        // Fields for design mode Server properties
         private Version m_productVersionOverride;
         private DatabaseEngineType? m_databaseEngineTypeOverride;
         private DatabaseEngineEdition? m_databaseEngineEditionOverride;
+        private bool? m_isFabricServerOverride;
 
         public event StatementEventHandler StatementExecuted
         {

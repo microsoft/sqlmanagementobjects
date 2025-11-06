@@ -20,6 +20,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
     /// </summary>
     [VSTest.TestClass]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlManagedInstance)]
+    [UnsupportedFeature(SqlFeature.Fabric)]
     public partial class ExternalFileFormat_SmoTestSuite : SqlTestBase
     {
         /// <summary>

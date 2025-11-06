@@ -17,7 +17,6 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Test.Manageability.Utils;
-using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
@@ -27,6 +26,7 @@ using Assert = NUnit.Framework.Assert;
 namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 {
     [TestClass]
+    [UnsupportedFeature(SqlFeature.Fabric)]
     public class ServerSmoTests : SqlTestBase
     {
         [TestMethod]

@@ -229,15 +229,15 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     case nameof(ExternalLibrary):
                         prefix = "EXTERNAL LIBRARY"; break;
-                    
+
                     case nameof(SqlAssembly):
                         prefix = "ASSEMBLY"; break;
-                    
-                    case nameof(UserDefinedDataType):                        
-                    case nameof(UserDefinedTableType):                        
+
+                    case nameof(UserDefinedDataType):
+                    case nameof(UserDefinedTableType):
                     case nameof(UserDefinedType):
                         prefix = "TYPE"; break;
-                    
+
                     case nameof(FullTextCatalog):
                         prefix = "FULLTEXT CATALOG"; break;
 
@@ -273,7 +273,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         prefix = "SYMMETRIC KEY"; break;
 
                     case nameof(AsymmetricKey):
-                        prefix = "ASYMMETRIC KEY"; break;                    
+                        prefix = "ASYMMETRIC KEY"; break;
 
                     // service broker related objects
                     case "MessageType":
@@ -3406,12 +3406,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 var server = TryGetServerObject();
                 // The current assumption is that HostPlatform is only relevant for on-premise servers and would be irrelevant if Azure SQL Database replats
                 // on Linux for some instances. If that changes, we may need to add such information to the executionmanager so we can have database-specific values
-                return new ServerInformation(this.ExecutionManager.GetServerVersion(),
-                    this.ExecutionManager.GetProductVersion(),
-                    this.ExecutionManager.GetDatabaseEngineType(),
-                    this.ExecutionManager.GetDatabaseEngineEdition(),
+                return new ServerInformation(ExecutionManager.GetServerVersion(),
+                    ExecutionManager.GetProductVersion(),
+                    ExecutionManager.GetDatabaseEngineType(),
+                    ExecutionManager.GetDatabaseEngineEdition(),
                     hostPlatform: server == null ? HostPlatformNames.Windows : server.HostPlatform,
-                    connectionProtocol: this.ExecutionManager.GetConnectionProtocol());
+                    connectionProtocol: ExecutionManager.GetConnectionProtocol(),
+                    isFabricServer: ExecutionManager.IsFabricConnection);
             }
         }
 
@@ -4235,7 +4236,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sp">Scripting preferences to get server info from. If null, it will default to server info of the current object.</param>
         /// <returns></returns>
         public IEnumerable<string> GetDisabledProperties(ScriptingPreferences sp = null)
-        {            
+        {
             return GetDisabledProperties(GetType(), sp == null ? DatabaseEngineEdition : sp.TargetDatabaseEngineEdition);
         }
 
@@ -4339,7 +4340,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             yield return nameof(Table.LedgerViewOperationTypeColumnName);
                             yield return nameof(Table.LedgerViewSchema);
                             yield return nameof(Table.LedgerViewSequenceNumberColumnName);
-                            yield return nameof(Table.LedgerViewTransactionIdColumnName);                
+                            yield return nameof(Table.LedgerViewTransactionIdColumnName);
                         }
                     }
                     break;
@@ -4349,6 +4350,11 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             yield return nameof(Index.SpatialIndexType);
                             yield return nameof(Index.IsSpatialIndex);
+                        }
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+                        {
+                            yield return nameof(Index.VectorIndexType);
+                            yield return nameof(Index.VectorIndexMetric);
                         }
                     }
                     break;
@@ -4657,7 +4663,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// When enumerating Database instances, we can't successfully fetch extra properties for unavailable databases.
-        /// When clients ask for "Status" in the property list explicitly, we will proactively exclude databases with a non-1 
+        /// When clients ask for "Status" in the property list explicitly, we will proactively exclude databases with a non-1
         /// status from full property population when such extra properties are requested.
         /// </summary>
         /// <param name="forScripting"></param>
@@ -6680,6 +6686,22 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        /// <summary>
+        /// Checks if the target engine type is cloud and target version is under 12.0 and if so
+        /// throw an exception indicating that this is not supported
+        /// </summary>
+        /// <param name="targetDatabaseEngineType">The type of engine being targeted</param>
+        /// <param name="targetVersion">The version being targeted</param>
+        /// <param name="minVersion">The minimum version allowed</param>
+        /// <param name="exceptionMessage">The error message to display if the check fails</param>
+        internal static void ThrowIfNotCloudAndBelowSpecifiedVersion(DatabaseEngineType targetDatabaseEngineType,
+            SqlServerVersion targetVersion, SqlServerVersion minVersion, string exceptionMessage = null)
+        {
+            if (targetDatabaseEngineType != DatabaseEngineType.SqlAzureDatabase)
+            {
+                ThrowIfBelowVersionLimit(targetVersion, minVersion, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
+            }
+        }
 
         /// <summary>
         /// Checks if the target version is smaller than 9.0, and if so
@@ -7613,7 +7635,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             try
             {
-                
+
 
                 if (!this.IsDesignMode)
                 {
@@ -8296,8 +8318,14 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
                 case SqlDataType.Vector:
                     this.Properties.Get("DataType").Value = dataType.GetSqlName(SqlDataType.Vector);
-                    this.Properties.Get("Length").Value = dataType.MaximumLength;
+                    this.Properties.Get("VectorDimensions").Value = dataType.VectorDimensions;
+                    if (!string.IsNullOrEmpty(dataType.VectorBaseType))
+                    {
+                        this.Properties.Get("VectorBaseType").Value = dataType.VectorBaseType;
+                    }
                     break;
+                // SMO_NEW_DATATYPE
+                // For objects that have a type, take the properties relevant for the type and store them in the property bag for the object itself
             }
         }
         #endregion
@@ -8312,7 +8340,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return typeName;
             }
-            
+
         }
 
         #region ISfcPropertyProvider Members

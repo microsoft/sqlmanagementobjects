@@ -15,12 +15,12 @@ using Assert=NUnit.Framework.Assert;
 namespace RegServerUnitTests
 {
     [TestClass]
+    [TestCategory("Unit")]
     public class UIConnectionInfoTests
     {
         private const string ExpectedXmlFormat =
             @"<ConnectionInformation><ServerType>{0}</ServerType><ServerName>myServer</ServerName><DisplayName>myDisplayName</DisplayName><AuthenticationType>1</AuthenticationType><UserName>myUser</UserName><AdvancedOptions /></ConnectionInformation>";
         [TestMethod]
-        [TestCategory("Unit")]
         public void UIConnectionInfo_SaveToStream_omits_password()
         {
             var connectionInfo = new UIConnectionInfo()
@@ -35,7 +35,7 @@ namespace RegServerUnitTests
             };
             var stringBuilder = new StringBuilder();
             var textWriter = XmlWriter.Create(stringBuilder);
-            connectionInfo.SaveToStream(textWriter, saveName:true);
+            connectionInfo.SaveToStream(textWriter, saveName: true);
             textWriter.Close();
             var xmlText = stringBuilder.ToString();
             Trace.TraceInformation(xmlText);
@@ -46,7 +46,6 @@ namespace RegServerUnitTests
         private const string InputXmlFormat =
             "<ConnectionInformation><ServerType>44a4a605-1e3a-4caa-a697-f16b8f65e78a</ServerType><ServerName>myServer</ServerName><DisplayName>myDisplayName</DisplayName><AuthenticationType>1</AuthenticationType><UserName>myUser</UserName><Password>{0}</Password><AdvancedOptions /></ConnectionInformation>";
         [TestMethod]
-        [TestCategory("Unit")]
         public void UIConnectionInfo_LoadFromStream_preserves_encrypted_password()
         {
             var password = Guid.NewGuid().ToString();
@@ -62,7 +61,6 @@ namespace RegServerUnitTests
         private const string InputXmlNoPassword =
             "<ConnectionInformation><ServerType>44a4a605-1e3a-4caa-a697-f16b8f65e78a</ServerType><ServerName>myServer</ServerName><DisplayName>myDisplayName</DisplayName><AuthenticationType>1</AuthenticationType><UserName>myUser</UserName><AdvancedOptions><ao1>10</ao1></AdvancedOptions></ConnectionInformation>";
         [TestMethod]
-        [TestCategory("Unit")]
         public void UIConnectionInfo_LoadFromStream_CanRead_AdvancedOptions_When_Password_Not_Listed()
         {
             UIConnectionInfo uiConnectionInfo = null;
@@ -78,7 +76,6 @@ namespace RegServerUnitTests
 
         // Verify that I can call SaveToStream() and then LoadFromStream() without losing data.
         [TestMethod]
-        [TestCategory("Unit")]
         public void UIConnectionInfo_SaveToStrem_and_LoadFromStream_Roundtrip()
         {
             var connectionInfo = new UIConnectionInfo()
@@ -125,9 +122,7 @@ namespace RegServerUnitTests
             Assert.That(connectionInfoFromStream.AdvancedOptions["advname2"],   Is.EqualTo("advvalue2"),                        "AdvancedOptions was not read or had incorrect value");
         }
 
-
         [TestMethod]
-        [TestCategory("Unit")]
         public void UIConnectionInfo_Copy_preserves_password()
         {
             var inputXml = String.Format(InputXmlFormat, DataProtection.ProtectData("somedata"));
@@ -139,6 +134,17 @@ namespace RegServerUnitTests
             Assert.That(copy.ServerName, Is.EqualTo(uiConnectionInfo.ServerName), "copy.ServerName");
         }
 
+        [DataRow(null, null)]
+        [DataRow("", "(local)")]
+        [DataRow(".", "(local)")]
+        [DataRow("myServer", "myServer")]
+        [DataRow(".\\abc", "(local)\\abc")]
+        [TestMethod]
+        public void UIConnectionInfo_ServerNameNoDotProperty(string input, string expectedOutput)
+        {
+            var uiConnectionInfo = new UIConnectionInfo() { ServerName = input };
+            Assert.That(uiConnectionInfo.ServerNameNoDot, Is.EqualTo(expectedOutput));
+        }
     }
 
     // copied from product code

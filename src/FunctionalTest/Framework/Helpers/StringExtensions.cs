@@ -190,6 +190,14 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         }
 
         /// <summary>
+        /// Normalizes whitespace in the input string by replacing multiple whitespace characters with a single space and trimming the result.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string NormalizeWhitespace(this string input) =>
+                System.Text.RegularExpressions.Regex.Replace(input, @"\s+", " ").Trim();
+
+        /// <summary>
         /// Checks if the file name is a DAC package
         /// </summary>
         /// <param name="fileName"></param>

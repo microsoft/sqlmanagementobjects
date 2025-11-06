@@ -559,7 +559,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
             SqlCommand cmd = this.SqlConnectionObject.CreateCommand();
 
-            cmd.CommandText = query;
+            cmd.CommandText = query; // CodeQL [SM03934] Codeql complained that the query might include value from the isolation reg value. Only well known values are allowed.
 
             // Set up its parameters
             foreach (SqlParameter param in m_Parameters)
@@ -805,7 +805,7 @@ namespace Microsoft.SqlServer.Management.Common
             else
             {
                 cmd = m_SqlCommand;
-                cmd.CommandText = query;
+                cmd.CommandText = query; // CodeQL [SM03934] Codeql complained that the query might include value from the isolation reg value. Only well known values are allowed.
             }
 
             cmd.CommandTimeout = this.StatementTimeout;

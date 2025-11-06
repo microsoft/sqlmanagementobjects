@@ -3,7 +3,7 @@
 	<settings>
 		<version min_major='8' max_major='8'>
 			<property_link table="dbo.sysobjects AS udf">udf.xtype in ( 'TF', 'FN', 'IF') and udf.name not like N'#%%'</property_link>
-			<property_link fields='#TableVariableName#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#XmlSchemaNamespace#' 
+			<property_link fields='#TableVariableName#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#XmlSchemaNamespace#'
 					left_join='syscolumns AS ret_param'>ret_param.id = udf.id and ret_param.number = &lt;msparam&gt;0&lt;/msparam&gt; and ret_param.name=''</property_link>
 		</version>
 		<version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
@@ -14,7 +14,7 @@
 				FT = Assembly (CLR) Table-valued Function
 			-->
 			<property_link table="sys.all_objects AS udf">udf.type in ('TF', 'FN', 'IF', 'FS', 'FT')</property_link>
-			<property_link fields='#TableVariableName#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#XmlSchemaNamespace#XmlSchemaNamespaceSchema#XmlDocumentConstraint#UserType#'
+			<property_link fields='#TableVariableName#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#VectorDimensions#VectorBaseType#XmlSchemaNamespace#XmlSchemaNamespaceSchema#XmlDocumentConstraint#UserType#'
 					left_join='sys.all_parameters AS ret_param'>ret_param.object_id = udf.object_id and ret_param.is_output = &lt;msparam&gt;1&lt;/msparam&gt;</property_link>
 		</version>
 		<version min_major="13" cloud_min_major='12' datawarehouse_enabled='true'>
@@ -25,15 +25,15 @@
 		<include file='inc_object.xml' alias='udf' />
         <include file='inc_system_table_view_sp_udf.xml' alias='udf' for="#IsSystemObject#" />
 		<include file='inc_type.xml' alias='ret_param' />
-		<include file='mixed_module_link.xml' alias='udf' 
+		<include file='mixed_module_link.xml' alias='udf'
 			for='#ReturnsNullOnNullInput#ExecutionContextPrincipal#ExecutionContext#MethodName#ClassName#AssemblyName#AnsiNullsStatus#IsSchemaBound#IsEncrypted#Text#TextBody#BodyStartIndex#'/>
-		
+
 		<version min_major='7' max_major='8'>
 			<property name="IsDeterministic" type="bit" access="Read" cast='true'>OBJECTPROPERTY(udf.id, N'IsDeterministic')</property>
 			<property name="FunctionType" type="int" report_type='UserDefinedFunctionType' mode="design">(case when 1 = OBJECTPROPERTY(udf.id, N'IsScalarFunction') then 1 when 1 = OBJECTPROPERTY(udf.id, N'IsInlineFunction') then 3 when 1 = OBJECTPROPERTY(udf.id, N'IsTableFunction') then 2 else 0 end)</property>
 			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">1</property>
 			<property name="QuotedIdentifierStatus" type="bit" cast='true' mode="design">isnull(OBJECTPROPERTYEX(udf.id, N'IsQuotedIdentOn'),1)</property>
-			
+
 			<!-- extended properties support -->
 			<property name="ObjectTypeName" type="sysname" hidden="true">N'FUNCTION'</property>
 		</version>
@@ -62,6 +62,10 @@
 			<version min_major ='15' cloud_min_major='12' datawarehouse_enabled='true'>
 			<property name="InlineType" type="bit" read_only_after_creation='true' cast='true'>ISNULL(sm.inline_type,0)</property>
 			<property name="IsInlineable" type="bit" access="Read" cast= 'true' >ISNULL(sm.is_inlineable,0)</property>
+		</version>
+		<version min_major='17' cloud_min_major='12'>
+			<property name="VectorDimensions" type="int" mode="design">ISNULL(ret_param.vector_dimensions, 0)</property>
+			<property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(ret_param.vector_base_type_desc, N'')</property>
 		</version>
 	</properties>
 </EnumObject>

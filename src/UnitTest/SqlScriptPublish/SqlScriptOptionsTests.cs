@@ -2,12 +2,12 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Resources;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.SqlScriptPublish;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
@@ -269,7 +269,7 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
         {
             foreach (string fieldName in Enum.GetNames(type))
             {
-                
+
                 var fi = type.GetField(fieldName);
 
                 var attributeAsObject = fi.GetCustomAttributes(typeof(DisplayNameKeyAttribute), true)
@@ -278,6 +278,31 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
                 var resource = resourceManager.GetString(attributeAsObject.Key);
                 Assert.That(resource, Is.Not.Null.And.Not.Empty,
                     $"Resource '{attributeAsObject.Key}' missing for enum value {type.Name}.{fieldName}");
+            }
+        }
+
+        /// <summary>
+        /// Verifies that LoadShellScriptingOptions sets the expected ScriptCompatibilityOptions to
+        /// ensure that the mapping between SqlServerVersion and ScriptCompatibilityOptions is correct.
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void LoadShellScriptingOptions_ReturnsExpectedTargetServerVersion()
+        {
+            var compatVersions = Enum.GetValues(typeof(ScriptCompatibilityOptions));
+            for (int i = 0; i < (int)SqlServerVersion.VersionLatest - 1; i++)
+            {
+                // This version doesn't really matter - we just care about the TargetServerVersion property
+                var options = new SqlScriptOptions(new Version(17, 0));
+                var publishingOptions = new TestPublishingOptions
+                {
+                    // SqlServerVersion starts at index 1 and also skips version 80, so we adjust to account for that
+                    TargetServerVersion = (SqlServerVersion)(i + 2)
+                };
+                options.LoadShellScriptingOptions(publishingOptions, smoObject: null);
+                // Version 105 corresponds to compat level 100
+                var expectedVersion = publishingOptions.TargetServerVersion == SqlServerVersion.Version105 ? ScriptCompatibilityOptions.Script100Compat : compatVersions.GetValue(i);
+                Assert.That(options.ScriptCompatibilityOption, Is.EqualTo(expectedVersion));
             }
         }
 

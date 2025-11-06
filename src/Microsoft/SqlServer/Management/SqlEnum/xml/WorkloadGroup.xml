@@ -31,6 +31,10 @@
     <version min_major='15'>
       <property name="RequestMaximumMemoryGrantPercentageAsDouble" type="float">wkg.request_max_memory_grant_percent_numeric</property>
     </version>
+    <version min_major='17'>
+      <property name="GroupMaximumTempdbDataMB" type="float">ISNULL(wkg.group_max_tempdb_data_mb, -1)</property>
+      <property name="GroupMaximumTempdbDataPercent" type="float">ISNULL(wkg.group_max_tempdb_data_percent, -1)</property>
+    </version>
      <include file='inc_policy_health_state.xml'/>
   </properties>
 </EnumObject>	

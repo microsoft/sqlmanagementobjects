@@ -9,7 +9,6 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.SqlParser;
 using Microsoft.SqlServer.Management.SqlParser.Metadata;
 using Microsoft.SqlServer.Management.SqlParser.MetadataProvider;
-
 using Microsoft.SqlServer.Management.SqlParser.Parser;
 using ConstraintCollection = Microsoft.SqlServer.Management.SqlParser.MetadataProvider.ConstraintCollection;
 
@@ -1479,6 +1478,48 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 indexedColumn.IsIncluded = included.GetValueOrDefault();
 
                 return indexedColumn;
+            }
+        }
+
+        public class OrderedColumnCollectionHelper : OrderedCollectionHelper<IOrderedColumn, Smo.IndexedColumn>
+        {
+            private readonly Smo.IndexedColumnCollection smoCollection;
+            private readonly IDatabaseTable dbTable;
+
+            public OrderedColumnCollectionHelper(Database database, IDatabaseTable dbTable, Smo.IndexedColumnCollection smoCollection)
+                : base(database)
+            {
+                Debug.Assert(dbTable != null, "SmoMetadataProvider Assert", "dbTable != null");
+                Debug.Assert(smoCollection != null, "SmoMetadataProvider Assert", "smoCollection != null");
+
+                this.dbTable = dbTable;
+                this.smoCollection = smoCollection;
+            }
+
+            protected override DatabaseObjectBase.IMetadataList<Smo.IndexedColumn> RetrieveSmoMetadataList()
+            {
+                return new DatabaseObjectBase.SmoCollectionMetadataList<Smo.IndexedColumn>(
+                    this.m_database.Server,
+                    this.smoCollection,
+                    i => i.ColumnStoreOrderOrdinal > 0
+                );
+            }
+
+            protected override IOrderedColumn CreateMetadataObject(Smo.IndexedColumn smoObject)
+            {
+                Debug.Assert(smoObject != null, "SmoMetadataProvider Assert", "smoObject != null");
+                Debug.Assert(smoObject != null, "SmoMetadataProvider Assert", "smoObject != null");
+
+                IIndexFactory factory = SmoMetadataFactory.Instance.Index;
+
+                IColumn referencedColumn = dbTable.Columns[smoObject.Name];
+                Debug.Assert(referencedColumn != null, "SmoMetadataProvider Assert", "referencedColumn != null");
+
+                IMutableOrderedColumn orderedColumn = factory.CreateOrderedColumn(referencedColumn);
+
+                orderedColumn.OrderOrdinal = smoObject.ColumnStoreOrderOrdinal;
+
+                return orderedColumn;
             }
         }
 

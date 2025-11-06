@@ -182,7 +182,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                // call the base class 
+                // call the base class
                 return GetUserPermissions();
             }
         }
@@ -225,7 +225,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Return true if default constraints should be embedded. 
+        /// Return true if default constraints should be embedded.
         /// </summary>
         /// <returns></returns>
         private bool EmbedDefaultConstraints(ScriptingPreferences sp = null)
@@ -524,7 +524,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         if (Cmn.DatabaseEngineType.SqlAzureDatabase != sp.TargetDatabaseEngineType)
                         {
                             // we need to force the collation of the computed columns
-                            // when we script optimizer data because it is dependent on the 
+                            // when we script optimizer data because it is dependent on the
                             // collation of the database and it might not match the stats blob
                             if (sp.Data.OptimizerData && RequiresCollate(sp))
                             {
@@ -744,7 +744,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
             }
-            
+
             if (null != Properties.Get("Nullable").Value && (this.CheckIsExternalTableColumn(sp) == false || sp.TargetDatabaseEngineEdition != Common.DatabaseEngineEdition.SqlOnDemand))
             {
                 if (false == (bool)Properties["Nullable"].Value)
@@ -781,10 +781,10 @@ namespace Microsoft.SqlServer.Management.Smo
         private void ScriptDefaultConstraint(StringBuilder sb, ScriptingPreferences sp)
         {
             // Default constraints are scripted with the query if
-            // - The default constraint exists 
+            // - The default constraint exists
             // - The constraint isn't ignored for scripting or it's for direct execution
             // - We should be embedding default constraints or default constraints are forced to be embedded
-            // We may get called here before the DefaultConstraint has been populated, so make sure it gets fully 
+            // We may get called here before the DefaultConstraint has been populated, so make sure it gets fully
             // built for scripting
             InitDefaultConstraint(forScripting:true);
             if (null != this.DefaultConstraint &&
@@ -875,7 +875,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Returns the system SqlDataType for the passed column. If the DataType is UDDT then
         /// it returns the underlying SqlDataType for the UDDT
         /// </returns>
-        /// 
+        ///
         private SqlDataType GetNativeDataType()
         {
             SqlDataType sqlDataType = this.DataType.SqlDataType;
@@ -903,7 +903,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="column">Column for which test the DataType</param>
         /// <param name="options">ScriptingPreferences to use</param>
-        /// 
+        ///
         private void CheckSupportedType(ScriptingPreferences options)
         {
             Diagnostics.TraceHelper.Assert(options != null);
@@ -940,7 +940,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     this.DefaultConstraint.SetState(SqlSmoState.Existing);
 
-                    // reset all properties 			
+                    // reset all properties
                     this.DefaultConstraint.Properties.SetAllDirty(false);
                 }
             }
@@ -1028,8 +1028,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// Returns true if the parent object is memory optimized
-        /// </summary>        
-        /// <returns></returns>        
+        /// </summary>
+        /// <returns></returns>
         private bool IsParentMemoryOptimized()
         {
             bool isMemoryOptimized = false;
@@ -1052,9 +1052,9 @@ namespace Microsoft.SqlServer.Management.Smo
         private bool RequiresCollate(ScriptingPreferences sp)
         {
             // In Hekaton, indexes can be created on string columns only if they use BIN2 collation.
-            // Similarly, Always Encrypted requires string columns (nvarchar, etc.) to use a BIN2 collations 
+            // Similarly, Always Encrypted requires string columns (nvarchar, etc.) to use a BIN2 collations
             // In SSMS, scripting collation option is set to false as default and so scripting through UI would give result without collation.
-            // For better user experience, we script collation for memory optimized table or user-defined table types at all times.            
+            // For better user experience, we script collation for memory optimized table or user-defined table types at all times.
             bool scriptCollation = (sp.IncludeScripts.Collation || this.IsParentMemoryOptimized() || this.IsEncrypted);
 
             if (ServerVersion.Major > 7
@@ -1094,7 +1094,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             bool mainAlterQuery = false;
 
-            // alter the column type 
+            // alter the column type
             // SQL 2000 and DW do not support "XmlSchemaNamespace" property, so extra care is taken to skip it
             if (Properties.Get("Collation").Dirty ||
                 Properties.Get("Nullable").Dirty ||
@@ -1120,7 +1120,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.AppendFormat(SmoApplication.DefaultCulture, " COLLATE {0}", sCollation);
                     }
                 }
-                
+
                 if(this.CheckIsExternalTableColumn(sp) == false || sp.TargetDatabaseEngineEdition != Common.DatabaseEngineEdition.SqlOnDemand)
                 {
                     if ((bool)Properties["Nullable"].Value)
@@ -1281,7 +1281,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //    This causes the masking function to be dropped (if exists) since we didn't supply it in mainAlterQuery
                 //    We will ADD the masking function in a separate ALTER statement if we still have masking
                 // 2. mainAlterQuery is 'false' (if the column's type, collation, nullness has not changed)
-                //    We will first DROP the masking function from the column (if previouly have one before the change), 
+                //    We will first DROP the masking function from the column (if previouly have one before the change),
                 //    and then ADD the function (if exists) after the change in separate ALTER statements
                 if (!mainAlterQuery && isOldMaskedColumn)
                 {
@@ -1322,7 +1322,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (isMaskedColumn && (null != maskingFunctionObj))
             {
                 maskingFunction = (string)maskingFunctionObj;
-                // We no longer validate masking functions on the client. 
+                // We no longer validate masking functions on the client.
                 // When SQL Server adds new ones we don't want to have to update SMO to support them.
             }
             return maskingFunction;
@@ -1515,7 +1515,7 @@ namespace Microsoft.SqlServer.Management.Smo
         // default constraint for this column
         DefaultConstraint defaultConstraint;
         // true if the default constraint object for this column is
-        // created and name set, it does not imply that the proeprties 
+        // created and name set, it does not imply that the proeprties
         // have been retrieved
         internal bool m_bDefaultInitialized;
         [SfcObject(SfcObjectRelationship.ChildObject, SfcObjectCardinality.ZeroToOne, SfcObjectFlags.Design)]
@@ -1548,7 +1548,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             return dcb;
         }
-        
+
         /// <summary>
         /// initializes data for this default, this is only used from prefetch
         /// </summary>
@@ -1738,7 +1738,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             return defaultConstraint;
 
-        }        
+        }
 
         public DataTable EnumUserPermissions(string username)
         {
@@ -1751,14 +1751,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 Request req = new Request(this.Urn.Value + string.Format(SmoApplication.DefaultCulture, "/Permission[@Grantee='{0}']", Urn.EscapeString(username)));
-                req.Fields = new String[] { 
-                    "Grantee", 
-                    "Grantor", 
-                    "PermissionState", 
-                    "Code", 
-                    "ObjectClass", 
-                    "GranteeType", 
-                    "GrantorType", 
+                req.Fields = new String[] {
+                    "Grantee",
+                    "Grantor",
+                    "PermissionState",
+                    "Code",
+                    "ObjectClass",
+                    "GranteeType",
+                    "GrantorType",
                     "ColumnName" };
 
                 return this.ExecutionManager.GetEnumeratorData(req);
@@ -1803,9 +1803,9 @@ namespace Microsoft.SqlServer.Management.Smo
             return retArr;
         }
 
-        // this function enumerates all the foreign keys for which this column is 
+        // this function enumerates all the foreign keys for which this column is
         // a referenced column. This is needed to support column deletion scenarios
-        // where the user needs to drop all the ForeignKeys that are dependent 
+        // where the user needs to drop all the ForeignKeys that are dependent
         // on that column
         public DataTable EnumForeignKeys()
         {
@@ -1851,7 +1851,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     req.ParentPropertiesRequests = new PropertiesRequest[1];
                     PropertiesRequest parentProps = new PropertiesRequest();
                     parentProps.Fields = new String[] { "Schema", "Name" };
-                    parentProps.OrderByList = new OrderBy[] { 	new OrderBy("Schema", OrderBy.Direction.Asc), 
+                    parentProps.OrderByList = new OrderBy[] { 	new OrderBy("Schema", OrderBy.Direction.Asc),
                                                                 new OrderBy("Name", OrderBy.Direction.Asc) };
                     req.ParentPropertiesRequests[0] = parentProps;
 
@@ -1906,7 +1906,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// forces data distribution statistics update for a referenced index or all 
+        /// forces data distribution statistics update for a referenced index or all
         /// indexes defined on a SQL Server table.
         /// </summary>
         public void UpdateStatistics()
@@ -1915,7 +1915,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// forces data distribution statistics update for a referenced index or all 
+        /// forces data distribution statistics update for a referenced index or all
         /// indexes defined on a SQL Server table.
         /// </summary>
         public void UpdateStatistics(StatisticsScanType scanType)
@@ -1924,7 +1924,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// forces data distribution statistics update for a referenced index or all 
+        /// forces data distribution statistics update for a referenced index or all
         /// indexes defined on a SQL Server table.
         /// </summary>
         public void UpdateStatistics(StatisticsScanType scanType, int sampleValue)
@@ -1933,7 +1933,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// forces data distribution statistics update for a referenced index or all 
+        /// forces data distribution statistics update for a referenced index or all
         /// indexes defined on a SQL Server table.
         /// </summary>
         public void UpdateStatistics(StatisticsScanType scanType, int sampleValue, bool recompute)
@@ -2058,7 +2058,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="version">The version of the server</param>
         /// <param name="databaseEngineType">The database engine type of the server</param>
         /// <param name="databaseEngineEdition">The database engine edition of the server</param>
-        /// <param name="defaultTextMode">indicates the text mode of the server. 
+        /// <param name="defaultTextMode">indicates the text mode of the server.
         /// If true this means only header and body are needed, otherwise all properties</param>
         /// <returns></returns>
         internal static string[] GetScriptFields(Type parentType,
@@ -2069,7 +2069,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // Column should always have a parent,.
             Diagnostics.TraceHelper.Assert(null != parentType, "null == parentType");
-            // in the case of views we don't need to prefetch all those 
+            // in the case of views we don't need to prefetch all those
             // properties for scripting
             if (!parentType.Equals(typeof(View)) || !defaultTextMode)
             {
@@ -2082,7 +2082,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         nameof(Computed),
                         nameof(ComputedText),
                         "DataTypeSchema",
-                        nameof(Default), 
+                        nameof(Default),
                         nameof(DefaultConstraintName),
                         nameof(DefaultSchema),
                         nameof(DistributionColumnName),
@@ -2118,9 +2118,13 @@ namespace Microsoft.SqlServer.Management.Smo
                         nameof(SensitivityInformationTypeName),
                         nameof(SensitivityRank),
                         "SystemType",
+                        "VectorDimensions",
+                        "VectorBaseType",
                         "XmlSchemaNamespace",
                         "XmlSchemaNamespaceSchema",
-                        nameof(XmlDocumentConstraint),
+                        nameof(XmlDocumentConstraint)
+                        // SMO_NEW_DATATYPE
+                        // If a new data type property was added it should likely be added to this list for performance reasons
                     };
                 List<string> list = GetSupportedScriptFields(typeof(Column.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
                 list.Add("DataType");
@@ -2154,7 +2158,7 @@ namespace Microsoft.SqlServer.Management.Smo
             return isExternal;
         }
 
-        
+
         /// <summary>
         /// This method determines if this column is a graph computed column. Graph computed
         /// columns are exposed in select * queries and have graph type identifiers

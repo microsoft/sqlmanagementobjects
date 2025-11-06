@@ -7,12 +7,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;
 #endif
 using Microsoft.SqlServer.Management.Common;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 
 namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
@@ -38,12 +40,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             var index = 1;
             return environments.Select(environment =>
             {
-                var connectionString = new SqlConnectionStringBuilder()
-                {
-                    DataSource = environment.ServerName,
-                    ConnectTimeout = environment.Timeout,
-                    TrustServerCertificate = true
-                };
+                var connectionString = GetBaseConnectionString(environment);
                 if (!string.IsNullOrEmpty(environment.UserName))
                 {
                     connectionString.UserID = environment.UserName;
@@ -53,6 +50,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                 {
                     connectionString.IntegratedSecurity = true;
                 }
+                var stringToTrace = new SqlConnectionStringBuilder(connectionString.ConnectionString)
+                {
+                    Password = string.IsNullOrEmpty(connectionString.Password) ? string.Empty : "<redacted>"
+                };
+                Trace.TraceInformation($"Connection string from JSON file:{stringToTrace.ConnectionString}");
                 var descriptor = new TestServerDescriptor()
                 {
                     Name = "TestServer" + index++,
@@ -70,7 +72,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                     if (realEdition == 12)
                     {
                         // For Fabric database, when connection string is specified, database shouldn't be dropped.
-                        descriptor.EnabledFeatures = new[] { SqlFeature.Fabric, SqlFeature.NoDropCreate};
+                        descriptor.EnabledFeatures = new[] { SqlFeature.Fabric, SqlFeature.NoDropCreate };
                     }
                     else
                     {
@@ -80,6 +82,63 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                 }
                 return descriptor;
             }).ToList();
+        }
+        private static SqlConnectionStringBuilder GetBaseConnectionString(JsonSqlEnvironment environment)
+        {
+            var strictEncryptAvailable = string.Compare(Environment.GetEnvironmentVariable("FS_GenerateTdsCertificate") ?? "false", "true", ignoreCase: true) == 0;
+            var connectionString = new SqlConnectionStringBuilder()
+            {
+                DataSource = strictEncryptAvailable ? $"tcp:{environment.ServerName}" : environment.ServerName,
+                ConnectTimeout = environment.Timeout,
+                TrustServerCertificate = !strictEncryptAvailable,
+#if MICROSOFTDATA
+                Encrypt = strictEncryptAvailable ? SqlConnectionEncryptOption.Strict : SqlConnectionEncryptOption.Optional,
+#endif
+            };
+#if MICROSOFTDATA
+            // if the servername isn't a full domain name, we assume it's the local machine and might have an alternative subject name
+            if (!environment.ServerName.Contains('.') && !connectionString.TrustServerCertificate)
+            {
+                connectionString.HostNameInCertificate = GetSubjectAlternativeName();
+            }
+#endif
+            return connectionString;
+        }
+
+        private static string GetSubjectAlternativeName()
+        {
+            var result = (majorVersion: int.MinValue, SAN: string.Empty);
+
+            var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default);
+
+            using (baseKey)
+            using (var key = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server"))
+            {
+                foreach (var subKeyName in key.GetSubKeyNames())
+                {
+                    // We are only interested in the default instance of SQL Server
+                    var m = Regex.Match(subKeyName, @"^MSSQL(\d+)\.MSSQLSERVER");
+                    if (!m.Success)
+                    {
+                        continue;
+                    }
+
+                    // In the unlikely scenario where there's multiple versions of SQL Server, assumes we are
+                    // connecting to the one with highest major version.
+                    var majorVersion = int.Parse(m.Groups[1].Value);
+                    if (majorVersion <= result.majorVersion)
+                    {
+                        continue;
+                    }
+
+                    using (var key2 = key.OpenSubKey($@"{subKeyName}\MSSQLServer\SuperSocketNetLib"))
+                    { 
+                        result = (majorVersion, key2.GetValue("SubjectAlternativeName", string.Empty) as string);
+                    }
+                }
+            }
+
+            return result.SAN;
         }
     }
 

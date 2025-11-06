@@ -31,12 +31,13 @@ doskey tst=pushd %BASEDIR%src\FunctionalTest\Smo\$*
 doskey slngen19=slngen -vs "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.exe" $*
 
 REM == Common test command:
-doskey rtests=pushd %BASEDIR%bin\debug\net472$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
-doskey netcoretests=pushd %BASEDIR%bin\debug\net8.0$Tvstest.console.exe microsoft.sqlserver.test.smo /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
+doskey rtests=pushd %BASEDIR%bin\debug\net472$Tvstest.console.exe microsoft.sqlserver.test.smo.dll /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
+doskey netcoretests=pushd %BASEDIR%bin\debug\net8.0$Tvstest.console.exe microsoft.sqlserver.test.smo.dll /logger:trx /TestCaseFilter:"(TestCategory != Staging)" /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings $*
 
 title git %BASEDIR%
 
 dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
+dotnet tool install --global Microsoft.SqlPackage
 IF NOT EXIST %BASEDIR%packages\StrawberryPerl.5.28.0.1\bin\perl.exe (
   %BASEDIR%Build\Local\Nuget\nuget.exe install StrawberryPerl -Version 5.28.0.1
 )
@@ -57,9 +58,11 @@ echo    REM == See %BASEDIR%bin\Debug\net472\ToolsConnectionInfo.xml
 echo    REM == for all the friendly names available.
 echo    REM == You'll need to edit connection strings in src/functionaltest/framework/toolsconnectioninfo.xml.
 echo    vstest.console.exe microsoft.sqlserver.test.smo.dll /TestCaseFilter:"(TestCategory != Staging)" /logger:trx /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings
+echo    REM == Or pick one of the runsettings files under %BASEDIR%src\FunctionalTest\Framework
+echo    vstest.console.exe /TestCaseFilter:"(TestCategory != Staging)" /logger:trx /Settings:%BASEDIR%src\FunctionalTest\Framework\functionaltest.runsettings
 echo.
 echo To run tests for netcore (alias: netcoretests)
-echo    pushd %BASEDIR%bin\debug\net6.0
+echo    pushd %BASEDIR%bin\debug\net8.0
 echo    REM == If you want to trim down the list of servers, use something like this:
 echo    REM == SET SqlTestTargetServersFilter=Sql2017;Sqlv150
 echo    REM == See %BASEDIR%bin\Debug\net472\ToolsConnectionInfo.xml

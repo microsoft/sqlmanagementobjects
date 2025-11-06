@@ -8,5 +8,6 @@
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
   <ItemGroup>
     <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <Compile Include="..\Common\UnitTestBase.cs" />
   </ItemGroup>
 </Project>

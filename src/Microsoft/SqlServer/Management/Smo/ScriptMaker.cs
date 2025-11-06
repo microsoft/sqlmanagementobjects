@@ -994,12 +994,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         this.currentRetryArgs = null;
                     }
                 }
-                catch (Exception e)
+                catch (Exception e) when (!ThrowException(urn, e))
                 {
-                    if (ThrowException(urn, e))
-                    {
-                        throw;
-                    }
                 }
 
                 if (this.objectScripting != null)
@@ -1013,7 +1009,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     this.objectScripting(this, new ObjectScriptingEventArgs(objecturn, urn, count, this.totalObjectsToScript, scriptType));
                 }
+#if DEBUG
                 TraceHelper.Trace("ScriptMaker", "ScriptCreate complete for {0}", urn);
+#endif
             }
         }
 

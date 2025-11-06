@@ -21,6 +21,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
     /// 
     /// </summary>
     [TestClass]
+    [UnsupportedFeature(SqlFeature.Fabric)]
     public class AuditSmoTests : SqlTestBase
     {
         /// <summary>

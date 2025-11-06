@@ -180,5 +180,56 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             string objectText = $"CREATE FUNCTION [dbo].testfunc (@value VARCHAR (5)) RETURNS INT WITH {execStatement} AS CALLER AS BEGIN return 1 END";
             Assert.That(_SMO.DdlTextParser.ParseDdlHeader(objectText), NUnit.Framework.Is.EqualTo(index), $"Parsing DDL Header failed while it should succeed with syntax : WITH {execStatement} AS CALLER.");
         }
+
+        /// <summary>
+        /// Tests CREATE COLUMNSTORE INDEX with order, returns valid.
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void CheckDdlHeader_Starting_With_Create_Columnstore_Index_With_Order_Valid()
+        {
+            const string objectText = @"CREATE COLUMNSTORE INDEX idx_ntccitrim_prim
+ON dbo.nttrim_prim(i1, c1, nvc1)
+ORDER(i1, c1);";
+            _SMO.DdlTextParserHeaderInfo headerInfo;
+            bool actualResult = _SMO.DdlTextParser.CheckDdlHeader(objectText, useQuotedIdentifier: true, headerInfo: out headerInfo);
+
+            Assert.That(actualResult, NUnit.Framework.Is.True, "Parsing DDL Header failed for CREATE COLUMNSTORE INDEX with order.");
+            Assert.That(headerInfo.objectType, NUnit.Framework.Is.EqualTo("COLUMNSTORE"), "ObjectType for COLUMNSTORE INDEX should be COLUMNSTORE.");
+        }
+
+        /// <summary>
+        /// Tests CREATE NONCLUSTERED COLUMNSTORE INDEX with order, returns valid.
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void CheckDdlHeader_Starting_With_Create_Nonclustered_Columnstore_Index_With_Order_Valid()
+        {
+            const string objectText = @"CREATE NONCLUSTERED COLUMNSTORE INDEX idx_ntccitrim_prim
+ON dbo.nttrim_prim (i1, c1, nvc1)
+ORDER (i1, c1);";
+            _SMO.DdlTextParserHeaderInfo headerInfo;
+            bool actualResult = _SMO.DdlTextParser.CheckDdlHeader(objectText, useQuotedIdentifier: true, headerInfo: out headerInfo);
+
+            Assert.That(actualResult, NUnit.Framework.Is.True, "Parsing DDL Header failed for CREATE NONCLUSTERED COLUMNSTORE INDEX with order.");
+            Assert.That(headerInfo.objectType, NUnit.Framework.Is.EqualTo("NONCLUSTERED"), "ObjectType for NONCLUSTERED COLUMNSTORE INDEX should be NONCLUSTERED.");
+        }
+
+        /// <summary>
+        /// Tests CREATE CLUSTERED COLUMNSTORE INDEX with order, returns valid.
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void CheckDdlHeader_Starting_With_Create_Clustered_Columnstore_Index_With_Order_Valid()
+        {
+            const string objectText = @"CREATE CLUSTERED COLUMNSTORE INDEX idx_ntccitrim_prim
+ON dbo.nttrim_prim
+ORDER (i1, c1);";
+            _SMO.DdlTextParserHeaderInfo headerInfo;
+            bool actualResult = _SMO.DdlTextParser.CheckDdlHeader(objectText, useQuotedIdentifier: true, headerInfo: out headerInfo);
+
+            Assert.That(actualResult, NUnit.Framework.Is.True, "Parsing DDL Header failed for CREATE CLUSTERED COLUMNSTORE INDEX with order.");
+            Assert.That(headerInfo.objectType, NUnit.Framework.Is.EqualTo("CLUSTERED"), "ObjectType for CLUSTERED COLUMNSTORE INDEX should be CLUSTERED.");
+        }
     }
 }

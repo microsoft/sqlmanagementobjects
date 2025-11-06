@@ -37,6 +37,8 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             { SqlDataType.UserDefinedTableType, SqlServerVersion.Version100},
             { SqlDataType.Json, SqlServerVersion.Version160},
             { SqlDataType.Vector, SqlServerVersion.Version170 },
+            // SMO_NEW_DATATYPE
+            // Add new types for validating in tests
         };
 
         /// <summary>
@@ -46,8 +48,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
         /// This is to prevent errors where a new data type is added to SqlDataType but that method is not updated
         /// correctly.
         /// Note: This unit test only covers the types on SQL Standalone.
-        ///    For Azure, new types added should have their dedicated unit tests that include edition type.
-        ///    See JsonDataType_SupportedOnAllApplicableVersions as an example.
+        ///    For Azure, new types added should be added to SqlDataType_SupportedOnAzure
         ///
         /// </summary>
         [TestCategory("Unit")]

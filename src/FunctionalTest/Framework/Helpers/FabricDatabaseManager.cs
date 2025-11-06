@@ -6,16 +6,43 @@ using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 {
-    public static class FabricDatabaseManager
+    /// <summary>
+    /// Fabric database types
+    /// </summary>
+    public enum FabricDatabaseType
+    {
+        /// <summary>
+        /// Fabric SQL database
+        /// </summary>
+        SQLDatabase,
+        
+        /// <summary>
+        /// Fabric data warehouse
+        /// </summary>
+        Warehouse
+    }
+
+    public class FabricDatabaseManager
     {
         // Path to the fabric-cli executable
         private static readonly string FabricCliPath = "fab.exe";
         // Default authentication method
         private static readonly string DefaultAuthMethod = ";Authentication=ActiveDirectoryDefault";
         // Cache LogIn Status
-        private static bool? CachedLogInStatus = null;
-        private static DateTime LogInStatusCacheExpirationTime;
-        private static TimeSpan CacheExpirationTime = TimeSpan.FromHours(1);
+        private bool? CachedLogInStatus = null;
+        private DateTime LogInStatusCacheExpirationTime;
+        private static readonly TimeSpan CacheExpirationTime = TimeSpan.FromHours(1);
+
+        /// <summary>
+        /// Constructs a FabricDatabaseManager for the specified environment.
+        /// </summary>
+        /// <param name="environment"></param>
+        public FabricDatabaseManager(string environment = "prod") => Environment = environment;
+
+        /// <summary>
+        /// Gets or sets the environment for the FabricDatabaseManager.
+        /// </summary>
+        public string Environment { get; }
 
         /// <summary>
         /// Creates a fabric database using the fabric-cli tool.
@@ -23,35 +50,21 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <param name="workspaceName">The workspace Name where fabric database needs to be created.</param>
         /// <param name="dbName">The name of the database to create.</param>
         /// <returns>The connection string of the created fabric database.</returns>
-        public static string CreateDatabase(string workspaceName, string dbName)
+        public string CreateDatabase(string workspaceName, string dbName)
         {
-            if (string.IsNullOrWhiteSpace(workspaceName))
-            {
-                throw new ArgumentException("Workspace name cannot be null or empty.", nameof(workspaceName));
-            }
-            if (string.IsNullOrWhiteSpace(dbName))
-            {
-                throw new ArgumentException("Database name cannot be null or empty.", nameof(dbName));
-            }
+            return CreateFabricResource(workspaceName, dbName, FabricDatabaseType.SQLDatabase);
+        }
 
-            // Make sure we are logged in to Fabric CLI
-            EnsureFabricCliLogin();
-
-            try
-            {
-                Trace.TraceInformation($"Creating fabric database '{dbName}' using fabric-cli.");
-                var dbPath = GetDatabasePath(workspaceName, dbName);
-                string output = ExecuteFabricCliCommand($"create {dbPath}");
-                Trace.TraceInformation($"Fabric database created: {output}");
-                // Get the connection string for the newly created database
-                string connectionString = ExecuteFabricCliCommand($"get {dbPath} -q properties.connectionString")+DefaultAuthMethod;
-                return connectionString;
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceError($"Failed to create fabric database '{dbName}': {ex.Message}");
-                throw new InvalidOperationException($"Error creating fabric database '{dbName}'", ex);
-            }
+        /// <summary>
+        /// Creates a fabric warehouse using the fabric-cli tool.
+        /// </summary>
+        /// <param name="workspaceName">The workspace Name where fabric warehouse needs to be created.</param>
+        /// <param name="warehouseName">The name of the warehouse to create.</param>
+        /// <returns>The connection string of the created fabric warehouse.</returns>
+        public string CreateWarehouse(string workspaceName, string warehouseName)
+        {
+            var baseStr = CreateFabricResource(workspaceName, warehouseName, FabricDatabaseType.Warehouse);
+            return $"Data Source={baseStr};Initial Catalog={warehouseName}";
         }
 
         /// <summary>
@@ -59,16 +72,91 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// </summary>
         /// <param name="workspaceName">Workspace Name</param>
         /// <param name="dbName">The name of the database to drop.</param>
-        public static void DropDatabase(string workspaceName, string dbName)
+        public void DropDatabase(string workspaceName, string dbName)
+        {
+            DropFabricResource(workspaceName, dbName, FabricDatabaseType.SQLDatabase);
+        }
+
+        /// <summary>
+        /// Drops a fabric warehouse using the fabric-cli tool.
+        /// </summary>
+        /// <param name="workspaceName">Workspace Name</param>
+        /// <param name="warehouseName">The name of the warehouse to drop.</param>
+        public void DropWarehouse(string workspaceName, string warehouseName)
+        {
+            DropFabricResource(workspaceName, warehouseName, FabricDatabaseType.Warehouse);
+        }
+
+        /// <summary>
+        /// Creates a fabric resource (database or warehouse) using the fabric-cli tool.
+        /// </summary>
+        /// <param name="workspaceName">The workspace Name where fabric resource needs to be created.</param>
+        /// <param name="resourceName">The name of the resource to create.</param>
+        /// <param name="resourceType">The type of fabric resource to create.</param>
+        /// <returns>The connection string of the created fabric resource.</returns>
+        private string CreateFabricResource(string workspaceName, string resourceName, FabricDatabaseType resourceType)
+        {
+            if (string.IsNullOrWhiteSpace(workspaceName))
+            {
+                throw new ArgumentException("Workspace name cannot be null or empty.", nameof(workspaceName));
+            }
+            if (string.IsNullOrWhiteSpace(resourceName))
+            {
+                throw new ArgumentException("Resource name cannot be null or empty.", nameof(resourceName));
+            }
+
+            // Make sure we are logged in to Fabric CLI
+            EnsureFabricCliLogin();
+            bool created = false;
+            try
+            {
+                string resourceTypeString = GetResourceTypeString(resourceType);
+                Trace.TraceInformation($"Creating fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}' using fabric-cli.");
+                var resourcePath = GetResourcePath(workspaceName, resourceName, resourceType);
+                string output = ExecuteFabricCliCommand($"create {resourcePath}");
+                created = true;
+                Trace.TraceInformation($"Fabric {resourceTypeString.ToLowerInvariant()} created: {output}");
+                // Get the connection string for the newly created resource
+                string connectionString = ExecuteFabricCliCommand($"get {resourcePath} -q properties.connectionString")+DefaultAuthMethod;
+                return connectionString;
+            }
+            catch (Exception ex)
+            {
+                var resourceTypeString = GetResourceTypeString(resourceType);
+                Trace.TraceError($"Failed to create fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}': {ex.Message}");
+                if (created)
+                {
+                    // If creation partially succeeded, attempt to clean up by dropping the resource
+                    try
+                    {
+                        DropFabricResource(workspaceName, resourceName, resourceType);
+                        Trace.TraceInformation($"Cleaned up partially created fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}'.");
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        Trace.TraceError($"Failed to clean up fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}': {cleanupEx.Message}");
+                    }
+                }
+                throw new InvalidOperationException($"Error creating fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}'", ex);
+            }
+        }
+
+        /// <summary>
+        /// Drops a fabric resource (database or warehouse) using the fabric-cli tool.
+        /// </summary>
+        /// <param name="workspaceName">Workspace Name</param>
+        /// <param name="resourceName">The name of the resource to drop.</param>
+        /// <param name="resourceType">The type of fabric resource to drop.</param>
+        private void DropFabricResource(string workspaceName, string resourceName, FabricDatabaseType resourceType)
         {
             if (string.IsNullOrWhiteSpace(workspaceName))
             {
                 throw new ArgumentException("Workspace name cannot be null or empty.", nameof(workspaceName));
             }
 
-            if (string.IsNullOrWhiteSpace(dbName))
+            if (string.IsNullOrWhiteSpace(resourceName))
             {
-                throw new ArgumentException("Database name cannot be null or empty.", nameof(dbName));
+                throw new ArgumentException("Resource name cannot be null or empty.", nameof(resourceName));
             }
 
             // Make sure we are logged in to Fabric CLI
@@ -76,21 +164,23 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 
             try
             {
-                Trace.TraceInformation($"Dropping fabric database '{dbName}' using fabric-cli.");
-                var dbPath = $"/{workspaceName}.Workspace/{dbName}.SQLDatabase";
-                ExecuteFabricCliCommand($"rm {dbPath} -f");
-                Trace.TraceInformation($"Fabric database dropped: {dbName}");
+                string resourceTypeString = GetResourceTypeString(resourceType);
+                Trace.TraceInformation($"Dropping fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}' using fabric-cli.");
+                var resourcePath = GetResourcePath(workspaceName, resourceName, resourceType);
+                ExecuteFabricCliCommand($"rm {resourcePath} -f");
+                Trace.TraceInformation($"Fabric {resourceTypeString.ToLowerInvariant()} dropped: {resourceName}");
             }
             catch (Exception ex)
             {
-                Trace.TraceError($"Failed to drop fabric database '{dbName}': {ex.Message}");
-                throw new InvalidOperationException($"Error dropping fabric database '{dbName}'", ex);
+                string resourceTypeString = GetResourceTypeString(resourceType);
+                Trace.TraceError($"Failed to drop fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}': {ex.Message}");
+                throw new InvalidOperationException($"Error dropping fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}'", ex);
             }
         }
 
-        private static void EnsureFabricCliLogin()
+        private void EnsureFabricCliLogin()
         {
-            if(Environment.UserInteractive && !IsLoggedInToFabricCli())
+            if(System.Environment.UserInteractive && !IsLoggedInToFabricCli())
             {
                 ExecuteFabricCliCommand("auth login", true);
                 // After successful login, update the cached status to true
@@ -103,7 +193,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 Trace.TraceInformation("Already logged in to Fabric CLI.");
             }
         }
-        private static bool IsLoggedInToFabricCli()
+        private bool IsLoggedInToFabricCli()
         {
             // Check if the login status is cached and not expired
             if (CachedLogInStatus.HasValue && DateTime.UtcNow < LogInStatusCacheExpirationTime)
@@ -131,12 +221,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <summary>
         /// Executes Fabric-Cli Command and returns the output.
         /// </summary>
-        private static string ExecuteFabricCliCommand(string arguments, bool interactiveInputNeeded = false)
+        private string ExecuteFabricCliCommand(string arguments, bool interactiveInputNeeded = false)
         {
             string output = string.Empty;
-            string error = string.Empty;
+            var error = string.Empty;
             
-                var processStartInfo = new ProcessStartInfo
+            var processStartInfo = new ProcessStartInfo
             {
                 FileName = FabricCliPath,
                 Arguments = arguments,
@@ -145,6 +235,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 UseShellExecute = interactiveInputNeeded,
                 CreateNoWindow = !interactiveInputNeeded,
             };
+            // Set FAB_API_ENDPOINT_FABRIC if Environment == "daily"
+            if (string.Equals(Environment, "daily", StringComparison.OrdinalIgnoreCase))
+            {
+                processStartInfo.FileName = "cmd.exe";
+                processStartInfo.Arguments = $"/c set FAB_API_ENDPOINT_FABRIC=dailyapi.fabric.microsoft.com&{FabricCliPath} {arguments}";
+            }
+            Trace.WriteLine($"Executing Fabric CLI command: {processStartInfo.FileName} {processStartInfo.Arguments}");
             using (var process = Process.Start(processStartInfo))
             {
                 if (process == null)
@@ -168,9 +265,32 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             }
         }
 
-        private static string GetDatabasePath(string workspaceName, string dbName)
+        /// <summary>
+        /// Gets the resource path for the specified resource type.
+        /// </summary>
+        /// <param name="workspaceName">The workspace name.</param>
+        /// <param name="resourceName">The resource name.</param>
+        /// <param name="resourceType">The type of fabric resource.</param>
+        /// <returns>The formatted resource path.</returns>
+        private string GetResourcePath(string workspaceName, string resourceName, FabricDatabaseType resourceType)
         {
-            return $"/{workspaceName}.Workspace/{dbName}.SQLDatabase";
+            string resourceTypeString = GetResourceTypeString(resourceType);
+            return $"/{workspaceName}.Workspace/{resourceName}.{resourceTypeString}";
+        }
+
+        /// <summary>
+        /// Gets the string representation of the resource type for use in resource paths.
+        /// </summary>
+        /// <param name="resourceType">The fabric database type.</param>
+        /// <returns>The string representation of the resource type.</returns>
+        private string GetResourceTypeString(FabricDatabaseType resourceType)
+        {
+            return resourceType.ToString();
+        }
+
+        private string GetDatabasePath(string workspaceName, string dbName)
+        {
+            return GetResourcePath(workspaceName, dbName, FabricDatabaseType.SQLDatabase);
         }
 
     }

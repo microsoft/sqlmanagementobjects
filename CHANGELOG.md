@@ -3,9 +3,23 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 172.87.0
+
+- Add Vector index support
+- Use vector_dimensions instead of max_length for Vector columns
+- Support Order Clause for NonClustered Columnstore Indexes
+- Add missing values to LogReuseWaitStatus enum
+- Add metadata provider for OrderedColumns
+- Expose GroupMaximumTempdbDataMB and GroupMaximumTempdbDataPercent for Resource Governor
+- Expose Database.OptimizedLockingOn property
+- Expose Database.AcceleratedRecoveryEnabled property for Azure
+
 ## 172.76.0
 
 - Fix scripting performance #165
+
+## 172.74.0
+
 - Add new audit action type INFORMATION_PROTECTION_OPERATION_GROUP
 - Add new database level permissions ALTER ANY EXTERNAL MODEL, CREATE EXTERNAL MODEL and ALTER ANY INFORMATION PROTECTION
 
@@ -30,10 +44,10 @@ Once we push a new version to nuget.org add a double hash header for that versio
 - Remove obsolete formatter-based serialization constructors from non-Netfx Exceptions
 - Add ConnectionOptions and Pushdown to `CREATE` and `ALTER` scripts for external data sources
 - Added new `DateLastModified` property on Error Logs returned by `EnumErrorLogs()`. Its value is the same as the existing `CreateDate`,
-  (which has been incorrectly namd for years) only properly stampted with the date/time offset information to allow easier 
+  (which has been incorrectly namd for years) only properly stampted with the date/time offset information to allow easier
   interoperability between client and servers in different time zones. `CreateDate` is essentially deprecated, and new applications
   should start using `DateLastModified` instead.
-- Fixed an issue in the `EnumErrorLogs()` where `CreateDate` field could be `NULL` depending on the configuration of the machine 
+- Fixed an issue in the `EnumErrorLogs()` where `CreateDate` field could be `NULL` depending on the configuration of the machine
   on which SQL Server was running on.
 - Regex for the EXECUTE statement was updated to also match the shortened form 'EXEC'
 
@@ -77,20 +91,20 @@ Once we push a new version to nuget.org add a double hash header for that versio
 - Enable datetime masked columns
 - Update product display names
 - Add database, server, and object permissions for SQL Server 2019 and SQL Server 2022
-- Add support for strict encryption and HostNameInCertificate 
+- Add support for strict encryption and HostNameInCertificate
 
 
 ## 170.12.0, 161.48028.0
 
 - Add certificate and asymmetric key user support for Azure DB
 - Change the name of the XML file used by SSMS 19 to RegSrvr16.xml
-- Change `SetDefaultInitFields` to [allow inclusion of properties unsupported](https://github.com/microsoft/sqlmanagementobjects/issues/84) by the connected SQL edition. 
+- Change `SetDefaultInitFields` to [allow inclusion of properties unsupported](https://github.com/microsoft/sqlmanagementobjects/issues/84) by the connected SQL edition.
 
 ## 170.11.0, 161.47027.0
 
 - Fix distribution columns on scripting for taking into consideration more than one distribution column
 - Add new EXTGOV_OPERATION_GROUP audit action type
-- Force [QUOTED_IDENTIFIER ON](https://github.com/microsoft/sqlmanagementobjects/issues/96) for all tables 
+- Force [QUOTED_IDENTIFIER ON](https://github.com/microsoft/sqlmanagementobjects/issues/96) for all tables
 - Change Databases enumeration on Azure DB to ignore `sys.databases` entries that don't have an entry in `sys.database_service_objectives`. Prevents attempted logins to user databases when enumerating databases on the logical master
 - Update permissions enumeration for SQL Server 2022
 

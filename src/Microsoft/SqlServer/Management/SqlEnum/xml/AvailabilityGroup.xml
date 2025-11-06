@@ -89,5 +89,10 @@
       <property name="IsContained" type="bit" cast="true" read_only_after_creation="true" expensive="false">ISNULL(AG.is_contained, 0)</property>
     </version>
 
+    <version min_major='17'>
+      <!--This property is used to configure ODBC connection string for AG and FCI to connect with TDS 8.0-->
+      <property name="ClusterConnectionOptions" type="nvarchar">ISNULL(AG.cluster_connection_options, N'')</property>
+    </version>
+
   </properties>
 </EnumObject>

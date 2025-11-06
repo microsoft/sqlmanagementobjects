@@ -13,7 +13,7 @@
 	</settings>
 	<properties>
 		<include file='parameter.xml'/>
-			
+
 		<version min_major='7' max_major='8'>
 			<property name="IsOutputParameter" type="bit"
 			cast='true' mode="design">CASE param.isoutparam WHEN 1 THEN param.isoutparam WHEN 0 THEN CASE param.name WHEN '' THEN 1 ELSE 0 END END</property>
@@ -26,5 +26,9 @@
 			<property name="IsReadOnly" type="bit" mode="design">param.is_readonly</property>
 		</version>
 		<property name="Number" type="int" hidden='true'>1</property>
+		<version min_major='17' cloud_min_major='12'>
+			<property name="VectorDimensions" type="int" mode="design">ISNULL(param.vector_dimensions, 0)</property>
+			<property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(param.vector_base_type_desc, N'')</property>
+		</version>
 	</properties>
 </EnumObject>

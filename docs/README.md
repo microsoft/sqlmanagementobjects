@@ -31,12 +31,27 @@ Create a corresponding partial class in `%basedir%\src\Microsoft\SqlServer\Manag
 7. Add a UrnSuffix: `public static string UrnSuffix => "<ObjectType>";`
 8. If the object is scriptable on its own, not directly included as part of the script for its parent, reference its UrnSuffix in the scriptableTypes HashSet in ScriptMaker.cs.
 
+### New data type
+
+* If the new data type has a **new** subfield (such as length or precision) then add it to the following. Search for VectorDimensions for an example
+  * column.xml
+  * SPParams.xml
+  * UDF.xml
+  * UDFParams.xml
+  * cfg.xml
+* Do a search for SMO_NEW_DATATYPE in the code and add the new datatype in each place
+* Add tests! Create new baseline objects using the new type for every object that can support the new type. There should be at least a:
+  * Table column
+  * Stored procedure parameters (both input and output)
+  * User-defined function parameter
+  * User-defined function return type
+
 ### DesignMode
 
 `DesignMode` (or `Design Mode`) is the label for an instance of the object hierarchy whose root `Server` object is using a `ServerConnection` that's in `Offline` mode. Any object added to a child collection in a `DesignMode` hierarchy is automatically set to the `Existing` state.
 
 
-When the connection is offline, many code paths get short circuited and skip running queries, leaving the objects in whatever state the caller has set them. Correct support for DesignMode in your object will enable it to be used for offline unit tests. In `DesignMode`, certain methods like `Alter` are blocked completely, but unit tests can call the internal `ScriptAlter` method and validate that correct scripts are generated based on the set of properties the unit test set. Such a unit test can detect bugs that affect non-DesignMode operation, such as a failure to properly check if a property has been set on the object before trying to reference its value. 
+When the connection is offline, many code paths get short circuited and skip running queries, leaving the objects in whatever state the caller has set them. Correct support for DesignMode in your object will enable it to be used for offline unit tests. In `DesignMode`, certain methods like `Alter` are blocked completely, but unit tests can call the internal `ScriptAlter` method and validate that correct scripts are generated based on the set of properties the unit test set. Such a unit test can detect bugs that affect non-DesignMode operation, such as a failure to properly check if a property has been set on the object before trying to reference its value.
 
 If an object property is not explicitly set by a caller and that object doesn't have a `default` value set for it in [cfg.xml](/src/Codegen/cfg.xml), attempting to get the property value will result in an exception. Typically, readonly properties _should_ have a default value assigned. Default values for settable properties are optional, and may be limited to the properties that don't directly affect the `ScriptAlter` implementation of the object.
 
@@ -61,7 +76,7 @@ If the object type you are adding corresponds to an entry in sys.securable_class
 
 ### Taxes and overhead
 
-#### Update the enumerations and references under
+#### Update the enumerations and references
 
 - Enumerations.cs/DatabaseObjectBase.cs - If necessary update the DatabaseObjectTypes with your new object type and add it to the EnumObjects method of Database
   - Note this is only for actual objects in the Database. Options and other "virtual" objects shouldn't be added here
@@ -69,7 +84,7 @@ If the object type you are adding corresponds to an entry in sys.securable_class
   - Such as a new "object unsupported in current version" message for your new type.
 - LocalizableResources.strings - Add descriptions for each publicly exposed property of the added type
   - This is REQUIRED if the object is a DMF Facet (it will have the `[Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet]` attribute on the base class definition). If it is not a DMF facet you won't need it unless you added something that's using the text, but it's still recommended you add it anyways
-  - Note that this applies to ALL public properties. So if you add a new object and it inherits from a base class with public properties you need to add descriptions for those as well. A suggestion is to view the object with something like ILSpy to see all the properties and make sure you aren't missing any. 
+  - Note that this applies to ALL public properties. So if you add a new object and it inherits from a base class with public properties you need to add descriptions for those as well. A suggestion is to view the object with something like ILSpy to see all the properties and make sure you aren't missing any.
 - script_patterns.cs - Add any common script additions here
   - e.g. Existence check for the new object
 - ScriptMaker.cs - If your newly added object implements Cmn.IScriptable, then add it to the HashSet in Scriptable

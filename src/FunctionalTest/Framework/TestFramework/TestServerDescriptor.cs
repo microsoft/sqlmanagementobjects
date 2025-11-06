@@ -73,13 +73,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             if (targetServers != null)
             {
                 TraceHelper.TraceInformation("Limiting tests to these servers based on environment: {0}", targetServersEnvVar);
-                }
-            
+            }
+
             var workspaces = connStringsDoc.XPathSelectElements(@"//FabricWorkspaces/FabricWorkspace")
-                   .Select(workspaceElement => new FabricWorkspaceDescriptor
+                   .Select(workspaceElement => new FabricWorkspaceDescriptor(workspaceElement.GetStringAttribute("environment"))
                    {
                        Name = workspaceElement.GetStringAttribute("name"),
-                       Environment = workspaceElement.GetStringAttribute("environment"),
                        WorkspaceName = workspaceElement.GetStringAttribute("workspaceName"),
                        DatabaseEngineType = workspaceElement.GetAttribute("databaseenginetype",
                             (s) => (DatabaseEngineType)Enum.Parse(typeof(DatabaseEngineType), s)),
@@ -94,8 +93,9 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                        MajorVersion = workspaceElement.GetAttribute("majorversion",
                         (s) => string.IsNullOrEmpty(s) ? 0 : int.Parse(s)),
                        DbNamePrefix = workspaceElement.GetStringAttribute("dbNamePrefix"),
+                       HostPlatform = workspaceElement.GetStringAttribute("hostplatform"),
                    }).Where((d) => targetServers == null || targetServers.Contains(d.Name)).ToList();
-           
+
             var servers = connStringsDoc.XPathSelectElements(@"//ConnectionString")
                     .Select(connStringElement => new TestServerDescriptor
                     {
@@ -149,7 +149,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             return connStringBuilder.ConnectionString;
         }
 
-        
+
 
         private static IEnumerable<SqlFeature> GetFeaturesFromString(string source)
         {
@@ -170,7 +170,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             return xElement.GetAttribute(attrName, (s) => s);
         }
 
-        internal static T GetAttribute<T>(this XElement xElement, string attrName, Func<string,T> converter = null )
+        internal static T GetAttribute<T>(this XElement xElement, string attrName, Func<string, T> converter = null)
         {
             XAttribute attr = xElement.Attribute(attrName);
             if (attr == null && converter == null)
@@ -185,7 +185,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
 
         static T DefaultConvert<T>(string s)
         {
-            return (T) Convert.ChangeType(s, typeof (T));
+            return (T)Convert.ChangeType(s, typeof(T));
         }
     }
 }

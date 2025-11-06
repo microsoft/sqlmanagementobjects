@@ -158,6 +158,20 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             /// <summary>
+            /// Check vector properties are not set for non vector index
+            /// </summary>
+            protected void CheckVectorProperties()
+            {
+                if (index.IsSupportedProperty(nameof(Index.VectorIndexMetric)))
+                {
+                    Exception exception = new SmoException(ExceptionTemplates.UnsupportedNonVectorParameters);
+
+                    this.CheckProperty(nameof(Index.VectorIndexMetric), string.Empty, exception);
+                    this.CheckProperty(nameof(Index.VectorIndexType), string.Empty, exception);
+                }
+            }
+
+            /// <summary>
             /// Check non clustered properties are not set for non applicable index
             /// </summary>
             protected void CheckNonClusteredProperties()
@@ -316,11 +330,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 //OPTIMIZE_FOR_SEQUENTIAL_KEY 15                15              15
                 // ======================================================================================================================================
 
+                var isVectorIndex = index.GetPropValueOptional<IndexType>(nameof(Index.IndexType)) == IndexType.VectorIndex;
                 // options not valid for a stretch db target or sql dw db target in azure
-                if (!preferences.TargetEngineIsAzureStretchDb() && !preferences.TargetEngineIsAzureSqlDw())
+                if (!preferences.TargetEngineIsAzureStretchDb()
+                    && !preferences.TargetEngineIsAzureSqlDw()
+                    && !isVectorIndex)
                 {
                     // These options are not valid for 8.0 PK/UK constraints.
-
                     if (!forRebuild || rebuildPartitionNumber == -1)
                     {
                         if (preferences.TargetDatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
@@ -344,13 +360,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 // index options are not supported for the inlined index on SQL DW tables
-                if (!forRebuild && !(this.index.IsSqlDwIndex && this.TableCreate))
+                if (!forRebuild && !(this.index.IsSqlDwIndex && this.TableCreate) && !isVectorIndex)
                 {
                     this.ScriptIndexOption(sb, "DROP_EXISTING", GetOnOffValue(index.dropExistingIndex));
                 }
 
                 // options not valid for a stretch db target or sql dw db target in azure
-                if (!preferences.TargetEngineIsAzureStretchDb() && !preferences.TargetEngineIsAzureSqlDw())
+                if (!preferences.TargetEngineIsAzureStretchDb() && !preferences.TargetEngineIsAzureSqlDw() && !isVectorIndex)
                 {
                     // The resumable option is valid for rebuild as of SQL version 140, and available for Create Index as of SQL version 150.
                     // Even if the script targets a higher version of SQL, do not script the option unless we are operating against at least
@@ -422,7 +438,7 @@ namespace Microsoft.SqlServer.Management.Smo
             /// <param name="forCreateIndex"></param>
             protected void ScriptIndexOptionOnline(StringBuilder sb, bool forRebuild, bool forCreateIndex)
             {
-                if (!preferences.TargetEngineIsAzureStretchDb())
+                if (!preferences.TargetEngineIsAzureStretchDb() && index.GetPropValueOptional<IndexType>(nameof(Index.IndexType)) != IndexType.VectorIndex)
                 {
                     StringBuilder onlinePropertiesSb = new StringBuilder(GetOnOffValue(index.onlineIndexOperation));
 
@@ -1522,6 +1538,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         return new SecondaryXmlIndexScripter(index, sp);
                     case IndexType.SpatialIndex:
                         return new SpatialIndexScripter(index, sp);
+                    case IndexType.VectorIndex:
+                        return new VectorIndexScripter(index, sp);
                     case IndexType.NonClusteredColumnStoreIndex:
                         return new NonClusteredColumnStoreIndexScripter(index, sp);
                     case IndexType.NonClusteredHashIndex:
@@ -1593,6 +1611,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckConflictingProperties();
                 this.CheckNonClusteredProperties();
                 this.CheckXmlProperties();
+                this.CheckVectorProperties();
                 this.CheckSpatialProperties();
             }
 
@@ -1783,6 +1802,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 this.CheckConflictingProperties();
                 this.CheckXmlProperties();
+                this.CheckVectorProperties();
                 this.CheckSpatialProperties();
             }
 
@@ -2208,6 +2228,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckClusteredProperties();
                 this.CheckNonClusteredProperties();
                 this.CheckXmlProperties();
+                this.CheckVectorProperties();
             }
 
             protected override void ScriptCreateHeaderDdl(StringBuilder sb)
@@ -2421,6 +2442,65 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        private class VectorIndexScripter : IndexScripter
+        {
+            public VectorIndexScripter(Index index, ScriptingPreferences sp)
+                : base(index, sp)
+            {
+            }
+
+            protected override void Validate()
+            {
+                ThrowIfNotCloudAndBelowSpecifiedVersion(preferences.TargetDatabaseEngineType, preferences.TargetServerVersion, SqlServerVersion.Version170);
+
+                this.CheckConstraintProperties();
+                this.CheckRegularIndexProperties();
+                this.CheckClusteredProperties();
+                this.CheckNonClusteredProperties();
+                this.CheckXmlProperties();
+                this.CheckSpatialProperties();
+            }
+
+            protected override void ScriptCreateHeaderDdl(StringBuilder sb)
+            {
+                sb.AppendFormat(SmoApplication.DefaultCulture, "CREATE VECTOR INDEX {0} ON {1}",
+                    index.FormatFullNameForScripting(preferences),
+                    parent.FormatFullNameForScripting(preferences));
+            }
+
+            protected override void ScriptIndexOptions(StringBuilder sb)
+            {
+                this.ScriptVectorIndexOptions(sb);
+                base.ScriptIndexOptions(sb);
+            }
+
+            private void ScriptVectorIndexOptions(StringBuilder sb)
+            {
+                var vectorIndexMetric = index.GetPropValueOptional(nameof(Index.VectorIndexMetric), string.Empty);
+                var vectorIndexType = index.GetPropValueOptional(nameof(Index.VectorIndexType), string.Empty);
+
+                // Script METRIC parameter
+                if (!string.IsNullOrEmpty(vectorIndexMetric))
+                {
+                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"METRIC = '{SqlSmoObject.SqlString(vectorIndexMetric)}'{Globals.commaspace}");
+                }
+
+                // Script TYPE parameter
+                if (!string.IsNullOrEmpty(vectorIndexType))
+                {
+                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"TYPE = '{SqlSmoObject.SqlString(vectorIndexType)}'{Globals.commaspace}");
+                }
+            }
+
+            protected override void ScriptIndexStorage(StringBuilder sb)
+            {
+                if (this.index.IsSupportedProperty("FileGroup", preferences) && !string.IsNullOrEmpty(this.index.GetPropValueOptional<string>("FileGroup", string.Empty)))
+                {
+                    base.ScriptIndexStorage(sb);
+                }
+            }
+        }
+
         private abstract class ColumnstoreIndexScripter : IndexScripter
         {
             public ColumnstoreIndexScripter(Index index, ScriptingPreferences sp)
@@ -2481,6 +2561,22 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     sb.AppendFormat(SmoApplication.DefaultCulture, "COMPRESSION_DELAY = {0}", index.CompressionDelay);
                     sb.Append(Globals.commaspace);
+                }
+            }
+
+            protected void ScriptOrderClause(StringBuilder sb)
+            {
+                // Add support for ORDER clause
+                List<IndexedColumn> orderedColumns = (from IndexedColumn col in index.IndexedColumns
+                                                      where col.IsSupportedProperty(nameof(IndexedColumn.ColumnStoreOrderOrdinal)) &&
+                                                      col.GetPropValueOptional(nameof(IndexedColumn.ColumnStoreOrderOrdinal), 0) > 0 select col)
+                                                      .OrderBy(x => x.GetPropValueOptional(nameof(IndexedColumn.ColumnStoreOrderOrdinal), 0))
+                                                      .ToList();
+
+                if (orderedColumns.Count > 0)
+                {
+                    string listOfCols = string.Join(",", orderedColumns.Select(x => MakeSqlBraket(x.Name)).ToArray());
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "ORDER ({0})", listOfCols);
                 }
             }
 
@@ -2551,6 +2647,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void ScriptIndexDetails(StringBuilder sb)
             {
+                // Only script ORDER clause for SQL Server v170+ or Azure SQL Database V12+ or SQL Managed Instance
+                if ((preferences.TargetDatabaseEngineType == Cmn.DatabaseEngineType.Standalone && preferences.TargetServerVersion >= SqlServerVersion.Version170) ||
+                    preferences.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlDatabase ||
+                    preferences.TargetDatabaseEngineEdition == Cmn.DatabaseEngineEdition.SqlManagedInstance)
+                {
+                    this.ScriptOrderClause(sb);
+                }
                 this.ScriptFilter(sb);
             }
         }
@@ -3261,18 +3364,15 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.AppendFormat(SmoApplication.DefaultCulture, "CREATE CLUSTERED COLUMNSTORE INDEX {0} ON {1} ",
                         index.FormatFullNameForScripting(preferences),
                         parent.FormatFullNameForScripting(preferences));
+                }
+            }
 
-                    List<IndexedColumn> indexedColumns =
-                                (from IndexedColumn col in index.IndexedColumns
-                                 where col.IsSupportedProperty("ColumnStoreOrderOrdinal") && col.GetPropValueOptional("ColumnStoreOrderOrdinal", 0) > 0
-                                 select col).ToList();
-
-                    if (indexedColumns.Count > 0)
-                    {
-                        List<IndexedColumn> orderedColumns = indexedColumns.OrderBy(x => x.GetPropValueOptional("ColumnStoreOrderOrdinal", 0)).ToList();
-                        string listOfCols = string.Join(",", orderedColumns.Select(x => MakeSqlBraket(x.Name)).ToArray());
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "ORDER ({0})", listOfCols);
-                    }
+            protected override void ScriptIndexDetails(StringBuilder sb)
+            {
+                if (!index.IsMemoryOptimizedIndex)
+                {
+                    // Add support for ORDER clause
+                    this.ScriptOrderClause(sb);
                 }
             }
 

@@ -2,12 +2,12 @@
 # Copyright (c) Microsoft Corporation.  All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 # ------------------------------------------------------------
-# String resource file 
+# String resource file
 #
 # When processed by the String Resource Tool, this file generates
 # both a .CS and a .RESX file with the same name as the file.
-# The .CS file contains a class which can be used to access these 
-# string resources, including the ability to format in 
+# The .CS file contains a class which can be used to access these
+# string resources, including the ability to format in
 # parameters, which are identified with the .NET {x} format
 # (see String.Format help).
 #
@@ -20,7 +20,7 @@
 
 # SMO build specific comment
 # after generating the .resx file, run resgen on it and get the .resources file
-# please remember to also check that .resources in, along with the 
+# please remember to also check that .resources in, along with the
 # .strings and .cs file
 [strings]
 
@@ -269,6 +269,8 @@ SelectiveXml = Selective XML
 SecondarySelectiveXml = Secondary Selective XML
 ClusteredColumnStore = Clustered Columnstore
 Heap = Heap
+Vector = Vector
+Json = JSON
 
 #AgentSubSystem enum strings
 TransactSql = Transact-SQL script (T-SQL)

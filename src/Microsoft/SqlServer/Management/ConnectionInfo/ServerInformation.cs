@@ -37,7 +37,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="dt"></param>
         /// <param name="databaseEngineEdition"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition)
-            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified)
+            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, isFabricServer: false)
         {
 
         }
@@ -51,15 +51,17 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="databaseEngineEdition"></param>
         /// <param name="hostPlatform"></param>
         /// <param name="connectionProtocol">net_transport value from dm_exec_connections for the current spid</param>
+        /// <param name="isFabricServer"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition,
-            string hostPlatform, NetworkProtocol connectionProtocol)
+            string hostPlatform, NetworkProtocol connectionProtocol, bool isFabricServer)
         {
-            this.serverVersion = sv;
+            serverVersion = sv;
             this.productVersion = productVersion;
-            this.databaseEngineType = dt;
+            databaseEngineType = dt;
             this.databaseEngineEdition = databaseEngineEdition;
             this.hostPlatform = hostPlatform;
             this.connectionProtocol = connectionProtocol;
+            IsFabricServer = isFabricServer;
         }
 
         /// <summary>
@@ -111,6 +113,14 @@ namespace Microsoft.SqlServer.Management.Common
             get { return connectionProtocol; }
         }
 
+        /// <summary>
+        /// Returns true if the server is running in Microsoft Fabric
+        /// </summary>
+        public bool IsFabricServer
+        {
+            get;
+        }
+
         private static readonly HashSet<DatabaseEngineEdition> validEditions = new HashSet<DatabaseEngineEdition>(Enum.GetValues(typeof(DatabaseEngineEdition)).Cast<DatabaseEngineEdition>());
         // this query needs to be safe on all platforms. DW and Sql2005 don't support CONNECTIONPROPERTY
         private const string serverVersionQuery = @"DECLARE @edition sysname;
@@ -118,7 +128,8 @@ SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
 SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',
 SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
 SERVERPROPERTY('ProductVersion') AS ProductVersion,
-@@MICROSOFTVERSION AS MicrosoftVersion;
+@@MICROSOFTVERSION AS MicrosoftVersion,
+case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer;
 ";
         static public ServerInformation GetServerInformation(IDbConnection sqlConnection, IDbDataAdapter dataAdapter, string serverVersionString)
         {
@@ -173,7 +184,7 @@ else
                 {
                     serverVersion = ParseMicrosoftVersion(Convert.ToUInt32(dataSet.Tables[0].Rows[0]["MicrosoftVersion"].ToString()));
                 }
-
+                var isFabricServer = Convert.ToBoolean(dataSet.Tables[0].Rows[0]["IsFabricServer"]);
                 var connectionProtocol = dataSet.Tables[2].Rows[0]["ConnectionProtocol"];
 
                 return new ServerInformation(serverVersion,
@@ -181,7 +192,8 @@ else
                     engineType,
                     edition,
                     (string)dataSet.Tables[1].Rows[0]["host_platform"],
-                    connectionProtocol == DBNull.Value ? NetworkProtocol.NotSpecified : ProtocolFromNetTransport((string)connectionProtocol)
+                    connectionProtocol == DBNull.Value ? NetworkProtocol.NotSpecified : ProtocolFromNetTransport((string)connectionProtocol),
+                    isFabricServer
                     );
             }
         }

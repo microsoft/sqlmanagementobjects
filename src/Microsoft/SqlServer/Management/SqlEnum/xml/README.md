@@ -48,6 +48,8 @@ Defines a join to a table. See [SqlPropertyLink.cs](../SqlPropertyLink.cs) for h
     - join 
     - left_join
 
+     ** Consider using a temp table for new property_link entries, particularly in data types that already have a high number of joins. Direct joins on system DMVs and catalog views often have a high performance penalty. Use a prefix entry to populate the temp table and a postfix to drop it. **
+
 ### parent_link
 
 Defines a property whose value is pulled from the parent object

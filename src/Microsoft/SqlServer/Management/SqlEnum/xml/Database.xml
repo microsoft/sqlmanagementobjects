@@ -18,7 +18,7 @@
       </prefix>
       <prefix fields="#LastBackupDate#LastDifferentialBackupDate#LastLogBackupDate#">
         create table #tempbackup (database_name nvarchar(128), [type] char(1), backup_finish_date datetime)
-        insert into #tempbackup select database_name, [type], max(backup_finish_date) from msdb..backupset where [type] = 'D' or [type] = 'L' or [type]='I' group by database_name, [type]
+        insert into #tempbackup select database_name, [type], max(backup_finish_date) from msdb..backupset where [type] = 'D' or [type] = 'L' or [type] = 'I' group by database_name, [type]
       </prefix>
       <postfix fields="#SpaceAvailable#">
         drop table #tmplog
@@ -82,7 +82,7 @@
       <property_link fields = '#FilestreamDirectoryName#FilestreamNonTransactedAccess#' left_join="sys.database_filestream_options AS fsopt">fsopt.database_id = dtb.database_id</property_link>
     </version>
 
-    <version min_major='15'>
+    <version min_major='15' cloud_min_major='12'>
       <property_link fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#" 
              left_join="#pvsfilegroups as pfg">pfg.database_id = dtb.database_id</property_link>
     </version>
@@ -125,20 +125,28 @@
       </prefix>
     </version>
 
-    <version min_major='15' >
+    <version min_major='15' cloud_min_major='12'>
+      <!-- Fabric DW throws an error trying to query sys.dm_tran_persistent_version_store_stats -->
       <prefix fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#">
-       create table #pvsfilegroups (name sysname, persistent_version_store_size_kb bigint, database_id int primary key)
-       insert into #pvsfilegroups select fg.name, tvs.persistent_version_store_size_kb, d.database_id from sys.databases d 
-           join sys.dm_tran_persistent_version_store_stats tvs on tvs.database_id = d.database_id 
-           join sys.filegroups fg on fg.data_space_id = tvs.pvs_filegroup_id
+        create table #pvsfilegroups (name sysname, persistent_version_store_size_kb bigint, database_id int primary key)
+        BEGIN TRY
+        exec sp_executesql N'insert into #pvsfilegroups select fg.name, tvs.persistent_version_store_size_kb, d.database_id from sys.databases d
+        join sys.dm_tran_persistent_version_store_stats tvs on tvs.database_id = d.database_id
+        join sys.filegroups fg on fg.data_space_id = tvs.pvs_filegroup_id'
+        END TRY
+        BEGIN CATCH
+        END CATCH
       </prefix>
-      <prefix fields='#DataRetentionEnabled#'>
-        create table #temp_data_retention_property (db_id int not null, is_data_retention_enabled bit)
-        if serverproperty('engineedition') = 9
-        exec sp_executesql N'insert into #temp_data_retention_property
-        select dr_db.database_id, dr_db.is_data_retention_enabled
-        from sys.databases dr_db'
-      </prefix>
+    </version>
+
+    <version min_major='15'>
+        <prefix fields='#DataRetentionEnabled#'>
+            create table #temp_data_retention_property (db_id int not null, is_data_retention_enabled bit)
+            if serverproperty('engineedition') = 9
+            exec sp_executesql N'insert into #temp_data_retention_property
+            select dr_db.database_id, dr_db.is_data_retention_enabled
+            from sys.databases dr_db'
+        </prefix>
     </version>
 
     <version min_major='9'>
@@ -152,7 +160,7 @@
       </prefix>
       <prefix fields="#LastBackupDate#LastDifferentialBackupDate#LastLogBackupDate#">
         create table #tempbackup (database_name nvarchar(128), [type] char(1), backup_finish_date datetime)
-        insert into #tempbackup select database_name, [type], max(backup_finish_date) from msdb..backupset where [type] = 'D' or [type] = 'L' or [type]='I' group by database_name, [type]
+        insert into #tempbackup select database_name, [type], max(backup_finish_date) from msdb..backupset where [type] = 'D' or [type] = 'L' or [type] = 'I' group by database_name, [type]
       </prefix>
       <postfix fields="#IsVarDecimalStorageFormatEnabled#">
         drop table #tmp_sp_db_vardecimal_storage_format
@@ -162,13 +170,16 @@
       </postfix>
     </version>
 
-    <version min_major='15' >
+    <version min_major='15' cloud_min_major='12'>
       <postfix fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#">
         drop table #pvsfilegroups
       </postfix>
-      <postfix fields='#DataRetentionEnabled#'>
-        drop table #temp_data_retention_property
-      </postfix>
+    </version>
+
+    <version min_major='15' >
+        <postfix fields='#DataRetentionEnabled#'>
+            drop table #temp_data_retention_property
+        </postfix>
     </version>
 
     <version cloud_min_major='12'>
@@ -364,7 +375,10 @@
       <property name="IsDatabaseSnapshot" type="bit" cast='true' access='Read'>isnull(dtb.source_database_id, 0)</property>
       <property name="IsDatabaseSnapshotBase" type="bit" cast='true' access='Read' expensive='true'>(select count(1) from sys.databases dtbmir where dtbmir.source_database_id = dtb.database_id)</property>
       <property name="DatabaseSnapshotBaseName" type="sysname" read_only_after_creation="true">ISNULL(DB_NAME(dtb.source_database_id), N'')</property>
-      <property name="IsFullTextEnabled" type="bit">dtb.is_fulltext_enabled</property>
+       <!-- We use the SERVERPROPERTY for MI since is_fulltext_enabled does not have the correct value in some cases.
+            This column actually shouldn't be used at all for anything (it's hardcoded in many cases, or otherwise incorrect),
+            but scoping the change to just MI for now to reduce chance of unintended side effects -->
+      <property name="IsFullTextEnabled" type="bit">case when SERVERPROPERTY('EngineEdition') = 8 then SERVERPROPERTY('IsFullTextInstalled') else dtb.is_fulltext_enabled end</property>
       <property name="ServiceBrokerGuid" type="uniqueidentifier" access='Read'>dtb.service_broker_guid</property>
       <property name="SnapshotIsolationState" type="tinyint" report_type="SnapshotIsolationState" access="Read">dtb.snapshot_isolation_state</property>
       <property name="ReplicationOptions" type="int"  report_type='ReplicationOptions' access = 'Read'>(dtb.is_published*1+dtb.is_subscribed*2+dtb.is_merge_published*4)</property>
@@ -560,11 +574,11 @@
     <version cloud_min_major='12' datawarehouse_enabled='true'>
       
       <!-- Size should be returned in MB -->
-      <property name="Size" type="float" access="Read">CONVERT(float, DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes')) / 1024.0 / 1024.0</property>
+      <property name="Size" type="float" access="Read">CONVERT(float, ISNULL(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'), 0)) / 1024.0 / 1024.0</property>
       <!-- MaxSize may be settable on Azure -->
-      <property name="MaxSizeInBytes" type="float">CONVERT(float, DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'))</property>
+      <property name="MaxSizeInBytes" type="float">CONVERT(float, ISNULL(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'), 0))</property>
       <!-- IsMaxSizeApplicable is to check if MaxSize is required/applicable in scripts -->
-      <property name="IsMaxSizeApplicable" type="bit" access="Read" cast='true'>(CASE WHEN 0 > CONVERT(float, DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes')) THEN 0 ELSE 1 END)</property>
+      <property name="IsMaxSizeApplicable" type="bit" access="Read" cast='true'>(CASE WHEN 0 > CONVERT(float, ISNULL(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'), 0)) THEN 0 ELSE 1 END)</property>
     </version>
     <version cloud_min_major='12'>
       <property name="SpaceAvailable" type="float" access="Read" cast='true' expensive='true'>(SELECT IIF(databasepropertyex(dtb.name,'Edition') = 'Hyperscale', 0, (SELECT ((CAST(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes') AS float) / 1024.0) - (SUM(reserved_page_count)*8.0 )) / 1024.0 FROM sys.dm_db_partition_stats)))</property>
@@ -576,7 +590,7 @@
     </version>
 
     <version cloud_min_major='12' datawarehouse_enabled='true'>
-      <property name="AzureServiceObjective" type="nvarchar">DATABASEPROPERTYEX(dtb.name, 'ServiceObjective')</property>
+      <property name="AzureServiceObjective" type="nvarchar">ISNULL(DATABASEPROPERTYEX(dtb.name, 'ServiceObjective'), N'')</property>
     </version>
 
     <version min_major ='8' max_major='8'>
@@ -734,26 +748,35 @@
     </version>
 
     <version min_major ='15' cloud_min_major='12'>
-      <!-- Catalog Collation properties -->
       <property name="CatalogCollation" type="int" report_type="CatalogCollationType" read_only_after_creation="true">dtb.catalog_collation_type</property>
     </version>
 
-    <version min_major="8" cloud_min_major="12"  datawarehouse_enabled='true'>
+    <version min_major="8" cloud_min_major="12" datawarehouse_enabled='true'>
       <property name='LastGoodCheckDbTime' type='datetime' cast='true' access='read'>ISNULL(DATABASEPROPERTYEX(dtb.name, 'lastgoodcheckdbtime'), 0)</property>
     </version>
-
+      
+    <version min_major="15" cloud_min_major="12">
+        <property name="PersistentVersionStoreFileGroup" expensive="true" type="sysname">ISNULL(pfg.name, N'')</property>
+        <property name="PersistentVersionStoreSizeKB" expensive="true" type="bigint" access="read">ISNULL(pfg.persistent_version_store_size_kb, 0)</property>
+    </version>
+      
     <version min_major="15">
-      <property name="AcceleratedRecoveryEnabled" type="bit" cast="true">dtb.is_accelerated_database_recovery_on</property>
-      <property name="PersistentVersionStoreFileGroup" expensive="true" type="sysname">ISNULL(pfg.name, N'')</property>
-      <property name="PersistentVersionStoreSizeKB" expensive="true" type="bigint" access="read">ISNULL(pfg.persistent_version_store_size_kb, 0)</property>
       <!--  Property only available on SQL EDGE i.e EngineEdition == 9 -->
       <property name="DataRetentionEnabled" type="bit" cast="true">ISNULL((select is_data_retention_enabled from #temp_data_retention_property as tdrp where tdrp.db_id = dtb.database_id),0)</property>
     </version>
+
+    <version min_major="15" cloud_min_major="12" datawarehouse_enabled='true'>
+      <property name="AcceleratedRecoveryEnabled" type="bit" cast="true">ISNULL(dtb.is_accelerated_database_recovery_on, 0)</property>
+    </version>
+    
+    <version min_major="17" cloud_min_major="12" datawarehouse_enabled='true'>
+      <property name="OptimizedLockingOn" type="bit" cast="true">ISNULL(dtb.is_optimized_locking_on, 0)</property>
+    </version>
     <version cloud_min_major="12">
-      <property name="IsFabricDatabase" type="bit" cast="true" access="Read">case when serverproperty('EngineEdition') = 12 then 1 else 0 end</property>
+      <property name="IsFabricDatabase" type="bit" cast="true" access="read" expensive="true">case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end</property>
     </version>
     <version min_major="7" datawarehouse_enabled='true'>
-      <property name="IsFabricDatabase" type="bit" cast="true" access="Read">0</property>
+      <property name="IsFabricDatabase" type="bit" cast="true" access="read" expensive="true">0</property>
     </version>
   </properties>
 

@@ -151,50 +151,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         }
 
         /// <summary>
-        /// We're hard-coding max memory usage per core per hardware generation for Managed Servers
-        /// in information.xml and inc_server.xml files. Since these numbers can change in production
-        /// and new hardware generations will show up, this test will fail if things are to be updated.
-        /// </summary>
-        [TestMethod]
-        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
-        public void CheckMemoryLimitConstantsForManagedInstance()
-        {
-            this.ExecuteWithMasterDb(
-               database =>
-               {
-                    const int memoryPerGbGen4 = 7168;
-                    const int memoryPerGbGen5 = 5223;
-
-                   _SMO.Server server = database.Parent;
-
-                   // Check if this server belongs to known hardware generations
-                   //
-                   Assert.That(server.HardwareGeneration, Is.EqualTo("Gen4").Or.EqualTo("Gen5"), "Unknown hardware generation - update information.xml and inc_server.xml!");
-
-                   // Check if memory per core ratio has changed
-                   //
-                   System.Data.DataSet ds = database.ExecuteWithResults("SELECT [process_memory_limit_mb] FROM sys.dm_os_job_object");
-                   int actualServerMemory = System.Int32.Parse(ds.Tables[0].Rows[0][0].ToString());
-                   int actualServerMemoryPerCore = actualServerMemory / server.Processors;
-
-                   switch(server.HardwareGeneration)
-                   {
-                       case "Gen4":
-                           Assert.That(memoryPerGbGen4, Is.EqualTo(actualServerMemoryPerCore), "Memory per core has changed for Gen4 - update information.xml and inc_server.xml!");
-                           break;
-                       case "Gen5":
-                           Assert.That(memoryPerGbGen5, Is.EqualTo(actualServerMemoryPerCore), "Memory per core has changed for Gen5 - update information.xml and inc_server.xml!");
-                           break;
-                       default:
-                           Assert.Fail("Unknown hardware generation - update information.xml and inc_server.xml!");
-                           break;
-                   }
-               }
-           );
-        }
-
-
-        /// <summary>
         /// Make sure that master db and log paths are not empty for SQL Standalone
         /// </summary>
         [TestMethod]

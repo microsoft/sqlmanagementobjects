@@ -22,7 +22,7 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
     /// Tests to verify that ServerInformation class uses efficient means of retrieving data.
     /// </summary>
     [TestClass]
-    public class ServerInformationTests
+    public class ServerInformationTests : Test.UnitTestBase
     {
         [TestMethod]
         [TestCategory("Unit")]
@@ -38,7 +38,8 @@ SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
 SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',
 SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
 SERVERPROPERTY('ProductVersion') AS ProductVersion,
-@@MICROSOFTVERSION AS MicrosoftVersion;
+@@MICROSOFTVERSION AS MicrosoftVersion,
+case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer;
 select host_platform from sys.dm_os_host_info
 if @edition = N'SQL Azure' 
   select 'TCP' as ConnectionProtocol
@@ -55,7 +56,7 @@ else
                 // Note use of a dataset that would never occur in real life
                 (DataSet ds) =>
                 {
-                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x320104d2, HostPlatformNames.Linux, "TCP");
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x320104d2, HostPlatformNames.Linux, "TCP", false);
                 });
 
             var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
@@ -87,7 +88,8 @@ SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
 SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',
 SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
 SERVERPROPERTY('ProductVersion') AS ProductVersion,
-@@MICROSOFTVERSION AS MicrosoftVersion;
+@@MICROSOFTVERSION AS MicrosoftVersion,
+case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer;
 select N'Windows' as host_platform
 if @edition = N'SQL Azure' 
   select 'TCP' as ConnectionProtocol
@@ -104,7 +106,7 @@ else
             dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
                 (DataSet ds) =>
                 {
-                    FillTestDataSet(ds, "12.0.2000.8", DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x0A0104d2, HostPlatformNames.Windows, null);
+                    FillTestDataSet(ds, "12.0.2000.8", DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x0A0104d2, HostPlatformNames.Windows, null, false);
                 });
 
             var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, "10.01.1234");
@@ -114,7 +116,7 @@ else
         }
 
         private void FillTestDataSet(DataSet ds, string productVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition,
-            int microsoftVersion, string hostPlatform, string protocol)
+            int microsoftVersion, string hostPlatform, string protocol, bool isFabricServer)
         {
             Trace.TraceInformation("Creating test DataSet");
             ds.Tables.Add("Table");
@@ -122,7 +124,8 @@ else
             ds.Tables["Table"].Columns.Add(new DataColumn("DatabaseEngineType", typeof(int)));
             ds.Tables["Table"].Columns.Add(new DataColumn("DatabaseEngineEdition", typeof(int)));
             ds.Tables["Table"].Columns.Add(new DataColumn("MicrosoftVersion", typeof(int)));
-            ds.Tables["Table"].Rows.Add(productVersion, (int)databaseEngineType, (int)databaseEngineEdition, microsoftVersion);
+            ds.Tables["Table"].Columns.Add(new DataColumn("IsFabricServer", typeof(bool)));
+            ds.Tables["Table"].Rows.Add(productVersion, (int)databaseEngineType, (int)databaseEngineEdition, microsoftVersion, isFabricServer);
             ds.Tables.Add("Table2");
             ds.Tables["Table2"].Columns.Add(new DataColumn("host_platform", typeof(string)));
             ds.Tables["Table2"].Rows.Add(hostPlatform);

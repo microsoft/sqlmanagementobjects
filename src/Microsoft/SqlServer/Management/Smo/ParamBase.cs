@@ -100,13 +100,13 @@ namespace Microsoft.SqlServer.Management.Smo
         [SfcReference(typeof(UserDefinedDataType), typeof(UserDefinedDataTypeResolver), "Resolve")]
         [SfcReference(typeof(UserDefinedTableType), typeof(UserDefinedTableTypeResolver), "Resolve")]
         [SfcProperty(SfcPropertyFlags.Design | SfcPropertyFlags.Standalone)]
-		public virtual DataType DataType 
+		public virtual DataType DataType
 		{
-			get 
+			get
 			{
 				return GetDataType(ref dataType);
 			}
-			set 
+			set
 			{
 				SetDataType(ref dataType, value);
 			}
@@ -131,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Smo
 				if (bFirst)
 				{
 					//first character is always at sign(@) for parameter name
-					if (c != '@')					
+					if (c != '@')
 					{
 						throw new WrongPropertyValueException(ExceptionTemplates.WrongPropertyValueException("Name", paramName));
 					}
@@ -162,11 +162,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (bUseDefault)
             {
-                String sDefaultValue = (string)this.GetPropValueOptional("DefaultValue");               
+                String sDefaultValue = (string)this.GetPropValueOptional("DefaultValue");
                 if (sDefaultValue != null)
                 {
                     // CLR object's parameter's default values or default value through SMO need to be surrounded quotes if required
-                    if ((this.Properties["DefaultValue"].Dirty ||(isParentClrImplemented() &&  this.GetPropValueOptional<bool>("HasDefaultValue",false))))                       
+                    if ((this.Properties["DefaultValue"].Dirty ||(isParentClrImplemented() &&  this.GetPropValueOptional<bool>("HasDefaultValue",false))))
                     {
                         // null value should not be surrounded with quotes
                         if (sDefaultValue.Equals("null", StringComparison.OrdinalIgnoreCase))
@@ -212,6 +212,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private string MakeSqlStringIfRequired(string defaultValue)
         {
+            // SMO_NEW_DATATYPE
+            // For types that can contain spaces, add them here so they're properly converted to SQL string values
             switch (this.DataType.SqlDataType)
             {
                 case SqlDataType.DateTime:
@@ -233,7 +235,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return MakeSqlString(defaultValue);
                 default:
                     return defaultValue;
-            }           
+            }
         }
 
         public void MarkForDrop(bool dropOnAlter)
@@ -304,7 +306,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="version">The version of the server</param>
         /// <param name="databaseEngineType">The database engine type of the server</param>
         /// <param name="databaseEngineEdition">The database engine edition of the server</param>
-        /// <param name="defaultTextMode">indicates the text mode of the server. 
+        /// <param name="defaultTextMode">indicates the text mode of the server.
         /// If true this means only header and body are needed, otherwise all properties</param>
         /// <returns></returns>
         internal static string[] GetScriptFields(Type parentType,
@@ -315,7 +317,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!defaultTextMode)
             {
-                string[] fields = {   
+                string[] fields = {
                                             "NumericPrecision",
                                             "NumericScale",
                                             "Length",
@@ -334,8 +336,8 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                // if the default text mode is true this means we will script the 
-                // object's header directly from the text, so there is no need to bring 
+                // if the default text mode is true this means we will script the
+                // object's header directly from the text, so there is no need to bring
                 // any other properties. But we will still prefetch the parameters because
                 // they might have extended properties.
                 return new string[] { };
@@ -416,7 +418,9 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="parentType">The type of the parent object</param>
         /// <param name="version">The version of the server</param>
-        /// <param name="defaultTextMode">indicates the text mode of the server. 
+        /// <param name="databaseEngineType"></param>
+        /// <param name="databaseEngineEdition"></param>
+        /// <param name="defaultTextMode">indicates the text mode of the server.
         /// If true this means only header and body are needed, otherwise all properties</param>
         /// <returns></returns>
         internal static string[] GetScriptFields(Type parentType,
@@ -427,7 +431,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!defaultTextMode)
             {
-                string[] fields = {   
+                string[] fields = {
                                                 "NumericPrecision",
                                                 "NumericScale",
                                                 "Length",
@@ -445,8 +449,8 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                // if the default text mode is true this means we will script the 
-                // object's header directly from the text, so there is no need to bring 
+                // if the default text mode is true this means we will script the
+                // object's header directly from the text, so there is no need to bring
                 // any other properties. But we will still prefetch the parameters because
                 // they might have extended properties.
                 return new string[] { };

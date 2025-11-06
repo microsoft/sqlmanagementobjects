@@ -53,11 +53,18 @@ namespace Microsoft.SqlServer.Management.Smo
                 set => collation = value;
             }
 
-            private int? maxLength = null;
-            public int MaxLength
+            private int? vectorDimensions = null;
+            public int VectorDimensions
             {
-                get => maxLength ?? throw new InvalidOperationException("MaxLength not set");
-                set => maxLength = value;
+                get => vectorDimensions ?? throw new InvalidOperationException("VectorDimensions not set");
+                set => vectorDimensions = value;
+            }
+
+            private string vectorBaseType = string.Empty;
+            public string VectorBaseType
+            {
+                get => vectorBaseType;
+                set => vectorBaseType = value;
             }
         }
 
@@ -116,7 +123,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                         this.tableName,
                                         columnNameSQL.ToString());
 
-                // In Hekaton M5, READ COMMITTED is not supported for SELECT statement of a memory optimized table, therefore we provide SNAPSHOT hint. 
+                // In Hekaton M5, READ COMMITTED is not supported for SELECT statement of a memory optimized table, therefore we provide SNAPSHOT hint.
                 if (table.IsSupportedProperty("IsMemoryOptimized") && table.IsMemoryOptimized)
                 {
                     this.selectCommand = String.Format(CultureInfo.InvariantCulture,
@@ -180,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     bool hasData = false;
 
-                    // If there are writable columns then establish a connection and 
+                    // If there are writable columns then establish a connection and
                     // check if there is anything to write
                     //
                     if (hasWritableColumns == true)
@@ -213,7 +220,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            // If IdentityOn statement is needed then set it as the 
+                            // If IdentityOn statement is needed then set it as the
                             // current string else read the data
                             //
                             if (this.hasIdentity)
@@ -238,9 +245,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 case EnumeratorState.PersistedON:
 
                     // At this point we dont need to read from the Reader
-                    // because we will come into IdentityON state from 
+                    // because we will come into IdentityON state from
                     // TruncateStatement state and in the code for TruncateStatement
-                    // we are calling Reader.Read but not processing it if we transition into 
+                    // we are calling Reader.Read but not processing it if we transition into
                     // IdentityON
                     //
                     if (this.hasIdentity)
@@ -263,9 +270,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 case EnumeratorState.IdentityON:
 
                     // At this point we dont need to read from the Reader
-                    // because we will come into IdentityON state from 
+                    // because we will come into IdentityON state from
                     // TruncateStatement state and in the code for TruncateStatement
-                    // we are calling Reader.Read but not processing it if we transition into 
+                    // we are calling Reader.Read but not processing it if we transition into
                     // IdentityON
                     //
                     currentScriptString = GetNextInsertStatement();
@@ -406,7 +413,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
 
         /// <summary>
-        /// Iterates over the columns and populates the columnNames for the columns 
+        /// Iterates over the columns and populates the columnNames for the columns
         /// which are not computed and are not of type TimeStamp.
         /// Also, generates the select statement that should used to read the data
         /// for generating insert statements
@@ -488,6 +495,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.columnData.Add(col.Name, columnData);
             }
 
+            // SMO_NEW_DATATYPE
+            // For any new datatype which has extra properties required to script (such as length) then
+            // add them here
             switch (col.UnderlyingSqlDataType)
             {
                 case SqlDataType.Decimal:
@@ -502,7 +512,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     columnData.Collation = col.Collation;
                     break;
                 case SqlDataType.Vector:
-                    columnData.MaxLength = col.DataType.MaximumLength;
+                    columnData.VectorDimensions = col.DataType.VectorDimensions;
+                    columnData.VectorBaseType = col.DataType.VectorBaseType;
                     break;
                 default:
                     break;
@@ -598,9 +609,12 @@ namespace Microsoft.SqlServer.Management.Smo
             string formattedValue = string.Empty;
 
             SqlDataType sqlDataType = col.UnderlyingSqlDataType;
-
+            // SMO_NEW_DATATYPE
+            // If a new datatype is added which needs a special format for scripting into select statements
+            // that should be done here (the default is just to select the column name)
             switch (sqlDataType)
             {
+                // TODO Remove
                 case SqlDataType.DateTime:
                 case SqlDataType.DateTime2:
                 case SqlDataType.Time:
@@ -631,7 +645,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// Creates the proper T-SQL syntaxt to cast the value to the proper sql_variant
-        /// underlying type.  We are relegated to doing this because not all types that 
+        /// underlying type.  We are relegated to doing this because not all types that
         /// are possible for an underlying sql_variant are exposed System.Data.SqlTypes.
         /// </summary>
         /// <param name="readerItem"></param>
@@ -731,7 +745,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "varchar":
                 case "char":
                     // If collation is not there then script data without it
-                    // Else convert to the right collation. This conversion is needed both on 2000 and 2005 
+                    // Else convert to the right collation. This conversion is needed both on 2000 and 2005
                     // because otherwise the data will stored using the collation for the Database
                     //
                     string inputData;
@@ -793,6 +807,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
             var columnData = this.columnData[columnName];
 
+            // SMO_NEW_DATATYPE
+            // If a new datatype is added which needs a special format for scripting the raw value
+            // into insert statements that should be done here
             switch (columnData.DataType)
             {
 
@@ -836,7 +853,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
 
                 case SqlDataType.Decimal:
-                    // we have to manually format the string by ToStringing the value first, and then converting 
+                    // we have to manually format the string by ToStringing the value first, and then converting
                     // the potential (European formatted) comma to a period.
                     var decimalValue = String.Format(
                             GetUsCultureInfo(),
@@ -845,7 +862,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     formattedValue = $"CAST({decimalValue} AS Decimal({columnData.NumericPrecision}, {columnData.NumericScale}))";
                     break;
                 case SqlDataType.Numeric:
-                    // we have to manually format the string by ToStringing the value first, and then converting 
+                    // we have to manually format the string by ToStringing the value first, and then converting
                     // the potential (European formatted) comma to a period.
                     var numericValue = String.Format(
                             GetUsCultureInfo(),
@@ -895,8 +912,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.VarChar:
                 case SqlDataType.VarCharMax:
                 case SqlDataType.Text:
-                    // The value is generated in the following format for Sql Server 2000 since inserting 
-                    // the unicode value directly when column size is more than 4000 chars does not 
+                    // The value is generated in the following format for Sql Server 2000 since inserting
+                    // the unicode value directly when column size is more than 4000 chars does not
                     // work for char and varchar types on 2000
                     // convert(text, N'Data' collate Collation)
                     //
@@ -955,13 +972,14 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 case SqlDataType.Vector:
                     string sqlStringValue = SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString());
-                    // Temporary workaround to convert the length of the column to the dimensions for vector types
-                    // until sys.columns is updated to include the dimensions of the vector type.
-                    // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/3906463
-                    // dimensions = (length - 8) / 4
-                    // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
-                    int dimensions = (columnData.MaxLength - 8) / 4;
-                    formattedValue = $"CAST({sqlStringValue} AS Vector({dimensions}))";
+                    if (!string.IsNullOrEmpty(columnData.VectorBaseType))
+                    {
+                        formattedValue = $"CAST({sqlStringValue} AS Vector({columnData.VectorDimensions}, {columnData.VectorBaseType}))";
+                    }
+                    else
+                    {
+                        formattedValue = $"CAST({sqlStringValue} AS Vector({columnData.VectorDimensions}))";
+                    }
                     break;
 
                 default:

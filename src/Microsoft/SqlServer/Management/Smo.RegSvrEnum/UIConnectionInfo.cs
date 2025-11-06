@@ -160,7 +160,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 
         
         /// <summary>
-        /// returns either server name or "(local)" if the server name is "." or empty
+        /// Returns "(local)" (with optional instance name) if the server name is "." or empty, null if the server name hasn't been set yet or the current server name otherwise.
         /// </summary>
         public string ServerNameNoDot
         {
@@ -170,21 +170,18 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
                 if (strRealName != null)
                 {
                     strRealName = strRealName.Trim();
-                }
 
-                //see if we need to adjust it
-                if (strRealName.Length == 0 || strRealName == "." )
-                {
-                    return "(local)";
-                } 
-                else if (strRealName.StartsWith(".\\",StringComparison.Ordinal))
-                {
-                    return String.Format(CultureInfo.InvariantCulture, "{0}{1}", "(local)", strRealName.Substring(1));
-                } 
-                else
-                {
-                    return strRealName;
+                    //see if we need to adjust it
+                    if (strRealName.Length == 0 || strRealName == ".")
+                    {
+                        return "(local)";
+                    }
+                    else if (strRealName.StartsWith(".\\", StringComparison.Ordinal))
+                    {
+                        return String.Format(CultureInfo.InvariantCulture, "{0}{1}", "(local)", strRealName.Substring(1));
+                    }
                 }
+                return strRealName;
             }
         }
 
