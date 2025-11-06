@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='ContentFormatterArgument' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="ContentFormatterId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="ContentFormatterId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_content_formatter_argument" alias="cfa" />
+		<prefix>
+CREATE TABLE #tmp_content_formatter_argument(
+    ContentFormatterArgumentId int,
+    ContentFormatterId int,
+    ArgumentName nvarchar(255),
+    ArgumentValue nvarchar(4000)
+)
+INSERT #tmp_content_formatter_argument EXEC [SchemaPrefix].NSGetContentFormatterArguments
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_content_formatter_argument
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">cfa.ArgumentName</property>
+		<property name="Value" type="nvarchar" size="4000">cfa.ArgumentValue</property>
+        <property name="Id" type="int" hidden="true">cfa.ContentFormatterArgumentId</property>
+        <property name="ContentFormatterId" type="int" hidden="true">cfa.ContentFormatterId</property>
+	</properties>
+</EnumObject>

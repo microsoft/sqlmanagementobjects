@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='9'>
+	<union>
+		<settings>
+			<include file='inc_perm.xml' alias='server'/>
+
+            <property_link fields = '#ObjectName#' 
+					join = 'sys.server_principals' alias = 'sp'>sp.principal_id = prmssn.major_id and prmssn.class = 101</property_link>
+      <prefix >
+        use [master];
+      </prefix>
+        </settings>
+		<properties>
+			<property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+			<property name="ObjectName" type="sysname">sp.name</property>
+			<property name="ObjectSchema" type="sysname">NULL</property>
+			<property name="ColumnName" type="sysname">NULL</property>
+			<property name="ObjectID" type="int">prmssn.major_id</property>
+            <property name="ObjectType" type="char" size='2'>NULL</property>
+		</properties>
+	</union>
+	<union>
+		<settings>
+			<include file='inc_perm.xml' alias='server'/>
+			
+			<property_link fields = '#ObjectName#' 
+					join = 'sys.certificates' alias = 'c'>c.certificate_id = prmssn.major_id and prmssn.class = 106</property_link>
+
+        </settings>
+		<properties>
+			<property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+			
+			<property name="ObjectName" type="sysname">c.name</property>
+			<property name="ObjectSchema" type="sysname">NULL</property>
+			<property name="ColumnName" type="sysname">NULL</property>
+			<property name="ObjectID" type="int">prmssn.major_id</property>
+            <property name="ObjectType" type="char" size='2'>NULL</property>
+        </properties>
+    </union>
+    <union>
+        <settings>
+            <include file='inc_perm.xml' alias='server'/>
+            <property_link 
+                fields = '#ObjectName#' 
+                join = 'sys.endpoints' 
+                alias = 'e'>e.endpoint_id = prmssn.major_id and prmssn.class = 105</property_link>
+        </settings>
+        <properties>
+            <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+            <property name="ObjectName" type="sysname">e.name</property>
+            <property name="ObjectSchema" type="sysname">NULL</property>
+            <property name="ColumnName" type="sysname">NULL</property>
+            <property name="ObjectID" type="int">prmssn.major_id</property>
+            <property name="ObjectType" type="char" size='2'>NULL</property>
+		</properties>
+	</union>
+    <union>
+      <settings>
+        <include file='inc_perm.xml' alias='server'/>
+        <property_link
+            fields = '#ObjectName#'
+            join = 'sys.servers'
+            alias = 'svr'>svr.server_id = prmssn.major_id and prmssn.class = 100</property_link>
+      </settings>
+      <properties>
+        <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+        <property name="ObjectName" type="sysname">svr.name</property>
+        <property name="ObjectSchema" type="sysname">NULL</property>
+        <property name="ColumnName" type="sysname">NULL</property>
+        <property name="ObjectID" type="int">prmssn.major_id</property>
+        <property name="ObjectType" type="char" size='2'>NULL</property>
+      </properties>
+    </union>  
+</EnumObject>

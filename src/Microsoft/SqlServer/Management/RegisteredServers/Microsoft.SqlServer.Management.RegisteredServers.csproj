@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.RegisteredServers</RootNamespace>
+    <ClsCompliant>true</ClsCompliant>
+  </PropertyGroup>
+  <ItemGroup Label="string resources">
+    <SqlStringResource Include="RegSvrStrings.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="xml\RegisteredServersStore.xml">
+      <Link>xml\RegisteredServersStore.xml</Link>
+      <LogicalName>RegisteredServersStore.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\RegisteredServer.xml">
+      <Link>xml\RegisteredServer.xml</Link>
+      <LogicalName>RegisteredServer.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ServerGroup.xml">
+      <Link>xml\ServerGroup.xml</Link>
+      <LogicalName>ServerGroup.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_urn.xml">
+      <Link>xml\inc_urn.xml</Link>
+      <LogicalName>inc_urn.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
+     <Reference Include="System.Security" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <PackageReference Include="System.Security.Permissions" />
+  </ItemGroup>
+</Project>

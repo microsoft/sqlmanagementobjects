@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<EnumObject type="OperatorJobNotification" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent='Name' local='OperatorName' />
+		</parent_link>
+		<request_parent_select>
+			<field name='Name' />
+		</request_parent_select>
+		<property_link table="#operator_job_notification_tmp ont" />
+		<prefix>
+			<link_multiple no='1' expression="
+create table #operator_job_notification_tmp(OperatorName sysname default '', JobId uniqueidentifier, JobName sysname, NotifyLevelEmail int, NotifyLevelNetSend int, NotifyLevelPage int)
+declare @OperatorName sysname
+
+declare crs cursor local fast_forward
+	for ( {0} ) 
+
+open crs 
+fetch crs into @OperatorName
+while @@fetch_status &gt;= 0 
+begin 
+		insert #operator_job_notification_tmp (JobId,JobName,NotifyLevelEmail,NotifyLevelNetSend,NotifyLevelPage) exec msdb.dbo.sp_help_operator_jobs @operator_name = @OperatorName
+		update #operator_job_notification_tmp set OperatorName=@OperatorName where OperatorName = ''
+		fetch crs into @OperatorName
+end 
+close crs
+deallocate crs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+			drop table #operator_job_notification_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="JobId" type="uniqueidentifier">ont.JobId</property>
+		<property name="JobName" type="sysname">ont.JobName</property>
+		<property name="NotifyLevelEmail" type="int">ont.NotifyLevelEmail</property>
+		<property name="NotifyLevelNetSend" type="int">ont.NotifyLevelNetSend</property>
+		<property name="NotifyLevelPage" type="int">ont.NotifyLevelPage</property>				
+		<property name="OperatorName" type="sysname" hidden='true'>ont.OperatorName</property>
+	</properties>
+</EnumObject>

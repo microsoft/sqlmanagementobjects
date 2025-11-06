@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<EnumObject type="Role" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+    <settings distinct='true'>
+        <version min_major='7' max_major='8'>
+            <property_link table = 'master.dbo.spt_values v1'>
+                v1.low=0 and v1.type='SRV'
+            </property_link>
+        </version>
+        <version min_major='9'>
+            <property_link table = 'sys.server_principals r'>r.type ='R'</property_link>
+            <property_link fields = '#Number#' table ='master.dbo.spt_values v1'>
+                v1.name = r.name and v1.low = 0
+            </property_link>
+        </version>
+        <version min_major='11'>
+            <property_link fields = '#Owner#' left_join='sys.server_principals AS ou'>ou.principal_id = r.owning_principal_id</property_link>
+        </version>
+        <version cloud_min_major='12'>
+            <property_link table = 'sys.server_principals r'>r.type ='R'</property_link>
+            <property_link fields = '#Owner#' left_join='sys.sql_logins AS l'>l.principal_id = r.owning_principal_id</property_link>
+        </version>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="NType" type="sysname" access='Read' hidden='true'>Role</property>
+        <version min_major='7' max_major='8'>
+            <property name="Name" type="nvarchar" size="250">v1.name</property>
+            <property name="Description" type="nvarchar" size="250" table="master.dbo.spt_values v2" link="v2.low=-1 and v2.type='SRV' and v1.number=v2.number">v2.name</property>
+            <property name="Number" type="int" hidden="true">v1.number</property>
+        </version>
+        <version min_major='9'>
+            <property name="Name" type="sysname">r.name</property>
+            <property name="ID" type="int">r.principal_id</property>
+            <property name="Description" type="nvarchar" size="250">N''</property>
+            <property name="Number" type="int" hidden="true">v1.number</property>
+
+            <!-- enable permissions -->
+            <property name="PermissionClass" type="int" hidden='true'>101</property>
+        </version>
+        <version min_major='11'>
+            <property name="DateModified" type="datetime" access="Read">r.modify_date</property>
+            <property name="DateCreated" type="datetime" access="Read">r.create_date</property>
+            <property name="Owner" type="sysname">ou.name</property>
+            <property name="IsFixedRole" type="bit" cast='true' access='Read'>r.is_fixed_role</property>
+            <include file='inc_policy_health_state.xml'/>
+        </version>
+        <version cloud_min_major='12'>
+            <property name="Name" type="sysname">r.name</property>
+            <property name="ID" type="int">r.principal_id</property>
+            <property name="Owner" type="sysname">l.name</property>
+            <property name="Description" type="nvarchar" size="250">N''</property>
+            <property name="DateModified" type="datetime" access="Read">r.modify_date</property>
+            <property name="DateCreated" type="datetime" access="Read">r.create_date</property>
+            <property name="IsFixedRole" type="bit" cast='true' access='Read'>r.is_fixed_role</property>
+        </version>
+    </properties>
+</EnumObject>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="inc_urn" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+	</settings>
+	<properties>
+    <property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='3' expression="{0} + '/{2}[@Name=' + quotename({1},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="Name" />
+				<link_field field="NType" />				
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

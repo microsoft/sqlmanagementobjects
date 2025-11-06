@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<EnumObject type="AvailabilityGroupListenerIPAddress" impl_type="SqlObject" min_major='11' >
+  <settings>
+    <parent_link>
+      <link parent='UniqueId' local='ListenerID'/>
+    </parent_link>
+    <property_link table="master.sys.availability_group_listener_ip_addresses" alias="AGLIP"/>
+
+  </settings>
+  <properties>
+
+    <version min_major='11'>
+      <property name="ListenerID" type="nvarchar" hidden="true" access="Read">AGLIP.listener_id</property>
+      <property name="IPAddress" type="nvarchar">ISNULL(AGLIP.ip_address,'')</property>
+      <property name="SubnetMask" type="nvarchar">ISNULL(AGLIP.ip_subnet_mask, '')</property>
+      <property name="SubnetIP" type="nvarchar">ISNULL(AGLIP.network_subnet_ip, '')</property>
+      <property name="SubnetIPv4Mask" type="nvarchar" access="Read">ISNULL(AGLIP.network_subnet_ipv4_mask, '')</property>
+      <property name="SubnetPrefixLength"  type="int" access="Read">AGLIP.network_subnet_prefix_length</property>
+      <property name="IsDHCP" type="bit">AGLIP.is_dhcp</property>
+      <property name="IPAddressState" type="tinyint" report_type="AvailabilityGroupListenerIPState" access="Read">ISNULL(AGLIP.State, 4)</property>
+      <property name="IPAddressStateDescription" type="nvarchar" access="Read">ISNULL(AGLIP.state_desc,'')</property>
+
+      <property name="Urn" type="nvarchar" size="600">
+        <link_multiple no='5' expression="{0} + '/{4}[@IPAddress=' + quotename({1},'''') + ' and @SubnetMask=' + quotename({2},'''') + ' and @SubnetIP=' + quotename({3},'''') + ']'">
+          <link_field type='parent' field="Urn" />
+          <link_field type='local' field="IPAddress" />
+          <link_field type='local' field="SubnetMask" />
+          <link_field type='local' field="SubnetIP" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='5' expression="{0} + '/{4}[@IPAddress=' + quotename({1},'''') + ' and @SubnetMask=' + quotename({2},'''') + ' and @SubnetIP=' + quotename({3},'''') + ']'">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field type='local' field="IPAddress" />
+          <link_field type='local' field="SubnetMask" />
+          <link_field type='local' field="SubnetIP" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      
+    </version>
+      
+    </properties>
+
+</EnumObject>
+

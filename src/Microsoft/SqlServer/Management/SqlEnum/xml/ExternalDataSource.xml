@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ExternalDataSource" impl_type="SqlObject" min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+  <settings>
+    <property_link table="sys.external_data_sources" alias="eds"/>
+    <property_link fields="#Credential#" left_join="sys.database_scoped_credentials AS c">c.credential_id = eds.credential_id</property_link>
+  </settings>
+  <properties>
+    <include file="inc_urn.xml"/>
+    <include file='inc_named_object.xml' alias='eds' for="#ExtPropClass#ExtPropMajorID#ExtPropMinorID#"/>
+    <property name="Name" type="sysname">eds.name</property>
+    <property name="ID" type="int" access="read">eds.data_source_id</property>
+    <property name="DataSourceType" type="tinyint" report_type="ExternalDataSourceType">eds.type</property>
+    <property name="Location" type="nvarchar" size="4000">ISNULL(eds.location,N'')</property>
+    <property name="Credential" type="sysname">ISNULL(c.name,N'')</property>
+    <version min_major='13'>
+      <property name="ResourceManagerLocation" type="nvarchar" size="4000">ISNULL(eds.resource_manager_location,N'')</property>
+    </version>
+    <version cloud_min_major='12'>
+      <property name="DatabaseName" type="sysname">ISNULL(eds.database_name,N'')</property>
+      <property name="ShardMapName" type="sysname">ISNULL(eds.shard_map_name,N'')</property>
+    </version>
+    <!--  External Generics is only available on prem. -->
+    <version min_major='15'>
+      <property name="ConnectionOptions" type="sysname">ISNULL(eds.connection_options,N'')</property>
+      <property name="PushdownOption" type="tinyint" report_type="ExternalDataSourcePushdownOption">case when ISNULL(eds.pushdown,N'OFF') = 'OFF' then 0 else 1 end</property>
+    </version>
+  </properties>
+</EnumObject>

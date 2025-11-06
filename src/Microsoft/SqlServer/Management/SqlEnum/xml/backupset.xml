@@ -1,0 +1,76 @@
+<?xml version='1.0' ?>
+<EnumObject type='backupset' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<property_link table='msdb.dbo.backupset bkps' />
+	</settings>
+	<properties>
+		<property name='Name' type='nvarchar' size='128'>bkps.name</property>
+		<property name='ID' type='int'>bkps.backup_set_id</property>
+		<property name='BackupSetUuid' type='uniqueidentifier'>bkps.backup_set_uuid</property>
+		<property name='MediaSetId' type='int'>bkps.media_set_id</property>
+		<property name='FirstFamilyNumber' type='tinyint'>bkps.first_family_number</property>
+		<property name='FirstMediaNumber' type='smallint'>bkps.first_media_number</property>
+		<property name='LastFamilyNumber' type='tinyint'>bkps.last_family_number</property>
+		<property name='LastMediaNumber' type='smallint'>bkps.last_media_number</property>
+		<property name='CatalogFamilyNumber' type='tinyint'>bkps.catalog_family_number</property>
+		<property name='CatalogMediaNumber' type='smallint'>bkps.catalog_media_number</property>
+		<property name='Position' type='int'>bkps.position</property>
+		<property name='ExpirationDate' type='datetime'>bkps.expiration_date</property>
+		<property name='SoftwareVendorId' type='int'>bkps.software_vendor_id</property>
+		<property name='Description' type='nvarchar' size='255'>bkps.description</property>
+		<property name='UserName' type='nvarchar' size='128'>bkps.user_name</property>
+		<property name='SoftwareMajorVersion' type='tinyint'>bkps.software_major_version</property>
+		<property name='SoftwareMinorVersion' type='tinyint'>bkps.software_minor_version</property>
+		<property name='SoftwareBuildVersion' type='smallint'>bkps.software_build_version</property>
+		<property name='TimeZone' type='smallint'>bkps.time_zone</property>
+		<property name='MtfMinorVersion' type='tinyint'>bkps.mtf_minor_version</property>
+		<property name='FirstLsn' type='numeric' size='25'>bkps.first_lsn</property>
+		<property name='LastLsn' type='numeric' size='25'>bkps.last_lsn</property>
+		<property name='CheckpointLsn' type='numeric' size='25'>bkps.checkpoint_lsn</property>
+		<property name='DatabaseBackupLsn' type='numeric' size='25'>bkps.database_backup_lsn</property>
+		<property name='DatabaseCreationDate' type='datetime'>bkps.database_creation_date</property>
+		<property name='BackupStartDate' type='datetime'>bkps.backup_start_date</property>
+		<property name='BackupFinishDate' type='datetime'>bkps.backup_finish_date</property>
+		<property name='BackupSetType' type='int' report_type = 'BackupSetType'>CASE bkps.type WHEN 'D' THEN 1 WHEN 'I' THEN 2 WHEN 'L' THEN 3 WHEN 'F' THEN 4 WHEN 'G' THEN 5 END</property>
+		<property name='SortOrder' type='smallint'>bkps.sort_order</property>
+		<property name='CodePage' type='smallint'>bkps.code_page</property>
+		<property name='CompatibilityLevel' type='tinyint' report_type = 'CompatibilityLevel'>bkps.compatibility_level</property>
+		<property name='DatabaseVersion' type='int'>bkps.database_version</property>
+		<property name='BackupSize' type='numeric' size='13'>bkps.backup_size</property>
+    		<property name='DatabaseName' type='nvarchar' size='128'>bkps.database_name</property>
+		<property name='ServerName' type='nvarchar' size='128'>bkps.server_name</property>
+		<property name='MachineName' type='nvarchar' size='128'>bkps.machine_name</property>
+		<version min_major='8'>
+			<property name='BackupSetFlags' type='int'>bkps.flags</property>
+			<property name='UnicodeLocale' type='int'>bkps.unicode_locale</property>
+			<property name='UnicodeCompareStyle' type='int'>bkps.unicode_compare_style</property>
+			<property name='CollationName' type='nvarchar' size='128'>bkps.collation_name</property>
+		</version>
+		<version min_major='9'>
+      			<property name='IsDamaged' type='bit'>bkps.is_damaged</property>
+      			<property name='IsCopyOnly' type='bit'>bkps.is_copy_only</property>
+      			<property name='IsSnapShot' type='bit'>bkps.is_snapshot</property>
+      			<property name='IsReadOnly' type='bit'>bkps.is_readonly</property>
+      			<property name='IsPasswordProtected' type='bit'>bkps.is_password_protected</property>
+      			<property name='HasIncompleteMetaData' type='bit'>bkps.has_incomplete_metadata</property>
+      			<property name='HasBulkLoggedData' type='bit'>bkps.has_bulk_logged_data</property>
+      			<property name='BeginsLogChain' type='bit'>bkps.begins_log_chain</property>
+      			<property name='IsForceOffline' type='bit'>bkps.is_force_offline</property>
+      			<property name='DatabaseGuid' type='uniqueidentifier' >bkps.database_guid</property>
+      			<property name='DifferentialBaseGuid' type='uniqueidentifier' >bkps.differential_base_guid</property>
+      			<property name='FirstRecoveryForkID' type='uniqueidentifier' >bkps.first_recovery_fork_guid</property>
+      			<property name='RecoveryForkID' type='uniqueidentifier' >bkps.last_recovery_fork_guid</property>
+      			<property name='FamilyGuid' type='uniqueidentifier' >bkps.family_guid</property>
+      			<property name='ForkPointLsn' type='numeric' size='25'>bkps.fork_point_lsn</property>
+      			<property name='DifferentialBaseLsn' type='numeric' size='25'>bkps.differential_base_lsn</property>
+    		</version>
+		<version min_major='10'>
+			<property name='CompressedBackupSize' type='numeric' size='20'>bkps.compressed_backup_size</property>
+		</version>
+		<version min_major='11'  min_build='9143'>
+			<property name='KeyAlgorithm' type='nvarchar' size='32'>bkps.key_algorithm</property>
+			<property name='EncryptorThumbprint' type='varbinary' size='20'>bkps.encryptor_thumbprint</property>
+			<property name='EncryptorType' type='nvarchar' size='32'>bkps.encryptor_type</property>
+		</version>
+	</properties>
+</EnumObject>

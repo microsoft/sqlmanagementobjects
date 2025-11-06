@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<EnumObject type="ForeignKey" impl_type="SqlObject" min_major='7'  cloud_min_major='10'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<version min_major='7' max_major='8'>
+			<property_link table="dbo.sysobjects AS cstr">cstr.type=N'F'</property_link>
+			<property_link fields="#ReferencedKey#ReferencedTable#ReferencedTableSchema#" 
+					join="dbo.sysreferences AS rfr">rfr.constid = cstr.id</property_link>
+			<property_link fields="#ReferencedKey#" 
+					left_join="dbo.sysindexes AS ki">ki.indid = rfr.rkeyindid AND ki.id = rfr.rkeyid</property_link>
+			<property_link fields="#ReferencedTable#ReferencedTableSchema#" 
+					join="dbo.sysobjects AS rtbl">rfr.rkeyid = rtbl.id</property_link>
+		</version>
+		<version min_major='9' max_major='11' cloud_min_major='10' cloud_max_major='11'>
+			<property_link table="sys.foreign_keys AS cstr" />
+			<property_link fields="#ReferencedKey#"
+					left_join="sys.indexes AS ki">ki.index_id = cstr.key_index_id and ki.object_id = cstr.referenced_object_id</property_link>
+			<property_link fields="#ReferencedTable#ReferencedTableSchema#" 
+					join="sys.tables rtbl">rtbl.object_id = cstr.referenced_object_id</property_link>
+		</version>
+		<version min_major='12' cloud_min_major='12'>
+			<property_link table="sys.foreign_keys AS cstr" />
+			<property_link fields="#ReferencedKey#IsMemoryOptimized#"
+					left_join="sys.indexes AS ki">ki.index_id = cstr.key_index_id and ki.object_id = cstr.referenced_object_id</property_link>
+			<property_link fields="#ReferencedTable#ReferencedTableSchema#" 
+					join="sys.tables rtbl">rtbl.object_id = cstr.referenced_object_id</property_link>
+		</version>
+    <version min_major='11'>
+      <property_link fields='#IsFileTableDefined#' left_join='sys.filetable_system_defined_objects AS filetableobj'>filetableobj.object_id = cstr.object_id</property_link>
+    </version>
+	</settings>
+	<properties>
+    
+		<include file='inc_constraint.xml' />
+		<version min_major='7' max_major='8'>
+			<property name="ReferencedKey" type="sysname" access='Read'>ki.name</property>
+			<property name="ReferencedTable" type="sysname" mode="design">rtbl.name</property>
+			<property name="ReferencedTableSchema" type="sysname" mode="design">user_name(rtbl.uid)</property>
+			<property name="DeleteAction" type="tinyint" report_type='ForeignKeyAction' read_only_after_creation="true" mode="design">OBJECTPROPERTY(cstr.id, N'CnstIsDeleteCascade')</property>
+			<property name="UpdateAction" type="tinyint" report_type='ForeignKeyAction' read_only_after_creation="true" mode="design">OBJECTPROPERTY(cstr.id, N'CnstIsUpdateCascade')</property>
+		</version>
+		
+		<!-- extended properties support-->		
+		<version min_major='8' max_major='8'>
+			<include file ="inc_level2SupportProperties.xml"/>
+		</version>
+		
+		<version min_major='9'  cloud_min_major='10'>
+			<property name="ReferencedKey" type="sysname" access='Read'>ki.name</property>
+			<property name="ReferencedTable" type="sysname" mode="design">rtbl.name</property>
+			<property name="ReferencedTableSchema" type="sysname" mode="design">schema_name(rtbl.schema_id)</property>
+			<!--
+			The referential action that was declared for this foreign key when an update happens, one of:
+			0 = No Action
+			1 = Cascade
+			2 = Set Null
+			3 = Set Default
+			-->
+			<property name="DeleteAction" type="tinyint" report_type='ForeignKeyAction' read_only_after_creation="true" mode="design">cstr.delete_referential_action</property>
+			<property name="UpdateAction" type="tinyint" report_type='ForeignKeyAction' read_only_after_creation="true" mode="design">cstr.update_referential_action</property>
+		</version>
+    <version min_major='11'>
+      <property name="IsFileTableDefined" type="bit" cast='true' access="read">CASE WHEN filetableobj.object_id IS NULL THEN 0 ELSE 1 END</property>
+    </version>
+
+    <!--Hekaton properties-->
+    <version min_major ='12' cloud_min_major='12'>
+      <!--This returns true for indexes in memory optimized table or table type. -->
+      <property name="IsMemoryOptimized" type="bit" cast="true" read_only_after_creation="true" expensive="true">
+        CASE WHEN ((SELECT o.type FROM sys.objects o WHERE o.object_id=ki.object_id)='U')
+        THEN
+        CASE WHEN ((SELECT tbl.is_memory_optimized FROM sys.tables tbl WHERE tbl.object_id = ki.object_id)=1) THEN 1 ELSE 0 END
+        ELSE
+        CASE WHEN ((SELECT tt.is_memory_optimized FROM sys.table_types tt WHERE tt.type_table_object_id = ki.object_id)=1) THEN 1 ELSE 0 END
+        END
+      </property>
+    </version>
+  </properties>
+</EnumObject>

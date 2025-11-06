@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="Table" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+	<settings>
+		<property_link fields='#FileGroup#PartitionScheme#IsPartitioned#' join='sys.data_spaces ds'>
+			<link_multiple no = '1' expression = 'ds.data_space_id = {0}'>
+				<link_field type='local' field="DataSpaceID" />
+			</link_multiple>
+		</property_link>
+	</settings>
+	<properties>
+		<property name="FileGroup" type="sysname">CASE WHEN 'FG'=ds.type THEN ds.name ELSE N'' END</property>
+		<property name="PartitionScheme" type="sysname">CASE WHEN 'PS'=ds.type THEN ds.name ELSE N'' END</property>
+		<property name="IsPartitioned" type="bit" cast='true' access="Read">CASE WHEN 'PS'=ds.type THEN 1 ELSE 0 END</property>
+	</properties>
+</EnumObject>

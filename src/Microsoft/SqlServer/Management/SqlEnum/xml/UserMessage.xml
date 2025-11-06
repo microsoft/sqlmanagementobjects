@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<EnumObject type="UserDefinedMessage" impl_type="SqlObject" min_major='7'>
+  <settings>
+    <version min_major='7' max_major='8'>
+      <property_link table = 'master.dbo.sysmessages AS sms'>sms.error &gt; 50000</property_link>
+      <property_link fields='#Language#' left_join='master.dbo.syslanguages AS sl '>sms.msglangid = sl.lcid</property_link>
+    </version>
+    <version min_major='9'>
+      <property_link table="sys.messages AS sms" >sms.message_id &gt; 50000</property_link>
+      <property_link fields='#Language#' left_join='sys.syslanguages AS sl '>sms.language_id = sl.lcid</property_link>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn_message.xml' />
+    <version min_major='7' max_major='8'>
+      <property name="ID" type="int" access='rw' read_only_after_creation="true" key_index ="1">sms.error</property>
+      <property name="IsLogged" type="bit" cast='true' >sms.dlevel</property>
+      <property name="Severity" type="int" cast="true">sms.severity</property>
+      <property name="Text" type="nvarchar" size="255"  >sms.description</property>
+      <property name="LanguageID" type="int" cast="true" read_only_after_creation="true">sms.msglangid</property>
+      <property name="Language" type="sysname" read_only_after_creation="true" key_index ="0">sl.name</property>
+    </version>
+
+    <version min_major='9'>
+      <property name="ID" type="int" access='rw' read_only_after_creation="true" key_index ="1">sms.message_id</property>
+      <property name="IsLogged" type="bit" cast='true' >sms.is_event_logged</property>
+      <property name="Severity" type="int" cast="true">sms.severity</property>
+      <property name="Text" type="nvarchar" size="255"  >sms.text</property>
+      <property name="LanguageID" type="int" cast="true" read_only_after_creation="true">sms.language_id</property>
+      <property name="Language" type="sysname" read_only_after_creation="true" key_index ="0">sl.name</property>
+    </version>
+  </properties>
+</EnumObject>
+
+

@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='EventClass' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_event_class" alias="evt" />
+		<prefix>
+CREATE TABLE #tmp_event_class(
+	EventClassId int,
+	EventClassName nvarchar(255), 
+	FileGroup nvarchar(128),
+    IndexSqlStatementsXml nvarchar(max),
+    RuleId int,
+    RuleName nvarchar(255),
+    RuleType tinyint,
+    Action ntext,
+    ActionTimeout int
+)
+INSERT #tmp_event_class EXEC [SchemaPrefix].NSGetEventClassesWithSqlStatements
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_event_class
+        </postfix>
+        <post_process fields="#IndexSqlStatements#" 
+            class_name="Microsoft.SqlServer.Management.Smo.PostProcessXmlToList" 
+            triggered_fields="#IndexSqlStatementsXml#" />
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">evt.EventClassName</property>
+		<property name="FileGroup" type="nvarchar" size="128">evt.FileGroup</property>
+        <property name="Id" type="int" hidden="true">evt.EventClassId</property>
+		<property name="IndexSqlStatements" type="int" report_type2="System.Object">null</property>
+        <property name="IndexSqlStatementsXml" type="nvarchar" size="max" hidden="true">evt.IndexSqlStatementsXml</property>
+        <property name="RuleId" type="int">evt.RuleId</property>
+		<property name="RuleName" type="nvarchar" size="255">evt.RuleName</property>
+        <property name="RuleType" type="tinyint">evt.RuleType</property>
+		<property name="Action" type="ntext">evt.Action</property>
+		<property name="ActionTimeout" type="int">evt.ActionTimeout</property>
+	</properties>
+</EnumObject>

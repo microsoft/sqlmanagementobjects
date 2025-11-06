@@ -1,0 +1,84 @@
+﻿# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in parameters,
+# which are identified with the .NET {x} format (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+
+#
+# LocStudio comments description:
+#
+
+; For localizers and UE (These comments will be seen in LocStudio)
+# For internal use (These comments will not be seen in LocStudio)
+
+# Comments should be added before the string. 
+
+# When the string resource file is complied the tool will read these comments 
+# and push the comment using the <comment> tag into the resx file.  
+# LocStudio parser looks in the resx file for the comment tag to load comments 
+# into the instruction field of the database. 
+# 
+# For LocStudio to parse the comments the resx name must match the .resources 
+# name in the manifest, so if you rename the namespace you need to change the 
+# name of the project as well.  After you have done this you will need to make a 
+# single character change to the string file and save, so that the SR.String cs 
+# file has the correct namespace embedded in it. 
+#
+
+[strings]
+
+# Display name for each object type
+Table = Tables
+View = Views 
+StoredProcedure = Stored Procedures
+UserDefinedFunction = User-Defined Functions
+UserDefinedDataType = User-Defined Data Types
+UserDefinedTableType = User-Defined Table Types
+SecurityPolicy = Security Policies
+Default = Defaults
+Rule = Rules
+ApplicationRole = Application Roles
+SqlAssembly = SQL Assemblies
+DdlTrigger = DDL Triggers
+DatabaseRole = Database Roles
+Synonym = Synonyms
+User = Users
+XmlSchemaCollection = Xml Schema Collections
+Schema = Schemas
+PlanGuide = Plan Guides
+UserDefinedType = User-DefinedTypes
+UserDefinedAggregate = User-Defined Aggregates
+FullTextCatalog = FullText Catalogs
+
+# Result type.
+None = Not Run
+InProgress = In progress
+Success = Success
+Warning = Warning
+Error = Error
+
+# Error messages
+UnableToConnect(string server) = Unable to connect to {0}.
+UnableToFind(string object) = Unable to find {0}.
+ValueIsNull(string str) = '{0}' is null.
+ValueIsNullOrEmpty(string str) = '{0}' is null or empty.
+InvalidObjectType(string typeName) = Invalid object type '{0}'.
+InvalidObjectTypeForVersion(string name, string type) = Object '{0}' of type '{1}' is not valid for the selected database engine type.
+ERROR_ScriptingFailed = An error occurred while scripting the objects.
+
+# Unsupported Options
+InvalidScriptPreText = /* * * *\nThe following script is not valid for the specified SQL Server database engine type and must be updated.\n* * * */\n
+InvalidScriptPostText = /* * * *\nEnd of invalid script block.\n* * * */\n
+# Publishing Exception messages
+ERROR_PublishDataInternalError = An error occurred while trying to publish data for table {0}.
+ERROR_PublishDataUdtError = Cannot publish data for table {0} with user defined type.
+ERROR_RowExceedsMaxRequestSize = Row number {0} in table {1} is longer than the max request size allowed by the web service.
+ERROR_PublishScriptFailed = An error occurred while trying to publish the following script:{0}
+ERROR_UnsupportedDatabaseEngineEditionAndDatabaseEngineTypeOptionCombination(string databaseEngineEdition, string databaseEngineType) = The database engine edition '{0}' is not supported on database engine type '{1}'.
+ERROR_UnexpectedDatabaseEngineTypeDetected(string databaseEngineType) = Unexpected database engine type detected '{0}'.
+ERROR_UnexpectedDatabaseEngineEditionDetected(string databaseEngineEdition) = Unexpected database engine edition detected '{0}'.

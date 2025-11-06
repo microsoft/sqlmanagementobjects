@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="Check" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<version min_major='7' max_major='8'>
+			<property_link table="dbo.sysobjects AS cstr">cstr.type = 'C'</property_link>
+		</version>
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link table="sys.check_constraints AS cstr" />
+		</version>
+    <version min_major='11'>
+      <property_link fields='#IsFileTableDefined#' left_join='sys.filetable_system_defined_objects AS filetableobj'>filetableobj.object_id = cstr.object_id</property_link>
+    </version>
+    
+	</settings>
+	<properties>
+		<include file='inc_constraint.xml' />
+		<include file='inc_fulltext.xml' alias = 'cstr' ro_after_creation='#Text#'/>
+		<!-- extended properties support-->		
+		<version min_major='8' max_major='8'>
+			<include file ="inc_level2SupportProperties.xml"/>
+		</version>
+    <version min_major='11'>
+      <property name="IsFileTableDefined" type="bit" cast='true' access="read">CASE WHEN filetableobj.object_id IS NULL THEN 0 ELSE 1 END</property>
+    </version>
+	</properties>
+</EnumObject>

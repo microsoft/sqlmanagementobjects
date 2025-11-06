@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="Login" impl_type="SqlObject" min_major='7' >
+	<settings>
+		<parent_link>
+			<link parent="ID" local="SRVID" />
+		</parent_link>
+		<version min_major='7' max_major='8'>
+			<property_link table='master.dbo.sysxlogins lnklgn'>
+				lnklgn.ishqoutmap = 1
+			</property_link>
+			<property_link fields = '#Name#' 
+				left_join='master.dbo.sysxlogins xlnklgn'>lnklgn.sid=xlnklgn.sid and ISNULL(xlnklgn.ishqoutmap,0) = 0</property_link>
+		</version>
+		<version min_major='9' >
+			<property_link table='sys.linked_logins ll'/>
+			<property_link fields = '#Name#'
+				left_join='sys.server_principals sp'>ll.local_principal_id = sp.principal_id</property_link>
+		</version>
+	</settings>	
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="NType" type="sysname" access='Read' hidden='true'>LinkedServerLogin</property>
+		<version min_major='7' max_major='8'>
+			<property name="Name" type="sysname">ISNULL(xlnklgn.name, '')</property>
+			<property name="RemoteUser" type="sysname">ISNULL(lnklgn.name, N'')</property>
+			<property name="Impersonate" type="bit" cast = "true">convert(bit,lnklgn.selfoutmap)</property>
+			<property name="SRVID" type="int" hidden="true">lnklgn.srvid</property>
+		</version>
+		<version min_major='9' >
+			<property name="Name" type="sysname">ISNULL(sp.name, '')</property>
+			<property name="RemoteUser" type="sysname">ISNULL(ll.remote_name, N'')</property>
+			<property name="Impersonate" type="bit" cast = "true">ll.uses_self_credential</property>
+			<property name="SRVID" type="int" hidden="true">ll.server_id</property>
+			<property name="DateLastModified" type="datetime" access='Read'>ll.modify_date</property>
+		</version>		
+	</properties>
+</EnumObject>

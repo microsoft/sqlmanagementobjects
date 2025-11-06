@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<EnumObject type="Server" impl_type="Server" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+  <settings>
+    <post_process fields = '#ServerType#IsContainedAuthentication#'
+       class_name='Microsoft.SqlServer.Management.Smo.PostProcessServerProperties'/>
+  </settings>
+  <properties>
+    <include file='inc_server.xml' />
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Name" type="sysname" cast='true'>
+        serverproperty(N'Servername')
+      </property>
+      <property name="InstanceName" type="sysname" access="Read" cast='true'>
+        ISNULL(serverproperty(N'instancename'),N'')
+      </property>      
+    </version>
+    <version min_major ='10' cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Status" type="int" report_type="ServerStatus" access="Read" cast='true'>0x0001</property>
+    </version>
+    <version min_major="7" max_major="13" cloud_min_major="11" datawarehouse_enabled='true'>
+      <property name="PathSeparator" type="nvarchar" size="1" access="Read">N'\'</property>      
+    </version>
+    <version min_major='14'>
+      <property name="PathSeparator" type="nvarchar" size="1" access="Read">SERVERPROPERTY('PathSeparator')</property>
+    </version>
+    <property name="IsContainedAuthentication" type="bit" access="Read">0</property>
+    <property name="ServerType" type="int" report_type2="Microsoft.SqlServer.Management.Common.DatabaseEngineType" access="Read" cast='true'>null</property>
+    </properties>  
+</EnumObject>

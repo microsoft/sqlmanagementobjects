@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+<EnumObject type='restorehistory' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<property_link table='msdb.dbo.restorehistory rthist' />
+	</settings>
+	<properties>
+		<property name='ID' type='int'>rthist.restore_history_id</property>
+		<property name='RestoreDate' type='datetime'>rthist.restore_date</property>
+		<property name='DestinationDatabaseName' type='nvarchar' size='128'>rthist.destination_database_name</property>
+		<property name='UserName' type='nvarchar' size='128'>rthist.user_name</property>
+		<property name='BackupSetId' type='int'>rthist.backup_set_id</property>
+		<property name='RestoreType' type='int' report_type = 'RestoreType'>CASE rthist.restore_type WHEN 'D' THEN 1 WHEN 'F' THEN 2 WHEN 'L' THEN 3 WHEN 'V' THEN 4 END</property>
+		<property name='ReplaceExistingData' type='bit'>rthist.replace</property>
+		<property name='IsWithRecovery' type='bit'>rthist.recovery</property>
+		<property name='IsRestartSpecified' type='bit'>rthist.restart</property>
+		<property name='StopAt' type='datetime'>rthist.stop_at</property>
+		<property name='DeviceCount' type='tinyint'>rthist.device_count</property>
+		<version min_major='8'>		
+			<property name='StopAtMarkName' type='nvarchar' size='128'>rthist.stop_at_mark_name</property>
+			<property name='IncludesMarkedTransaction' type='bit'>rthist.stop_before</property>			
+		</version>
+	</properties>
+</EnumObject>

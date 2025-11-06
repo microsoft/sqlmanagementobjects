@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type='Application' impl_type='SqlObject' min_major='9' >
+  <settings>
+    <property_link table="#tmp_application_details" alias="dad" />
+    <prefix>
+CREATE TABLE #tmp_application_names(
+    ApplicationName nvarchar(max),
+    ApplicationDb nvarchar(128),
+    AppSchemaName nvarchar (128),
+    DropOnDelete bit,
+    ApplicationEnabled bit,
+    SubscribersEnabled bit,
+    SubscriptionsEnabled bit,
+    EventProviderEnabled bit,
+    GeneratorEnabled bit,
+    DistributorEnabled bit,
+)
+
+INSERT #tmp_application_names EXEC [SchemaPrefix].NSGetApplicationNames
+
+CREATE TABLE #tmp_local_application_details(
+    ApplicationName nvarchar(max),
+    BaseDirectoryPath nvarchar(260),
+    ApplicationDefinitionFilePath nvarchar(260),
+    QuantumDuration int,
+    ChronicleQuantumLimit int,
+    SubscriptionQuantumLimit int,
+    ProcessEventsInOrder bit,
+    RetentionAge int,
+    PerformanceQueryInterval int,
+    EventThrottle int,
+    SubscriptionThrottle int,
+    NotificationThrottle int,
+    LogBeforeDeliveryAttempts bit,
+    LogStatusInfo bit,
+    LogNotificationText bit,
+)
+
+CREATE TABLE #tmp_application_version(
+    ApplicationName nvarchar(max),
+    ApplicationDatabase nvarchar (255),
+    SchemaName nvarchar (255),
+    VersionId               int,
+    UpdateDescription       nvarchar(255),
+    UpdateStarted           datetime,
+    UpdateFinished          datetime,
+    UpdateUserId            nvarchar(255),
+    NSEdition               nvarchar(255),
+    NSVersionMajor          int,
+    NSVersionMinor          int,
+    NSVersionBuild          int,
+    NSVersionRevision       int,
+    ConfigVersionMajor      int,
+    ConfigVersionMinor      int,
+    ConfigVersionBuild      int,
+    ConfigVersionRevision   int,
+    AdfVersionMajor         int,
+    AdfVersionMinor         int,
+    AdfVersionBuild         int,
+    AdfVersionRevision      int
+)
+
+CREATE TABLE #tmp_generator_details(
+    ApplicationName nvarchar(max),
+    GeneratorId             int,
+    GeneratorName           nvarchar(255),
+    SystemName              nvarchar(255),
+    PreviousFiringTime      datetime,
+    ThreadPoolSize          int,
+    ActivationState         tinyint
+)
+
+DECLARE @dbname7 sysname
+DECLARE @AppSchemaName nvarchar(128)
+DECLARE @sql7 NVARCHAR(MAX)
+DECLARE applications_cursor CURSOR FOR
+SELECT ApplicationDb, AppSchemaName FROM #tmp_application_names FOR READ ONLY
+OPEN applications_cursor
+FETCH applications_cursor into @dbname7, @AppSchemaName
+WHILE @@FETCH_STATUS >= 0
+BEGIN
+    SET @sql7 = CONVERT (NVARCHAR (MAX), N' USE ' + quotename(@dbname7))
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' INSERT #tmp_local_application_details EXEC ' + quotename (@AppSchemaName) + N'.NSGetApplicationConfig')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' INSERT #tmp_application_version EXEC ' + quotename (@AppSchemaName) + N'.NSGetVersionInfo')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' INSERT #tmp_generator_details EXEC ' + quotename (@AppSchemaName) + N'.NSGetGenerators')
+    EXEC (@sql7)
+    FETCH applications_cursor into @dbname7, @AppSchemaName
+END
+CLOSE applications_cursor
+DEALLOCATE applications_cursor
+
+CREATE TABLE #tmp_application_details(
+    applicationdb nvarchar(max),
+    name nvarchar(max),
+    AppSchemaName nvarchar(128),
+    ApplicationEnabled bit,
+    SubscribersEnabled bit,
+    SubscriptionsEnabled bit,
+    EventProviderEnabled bit,
+    GeneratorEnabled bit,
+    DistributorEnabled bit,
+    BaseDirectoryPath nvarchar(260),
+    ApplicationDefinitionFilePath nvarchar(260),
+    QuantumDuration int,
+    ChronicleQuantumLimit int,
+    SubscriptionQuantumLimit int,
+    ProcessEventsInOrder bit,
+    RetentionAge int,
+    PerformanceQueryInterval int,
+    EventThrottle int,
+    SubscriptionThrottle int,
+    NotificationThrottle int,
+    LogBeforeDeliveryAttempts bit,
+    LogStatusInfo bit,
+    LogNotificationText bit,
+    NSVersionMajor int,
+    NSVersionMinor int,
+    NSVersionBuild int,
+    NSVersionRevision int,
+    AdfVersionMajor int,
+    AdfVersionMinor int,
+    AdfVersionBuild int,
+    AdfVersionRevision int,
+    GeneratorId int,
+    GeneratorName nvarchar(255)
+)
+
+DECLARE @ApplicationName nvarchar (128)
+
+DECLARE application_details_cursor CURSOR FOR
+SELECT ApplicationName, ApplicationDb FROM #tmp_application_names
+FOR READ ONLY
+OPEN application_details_cursor
+FETCH application_details_cursor into @ApplicationName, @dbname7
+WHILE @@FETCH_STATUS >= 0
+BEGIN
+    SET @sql7 = CONVERT (NVARCHAR (MAX), N' USE ' + quotename(@dbname7))
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' INSERT #tmp_application_details')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' SELECT app.ApplicationDb, app.ApplicationName, app.AppSchemaName, ')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   app.ApplicationEnabled, app.SubscribersEnabled, app.SubscriptionsEnabled,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   app.EventProviderEnabled, app.GeneratorEnabled, app.DistributorEnabled,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   cfg.BaseDirectoryPath, cfg.ApplicationDefinitionFilePath,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   cfg.QuantumDuration, cfg.ChronicleQuantumLimit, cfg.SubscriptionQuantumLimit,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   cfg.ProcessEventsInOrder, cfg.RetentionAge, cfg.PerformanceQueryInterval, cfg.EventThrottle, cfg.SubscriptionThrottle,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   cfg.NotificationThrottle, cfg.LogBeforeDeliveryAttempts, cfg.LogStatusInfo, cfg.LogNotificationText, ')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   ver.NSVersionMajor, ver.NSVersionMinor, ver.NSVersionBuild, ver.NSVersionRevision,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   ver.AdfVersionMajor, ver.AdfVersionMinor, ver.AdfVersionBuild, ver.AdfVersionRevision,')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N'   gen.GeneratorId, gen.GeneratorName')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' FROM #tmp_local_application_details as cfg, #tmp_application_version as ver, #tmp_generator_details as gen, #tmp_application_names as app')
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' WHERE app.ApplicationName = N' + quotename (@ApplicationName, N''''))
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' AND cfg.ApplicationName = N' + quotename (@ApplicationName, N''''))
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' AND ver.ApplicationName = N' + quotename (@ApplicationName, N''''))
+    SET @sql7 = @sql7 + CONVERT (NVARCHAR (MAX), N' AND gen.ApplicationName = N' + quotename (@ApplicationName, N''''))
+    EXEC (@sql7)
+    FETCH application_details_cursor into @ApplicationName, @dbname7
+END
+CLOSE application_details_cursor
+DEALLOCATE application_details_cursor
+    </prefix>
+    <postfix>
+DROP TABLE #tmp_application_details
+DROP TABLE #tmp_generator_details
+DROP TABLE #tmp_application_version
+DROP TABLE #tmp_local_application_details
+DROP TABLE #tmp_application_names
+    </postfix>
+    <post_process fields="#Version#" 
+			class_name="Microsoft.SqlServer.Management.Smo.PostProcessVersion" 
+			triggered_fields="#NSVersionMajor#NSVersionMinor#NSVersionBuild#NSVersionRevision#" />
+    <post_process fields="#ApplicationDefinitionFileVersion#" 
+			class_name="Microsoft.SqlServer.Management.Smo.PostProcessVersion" 
+			triggered_fields="#AdfVersionMajor#AdfVersionMinor#AdfVersionBuild#AdfVersionRevision#" />
+  </settings>
+  <properties>
+    <include file='inc_urn_single.xml' />
+    <property name="Name" type="sysname">dad.name</property>
+    <property name="DatabaseName" type="sysname">dad.applicationdb</property>
+    <property name="SchemaName" type="nvarchar" size="128">dad.AppSchemaName</property>
+    <property name="ApplicationDatabase" type="sysname" hidden="true">dad.applicationdb</property>
+    <property name="InstanceName" type="nvarchar" size="128" hidden="true">dad.InstanceName</property>
+    <property name="Version" type="int" access="Read" report_type2="System.Version">null</property>
+    <property name="NSVersionMajor" type="int" access="Read" hidden="true">dad.NSVersionMajor</property>
+    <property name="NSVersionMinor" type="int" access="Read" hidden="true">dad.NSVersionMinor</property>
+    <property name="NSVersionBuild" type="int" access="Read" hidden="true">dad.NSVersionBuild</property>
+    <property name="NSVersionRevision" type="int" access="Read" hidden="true">dad.NSVersionRevision</property>
+    <property name="ApplicationDefinitionFileVersion" type="int" report_type2="System.Version">null</property>
+    <property name="AdfVersionMajor" type="int" access="Read" hidden="true">dad.AdfVersionMajor</property>
+    <property name="AdfVersionMinor" type="int" access="Read" hidden="true">dad.AdfVersionMinor</property>
+    <property name="AdfVersionBuild" type="int" access="Read" hidden="true">dad.AdfVersionBuild</property>
+    <property name="AdfVersionRevision" type="int" access="Read" hidden="true">dad.AdfVersionRevision</property>
+    <property name="BaseDirectoryPath" type="nvarchar" size="260">dad.BaseDirectoryPath</property>
+    <property name="ApplicationDefinitionFilePath" type="nvarchar" size="260">dad.ApplicationDefinitionFilePath</property>
+    <property name="QuantumDuration" type="int">dad.QuantumDuration</property>
+    <property name="ChronicleQuantumLimit" type="int">dad.ChronicleQuantumLimit</property>
+    <property name="SubscriptionQuantumLimit" type="int">dad.SubscriptionQuantumLimit</property>
+    <property name="ProcessEventsInOrder" type="bit">dad.ProcessEventsInOrder</property>
+    <property name="PerformanceQueryInterval" type="int">dad.PerformanceQueryInterval</property>
+    <property name="EventThrottle" type="int">dad.EventThrottle</property>
+    <property name="SubscriptionThrottle" type="int">dad.SubscriptionThrottle</property>
+    <property name="NotificationThrottle" type="int">dad.NotificationThrottle</property>
+    <property name="LogBeforeDeliveryAttempts" type="bit">dad.LogBeforeDeliveryAttempts</property>
+    <property name="LogStatusInfo" type="bit">dad.LogStatusInfo</property>
+    <property name="LogNotificationText" type="bit">dad.LogNotificationText</property>
+    <property name="VacuumRetentionAge" type="int">dad.RetentionAge</property>
+    <property name="ApplicationEnabled" type="bit" access="Read">dad.ApplicationEnabled</property>
+    <property name="SubscribersEnabled" type="bit" access="Read">dad.SubscribersEnabled</property>
+    <property name="SubscriptionsEnabled" type="bit" access="Read">dad.SubscriptionsEnabled</property>
+    <property name="EventProvidersEnabled" type="bit" access="Read">dad.EventProviderEnabled</property>
+    <property name="GeneratorEnabled" type="bit" access="Read">dad.GeneratorEnabled</property>
+    <property name="DistributorsEnabled" type="bit" access="Read">dad.DistributorEnabled</property>
+    <property name="GeneratorId" type="int">dad.GeneratorId</property>
+    <property name="GeneratorName" type="nvarchar" size="255">dad.GeneratorName</property>
+  </properties>
+</EnumObject>

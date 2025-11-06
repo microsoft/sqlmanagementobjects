@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+    <metadata minClientVersion="2.12">
+        <id>Microsoft.SqlServer.Management.Assessment</id>
+        <version>$PackageVersion$</version>
+        <authors>Microsoft</authors>
+        <owners>nugetsqltools,Microsoft</owners>
+        <license type="expression">MIT</license>
+        <description>Implements SQL Management Object-based wrappers for the Microsoft.SqlServer.Assessment APIs</description>
+        <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+        <icon>nuspecicon.png</icon>
+        <projectUrl>https://docs.microsoft.com/sql/relational-databases/server-management-objects-smo/overview-smo</projectUrl>
+        <tags>SQL SMO XPLAT ASSESSMENT</tags>
+        <releaseNotes>See https://raw.githubusercontent.com/Microsoft/sqlmanagementobjects/main/CHANGELOG.md</releaseNotes>
+        <readme>docs\README.md</readme>
+        <dependencies>
+          <group targetFramework=".NETFramework4.7.2">
+            <dependency id="Microsoft.SqlServer.Assessment" version="1.1.9" exclude="Build,Analyzers" />
+            <dependency id="Microsoft.SqlServer.SqlManagementObjects" version="$SmoVersion$" exclude="Build,Analyzers" />
+          </group>
+          <group targetFramework="net8.0">
+            <dependency id="Microsoft.SqlServer.Assessment" version="1.1.9" exclude="Build,Analyzers" />
+            <dependency id="Microsoft.SqlServer.SqlManagementObjects" version="$SmoVersion$" exclude="Build,Analyzers" />
+          </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="nuspecicon.png" />
+        <file src="README.md" target="docs\" />
+        <file src="$NugetFilesBase$\$netFx$\Microsoft.SqlServer.Management.Assessment.dll" target="lib\$netFx$" />
+        <file src="$NugetFilesBase$\$netFx$\Microsoft.SqlServer.Management.Assessment.pdb" target="lib\$netFx$" />
+        <file src="$NugetBinaryDropPath$\Documentation\$netFx$\Microsoft.SqlServer.Management.Assessment.xml" target="lib\$netFx$" />
+        <file src="$NugetFilesBase$\net8.0\Microsoft.SqlServer.Management.Assessment.dll" target="lib\net8.0" />
+        <file src="$NugetFilesBase$\net8.0\Microsoft.SqlServer.Management.Assessment.pdb" target="lib\net8.0" />
+        <file src="$NugetBinaryDropPath$\Documentation\net8.0\Microsoft.SqlServer.Management.Assessment.xml" target="lib\net8.0" />
+    </files>
+</package>

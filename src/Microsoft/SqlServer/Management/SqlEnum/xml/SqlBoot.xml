@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="SqlBoot" impl_type="SqlObject" min_major='7' >
+  <settings>
+    <version min_major="11">      
+      <prefix fields="#AlwaysOn#">
+        DECLARE @alwayson INT
+        EXECUTE @alwayson = master.dbo.xp_qv N'3641190370', @@SERVICENAME;
+      </prefix>
+      <prefix fields ="#Mirroring#">
+        DECLARE @mirroring INT
+        EXECUTE @mirroring = master.dbo.xp_qv N'1748503642', @@SERVICENAME;        
+      </prefix>
+      <prefix fields ="#LogShipping#">
+        DECLARE @logshipping INT
+        EXECUTE @logshipping = master.dbo.xp_qv N'1182307513', @@SERVICENAME;        
+      </prefix>
+      <prefix fields ="#Ucp#">
+        DECLARE @ucp INT
+        EXECUTE @ucp = master.dbo.xp_qv N'1675385081', @@SERVICENAME;        
+      </prefix>
+      <prefix fields ="#UcpManagedAllowed#">
+        DECLARE @ucpmanagedallowed INT
+        EXECUTE @ucpmanagedallowed = master.dbo.xp_qv N'3090395820', @@SERVICENAME;        
+      </prefix>
+    </version>
+  </settings>
+  <properties>
+    <version min_major='11'>
+      <property name="AlwaysOn" type="int" access="Read">ISNULL(@alwayson, -1)</property>
+      <property name="Mirroring" type="int" access="Read">ISNULL(@mirroring, -1)</property>
+      <property name="LogShipping" type="int" access="Read">ISNULL(@logshipping, -1)</property>
+      <property name="Ucp" type="int" access="Read">ISNULL(@ucp, -1)</property>
+      <property name="UcpManagedAllowed" type="int" access="Read">ISNULL(@ucpmanagedallowed, -1)</property>
+    </version>
+  </properties>
+</EnumObject>

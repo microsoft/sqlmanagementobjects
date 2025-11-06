@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<EnumObject type="RemoteDrive" impl_type="SqlObject" min_major='7'>
+	<settings main_table="#fixdrv">
+		<prefix> 
+create table #fixdrv ( Name sysname NOT NULL, Size int NOT NULL ) insert #fixdrv EXECUTE master.dbo.xp_fixeddrives 1
+update #fixdrv set Name = Name + ':'
+		</prefix>
+		<postfix> drop table #fixdrv</postfix>
+	</settings>
+	<properties>
+		<property name="Name" type="sysname" access="Read">Name</property>
+		<property name="Size" type="int" access="Read">Size</property>
+	</properties>
+</EnumObject>

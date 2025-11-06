@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<EnumObject type="EdgeConstraintClause" impl_type="SqlObject" min_major='15'  cloud_min_major='12' datawarehouse_enabled='false'>
+  <settings>
+    <version min_major='15'  cloud_min_major='12' datawarehouse_enabled='false'>
+      <property_link join="sys.edge_constraint_clauses AS ec">
+        (cstr.object_id = ec.object_id)
+      </property_link>
+      <property_link join="sys.tables AS f">
+        (ec.from_object_id = f.object_id)
+      </property_link>
+      <property_link join="sys.tables AS t">
+        (ec.to_object_id = t.object_id)
+      </property_link>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="Name" type="nvarchar" mode="design" access="Read">CONCAT(f.object_id, '_', t.object_id)</property>
+    <property name="ExtPropClass" type="int" hidden='true'>1</property>
+    <property name="From" type="nvarchar">f.name</property>
+    <property name="To" type="nvarchar">t.name</property>
+    <property name="FromSchema" type="nvarchar">schema_name(f.schema_id)</property>
+    <property name="ToSchema" type="nvarchar">schema_name(t.schema_id)</property>
+  </properties>
+</EnumObject>

@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject type="BrokerService" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+		<property_link table = 'sys.services s'/>
+        <property_link fields='#Owner#' join="sys.database_principals AS dp">dp.principal_id = s.principal_id</property_link>
+        <property_link fields='#QueueName#' join="sys.objects AS so">so.object_id = s.service_queue_id</property_link>
+        <property_link fields='#QueueSchema#' join="sys.objects AS sysob">sysob.object_id = s.service_queue_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+        <!-- extended properties support -->
+        <include file='inc_ext_prop.xml' />
+        <property name="ExtPropClass" type="int" hidden='true'>17</property>
+		<property name="NType" type="sysname" access='Read' hidden='true'>BrokerService</property>
+		<property name="Name" type="nvarchar" size="300">s.name</property>
+		<property name="ID" type="int" access='Read'>s.service_id</property>		
+		<property name="Owner" type="sysname" read_only_after_creation="true">dp.name</property>
+		<property name="QueueName" type="sysname">so.name</property>
+		<property name="QueueSchema" type="sysname">schema_name(sysob.schema_id)</property>
+        <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->        
+        <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when  s.service_id &lt; 65536 then 1 else 0 end</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

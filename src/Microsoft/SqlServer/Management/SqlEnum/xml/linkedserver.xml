@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<EnumObject type="LinkedServer" impl_type="SqlObject" min_major='7' >
+	<settings>
+		<version min_major='7' max_major='8'>
+			<property_link table='master.dbo.sysservers AS srv'>srv.srvid != 0</property_link>
+		</version>
+        <version min_major='7' max_major='7'>
+		    <property_link fields='#CollationCompatible#DataAccess#Distributor#DistPublisher#Publisher#RPC#RPCOut#Subscriber#' join='#tmp_srvoptions' alias='so'>srv.srvid != 0 AND srv.srvname = so.srvname</property_link>
+        </version>
+		<version min_major='9' >
+			<property_link table='sys.servers AS srv'>srv.server_id != 0</property_link>
+		</version>
+		<version min_major = '7' max_major='7'>
+			<prefix fields='#CollationCompatible#DataAccess#Distributor#DistPublisher#Publisher#RPC#RPCOut#Subscriber'>
+                create table #tmp_srvoptions([srvname] nvarchar(255) not null, [collationcompatible] bit not null, [dataaccess] bit not null, [dist] bit not null, [dpub] bit not null, [pub] bit not null, [rpc] bit not null, [rpcout] bit not null, [sub] bit not null)
+                declare @srvname nvarchar(255)
+                declare @collation_compatible bit
+                declare @data_access bit
+                declare @dist bit
+                declare @pub bit
+                declare @dpub bit
+                declare @rpc bit
+                declare @rpc_out bit
+                declare @sub bit
+                create table #tmp(opt nvarchar(100))
+                declare srvname_cursor cursor for
+                select srvname FROM dbo.sysservers WHERE srvid &lt;&gt; 0
+                open srvname_cursor
+                fetch next from srvname_cursor into @srvname
+                while @@FETCH_STATUS = 0
+                begin
+                truncate table #tmp
+                insert #tmp exec sp_serveroption @srvname
+                set @collation_compatible = case when exists ( select * from #tmp where opt = 'collation compatible') then 1 else 0 end
+                set @data_access = case when exists ( select * from #tmp where opt = 'data access') then 1 else 0 end
+                set @dist = case when exists ( select * from #tmp where opt = 'dist') then 1 else 0 end
+                set @dpub = case when exists ( select * from #tmp where opt = 'dpub') then 1 else 0 end
+                set @pub = case when exists ( select * from #tmp where opt = 'pub') then 1 else 0 end
+                set @rpc = case when exists ( select * from #tmp where opt = 'rpc') then 1 else 0 end
+                set @rpc_out = case when exists ( select * from #tmp where opt = 'rpc out') then 1 else 0 end
+                set @sub = case when exists ( select * from #tmp where opt = 'sub') then 1 else 0 end
+                insert into #tmp_srvoptions([srvname], [collationcompatible], [dataaccess], [dist], [dpub], [pub], [rpc], [rpcout], [sub]) values (@srvname, @collation_compatible, @data_access, @dist, @dpub, @pub, @rpc, @rpc_out, @sub)
+                fetch next from srvname_cursor into @srvname
+                end
+                close srvname_cursor
+                deallocate srvname_cursor
+                drop table #tmp
+			</prefix>
+		    <postfix fields='#CollationCompatible#DataAccess#Distributor#DistPublisher#Publisher#RPC#RPCOut#Subscriber#'>
+                drop table #tmp_srvoptions
+		    </postfix>
+		</version>
+		<post_process fields="#ProviderString#" class_name="Microsoft.SqlServer.Management.Smo.PostProcessCreateSqlSecureString" triggered_fields="#ProviderStringIn#" />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<version min_major='7' max_major='8'>
+			<property name="Name" type="sysname">srv.srvname</property>
+			<property name="ID" type="int" cast='true'>srv.srvid</property>
+			<property name="Catalog" type="sysname" read_only_after_creation="true">ISNULL(srv.catalog,N'')</property>
+			<property name="DataSource" type="sysname" read_only_after_creation="true">ISNULL(srv.datasource,N'')</property>
+			<property name="Location" type="sysname" read_only_after_creation="true">ISNULL(srv.location,N'')</property>
+			<property name="ProductName" type="sysname" read_only_after_creation="true">srv.srvproduct</property>
+			<property name="ProviderName" type="sysname" read_only_after_creation="true">srv.providername</property>
+			<property name="ProviderStringIn" type="sysname" hidden="true">srv.providerstring</property>
+			<property name="ProviderString" type="sysname" report_type="Internal.SqlSecureString" read_only_after_creation="true">null</property>
+		</version>
+		<version min_major='7' max_major='7'>
+			<property name="CollationCompatible" type="bit" cast='true'>so.collationcompatible</property>
+			<property name="DataAccess" type="bit" cast='true'>so.dataaccess</property>
+			<property name="Distributor" type="bit" cast='true'>so.dist</property>
+			<property name="DistPublisher" type="bit" cast='true'>so.dpub</property>
+			<property name="Publisher" type="bit" cast='true'>so.pub</property>
+			<property name="Rpc" type="bit" cast='true'>so.rpc</property>
+			<property name="RpcOut" type="bit" cast='true'>so.rpcout</property>
+			<property name="Subscriber" type="bit" cast='true'>so.sub</property>
+		</version>
+		<version min_major='8' max_major='8' comment='those need to be ported to 7.0, but we obtain them differently'>
+			<property name="CollationCompatible" type="bit" cast='true'>srv.collationcompatible</property>
+			<property name="DataAccess" type="bit" cast='true'>srv.dataaccess</property>
+			<property name="Distributor" type="bit" cast='true'>srv.dist</property>
+			<property name="DistPublisher" type="bit" cast='true'>srv.dpub</property>
+			<property name="Publisher" type="bit" cast='true'>srv.pub</property>
+			<property name="Rpc" type="bit" cast='true'>srv.rpc</property>
+			<property name="RpcOut" type="bit" cast='true'>srv.rpcout</property>
+			<property name="Subscriber" type="bit" cast='true'>srv.sub</property>
+		</version>
+		<version min_major='8' max_major='8'>
+			<property name="CollationName" type="sysname" cast='true'>ISNULL(COLLATIONPROPERTYFROMID(srv.srvcollation, 'name'),N'')</property>
+			<property name="ConnectTimeout" type="int">srv.connecttimeout</property>
+			<property name="LazySchemaValidation" type="bit" cast='true'>srv.lazyschemavalidation</property>
+			<property name="QueryTimeout" type="int">srv.querytimeout</property>
+			<property name="UseRemoteCollation" type="bit" cast='true'>srv.useremotecollation</property>
+		</version>
+		<version min_major='9'>
+			<property name="Name" type="sysname">srv.name</property>
+			<property name="ID" type="int" cast='true'>srv.server_id</property>
+			<property name="Catalog" type="sysname" read_only_after_creation="true">ISNULL(srv.catalog,N'')</property>
+			<property name="DataSource" type="sysname" read_only_after_creation="true">ISNULL(srv.data_source,N'')</property>
+			<property name="Location" type="sysname" read_only_after_creation="true">ISNULL(srv.location,N'')</property>
+			<property name="ProductName" type="sysname" read_only_after_creation="true">srv.product</property>
+			<property name="ProviderName" type="sysname" read_only_after_creation="true">srv.provider</property>
+			<property name="CollationCompatible" type="bit" cast='true'>srv.is_collation_compatible</property>
+			<property name="DataAccess" type="bit" cast='true'>srv.is_data_access_enabled</property>
+			<property name="Distributor" type="bit" cast='true'>srv.is_distributor</property>
+      <!-- DistPublisher defaults to 0 because we need to have this property 
+           in the property bag for Yukon -->
+			<property name="DistPublisher" type="bit" cast='true'>0</property>
+			<property name="Publisher" type="bit" cast='true'>srv.is_publisher</property>
+			<property name="Rpc" type="bit" cast='true'>srv.is_remote_login_enabled</property>
+			<property name="RpcOut" type="bit" cast='true'>srv.is_rpc_out_enabled</property>
+			<property name="Subscriber" type="bit" cast='true'>srv.is_subscriber</property>
+			<property name="CollationName" type="sysname">ISNULL(srv.collation_name,N'')</property>
+			<property name="ConnectTimeout" type="int">srv.connect_timeout</property>
+			<property name="LazySchemaValidation" type="bit">srv.lazy_schema_validation</property>
+			<property name="QueryTimeout" type="int">srv.query_timeout</property>
+			<property name="UseRemoteCollation" type="bit">srv.uses_remote_collation</property>
+			<property name="DateLastModified" type="datetime" access='Read'>srv.modify_date</property>
+			<property name="ProviderStringIn" type="sysname" hidden="true">srv.provider_string</property>
+			<property name="ProviderString" type="sysname" report_type="Internal.SqlSecureString" read_only_after_creation="true">null</property>
+		</version>
+		<version min_major='10' >
+			<property name="IsPromotionofDistributedTransactionsForRPCEnabled" type="bit" cast='true'>srv.is_remote_proc_transaction_promotion_enabled</property>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+	</properties>
+</EnumObject>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type='CryptographicProvider' impl_type='SqlObject' min_major='10'>
+	<settings>
+		<property_link table='sys.cryptographic_providers' alias='c' />
+		<property_link fields='#VersionString#SqlCryptographicVersionString#SymmetricKeySupported#SymmetricKeyExportable#SymmetricKeyImportable#SymmetricKeyPersistable#AsymmetricKeySupported#AsymmetricKeyExportable#AsymmetricKeyImportable#AsymmetricKeyPersistable#' join="sys.dm_cryptographic_provider_properties AS cp">cp.provider_id = c.provider_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>c.name</property>
+		<property name='ID' type='int' access='Read'>c.provider_id</property>
+		<property name='ProviderGuid' type='uniqueidentifier' access='Read'>c.guid</property>
+		<property name='VersionString' type='sysname' access='Read'>cp.provider_version</property>
+		<property name='DllPath' type='sysname'>c.dll_path</property>
+		<property name='Enabled' type='bit'>c.is_enabled</property>
+		<property name='SqlCryptographicVersionString' type='sysname' access='Read'>cp.sqlcrypt_version</property>
+		<property name='AuthenticationType' type='tinyint' report_type='ProviderAuthenticationType' access='Read'>case cp.authentication_type when 'WINDOWS' then 0 when 'BASIC' then 1 when 'OTHER' THEN 2 end</property>
+		<property name='SymmetricKeySupported' type='bit' access='Read' cast='true'>cp.symmetric_key_support</property>
+		<property name='SymmetricKeyExportable' type='bit' access='Read' cast='true'>cp.symmetric_key_export</property>
+		<property name='SymmetricKeyImportable' type='bit' access='Read' cast='true'>cp.symmetric_key_import</property>
+		<property name='SymmetricKeyPersistable' type='bit' access='Read' cast='true'>cp.symmetric_key_persistance</property>
+		<property name='AsymmetricKeySupported' type='bit' access='Read' cast='true'>cp.asymmetric_key_support</property>
+		<property name='AsymmetricKeyExportable' type='bit' access='Read' cast='true'>cp.asymmetric_key_export</property>
+		<property name='AsymmetricKeyImportable' type='bit' access='Read' cast='true'>cp.asymmetric_key_import</property>
+		<property name='AsymmetricKeyPersistable' type='bit' access='Read' cast='true'>cp.asymmetric_key_persistance</property>
+              <include file='inc_policy_health_state.xml'/>
+	</properties>
+</EnumObject>

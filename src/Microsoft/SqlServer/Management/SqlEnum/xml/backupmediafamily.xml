@@ -1,0 +1,20 @@
+<?xml version='1.0' ?>
+<EnumObject type='backupmediafamily' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent='ID' local='MediaSetId'/>
+		</parent_link>
+		<property_link table='msdb.dbo.backupmediafamily bkpmf'/>
+	</settings>
+	<properties>
+		<property name='MediaSetId' type='int' hidden='true'>bkpmf.media_set_id</property>
+		<property name='ID' type='uniqueidentifier'>bkpmf.media_family_id</property>		
+		<property name='FamilySequenceNumber' type='tinyint'>bkpmf.family_sequence_number</property>
+		<property name='MediaCount' type='int'>bkpmf.media_count</property>
+		<property name='LogicalDeviceName' type='nvarchar' size='128'>bkpmf.logical_device_name</property>
+		<property name='PhysicalDeviceName' type='nvarchar' size='260'>bkpmf.physical_device_name</property>
+		<property name='BackupDeviceType' type='int' report_type = 'BackupDeviceType'>CASE WHEN bkpmf.device_type &gt; 100 THEN bkpmf.device_type - 100 ELSE bkpmf.device_type END</property>
+		<property name='IsBackupDevicePermanent' type='bit' cast='true'>CASE WHEN bkpmf.device_type &gt; 100 THEN 1 ELSE 0 END</property>
+		<property name='PhysicalBlockSize' type='int'>bkpmf.physical_block_size</property>
+	</properties>
+</EnumObject>
