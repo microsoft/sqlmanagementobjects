@@ -23,6 +23,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <returns></returns>
         static public String DbTypeToClrType(String strDBType)
         {
+            // SMO_NEW_DATATYPE
+            // Add the data type -> corresponding CLR type here
             String strType;
             switch(strDBType)
             {
@@ -116,7 +118,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return new EnumResult(ds, res);
             }
-            else 
+            else
             {
                 TraceHelper.Assert( ResultType.DataTable == res );
                 return new EnumResult(ds.Tables[0], res);
@@ -253,8 +255,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
             return listNames;
         }
-        
-       
+
+
         internal static string EscapeLikePattern(string pattern)
         {
             // The characters: %[]_ are special characters to the sql LIKE operator. To escape them,
@@ -276,16 +278,16 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     case '_':
                         escape = true;
                         break;
-                    
+
                     default:
                         break;
                 }
 
                 if (escape && null == sb)
                 {
-                    // Havent had to escape yet, 
+                    // Havent had to escape yet,
                     // put the leading portion of the string into the stringbuilder
-                    // from now on, every char will go into the 
+                    // from now on, every char will go into the
                     // the StringBuilder
                     sb = new StringBuilder(pattern.Length * 3);
                     sb.Append(pattern.Substring(0, i));
@@ -294,7 +296,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 // if we are going to escape this character, then sb should not be null
                 TraceHelper.Assert(!escape || sb != null);
 
-                
+
                 if (escape)
                 {
                     sb.Append("[");
@@ -310,15 +312,15 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 {
                     sb.Append("]");
                 }
-                
-                
+
+
             }
 
             // if we didnt do any escaping, just return the pattern, else return the StringBuilder sb
             return sb == null ? pattern : sb.ToString();
-    
+
         }
 
     }
-            
+
 }

@@ -99,7 +99,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             var newSchema = "newSchema";
                             user.DefaultSchema = newSchema;
                             expectedUserScriptAlterUserWithLogin = $"ALTER USER [{user.Name}] WITH DEFAULT_SCHEMA=[{newSchema}], LOGIN=[{newLogin}]";
-                        } 
+                        }
                         else
                         {
                             expectedUserScriptAlterUserWithLogin = $"ALTER USER [{user.Name}] WITH LOGIN=[{newLogin}]";
@@ -107,12 +107,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                         var script = database.ExecutionManager.RecordQueryText(user.Alter);
 
-                        // the constraints don't like carriage returns/line feeds. SMO seems to use both \r\n and \n 
+                        // the constraints don't like carriage returns/line feeds. SMO seems to use both \r\n and \n
                         string actualScript = script.ToSingleString().FixNewLines().TrimEnd();
-                        
+
                         // modify the script to remove the 'USE' statement from the first portion and retain only the text following the 'ALTER' command to verify it matches the expected string
                         actualScript = actualScript.Contains("ALTER") ? actualScript.Substring(actualScript.IndexOf("ALTER")) : string.Empty;
-                        
+
                         // the header has the current timestamp, so just skip most of it
                         Assert.That(actualScript,
                                     Does.EndWith(expectedUserScriptAlterUserWithLogin),
@@ -120,8 +120,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     }
                     finally
                     {
-                        user.DropIfExists();
-                        login.DropIfExists();
+                        // DropIfExists supported in SQL 2016 and later versions
+                        if (ServerContext.VersionMajor < 13)
+                        {
+                            user.Drop();
+                            login.Drop();
+                        }
+                        else
+                        {
+                            user.DropIfExists();
+                            login.DropIfExists();
+                        }
                     }
                 });
         }
@@ -130,7 +139,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests scripting an alter to existing user's login information through SMO.
         /// </summary>
         [TestMethod]
-        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 12)]
         public void SmoAlter_UserWithLogin_LoginOptionAlter()
         {
             SmoAlter_UserWithLogin_Alter();
@@ -140,7 +149,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests scripting an alter to existing user's login information and default schema through SMO.
         /// </summary>
         [TestMethod]
-        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 12)]
         public void SmoAlter_UserWithLogin_MultipleOptionsAlter()
         {
             SmoAlter_UserWithLogin_Alter(true);
@@ -149,11 +158,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         #endregion
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
             Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void User_creation_on_Azure_requires_password()
         {
             this.ExecuteWithDbDrop(

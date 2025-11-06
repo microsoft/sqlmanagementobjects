@@ -176,7 +176,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 FormatFullNameForScripting(sp));
 
             int count = 0;
-            GetAllParams(createQuery, sp, ref count);
+            GetAllParams(createQuery, sp, ref count, isAlterOperation: false);
 
             // Append Parameters, Ex:
             // USING( GroupMaximumRequests = 1, Importance='Medium')
@@ -225,7 +225,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 FormatFullNameForScripting(sp));
 
             int countParams = 0;
-            GetAllParams(alterQuery, sp, ref countParams);
+            GetAllParams(alterQuery, sp, ref countParams, isAlterOperation: true);
 
             // Starting SQL15, we added external pool option
             int countUsing = 0;
@@ -306,6 +306,15 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             this.RequestMemoryGrantTimeoutInSeconds = this.RequestMemoryGrantTimeoutInSeconds;
             this.MaximumDegreeOfParallelism = this.MaximumDegreeOfParallelism;
+            // Note: The following properties will be added when the code generation is run:
+            if (IsSupportedProperty(nameof(GroupMaximumTempdbDataMB)))
+            {
+                this.GroupMaximumTempdbDataMB = this.GroupMaximumTempdbDataMB;
+            }
+            if (IsSupportedProperty(nameof(GroupMaximumTempdbDataPercent)))
+            {
+                this.GroupMaximumTempdbDataPercent = this.GroupMaximumTempdbDataPercent;
+            }
         }
 
         #endregion
@@ -326,7 +335,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sb">T-SQL string fragment</param>
         /// <param name="so">Scripting Options</param>
         /// <param name="count">The count.</param>
-        private void GetAllParams(StringBuilder sb, ScriptingPreferences sp, ref int count)
+        /// <param name="isAlterOperation">True if this is an ALTER operation, false for CREATE</param>
+        private void GetAllParams(StringBuilder sb, ScriptingPreferences sp, ref int count, bool isAlterOperation)
         {
             StringBuilder parameters = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             GetParameter(parameters, sp, nameof(GroupMaximumRequests), "group_max_requests={0}", ref count);
@@ -343,6 +353,54 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             GetParameter(parameters, sp, nameof(RequestMemoryGrantTimeoutInSeconds), "request_memory_grant_timeout_sec={0}", ref count);
             GetParameter(parameters, sp, nameof(MaximumDegreeOfParallelism), "max_dop={0}", ref count);
+
+            if (IsSupportedProperty(nameof(GroupMaximumTempdbDataMB), sp))
+            {
+                // For ALTER operations: convert -1 to null to explicitly reset the value in the script only if the property is dirty
+                // For CREATE operations: exclude -1 values entirely
+                var tempdbMBProperty = Properties.Get(nameof(GroupMaximumTempdbDataMB));
+                var originalValue = tempdbMBProperty.Value;
+                
+                if (originalValue is double doubleValue && doubleValue == -1.0)
+                {
+                    if (isAlterOperation && tempdbMBProperty.Dirty)
+                    {
+                        // For ALTER: include as null to reset the value on the server
+                        if (count++ > 0)
+                        {
+                            _ = parameters.Append(", ");
+                        }
+                        _ = parameters.Append("group_max_tempdb_data_mb=null");
+                    }
+                }
+                else if (originalValue != null)
+                {
+                    GetParameter(parameters, sp, nameof(GroupMaximumTempdbDataMB), "group_max_tempdb_data_mb={0}", ref count, false);
+                }
+            }
+            if (IsSupportedProperty(nameof(GroupMaximumTempdbDataPercent), sp))
+            {
+                // For ALTER operations: convert -1 to null to explicitly reset the value in the script only if the property is dirty
+                // For CREATE operations: exclude -1 values entirely
+                var tempdbPercentProperty = Properties.Get(nameof(GroupMaximumTempdbDataPercent));
+                var originalValue = tempdbPercentProperty.Value;
+                if (originalValue is double doubleValue && doubleValue == -1.0)
+                {
+                    if (isAlterOperation && tempdbPercentProperty.Dirty)
+                    {
+                        // For ALTER: include as null to reset the value on the server
+                        if (count++ > 0)
+                        {
+                            _ = parameters.Append(", ");
+                        }
+                        _ = parameters.Append("group_max_tempdb_data_percent=null");
+                    }
+                }
+                else if(originalValue != null)
+                {
+                    GetParameter(parameters, sp, nameof(GroupMaximumTempdbDataPercent), "group_max_tempdb_data_percent={0}", ref count, false);
+                }
+            }
 
             if (0 < count)
             {

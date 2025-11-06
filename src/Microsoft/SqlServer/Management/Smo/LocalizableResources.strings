@@ -404,6 +404,9 @@ Database_MirroringWitnessStatusDesc=The status of the mirroring witness server.
 Database_NameName=Name
 Database_NameDesc=The name of the database.
 
+Database_OptimizedLockingOn=Optimized Locking On
+Database_OptimizedLockingOnDesc=Indicates whether Optimized Locking (OL) is on.
+
 Database_OwnerName=Owner
 Database_OwnerDesc=The database principal that is the owner of the database.
 
@@ -1437,6 +1440,12 @@ Index_IsMemoryOptimizedDesc = Gets or sets the Boolean property value that speci
 Index_CompressionDelayName=Compression delay
 Index_CompressionDelayDesc=Gets or sets the int property value that specifies the compression_delay index option for columnstore indexes.
 
+Index_VectorIndexMetricName=Vector Index Metric
+Index_VectorIndexMetricDesc=Gets or sets the vector index metric type for a vector index.
+
+Index_VectorIndexTypeName=Vector Index Type
+Index_VectorIndexTypeDesc=Gets or sets the vector index type for a vector index.
+
 ######## End Index
 
 
@@ -2124,7 +2133,7 @@ Table_DataSpaceUsedName=Data Space Used
 Table_DataSpaceUsedDesc=Gets the storage space used by the rows of the referenced table in kilobytes.
 
 Table_DataRetentionEnabledName =Data Retention Enabled
-Table_DataRetentionEnabledDesc =Allows manual and automatic cleanup on the table. If enabled at the database level clean up is automatic. Otherwise manual cleanup is used to remove aged rows from table. 
+Table_DataRetentionEnabledDesc =Allows manual and automatic cleanup on the table. If enabled at the database level clean up is automatic. Otherwise manual cleanup is used to remove aged rows from table.
 
 Table_DataRetentionPeriodName =Data Retention Period
 Table_DataRetentionPeriodDesc =The length of time to retain data in the table.
@@ -2133,7 +2142,7 @@ Table_DataRetentionPeriodUnitName =Data Retention Period Unit
 Table_DataRetentionPeriodUnitDesc =The unit of time to retain data in the table (DAY, WEEK, MONTH, YEAR, INFINITE).
 
 Table_DataRetentionFilterColumnName =Data Retention Filter Column Name
-Table_DataRetentionFilterColumnNameDesc =The name of the column used to filter rows for data retention. 
+Table_DataRetentionFilterColumnNameDesc =The name of the column used to filter rows for data retention.
 
 Table_DateLastModifiedName=Date Last Modified
 Table_DateLastModifiedDesc=Gets the date and time when the table was last modified.
@@ -3274,6 +3283,12 @@ WorkloadGroup_NameDesc=The name of the workload group.
 WorkloadGroup_GroupMaximumRequestsName=Group Maximum Requests
 WorkloadGroup_GroupMaximumRequestsDesc=Gets or sets the group maximum requests for a workload group.
 
+WorkloadGroup_GroupMaximumTempdbDataMBName=Group Maximum tempdb Data MB
+WorkloadGroup_GroupMaximumTempdbDataMBDesc=Gets or sets the group maximum tempdb data in megabytes for a workload group.
+
+WorkloadGroup_GroupMaximumTempdbDataPercentName=Group Maximum tempdb Data Percent
+WorkloadGroup_GroupMaximumTempdbDataPercentDesc=Gets or sets the group maximum tempdb data in percent for a workload group.
+
 WorkloadGroup_ImportanceName=Importance
 WorkloadGroup_ImportanceDesc=Gets or sets the importance for a workload group.
 
@@ -3967,6 +3982,9 @@ AvailabilityGroup_RequiredSynchronizedSecondariesToCommitDesc=The minimum number
 
 AvailabilityGroup_IsContainedName=Is Contained
 AvailabilityGroup_IsContainedDesc=Gets or set a Boolean property value that specifies whether this is a Contained Availability Group.
+
+AvailabilityGroup_ClusterConnectionOptionsName=Cluster Connection Options
+AvailabilityGroup_ClusterConnectionOptionsDesc=Gets or sets a string property that defines the cluster connection options used by the Availability Group (AG) to connect to the Windows Server Failover Cluster (WSFC) via ODBC.
 
 ######## End AvailabilityGroup
 

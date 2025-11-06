@@ -11,7 +11,7 @@
       <property_link fields='#Default#DefaultSchema#' left_join='dbo.sysobjects AS d'>d.id = clmns.cdefault and 0=d.category &amp; 0x0800</property_link>
       <property_link fields='#Rule#RuleSchema#' left_join='dbo.sysobjects AS r'>r.id = clmns.domain</property_link>
       <property_link fields='#DefaultConstraintName#' left_join='dbo.sysobjects AS dc'>dc.xtype='D' and dc.name not like N'#%%' and 0!=convert(bit,cstr.category &amp; 0x0800)</property_link>
-      <post_process fields='#ComputedText#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessText' />      
+      <post_process fields='#ComputedText#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessText' />
     </version>
     <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property_link table='sys.all_columns AS clmns' />
@@ -21,7 +21,7 @@
       <property_link fields='#InPrimaryKey#' left_join='sys.index_columns AS cik'>cik.index_id = ik.index_id and cik.column_id = clmns.column_id and cik.object_id = clmns.object_id and 0 = cik.is_included_column</property_link>
       <property_link fields='#Default#DefaultSchema#' left_join='sys.objects AS d'>d.object_id = clmns.default_object_id</property_link>
       <property_link fields='#Rule#RuleSchema#' left_join='sys.objects AS r'>r.object_id = clmns.rule_object_id</property_link>
-      <property_link fields='#DefaultConstraintName#' left_join='sys.default_constraints as dc'>clmns.default_object_id = dc.object_id</property_link>      
+      <property_link fields='#DefaultConstraintName#' left_join='sys.default_constraints as dc'>clmns.default_object_id = dc.object_id</property_link>
     </version>
     <version min_major='13' cloud_min_major='12'>
       <property_link fields="#ColumnEncryptionKeyName#" left_join="sys.column_encryption_keys AS ceks">(ceks.column_encryption_key_id = clmns.column_encryption_key_id)</property_link>
@@ -56,11 +56,11 @@
       <property name="IsFullTextIndexed" type="bit" cast='true' access='read' >COLUMNPROPERTY(clmns.id, clmns.name, N'IsFulltextIndexed')</property>
       <property name="ComputedText" type="nvarchar" size='4000' expensive='true' read_only_after_creation="true" mode="design">cast(clmns.id as nvarchar(20)) + '_' + cast(clmns.colid as nvarchar(20)) + '_' + cast(db_id() as nvarchar(20)) + '_0'</property>
       <property name="Identity" type="bit" cast='true' read_only_after_creation="true" mode="design">COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity')</property>
-      <property name="IsForeignKey" type="bit" cast='true' 
+      <property name="IsForeignKey" type="bit" cast='true'
         access='read' >ISNULL((select top 1 1 from dbo.sysforeignkeys AS colfk where colfk.fkey = clmns.colid and colfk.fkeyid = clmns.id), 0)</property>
       <version min_major='8' max_major='8'>
         <property name="Collation" type="sysname" mode="design">ISNULL(clmns.collation, N'')</property>
-        
+
         <property name="IdentitySeed" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">
           <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
             <link_field type='parent' field="FullName" />
@@ -107,7 +107,7 @@
 
       <!-- default section -->
       <property name="ColumnDefaultID" type="int" hidden='true'>clmns.cdefault</property>
-      <property name="ParentID" type="int" hidden="true">clmns.id</property>			
+      <property name="ParentID" type="int" hidden="true">clmns.id</property>
       <property name="Default" type="sysname" read_only_after_creation="true">(case when clmns.cdefault = 0 then N'' else d.name end)</property>
       <property name="DefaultSchema" type="sysname" read_only_after_creation="true">(case when clmns.cdefault = 0 then N'' else user_name(d.uid) end)</property>
       <!-- "Default" refers to a default bound by sp_bindefault. "DefaultConstraintName" refers to the name of a modern default constraint.
@@ -133,11 +133,11 @@
       <property name="InPrimaryKey" type="bit" access='read' cast='true'>ISNULL(cik.index_column_id, 0)</property>
       <property name="AnsiPaddingStatus" type="bit" access='read'>clmns.is_ansi_padded</property>
       <property name="RowGuidCol" type="bit" cast='true' mode="design">clmns.is_rowguidcol</property>
-      
+
       <property name="ComputedText" type="nvarchar" size='max' expensive='true' read_only_after_creation="true" mode="design">ISNULL(cc.definition,N'')</property>
       <property name="IsPersisted" type="bit" cast="true" mode="design">ISNULL(cc.is_persisted, 0)</property>
       <property name="Collation" type="sysname" mode="design">ISNULL(clmns.collation_name, N'')</property>
-      <property name="IsForeignKey" type="bit" cast='true' 
+      <property name="IsForeignKey" type="bit" cast='true'
         access='read' >ISNULL((select TOP 1 1 from sys.foreign_key_columns AS colfk where colfk.parent_column_id = clmns.column_id and colfk.parent_object_id = clmns.object_id), 0)</property>
       <!-- identity section -->
       <property name="Identity" type="bit" read_only_after_creation="true" mode="design">clmns.is_identity</property>
@@ -197,7 +197,7 @@
       <property name="IsColumnSet" type="bit" cast="true" read_only_after_creation="true" mode="design">clmns.is_column_set</property>
     </version>
     <include alias = 'clmns' file='inc_type.xml' />
-    
+
     <!-- extended properties support -->
     <version min_major='7' max_major='9'>
       <property name="ExtPropMajorID" type="int" hidden='true'>
@@ -211,7 +211,7 @@
         </link_multiple>
       </property>
     </version>
-    
+
     <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="ExtPropMajorID" type="int" hidden='true'>
         <link_multiple no='1' expression="{0}">
@@ -304,6 +304,11 @@
     <!--SQL GraphDB properties.-->
     <version min_major="14" cloud_min_major="12">
       <property name="GraphType" type="int" report_type="GraphType">ISNULL(clmns.graph_type, 0)</property>
+    </version>
+
+    <version min_major='17' cloud_min_major='12'>
+      <property name="VectorDimensions" type="int" mode="design">ISNULL(clmns.vector_dimensions, 0)</property>
+      <property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(clmns.vector_base_type_desc, N'')</property>
     </version>
   </properties>
 </EnumObject>

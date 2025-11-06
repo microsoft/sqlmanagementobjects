@@ -17,7 +17,7 @@ using Assert = NUnit.Framework.Assert;
 namespace Microsoft.SqlServer.ConnectionInfoUnitTests
 {
     [TestClass]
-    public class SqlConnectionInfoTests
+    public class SqlConnectionInfoTests : Test.UnitTestBase
     {
         [TestMethod]
         [TestCategory("Unit")]

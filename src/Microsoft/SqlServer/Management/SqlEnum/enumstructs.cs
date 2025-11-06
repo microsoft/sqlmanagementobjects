@@ -22,7 +22,7 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum FileGrowthType
     {
@@ -99,7 +99,7 @@ namespace Microsoft.SqlServer.Management.Smo
         NonClusteredColumnStoreIndex = 5,
         /// <summary>
         /// Nonclustered Hash Index.
-        /// </summary> 
+        /// </summary>
         [TsqlSyntaxString("NONCLUSTERED HASH INDEX")]
         [LocDisplayName("NonClusteredHash")]
         NonClusteredHashIndex = 6,
@@ -126,7 +126,19 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         [TsqlSyntaxString("HEAP")]
         [LocDisplayName("Heap")]
-        HeapIndex = 10
+        HeapIndex = 10,
+        /// <summary>
+        /// Vector Index.
+        /// </summary>
+        [TsqlSyntaxString("VECTOR INDEX")]
+        [LocDisplayName("Vector")]
+        VectorIndex = 11,
+        /// <summary>
+        /// JSON Index.
+        /// </summary>
+        [TsqlSyntaxString("JSON INDEX")]
+        [LocDisplayName("Json")]
+        JsonIndex = 12
     }
 
 
@@ -339,15 +351,15 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         [TsqlSyntaxString("PARQUET")]
         Parquet = 3,
-        
+
         /// <summary>
-        /// JSON file format. 
+        /// JSON file format.
         /// </summary>
         [TsqlSyntaxString("JSON")]
         JSON = 4,
-        
+
         /// <summary>
-        /// DELTA file format. 
+        /// DELTA file format.
         /// </summary>
         [TsqlSyntaxString("DELTA")]
         Delta = 5
@@ -790,7 +802,7 @@ namespace Microsoft.SqlServer.Management.Smo
         NonNTLogin = 99,
         /// <summary>
         ///The login has not been explicitly granted or denied permissions to access this server. </summary>
-        ///The login may still have access through a group membership, but this is not recorded as a login property. 
+        ///The login may still have access through a group membership, but this is not recorded as a login property.
         Undefined = 0
     }
 
@@ -855,7 +867,7 @@ namespace Microsoft.SqlServer.Management.Smo
         Version80 = 0,
         ///
         Version90 = 1,
-        /// 
+        ///
         Version100 = 2,
         ///
         Version105 = 3,
@@ -912,9 +924,9 @@ namespace Microsoft.SqlServer.Management.Smo
         Version80 = 80,
         ///
         Version90 = 90,
-        /// 
+        ///
         Version100 = 100,
-        /// 
+        ///
         Version110 = 110,
         ///
         Version120 = 120,
@@ -1012,21 +1024,21 @@ namespace Microsoft.SqlServer.Management.Smo
         ///</summary>
         Allowed = 1,
         /// <summary>
-        /// Delayed durability is forced.      
+        /// Delayed durability is forced.
         ///</summary>
         Forced = 2
     }
 
     /// <summary>
-    /// The RangeType  enum specifies whether the boundary values specified with 
+    /// The RangeType  enum specifies whether the boundary values specified with
     /// RangeValues are placed in the LEFT or RIGHT side of the interval. None corresponds
-    /// to no boundary condition. Table with no partition is suitable example. 
+    /// to no boundary condition. Table with no partition is suitable example.
     /// </summary>
     [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.RangeTypeConverter))]
     public enum RangeType
     {
         /// <summary>
-        /// RangeType is not set. 
+        /// RangeType is not set.
         /// </summary>
         [TsqlSyntaxString("")]
         None = -1,
@@ -1456,7 +1468,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         Differential = 2,
         /// <summary>
-        /// Differential backupset. 
+        /// Differential backupset.
         /// MSSQL doesn't support incremental backup.
         /// (present here just for backward compatibility.)
         /// </summary>
@@ -1806,7 +1818,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         EncryptionKeyChangesInProgress = 4,
         /// <summary>
-        /// Database Decryption in progress 
+        /// Database Decryption in progress
         /// </summary>
         DecryptionInProgress = 5
     }
@@ -1814,9 +1826,9 @@ namespace Microsoft.SqlServer.Management.Smo
     /// <summary>
     ///see engine spec: CatalogViewsRef: Appendix  Universal Entity Classes
     ///The following table represents the domain of entity classes in the system, defined in the header file cmedscan.h.   Entity class usages include:
-    ///sys.database_permissions 
-    ///sys.server_permissions 
-    ///sys.extended_properties 
+    ///sys.database_permissions
+    ///sys.server_permissions
+    ///sys.extended_properties
     ///included here are only securable objects</summary>
     public enum ObjectClass
     {
@@ -2194,9 +2206,9 @@ namespace Microsoft.SqlServer.Management.Smo
         Integrated = 8,
         ///
         Ntlm = 16,
-        /// 
+        ///
         Kerberos = 32,
-        /// 
+        ///
         All = Anonymous | Basic | Digest | Integrated | Ntlm | Kerberos
     }
 
@@ -2204,26 +2216,62 @@ namespace Microsoft.SqlServer.Management.Smo
     /// Reuse of transaction log space is currently waiting on.</summary>
     public enum LogReuseWaitStatus
     {
-        ///
+        /// <summary>
+        /// NOTHING
+        /// </summary>
         Nothing = 0,
-        ///
+        /// <summary>
+        /// CHECKPOINT
+        /// </summary>
         Checkpoint = 1,
-        ///
+        /// <summary>
+        /// LOG_BACKUP
+        /// </summary>
         LogBackup = 2,
-        ///
+        /// <summary>
+        /// ACTIVE_BACKUP_OR_RESTORE
+        /// </summary>
         BackupOrRestore = 3,
-        ///
+        /// <summary>
+        /// ACTIVE_TRANSACTION
+        /// </summary>
         Transaction = 4,
-        ///
+        /// <summary>
+        /// DATABASE_MIRRORING
+        /// </summary>
         Mirroring = 5,
-        ///
+        /// <summary>
+        /// REPLICATION
+        /// </summary>
         Replication = 6,
-        ///
+        /// <summary>
+        /// DATABASE_SNAPSHOT_CREATION
+        /// </summary>
         SnapshotCreation = 7,
-        ///
+        /// <summary>
+        /// LOG_SCAN
+        /// </summary>
         LogScan = 8,
-        ///
-        Other = 9
+        /// <summary>
+        /// AVAILABILITY_REPLICA
+        /// </summary>
+        AvailabilityReplica = 9,
+        /// <summary>
+        /// SQL 2008 R2 and earlier: Other (Transient). SQL 2012 and later: AVAILABILITY_REPLICA
+        /// </summary>
+        Other = AvailabilityReplica,
+        /// <summary>
+        /// OLDEST_PAGE
+        /// </summary>
+        OldestPage = 13,
+        /// <summary>
+        /// XTP_CHECKPOINT
+        /// </summary>
+        XtpCheckpoint = 16,
+        /// <summary>
+        /// SLOG_SCAN
+        /// </summary>
+        SLogScan = 17,
     }
 
     /// <summary>
@@ -2413,7 +2461,7 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
     /// <summary>
-    /// EndpointEncryption 
+    /// EndpointEncryption
     /// </summary>
     public enum EndpointEncryption
     {
@@ -2421,7 +2469,7 @@ namespace Microsoft.SqlServer.Management.Smo
         Disabled = 0,
         /// Data is encrypted if the opposite endpoint specifies either Supported or Required.
         Supported = 1,
-        /// Encryption is used if the opposite endpoint is either Supported or Required.  
+        /// Encryption is used if the opposite endpoint is either Supported or Required.
         Required = 2
     }
 
@@ -2430,7 +2478,7 @@ namespace Microsoft.SqlServer.Management.Smo
     /// </summary>
     public enum EndpointEncryptionAlgorithm
     {
-        /// 
+        ///
         None = 0,
         /// RC4
         RC4 = 1,
@@ -2448,25 +2496,25 @@ namespace Microsoft.SqlServer.Management.Smo
     [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
     public enum EndpointAuthenticationOrder
     {
-        /// 
+        ///
         Ntlm = 1,
-        /// 
+        ///
         Kerberos = 2,
-        /// 
+        ///
         Negotiate = 3,
-        /// 
+        ///
         Certificate = 4,
-        /// 
+        ///
         NtlmCertificate = 5,
-        /// 
+        ///
         KerberosCertificate = 6,
-        /// 
+        ///
         NegotiateCertificate = 7,
-        /// 
+        ///
         CertificateNtlm = 8,
-        /// 
+        ///
         CertificateKerberos = 9,
-        /// 
+        ///
         CertificateNegotiate = 10
     }
 
@@ -2501,10 +2549,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
     /// <summary>
     /// see fk syntax:
-    /// | [ FOREIGN KEY ] 
-    ///     REFERENCES [ schema_name . ] referenced_table_name [ ( ref_column ) ] 
-    ///     [ ON DELETE { NO ACTION | CASCADE | SET NULL | SET DEFAULT } ] 
-    ///     [ ON UPDATE { NO ACTION | CASCADE | SET NULL | SET DEFAULT } ] 
+    /// | [ FOREIGN KEY ]
+    ///     REFERENCES [ schema_name . ] referenced_table_name [ ( ref_column ) ]
+    ///     [ ON DELETE { NO ACTION | CASCADE | SET NULL | SET DEFAULT } ]
+    ///     [ ON UPDATE { NO ACTION | CASCADE | SET NULL | SET DEFAULT } ]
     /// </summary>
     public enum ForeignKeyAction
     {
@@ -2521,8 +2569,8 @@ namespace Microsoft.SqlServer.Management.Smo
     /// <summary>
     /// Enumerates possible referential actions when an EdgeConstraint object is modified.
     /// see ec syntax:
-    /// | [ EdgeConstraint ] 
-    ///     CONNECTION ([ schema_name . ] referenced_table_from_name TO  [ schema_name . ] referenced_table_to_name] 
+    /// | [ EdgeConstraint ]
+    ///     CONNECTION ([ schema_name . ] referenced_table_from_name TO  [ schema_name . ] referenced_table_to_name]
     ///     [ ON DELETE { NO ACTION | CASCADE } ]
     /// </summary>
     public enum EdgeConstraintDeleteAction
@@ -2597,7 +2645,7 @@ namespace Microsoft.SqlServer.Management.Smo
         None = 0,
         ///Log successful authentication
         Success = 1,
-        ///Log failed authentication 
+        ///Log failed authentication
         Failure = 2,
         ///Log all authentication attempts regardless of success or failure
         All = 3
@@ -2653,7 +2701,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
     /// <summary>
     /// Type of plan guide
-    /// </summary>    
+    /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
     public enum PlanGuideType
     {
@@ -3231,7 +3279,7 @@ namespace Microsoft.SqlServer.Management.Smo
     /*
      * This is commented until the connection director work is implemented in the engine
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public enum AvailabilityGroupVirtualNameHealth
         {
@@ -3632,7 +3680,7 @@ namespace Microsoft.SqlServer.Management.Smo
         NotSynchronizing = 0,
 
         /// <summary>
-        /// Data movement is happening between the primary and the secondary. This will 
+        /// Data movement is happening between the primary and the secondary. This will
         /// be the state even if there is currently no data to be sent between the two.
         /// </summary>
         [LocDisplayName("adssSynchronizing")]
@@ -3851,7 +3899,7 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
     /// <summary>
-    /// This enumeration specifies how replicas in the primary role are treated in the evaluation to pick the desired replica to perform a backup.  
+    /// This enumeration specifies how replicas in the primary role are treated in the evaluation to pick the desired replica to perform a backup.
     /// </summary>
     [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.AvailabilityGroupAutomatedBackupPreferenceConverter))]
     public enum AvailabilityGroupAutomatedBackupPreference
@@ -4297,7 +4345,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
     }
 
     /// <summary>
-    /// Since proxy accounts are tightly coupled with SQL Agent subsystems and we don't have a special 
+    /// Since proxy accounts are tightly coupled with SQL Agent subsystems and we don't have a special
     /// SubSystem object, but rather an enum.
     /// The values of this enum must match the service_id value from the engine
     /// </summary>
@@ -4606,7 +4654,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         ///
         None = 0,
         /// <summary>
-        /// Appends the job output (if any) to the log file, if any log file 
+        /// Appends the job output (if any) to the log file, if any log file
         /// has been specified. If not set, the log file is overwritten
         /// </summary>
         AppendToLogFile = 2,

@@ -1265,6 +1265,7 @@
       <Link>xml\YukonuserownedobjectSchema.xml</Link>
     </EmbeddedResource>
     <None Include="xml\*.xml" />
+    <None Include="xml\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />

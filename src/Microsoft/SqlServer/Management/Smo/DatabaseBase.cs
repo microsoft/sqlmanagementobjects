@@ -210,6 +210,12 @@ namespace Microsoft.SqlServer.Management.Smo
                }
         }
 
+
+        /// <summary>
+        /// Returns true if the database is a Fabric database or Fabric Warehouse
+        /// </summary>
+        public bool IsFabricDatabase => ExecutionManager.IsFabricConnection; // Not using the property bag, to support design mode
+
         private OptionTerminationStatement optionTerminationStatement = null;
         /// <summary>
         /// Returns the name of the type in the urn expression
@@ -6363,7 +6369,7 @@ SortedList list = new SortedList();
             // eg: ALTER DATABASE [MyDatabase] SET ACCELERATED_DATABASE_RECOVERY = ON (PERSISTENT_VERSION_STORE_FILEGROUP = [VersionStoreFG])
             // The filegroup can only be changed if one disables ADR first
             // https://docs.microsoft.com/sql/relational-databases/accelerated-database-recovery-management?view=sql-server-ver15
-            if (IsSupportedProperty(nameof(AcceleratedRecoveryEnabled), sp) && !targetEditionIsManagedServer)
+            if (IsSupportedProperty(nameof(AcceleratedRecoveryEnabled), sp) && !isAzureDb && !targetEditionIsManagedServer)
             {
                 var propAdr = Properties.Get(nameof(AcceleratedRecoveryEnabled));
                 if (null != propAdr.Value &&
@@ -6386,6 +6392,12 @@ SortedList list = new SortedList();
                         $"{(adrEnable ? Globals.On : Globals.Off)} {filegroupSetting}",
                         useEqualityOperator: true);
                 }
+            }
+
+            // https://docs.microsoft.com/en-us/sql/relational-databases/performance/optimized-locking?view=sql-server-ver17
+            if (IsSupportedProperty(nameof(OptimizedLockingOn), sp) && !isAzureDb && !targetEditionIsManagedServer)
+            {
+                ScriptAlterPropBool(nameof(OptimizedLockingOn), "OPTIMIZED_LOCKING", sp, query, true);
             }
 
             ScriptAlterPropBool(nameof(DataRetentionEnabled), "DATA_RETENTION", sp, query, false);

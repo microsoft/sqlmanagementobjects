@@ -175,6 +175,10 @@ namespace Microsoft.SqlServer.Management.Smo
         [DisplayDescriptionKey("Database_MirroringTimeoutDesc")]
         Int32 MirroringTimeout { get; set;}
 
+        [DisplayNameKey("Database_OptimizedLockingOnName")]
+        [DisplayDescriptionKey("Database_OptimizedLockingOnDesc")]
+        Boolean OptimizedLockingOn { get; set; }
+
         [DisplayNameKey("Database_PageVerifyName")]
         [DisplayDescriptionKey("Database_PageVerifyDesc")]
         Microsoft.SqlServer.Management.Smo.PageVerify PageVerify { get; set; }

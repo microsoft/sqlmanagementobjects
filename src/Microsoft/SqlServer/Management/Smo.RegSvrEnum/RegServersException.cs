@@ -35,6 +35,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
         {
         }
 
+#if !NETCOREAPP
         /// <summary>
         /// An exception in a RegisteredServer object
         /// </summary>
@@ -44,6 +45,6 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
             : base(info, context)
         {
         }
-
+#endif
     }
 }

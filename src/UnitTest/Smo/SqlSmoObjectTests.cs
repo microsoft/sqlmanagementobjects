@@ -159,6 +159,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     "LocalCursorsDefault",
                     "NestedTriggersEnabled",
                     "NumericRoundAbortEnabled",
+                    nameof(Database.OptimizedLockingOn),
                     "QuotedIdentifiersEnabled",
                     "ReadOnly",
                     "RecursiveTriggersEnabled",

@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Test.Manageability.Utils;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
@@ -74,6 +75,118 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         #endregion
 
         #region Scripting Tests
+
+        /// <summary>
+        /// Validate the scripting of ClusterConnectionOptions property when targeting SQL 2022 or lower. 
+        /// 
+        /// Only captures the T-SQL scripts, doesn't execute them.
+        /// </summary>
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MaxMajor = 16)]
+        public void AvailabilityGroup_Scripting_ClusterConnectionOptions160OrLower()
+        {
+            this.ExecuteTest(server =>
+            {
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Invoking the getter for Cluster_Connection_Options property, UnknownPropertyException should be thrown.");
+
+                    Assert.That(Assert.Throws<_SMO.UnknownPropertyException>(() => { var _ = ag.ClusterConnectionOptions; }).PropertyName,
+                        Is.EqualTo("ClusterConnectionOptions"),
+                        "Property name should be ClusterConnectionOptions.");
+
+                    TraceHelper.TraceInformation("Invoking the setter for Cluster_Connection_Options property, UnknownPropertyException should be thrown.");
+                    Assert.That(Assert.Throws<_SMO.UnknownPropertyException>(() => { var _ = ag.ClusterConnectionOptions = "Encrypt=Strict"; }).PropertyName,
+                        Is.EqualTo("ClusterConnectionOptions"),
+                        "Property name should be ClusterConnectionOptions.");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Validate the scripting of ClusterConnectionOptions property when targeting SQL 2025 or higher. 
+        /// 
+        /// Only captures the T-SQL scripts, doesn't execute them.
+        /// </summary>
+        [TestMethod]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.Express)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        public void AvailabilityGroup_Scripting_ClusterConnectionOptions170OrHigher()
+        {
+            this.ExecuteTest(server =>
+            {
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Default Cluster_Connection_Options is NULL, DDL should not contain Cluster_Connection_Options clause.");
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Not.Contain("Cluster_Connection_Options").IgnoreCase,
+                        "Script should not contain Cluster_Connection_Options clause");
+                }
+
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Setting Cluster_Connection_Options to empty string, DDL should set Cluster_Connection_Options to ''.");
+                    ag.ClusterConnectionOptions = string.Empty;
+
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Contain("CLUSTER_CONNECTION_OPTIONS = ''").IgnoreCase,
+                        "Setting Cluster_Connection_Options to empty string, script should set Cluster_Connection_Options to ''");
+                }
+
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Setting Cluster_Connection_Options to a string with one whitespace only, DDL should set Cluster_Connection_Options to ''.");
+                    ag.ClusterConnectionOptions = " ";
+
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Contain("CLUSTER_CONNECTION_OPTIONS = ''").IgnoreCase,
+                        "Setting Cluster_Connection_Options to a string with one whitespace only, script should not contain Cluster_Connection_Options clause");
+                }
+
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Setting Cluster_Connection_Options to non-empty should work.");
+                    ag.ClusterConnectionOptions = "Encrypt=Strict";
+
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Contain("Encrypt=Strict").IgnoreCase,
+                        "Script contain Cluster_Connection_Options clause with expected value");
+                }
+
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Setting Cluster_Connection_Options to non-empty should work.");
+                    ag.ClusterConnectionOptions = "Encrypt=Strict";
+                    ag.SetClusterConnectionOptions(ClusterConnectionOptionsConstants.HostNameInCertificateKey, "TestHNIC");
+
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Contain("Encrypt=Strict").IgnoreCase,
+                        "Script contain Cluster_Connection_Options clause with Encrypt=Strict");
+
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Contain("HostNameInCertificate=TestHNIC").IgnoreCase,
+                        "Script contain Cluster_Connection_Options clause with HostNameInCertificate=TestHNIC");
+                }
+
+                {
+                    var ag = AlwaysOnTestHelper.CreateDefaultAGObject(server);
+
+                    TraceHelper.TraceInformation("Setting Cluster_Connection_Options to non-empty using constraints should work.");
+                    ag.SetClusterConnectionOptions(ClusterConnectionOptionsConstants.EncryptKey, ClusterConnectionOptionsConstants.EncryptValueStrict);
+
+                    Assert.That(TSqlScriptingHelper.GenerateScriptForAction(server, ag.Create),
+                        Does.Contain("Encrypt=Strict").IgnoreCase,
+                        "Script contain Cluster_Connection_Options clause with Encrypt=Strict");
+                }
+            });
+        }
 
         /// <summary>
         /// Validate the scripting of ReadonlyRoutingConnectionUrl property when targeting SQL 2022 or lower. 
@@ -431,7 +544,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Test if distributed availability group that doesn't have "Server=" in endpoint URL of any replica isn't managed instance link
         /// </summary>
         [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15, HostPlatform = HostPlatformNames.Windows)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, HostPlatform = HostPlatformNames.Windows)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlDatabaseEdge)]
         public void AvailabilityGroup_IsNotManagedInstanceLink_WhenReplicaDoesNotContainServerInEndpointUrl()
         {
@@ -442,10 +555,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     var dbName = "db" + Guid.NewGuid();
                     var db = new _SMO.Database(server, dbName);
                     var agName = "ag" + Guid.NewGuid();
-                    var ag = new _SMO.AvailabilityGroup(server, agName)
+                    var ag = new _SMO.AvailabilityGroup(server, agName);
+
+                    if (server.Version.Major >= 14)
                     {
-                        ClusterType = _SMO.AvailabilityGroupClusterType.None
-                    };
+                        ag.ClusterType = _SMO.AvailabilityGroupClusterType.None;
+                    }
+
                     var dagName = "dag" + Guid.NewGuid();
                     var dag = new _SMO.AvailabilityGroup(server, dagName)
                     {
@@ -474,7 +590,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Test creating valid managed instance link
         /// </summary>
         [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15, HostPlatform = HostPlatformNames.Windows)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13, HostPlatform = HostPlatformNames.Windows)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlDatabaseEdge)]
         public void AvailabilityGroup_AvailabilityGroupIsManagedInstanceLink()
         {
@@ -485,10 +601,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     var dbName = "db" + Guid.NewGuid();
                     var db = new _SMO.Database(server, dbName);
                     var agName = "ag" + Guid.NewGuid();
-                    var ag = new _SMO.AvailabilityGroup(server, agName)
+                    var ag = new _SMO.AvailabilityGroup(server, agName);
+
+                    if (server.Version.Major >= 14)
                     {
-                        ClusterType = _SMO.AvailabilityGroupClusterType.None
-                    };
+                        ag.ClusterType = _SMO.AvailabilityGroupClusterType.None;
+                    }
+
                     var dagName = "dag" + Guid.NewGuid();
                     var dag = new _SMO.AvailabilityGroup(server, dagName)
                     {

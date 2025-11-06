@@ -30,29 +30,35 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
         public sealed class SmoCollectionMetadataList<T> : IMetadataList<T>
             where T : Smo.NamedSmoObject
         {
-            private readonly Smo.SmoCollectionBase smoCollection;
+            private readonly List<T> smoObjectList;
             private readonly int count;
 
-            public SmoCollectionMetadataList(Server server, Smo.SmoCollectionBase smoCollection)
+            // filterPredicate is the function to filter the smoCollection.
+            //
+            public SmoCollectionMetadataList(Server server, Smo.SmoCollectionBase smoCollection, Func<T, bool> filterPredicate = null)
             {
                 Debug.Assert(server != null, "SmoMetadataProvider Assert", "server != null");
                 Debug.Assert(smoCollection != null, "SmoMetadataProvider Assert", "smoCollection != null");
 
                 Config.SmoInitFields initFields = Config.SmoInitFields.GetInitFields(typeof(T));
                 server.TryRefreshSmoCollection(smoCollection, initFields);
-                this.smoCollection = smoCollection;
-                this.count = GetCount(smoCollection, server.IsConnected);
+
+                this.smoObjectList = filterPredicate == null ?
+                    smoCollection.Cast<T>().ToList():
+                    smoCollection.Cast<T>().Where(filterPredicate).ToList();
+                this.count = GetCount(smoCollection, server.IsConnected, filterPredicate);
             }
 
-            private static int GetCount(Smo.SmoCollectionBase smoCollectionBase, bool isConnected)
+            private static int GetCount(Smo.SmoCollectionBase smoCollection, bool isConnected, Func<T, bool> filterPredicate = null)
             {
-                Debug.Assert(smoCollectionBase != null, "SmoMetadataProvider Assert", "smoCollectionBase != null");
+                Debug.Assert(smoCollection != null, "SmoMetadataProvider Assert", "smoCollection != null");
 
                 int count;
 
                 try
                 {
-                    count = smoCollectionBase.Count;
+                    int collectionCount = smoCollection.Count;
+                    count = filterPredicate != null ? smoCollection.Cast<T>().Count(filterPredicate) : collectionCount;
                 }
                 catch (InvalidVersionEnumeratorException)
                 {
@@ -102,7 +108,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
 
             public IEnumerator<T> GetEnumerator()
             {
-                return this.count > 0 ? this.smoCollection.Cast<T>().GetEnumerator() : GetEmptyEnumerator();
+                return this.count > 0 ? this.smoObjectList.GetEnumerator() : GetEmptyEnumerator();
             }
 
             #endregion
@@ -111,7 +117,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return this.count > 0 ? this.smoCollection.GetEnumerator() : GetEmptyEnumerator();
+                return (IEnumerator)GetEnumerator();
             }
 
             #endregion

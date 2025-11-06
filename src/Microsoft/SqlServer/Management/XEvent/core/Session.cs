@@ -710,7 +710,8 @@ namespace Microsoft.SqlServer.Management.XEvent
                     {
                         throw new XEventException(ExceptionTemplates.NameNullEmpty);
                     }
-                    this.Properties["Name"].Value = value;
+                    Properties[nameof(Name)].Value = value;
+                    AbstractIdentityKey = null;
                 }
                 else
                 {

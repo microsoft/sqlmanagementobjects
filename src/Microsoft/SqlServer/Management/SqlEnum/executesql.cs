@@ -1,24 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-namespace Microsoft.SqlServer.Management.Smo
-{
-    using System;
-    using System.Globalization;
-    using System.Data;
+using System;
+using System.Globalization;
+using System.Data;
 #if MICROSOFTDATA
-    using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 #else
     using System.Data.SqlClient;
 #endif
-    using System.Collections.Specialized;
-    using System.Collections;
-    using Microsoft.SqlServer.Management.Common;
-    using System.Runtime.InteropServices;
-    using Microsoft.SqlServer.Management.Sdk.Sfc;
-    using Microsoft.SqlServer.Management.Smo.SqlEnum;
+using System.Collections.Specialized;
+using System.Collections;
+using Microsoft.SqlServer.Management.Common;
+using System.Runtime.InteropServices;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Smo.SqlEnum;
 
-
+namespace Microsoft.SqlServer.Management.Smo
+{
     /// <summary>
     ///this class is used to execute tsql 
     ///it is the only way tsql gets executed by the enumerator</summary>
@@ -111,32 +110,28 @@ namespace Microsoft.SqlServer.Management.Smo
         void InitConnection(Object con)
         {
             m_conctx = con as ServerConnection;
-            if( null != m_conctx )
+            if (null != m_conctx)
             {
                 return;
             }
-            
-                 SqlConnectionInfoWithConnection sciwc = con as SqlConnectionInfoWithConnection;
-                 if( null != sciwc )
-                 {
-                    m_conctx = sciwc.ServerConnection;
-                    return;
-                 }
-                 
-            SqlConnectionInfo sci = con as SqlConnectionInfo;
-            if( null != sci )
+
+            if (con is SqlConnectionInfoWithConnection sciwc)
+            {
+                m_conctx = sciwc.ServerConnection;
+                return;
+            }
+
+            if (con is SqlConnectionInfo sci)
             {
                 m_conctx = new ServerConnection(sci);
                 return;
             }
-            SqlConnection sc = con as SqlConnection;
-            if( null != sc )
+            if (con is SqlConnection sc)
             {
                 m_conctx = new ServerConnection(sc);
                 return;
             }
-            SqlDirectConnection sdc = con as SqlDirectConnection;
-            if( null != sdc )
+            if (con is SqlDirectConnection sdc)
             {
                 m_conctx = new ServerConnection(sdc.SqlConnection);
                 return;
@@ -145,8 +140,9 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        ///start capturing messages</summary>
-        void StartCapture()
+        /// start capturing messages
+        /// </summary>
+        private void StartCapture()
         {
             m_Messages = new ArrayList();
             m_ServerInfoMessage = new SqlInfoMessageEventHandler(RecordMessage);
@@ -161,8 +157,10 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        ///stop capturing messages, return what was captured</summary>
-        ArrayList ClearCapture()
+        /// stop capturing messages, return what was captured
+        /// </summary>
+        /// <returns></returns>
+        private ArrayList ClearCapture()
         {
             if( null != m_ServerInfoMessage )
             {
@@ -181,7 +179,7 @@ namespace Microsoft.SqlServer.Management.Smo
         ///so we are garanteed to make a genuine attempt to reconnect instead af taking an already 
         ///invalid connection from the pool
         ///return true if success</summary>
-        bool TryToReconnect(ExecutionFailureException e)
+        private bool TryToReconnect(ExecutionFailureException e)
         {
             //check for valid exception. 
             if( null == e )
@@ -354,6 +352,18 @@ namespace Microsoft.SqlServer.Management.Smo
             //after it first connects even if the connection goes bad
             return m_conctx.IsContainedAuthentication;
         }
+
+        /// <summary>
+        /// Returns true if the connection is to a Fabric Database or Fabric Warehouse
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsFabricConnection(object con) => new ExecuteSql(con).IsFabricConnection();
+
+        /// <summary>
+        /// Returns true if the current connection is to a Fabric Database or Fabric Warehouse
+        /// </summary>
+        /// <returns></returns>
+        public bool IsFabricConnection() => m_conctx.IsFabricServer;
 
 
         /// <summary>

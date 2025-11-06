@@ -131,9 +131,10 @@ namespace Microsoft.SqlServer.Management.Smo
         // VBUMP
         [DisplayNameKey("ServerSQLv170")]
         VersionLatest = Version170,
-        [DisplayNameKey("ServerSQL15")]
-        // Set this to the oldest SQL Server version still under extended support
-        VersionOldestSupported = Version130
+        // Set this to the oldest SQL Server version still under extended security support
+        // https://learn.microsoft.com/lifecycle/faq/extended-security-updates#esu-availability-and-end-dates
+        [DisplayNameKey("ServerSQL14")]
+        VersionOldestSupported = Version120
     }
 
     public static class TypeConverters
@@ -671,13 +672,13 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Scripts object using "CREATE OR ALTER" syntax. 
+        /// Scripts object using "CREATE OR ALTER" syntax.
         /// </summary>
         /// <remarks>
         /// This setting is not supported for all object types, and only works when the destination is SQL Server 2016 Service Pack 1+.
         /// If toggled from true to false, the script behavior will change to CREATE for all objects.
         /// When set to true:
-        /// 1. Objects that do not support "CREATE OR ALTER" will be scripted as CREATE. 
+        /// 1. Objects that do not support "CREATE OR ALTER" will be scripted as CREATE.
         ///    Their script content will also depend on the value of the IncludeIfNotExists property.
         /// 2. Objects that support "CREATE OR ALTER" will ignore the IncludeIfNotExists property.
         /// </remarks>

@@ -510,7 +510,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                         var desiredEdition = ConnectionHelpers.GetDefaultEdition(TargetServerFriendlyName);
                         if (desiredEdition == DatabaseEngineEdition.SqlDataWarehouse)
                         {
-                            requestedEdition = AzureDatabaseEdition.DataWarehouse;
+                            requestedEdition = dbParameters.AzureDatabaseEdition = AzureDatabaseEdition.DataWarehouse;
                         }
                     }
                     Database db;
@@ -765,7 +765,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                                         exceptions.Select(
                                             e =>
                                                 String.Format("\n******* {0} *******\n{1}\n{2}", e.Item1,
-                                                    e.Item2.Message,
+                                                    e.Item2.BuildRecursiveExceptionMessage(),
                                                     e.Item2.StackTrace))))
                                 , exceptions.Select(e => e.Item2));
                         }

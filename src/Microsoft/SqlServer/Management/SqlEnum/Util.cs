@@ -21,7 +21,7 @@ namespace Microsoft.SqlServer.Management.Smo
 #if DEBUG || EXPOSE_MANAGED_INTERNALS
     public
 #else
-    internal 
+    internal
 #endif
     class Util
     {
@@ -32,6 +32,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         static public String DbTypeToClrType(String strDBType)
         {
+            // SMO_NEW_DATATYPE
+            // Add the data type -> corresponding CLR type here
             String strType;
             switch(strDBType)
             {
@@ -168,7 +170,7 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 String fullName = SqlEnumNetCoreExtension.GetAssembly(typeof(Util)).FullName;
-                fullName = fullName.Replace(SqlEnumNetCoreExtension.GetAssembly(typeof(Util)).GetName().Name, assemblyName);                 
+                fullName = fullName.Replace(SqlEnumNetCoreExtension.GetAssembly(typeof(Util)).GetName().Name, assemblyName);
                 a = Assembly.Load(new AssemblyName(fullName));
             }
             catch(Exception e)
@@ -260,8 +262,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             return listNames;
         }
-        
-       
+
+
         internal static string EscapeLikePattern(string pattern)
         {
             // The characters: %[]_ are special characters to the sql LIKE operator. To escape them,
@@ -283,16 +285,16 @@ namespace Microsoft.SqlServer.Management.Smo
                     case '_':
                         escape = true;
                         break;
-                    
+
                     default:
                         break;
                 }
 
                 if (escape && null == sb)
                 {
-                    // Havent had to escape yet, 
+                    // Havent had to escape yet,
                     // put the leading portion of the string into the stringbuilder
-                    // from now on, every char will go into the 
+                    // from now on, every char will go into the
                     // the StringBuilder
                     sb = new StringBuilder(pattern.Length * 3);
                     sb.Append(pattern.Substring(0, i));
@@ -301,7 +303,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // if we are going to escape this character, then sb should not be null
                 TraceHelper.Assert(!escape || sb != null);
 
-                
+
                 if (escape)
                 {
                     sb.Append("[");
@@ -317,8 +319,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     sb.Append("]");
                 }
-                
-                
+
+
             }
 
             // if we didnt do any escaping, just return the pattern, else return the StringBuilder sb
@@ -427,7 +429,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else // mimic Path.Combine
             {
-                
+
                 if (path1.Trim().Length == 0 || path2.StartsWith("/"))
                 {
                     return path2;
@@ -438,7 +440,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// Returns the directory string given a path. Handles XI path. It is a simple
-        /// wrapper so it will be Garbage-In|Garbage-out. 
+        /// wrapper so it will be Garbage-In|Garbage-out.
         /// </summary>
         /// <param name="s1">Original path.</param>
         /// <returns>directory string</returns>
@@ -449,10 +451,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// Returns the directory string given a path. Handles XI path. It is a simple
-        /// wrapper so it will be Garbage-In|Garbage-out. 
+        /// wrapper so it will be Garbage-In|Garbage-out.
         /// </summary>
         /// <param name="s1">Original path.</param>
-        /// <param name="pathType">type of path. If Unspecified, the function will use Linux if s1 starts with /, Windows otherwise </param>        
+        /// <param name="pathType">type of path. If Unspecified, the function will use Linux if s1 starts with /, Windows otherwise </param>
         /// <returns>directory string</returns>
         static public string GetDirectoryName(string s1, PathType pathType)
         {
@@ -482,7 +484,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return null;
                 }
                 var lastSeparatorIndex = s1.LastIndexOf("/", StringComparison.Ordinal);
-                // No directory 
+                // No directory
                 if (lastSeparatorIndex < 0)
                 {
                     return String.Empty;

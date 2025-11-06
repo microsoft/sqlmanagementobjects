@@ -31,7 +31,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
     /// </summary>
     public static class ServerObjectHelpers
     {
-        private static readonly Semaphore azureDbCreateLock = new Semaphore(3, 3);
+        private static readonly Semaphore azureDbCreateLock = new Semaphore(2, 2);
 
         /// <summary>
         /// Restores a database from the specified backup file. It's the callers responsibility to ensure the server

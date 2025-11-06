@@ -38,7 +38,7 @@
       <property name="IsIncluded" type="bit" mode="design#deploy">ic.is_included_column</property>
     </version>
     <version min_major='15' cloud_min_major='12' datawarehouse_enabled='true'>
-      <property name="ColumnStoreOrderOrdinal" type="int" access="Read" cast = 'true'>ISNULL(ic.column_store_order_ordinal,0)</property>
+      <property name="ColumnStoreOrderOrdinal" type="int" cast = 'true'>ISNULL(ic.column_store_order_ordinal,0)</property>
     </version>
     <version min_major='9' cloud_min_major='10'>
       <property name="IsComputed" type="bit" access="Read"

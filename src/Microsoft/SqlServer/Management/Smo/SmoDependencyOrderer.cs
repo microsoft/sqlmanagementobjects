@@ -45,6 +45,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private static string SPATIALINDEX = "spatialindex";
         private static string COLUMNSTOREINDEX = "columnstoreindex";
         private static string CLUSTEREDCOLUMNSTOREINDEX = "clusteredcolumnstoreindex";
+        private static string VECTORINDEX = "vectorindex";
         private static string DATA = "data";
         private static string SERVERPERMISSION = "serverpermission";
         private static string DATABASEPERMISSION = "databasepermission";
@@ -436,6 +437,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 List<Index> spatialIndex = new List<Index>();
                 List<Index> columnstoreIndex = new List<Index>();
                 List<Index> clusteredColumnstoreIndex = new List<Index>();
+                List<Index> vectorIndex = new List<Index>();
 
                 foreach (var index in indexList)
                 {
@@ -495,7 +497,9 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
                         case IndexType.HeapIndex:
                             break;
-
+                        case IndexType.VectorIndex:
+                            vectorIndex.Add(index);
+                            break;
                         default:
                             throw new WrongPropertyValueException(index.Properties["IndexType"]);
                     }
@@ -511,6 +515,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.SPATIALINDEX), spatialIndex.ConvertAll(p => { return p.Urn; }));
                 this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.COLUMNSTOREINDEX), columnstoreIndex.ConvertAll(p => { return p.Urn; }));
                 this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.CLUSTEREDCOLUMNSTOREINDEX), clusteredColumnstoreIndex.ConvertAll(p => { return p.Urn; }));
+                this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.VECTORINDEX), vectorIndex.ConvertAll(p => { return p.Urn; }));
             }
         }
 
@@ -532,6 +537,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 List<Urn> spatialIndex = new List<Urn>();
                 List<Urn> columnstoreIndex = new List<Urn>();
                 List<Urn> clusteredColumnstoreIndex = new List<Urn>();
+                List<Urn> vectorIndex = new List<Urn>();
 
                 foreach (var index in indexList)
                 {
@@ -577,6 +583,9 @@ namespace Microsoft.SqlServer.Management.Smo
                                 break;
                             case IndexType.HeapIndex:
                                 break;
+                            case IndexType.VectorIndex:
+                                vectorIndex.Add(index);
+                                break;
                             default:
                                 Diagnostics.TraceHelper.Assert(false, "Invalid IndexType");
                                 break;
@@ -594,6 +603,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.SPATIALINDEX), spatialIndex);
                 this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.COLUMNSTOREINDEX), columnstoreIndex);
                 this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.CLUSTEREDCOLUMNSTOREINDEX), clusteredColumnstoreIndex);
+                this.urnTypeDictionary.Add(new UrnTypeKey(SmoDependencyOrderer.VECTORINDEX), vectorIndex);
             }
         }
 

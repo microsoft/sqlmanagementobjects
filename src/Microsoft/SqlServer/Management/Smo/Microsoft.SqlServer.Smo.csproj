@@ -610,7 +610,7 @@
     <Compile Include="$(SmoSourceDir)\VersionUtils.cs" />
     <Compile Include="$(SmoSourceDir)\ViewBase.cs" />
     <Compile Include="$(SmoSourceDir)\WorkloadGroupBase.cs" />
-	<Compile Include="$(SmoSourceDir)\WorkloadManagementWorkloadClassifierBase.cs" />
+    <Compile Include="$(SmoSourceDir)\WorkloadManagementWorkloadClassifierBase.cs" />
     <Compile Include="$(SmoSourceDir)\WorkloadManagementWorkloadGroupBase.cs" />
     <Compile Include="$(SmoSourceDir)\XmlSchemaCollectionBase.cs" />
   </ItemGroup>
@@ -620,8 +620,9 @@
     </SqlStringResource>
     <SqlStringResource Include="$(SmoSourceDir)\ExceptionTemplatesImpl.strings" />
     <SqlStringResource Include="$(SmoSourceDir)\FacetSR.strings" />
-    <SqlStringResource Include="$(SmoSourceDir)\LocalizableResources.strings" /> 
-    <None Include="@(SqlStringResource)"/>
+    <SqlStringResource Include="$(SmoSourceDir)\LocalizableResources.strings" />
+    <None Include="..\..\..\..\..\docs\README.md" Link="README.md" />
+    <None Include="@(SqlStringResource)" />
   </ItemGroup>
   <ItemGroup>
     <EventsFileName Include="ServerEvents.cs">
@@ -657,10 +658,10 @@
   <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
       <Reference Include="System.Management" />
   </ItemGroup>
-  <Target Name="RunCodeGen" 
-    BeforeTargets="CoreResGen" 
-    Condition="'$(BuildingInsideVisualStudio)'!='true' and '@(CodeGen)' != ''" 
-    Inputs="$(MSBuildAllProjects);@(CodeGenInput)" 
+  <Target Name="RunCodeGen"
+    BeforeTargets="CoreResGen"
+    Condition="'$(BuildingInsideVisualStudio)'!='true' and '@(CodeGen)' != ''"
+    Inputs="$(MSBuildAllProjects);@(CodeGenInput)"
     Outputs="@(CodeGen->'$(CodeGenOutputDir)\%(filename).cs')"
     >
       <PropertyGroup>
@@ -668,7 +669,7 @@
         <CodeGenCmd Condition="'$(CodeGenCmd)' == ''">dotnet --roll-forward LatestMajor "$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.dll"</CodeGenCmd>
       </PropertyGroup>
       <Message Importance="high" Text="$(CodeGenCmd)  &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" />
-      <Exec Command="$(CodeGenCmd) &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" /> 
-      
+      <Exec Command="$(CodeGenCmd) &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" />
+
   </Target>
 </Project>

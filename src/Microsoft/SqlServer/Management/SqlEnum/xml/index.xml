@@ -24,7 +24,7 @@
       <property_link fields = '#IndexType#SecondaryXmlIndexType#ParentXmlIndex#' left_join="sys.xml_indexes AS xi">xi.object_id = i.object_id AND xi.index_id = i.index_id</property_link>
       <property_link fields = '#ParentXmlIndex#' left_join="sys.xml_indexes AS xi2">xi2.object_id = xi.object_id AND xi2.index_id = xi.using_xml_index_id</property_link>
     </version>
-    
+
     <version min_major ="11" cloud_min_major='12' >
       <property_link fields = '#IndexType#SecondaryXmlIndexType#ParentXmlIndex#IndexedXmlPathName#' left_join="sys.xml_indexes AS xi">xi.object_id = i.object_id AND xi.index_id = i.index_id</property_link>
       <property_link fields = '#ParentXmlIndex#' left_join="sys.xml_indexes AS xi2">xi2.object_id = xi.object_id AND xi2.index_id = xi.using_xml_index_id</property_link>
@@ -53,13 +53,36 @@
       <property_link fields='#BucketCount#' left_join="sys.hash_indexes AS hi">i.object_id = hi.object_id AND i.index_id = hi.index_id</property_link>
     </version>
 
+    <!-- Vector Index support added in SQL Server 2025 (version 17) -->
+    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+      <property_link fields='#VectorIndexMetric#VectorIndexType#' left_join="#vectorindexes AS vi">i.object_id = vi.object_id AND i.index_id = vi.index_id</property_link>
+    </version>
+
     <!-- Selective XML Index (SXI) was introduced in SP1. First build with SXI was SQL11_PCU_Main 11.0.2813 -->
     <version min_major ="11"  min_build='2813' cloud_min_major='12'>
       <property_link fields='#IndexedXmlPathName#' left_join="sys.selective_xml_index_paths AS indexedpaths">xi.object_id = indexedpaths.object_id AND xi.using_xml_index_id = indexedpaths.index_id AND xi.path_id = indexedpaths.path_id</property_link>
     </version>
-     
+
     <version min_major='7'>
       <prefix fields="#SpaceUsed#">declare @PageSize float select @PageSize=v.low/1024.0 from master.dbo.spt_values v where v.number=&lt;msparam&gt;1&lt;/msparam&gt; and v.type=&lt;msparam&gt;E&lt;/msparam&gt;</prefix>
+    </version>
+    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+      <prefix fields='#VectorIndexMetric#VectorIndexType#'>
+        create table #vectorindexes (object_id int, index_id int, distance_metric nvarchar(60), vector_index_type nvarchar(60));
+        begin try
+          exec sp_executesql N'
+          insert into #vectorindexes (object_id, index_id, distance_metric, vector_index_type)
+          select object_id, index_id,
+          distance_metric,
+          vector_index_type
+          from sys.vector_indexes'
+        end try
+        begin catch
+        end catch
+      </prefix>
+      <postfix fields='#VectorIndexMetric#VectorIndexType#'>
+        drop table #vectorindexes
+      </postfix>
     </version>
   </settings>
   <properties>
@@ -193,8 +216,8 @@
       <property name="TableIDForPartition" type="int" hidden='true' cast='true'>(CASE WHEN i.type = 4 THEN allobj.object_id ELSE i.object_id END)</property>
       <!-- whether any source columns for the index are sparse -->
       <property name="HasSparseColumn" type="bit" cast='true' access='Read'>
-        ISNULL ((select distinct 1 from sys.index_columns ic 
-                 join sys.columns c on ic.object_id = c.object_id and c.column_id = ic.column_id 
+        ISNULL ((select distinct 1 from sys.index_columns ic
+                 join sys.columns c on ic.object_id = c.object_id and c.column_id = ic.column_id
                  where c.is_sparse = 1 and c.object_id = i.object_id and ic.index_id = i.index_id), 0)
       </property>
     </version>
@@ -213,7 +236,7 @@
     <version min_major='11'>
       <property name="IsFileTableDefined" type="bit" cast='true' access="read">CASE WHEN filetableobj.object_id IS NULL THEN 0 ELSE 1 END</property>
     </version>
-    
+
 
      <!-- IndexType: Looks up sys.indexes.type and returns an SMO index type
       		SMO Index Type				SMO Value	Sys.indexes.type
@@ -239,7 +262,7 @@
 
     <!-- We must specify max_minor, otherwise XmlReader will fail to distinguish the following from the one above it-->
     <version min_major='11' max_major='11' min_minor='0' max_minor='0' min_build="2813">
-      
+
        <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
           CASE i.type WHEN 1 THEN 0 WHEN 4 THEN 4
                       WHEN 3 THEN CASE xi.xml_index_type WHEN 0 THEN 2 WHEN 1 THEN 3 WHEN 2 THEN 7 WHEN 3 THEN 8 END
@@ -248,15 +271,41 @@
     </version>
 
     <!-- Hash Indexes and Clustered Columnstore indexes added in SQL2014 (version 12) -->
+     <!-- Maps to type column values https://learn.microsoft.com/sql/relational-databases/system-catalog-views/sys-indexes-transact-sql
+        0 = Heap
+        1 = Clustered rowstore (B-tree)
+        2 = Nonclustered rowstore (B-tree)
+        3 = XML
+        4 = Spatial
+        5 = Clustered columnstore index
+        6 = Nonclustered columnstore index
+        7 = Nonclustered hash index
+        8 = Vector
+        9 = JSON
+     -->
     <version min_major='12' cloud_min_major='12'>
        <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
-          CASE i.type WHEN 1 THEN 0 WHEN 4 THEN 4
-                      WHEN 3 THEN CASE xi.xml_index_type WHEN 0 THEN 2 WHEN 1 THEN 3 WHEN 2 THEN 7 WHEN 3 THEN 8 END
-                      WHEN 4 THEN 4 WHEN 6 THEN 5 WHEN 7 THEN 6 WHEN 5 THEN 9 ELSE 1 END
+          CASE i.type
+          WHEN 1 THEN 0
+          WHEN 4 THEN 4
+          WHEN 3 THEN
+            CASE xi.xml_index_type
+            WHEN 0 THEN 2
+            WHEN 1 THEN 3
+            WHEN 2 THEN 7
+            WHEN 3 THEN 8
+            END
+          WHEN 6 THEN 5
+          WHEN 7 THEN 6
+          WHEN 5 THEN 9
+          WHEN 8 THEN 11
+          WHEN 9 THEN 12
+          ELSE 1
+          END
        </property>
     </version>
 
-    <!-- Hash Indexes and Clustered Columnstore indexes added in SQL2014 (version 12) 
+    <!-- Hash Indexes and Clustered Columnstore indexes added in SQL2014 (version 12)
          SQL DW does not support xml indexes. -->
     <!-- IndexType: Looks up sys.indexes.type and returns an SMO index type
           SMO Index Type                SMO Value Sys.indexes.type
@@ -271,7 +320,7 @@
           (selective xml index)         7         3 (not supported for SQL DW)
           (selective xml index)         8         3 (not supported for SQL DW)
           ClusteredColumnStoreIndex     9         5 -->
-          
+
     <version datawarehouse_enabled='true'>
       <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>
         CASE i.type
@@ -315,17 +364,17 @@
         case when ((SELECT  MAX(data_compression) FROM sys.partitions  WHERE object_id = (CASE WHEN i.type = 4 THEN allobj.object_id ELSE i.object_id END) AND index_id = (CASE WHEN i.type = 4 THEN 1 ELSE i.index_id END)) &gt; 0) then 1 else 0 end
       </property>
     </version>
-      
+
     <version min_major='16'>
       <property name="HasXmlCompressedPartitions" type="bit" access='Read' cast='true' expensive='true'>
         case when ((SELECT  MAX(case when xml_compression = 1 then 1 else 0 end) FROM sys.partitions  WHERE object_id = (CASE WHEN i.type = 4 THEN allobj.object_id ELSE i.object_id END) AND index_id = (CASE WHEN i.type = 4 THEN 1 ELSE i.index_id END)) &gt; 0) then 1 else 0 end
       </property>
-    </version>    
+    </version>
 
      <!--Hekaton properties-->
     <version min_major ='12' cloud_min_major='12'>
       <property name="BucketCount" type="int" cast="true" read_only_after_creation="true">case when (i.type=7) then hi.bucket_count else 0 end</property>
-      <!--This returns true for indexes in memory optimized table or table type. -->  
+      <!--This returns true for indexes in memory optimized table or table type. -->
       <property name="IsMemoryOptimized" type="bit" cast="true" read_only_after_creation="true" expensive="true">
           CASE WHEN ((SELECT o.type FROM sys.objects o WHERE o.object_id=i.object_id)='U')
           THEN
@@ -346,7 +395,7 @@
          N''
       </property>
     </version>
-    
+
     <version min_major ='11' min_minor='0' min_build='2813' cloud_min_major='12'>
       <property name="IndexedXmlPathName" type="sysname" read_only_after_creation="true">
         ISNULL(indexedpaths.name, N'')
@@ -364,5 +413,14 @@
       <property name="IsOptimizedForSequentialKey" type="bit" cast="true" mode="design#deploy">ISNULL(INDEXPROPERTY(i.object_id, i.name, N'IsOptimizedForSequentialKey'), 0)</property>
     </version>
 
+    <!-- Vector Index properties added in SQL Server 2025 -->
+    <version min_major='17' max_major='17' min_minor='0' max_minor='0' max_build="949">
+      <property name="VectorIndexMetric" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">N''</property>
+      <property name="VectorIndexType" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">N''</property>
+    </version>
+    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+      <property name="VectorIndexMetric" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">ISNULL(vi.distance_metric, N'')</property>
+      <property name="VectorIndexType" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">ISNULL(vi.vector_index_type, N'')</property>
+    </version>
   </properties>
 </EnumObject>

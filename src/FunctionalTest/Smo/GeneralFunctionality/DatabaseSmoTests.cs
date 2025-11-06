@@ -692,6 +692,20 @@ end
         }
 
         [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
+        public void Database_FullTextEnabled_for_managed_instances()
+        {
+            // Despite the fact that full text is always enabled for managed instances,
+            // sys.databases.is_fulltext_enabled can occassionally be false
+            // (by design, as the field is obsolete).
+            // This test ensures that the SMO property is always true.
+            ExecuteFromDbPool((db) =>
+            {
+                Assert.That(db.IsFullTextEnabled, Is.True, "IsFullTextEnabled should be true for Managed Instances");
+            });
+        }
+
+        [TestMethod]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabase, DatabaseEngineEdition.SqlDataWarehouse)]
         public void Database_EnumMatchingSPs_returns_correct_URNs()
         {
@@ -988,14 +1002,10 @@ end
         {
             ExecuteFromDbPool(db =>
             {
-                if (db.CompatibilityLevel >= CompatibilityLevel.Version170)
-                {
-                    // needed to allow accelerated recovery to be disabled
-                    db.ExecuteNonQuery("ALTER DATABASE SCOPED CONFIGURATION SET OPTIMIZED_HALLOWEEN_PROTECTION = OFF");
-                }
                 db.AcceleratedRecoveryEnabled = true;
                 db.Alter();
-                db.Refresh();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AcceleratedRecoveryEnabled) });
+                db = db.Parent.Databases[db.Name];
                 var table = db.CreateTable("adr");
                 table.InsertDataToTable(200);
                 Assert.Multiple(() =>
@@ -1006,8 +1016,38 @@ end
                 });
                 db.AcceleratedRecoveryEnabled = false;
                 db.Alter();
-                db.Refresh();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AcceleratedRecoveryEnabled) });
+                db = db.Parent.Databases[db.Name];
                 Assert.That(db.AcceleratedRecoveryEnabled, Is.False, "AcceleratedRecoveryEnabled set to false by Alter");
+            });
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDataWarehouse)]
+        public void Database_accelerated_recovery_in_Azure()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                Assert.Multiple(() =>
+                {
+                    Assert.That(db.AcceleratedRecoveryEnabled, Is.True, "AcceleratedRecoveryEnabled is always true in Azure");
+                    Assert.That(db.PersistentVersionStoreFileGroup, Is.EqualTo("PRIMARY"), "Default persistent store file group");
+                });
+
+                // Setting ADR to false should be ignored in Azure.
+                db.AcceleratedRecoveryEnabled = false;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AcceleratedRecoveryEnabled) });
+                db = db.Parent.Databases[db.Name];
+                var table = db.CreateTable("adr");
+                table.InsertDataToTable(200);
+                Assert.Multiple(() =>
+                {
+                    Assert.That(db.AcceleratedRecoveryEnabled, Is.True, "AcceleratedRecoveryEnabled set to true by Alter");
+                    Assert.That(db.PersistentVersionStoreFileGroup, Is.EqualTo("PRIMARY"), "Default persistent store file group");
+                    Assert.That(db.PersistentVersionStoreSizeKB, Is.GreaterThan(0), "PersistentVersionStoreSizeKB");
+                });
             });
         }
 
@@ -1021,13 +1061,34 @@ end
             {
                 db.AcceleratedRecoveryEnabled = acceleratedRecoveryValue;
                 db.Alter();
-                db.Refresh();
-
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AcceleratedRecoveryEnabled) });
+                db = db.Parent.Databases[db.Name];
+                
                 // Accelerated recovery should always be 'true'
                 //
                 Assert.IsTrue(
                     db.AcceleratedRecoveryEnabled,
                     "AcceleratedRecoveryEnabled should always be true");
+            });
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 17)]
+        public void Database_Alter_toggles_optimized_locking()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                db.AcceleratedRecoveryEnabled = true;
+                db.OptimizedLockingOn = true;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.OptimizedLockingOn) });
+                db = db.Parent.Databases[db.Name];
+                Assert.That(db.OptimizedLockingOn, Is.True, "OptimizedLockingOn set to true by Alter");
+                db.OptimizedLockingOn = false;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.OptimizedLockingOn) });
+                db = db.Parent.Databases[db.Name];
+                Assert.That(db.OptimizedLockingOn, Is.False, "OptimizedLockingOn set to false by Alter");
             });
         }
 

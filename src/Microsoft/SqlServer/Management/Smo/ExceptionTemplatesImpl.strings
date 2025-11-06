@@ -490,6 +490,7 @@ UnexpectedIndexTypeDetected(string indexType) = Unexpected index type detected. 
 NoXmlIndexUnique = An XML index cannot be unique.
 NoXmlIndexClustered = An XML index cannot be clustered.
 UnsupportedNonXmlParameters=Cannot specify ParentXmlIndex or SecondaryXmlIndexType for non-XML indexes.
+UnsupportedNonVectorParameters=Cannot specify VectorIndexMetric or VectorIndexType for non-Vector indexes.
 CantSetDefaultFalse = The IsDefault property cannot be set to false. Please select another file group and try to make it default.
 TimeoutMustBePositive = A positive value must be supplied for the transaction termination time.
 NoPropertyChangeForDotNet(string propertyName) = The {0} property cannot be changed for .NET run-time routines.

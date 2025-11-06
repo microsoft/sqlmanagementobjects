@@ -16,6 +16,7 @@ namespace Microsoft.SqlServer.Management.Smo
     {
         /// <summary>
         /// Whether the specified type is supported by the specified server Version, Engine Type and Engine Edition.
+        /// Assumes the database is not a fabric database.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="serverVersion"></param>
@@ -23,6 +24,18 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="databaseEngineEdition"></param>
         /// <returns></returns>
         public static bool IsSupportedObject(Type type, ServerVersion serverVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition)
+            => IsSupportedObject(type, serverVersion, databaseEngineType, databaseEngineEdition, isFabricDatabase: false);
+
+        /// <summary>
+        /// Whether the specified type is supported by the specified server Version, Engine Type and Engine Edition.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="serverVersion"></param>
+        /// <param name="databaseEngineType"></param>
+        /// <param name="databaseEngineEdition"></param>
+        /// <param name="isFabricDatabase">True if the database is running in Microsoft Fabric</param>
+        /// <returns></returns>
+        public static bool IsSupportedObject(Type type, ServerVersion serverVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition, bool isFabricDatabase)
         {
             if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {
@@ -37,7 +50,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             return false;
                         case nameof(ExternalFileFormat):
                         case nameof(DatabaseScopedCredential):
-                            return true;
+                            return !isFabricDatabase;
                     }
                 }
                 else

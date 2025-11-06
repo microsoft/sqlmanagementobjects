@@ -16,6 +16,9 @@ using System.Collections.Specialized;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using NUnit.Framework;
+using System.Linq;
+using Microsoft.SqlServer.Management.Smo;
+using SFC = Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -140,13 +143,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 tb.Columns.Add(new _SMO.Column(tb, "c2", _SMO.DataType.Xml(string.Empty)) { Nullable = false });
 
                 NUnit.Framework.Assert.That(tb.Create, NUnit.Framework.Throws.Nothing, "Create table should succeed");
-                
+
                 db.ExecuteNonQuery($@"INSERT INTO {tb.Name}(ItemDate, ItemName,c2) VALUES
                                       ('20200110', 'Partition1January', '<data><elem>1</elem></data>'),
                                       ('20200215', 'Partition1February', '<data><elem>2</elem></data>'),
                                       ('20200320', 'Partition1March', '<data><elem>3</elem></data>'),
                                       ('20200402', 'Partition1April', '<data><elem>4</elem></data>')");
-                
+
                 _SMO.Index index = CreatePartitionedIndex(db, tb);
 
                 index.PhysicalPartitions[1].XmlCompression = _SMO.XmlCompressionType.On;
@@ -420,6 +423,91 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             table.Indexes.Add(pkIdx);
 
             table.Create();
+        }
+
+        /// <summary>
+        /// Verify vector index create script with just required parameters
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_CreateVectorIndex_RequiredProps()
+        {
+            Verify_Create_Vector_Index("cosine", "DiskANN");
+        }
+
+        /// <summary>
+        /// Verify vector index create script with filegroup specified
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_CreateVectorIndex_WithFilegroup()
+        {
+            Verify_Create_Vector_Index("cosine", "DiskANN", filegroup: "PRIMARY");
+        }
+
+        /// <summary>
+        /// Verify spatial index create script.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_CreateVectorIndex_AllProps()
+        {
+            Verify_Create_Vector_Index("euclidean", "DiskANN", m: 42, r: 43, l: 44);
+        }
+
+        private void Verify_Create_Vector_Index(string metric, string type, int? m = null, int? r = null, int? l = null, string filegroup = null)
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    _SMO.Table table = null;
+                    database.ExecuteNonQuery("ALTER DATABASE SCOPED CONFIGURATION SET PREVIEW_FEATURES = ON");
+                    try
+                    {
+                        // Create our table
+                        table = new _SMO.Table(database, "VectorIndexTable_" + Guid.NewGuid());
+                        table.Columns.Add(new _SMO.Column(table, "pk", _SMO.DataType.Int) { Nullable = false });
+                        table.Columns.Add(new _SMO.Column(table, "vecCol", _SMO.DataType.Vector(3)) { Nullable = false });
+
+                        _SMO.Index pkIdx = new _SMO.Index(table, "PK_" + table.Name) { IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey, IndexType = _SMO.IndexType.ClusteredIndex };
+                        pkIdx.IndexedColumns.Add(new _SMO.IndexedColumn(pkIdx, "pk"));
+                        table.Indexes.Add(pkIdx);
+                        table.Create();
+
+                        // Create the vector index
+                        _SMO.Index index = new _SMO.Index(table, "VectorIndex_" + table.Name)
+                        {
+                            IndexType = _SMO.IndexType.VectorIndex,
+                            VectorIndexMetric = metric,
+                            VectorIndexType = type
+                        };
+                        _SMO.IndexedColumn vectorColumn = new _SMO.IndexedColumn(index, "vecCol");
+                        index.IndexedColumns.Add(vectorColumn);
+                        if (filegroup != null)
+                        {
+                            index.FileGroup = filegroup;
+                        }
+                        index.Create();
+
+                        // Refresh to get a clean copy of the object from the server
+                        table.Indexes.ClearAndInitialize($"[@Name='{SFC.Urn.EscapeString(index.Name)}']", new string[] { nameof(_SMO.Index.VectorIndexMetric), nameof(_SMO.Index.VectorIndexType) });
+                        var newIndex = table.Indexes[index.Name];
+                        Assert.That(newIndex.IndexType, Is.EqualTo(IndexType.VectorIndex));
+                        Assert.That(newIndex.VectorIndexMetric, Is.EqualTo(index.VectorIndexMetric));
+                        Assert.That(newIndex.VectorIndexType, Is.EqualTo(index.VectorIndexType));
+                        Assert.That(newIndex.FileGroup, Is.EqualTo(index.FileGroup));
+                    }
+                    finally
+                    {
+                        table?.Drop();
+                    }
+            });
         }
 
         #endregion
@@ -1502,6 +1590,325 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                         //
                     }
                 });
+        }
+
+        /// <summary>
+        /// Tests creating a clustered columnstore index
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 12)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Index_CreateClusteredColumnstoreIndex()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table with several columns
+                var table = new _SMO.Table(database, "CreateClusteredColumnstoreIndex");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value1", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value2", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a clustered columnstore index
+                var index = new _SMO.Index(table, "CCS_Idx");
+                index.IndexType = _SMO.IndexType.ClusteredColumnStoreIndex;
+
+                // Add columns
+                var col1 = new _SMO.IndexedColumn(index, "Value1");
+                var col2 = new _SMO.IndexedColumn(index, "Value2");
+
+                index.IndexedColumns.Add(col1);
+                index.IndexedColumns.Add(col2);
+
+                // Script and verify the index creation T-SQL
+                var script = ScriptSmoObject(index);
+                Assert.That(script.NormalizeWhitespace(), Does.Contain("CREATE CLUSTERED COLUMNSTORE INDEX [CCS_Idx] ON [dbo].[CreateClusteredColumnstoreIndex]"), "incorrect in index script.");
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
+
+                index.Drop();
+                table.Drop();
+            });
+        }
+
+        /// <summary>
+        /// Tests creating a clustered columnstore index with an ORDER clause using ColumnStoreOrderOrdinal.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Index_CreateClusteredColumnstoreIndex_WithOrderClause_ColumnStoreOrderOrdinal()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table with several columns
+                var table = new _SMO.Table(database, "OCCI");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value1", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value2", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a clustered columnstore index with an ORDER clause
+                var index = new _SMO.Index(table, "CCI_Ordered_Idx");
+                index.IndexType = _SMO.IndexType.ClusteredColumnStoreIndex;
+
+                // Add columns and set ColumnStoreOrderOrdinal property
+                var col1 = new _SMO.IndexedColumn(index, "Value1");
+                var col2 = new _SMO.IndexedColumn(index, "Value2");
+
+                col1.ColumnStoreOrderOrdinal = 1; // First column in the ORDER clause
+                col2.ColumnStoreOrderOrdinal = 2; // Second column in the ORDER clause
+
+                index.IndexedColumns.Add(col1);
+                index.IndexedColumns.Add(col2);
+
+                // Script and verify the index creation T-SQL
+                var script = ScriptSmoObject(index);
+                Assert.That(script.NormalizeWhitespace(), Does.Contain("CREATE CLUSTERED COLUMNSTORE INDEX [CCI_Ordered_Idx] ON [dbo].[OCCI] ORDER ([Value1],[Value2])"), "ORDER clause not found or incorrect in index script.");
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCI_Ordered_Idx"));
+
+                index.Drop();
+                table.Drop();
+            });
+        }
+
+        /// <summary>
+        /// Tests creating a nonClustered columnstore index with an ORDER clause using ascending order.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Index_CreateNonClusteredColumnstoreIndex_WithOrderClause_ASC()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table with several columns
+                var table = new _SMO.Table(database, "ONCCIASC");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value1", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value2", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value3", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a nonclustered columnstore index with an ORDER clause
+                var index = new _SMO.Index(table, "NCCS_Ordered_Idx");
+                index.IndexType = _SMO.IndexType.NonClusteredColumnStoreIndex;
+
+                // Add columns and set ColumnStoreOrderOrdinal property
+                var col1 = new _SMO.IndexedColumn(index, "Value1");
+                var col2 = new _SMO.IndexedColumn(index, "Value2");
+                var col3 = new _SMO.IndexedColumn(index, "Value3");
+
+                col1.ColumnStoreOrderOrdinal = 1; // First column in the ORDER clause
+                col2.ColumnStoreOrderOrdinal = 2; // Second column in the ORDER clause
+                col3.ColumnStoreOrderOrdinal = 3; // Third column in the ORDER clause
+
+                index.IndexedColumns.Add(col1);
+                index.IndexedColumns.Add(col2);
+                index.IndexedColumns.Add(col3);
+
+                // Script and verify the index creation T-SQL
+                var script = ScriptSmoObject(index);
+                Assert.That(script.NormalizeWhitespace(), Does.Contain("CREATE NONCLUSTERED COLUMNSTORE INDEX [NCCS_Ordered_Idx] ON [dbo].[ONCCIASC] ( [Value1], [Value2], [Value3] )ORDER ([Value1],[Value2],[Value3])"), "ORDER clause not found or incorrect in index script.");
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("NCCS_Ordered_Idx"));
+
+                index.Drop();
+                table.Drop();
+            });
+        }
+
+        /// <summary>
+        /// Tests creating a nonClustered columnstore index with an ORDER clause using descending order.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Index_CreateNonClusteredColumnstoreIndex_WithOrderClause_DES()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table with several columns
+                var table = new _SMO.Table(database, "NCCSOrderedTable");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value1", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value2", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value3", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a nonclustered columnstore index with an ORDER clause
+                var index = new _SMO.Index(table, "NCCS_Ordered_Idx");
+                index.IndexType = _SMO.IndexType.NonClusteredColumnStoreIndex;
+
+                // Add columns and set ColumnStoreOrderOrdinal property
+                var col1 = new _SMO.IndexedColumn(index, "Value1");
+                var col2 = new _SMO.IndexedColumn(index, "Value2");
+                var col3 = new _SMO.IndexedColumn(index, "Value3");
+
+                col1.ColumnStoreOrderOrdinal = 3; // Thrid column in the ORDER clause
+                col2.ColumnStoreOrderOrdinal = 2; // Second column in the ORDER clause
+                col3.ColumnStoreOrderOrdinal = 1; // First column in the ORDER clause
+
+                index.IndexedColumns.Add(col1);
+                index.IndexedColumns.Add(col2);
+                index.IndexedColumns.Add(col3);
+
+                // Script and verify the index creation T-SQL
+                var script = ScriptSmoObject(index);
+                Assert.That(script.NormalizeWhitespace(), Does.Contain("CREATE NONCLUSTERED COLUMNSTORE INDEX [NCCS_Ordered_Idx] ON [dbo].[NCCSOrderedTable] ( [Value1], [Value2], [Value3] )ORDER ([Value3],[Value2],[Value1])"), "ORDER clause not found or incorrect in index script.");
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("NCCS_Ordered_Idx"));
+
+                index.Drop();
+                table.Drop();
+            });
+        }
+
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        public void Index_CreateClusteredColumnstoreIndex_WithCompressionDelay()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table
+                var table = new _SMO.Table(database, "CompressedTableForCCI");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a clustered columnstore index with specific options
+                var index = new _SMO.Index(table, "SmoBaselineVerification_CompressedColumnstoreIndexWithCompressionDelay");
+                index.IndexType = _SMO.IndexType.ClusteredColumnStoreIndex;
+                index.CompressionDelay = 0;
+                index.DropExistingIndex = false;
+                index.FileGroup = "PRIMARY";
+                table.Indexes.Add(index);
+
+                // Script and verify the index creation T-SQL
+                var script = ScriptSmoObject(index);
+
+                Assert.That(
+                    script.NormalizeWhitespace(),
+                    Does.Contain(
+                        "CREATE CLUSTERED COLUMNSTORE INDEX [SmoBaselineVerification_CompressedColumnstoreIndexWithCompressionDelay] ON [dbo].[CompressedTableForCCI] WITH (DROP_EXISTING = OFF, COMPRESSION_DELAY = 0) ON [PRIMARY]"
+                    ),
+                    "Clustered columnstore index script does not match expected T-SQL."
+                );
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("SmoBaselineVerification_CompressedColumnstoreIndexWithCompressionDelay"));
+
+                index.Drop();
+                table.Drop();
+            });
+        }
+
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Index_CreateClusteredColumnstoreIndex_WithInclude_NoClauseGenerate()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table with several columns
+                var table = new _SMO.Table(database, "CCIWithInclude");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value1", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value2", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a clustered columnstore index with INCLUDE columns (not supported)
+                var index = new _SMO.Index(table, "CCS_Idx");
+                index.IndexType = _SMO.IndexType.ClusteredColumnStoreIndex;
+
+                var col1 = new _SMO.IndexedColumn(index, "Value1");
+                var col2 = new _SMO.IndexedColumn(index, "Value2");
+                col1.IsIncluded = true;
+                col2.IsIncluded = true;
+
+                index.IndexedColumns.Add(col1);
+                index.IndexedColumns.Add(col2);
+
+                var script = ScriptSmoObject(index);
+
+                Assert.That(
+                    script.NormalizeWhitespace(),
+                    Does.Contain(
+                        "CREATE CLUSTERED COLUMNSTORE INDEX [CCS_Idx] ON [dbo].[CCIWithInclude] WITH (DROP_EXISTING = OFF, COMPRESSION_DELAY = 0)"
+                    ),
+                    "Clustered columnstore index script does not match expected T-SQL."
+                );
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
+
+                index.Drop();
+                table.Drop();
+            });
+        }
+
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 16)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Index_CreateNonClusteredColumnstoreIndex_WithInclude_NoClauseGenerate()
+        {
+            this.ExecuteFromDbPool(database =>
+            {
+                // Create a table with several columns
+                var table = new _SMO.Table(database, "NCCIWithInclude");
+                table.Columns.Add(new _SMO.Column(table, "Id", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value1", _SMO.DataType.Int) { Nullable = false });
+                table.Columns.Add(new _SMO.Column(table, "Value2", _SMO.DataType.Int) { Nullable = false });
+                table.Create();
+
+                // Create a clustered columnstore index with INCLUDE columns (not supported)
+                var index = new _SMO.Index(table, "CCS_Idx");
+                index.IndexType = _SMO.IndexType.NonClusteredColumnStoreIndex;
+
+                var col1 = new _SMO.IndexedColumn(index, "Value1");
+                var col2 = new _SMO.IndexedColumn(index, "Value2");
+                col1.IsIncluded = true;
+                col2.IsIncluded = true;
+
+                index.IndexedColumns.Add(col1);
+                index.IndexedColumns.Add(col2);
+
+                var script = ScriptSmoObject(index);
+
+                Assert.That(
+                    script.NormalizeWhitespace(),
+                    Does.Contain(
+                        "CREATE NONCLUSTERED COLUMNSTORE INDEX [CCS_Idx] ON [dbo].[NCCIWithInclude] ( [Value1], [Value2] )WITH (DROP_EXISTING = OFF, COMPRESSION_DELAY = 0)"
+                    ),
+                    "NonClustered columnstore index script does not match expected T-SQL."
+                );
+
+                index.Create();
+                table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
+
+                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
+
+                index.Drop();
+                table.Drop();
+            });
         }
 
         /// <summary>

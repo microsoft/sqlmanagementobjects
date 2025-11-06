@@ -41,7 +41,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         //                            Is it needed at all? Always?
         public void VerifyPositiveExternalDataSourceCreateAlterDropPolybase()
         {
-            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"hdfs://10.10.10.10:1100", @"wasbs://commondatabases@sqltoolstestsstorage.blob.core.windows.net/", @"wasbs://commondatabases2@sqltoolstestsstorage.blob.core.windows.net/" };
+            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"hdfs://10.10.10.10:1100", @"wasbs://commondatabases@ssmsteststorage.blob.core.windows.net/", @"wasbs://commondatabases2@ssmsteststorage.blob.core.windows.net/" };
             string[] externalDataSourceResourceManagerLocations = { @"10.10.10.10:1010", @"10.10.10.10:1111" }; // test-only value for the resource manager location; the create/drop DDLs don't connect to in
             string[] externalDataSourceCredentials = { "cred1", "cred]1" };
             string[] externalDataSourceNames = { "eds1", "eds[]1", "eds'1", "eds--1" };
@@ -88,7 +88,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteWithDbDrop("ExternalDataSourceSmo_",
                 database =>
                 {
-                    string[] externalDataSourceLocations = { "abc.xyz.com", "external-server-name", "one's computer", "wasbs://commondatabases2@sqltoolstestsstorage.blob.core.windows.net/" };
+                    string[] externalDataSourceLocations = { "abc.xyz.com", "external-server-name", "one's computer", "wasbs://commondatabases2@ssmsteststorage.blob.core.windows.net/" };
                     string[] externalDataSourceCredentials = { "cred1", "cred[]1", "cred'1" };
                     string[] externalDataSourceDatabaseNames = { "database1", "database'1", "database]" };
                     string[] externalDataSourceShardMapNames = { "shardmap1", " shard map '1" };
@@ -111,28 +111,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
-        // DEVNOTE(MatteoT) 7/7/2019. The following test is temporarily disabled (bug in new ExternalGenerics stuff? Or just a test bug?)
-        // <summary>
-        // Same as above, but for ExternalGenerics which are only supported on v150+
-        // </summary>
-        //[VSTest.TestMethod]
-        //[SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15, HostPlatform = HostPlatformNames.Linux)]
-        //[SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15, HostPlatform = HostPlatformNames.Windows)]
-        //[SqlTestArea(SqlTestArea.Polybase)]
-        //public void VerifyPositiveExternalDataSourceSQLv150Plus()
-        //{
-        //    this.ExecuteWithDbDrop("ExternalDataSourceSmo_",
-        //        database =>
-        //        {
-        //            string[] externalDataSourceLocations = { "sqlserver://127.0.0.1", "wasbs://commondatabases2@sqltoolstestsstorage.blob.core.windows.net/" };
-        //            string[] externalDataSourceCredentials = { "cred1", "cred[]1" };
-        //            string[] externalDataSourceDatabaseNames = { "database'1", "database]" };
-        //            string[] externalDataSourceNames = { "eds[]1", "--eds'1", };
-        //            // Create a few ExternalGenerics data sources.
-        //            VerifyPositiveExternalDataSourceCreateDropHelperGQ(database, ExternalDataSourceType.ExternalGenerics, externalDataSourceNames[0], externalDataSourceLocations[0], externalDataSourceDatabaseNames[0], null, externalDataSourceCredentials[0]);
-        //            VerifyPositiveExternalDataSourceCreateDropHelperGQ(database, ExternalDataSourceType.ExternalGenerics, externalDataSourceNames[1], externalDataSourceLocations[1], externalDataSourceDatabaseNames[1], null, externalDataSourceCredentials[1]);
-        //        });
-        //}
 
         /// <summary>
         /// Tests dropping an external data source with IF EXISTS option through SMO on SQL16 and later.
@@ -456,9 +434,15 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             // Change database context to test database, as external data source and database credential require test database context.
             // connection.ChangeDatabase(db.Name);
 
-            externalDataSource.Location = externalDataSourceLocation;
-            externalDataSource.DatabaseName = externalDataSourceDatabaseName;
-
+            if (externalDataSource.IsSupportedProperty(nameof(ExternalDataSource.Location)))
+            {
+                // Set the location property.
+                externalDataSource.Location = externalDataSourceLocation;
+            }
+            if (externalDataSource.IsSupportedProperty(nameof(ExternalDataSource.DatabaseName)))
+            {
+                externalDataSource.DatabaseName = externalDataSourceDatabaseName;
+            }
             const string DatabaseCredentialQuery = @"IF NOT EXISTS (SELECT * FROM sys.database_scoped_credentials WHERE name = '{0}') BEGIN CREATE DATABASE SCOPED CREDENTIAL [{1}] WITH IDENTITY = 'Test' END";
 
             db.ExecuteNonQuery(
@@ -617,7 +601,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         public void VerifyNegativeExternalDataSourceCreateAlterDropPolybase()
         {
 
-            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"wasbs://commondatabases@sqltoolstestsstorage.blob.core.windows.net/" };
+            string[] externalDataSourceLocations = { @"hdfs://10.10.10.10:1000", @"wasbs://commondatabases@ssmsteststorage.blob.core.windows.net/" };
             string[] externalDataSourceResourceManagerLocations = { @"10.10.10.10:1010", @"10.10.10.10:1111" };
 
             this.ExecuteWithDbDrop(this.TestContext.TestName,

@@ -805,6 +805,8 @@ using System.Data.SqlClient;
             return this.ConnectionContext.ConnectionProtocol;
         }
 
+        internal bool IsFabricConnection => ConnectionContext.IsFabricServer;
+
         internal bool IsCurrentConnectionStandardLogin(string name)
         {
             if( !this.ConnectionContext.LoginSecure &&

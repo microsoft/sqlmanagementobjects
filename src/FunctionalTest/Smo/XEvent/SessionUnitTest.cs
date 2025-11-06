@@ -483,34 +483,42 @@ ADD TARGET package0.ring_buffer
 
         public void TestSessionNameUpdate()
         {
+            var initialCount = store.Sessions.Count;
             string guid = Guid.NewGuid().ToString();
             string sessionName = "XEventSessionTest" + guid;
 
             Session session = store.CreateSession(sessionName);
+            Session session2 = null;
             Assert.AreEqual("XEventSessionTest" + guid, session.Name);
             session.AddEvent("sqlserver.lock_deadlock");
-            session.Create();
+            try
+            {
+                session.Create();
 
-            Session session2 = store.CreateSession(sessionName);
-            Assert.AreEqual("XEventSessionTest" + guid, session.Name);
-            session2.AddEvent("sqlserver.lock_deadlock");
+                session2 = store.CreateSession(sessionName);
+                Assert.AreEqual("XEventSessionTest" + guid, session.Name);
+                session2.AddEvent("sqlserver.lock_deadlock");
 
-            // Try to create another session with same name and fail
-            var ex = Assert.Throws<SfcCRUDOperationFailedException>(() => session2.Create(), "Creating XEvent session with same name should throw an exception");
-            Assert.That(ex.InnerException.InnerException.Message, Contains.Substring("  Choose a unique name for the event session."),
-                        "Unique name for XEvent exception should be thrown");
+                // Try to create another session with same name and fail
+                var ex = Assert.Throws<SfcCRUDOperationFailedException>(() => session2.Create(), "Creating XEvent session with same name should throw an exception");
+                Assert.That(ex.InnerException.InnerException.Message, Contains.Substring("  Choose a unique name for the event session."),
+                            "Unique name for XEvent exception should be thrown");
 
-            guid = Guid.NewGuid().ToString();
-            session2.Name = "XEventSessionTest2" + guid;
-            var expectedCreateString = $@"CREATE EVENT SESSION [{session2.Name}]";
+                guid = Guid.NewGuid().ToString();
+                session2.Name = "XEventSessionTest2" + guid;
+                var expectedCreateString = $@"CREATE EVENT SESSION [{session2.Name}]";
 
-            session2.Create();
-            Assert.AreEqual(store.Sessions.Count, 2, "Number of sessions created should be 2");
-            Assert.IsTrue(store.Sessions[session2.Name] != null, "New session not present in Sessions collection");
-            Assert.That(session2.ScriptCreate().ToString().Contains(expectedCreateString), "Generated Create script is not same as expected string!");
+                session2.Create();
 
-            session.Drop();
-            session2.Drop();
+                Assert.AreEqual(initialCount + 2, store.Sessions.Count, "Number of sessions created should be 2");
+                Assert.IsTrue(store.Sessions[session2.Name] != null, "New session not present in Sessions collection");
+                Assert.That(session2.ScriptCreate().ToString().Contains(expectedCreateString), "Generated Create script is not same as expected string!");
+            }
+            finally
+            {
+                session.Drop();
+                session2?.Drop();
+            }
         }
     }
 }

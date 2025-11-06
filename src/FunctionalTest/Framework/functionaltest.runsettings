@@ -2,7 +2,8 @@
 <!-- File name extension must be .runsettings -->
 <RunSettings>
   <TestRunParameters>
-    <Parameter name="SqlTestTargetServersFilter" value="Sql2008;Sql2008R2;Sql2012;Sql2014;Sql2016;Sql2017;AzureSterlingV12;AzureSterlingV12_SqlDW;AzureSterlingV12_SqlOnDemand;Sqlv150;Sql2016Express;Sql2017Express;Sqlv150Express;Sqlv150Linux;Sqlv160Linux;Sqlv160;Sqlv160Express;SqlManagedInstance;SqlDatabaseEdge;Sqlv170;Sqlv170Express" />
+  <!-- Note you need to run "fab auth login" to have the FabricDatabase;FabricWarehouse; entries in the filter for local test runs -->
+    <Parameter name="SqlTestTargetServersFilter" value="Sql2014;Sql2016;Sql2017;AzureSterlingV12;AzureSterlingV12_SqlDW;AzureSterlingV12_SqlOnDemand;Sqlv150;Sql2016Express;Sql2017Express;Sqlv150Express;Sqlv150Linux;Sqlv160Linux;Sqlv160;Sqlv160Express;SqlManagedInstance;SqlDatabaseEdge;Sqlv170;Sqlv170Express" />
   </TestRunParameters>
   <DataCollectionRunSettings>
     <DataCollectors>

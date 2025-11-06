@@ -306,6 +306,18 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             return m_conctx.IsContainedAuthentication;
         }
 
+        /// <summary>
+        /// Returns true if the connection is to a Fabric Database or Fabric Warehouse
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsFabricConnection(object con) => new ExecuteSql(con).IsFabricConnection();
+
+        /// <summary>
+        /// Returns true if the current connection is to a Fabric Database or Fabric Warehouse
+        /// </summary>
+        /// <returns></returns>
+        public bool IsFabricConnection() => m_conctx.IsFabricServer;
+
         internal string GetHostPlatform()
         { 
             return m_conctx.HostPlatform;

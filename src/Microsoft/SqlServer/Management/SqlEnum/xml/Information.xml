@@ -387,5 +387,14 @@
       <property name="ReservedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'ReservedStorageSizeMB' )</property>
       <property name="UsedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'UsedStorageSizeMB' )</property>
     </version>
+
+    <!-- Fabric properties -->
+    <version min_major='7' datawarehouse_enabled='true'>
+      <property name="IsFabricServer" type="bit" cast="true" access="read">0</property>
+    </version>
+    <version cloud_min_major="12">
+      <!-- 12 == fabric db,  11 is either Synapse Serverless or Fabric DW depending on @@version -->
+      <property name="IsFabricServer" type="bit" cast="true" access="read">case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end</property>
+    </version>
   </properties>
 </EnumObject>

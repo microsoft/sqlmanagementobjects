@@ -200,7 +200,7 @@
       <property name="ID" generate="true" is_intrinsic="false" />
       <property name="IndexSpaceUsage" generate="true" is_intrinsic="false" />
       <property name="IsAccessible" generate="true" is_intrinsic="false" />
-      <property name="IsFabricDatabase" generate="true" is_intrinsic="false" />
+      <property name="IsFabricDatabase" generate="false" is_intrinsic="false" />
       <property name="IsDatabaseSnapshot" generate="true" is_intrinsic="false" />
       <property name="IsDatabaseSnapshotBase" generate="true" is_intrinsic="false" />
       <property name="IsDbAccessAdmin" generate="true" is_intrinsic="false" />
@@ -245,14 +245,14 @@
                     reference_template_parameters are the properties of this object that are passed into the URN template
                         in case of multiple keys, use a comma separated list, such as "Parent.Name,Schema,Name"
                     reference_keys only need to be specified for multi-key references, such as "Schema,Name" (not needed in this case)
-                    
+
                     In case of a custom resolver:
                     =============================
-                    
+
                     reference_template specifies: "resolver:<type>"
-                    
+
                     <type> : a fully qualified type name that implements:
-                    
+
                     Resolve()
                     ResolveUrn()
 
@@ -302,6 +302,7 @@
       <property name="MirroringRedoQueueMaxSize" generate="true" is_intrinsic="false" />
       <property name="MirroringTimeout" generate="true" is_intrinsic="false" />
       <property name="LastDifferentialBackupDate" generate="true" is_intrinsic="true" />
+      <property name="OptimizedLockingOn" generate="true" is_intrinsic="false" />
 
       <!-- HADR Properties-->
       <property name="AvailabilityGroupName" generate="true" is_intrinsic="true" />
@@ -309,9 +310,9 @@
       <property name="HasFullBackup" generate="false" is_intrinsic="false" />
 
       <!-- Hekaton properties-->
-      <property name="HasMemoryOptimizedObjects" generate="true" is_intrinsic="false"/>
-      <property name="MemoryAllocatedToMemoryOptimizedObjectsInKB" generate="true" is_intrinsic="false"/>
-      <property name="MemoryUsedByMemoryOptimizedObjectsInKB" generate="true" is_intrinsic="false"/>
+      <property name="HasMemoryOptimizedObjects" generate="true" is_intrinsic="false" />
+      <property name="MemoryAllocatedToMemoryOptimizedObjectsInKB" generate="true" is_intrinsic="false" />
+      <property name="MemoryUsedByMemoryOptimizedObjectsInKB" generate="true" is_intrinsic="false" />
 
       <!-- SQL-XI properties -->
       <property name="HasFileInCloud" generate="true" is_intrinsic="false" />
@@ -354,7 +355,7 @@
 
       <!-- Catalog Collation -->
       <property name="CatalogCollation" generate ="false" is_intrinsic="false" />
-      
+
       <property name="LastGoodCheckDbTime" generate="true" is_intrinsic="false" />
 
       <!-- Accelerated Database Recovery (ADR) new for 2019+ -->
@@ -842,7 +843,7 @@
       <property name="FileStreamPartitionScheme" generate="true" is_intrinsic="true" reference_type="PartitionScheme" reference_template="Server[@Name='{0}']/Database[@Name='{1}']/PartitionScheme[@Name='{2}']" reference_template_parameters="Parent.Parent.ConnectionContext.TrueName,Parent.Name,FileStreamPartitionScheme" />
       <property name="HasAfterTrigger" generate="true" is_intrinsic="false" />
       <property name="HasClusteredIndex" generate="true" is_intrinsic="false" />
-      <property name="HasPrimaryClusteredIndex" generate="true" is_intrinsic="false" />	  
+      <property name="HasPrimaryClusteredIndex" generate="true" is_intrinsic="false" />
       <property name="HasClassifiedColumn" generate="true" is_intrinsic="false" />
       <property name="HasClusteredColumnStoreIndex" generate="true" is_intrinsic="false" />
       <property name="HasNonClusteredIndex" generate="true" is_intrinsic="false" />
@@ -942,7 +943,7 @@
       <property name="Collation" generate="true" is_intrinsic="true" />
       <property name="Computed" generate="true" is_intrinsic="true" />
       <property name="ComputedText" generate="true" is_intrinsic="true" />
-      <!-- 
+      <!--
         This is an example of a custom resolver. Note generate="false". In this case
         the resolver was implemented manually.
         See the TODO near SfcReferenceAttribute in SfcAttributes.cs (code marker !SR!)
@@ -991,7 +992,7 @@
       <property name="ColumnEncryptionKeyName" generate="true" is_intrinsic="false" />
       <property name="IsMasked" generate="true" is_intrinsic="false" />
       <property name="MaskingFunction" generate="true" is_intrinsic="false" />
-      <!-- Data classification properties-->	  
+      <!-- Data classification properties-->
       <property name="IsClassified" generate="true" is_intrinsic="false" />
       <property name="SensitivityLabelId" generate="true" is_intrinsic="false" />
       <property name="SensitivityLabelName" generate="true" is_intrinsic="false" />
@@ -1003,6 +1004,8 @@
       <property name="IsDistributedColumn" generate="true"/>
       <!-- SQL GraphDB properties-->
       <property name="GraphType" generate="true" is_intrinsic="false"/>
+      <property name="VectorDimensions" generate="false" is_intrinsic="true"/>
+      <property name="VectorBaseType" generate="false" is_intrinsic="true"/>
     </object>
     <object class_name="SensitivityClassification" collection_name="SensitivityClassifications" urn="Server[@Name='']/Database/SensitivityClassification" parent_type="SqlSmoObject" >
       <property name="SensitivityLabelId" generate="true" is_intrinsic="false" />
@@ -1112,6 +1115,10 @@
       <property name="CompressionDelay" generate="false" is_intrinsic="false"/>
       <property name="ResumableOperationState" generate="true" is_intrinsic="true" />
       <property name="IsOptimizedForSequentialKey" generate="true" is_intrinsic="false" />
+
+      <!--Vector Index properties-->
+      <property name="VectorIndexMetric" generate="true" is_intrinsic="true" />
+      <property name="VectorIndexType" generate="true" is_intrinsic="true" />
 
       <!--Hekaton properties-->
       <property name="BucketCount" generate="true" is_intrinsic="false"/>
@@ -1397,6 +1404,8 @@
       <property name="XmlDocumentConstraint" generate="false" is_intrinsic="false" />
       <property name="XmlSchemaNamespace" generate="false" is_intrinsic="false" />
       <property name="XmlSchemaNamespaceSchema" generate="false" is_intrinsic="false" />
+      <property name="VectorDimensions" generate="false" is_intrinsic="true" />
+      <property name="VectorBaseType" generate="false" is_intrinsic="true" />
       <property name="IsReadOnly" generated="false" is_intrinsic="false" />
     </object>
     <object class_name="StoredProcedureParameter" collection_name="Parameters" urn="Server[@Name='']/Database/StoredProcedure/Param" is_design_mode="true" parent_type="StoredProcedure" parent_mode="Design" has_constructors="true" has_schema="false" new_on_get_parent="false" gen_body="none,sprocparam_ctor">
@@ -1413,6 +1422,8 @@
       <property name="NumericScale" generate="false" is_intrinsic="true" />
       <property name="SystemType" generate="false" is_intrinsic="true" />
       <property name="UserType" generate="false" is_intrinsic="true" />
+      <property name="VectorDimensions" generate="false" is_intrinsic="true"/>
+      <property name="VectorBaseType" generate="false" is_intrinsic="true"/>
       <property name="XmlDocumentConstraint" generate="false" is_intrinsic="true" />
       <property name="XmlSchemaNamespace" generate="false" is_intrinsic="true" />
       <property name="XmlSchemaNamespaceSchema" generate="false" is_intrinsic="true" />
@@ -1524,7 +1535,8 @@
       <property name="IsSchemaOwned" generate="true" is_intrinsic="false" />
       <property name="InlineType" generate="true" is_intrinsic="false"/>
       <property name="IsInlineable" generate="true" is_intrinsic="false"/>
-
+      <property name="VectorDimensions" generate="false" is_intrinsic="true"/>
+      <property name="VectorBaseType" generate="false" is_intrinsic="true"/>
       <!--Hekaton properties-->
       <property name="IsNativelyCompiled" generate="true" is_intrinsic="false" />
     </object>
@@ -1540,6 +1552,8 @@
       <property name="NumericScale" generate="false" is_intrinsic="true" />
       <property name="SystemType" generate="false" is_intrinsic="true" />
       <property name="UserType" generate="false" is_intrinsic="true" />
+      <property name="VectorDimensions" generate="false" is_intrinsic="true"/>
+      <property name="VectorBaseType" generate="false" is_intrinsic="true"/>
       <property name="XmlDocumentConstraint" generate="false" is_intrinsic="true" />
       <property name="XmlSchemaNamespace" generate="false" is_intrinsic="true" />
       <property name="XmlSchemaNamespaceSchema" generate="false" is_intrinsic="true" />
@@ -1611,7 +1625,7 @@
     </object>
 
     <!--End: Edge constraint def-->
-    
+
     <object class_name="UserOptions" urn="Server[@Name='']/UserOption" is_design_mode="true" singleton="true" has_constructors="false">
       <property name="AbortOnArithmeticErrors" generate="true" is_intrinsic="false" default="false"/>
       <property name="AbortTransactionOnError" generate="true" is_intrinsic="false" default="false"/>
@@ -1682,6 +1696,7 @@
       <property name="ServiceTier" generate="true" is_intrinsic="false"/>
       <property name="ReservedStorageSizeMB" generate="true" is_intrinsic="false"/>
       <property name="UsedStorageSizeMB" generate="true" is_intrinsic="false"/>
+      <property name="IsFabricServer" generate="true" is_intrinsic="false"/>
     </object>
     <object class_name="ServerProxyAccount" urn="Server[@Name='']/ServerProxyAccount" singleton="true" parent_type="Server" has_constructors="false">
       <property name="IsEnabled" generate="true" is_intrinsic="false" />
@@ -1956,6 +1971,8 @@
       <property name="RequestMemoryGrantTimeoutInSeconds" generate="true" is_intrinsic="false" />
       <property name="MaximumDegreeOfParallelism" generate="true" is_intrinsic="false" />
       <property name="ExternalResourcePoolName" generate="true" is_intrinsic="false" />
+      <property name="GroupMaximumTempdbDataMB" generate="true" is_intrinsic="false" default="-1" />
+      <property name="GroupMaximumTempdbDataPercent" generate="true" is_intrinsic="false" default="-1" />
       <property name="PolicyHealthState" generate="false" is_intrinsic="false" />
     </object>
     <object class_name="SmartAdmin" urn="Server[@Name='']/SmartAdmin" is_design_mode="true" singleton="true" has_constructors="true">
@@ -1988,6 +2005,7 @@
       <property name="RequiredSynchronizedSecondariesToCommit" generate="true" />
       <property name="IsManagedInstanceLink" generate="true" default="false" />
       <property name="IsContained" generate="true" default="false"/>
+      <property name="ClusterConnectionOptions" generate="true"/>
     </object>
 
     <object class_name="AvailabilityReplica" collection_name="AvailabilityReplicas" urn="Server[@Name='']/AvailabilityGroup/AvailabilityReplica" parent_type="AvailabilityGroup" >
@@ -2214,7 +2232,7 @@
     <object class_name="WorkloadManagementWorkloadClassifier" collection_name="WorkloadManagementWorkloadClassifiers" urn="Server[@Name='']/Database/WorkloadManagementWorkloadClassifier" parent_type="Database" is_design_mode="true" has_constructors="true">
       <property name="Id" generate="true" is_intrinsic="false"/>
       <property name="GroupName" generate="true" is_intrinsic="false"/>
-      <property name="Name" generate="true" is_intrinsic="false"/>  
+      <property name="Name" generate="true" is_intrinsic="false"/>
       <property name="Importance" generate="true" is_intrinsic="false"/>
       <property name="MemberName" generate="true" is_intrinsic="false"/>
       <property name="WlmLabel" generate="true" is_intrinsic="false"/>
@@ -2222,7 +2240,7 @@
       <property name="StartTime" generate="true" is_intrinsic="false"/>
       <property name="EndTime" generate="true" is_intrinsic="false"/>
     </object>
-  
+
 
     <object class_name="WorkloadManagementWorkloadGroup" collection_name="WorkloadManagementWorkloadGroups" urn="Server[@Name='']/Database/WorkloadManagementWorkloadGroup" parent_type="Database" is_design_mode="true" has_constructors="true">
       <property name="CapPercentageResource" generate="true" is_intrinsic="false"/>

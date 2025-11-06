@@ -230,6 +230,21 @@ namespace Microsoft.SqlServer.Management.Smo
             this.DoCustomAction(script, ExceptionTemplates.ForceFailoverFailed(this.Parent.Name, this.Name));
         }
 
+        /// <summary>
+        /// Method to append key/value pairs to the ClusterConnectionOptions property.
+        /// </summary>
+        public void SetClusterConnectionOptions(string key, string value) 
+        {
+            string oldValue = (string)GetPropValueOptional(nameof(ClusterConnectionOptions));
+            if (string.IsNullOrWhiteSpace(oldValue))
+            {
+                ClusterConnectionOptions = $";{key}={value};";
+            }
+            else 
+            {
+                ClusterConnectionOptions += $";{key}={value};";
+            }
+        }
         #endregion Failover Members
 
         #region ICreatable Members
@@ -366,6 +381,7 @@ namespace Microsoft.SqlServer.Management.Smo
              *          | DB_FAILOVER = { ON | OFF }
              *          | FAILURE_CONDITION_LEVEL = { 1 | 2 | 3 | 4 | 5 }
              *          | HEALTH_CHECK_TIMEOUT = milliseconds
+             *          | CLUSTER_CONNECTION_OPTIONS = 'key_value_pairs>[;...]'
              *
              * <replica_spec> ::=
              *      'server_instance' WITH
@@ -428,6 +444,7 @@ namespace Microsoft.SqlServer.Management.Smo
              * | [ BASIC | DISTRIBUTED ]
              * | REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT = { integer }
              * | CLUSTER_TYPE = { WSFC | EXTERNAL | NONE } 
+             * | CLUSTER_CONNECTION_OPTIONS = 'key_value_pairs>[;...]'
              *
              * <add_replica_spec>::=
              * <server_instance> WITH
@@ -813,6 +830,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal static readonly string AvailabilityGroupOn = "AVAILABILITY GROUP ON";
         internal static readonly string ContainedScript = "CONTAINED";
         internal static readonly string ReuseSystemDatabasesScript = "REUSE_SYSTEM_DATABASES";
+        internal static readonly string ClusterConnectionOptionsScript = "CLUSTER_CONNECTION_OPTIONS";
 
         //Property names
         internal const string AutomatedBackupPreferencePropertyName = "AutomatedBackupPreference";
@@ -825,7 +843,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal const string RequiredSynchronizedSecondariesToCommitPropertyName = "RequiredSynchronizedSecondariesToCommit";
         internal const string DistributedPropertyName = nameof(IsDistributedAvailabilityGroup);
         internal const string IsContainedPropertyName = nameof(IsContained);
-
+        internal const string ClusterConnectionOptionsPropertyName = nameof(ClusterConnectionOptions);
 
         //Automated backup preference scripts
         internal static readonly string PrimaryScript = "PRIMARY";
@@ -862,7 +880,10 @@ namespace Microsoft.SqlServer.Management.Smo
             RequiredSynchronizedSecondariesToCommitPropertyName,
 
             // SQL 2022+
-            IsContainedPropertyName
+            IsContainedPropertyName,
+
+            // SQL 2025+
+            ClusterConnectionOptionsPropertyName
         };
 
         /// <summary>
@@ -899,7 +920,10 @@ namespace Microsoft.SqlServer.Management.Smo
             DtcSupportEnabledPropertyName,
 
             // SQL 2017+
-            RequiredSynchronizedSecondariesToCommitPropertyName
+            RequiredSynchronizedSecondariesToCommitPropertyName,
+
+            // SQL 2025+
+            ClusterConnectionOptionsPropertyName
         };
 
         internal static string GetAvailabilityGroupClusterType(AvailabilityGroupClusterType availabilityGroupClusterType)
@@ -1042,6 +1066,17 @@ namespace Microsoft.SqlServer.Management.Smo
                              script.Append(DistributedScript);
                          }
                          break;
+
+                    case ClusterConnectionOptionsPropertyName:
+                        if (ClusterConnectionOptions != null) {
+                            script.Append($"{ClusterConnectionOptionsScript} = ");
+                            script.Append(
+                                string.IsNullOrWhiteSpace(ClusterConnectionOptions)
+                                ? "''"
+                                : SqlSmoObject.MakeSqlString(ClusterConnectionOptions));
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -1114,6 +1149,25 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         #endregion
+    }
+
+
+    /// <summary>
+    /// Constants for available keys and values for ClusterConnectionOptions property of an Availability Group.
+    /// </summary>
+    public static class ClusterConnectionOptionsConstants
+    {
+        public const string EncryptKey = "Encrypt";
+        public const string HostNameInCertificateKey = "HostNameInCertificate";
+        public const string TrustServerCertificateKey = "TrustServerCertificate";
+        public const string ServerCertificateKey = "ServerCertificate";
+
+        public const string EncryptValueStrict = "Strict";
+        public const string EncryptValueMandatory = "Mandatory";
+        public const string EncryptValueOptional = "Optional";
+
+        public const string TrustServerCertificateValueYes = "Yes";
+        public const string TrustServerCertificateValueNo = "No";
     }
 }
 

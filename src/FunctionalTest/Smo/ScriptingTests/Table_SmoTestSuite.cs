@@ -4067,19 +4067,23 @@ AS NODE ON [PRIMARY]
 
         #region Vector column tests
         /// <summary>
-        /// This test verifies that JSON column is correctly scripted for insert statements.
+        /// This test verifies that vector column is correctly scripted for insert statements.
         /// </summary>
         [TestMethod]
-        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        // TODO: Azure and MI currently don't support the 2-parameter vector declaration. That will be
+        // enabled soon, and we aren't planning on being backwards compatible with the 1-param version so
+        // for now just disable this test.
+        // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/4698232
+        // [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
         public void ScriptingInsertTableWithVectorColumnTest()
         {
             ExecuteFromDbPool(
                 this.TestContext.FullyQualifiedTestClassName,
                 (database) =>
                 {
-                    if (database.Parent.ServerType != DatabaseEngineType.Standalone || database.Parent.VersionMajor > 17)
+                    if (database.Parent.ServerType != DatabaseEngineType.Standalone || database.Parent.VersionMajor >= 17)
                     {
                         string queryMatch = @"INSERT \[.*\]\.\[.*\] \(\[vectorColumn\]\) VALUES \(CAST\(N'\[0\.0000000e\+000,0\.0000000e\+000\]' AS Vector\(2\)\)\)";
 

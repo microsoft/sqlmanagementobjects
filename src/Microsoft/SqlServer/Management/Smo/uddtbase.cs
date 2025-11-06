@@ -314,6 +314,10 @@ END
         /// <returns></returns>
         static private string GetTypeDefinitionScript(ScriptingPreferences sp, SqlSmoObject oObj, string sTypeNameProperty, bool bSquareBraketsForNative)
         {
+            // SMO_NEW_DATATYPE
+            // Add logic for generating the type definition script
+            // Note the "TypeAllows*" methods below, which correspond to the relevant properties of a type. New types should be added
+            // to those methods for any that are relevant (and new methods added for new properties)
             StringBuilder sb = new StringBuilder();
 
             PropertyCollection p = oObj.Properties;
@@ -417,16 +421,7 @@ END
                         throw new PropertyNotSetException("Length");
                     }
                     var length = (Int32)oLength;
-                    if (sType == "vector")
-                    {
-                        // Temporary workaround to convert the length of the column to the dimensions for vector types
-                        // until sys.columns is updated to include the dimensions of the vector type.
-                        // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/3906463
-                        // dimensions = (length - 8) / 4
-                        // https://learn.microsoft.com/sql/t-sql/data-types/vector-data-type
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "({0})", (length - 8) / 4);
-                    }
-                    else if (length != 0)
+                    if (length != 0)
                     {
                         if ((sType == "varchar" || sType == "nvarchar" || sType == "varbinary") && length < 0)
                         {
@@ -436,6 +431,23 @@ END
                         {
                             sb.AppendFormat(SmoApplication.DefaultCulture, "({0})", oLength);
                         }
+                    }
+                }
+                else if (sType == "vector")
+                {
+                    object oDimensions = p.Get("VectorDimensions").Value;
+                    if (null == oDimensions)
+                    {
+                        throw new PropertyNotSetException("VectorDimensions");
+                    }
+                    object oBaseType = p.Get("VectorBaseType").Value;
+                    if (string.IsNullOrEmpty(oBaseType?.ToString()))
+                    {
+                        sb.Append($"({oDimensions})");
+                    }
+                    else
+                    {
+                        sb.Append($"({oDimensions}, {oBaseType})");
                     }
                 }
                 else if (true == UserDefinedDataType.TypeAllowsPrecisionScale(sType, oObj.StringComparer))
@@ -577,10 +589,10 @@ END
         /// <param name="oObj"></param>
         /// <param name="sp"></param>
         /// <returns></returns>
-        static internal bool IsSystemType(SqlSmoObject oObj, ScriptingPreferences sp)
+        internal static bool IsSystemType(SqlSmoObject oObj, ScriptingPreferences sp)
         {
-            String type = oObj.Properties.Get("DataType").Value as string;
-            return DataType.IsSystemDataType(DataType.SqlToEnum(type), sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition);
+            var type = oObj.Properties.Get("DataType").Value as string;
+            return DataType.IsSystemDataType(DataType.SqlToEnum(type), sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition, oObj.GetServerObject().ConnectionContext.IsFabricServer);
         }
 
         /// <summary>
@@ -796,8 +808,7 @@ END
                 0 == comparer.Compare(type, "binary") ||
                 0 == comparer.Compare(type, "varbinary") ||
                 0 == comparer.Compare(type, "nchar") ||
-                0 == comparer.Compare(type, "char") ||
-                0 == comparer.Compare(type, "vector"))
+                0 == comparer.Compare(type, "char"))
             {
                 return true;
             }

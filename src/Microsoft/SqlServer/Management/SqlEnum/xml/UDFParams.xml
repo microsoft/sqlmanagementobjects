@@ -4,7 +4,7 @@
 		<parent_link>
 			<link parent="ID" local="ParentID" />
 		</parent_link>
-		
+
 		<version min_major='7' max_major='8'>
 			<property_link table='syscolumns' alias='param'>param.number = 1 or (param.number = 0 and 1 = OBJECTPROPERTY(param.id, N'IsScalarFunction') and isnull(param.name, '') != '')</property_link>
 		</version>
@@ -17,6 +17,10 @@
 		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="IsReadOnly" type="bit" mode="design">param.is_readonly</property>
 		</version>
-		<include file='parameter.xml'/>	
+		<version min_major='17' cloud_min_major='12'>
+			<property name="VectorDimensions" type="int" mode="design">ISNULL(param.vector_dimensions, 0)</property>
+			<property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(param.vector_base_type_desc, N'')</property>
+		</version>
+		<include file='parameter.xml'/>
 	</properties>
 </EnumObject>

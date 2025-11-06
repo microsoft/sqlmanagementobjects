@@ -391,43 +391,22 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             this.scriptChangeTracking = ConvertBooleanToBooleanTypeOption(scriptingOptions.ScriptChangeTracking);
             this.scriptDataCompressionOptions = ConvertBooleanToBooleanTypeOption(scriptingOptions.ScriptDataCompressionOptions);
             this.scriptXmlCompressionOptions = ConvertBooleanToBooleanTypeOption(scriptingOptions.ScriptXmlCompressionOptions);
-            this.sourceEngineEdition = smoObject.DatabaseEngineEdition;
-            this.sourceEngineType = smoObject.DatabaseEngineType;
+            if (smoObject != null)
+            {
+                this.sourceEngineEdition = smoObject.DatabaseEngineEdition;
+                this.sourceEngineType = smoObject.DatabaseEngineType;
+            }
             LoadDestinationOptions(scriptingOptions, smoObject);
         }
 
         void LoadDestinationOptions(IScriptPublishOptions scriptingOptions, Smo.SqlSmoObject smoObject)
         {
             var smoOptions = smoObject == null ? scriptingOptions.GetSmoScriptingOptions() : scriptingOptions.GetSmoScriptingOptions(smoObject);
-            switch (smoOptions.TargetServerVersion)
-            {
-                case Smo.SqlServerVersion.Version90:
-                    this.compatMode = ScriptCompatibilityOptions.Script90Compat;
-                    break;
-                case Smo.SqlServerVersion.Version100:
-                case Smo.SqlServerVersion.Version105:
-                    this.compatMode = ScriptCompatibilityOptions.Script100Compat;
-                    break;
-                case Smo.SqlServerVersion.Version110:
-                    this.compatMode = ScriptCompatibilityOptions.Script110Compat;
-                    break;
-                case Smo.SqlServerVersion.Version120:
-                    this.compatMode = ScriptCompatibilityOptions.Script120Compat;
-                    break;
-                case Smo.SqlServerVersion.Version130:
-                    this.compatMode = ScriptCompatibilityOptions.Script130Compat;
-                    break;
-                case Smo.SqlServerVersion.Version140:
-                    this.compatMode = ScriptCompatibilityOptions.Script140Compat;
-                    break;
-                case Smo.SqlServerVersion.Version150:
-                    this.compatMode = ScriptCompatibilityOptions.Script150Compat;
-                    break;
-                case Smo.SqlServerVersion.Version160:
-                default:
-                    compatMode = ScriptCompatibilityOptions.Script160Compat;
-                    break;
-            }
+            // 105 is a special case since there isn't a 105 compat level, it maps to 100 instead.
+            // Otherwise we can directly map the enum values (with an offset of -2 since they start at different places)
+            this.compatMode = smoOptions.TargetServerVersion == Smo.SqlServerVersion.Version105 ?
+                ScriptCompatibilityOptions.Script100Compat :
+                (ScriptCompatibilityOptions)((int)smoOptions.TargetServerVersion - 2);
 
             this.TargetDatabaseEngineType = ScriptDatabaseEngineType.SingleInstance;
 

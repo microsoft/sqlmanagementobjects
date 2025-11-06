@@ -3,7 +3,7 @@
 
 using System;
 using System.Diagnostics;
-
+using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.SqlParser.Metadata;
 
 namespace Microsoft.SqlServer.Management.SmoMetadataProvider
@@ -11,6 +11,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
     class RelationalIndex : Index, IRelationalIndex
     {
         private readonly Utils.IndexedColumnCollectionHelper columnCollection;
+        private readonly Utils.OrderedColumnCollectionHelper orderedColumnsCollection;
         private IUniqueConstraintBase m_indexKey;
 
         public RelationalIndex(Database database, IDatabaseTable parent, Smo.Index smoIndex)
@@ -23,6 +24,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
             Debug.Assert(!Utils.IsXmlIndex(smoIndex), "SmoMetadataProvider Assert", "SMO index should not be XML!");
 
             this.columnCollection = new Utils.IndexedColumnCollectionHelper(database, parent, this.m_smoIndex.IndexedColumns);
+            this.orderedColumnsCollection = new Utils.OrderedColumnCollectionHelper(database, parent, this.m_smoIndex.IndexedColumns);
         }
 
         public override T Accept<T>(IMetadataObjectVisitor<T> visitor)
@@ -85,6 +87,14 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
         public IMetadataOrderedCollection<IIndexedColumn> IndexedColumns
         {
             get { return this.columnCollection.MetadataCollection; }
+        }
+
+        public IMetadataOrderedCollection<IOrderedColumn> OrderedColumns
+        {
+            get
+            {
+                return this.orderedColumnsCollection.MetadataCollection;
+            }
         }
 
         public IUniqueConstraintBase IndexKey

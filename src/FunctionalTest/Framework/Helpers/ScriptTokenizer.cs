@@ -307,7 +307,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             str = TokenizeStrippedValues(str);
 
             // The Azure DB might have been created separately from the test run and have different collation
-            if (database.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse)
+            if (database.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && database.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase && !database.IsFabricDatabase)
             {
                 var catalogCollationTypeConverter = TypeDescriptor.GetConverter(typeof(CatalogCollationType));
                 

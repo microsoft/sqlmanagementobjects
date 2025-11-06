@@ -229,6 +229,17 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                 return false;
             }
 
+            if (Edition != DatabaseEngineEdition.Unknown && Edition != serverDescriptor.DatabaseEngineEdition)
+            {
+                return false;
+            }
+            if (!string.IsNullOrEmpty(HostPlatform) && !string.IsNullOrEmpty(serverDescriptor.HostPlatform))
+            {
+                if (string.Compare(HostPlatform, serverDescriptor.HostPlatform, StringComparison.OrdinalIgnoreCase) != 0)
+                {
+                    return false;
+                }
+            }
             var serverVersion = new Version(serverDescriptor.MajorVersion, 0);
             Version minVersion = new Version(MinMajor, MinMinor, MinBuild, MinRevision);
             Version maxVersion = new Version(MaxMajor, MaxMinor, MaxBuild, MaxRevision);

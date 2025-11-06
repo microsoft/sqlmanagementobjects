@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-namespace Microsoft.SqlServer.Management.Smo
-{
-    using System;
-    using System.Data;
-    using System.Globalization;
+using System;
+using System.Data;
+using System.Globalization;
 #if STRACE
     using Microsoft.SqlServer.Management.Diagnostics;
 #endif
-    using Microsoft.SqlServer.Management.Common;
-    using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
 
+namespace Microsoft.SqlServer.Management.Smo
+{
     internal class PostProcessDatabaseInsideAttribs : PostProcessWithRowCaching
     {
         string databaseName = string.Empty;
@@ -138,18 +138,21 @@ namespace Microsoft.SqlServer.Management.Smo
             var sb = new StatementBuilder();
 
             BuildCommonSql(sb);
+            
+            var isFabricDW = ExecuteSql.IsFabricConnection(ConnectionInfo) && ExecuteSql.GetDatabaseEngineEdition(ConnectionInfo) == DatabaseEngineEdition.SqlOnDemand;
 
+            // In Fabric DW, sys.database_files is not accessible.
             if ( GetIsFieldHit("SpaceAvailable") || GetIsFieldHit("Size") )
             {
-                sb.AddProperty("DbSize", "(SELECT SUM(CAST(df.size as float)) FROM sys.database_files AS df WHERE df.type in ( 0, 2, 4 ) )");
+                sb.AddProperty("DbSize", isFabricDW ? "CAST(0 as float)" : "(SELECT SUM(CAST(df.size as float)) FROM sys.database_files AS df WHERE df.type in ( 0, 2, 4 ) )");
             }
             if ( GetIsFieldHit("SpaceAvailable") )
             {
-                sb.AddProperty("SpaceUsed", "(SUM(a.total_pages) + (SELECT ISNULL(SUM(CAST(df.size as bigint)), 0) FROM sys.database_files AS df WHERE df.type = 2 ))");
+                sb.AddProperty("SpaceUsed", isFabricDW ? "0" : "(SUM(a.total_pages) + (SELECT ISNULL(SUM(CAST(df.size as bigint)), 0) FROM sys.database_files AS df WHERE df.type = 2 ))");
             }
             if ( GetIsFieldHit("Size") )
             {
-                sb.AddProperty("LogSize", "(SELECT SUM(CAST(df.size as float)) FROM sys.database_files AS df WHERE df.type in (1, 3))");
+                sb.AddProperty("LogSize", isFabricDW ? "CAST(0 as float)" : "(SELECT SUM(CAST(df.size as float)) FROM sys.database_files AS df WHERE df.type in (1, 3))");
                 // Determine whether this is a Hyperscale edition and save it for later use.
                 // DEVNOTE(MatteoT): we could have compute the property without checking the database engine type,
                 //                   this making the code a little cleaner. However, that would have been at  the
@@ -191,17 +194,17 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if ( GetIsFieldHit("MemoryAllocatedToMemoryOptimizedObjectsInKB"))
             {
-                sb.AddProperty("MemoryAllocatedToMemoryOptimizedObjectsInKB", @"isnull((select convert(decimal(18,2),(sum(tms.memory_allocated_for_table_kb) + sum(tms.memory_allocated_for_indexes_kb))) 
+                sb.AddProperty("MemoryAllocatedToMemoryOptimizedObjectsInKB", isFabricDW ? "0.00" :  @"isnull((select convert(decimal(18,2),(sum(tms.memory_allocated_for_table_kb) + sum(tms.memory_allocated_for_indexes_kb))) 
                                                                                 from [sys].[dm_db_xtp_table_memory_stats] tms), 0.00)");
             }
             if ( GetIsFieldHit("MemoryUsedByMemoryOptimizedObjectsInKB"))
             {
-                sb.AddProperty("MemoryUsedByMemoryOptimizedObjectsInKB", @"isnull((select convert(decimal(18,2),(sum(tms.memory_used_by_table_kb) + sum(tms.memory_used_by_indexes_kb))) 
+                sb.AddProperty("MemoryUsedByMemoryOptimizedObjectsInKB",  isFabricDW ? "0.00" : @"isnull((select convert(decimal(18,2),(sum(tms.memory_used_by_table_kb) + sum(tms.memory_used_by_indexes_kb))) 
                                                                            from [sys].[dm_db_xtp_table_memory_stats] tms), 0.00)");
             }
             if (GetIsFieldHit("HasFileInCloud"))
             {
-                sb.AddProperty("HasFileInCloud", @"ISNULL ((select top 1 1 from sys.database_files
+                sb.AddProperty("HasFileInCloud", isFabricDW ? "0" : @"ISNULL ((select top 1 1 from sys.database_files
                                                     where state = 0 and physical_name like 'https%' collate SQL_Latin1_General_CP1_CI_AS), 0)");
             }
             if (GetIsFieldHit("DataSpaceUsage") || GetIsFieldHit("IndexSpaceUsage"))
@@ -242,7 +245,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (ExecuteSql.IsContainedAuthentication(this.ConnectionInfo))
                 {
                     sb.AddProperty("PrimaryFilePath", "(select ISNULL(df.physical_name, N'') from sys.database_files as df where df.data_space_id = 1 and df.file_id = 1)");
-                }                
+                }
             }
             if (GetIsFieldHit("MaxDop"))
             {
