@@ -38,8 +38,18 @@ title git %BASEDIR%
 
 dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
 dotnet tool install --global Microsoft.SqlPackage
+
+REM Download nuget.exe if it doesn't exist
+IF NOT EXIST %BASEDIR%Build\Local\Nuget\nuget.exe (
+  IF NOT EXIST %BASEDIR%Build\Local\Nuget (
+    mkdir %BASEDIR%Build\Local\Nuget
+  )
+  echo Downloading nuget.exe...
+  powershell -Command "Invoke-WebRequest -Uri 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile '%BASEDIR%Build\Local\Nuget\nuget.exe'"
+)
+
 IF NOT EXIST %BASEDIR%packages\StrawberryPerl.5.28.0.1\bin\perl.exe (
-  %BASEDIR%Build\Local\Nuget\nuget.exe install StrawberryPerl -Version 5.28.0.1
+  %BASEDIR%Build\Local\Nuget\nuget.exe install StrawberryPerl -Version 5.28.0.1 -OutputDirectory %BASEDIR%packages
 )
 
 echo.
