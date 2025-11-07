@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalLanguageFile" impl_type="SqlObject" min_major='15'>
+    <settings>
+        <parent_link>
+            <link parent="ID" local="ParentID" />
+        </parent_link>
+        <property_link table='sys.external_language_files AS lfiles' />
+        <property_link fields='#Owner#' join='sys.external_languages AS language'>lfiles.external_language_id = language.external_language_id</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="ParentID" type="int" hidden="true">lfiles.external_language_id</property>
+        <property name="FileName" type="nvarchar" size="266">lfiles.file_name</property>
+        <property name="ContentFromFile" type="nvarchar" size="266">COALESCE(NULL , '')</property>
+        <property name="ContentFromBinary" type="image">lfiles.content</property>
+        <property name="Parameters" type="nvarchar" size="4000" access="Read">lfiles.parameters</property>
+        <property name="Platform" type="tinyint" report_type="ExternalLanguageFilePlatform">lfiles.platform</property>
+        <property name="EnvironmentVariables" type="nvarchar" size="4000" access="Read">lfiles.environment_variables</property>
+        <property name="IsSystemNamed" type="bit" cast='true' access='Read'>1</property>
+        <property name="Name" type="nvarchar" access="Read">CONCAT(lfiles.file_name, '_', lfiles.platform)</property>
+    </properties>
+</EnumObject>

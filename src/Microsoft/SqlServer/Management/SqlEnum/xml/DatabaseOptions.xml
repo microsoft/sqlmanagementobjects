@@ -1,0 +1,133 @@
+<?xml version="1.0" ?>
+<EnumObject type="Database" impl_type="Database" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <settings>
+        <version min_major='9' >
+            <property_link fields = '#MirroringRedoQueueMaxSize#MirroringTimeout#'
+					left_join='sys.database_mirroring AS dmi'>dmi.database_id = dtb.database_id</property_link>
+        </version>
+        <version min_major='8' max_major='8'>
+            <property_link fields='#DatabaseOwnershipChaining#' join='master.dbo.spt_values AS v'>v.name = 'db chaining'</property_link>
+        </version>
+        <!-- add this empty prefix to force inclusion of the sysdatabases table from the parent-->
+        <prefix>
+            <link_multiple no='1' expression="">
+                <link_field type='parent' field="ID" />
+            </link_multiple>
+        </prefix>
+      <version min_major='15'>
+        <prefix fields='#DataRetentionEnabled#'>
+          create table #temp_data_retention_property2 (db_id int not null, is_data_retention_enabled bit)
+
+          if serverproperty('engineedition') = 9
+          exec sp_executesql N'insert into #temp_data_retention_property2
+          select dr_db.database_id, dr_db.is_data_retention_enabled
+          from sys.databases dr_db'
+        </prefix>
+
+        <postfix fields='#DataRetentionEnabled#'>
+          drop table #temp_data_retention_property2
+        </postfix>
+      </version>
+        <version min_major='8' max_major='8'>
+            <post_process fields = '#DatabaseOwnershipChaining#'
+              class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+              triggered_fields='#DatabaseNameOptions#'/>
+        </version>
+    </settings>
+    <properties>
+        <version min_major='15'>
+            <!--  Property only available on SQL EDGE i.e EngineEdition == 9 -->
+            <property name="DataRetentionEnabled" type="bit" cast='true'>ISNULL((select is_data_retention_enabled from #temp_data_retention_property2 as tdrp where tdrp.db_id = dtb.database_id),0)</property>
+        </version>
+        <version min_major='12'>
+            <property name="AutoCreateStatisticsIncremental" type="bit">dtb.is_auto_create_stats_incremental_on</property>
+        </version>
+
+        <version min_major='7' max_major='8'>
+            <property name="AutoClose" type="bit" cast='true'>dtb.status &amp; 1</property>
+            <property name="AutoShrink" type="bit" cast='true'>dtb.status &amp; 4194304</property>
+        </version>
+
+        <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+            <property name="AnsiNullDefault" type="bit">dtb.is_ansi_null_default_on</property>
+            <property name="AnsiNullsEnabled" type="bit">dtb.is_ansi_nulls_on</property>
+            <property name="AnsiPaddingEnabled" type="bit">dtb.is_ansi_padding_on</property>
+            <property name="AnsiWarningsEnabled" type="bit">dtb.is_ansi_warnings_on</property>
+            <property name="ArithmeticAbortEnabled" type="bit">dtb.is_arithabort_on</property>
+            <property name="AutoCreateStatistics" type="bit">dtb.is_auto_create_stats_on</property>
+            <property name="AutoShrink" type="bit">dtb.is_auto_shrink_on</property>
+            <property name="AutoUpdateStatistics" type="bit">dtb.is_auto_update_stats_on</property>
+            <property name="CloseCursorsOnCommitEnabled" type="bit">dtb.is_cursor_close_on_commit_on</property>
+            <property name="ConcatenateNullYieldsNull" type="bit">dtb.is_concat_null_yields_null_on</property>
+            <property name="NumericRoundAbortEnabled" type="bit">dtb.is_numeric_roundabort_on</property>
+            <property name="QuotedIdentifiersEnabled" type="bit">dtb.is_quoted_identifier_on</property>
+            <property name="ReadOnly" type="bit">dtb.is_read_only</property>
+            <property name="RecursiveTriggersEnabled" type="bit">dtb.is_recursive_triggers_on</property>
+            <property name="LocalCursorsDefault" type="bit">dtb.is_local_cursor_default</property>
+            <property name="PageVerify" type="tinyint" report_type = 'PageVerify'>dtb.page_verify_option</property>
+            <property name="RecoveryModel" type="int" report_type="RecoveryModel">dtb.recovery_model</property>
+            <property name="UserAccess" type="int" report_type = 'DatabaseUserAccess'>dtb.user_access</property>
+            <property name="SnapshotIsolationState" type="tinyint" report_type="SnapshotIsolationState" access="Read">dtb.snapshot_isolation_state</property>
+            <property name="DatabaseOwnershipChaining" type="bit">dtb.is_db_chaining_on</property>
+            <property name="AutoUpdateStatisticsAsync" type="bit">dtb.is_auto_update_stats_async_on</property>
+            <property name="DateCorrelationOptimization" type="bit">dtb.is_date_correlation_on</property>
+            <property name="BrokerEnabled" type="bit">dtb.is_broker_enabled</property>
+            <property name="Trustworthy" type="bit">dtb.is_trustworthy_on</property>
+            <property name="IsParameterizationForced" type="bit">dtb.is_parameterization_forced</property>
+        </version>
+        <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+          <property name="AutoClose" type="bit">dtb.is_auto_close_on</property>
+	</version>
+	<version min_major='9'>
+          <property name="MirroringRedoQueueMaxSize" type="int" access="read">ISNULL((case dmi.mirroring_redo_queue_type when N'UNLIMITED' then 0 else dmi.mirroring_redo_queue end),0)</property>
+          <property name="MirroringTimeout" type="int">ISNULL(dmi.mirroring_connection_timeout,0)</property>
+        </version>
+        <version min_major='8' max_major='8'>
+            <property name="AnsiNullDefault" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsAnsiNullDefault')</property>
+            <property name="AnsiNullsEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsAnsiNullsEnabled')</property>
+            <property name="AnsiPaddingEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsAnsiPaddingEnabled')</property>
+            <property name="AnsiWarningsEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsAnsiWarningsEnabled')</property>
+            <property name="ArithmeticAbortEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsArithmeticAbortEnabled')</property>
+            <property name="AutoCreateStatistics" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsAutoCreateStatistics')</property>
+            <property name="AutoUpdateStatistics" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsAutoUpdateStatistics')</property>
+            <property name="CloseCursorsOnCommitEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsCloseCursorsOnCommitEnabled')</property>
+            <property name="ConcatenateNullYieldsNull" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsNullConcat')</property>
+            <property name="NumericRoundAbortEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsNumericRoundAbortEnabled')</property>
+            <property name="QuotedIdentifiersEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsQuotedIdentifiersEnabled')</property>
+            <property name="ReadOnly" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsReadOnly')</property>
+            <property name="RecursiveTriggersEnabled" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsRecursiveTriggersEnabled')</property>
+            <property name="LocalCursorsDefault" type="bit" cast='true'>DATABASEPROPERTYEX(dtb.name, 'IsLocalCursorsDefault')</property>
+            <property name="PageVerify" type="tinyint" report_type = 'PageVerify'>CASE WHEN 1=DATABASEPROPERTYEX(dtb.name, 'IsTornPageDetectionEnabled') THEN 1 ELSE 0 END</property>
+            <property name="RecoveryModel" type="int"
+				report_type="RecoveryModel">CASE DATABASEPROPERTYEX(dtb.name, 'Recovery') WHEN 'SIMPLE' THEN 3 WHEN 'BULK_LOGGED' THEN 2 ELSE /*FULL*/ 1 END</property>
+            <property name="UserAccess" type="int"
+				report_type = 'DatabaseUserAccess'>CASE CONVERT(sysname,DATABASEPROPERTYEX(dtb.name, 'UserAccess')) WHEN 'SINGLE_USER' THEN 1 WHEN 'RESTRICTED_USER' THEN 2 ELSE /*MULTI_USER*/ 0 END</property>
+            <property name="DatabaseOwnershipChaining" type="bit" cast='true' expensive='true'>
+                case when (dtb.status2 &amp; v.number != 0) then 1 else 0 end
+            </property>
+            <property name="DatabaseNameOptions" type="sysname" hidden='true'>dtb.name</property>
+        </version>
+
+        <version min_major='7' max_major='7'>
+            <property name="AnsiNullDefault" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsAnsiNullDefault')</property>
+            <property name="AnsiNullsEnabled" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsAnsiNullsEnabled')</property>
+            <property name="AnsiWarningsEnabled" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsAnsiWarngingsEnabled')</property>
+            <property name="AutoCreateStatistics" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsAutoCreateStatistics')</property>
+            <property name="AutoUpdateStatistics" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsAutoUpdateStatistics')</property>
+            <property name="CloseCursorsOnCommitEnabled" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsCloseCursorsOnCommitEnabled')</property>
+            <property name="QuotedIdentifiersEnabled" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsQuotedIdentifiersEnabled')</property>
+            <property name="RecursiveTriggersEnabled" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsRecursiveTriggersEnabled')</property>
+            <property name="LocalCursorsDefault" type="bit" cast='true'>DATABASEPROPERTY(dtb.name, 'IsLocalCursorsDefault')</property>
+            <property name="RecoveryModel" type="int" report_type="RecoveryModel">
+                CASE WHEN 1=DATABASEPROPERTY(dtb.name, 'IsTruncLog') THEN CASE WHEN 1=DATABASEPROPERTY(dtb.name, 'IsBulkCopy') THEN NULL ELSE 3/*SIMPLE=trunc. log on chkpt.*/ END
+                WHEN 1=DATABASEPROPERTY(dtb.name, 'IsBulkCopy') THEN 2 /*BULK_LOGGED*/
+                ELSE 1 END /*FULL*/
+            </property>
+            <property name="UserAccess" type="int" report_type = 'DatabaseUserAccess'>
+                CASE DATABASEPROPERTY(dtb.name, 'IsSingleUser') WHEN 1 THEN 1
+                ELSE (CASE DATABASEPROPERTY(dtb.name,'IsDboOnly') WHEN 0 THEN 0/*MULTI_USER*/ ELSE 1 END)
+                END
+            </property>
+        </version>
+    </properties>
+</EnumObject>

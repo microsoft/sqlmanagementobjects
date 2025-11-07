@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<EnumObject type="DefaultConstrain" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<parent_link>
+			<link local='ID' parent='ColumnDefaultID' />
+		</parent_link>
+	
+		<version min_major='7' max_major='8'>
+			<property_link table="dbo.sysobjects AS cstr">cstr.xtype='D' and cstr.name not like N'#%%' and 0!=convert(bit,cstr.category &amp; 0x0800)</property_link>
+		</version>
+		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link join="sys.default_constraints AS cstr"/>
+		</version>
+    <version min_major='11'>
+      <property_link fields='#IsFileTableDefined#' left_join='sys.filetable_system_defined_objects AS filetableobj'>filetableobj.object_id = cstr.object_id</property_link>
+    </version>
+	</settings>
+	<properties>
+		<include file='inc_constraint.xml' for='#Urn#Name#ID#CreateDate#IsSystemNamed#' />
+		<include file='inc_fulltext.xml' alias='cstr' />
+		<property name="ParentNumber" type='smallint' hidden='true'>0</property>		
+
+		<!-- extended properties support-->		
+		<version min_major='8' max_major='8'>
+			<property name="ObjectTypeName" type="sysname" hidden='true'>N'CONSTRAINT'</property>		
+			<property name="ParentObjName" type="sysname" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ParentObjName" />
+				</link_multiple>
+			</property>
+			<property name="ParentOwner" type="sysname" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ParentOwner" />
+				</link_multiple>
+			</property>
+			<property name="ParentObjectSchemaFromFilter" type="sysname" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ParentObjectSchemaFromFilter" />
+				</link_multiple>
+			</property>
+			<property name="ParentObjectTypeName" type="sysname" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ParentObjectTypeName" />
+				</link_multiple>
+			</property>
+			<property name="ParentObjectNameFromFilter" type="sysname" hidden='true'>
+				<link_multiple no='1' expression="{0}">
+					<link_field type='parent' field="ParentObjectNameFromFilter" />
+				</link_multiple>
+			</property>
+		</version>
+    <version min_major='11'>
+      <property name="IsFileTableDefined" type="bit" cast='true' access="read">CASE WHEN filetableobj.object_id IS NULL THEN 0 ELSE 1 END</property>
+    </version>
+    <version min_major='7' max_major='10' cloud_min_major='12'  datawarehouse_enabled='true'>
+      <property name="IsFileTableDefined" type="bit" cast='true' access="read">0</property>
+    </version>
+	</properties>
+</EnumObject>

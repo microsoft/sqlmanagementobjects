@@ -1,0 +1,29 @@
+<?xml version='1.0' ?>
+<EnumObject type='SoapEndpoints' impl_type='SqlObject' min_major='9'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="EndpointID" />
+		</parent_link>
+	
+		<property_link table='sys.soap_endpoints' alias='se'/>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='DefaultDatabase' type='sysname'>ISNULL(se.default_database, N'')</property>
+		<property name='IsSqlBatchesEnabled' type='bit'>se.is_sql_language_enabled</property>
+		<property name='DefaultNamespace' type='nvarchar' size = '384'>se.default_namespace</property>
+		<property name="XmlFormatOption" type="int" report_type="XmlFormatOption" >2-convert(int, se.is_xml_charset_enforced)</property>
+		<property name="XsdSchemaOption" type="int" cast="true" report_type="XsdSchemaOption" >se.default_result_schema</property>
+		<property name='WsdlGeneratorProcedure' type='nvarchar' size = '776'>se.wsdl_generator_procedure</property>
+		<property name="WsdlGeneratorOption" type="int" cast="true" report_type="WsdlGeneratorOption" >case LEN(ISNULL(se.wsdl_generator_procedure,'')) when 0 then 0 else 2 end</property>
+		<property name='IsSessionEnabled' type='bit'>se.is_session_enabled</property>
+		<property name='SessionTimeout' type='int'>se.session_timeout</property>
+		<property name='SessionNeverTimesOut' type='bit' cast='true'>CASE WHEN se.session_timeout &lt; 0 THEN 1 ELSE 0 END</property>
+		
+		<property name='EndpointID' type='int' hidden='true'>se.endpoint_id</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when se.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>

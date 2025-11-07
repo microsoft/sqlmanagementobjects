@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="PartitionFunctionParameter" impl_type="SqlObject" min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='sys.partition_parameters AS spp' />
+		<property_link fields='#Name#' join='sys.types AS st'>st.system_type_id = st.user_type_id and spp.system_type_id = st.system_type_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="BaseTypeHidden" />
+			</link_multiple>
+		</property>
+		<property name="ID" type="int" access='Read'>spp.parameter_id</property>
+		<property name="ParentID" type="int" hidden="true">spp.function_id</property>
+		<property name="Collation" type="sysname">ISNULL(spp.collation_name,N'')</property>
+		<include file='inc_type.xml' for='#Length#NumericPrecision#NumericScale#' alias='spp'/>
+	</properties>
+</EnumObject>

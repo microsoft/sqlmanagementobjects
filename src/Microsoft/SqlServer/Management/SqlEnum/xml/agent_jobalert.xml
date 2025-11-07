@@ -1,0 +1,11 @@
+<?xml version='1.0' ?>
+<EnumObject type='sysalerts' impl_type='SqlObject' min_major='7'>
+	<settings>
+		<parent_link>
+			<link local='JobID' parent='JobID'/>
+		</parent_link>
+	</settings>
+	<properties>
+		<include file='agent_alert.xml' />
+	</properties>
+</EnumObject>

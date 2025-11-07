@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <AssemblyMajorVersion Condition="'$(AssemblyMajorVersion)'==''">18</AssemblyMajorVersion>
+    <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'=='' and '$(GacVersion)' == 'true'">0</AssemblyMinorVersion>
+    <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'==''">100</AssemblyMinorVersion>
+    <AssemblyBuildVersion Condition="'$(LocalBuildVersion)'!=''">$(LocalBuildVersion)</AssemblyBuildVersion>
+    <AssemblyBuildRevision Condition="'$(LocalBuildRevision)'!=''">$(LocalBuildRevision)</AssemblyBuildRevision>
+    <AssemblyBuildVersion Condition="'$(AssemblyBuildVersion)'==''">0</AssemblyBuildVersion>
+    <AssemblyBuildRevision Condition="'$(AssemblyBuildRevision)'==''">0</AssemblyBuildRevision>
+    <AssemblyFileVersion Condition="'$(AssemblyFileVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</AssemblyFileVersion>
+    <!-- Source link will append the most recent branch commit id to the informational version -->
+    <InformationalVersion>$(AssemblyFileVersion)</InformationalVersion>
+    <FileVersion>$(AssemblyFileVersion)</FileVersion>
+    <Version>$(AssemblyFileVersion)</Version>
+    <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">0</PackageMajorVersionIncrement>
+    <PackageVersion Condition="'$(PackageVersion)' == ''">$(AssemblyMajorVersion)$(PackageMajorVersionIncrement).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</PackageVersion>
+    <AssemblyVersion Condition="'$(AssemblyVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).0.0</AssemblyVersion>
+  </PropertyGroup>
+</Project>

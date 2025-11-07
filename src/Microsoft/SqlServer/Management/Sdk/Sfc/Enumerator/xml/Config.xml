@@ -1,0 +1,1046 @@
+<?xml version="1.0"?>
+<objects>
+
+  <!-- XEvent object model declarations -->
+  <object type="XEStore" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="XEStore.xml">
+    <object type="Package" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="Package.xml">
+      <object type="EventInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="EventInfo.xml">
+        <object type="EventColumnInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="EventColumnInfo.xml" />
+        <object type="DataEventColumnInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="DataEventColumnInfo.xml" />
+        <object type="ReadOnlyEventColumnInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="ReadOnlyEventColumnInfo.xml" />
+      </object>
+      <object type="ActionInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="ActionInfo.xml">
+      </object>
+      <object type="TargetInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="TargetInfo.xml">
+        <object type="TargetColumnInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="TargetColumnInfo.xml">
+        </object>
+      </object>
+      <object type="TypeInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="TypeInfo.xml">
+      </object>
+      <object type="MapInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="MapInfo.xml">
+        <object type="MapValueInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="MapValueInfo.xml">
+        </object>
+      </object>
+      <object type="PredSourceInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="PredSourceInfo.xml">
+      </object>
+      <object type="PredCompareInfo" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="PredCompareInfo.xml">
+      </object>
+    </object>
+
+    <object type="Session" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="Session.xml">
+      <object type="Event" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="Event.xml">
+        <object type="Action" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="Action.xml" />
+        <object type="EventField" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="EventField.xml" />
+      </object>
+      <object type="Target" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="Target.xml">
+        <object type="TargetField" assembly="Microsoft.SqlServer.Management.XEventEnum" implement="Microsoft.SqlServer.Management.XEvent.XEventObject" cfg="TargetField.xml" />
+      </object>
+    </object>
+  </object>
+
+  <!-- Azure Storage enumerator -->
+  <object type="AzureStorage" assembly="Microsoft.SqlServer.AzureStorageEnum" implement="Microsoft.SqlServer.Management.Smo.AzureStorageEnum.AzureStorage">
+    <object type="Container" assembly="Microsoft.SqlServer.AzureStorageEnum" implement="Microsoft.SqlServer.Management.Smo.AzureStorageEnum.Container">
+      <object type="Blob" assembly="Microsoft.SqlServer.AzureStorageEnum" implement="Microsoft.SqlServer.Management.Smo.AzureStorageEnum.Blob" />
+    </object>
+  </object>
+  
+  <!-- Azure Ssis Ir enumerator -->
+  <object type="SsisIr" assembly="Microsoft.SqlServer.Management.SsisIrEnum" implement="Microsoft.SqlServer.Management.SsisIrEnum.IntegrationRuntime">
+    <object type="RunningPackages" assembly="Microsoft.SqlServer.Management.SsisIrEnum" implement="Microsoft.SqlServer.Management.SsisIrEnum.RunningPackages">
+      <object type="RunningPackage" assembly="Microsoft.SqlServer.Management.SsisIrEnum" implement="Microsoft.SqlServer.Management.SsisIrEnum.RunningPackage"/>
+    </object>
+    <object type="StoredPackages" assembly="Microsoft.SqlServer.Management.SsisIrEnum" implement="Microsoft.SqlServer.Management.SsisIrEnum.StoredPackages">
+      <object type="ServiceFolder" assembly="Microsoft.SqlServer.Management.SsisIrEnum" implement="Microsoft.SqlServer.Management.SsisIrEnum.ServiceFolder">
+        <object type="StoredPackage" assembly="Microsoft.SqlServer.Management.SsisIrEnum" implement="Microsoft.SqlServer.Management.SsisIrEnum.StoredPackage" allow_recursion="True"/>
+      </object>
+    </object>
+  </object>
+
+  <!-- XEventDbScoped object model declarations -->
+  <object type="DatabaseXEStore" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEStoreObject" cfg="XEStore.xml">
+    <object type="Package" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="Package.xml">
+      <object type="EventInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="EventInfo.xml">
+        <object type="EventColumnInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="EventColumnInfo.xml" />
+        <object type="DataEventColumnInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="DataEventColumnInfo.xml" />
+        <object type="ReadOnlyEventColumnInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="ReadOnlyEventColumnInfo.xml" />
+      </object>
+      <object type="ActionInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="ActionInfo.xml">
+      </object>
+      <object type="TargetInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="TargetInfo.xml">
+        <object type="TargetColumnInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="TargetColumnInfo.xml">
+        </object>
+      </object>
+      <object type="TypeInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="TypeInfo.xml">
+      </object>
+      <object type="MapInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="MapInfo.xml">
+        <object type="MapValueInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="MapValueInfo.xml">
+        </object>
+      </object>
+      <object type="PredSourceInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="PredSourceInfo.xml">
+      </object>
+      <object type="PredCompareInfo" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="PredCompareInfo.xml">
+      </object>
+    </object>
+
+    <object type="Session" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="Session.xml">
+      <object type="Event" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="Event.xml">
+        <object type="Action" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="Action.xml" />
+        <object type="EventField" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="EventField.xml" />
+      </object>
+      <object type="Target" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="Target.xml">
+        <object type="TargetField" assembly="Microsoft.SqlServer.Management.XEventDbScopedEnum" implement="Microsoft.SqlServer.Management.XEventDbScoped.XEventObject" cfg="TargetField.xml" />
+      </object>
+    </object>
+  </object>
+
+  <!-- XEvent object model TEST declarations -->
+  <object type="TestXEStore" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.XEStore" >
+    <object type="Package" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.Package" >
+      <object type="EventInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.EventInfo" >
+        <object type="EventColumnInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.EventColumnInfo" />
+        <object type="DataEventColumnInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.DataEventColumnInfo" />
+        <object type="ReadOnlyEventColumnInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.ReadOnlyEventColumnInfo" />
+      </object>
+      <object type="ActionInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.ActionInfo" >
+      </object>
+      <object type="TargetInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.TargetInfo" >
+        <object type="TargetColumnInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.TargetColumnInfo" >
+        </object>
+      </object>
+      <object type="TypeInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.TypeInfo" >
+      </object>
+      <object type="MapInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.MapInfo" >
+        <object type="MapValueInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.MapValueInfo" >
+        </object>
+      </object>
+      <object type="PredSourceInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.PredSourceInfo" >
+      </object>
+      <object type="PredCompareInfo" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.PredCompareInfo" >
+      </object>
+    </object>
+
+    <object type="Session" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.Session" >
+      <object type="Event" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.Event" >
+        <object type="Action" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.Action" />
+        <object type="EventField" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.EventField" />
+      </object>
+      <object type="Target" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.Target" >
+        <object type="TargetField" assembly="Microsoft.SqlServer.Test.XeventTestProvider" implement="Microsoft.SqlServer.Test.XeventTestProvider.Enumerator.TargetField" />
+      </object>
+    </object>
+  </object>
+
+  <object type="Utility" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="Fabric.xml">
+    <object type="Computer" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="Computer.xml">
+      <object type="Volume" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="Volume.xml">
+      </object>
+    </object>
+    <object type="DeployedDac" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="DeployedDac.xml"/>
+    <object type="ImportedObject" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="ImportedObject.xml">
+      <object type="DeployableObject" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="DeployableObject.xml">
+      </object>
+    </object>
+    <object type="DeploymentProfile" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="DeploymentProfile.xml">
+      <object type="InstanceSelectionPolicy" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="InstanceSelectionPolicy.xml">
+      </object>
+      <object type="DesiredConfigurationPolicy" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="DesiredConfigurationPolicy.xml">
+      </object>
+    </object>
+    <object type="ManagedInstance" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="ManagedInstance.xml">
+    </object>
+    <object type="Server" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="server.xml">
+      <object type="Database" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="Database.xml">
+        <object type="FileGroup" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="FileGroup.xml">
+          <object type="File" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="DataFile.xml" />
+        </object>
+        <object type="LogFile" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="LogFile.xml" />
+      </object>
+    </object>
+    <object type="ResourceHealthPolicy" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="ResourceHealthPolicy.xml">
+      <object type="HealthPolicyViolation" assembly="Microsoft.SqlServer.Management.UtilityEnum" implement="Microsoft.SqlServer.Management.Utility.UtilityObject" cfg="HealthPolicyViolation.xml">
+      </object>
+    </object>
+  </object>
+  <object type="DacDomain" assembly="Microsoft.SqlServer.Management.DacEnum" implement="Microsoft.SqlServer.Management.Dac.DacObject" cfg="DacDomain.xml">
+    <object type="DacInstance" assembly="Microsoft.SqlServer.Management.DacEnum" implement="Microsoft.SqlServer.Management.Dac.DacObject" cfg="DacInstance.xml">
+    </object>
+  </object>
+
+  <object type="PolicyStore" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="PolicyStore.xml">
+    <object type="Condition" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="Condition.xml">
+    </object>
+    <object type="ObjectSet" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="ObjectSet.xml">
+      <object type="TargetSet" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="TargetSet.xml">
+        <object type="TargetSetLevel" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="TargetSetLevel.xml">
+        </object>
+      </object>
+    </object>
+    <object type="Policy" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="Policy.xml">
+      <object type="EvaluationHistory" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="EvaluationHistory.xml">
+        <object type="ConnectionEvaluationHistory" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="ConnectionEvaluationHistory.xml">
+          <object type="EvaluationDetail" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="EvaluationDetail.xml" >
+          </object>
+        </object>
+      </object>
+    </object>
+    <object type="PolicyCategory" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="PolicyCategory.xml">
+    </object>
+    <object type="PolicyCategorySubscription" assembly="Microsoft.SqlServer.PolicyEnum" implement="Microsoft.SqlServer.Management.Dmf.PolicyObject" cfg="PolicyCategorySubscription.xml">
+    </object>
+  </object>
+  <object type="ACMEServer" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.SqlServer" cfg="Server.xml" >
+    <object type="Database" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.DatabaseLevel" cfg="xml='Database.xml' last='true'">
+      <object type="Schema" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.AcmeObject" cfg="schema.xml" />
+      <object type="Table" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.AcmeObject" cfg="table.xml">
+        <object type="Column" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.AcmeObject" cfg="column.xml" />
+      </object>
+    </object>
+    <object type="Login" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.AcmeObject" cfg="Login.xml">
+      <object type="DatabaseRef" assembly="Microsoft.SqlServer.Test.ManagementSDKTests.AcmeEnumerator" implement="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototype.AcmeObject" cfg="DatabaseRef.xml" />
+    </object>
+  </object>
+  <!--Data Collector object model declarations-->
+  <object type="CollectorConfigStore" assembly="Microsoft.SqlServer.Management.CollectorEnum" implement="Microsoft.SqlServer.Management.Collector.CollectorObject" cfg="CollectorConfigStore.xml">
+    <object type="CollectionSet" assembly="Microsoft.SqlServer.Management.CollectorEnum" implement="Microsoft.SqlServer.Management.Collector.CollectorObject" cfg="CollectionSet.xml">
+      <object type="CollectionItem" assembly="Microsoft.SqlServer.Management.CollectorEnum" implement="Microsoft.SqlServer.Management.Collector.CollectorObject" cfg="CollectionItem.xml">
+      </object>
+      <object type="CollectionSetExecutionHistoryDetail" assembly="Microsoft.SqlServer.Management.CollectorEnum" implement="Microsoft.SqlServer.Management.Collector.CollectorObject" cfg="CollectionSetExecutionHistoryDetail.xml">
+      </object>
+      <object type="CollectionSetExecutionHistory" assembly="Microsoft.SqlServer.Management.CollectorEnum" implement="Microsoft.SqlServer.Management.Collector.CollectorObject" cfg="CollectionSetExecutionHistory.xml">
+      </object>
+      <object type="CollectionSetLastUploadTime" assembly="Microsoft.SqlServer.Management.CollectorEnum" implement="Microsoft.SqlServer.Management.Collector.CollectorObject" cfg="CollectionSetLastUploadTime.xml">
+      </object>
+    </object>
+  </object>
+
+  <!--Integration Services object model declarations-->
+  <object type="IntegrationServices" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="IntegrationServices.xml">
+    <object type="Catalog" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="Catalog.xml">
+      <object type="Operation" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="Operation.xml">
+        <object type="OperationMessage" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="OperationMessage.xml">
+        </object>
+      </object>
+      <object type="ExecutionOperation" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="ExecutionOperation.xml">
+        <!--let Operation\OperationMessage and Operation\ExecutionOperation\OperationMessage share the same OM "OperationMessage", also use same xml, because the two happen to share the same " <link parent="Id" local="OperationId" />"-->
+        <object type="OperationMessage" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="OperationMessage.xml">
+        </object>
+      </object>
+      <object type="ValidationOperation" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="ValidationOperation.xml">
+        <!--let Operation\OperationMessage and Operation\ValidationOperation\OperationMessage share the same OM "OperationMessage", also use same xml, because the two happen to share the same " <link parent="Id" local="OperationId" />"-->
+        <object type="OperationMessage" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="OperationMessage.xml">
+        </object>
+      </object>
+      <object type="CustomizedLoggingLevel" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="CustomizedLoggingLevel.xml">
+      </object>
+      <object type="CatalogFolder" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="CatalogFolder.xml">
+        <object type="ProjectInfo" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="ProjectInfo.xml">
+          <object type="PackageInfo" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="PackageInfo.xml">
+            <object type="ParameterInfo" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="PackageParameterInfo.xml">
+            </object>
+          </object>
+          <object type="ProjectVersion" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="ProjectVersion.xml">
+          </object>
+          <object type="EnvironmentReference" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="EnvironmentReference.xml">
+          </object>
+          <!--let ProjectInfo\ParameterInfo and ProjectInfo\PackageInfo\ParameterInfo share the same OM "ParameterInfo", but use seperate xml's-->
+          <object type="ParameterInfo" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="ProjectParameterInfo.xml">
+          </object>
+        </object>
+        <object type="EnvironmentInfo" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="EnvironmentInfo.xml">
+          <object type="EnvironmentVariable" assembly="Microsoft.SqlServer.Management.IntegrationServicesEnum" implement="Microsoft.SqlServer.Management.IntegrationServices.IntegrationObject" cfg="EnvironmentVariable.xml">
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <!--End-->
+
+  <!--Dependency Services object model declarations-->
+  <object type="DependencyServicesStore" assembly="Microsoft.SqlServer.DependencyServicesEnum" implement="Microsoft.SqlServer.DependencyServicesEnum.DependencyServicesObject" cfg="DependencyServicesStore.xml">
+    <object type="DependencyProvider" assembly="Microsoft.SqlServer.DependencyServicesEnum" implement="Microsoft.SqlServer.DependencyServicesEnum.DependencyServicesObject" cfg="DependencyProvider.xml">
+      <object type="ExtractionPoint" assembly="Microsoft.SqlServer.DependencyServicesEnum" implement="Microsoft.SqlServer.DependencyServicesEnum.DependencyServicesObject" cfg="ExtractionPoint.xml">
+        <object type="ExtractionPointCatalogObject" assembly="Microsoft.SqlServer.DependencyServicesEnum" implement="Microsoft.SqlServer.DependencyServicesEnum.DependencyServicesObject" cfg="ExtractionPointCatalogObject.xml">
+        </object>
+      </object>
+    </object>
+    <object type="Operation" assembly="Microsoft.SqlServer.DependencyServicesEnum" implement="Microsoft.SqlServer.DependencyServicesEnum.DependencyServicesObject" cfg="Operation.xml">
+      <object type="OperationMessage" assembly="Microsoft.SqlServer.DependencyServicesEnum" implement="Microsoft.SqlServer.DependencyServicesEnum.DependencyServicesObject" cfg="OperationMessage.xml">
+      </object>
+    </object>
+  </object>
+
+  <object type="Server" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlServer" cfg="Server.xml">
+
+    <object type="NotificationServices" cfg="NS.NotificationServices.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+      <object type="Instance" cfg="xml='NS.Instance.xml' db_name='DatabaseName' SchemaPrefix='SchemaName'" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.NSDatabaseLevel">
+        <object type="DeliveryChannel" cfg="NS.DeliveryChannel.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+          <object type="DeliveryChannelArgument" cfg="NS.DeliveryChannelArgument.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+        </object>
+        <object type="ProtocolDefinition" cfg="NS.ProtocolDefinition.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+        <object type="Subscriber" cfg="NS.Subscriber.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+          <object type="SubscriberDevice" cfg="NS.SubscriberDevice.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+        </object>
+        <object type="InstanceDatabaseOptions" cfg="NS.InstanceDatabaseOptions.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+          <object type="InstanceDatabaseFileGroup" cfg="NS.InstanceDatabaseFileGroup.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+            <object type="InstanceDatabaseFile" cfg="NS.InstanceDatabaseFile.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          </object>
+          <object type="InstanceDatabaseLogFile" cfg="NS.InstanceDatabaseLogFile.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+        </object>
+        <object type="Application" cfg="xml='NS.Application.xml' db_name='DatabaseName' SchemaPrefix='SchemaName'" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.NSDatabaseLevel">
+          <object type="VacuumSchedule" cfg="NS.VacuumSchedule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          <object type="Distributor" cfg="NS.Distributor.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          <object type="Generator" cfg="NS.Generator.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          <object type="ApplicationDatabaseOptions" cfg="NS.ApplicationDatabaseOptions.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+            <object type="ApplicationDatabaseFileGroup" cfg="NS.ApplicationDatabaseFileGroup.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+              <object type="ApplicationDatabaseFile" cfg="NS.ApplicationDatabaseFile.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            </object>
+            <object type="ApplicationDatabaseLogFile" cfg="NS.ApplicationDatabaseLogFile.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          </object>
+          <object type="EventClass" cfg="NS.EventClass.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+            <object type="EventField" cfg="NS.EventField.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="EventChronicleRule" cfg="NS.EventChronicleRule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="EventChronicle" cfg="NS.EventChronicle.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          </object>
+          <object type="NonHostedEventProvider" cfg="NS.NonHostedEventProvider.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          <object type="HostedEventProvider" cfg="NS.HostedEventProvider.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+            <object type="HostedEventProviderArgument" cfg="NS.HostedEventProviderArgument.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          </object>
+          <object type="NotificationClass" cfg="NS.NotificationClass.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+            <object type="NotificationField" cfg="NS.NotificationField.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="NotificationComputedField" cfg="NS.NotificationComputedField.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="ContentFormatter" cfg="NS.ContentFormatter.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+              <object type="ContentFormatterArgument" cfg="NS.ContentFormatterArgument.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            </object>
+            <object type="NotificationClassProtocol" cfg="NS.NotificationClassProtocol.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+              <object type="ProtocolField" cfg="NS.ProtocolField.xml"  assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+              <object type="ProtocolRetrySchedule" cfg="NS.ProtocolRetrySchedule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            </object>
+          </object>
+          <object type="SubscriptionClass" cfg="NS.SubscriptionClass.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject">
+            <object type="SubscriptionField" cfg="NS.SubscriptionField.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="SubscriptionEventRule" cfg="NS.SubscriptionEventRule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="SubscriptionConditionEventRule" cfg="NS.SubscriptionConditionEventRule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="SubscriptionScheduledRule" cfg="NS.SubscriptionScheduledRule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="SubscriptionConditionScheduledRule" cfg="NS.SubscriptionConditionScheduledRule.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+            <object type="SubscriptionChronicle" cfg="NS.SubscriptionChronicle.xml" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject"/>
+          </object>
+        </object>
+      </object>
+    </object>
+    <object type="TemporaryTable" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="temp_table.xml" />
+    <object type="Transaction" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObjectUnion" cfg="transaction.xml" />
+    <object type="DatabaseMirroringWitnessRole" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseMirroringWitnessRole.xml" />
+    <object type="LogMarkHistory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LogMarkHistory.xml"/>
+    <object type="MaintenancePlan" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MaintenancePlan.xml">
+      <object type="SubPlan" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MaintenanceSubPlan.xml">
+        <object type="Log" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MaintSubPlanLog.xml">
+          <object type="Detail" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MaintSubPlanLogDetail.xml"/>
+        </object>
+      </object>
+    </object>
+    <!-- Support for Remote Maintenance Plan Log Viewer. Relational schema is broken in tables, so hierarchy is broken here -->
+    <object type="RemoteMaintenancePlan" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RemoteMaintenancePlan.xml" />
+    <object type="RemoteSubPlan" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RemoteSubPlan.xml" />
+    <object type="RemotePlanLog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RemotePlanLog.xml">
+      <object type="Detail" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RemotePlanLogDetail.xml"/>
+    </object>
+    <object type="Mail" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Mail.xml">
+      <object type="ConfigurationValue" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ConfigurationValue.xml" />
+      <object type="MailProfile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MailProfile.xml" >
+        <object type="MailProfileAccount" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MailProfileAccounts.xml" />
+        <object type="MailProfilePrincipal" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MailProfilePrincipals.xml" />
+      </object>
+      <object type="MailAccount" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MailAccount.xml" >
+        <object type="MailServer" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MailServer.xml" />
+      </object>
+      <object type="ErrorLog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Mail_ErrorLog.xml" />
+    </object>
+    <object type="MasterKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServiceMasterKey.xml"/>
+    <object type="MaintenancePlanDeprecated" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MaintenancePlanDeprecated.xml"/>
+    <object type="ServerActiveDirectory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerActiveDirectory.xml" />
+    <object type="PerfInfo" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PerfInfo.xml" />
+    <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SrvYukonPerm.xml" />
+    <object type="LevelPermission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObjectUnion" cfg="SrvObjectPerm.xml" />
+    <object type="LegacyPackage" assembly="Microsoft.SqlServer.DTEnum" implement="Microsoft.SqlServer.Dts.SmoEnum.LegacyPackageObject" cfg="Package.xml" />
+    <object type="NotificationServicesInstance" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.DatabaseLevel" cfg="xml='NotificationServicesInstance.xml' db_name='Database' assemly='Microsoft.SqlServer.NotificationServicesEnumerator'"/>
+    <object type="Replication" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.DatabaseLevel" cfg="xml='replication.xml' db_name='Database'  assemly='Microsoft.SqlServer.ReplEnum' last='true'">
+      <object type="Publication" assembly="Microsoft.SqlServer.ReplEnum" implement="Microsoft.SqlServer.Management.Smo.Replication.Publication" cfg="publication.xml">
+        <object type="PublicationSubscription" assembly="Microsoft.SqlServer.ReplEnum" implement="Microsoft.SqlServer.Management.Smo.Replication.ReplSqlObject" cfg="pubsubscription.xml" />
+      </object>
+      <object type="Subscription" assembly="Microsoft.SqlServer.ReplEnum" implement="Microsoft.SqlServer.Management.Smo.Replication.Subscription" cfg="subscription.xml" />
+    </object>
+    <object type="ServerProxyAccount" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerProxyAccount.xml" />
+    <object type="UserOption" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UserOption.xml" />
+    <object type="Information" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Information.xml" />
+    <object type="Setting" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Settings.xml">
+      <object type="OleDbProviderSetting" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="OLEDBProviderSetting.xml" />
+    </object>
+    <object type="Endpoint" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="endpoint.xml">
+      <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SrvYukonObjectPerm.xml" />
+      <object type="Soap" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="soap_endpoint.xml" >
+        <object type="Method" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="soap_endpoint_method.xml" />
+      </object>
+      <object type="DatabaseMirroring" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="database_mirroring_endpoint.xml"/>
+      <object type="ServiceBroker" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="service_broker_endpoint.xml"/>
+      <object type="Http" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="http_endpoint.xml"/>
+      <object type="Tcp" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="tcp_endpoint.xml"/>
+      <object type="Via" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="via_endpoint.xml"/>
+    </object>
+    <object type="Database" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.DatabaseLevel" cfg="xml='Database.xml' last='true'">
+      <object type="PlanGuide" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PlanGuide.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+      </object>
+      <object type="Option" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.DatabaseOption" cfg="DatabaseOptions.xml" />
+      <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DbExtendedProperty.xml" />
+      <object type="LevelPermission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObjectUnion" cfg="DBObjectPerm.xml" />
+      <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DBPerm.xml" />
+      <object type="DatabaseActiveDirectory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseActiveDirectory.xml" />
+      <object type="MasterKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseMasterKey.xml" >
+        <object type="Encryption" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="MasterKeyEncryption.xml" />
+      </object>
+      <object type="DatabaseScopedCredential" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseScopedCredential.xml" >
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="Certificate" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="certificate.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="SymmetricKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="symmetrickey.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="KeyEncryption" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="KeyEncryption.xml" />
+      </object>
+      <object type="AsymmetricKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="asymmetrickey.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="DatabaseEncryptionKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseEncryptionKey.xml" />
+      <object type="Synonym" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="synonym.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="Sequence" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="sequence.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="SecurityPolicy" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SecurityPolicy.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="SecurityPredicate" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SecurityPredicate.xml"/>
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="DatabaseScopedConfiguration" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseScopedConfiguration.xml">
+      </object>
+      <object type="ExternalDataSource" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalDataSource.xml" />
+      <object type="ExternalFileFormat" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalFileFormat.xml" />
+      <object type="ExternalStream" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalStream.xml" />
+      <object type="ExternalStreamingJob" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalStreamingJob.xml" />
+      <object type="ColumnMasterKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ColumnMasterKey.xml">
+      </object>
+      <object type="ColumnEncryptionKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ColumnEncryptionKey.xml">
+        <object type="ColumnEncryptionKeyValue" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ColumnEncryptionKeyValue.xml"/>
+      </object>
+      <object type="Schema" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Schema.xml">
+        <object type="OwnedObject" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObjectUnion" cfg="YukonuserownedobjectSchema.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="FullTextCatalog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextCatalog.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="ErrorLog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="fulltext_ErrorLog.xml">
+          <object type="LogEntry" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="fulltext_ErrorLogText.xml"/>
+        </object>
+      </object>
+      <object type="FullTextStopList" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextStopList.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="SearchPropertyList" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SearchPropertyList.xml">
+        <object type="SearchProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SearchProperty.xml"/>
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="UserDefinedAggregate" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UserDefinedAggregate.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Param" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UserDefinedAggregateParameter.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        </object>
+      </object>
+      <object type="UserDefinedType" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UserDefinedType.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+      </object>
+      <object type="SqlAssembly" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SqlAssembly.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="SqlAssemblyFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SqlAssemblyFile.xml" />
+      </object>
+      <object type="ExternalLibrary" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalLibrary.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="ExternalLibraryFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalLibraryFile.xml" />
+      </object>
+      <object type="ExternalLanguage" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalLanguage.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="ExternalLanguageFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalLanguageFile.xml" />
+      </object>
+      <object type="Lock" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseLocks.xml" />
+      <object type="FileGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FileGroup.xml">
+        <object type="File" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="File.xml" >
+        </object>
+        <object type="FullTextFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextFile.xml" />
+      </object>
+      <object type="LogFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LogFile.xml" >
+      </object>
+      <object type="User" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="User.xml">
+        <object type="OwnedObject" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObjectUnion" cfg="Yukonuserownedobject.xml" />
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level0ExtendedProperty.xml" />
+      </object>
+      <object type="Role" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseRole.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="Member" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseRoleMember.xml" />
+      </object>
+      <object type="ApplicationRole" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ApplicationRole.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+      </object>
+      <object type="DatabaseAuditSpecification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseAuditSpecification.xml">
+        <object type="DatabaseAuditSpecificationDetail" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseAuditSpecificationDetail.xml" />
+      </object>
+      <object type="WorkloadManagementWorkloadGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="WorkloadManagementWorkloadGroup.xml" />
+      <object type="Table" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="table.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="TablePerm.xml" />
+        <object type="PartitionSchemeParameter" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionSchemeParameter.xml" />
+        <object type="PhysicalPartition" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PhysicalPartition.xml">
+          <object type="PhysicalPartitionSegment" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PhysicalPartitionSegment.xml" />
+        </object>
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level1ExtendedProperty.xml" />
+        <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Column.xml">
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ComputedText.xml" />
+          <object type="Default" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DefaultConstrain.xml">
+            <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ColumnPerm.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+        </object>
+        <object type="Statistic" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Statistic.xml">
+          <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="StatisticColumn.xml" />
+        </object>
+        <object type="Index" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Index.xml">
+          <object type="FragmentationFast" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexFragFast.xml" />
+          <object type="FragmentationSampled" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexFragSampled.xml" />
+          <object type="FragmentationDetailed" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexFragDetail.xml" />
+          <object type="PartitionSchemeParameter" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionSchemeParameter.xml" />
+          <object type="PhysicalPartition" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PhysicalPartition.xml">
+            <object type="PhysicalPartitionSegment" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PhysicalPartitionSegment.xml" />
+          </object>
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2IndexExtendedProperty.xml" />
+          <object type="IndexedColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedColumn.xml" />
+          <object type="IndexedJsonPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedJsonPath.xml" />
+          <object type="IndexedXmlPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPath.xml" />
+          <object type="IndexedXmlPathNamespace" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPathNamespace.xml" />
+          <object type="DistributionColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DistributionColumn.xml" />
+        </object>
+        <object type="FullTextIndex" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextIndex.xml">
+          <object type="FullTextIndexColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextIndexColumn.xml" />
+        </object>
+        <object type="Trigger" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Trigger.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        </object>
+        <object type="Check" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Check.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        </object>
+        <object type="EdgeConstraint" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="EdgeConstraint.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          <object type="EdgeConstraintClause" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="EdgeConstraintClause.xml">
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+        </object>
+        <object type="ForeignKey" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ForeignKey.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FKColumn.xml" />
+        </object>
+        <object type="ResumableIndex" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="resumableindex.xml">
+        </object>
+      </object>
+      <object type="SensitivityClassification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SensitivityClassification.xml" />
+      <object type="WorkloadManagementWorkloadClassifier" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="WorkloadManagementWorkloadClassifier.xml"/>
+      <object type="View" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="View.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="TablePerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level1ExtendedProperty.xml" />
+        <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Column.xml">
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ComputedText.xml" />
+          <object type="Default" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DefaultConstrain.xml">
+            <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ColumnPerm.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+        </object>
+        <object type="Trigger" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Trigger.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        </object>
+        <object type="Statistic" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Statistic.xml">
+          <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="StatisticColumn.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        </object>
+        <object type="Index" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Index.xml">
+          <object type="FragmentationFast" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexFragFast.xml" />
+          <object type="FragmentationSampled" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexFragSampled.xml" />
+          <object type="FragmentationDetailed" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexFragDetail.xml" />
+          <object type="PartitionSchemeParameter" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionSchemeParameter.xml" />
+          <object type="PhysicalPartition" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PhysicalPartition.xml" >
+            <object type="PhysicalPartitionSegment" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PhysicalPartitionSegment.xml" />
+          </object>
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2IndexExtendedProperty.xml" />
+          <object type="IndexedColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedColumn.xml" />
+          <object type="IndexedJsonPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedJsonPath.xml" />
+          <object type="IndexedXmlPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPath.xml" />          
+          <object type="IndexedXmlPathNamespace" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPathNamespace.xml" />
+        </object>
+        <object type="FullTextIndex" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextIndex.xml">
+          <object type="FullTextIndexColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextIndexColumn.xml" />
+        </object>
+        <object type="ResumableIndex" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="resumableindex.xml">
+        </object>
+      </object>
+      <object type="StoredProcedure" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="StoredProcedure.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ShilohYukonPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level1ExtendedProperty.xml" />
+        <object type="Param" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SPParams.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+        </object>
+        <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        <object type="Numbered" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="NumberedStoredProcedure.xml">
+          <object type="Param" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="NumberedSPParams.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+      </object>
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        </object>
+      </object>
+      <object type="ExtendedStoredProcedure" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="XStoredProcedure.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ShilohYukonPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+      </object>
+      <object type="UserDefinedFunction" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UDF.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ShilohYukonPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level1ExtendedProperty.xml" />
+        <object type="Param" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UDFParams.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+        </object>
+        <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="udfcolumn.xml">
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ComputedText.xml" />
+          <object type="Default" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DefaultConstrain.xml">
+            <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ColumnPerm.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+        </object>
+        <object type="OrderColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="OrderColumn.xml" />
+        <object type="Check" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Check.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        </object>
+        <object type="EdgeConstraint" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="EdgeConstraint.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          <object type="EdgeConstraintClause" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="EdgeConstraintClause.xml">
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+        </object>
+        <object type="Index" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Index.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2IndexExtendedProperty.xml" />
+          <object type="IndexedColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedColumn.xml" />
+        </object>
+        <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+      </object>
+      <object type="UserDefinedDataType" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Uddt.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level0ExtendedProperty.xml" />
+        <object type="BoundColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="BoundColumn.xml" />
+      </object>
+      <object type="UserDefinedTableType" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="UserDefinedTableType.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Column.xml">
+          <object type="Default" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DefaultConstrain.xml">
+            <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ComputedText.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+        </object>
+        <object type="Index" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Index.xml">
+          <object type="IndexedColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedColumn.xml" />
+        </object>
+        <object type="Check" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Check.xml">
+      <!-- UDTT constraints don't fully support extended properties but SfcSerialization expects the URN that references EP to work -->
+      <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2ExtendedProperty.xml" />
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+        </object>
+        <object type="EdgeConstraint" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="EdgeConstraint.xml">
+          <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          <object type="EdgeConstraintClause" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="EdgeConstraintClause.xml">
+            <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+          </object>
+        </object>
+      </object>
+      <object type="Rule" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Rule.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level1ExtendedProperty.xml" />
+        <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RuleColumn.xml" />
+        <object type="DataType" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RuleDataType.xml" />
+        <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+      </object>
+      <object type="Default" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Default.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level1ExtendedProperty.xml" />
+        <object type="Column" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DefaultColumn.xml" />
+        <object type="DataType" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DefaultDataType.xml" />
+        <object type="Text" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Text.xml" />
+      </object>
+      <object type="ServiceBroker" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="ServiceBroker.xml">
+        <object type="MessageType" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="MessageType.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        </object>
+        <object type="ServiceContract" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="ServiceContract.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+          <object type="MessageTypeMapping" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="MessageTypeMapping.xml" />
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        </object>
+        <object type="ServiceQueue" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="ServiceQueues.xml">
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        </object>
+        <object type="BrokerService" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="BrokerService.xml">
+          <object type="ServiceContractMapping" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="ServiceContractMapping.xml" />
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        </object>
+        <object type="BrokerPriority" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="BrokerPriority.xml">
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        </object>
+        <object type="RemoteServiceBinding" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="RemoteServiceBinding.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        </object>
+        <object type="ServiceRoute" assembly="Microsoft.SqlServer.ServiceBrokerEnum" implement="Microsoft.SqlServer.Management.Smo.Broker.ServiceBrokerSqlObject" cfg="ServiceRoute.xml">
+          <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+          <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        </object>
+      </object>
+      <object type="XmlSchemaCollection" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="XmlSchemaCollection.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Namespace" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="XmlNamespace.xml" >
+          <object type="Type" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="XmlType.xml" />
+        </object>
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonSchemaObjectPerm.xml" />
+      </object>
+      <object type="PartitionFunction" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionFunction.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="PartitionFunctionParameter" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionFunctionParameter.xml" />
+        <object type="RangeValue" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionFunctionRangeValue.xml" />
+      </object>
+      <object type="PartitionScheme" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionScheme.xml">
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="FileGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PartitionSchemeFileGroup.xml" />
+      </object>
+      <object type="DdlTrigger" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseDdlTrigger.xml" >
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+        <object type="Event" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseDdlTriggerEvent.xml" />
+      </object>
+      <object type="DatabaseDiagram" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseDiagram.xml" />
+      <object type="QueryStoreOptions" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="QueryStoreOptions.xml" />
+    </object>
+    <object type="OLEDBProvider" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="OLEDBProvider.xml">
+      <object type="OLEDBProviderProp" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="OLEDBProvProp.xml" />
+    </object>
+    <object type="Role" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerRole.xml">
+      <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SrvYukonObjectPerm.xml" />
+      <object type="Member" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Member.xml" />
+    </object>
+    <object type="ErrorLog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ErrorLog.xml">
+      <object type="LogEntry" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ErrorLogText.xml" />
+    </object>
+    <object type="Collation" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Collation.xml" />
+    <object type="Audit" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Audit.xml" />
+    <object type="ServerAuditSpecification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerAuditSpecification.xml">
+      <object type="ServerAuditSpecificationDetail" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerAuditSpecificationDetail.xml" />
+    </object>
+    <object type="Login" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Login.xml">
+      <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SrvYukonObjectPerm.xml" />
+      <object type="DatabaseMapping" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseMappings.xml" />
+    </object>
+    <object type="SystemDataType" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="sdt.xml" />
+    <object type="TapeDevice" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="TapeDevice.xml" />
+    <object type="FixedDrive" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FixedDrive.xml" />
+    <object type="RemoteDrive" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RemoteDrive.xml" />
+    <object type="RemovableDrive" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="RemovableDrive.xml" />
+    <object type="CdromDrive" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="CdromDrive.xml" />
+    <object type="Drive" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Drive.xml" />
+    <object type="AvailableMedia" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AvailableMedia.xml" />
+    <object type="File" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.DiskFile" cfg="DiskFile.xml" />
+    <object type="Language" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Language.xml" />
+    <object type="SystemMessage" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="sysmessage.xml" />
+    <object type="UserDefinedMessage" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="usermessage.xml" />
+    <object type="LinkedServer" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LinkedServer.xml">
+      <object type="Login" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LinkedServerLogin.xml" />
+      <object type="LinkedServerCatalog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LinkedServerCatalog.xml" >
+        <object type="LinkedServerTable" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LinkedServerTable.xml" />
+        <object type="LinkedServerView" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="LinkedServerView.xml" />
+      </object>
+    </object>
+    <object type="ResourceGovernor" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ResourceGovernor.xml">
+      <object type="ResourcePool" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ResourcePool.xml">
+        <object type="WorkloadGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="WorkloadGroup.xml" />
+        <object type="ResourcePoolAffinityInfo" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ResourcePoolAffinityInfo.xml" />
+        <object type="ResourcePoolScheduler" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ResourcePoolScheduler.xml" />
+      </object>
+      <object type="ExternalResourcePool" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalResourcePool.xml">
+        <object type="ExternalResourcePoolAffinityInfo" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalResourcePoolAffinityInfo.xml" />
+      </object>
+    </object>
+    <object type="SmartAdmin" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SmartAdmin.xml">
+    </object>
+    <object type="JobServer" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="JobServer.xml">
+      <object type="ProxyAccount" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ProxyAccount.xml">
+        <object type="AgentSubSystem" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AgentSubsystems.xml" />
+        <object type="ProxyAccountPrincipal" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ProxyAccountPrincipals.xml" />
+      </object>
+      <object type="PerfInfo" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AgentPerfInfo.xml" />
+      <object type="Schedule" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Schedule.xml" />
+      <object type="AlertCategory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_alert_categories.xml" />
+      <object type="JobCategory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_job_categories.xml" />
+      <object type="OperatorCategory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_operator_categories.xml" />
+      <object type="AlertSystem" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_alertsystem.xml" />
+      <object type="Alert" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_alert.xml">
+        <object type="Notification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AlertNotification.xml" />
+      </object>
+      <object type="Operator" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_operator.xml">
+        <object type="Notification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="OperatorNotification.xml" />
+        <object type="JobNotification" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="OperatorJobNotification.xml" />
+      </object>
+      <object type="TargetServer" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_targetserver.xml" />
+      <object type="TargetServerGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_targetservergroup.xml">
+        <object type="Member" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_targetservermember.xml" />
+      </object>
+      <object type="Job" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Job.xml">
+        <object type="Step" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="JobStep.xml">
+          <object type="OutputLog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="JobStepOutputLog.xml" />
+        </object>
+        <object type="Schedule" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_jobschedule.xml"/>
+        <object type="Alert" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_jobalert.xml" />
+        <object type="History" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_jobhistory.xml" />
+        <object type="TargetServer" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_jobtargetservers.xml" />
+      </object>
+      <object type="ErrorLog" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_ErrorLog.xml">
+        <object type="LogEntry" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="agent_ErrorLogText.xml" />
+      </object>
+    </object>
+    <object type="FullTextService" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextService.xml" >
+      <object type="Language" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FullTextLanguage.xml" />
+      <object type="SemanticLanguage" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FulltextSemanticLanguage.xml" />
+    </object>
+    <object type="Parameter" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AditionalParameters.xml" />
+    <object type="ConnectionOption" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Connection.xml" />
+    <object type="Configuration" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Configuration.xml" />
+    <object type="AffinityInfo" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AffinityInfo.xml" />
+    <object type="PrimaryFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.PrimaryFile" cfg="PrimaryFile.xml">
+      <object type="File" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="PrimaryChildren.xml" />
+    </object>
+    <object type="NTGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="NTGroup.xml" />
+    <object type="NTLogin" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="NTLogin.xml" />
+    <object type="Lock" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Lock.xml" />
+    <object type="Process" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Process.xml" />
+    <object type="BackupDevice" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="BackupDevice.xml" />
+    <object type="BackupSet" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="backupset.xml">
+      <object type="File" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="backupfile.xml" />
+    </object>
+    <object type="RestorePlan" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.RestorePlanInternal" cfg="restore_plan.xml" />
+    <object type="BackupMediaSet" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="backupmediaset.xml">
+      <object type="MediaFamily" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="backupmediafamily.xml" />
+    </object>
+    <object type="RestoreHistory" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="restorehistory.xml">
+      <object type="File" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="restorefile.xml" />
+      <object type="FileGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="restorefilegroup.xml" />
+    </object>
+    <object type="DdlTrigger" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerDdlTrigger.xml" >
+      <object type="Event" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ServerDdlTriggerEvent.xml" />
+    </object>
+    <object type="Credential" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Credential.xml" />
+    <object type="CryptographicProvider" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="CryptographicProvider.xml" />
+    <object type="AvailabilityGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AvailabilityGroup.xml">
+      <object type="AvailabilityReplica" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AvailabilityReplica.xml"/>
+      <object type="AvailabilityDatabase" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AvailabilityDatabase.xml"/>
+      <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SrvYukonObjectPerm.xml" />
+      <object type="DatabaseReplicaState" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseReplicaState.xml"/>
+      <object type="ReplicaClusterNode" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ReplicaClusterNode.xml"/>
+      <object type="AvailabilityGroupListener" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AvailabilityGroupListener.xml">
+      <object type="AvailabilityGroupListenerIPAddress" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="AvailabilityGroupListenerIPAddress.xml" />
+      </object>
+    </object>
+    <object type="ClusterSubnet" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ClusterSubnet.xml"/>
+    <object type="ClusterMemberState" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ClusterMemberState.xml"/>
+    <object type="SqlBoot" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="SqlBoot.xml"/>
+  </object>
+  <object type="OlapServer" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Server">
+    <object type="Database" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Database">
+      <object type="Assembly" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Assembly" />
+      <object type="ClrAssembly" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.ClrAssembly" />
+      <object type="ComAssembly" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.ComAssembly" />
+      <object type="DataSourceView" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.DataSourceView" />
+      <object type="Dimension" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Dimension">
+        <object type="Attribute" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Attribute" />
+        <object type="Hierarchy" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Hierarchy">
+          <object type="Level" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Level" />
+        </object>
+      </object>
+      <object type="Cube" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Cube">
+        <object type="MeasureGroup" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.MeasureGroup">
+          <object type="Partition" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Partition" />
+          <object type="AggregationDesign" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.AggregationDesign" />
+        </object>
+        <object type="CubeRole" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.CubeRole" />
+      </object>
+      <object type="Command" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Command" />
+      <object type="DataSource" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.DataSource" />
+      <object type="Role" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Role">
+        <object type="Member" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Member" />
+      </object>
+      <object type="DatabasePermission" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.DatabasePermission" />
+      <object type="MiningStructure" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.MiningStructure">
+        <object type="MiningModel" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.MiningModel" />
+      </object>
+    </object>
+    <object type="OlapXEventStore" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.XEvents.XEventStore">
+      <object type="OlapXEventSession" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.XEvents.XEventSession">
+        <object type="OlapXEventTarget" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.XEvents.XEventTarget" />
+      </object>
+    </object>
+    <object type="Assembly" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Assembly" />
+    <object type="ClrAssembly" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.ClrAssembly" />
+    <object type="ComAssembly" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.ComAssembly" />
+    <object type="Role" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Role">
+      <object type="Member" assembly="Microsoft.SqlServer.OlapEnum" implement="Microsoft.SqlServer.Management.Smo.Olap.Member" />
+    </object>
+  </object>
+  <object type="ManagedComputer" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.EnumManagedComputer">
+    <object type="Service" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.Service" />
+    <object type="ServiceAdvancedProperty" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ServiceAdvancedProperty" />
+    <object type="ServerAlias" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.SAlias" />
+    <object type="ClientProtocol" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ClientProtocol" >
+      <object type="Property" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ClientProtocolProperties" />
+    </object>
+    <object type="ClientNetLibInfo" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.CNetLibInfo" />
+    <object type="ServerInstance" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ServerInstance" >
+      <object type="ServerProtocol" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ServerProtocol" >
+        <object type="Property" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ServerProtocolProperties" />
+        <object type="IPAddress" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ServerProtocolIPAddress" >
+          <object type="Property" assembly="Microsoft.SqlServer.WmiEnum" implement="Microsoft.SqlServer.Management.Smo.Wmi.ServerProtocolIPAddressProperty" />
+        </object>
+      </object>
+    </object>
+  </object>
+  <object type="SqlServerCe" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.Database" cfg="Database.xml">
+    <object type="SysTable" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="SysTable.xml">
+      <object type="SysColumn" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SysColumn" cfg="SysColumn.xml"></object>
+      <object type="Index" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="Index.xml">
+        <object type="IndexedColumn" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="IndexedColumn.xml" />
+      </object>
+    </object>
+    <object type="UsrTable" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="UsrTable.xml">
+      <object type="UsrColumn" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.UsrColumn" cfg="UsrColumn.xml"></object>
+      <object type="Index" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="Index.xml">
+        <object type="IndexedColumn" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="IndexedColumn.xml" />
+      </object>
+      <object type="Trigger" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="Trigger.xml"></object>
+    </object>
+    <object type="SysView" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SysView" cfg="SysView.xml">
+      <object type="SysColumn" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SysViewColumn" cfg="SysViewColumn.xml"></object>
+    </object>
+    <object type="Type" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="Type.xml"></object>
+    <object type="Subscription" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.Subscription" cfg="Subscription.xml"></object>
+    <object type="Assembly" assembly="Microsoft.SqlServerCe.Enumerator" implement="Microsoft.SqlServerCe.Management.Smo.SqlCeObject" cfg="Assembly.xml"></object>
+  </object>
+  <object type="ReportServer" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ReportServerEnumerator">
+    <object type="Report" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ReportEnumerator">
+      <object type="ReportDataSourceItem" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ReportDataSourceEnumerator" />
+      <object type="ReportHistoryItem" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ReportHistoryEnumerator" />
+      <object type="ReportSubscriptionItemDD" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.DDSubcriptionEnumerator" />
+      <object type="ReportSubscriptionItem" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.SubscriptionEnumerator" />
+    </object>
+    <object type="LinkedReport" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.LinkedReportEnumerator">
+      <object type="ReportHistoryItem" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ReportHistoryEnumerator" />
+      <object type="ReportSubscriptionItemDD" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.DDSubcriptionEnumerator" />
+      <object type="ReportSubscriptionItem" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.SubscriptionEnumerator" />
+    </object>
+    <object type="Model" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ModelEnumerator" />
+    <object type="Resource" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ResourceEnumerator" />
+    <object type="DataSource" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.DataSourceEnumerator" />
+    <object type="ReportFolder" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.FolderEnumerator">
+      <object type="Report" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ReportEnumerator" />
+      <object type="LinkedReport" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.LinkedReportEnumerator" />
+      <object type="Model" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ModelEnumerator" />
+      <object type="Resource" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ResourceEnumerator" />
+      <object type="DataSource" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.DataSourceEnumerator" />
+      <object type="ReportFolder" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.FolderEnumerator" />
+    </object>
+    <object type="Schedule" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.ScheduleEnumerator" />
+    <object type="UserRoles" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.UserRolesEnumerator" />
+    <object type="SystemRoles" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.SystemRolesEnumerator" />
+    <object type="Job" assembly="Microsoft.SqlServer.Management.UI.RSUserInterface" implement="Microsoft.SqlServer.Management.UI.RSUserInterface.JobEnumerator" />
+  </object>
+  <object type="ServerType" assembly="Microsoft.SqlServer.RegSvrEnum" implement="Microsoft.SqlServer.Management.Smo.RegSvrEnum.EnumServerType">
+    <object type="ServerGroup" assembly="Microsoft.SqlServer.RegSvrEnum" implement="Microsoft.SqlServer.Management.Smo.RegSvrEnum.EnumServerGroup"/>
+    <object type="RegisteredServer" assembly="Microsoft.SqlServer.RegSvrEnum" implement="Microsoft.SqlServer.Management.Smo.RegSvrEnum.EnumRegisteredServer"/>
+  </object>
+  <object type="AvailableSqlServer" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.AvailableSQLServers"/>
+  <object type="DtsServer" assembly="Microsoft.SqlServer.DtEnum" implement="Microsoft.SqlServer.Dts.SmoEnum.DtsServer">
+    <object type="DtsRunningPackage" assembly="Microsoft.SqlServer.DtEnum" implement="Microsoft.SqlServer.Dts.SmoEnum.RunningPackage" />
+  </object>
+  <object type="DTS" assembly="Microsoft.SqlServer.DTEnum" implement="Microsoft.SqlServer.Dts.SmoEnum.DTSEnum">
+    <object type="Package" assembly="Microsoft.SqlServer.DTEnum" implement="Microsoft.SqlServer.Dts.SmoEnum.PackageEnum"></object>
+    <object type="RunningPackage" assembly="Microsoft.SqlServer.DTEnum" implement="Microsoft.SqlServer.Dts.SmoEnum.RunningPackageEnum"></object>
+  </object>
+  <!--Registered Servers object model declarations. Note that -->
+  <!--RegisteredServer can be under the Store, or under a ServerGroup. Also -->
+  <!--note that ServerGroup itself is a recursive type.-->
+  <object type="RegisteredServersStore" assembly="Microsoft.SqlServer.Management.RegisteredServers" implement="Microsoft.SqlServer.Management.RegisteredServers.RegisteredServersEnumerator" cfg="RegisteredServersStore.xml">
+    <object type="RegisteredServer" assembly="Microsoft.SqlServer.Management.RegisteredServers" implement="Microsoft.SqlServer.Management.RegisteredServers.RegisteredServersEnumerator" cfg="RegisteredServer.xml">
+    </object>
+    <object type="ServerGroup" assembly="Microsoft.SqlServer.Management.RegisteredServers" implement="Microsoft.SqlServer.Management.RegisteredServers.RegisteredServersEnumerator" cfg="ServerGroup.xml" allow_recursion="True">
+      <object type="RegisteredServer" assembly="Microsoft.SqlServer.Management.RegisteredServers" implement="Microsoft.SqlServer.Management.RegisteredServers.RegisteredServersEnumerator" cfg="RegisteredServer.xml">
+      </object>
+    </object>
+  </object>
+  <object type="Machine" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Machine" cfg="Machine.xml">
+    <object type="Product" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Product" cfg="Product.xml">
+      <object type="Feature" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.ProductFeature">
+        <object type="Install" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Install">
+          <object type="MsiFeature" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.MsiFeature"/>
+          <object type="PatchInstall" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.PatchInstall"/>
+        </object>
+      </object>
+      <object type="Instance" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Instance" cfg="Instance.xml">
+        <object type="Feature" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.ProductInstanceFeature">
+          <object type="Install" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Install">
+            <object type="MsiFeature" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.MsiFeature"/>
+            <object type="PatchInstall" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.PatchInstall"/>
+          </object>
+        </object>
+      </object>
+    </object>
+    <object type="RedistributableProduct" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Product" cfg="RedistributableProduct.xml">
+      <object type="Install" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.Install">
+        <object type="MsiFeature" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.MsiFeature"/>
+        <object type="PatchInstall" assembly="Microsoft.SqlServer.Discovery" implement="Microsoft.SqlServer.Discovery.PatchInstall"/>
+      </object>
+    </object>
+  </object>
+</objects>

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_text" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+	<settings>
+		<!--TableVariableName is need in udf - we need to parse the text to get the name of the retun table, 
+		it is not present in the metadata-->
+		<post_process fields='#Text#BodyStartIndex#HasColumnSpecification#TableVariableName#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessBodyText'
+					triggered_fields='#Definition#'/>
+	</settings>
+	<properties>
+		<!-- Definition must be already there-->
+		<version min_major = '9'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="Text" type="nvarchar" size='max' expensive='true' access="Read">NULL</property>		
+		</version>
+		<version min_major = '7' max_major = '8'>
+			<property name="Text" type="nvarchar" size='4000' expensive='true' access="Read">NULL</property>		
+		</version>
+		<property name="BodyStartIndex" type="int" expensive='true' access="Read">NULL</property>
+	</properties>
+</EnumObject>

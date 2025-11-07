@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="NTLogin" impl_type="SqlObject" min_major='7'>
+	<settings main_table="#tmpntlogin">
+		<prefix>
+			create table #tmpntlogin ( [Account name] sysname NULL, Type sysname	NULL, [Privilege] sysname NULL, [Mapped login name] sysname NULL, [Permission path] sysname NULL)
+			insert into #tmpntlogin exec master.dbo.xp_logininfo 
+		</prefix>
+		<postfix>
+			drop table #tmpntlogin
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Account name" type="sysname">[Account name]</property>
+		<property name="Type" type="sysname">Type</property>
+		<property name="Privilege" type="sysname">[Privilege]</property>
+		<property name="Mapped login name" type="sysname">[Mapped login name]</property>
+		<property name="Permission path" type="sysname">[Permission path]</property>
+	</properties>
+</EnumObject>

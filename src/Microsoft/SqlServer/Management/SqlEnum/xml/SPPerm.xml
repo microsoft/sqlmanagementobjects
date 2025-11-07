@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent="Name" local="Object" />
+		</parent_link>
+		<include file='inc_perm.xml' />
+		<property_link>p.action in (193, 195, 196, 197, 224, 26)</property_link>
+	</settings>
+	<properties>
+		<property name="Object" type="nvarchar" size="300">object_name(p.id)</property>
+	</properties>
+</EnumObject>

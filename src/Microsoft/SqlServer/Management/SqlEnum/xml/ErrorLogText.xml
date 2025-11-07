@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<EnumObject type="ErrorLogText" impl_type="SqlObject" min_major='7'>
+	<settings>
+		<parent_link>
+			<link parent='ArchiveNo' local='ArchiveNo' />
+		</parent_link>
+		<request_parent_select>
+			<field name='ArchiveNo' />
+		</request_parent_select>
+		<property_link table="#err_log_text_tmp_final ert" />
+        <prefix>
+            create table #err_log_text_tmp_final(Text nvarchar(4000), ArchiveNo int null, LogDate datetime null, ProcessInfo nvarchar(100) null)
+        </prefix>
+        <version min_major="7" max_major="8">
+            <prefix>
+                declare @text_offset int
+                declare @process_info_length int
+
+                set @text_offset = 34
+                set @process_info_length = 10
+            </prefix>
+            <prefix>
+                <link_multiple no='1' expression="
+create table #err_log_text_tmp(id int IDENTITY(0, 1) primary key clustered, Text nvarchar(4000), ContinuationRow bit, ArchiveNo int null)
+
+declare @ArchiveNo int
+
+declare crs insensitive cursor 
+	for ( {0} ) 
+for read only 
+open crs 
+fetch crs into @ArchiveNo
+while @@fetch_status &gt;= 0 
+begin 
+		if( @ArchiveNo &gt; 0 )
+			insert #err_log_text_tmp (Text, ContinuationRow) exec master.dbo.sp_readerrorlog @ArchiveNo
+		else
+			insert #err_log_text_tmp (Text, ContinuationRow) exec master.dbo.sp_readerrorlog
+		update #err_log_text_tmp set ArchiveNo = @ArchiveNo where ArchiveNo is null
+		fetch crs into @ArchiveNo
+end 
+close crs
+deallocate crs
+
+declare @off int
+select @off = 1
+
+while exists ( select ContinuationRow from #err_log_text_tmp where ContinuationRow = 1 )
+begin
+	update t1
+	set t1.Text = t1.Text + t2.Text
+	from #err_log_text_tmp as t1
+		inner join #err_log_text_tmp as t2 on t1.id + @off = t2.id
+	where t1.ContinuationRow = 0
+	and t2.ContinuationRow = 1
+	
+	delete t2
+	from #err_log_text_tmp as t2
+		inner join #err_log_text_tmp as t1 on t1.id + @off = t2.id
+	where t2.ContinuationRow = 1
+
+	set @off = @off + 1
+end
+
+insert #err_log_text_tmp_final
+	select 
+		Text = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-2][0-9]-[0-3][0-9] [0-6][0-9]:[0-6][0-9]:[0-9][0-9]%'
+				then /*structured row: remove date/spid part */ SUBSTRING(Text, @text_offset, 4000) else /*non structured row*/ Text end,
+		ArchiveNo, 
+		LogDate = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-2][0-9]-[0-3][0-9] [0-6][0-9]:[0-6][0-9]:[0-9][0-9]%'
+				then /*structured row: get date part */ CONVERT(datetime, LEFT(Text, 23), 121) else /*non structured row*/ null end,
+		ProcessInfo = CASE WHEN Text like '[1-2][0-9][0-9][0-9]-[0-2][0-9]-[0-3][0-9] [0-6][0-9]:[0-6][0-9]:[0-9][0-9]%'
+				then /*structured row: get spid part */ rtrim(SUBSTRING(Text, 24, @process_info_length)) else /*non structured row*/ null end
+	from #err_log_text_tmp
+
+drop table #err_log_text_tmp
+">
+                    <link_field field="ParentSelect" />
+                </link_multiple>
+            </prefix>
+        </version>
+        <version min_major="9">
+            <prefix>
+                <link_multiple no='1' expression="
+declare @ArchiveNo int
+
+declare crs insensitive cursor 
+	for ( {0} ) 
+for read only 
+open crs 
+fetch crs into @ArchiveNo
+while @@fetch_status &gt;= 0 
+begin 
+		if( @ArchiveNo &gt; 0 )
+			insert #err_log_text_tmp_final (LogDate, ProcessInfo, Text) exec master.dbo.sp_readerrorlog @ArchiveNo
+		else
+			insert #err_log_text_tmp_final (LogDate, ProcessInfo, Text) exec master.dbo.sp_readerrorlog
+		update #err_log_text_tmp_final set ArchiveNo = @ArchiveNo where ArchiveNo is null
+		fetch crs into @ArchiveNo
+end 
+close crs
+deallocate crs
+">
+                    <link_field field="ParentSelect" />
+                </link_multiple>
+            </prefix>
+        </version>
+		<postfix>
+			drop table #err_log_text_tmp_final
+		</postfix>
+	</settings>
+	<properties>
+		<property name="LogDate" type="datetime">ert.LogDate</property>
+		<property name="ProcessInfo" type="nvarchar" size = '100'>ert.ProcessInfo</property>
+		<property name="Text" type="nvarchar" size='4000'>ert.Text</property>
+		<property name="ArchiveNo" type="int" hidden='true'>ert.ArchiveNo</property>
+	</properties>
+</EnumObject>

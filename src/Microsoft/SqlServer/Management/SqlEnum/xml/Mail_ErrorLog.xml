@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ErrorLog" impl_type="SqlObject" min_major='9'>
+	<settings>
+		<property_link table="msdb.dbo.sysmail_event_log er" />
+	</settings>
+	<properties>
+		<property name="LogID" type="int">er.log_id</property>
+		<property name="EventType" type="sysname">er.event_type</property>
+		<property name="LogDate" type="datetime">er.log_date</property>
+		<property name="Description" type="nvarchar" size="max">er.description</property>
+		<property name="ProcessID" type="int">er.process_id</property>
+		<property name="MailItemID" type="int">er.mailitem_id</property>
+		<property name="AccountID" type="int">er.account_id</property>
+		<property name="LastModifiedDate" type="datetime">er.last_mod_date</property>
+		<property name="LastModifiedUser" type="sysname">er.last_mod_user</property>
+	</properties>
+</EnumObject>

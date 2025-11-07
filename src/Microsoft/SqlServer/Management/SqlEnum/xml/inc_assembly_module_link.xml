@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject min_major='9'  cloud_min_major='12'>
+	<settings>
+		<version min_major='9'  cloud_min_major='12'>
+			<property_link fields='#ClassName#MethodName#AssemblyName#ExecutionContext#ExecutionContextPrincipal#ReturnsNullOnNullInput#' 
+						left_join='sys.assembly_modules' alias='am{0}'>am{0}.object_id = {0}.object_id</property_link>
+			<property_link fields='#AssemblyName#' 
+						left_join='sys.assemblies' alias='asmbl{0}'>asmbl{0}.assembly_id = am{0}.assembly_id</property_link>
+			<property_link fields='#ExecutionContextPrincipal#'
+					left_join='sys.database_principals' alias = 'ampr{0}'>ampr{0}.principal_id = am{0}.execute_as_principal_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<property name="AnsiNullsStatus" type="bit" cast='true'>OBJECTPROPERTY({0}.id,N'ExecIsAnsiNullsOn')</property>
+		<property name="QuotedIdentifierStatus" type="bit" cast='true'>OBJECTPROPERTY({0}.id,N'ExecIsQuotedIdentOn')</property>
+		<property name="IsSchemaBound" type="bit" cast='true'>OBJECTPROPERTY({0}.id, N'IsSchemaBound')</property>
+	
+		<property name="AssemblyName" type="sysname">asmbl{0}.name</property>
+		<property name="ClassName" type="sysname">am{0}.assembly_class</property>
+		<property name="MethodName" type="sysname">am{0}.assembly_method</property>
+		<property name="ReturnsNullOnNullInput" type="bit" cast='true'>am{0}.null_on_null_input</property>
+
+		<property name="ExecutionContext" type="int" report_type="ExecutionContext">case isnull(am{0}.execute_as_principal_id, -1) when -1 then 1 when -2 then 2 else 3 end</property>			
+		<property name="ExecutionContextPrincipal" type="sysname">ampr{0}.name</property>			
+	</properties>
+</EnumObject>

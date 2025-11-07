@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<EnumObject type="MailServer" impl_type="SqlObject" min_major='9'>
+    <settings>
+	<parent_link>
+		<link parent='Name' local='AccountName' />
+	</parent_link>
+	<request_parent_select>
+		<field name='Name' />
+	</request_parent_select>
+
+	<property_link table='#account_server_tmp' alias='ast'/>
+	<prefix>
+		<link_multiple no='1' expression="
+create table #account_server_tmp(account_id int, name nvarchar(128), description nvarchar(256) null, email_address nvarchar(128) null, display_name nvarchar(128) null, replyto_address nvarchar(128) null, servertype nvarchar(128), servername nvarchar(128), port int, username nvarchar(128) null, use_default_credentials bit, enable_ssl bit)
+declare @AccountName sysname
+
+declare crs cursor local fast_forward
+	for ( {0} ) 
+open crs 
+fetch crs into @AccountName 
+while @@fetch_status &gt;= 0 
+begin 
+	insert #account_server_tmp(account_id, name, description, email_address, display_name, replyto_address, servertype, servername, port, username, use_default_credentials, enable_ssl) exec msdb.dbo.sysmail_help_account_sp @account_name=@AccountName
+	fetch crs into @AccountName 
+end 
+close crs
+deallocate crs">
+			<link_field field="ParentSelect" />
+		</link_multiple>
+	</prefix>
+	<postfix>
+drop table #account_server_tmp
+	</postfix>
+    </settings>
+    <properties>
+	<include file='inc_urn.xml' />
+	<property name='Name' type='sysname'>ast.servername</property>
+	<property name='Port' type='int'>ast.port</property>
+	<property name='UserName' type='nvarchar' size = '128'>ISNULL(ast.username, N'')</property>
+	<property name='AccountName' type='nvarchar' size = '128' hidden='true'>ast.name</property>
+	<property name='ServerType' type='nvarchar' size = '128' access='read'>ast.servertype</property>
+	<property name='UseDefaultCredentials' type='bit' cast = 'true'>ast.use_default_credentials</property>
+	<property name='EnableSsl' type='bit' cast = 'true'>ast.enable_ssl</property>
+    </properties>
+</EnumObject>

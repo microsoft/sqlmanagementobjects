@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<EnumObject type="UserDefinedType" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+  <settings>
+    <property_link table='sys.assembly_types AS atypes' />
+    <property_link join='sys.assemblies AS asmbl'>(asmbl.assembly_id = atypes.assembly_id) and (atypes.is_user_defined = 1)</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn_schema.xml' />
+    <include file='inc_type_reference.xml' alias='atypes' />
+
+    <property name="ID" type="int" access='Read'>atypes.user_type_id</property>
+    <property name="MaxLength" type="int" access='Read' cast='true'>atypes.max_length</property>
+    <property name="Collation" type="sysname" access='Read'>ISNULL(atypes.collation_name,N'')</property>
+    <property name="NumericPrecision" type="int" access='Read' cast='true'>atypes.precision</property>
+    <property name="NumericScale" type="int" access='Read' cast='true'>atypes.scale</property>
+    <property name="IsNullable" type="bit" cast = 'true' access='Read'>atypes.is_nullable</property>
+
+    <property name="AssemblyName" type="sysname">asmbl.name</property>
+
+    <property name="ClassName" type="sysname">ISNULL(atypes.assembly_class,N'')</property>
+    <property name="IsBinaryOrdered" type="bit" access='Read'>atypes.is_binary_ordered</property>
+    <property name="IsFixedLength" type="bit" access='Read'>atypes.is_fixed_length</property>
+    <property name="IsComVisible" type="bit" cast = 'true' access='Read'>0</property>
+    <property name="BinaryTypeIdentifier" type="varbinary" access='Read' cast='true'>0x0</property>
+    <property name="UserDefinedTypeFormat" type="tinyint" access='Read' report_type="UserDefinedTypeFormat" cast='true'>0</property>
+
+    <!-- extended properties support -->
+    <property name="ExtPropClass" type="int" hidden='true'>6</property>
+    <property name="ExtPropMajorID" type="int" hidden='true'>
+      <link_multiple no='1' expression="{0}">
+        <link_field type='local' field="ID" />
+      </link_multiple>
+    </property>
+    <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+
+  </properties>
+</EnumObject>

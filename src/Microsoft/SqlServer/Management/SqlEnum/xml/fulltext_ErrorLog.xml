@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<EnumObject type="ErrorLog" impl_type="SqlObject" min_major='9' >
+	<settings>
+		<request_parent_select>
+			<field name='ID' />
+		</request_parent_select>
+	
+		<property_link table="#fulltext_log_tmp er" />
+		<prefix>
+			<link_multiple no='1' expression="
+create table #fulltext_log_tmp(ArchiveNo int, CreateDate nvarchar(24), Size int, ctlgid int null)
+declare @ctlgid int 
+declare @dbid int 
+set @dbid = db_id()
+declare crs_ctlg cursor local fast_forward
+	for({0})
+for read only 
+open crs_ctlg
+fetch next from crs_ctlg into @ctlgid
+while 0 = @@fetch_status
+begin
+	insert #fulltext_log_tmp (ArchiveNo, CreateDate, Size) exec master.dbo.xp_enumerrorlogs 3, @dbid, @ctlgid
+	update #fulltext_log_tmp set ctlgid = @ctlgid where ctlgid is null
+	fetch next from crs_ctlg into @ctlgid
+end
+close crs_ctlg
+deallocate crs_ctlg">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+drop table #fulltext_log_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='3' expression="{0} + '/{2}[@ArchiveNo=''' + CAST({1} AS sysname) + ''']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="ArchiveNo" />
+				<link_field field="NType" />				
+			</link_multiple>
+		</property>
+	
+		<property name="Name" type="sysname" cast='true' access='read'>er.ArchiveNo</property>
+		<property name="ArchiveNo" type="int" access='read'>er.ArchiveNo</property>
+		<property name="CreateDate" type="datetime" access='read'>CONVERT(datetime, er.CreateDate, 101)</property>
+		<property name="DateLastModified" type="datetimeoffset">TODATETIMEOFFSET(CONVERT(datetime, er.CreateDate, 101),DATEDIFF(minute, SYSUTCDATETIME(), SYSDATETIME()))</property>		
+		<property name="Size" type="int" access='read'>er.Size</property>
+		
+		<property name="CatalogId" type="int" hidden='true'>er.ctlgid</property>		
+	</properties>
+</EnumObject>

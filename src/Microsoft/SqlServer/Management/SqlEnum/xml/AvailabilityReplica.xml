@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<EnumObject type="AvailabilityReplica" impl_type="SqlObject" min_major='11' >
+  <settings>
+    <parent_link>
+      <link parent='UniqueId' local='ParentID'/>
+    </parent_link>
+    <version min_major='11' max_major='12'>
+      <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
+    </version>
+    <version min_major='13' max_major='16'>
+      <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
+    </version>
+    <version min_major='17'>
+      <property_link fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#" table="#tmpar_availability_replicas" alias="AR">AR.replica_server_name IS NOT NULL</property_link>
+    </version>
+    <property_link fields="#Role#OperationalState#RollupRecoveryState#RollupSynchronizationState#ConnectionState#LastConnectErrorNumber#LastConnectErrorDescription#LastConnectErrorTimestamp#" left_join="#tmpar_availability_replica_states AS arstates">AR.replica_id = arstates.replica_id</property_link>
+    <property_link fields="#RollupSynchronizationState#" left_join="#tmpar_replica_rollupstate AS arrollupstates">AR.replica_id = arrollupstates.replica_id</property_link>
+    <property_link fields="#ReadonlyRoutingListDelimited#" left_join="#ror_list_delimited AS rorlists">AR.replica_id = rorlists.replica_id</property_link>
+    <property_link fields="#JoinState#" left_join="#tmpar_availability_replica_cluster_states AS arcs">AR.replica_id = arcs.replica_id</property_link>
+    <property_link fields="#QuorumVoteCount#MemberState#" left_join="#tmpar_availability_replica_cluster_info AS arci">UPPER(AR.replica_server_name) = UPPER(arci.replica_server_name) </property_link>
+    <version min_major='11' max_major='12'>
+      <prefix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#">
+        select group_id, replica_id, replica_server_name,create_date, modify_date, endpoint_url, read_only_routing_url, primary_role_allow_connections, secondary_role_allow_connections, availability_mode,failover_mode, session_timeout, backup_priority, owner_sid into #tmpar_availability_replicas from master.sys.availability_replicas
+      </prefix>
+    </version>
+    <version min_major='13' max_major='16'>
+      <prefix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#">
+        select group_id, replica_id, replica_server_name,create_date, modify_date, endpoint_url, read_only_routing_url, primary_role_allow_connections, secondary_role_allow_connections, availability_mode,failover_mode, session_timeout, backup_priority, owner_sid, seeding_mode into #tmpar_availability_replicas from master.sys.availability_replicas
+      </prefix>
+    </version>
+    <version min_major='17'>
+      <prefix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#SeedingMode#">
+        select group_id, replica_id, replica_server_name,create_date, modify_date, endpoint_url, read_only_routing_url, read_write_routing_url, primary_role_allow_connections, secondary_role_allow_connections, availability_mode,failover_mode, session_timeout, backup_priority, owner_sid, seeding_mode into #tmpar_availability_replicas from master.sys.availability_replicas
+      </prefix>
+    </version>
+    <prefix fields="#ReadonlyRoutingListDelimited#">
+      CREATE TABLE #ror_list_delimited (
+      replica_id uniqueidentifier,
+      read_only_routing_list nvarchar(max)
+      )
+      select replica_id,read_only_replica_id,routing_priority into #tmp_availability_read_only_routing_lists from sys.availability_read_only_routing_lists
+
+      INSERT INTO #ror_list_delimited
+      SELECT DISTINCT ars.replica_id, a.delimited
+      FROM #tmpar_availability_replicas AS ars
+      CROSS APPLY
+      (
+        SELECT STUFF(final_list.read_only_routing_list,1,1,'') FROM (
+        SELECT CASE 
+        WHEN CHARINDEX(',', STUFF(priority_grouped_list.priority_group, 1, 1, '')) = 0 THEN priority_grouped_list.priority_group
+        ELSE ',(' + STUFF(priority_grouped_list.priority_group, 1, 1, '') + ')' 
+          END 
+        FROM (
+        SELECT (SELECT  ',N'''+ ars2.replica_server_name +''''
+        FROM #tmp_availability_read_only_routing_lists AS rrlists
+        INNER JOIN #tmpar_availability_replicas AS ars2
+        ON ars2.replica_id = rrlists.read_only_replica_id
+        WHERE rrlists.routing_priority = prioritylist.routing_priority
+        AND rrlists.replica_id = ars.replica_id
+        FOR XML PATH('') ) AS priority_group
+        FROM
+        (SELECT  distinct(routing_priority)
+        FROM #tmp_availability_read_only_routing_lists where replica_id = ars.replica_id) AS prioritylist(routing_priority)) priority_grouped_list
+        FOR XML PATH('') ) AS final_list(read_only_routing_list) ) AS a(delimited)
+    </prefix>
+
+    <prefix fields="#RollupSynchronizationState#Role#OperationalState#RollupRecoveryState#RollupSynchronizationState#ConnectionState#LastConnectErrorNumber#LastConnectErrorDescription#LastConnectErrorTimestamp#">
+      select group_id, replica_id, role,operational_state,recovery_health,synchronization_health,connected_state, last_connect_error_number,last_connect_error_description, last_connect_error_timestamp into #tmpar_availability_replica_states from master.sys.dm_hadr_availability_replica_states
+    </prefix>
+    <prefix fields="#JoinState#">
+      select replica_id,join_state into #tmpar_availability_replica_cluster_states from master.sys.dm_hadr_availability_replica_cluster_states
+    </prefix>
+    <prefix fields="#RollupSynchronizationState#">
+      select * into #tmpar_ags from master.sys.dm_hadr_availability_group_states
+      select ar.group_id, ar.replica_id, ar.replica_server_name, ar.availability_mode, (case when UPPER(ags.primary_replica) = UPPER(ar.replica_server_name) then 1 else 0 end) as role, ars.synchronization_health into #tmpar_availabilty_mode from #tmpar_availability_replicas as ar
+      left join #tmpar_ags as ags on ags.group_id = ar.group_id
+      left join #tmpar_availability_replica_states as ars on ar.group_id = ars.group_id and ar.replica_id = ars.replica_id
+      select am1.replica_id, am1.role, (case when (am1.synchronization_health is null) then 3 else am1.synchronization_health end) as sync_state, (case when (am1.availability_mode is NULL) or (am3.availability_mode is NULL) then null when (am1.role = 1) then 1 when (am1.availability_mode = 0 or am3.availability_mode = 0) then 0 else 1 end) as effective_availability_mode
+      into #tmpar_replica_rollupstate from #tmpar_availabilty_mode as am1 left join (select group_id, role, availability_mode from #tmpar_availabilty_mode as am2 where am2.role = 1) as am3 on am1.group_id = am3.group_id
+      drop table #tmpar_availabilty_mode
+      drop table #tmpar_ags
+    </prefix>
+
+    <prefix fields="#QuorumVoteCount#MemberState#">
+        SELECT
+            arrc.replica_server_name, 
+            COUNT(cm.member_name) AS node_count,
+            SUM(cm.member_state) AS member_state_sum,
+            SUM(cm.number_of_quorum_votes) AS quorum_vote_sum
+        INTO #tmpar_availability_replica_cluster_info
+        FROM 
+            (SELECT DISTINCT replica_server_name, node_name FROM master.sys.dm_hadr_availability_replica_cluster_nodes) AS arrc 
+        LEFT OUTER JOIN master.sys.dm_hadr_cluster_members AS cm ON UPPER(arrc.node_name) = UPPER(cm.member_name) 
+        GROUP BY arrc.replica_server_name
+    </prefix>
+    
+    
+    <postfix fields="#ReadonlyRoutingListDelimited#">
+      DROP TABLE #ror_list_delimited
+      DROP TABLE #tmp_availability_read_only_routing_lists
+    </postfix>
+    <postfix fields="#RollupSynchronizationState#ReadonlyRoutingListDelimited#ParentID#Name#UniqueId#CreateDate#DateLastModified#EndpointUrl#ReadonlyRoutingConnectionUrl#ReadwriteRoutingConnectionUrl#ConnectionModeInPrimaryRole#ConnectionModeInSecondaryRole#AvailabilityMode#FailoverMode#SessionTimeout#BackupPriority#Owner#QuorumVoteCount#MemberState#">
+      DROP TABLE #tmpar_availability_replicas
+    </postfix>
+    <postfix fields="#Role#OperationalState#RollupRecoveryState#RollupSynchronizationState#ConnectionState#LastConnectErrorNumber#LastConnectErrorDescription#LastConnectErrorTimestamp#">
+      DROP TABLE #tmpar_availability_replica_states
+    </postfix>
+    <postfix fields="#JoinState#">
+      DROP TABLE #tmpar_availability_replica_cluster_states
+    </postfix>
+    <postfix fields="#RollupSynchronizationState#">
+      DROP TABLE #tmpar_replica_rollupstate
+    </postfix>
+
+    <postfix fields="#QuorumVoteCount#MemberState#">
+      DROP TABLE #tmpar_availability_replica_cluster_info
+    </postfix>
+
+  </settings>
+  <properties>   
+    <include file='inc_urn.xml'/>
+
+    <version min_major='11'>
+      <property name="ParentID" type="uniqueidentifier" hidden="true">AR.group_id</property>
+      <property name="Name" type="nvarchar">AR.replica_server_name</property>
+      <property name="UniqueId" type="uniqueidentifier" access="Read">AR.replica_id</property>
+      <property name="Role" type="int" report_type="AvailabilityReplicaRole" access="Read">ISNULL(arstates.role, 3)</property>
+      <property name="OperationalState" type="tinyint" report_type="AvailabilityReplicaOperationalState" access="Read">ISNULL(arstates.operational_state, 6)</property>
+      <property name="RollupRecoveryState" type="tinyint" report_type="AvailabilityReplicaRollupRecoveryState" access="Read">ISNULL(arstates.recovery_health, 2)</property>
+      <property name="RollupSynchronizationState" type="tinyint" report_type="AvailabilityReplicaRollupSynchronizationState" access="Read">(case when arrollupstates.sync_state = 3 then 3 when (arrollupstates.effective_availability_mode = 1 or arrollupstates.role = 1) then arrollupstates.sync_state when arrollupstates.sync_state = 2 then 1 else 0 end)</property>
+      <property name="ConnectionState" type="int" report_type="AvailabilityReplicaConnectionState" access="Read">ISNULL(arstates.connected_state, 2)</property>
+      <property name="CreateDate" type="datetime" access="Read">ISNULL(AR.create_date, 0)</property>
+      <property name="DateLastModified" type="datetime" access="Read">ISNULL(AR.modify_date, 0)</property>
+      <property name="EndpointUrl" type="nvarchar">ISNULL(AR.endpoint_url, N'')</property>
+      <property name="ReadonlyRoutingConnectionUrl" type="nvarchar">ISNULL(AR.read_only_routing_url, '')</property>
+      <property name="ReadonlyRoutingListDelimited" type="nvarchar" access="Read">ISNULL(rorlists.read_only_routing_list, '')</property>
+      <property name="ConnectionModeInPrimaryRole" type="int" report_type="AvailabilityReplicaConnectionModeInPrimaryRole">ISNULL(AR.primary_role_allow_connections, 4)</property>
+      <property name="ConnectionModeInSecondaryRole" type="int" report_type="AvailabilityReplicaConnectionModeInSecondaryRole">ISNULL(AR.secondary_role_allow_connections, 3)</property>
+      <property name="AvailabilityMode" type="int" report_type="AvailabilityReplicaAvailabilityMode">ISNULL(AR.availability_mode, 2)</property>
+      <property name="FailoverMode" type="int" report_type="AvailabilityReplicaFailoverMode">ISNULL(AR.failover_mode, 3)</property>
+      <property name="SessionTimeout" type="int">ISNULL(AR.session_timeout, -1)</property>
+      <property name="LastConnectErrorNumber" type="int" access="Read">ISNULL(arstates.last_connect_error_number,-1)</property>
+      <property name="LastConnectErrorDescription" type="nvarchar" access="Read">ISNULL(arstates.last_connect_error_description, N'')</property>
+      <property name="BackupPriority" type="int">ISNULL(AR.backup_priority, -1)</property>
+      <property name="LastConnectErrorTimestamp" type="datetime" access="Read">ISNULL(arstates.last_connect_error_timestamp, 0)</property>
+      <property name="Owner" type="sysname" access="Read">suser_sname(AR.owner_sid)</property>
+      <property name="JoinState" type="tinyint" report_type="AvailabilityReplicaJoinState" access="Read">ISNULL(arcs.join_state, 99)</property>
+      <property name="QuorumVoteCount" type="int" expensive="true" access="Read">ISNULL(arci.quorum_vote_sum, -1)</property>
+      <property name="MemberState" type="tinyint" report_type ="ClusterMemberState" expensive="true" access="Read">
+CASE 
+    WHEN arci.member_state_sum IS NULL OR arci.node_count = 0 THEN 3
+    WHEN arci.member_state_sum = 0 THEN 0 
+    WHEN arci.member_state_sum &lt; arci.node_count THEN 2
+    WHEN arci.member_state_sum = arci.node_count THEN 1
+    ELSE 3
+END
+      </property>
+      <include file='inc_hadr_policy_health_state.xml'/>
+    </version>
+    <version min_major='13'>
+      <property name="SeedingMode" type="tinyint" report_type="AvailabilityReplicaSeedingMode">ISNULL(AR.seeding_mode, 1)</property>
+    </version>
+    <version min_major='17'>
+      <property name="ReadwriteRoutingConnectionUrl" type="nvarchar">ISNULL(AR.read_write_routing_url, '')</property>
+    </version>
+  </properties>
+
+</EnumObject>

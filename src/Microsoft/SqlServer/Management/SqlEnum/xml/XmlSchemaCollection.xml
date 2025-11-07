@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<EnumObject type="XmlSchemaCollection" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+	<settings>
+		<property_link table="sys.xml_schema_collections AS xsc">
+				xsc.schema_id   &lt;&gt; 4</property_link>
+		<property_link fields='#Schema#Text#' 
+				join='sys.schemas AS sch'>xsc.schema_id = sch.schema_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn_schema.xml' />
+		<property name="Name" type="sysname">xsc.name</property>			
+		<property name="ID" type="int" access='Read'>xsc.xml_collection_id</property>
+		<property name="Schema" type="sysname">sch.name</property>
+		<property name="CreateDate" type="datetime" access='Read'>xsc.create_date</property>
+		<property name="DateLastModified" type="datetime" access='Read'>xsc.modify_date</property>
+		<property name="Text" type="xml" read_only_after_creation="true">XML_SCHEMA_NAMESPACE(sch.Name, xsc.name)</property>
+		
+		<!-- extended properties support -->
+		<property name="ExtPropClass" type="int" hidden='true'>10</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>xsc.xml_collection_id</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>
+

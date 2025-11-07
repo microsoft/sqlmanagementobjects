@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='SubscriptionClass' impl_type='SqlObject' min_major='9' >
+	<settings>
+		<property_link table="#tmp_subscription_class" alias="sc" />
+		<prefix>
+CREATE TABLE #tmp_subscription_class(
+    SubscriptionClassId int,
+    SubscriptionClassName nvarchar(255),
+    FileGroup nvarchar(128),
+    IndexSqlStatementsXml nvarchar(max)
+)
+INSERT #tmp_subscription_class EXEC [SchemaPrefix].NSGetSubscriptionClasses
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_subscription_class
+        </postfix>
+        <post_process fields="#IndexSqlStatements#" 
+            class_name="Microsoft.SqlServer.Management.Smo.PostProcessXmlToList" 
+            triggered_fields="#IndexSqlStatementsXml#" />
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="Id" type="int" hidden="true">sc.SubscriptionClassId</property>
+		<property name="Name" type="nvarchar" size="255">sc.SubscriptionClassName</property>
+		<property name="FileGroup" type="nvarchar" size="128">sc.FileGroup</property>
+		<property name="IndexSqlStatements" type="int" report_type2="System.Object">null</property>
+        <property name="IndexSqlStatementsXml" type="nvarchar" size="max" hidden="true">sc.IndexSqlStatementsXml</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,187 @@
+# General
+NoSuchCollection(string name) = Collection '{0}' does not exist.
+UnsupportedObjectType(string type, string host) = Object type {0} is not supported by {1}.
+UnknownEnumeration(string type) = The value for enumeration type {0} is not valid.
+InvalidArgument(string arg) = '{0}' is invalid. 
+ObjectCannotBeCreated (string obj) = {0} cannot be created. 
+TooManyURNsReturned(string type) = Multiple URNs were returned for root condition {0}.
+RootConditionFailed(string type) = Root condition {0} failed to retrieve the object.
+UnsupportedConnectionType(string type) = Connection type '{0}' is not supported. Use a SqlStoreConnection or ServerConnection object instead.
+
+Policy = Policy
+Condition = Condition
+ObjectSet = Object Set
+Category = Category
+RootCondition = Server Condition
+EvaluationMode = Evaluation Mode
+Schedule = Schedule
+Enabled = Enabled
+TargetSet = Target Set
+ManagementFacet = Management Facet
+Property = Property
+ObjectType = Object type
+PolicyStore=Policy Store
+CategorySubscription = Category Subscription
+NotSupported (string host_type, string host_name, string object_type, string object_name) = {0} '{1}' does not support {2} '{3}'. 
+ObjectAlreadyExists (string object, string name) = {0} '{1}' already exists. 
+ObjectDoesntExist (string object, string name) = {0} '{1}' does not exist. 
+ArgumentNullOrEmpty (string argument) = {0} cannot be Null or Empty.
+FailedOperation(string opName, string objType, string objName) = {0} failed for {1} '{2}'.
+ConsistencyRepair=Consistency Repair
+EraseSystemHealthPhantomRecords=Erasing the phantom records from the system_health_state table
+ValuePositive=Value must be greater than or equal to zero.
+PurgeHealthState=Delete health state
+MarkSystemObject=Mark system object
+CannotMarkSystemObject(string objType)=Cannot mark '{0}' object as System.
+
+#default category name
+DefaultCategory = <Default>
+
+#Evaluation mode descriptions and warning text
+EvaluationModeNoneDescription	= On demand
+EvaluationModeEnforceDescription	= On change: prevent
+EvaluationModeCoCDescription		= On change: log only
+EvaluationModeCoSDescription		= On schedule
+AdditionalHelpText = Additional help text
+AdditionalHelpLink = Additional help link
+
+#Ad hoc evaluation mode
+CheckMode=Check Mode
+ConfigureMode=Configure Mode
+CheckSqlScriptAsProxyMode=Check Sql Script As Proxy
+
+
+# Adapters
+AdapterAlreadyExists(string interface, string object) = Adapter for this interface and object pair already exists ({0}, {1}).
+AdapterHasTooManyArguments(string name) = Adapter {0} has a constructor that has more than one argument
+AssemblyAlreadyRegistered(string name) = Assembly {0} is already registered.
+FailedMethodCall(string methodName, string facetType, string targetName) = Method call {0} failed for facet type {1} over target type {2}.
+
+#Exception thrown when accessing configuration properties when config value and run value do not match
+ConfigValueMismatch(string propertyName, string configValue, string runValue)=Value of property {0} is not in a committed state. Configuration value = {1}, Run value = {2}. Before policies can evaluate this property, you must restart the service.
+
+# Expressions
+OperatorNotApplicable(string operator, string type) = Operator {0} is not a supported comparison operator for type {1}.
+FunctionWrongArgumentsNumber(string function, int argsReceived, int argsExpected) = Function {0} received {1} arguments. The expected number of arguments is {2}.
+FunctionWrongArgumentType(string function, string typeReceived, string typeExpected) = Function {0} received an argument of type {1}. The expected type is {2}.
+ExpressionTypeMistmatch(string typeLeft, string typeRight) = Type {0} cannot be compared to {1}.
+NullFacet(string facet) = Cannot find Facet associated with {0}.
+BadExpressionTree(string reason) = ExpressionTree is not formed correctly. ({0}) 
+EvaluatingOperatorNone = Operator of type NONE cannot be evaluated.
+ExpressionNodeNotConfigurableGeneric = Expression cannot be configured.
+ExpressionNodeNotConfigurable(string subtype) = Cannot configure the target. The result is not deterministic because of operator [{0}].
+ExpressionNodeNotConfigurableOperators(string propertyName,string expression) = Cannot configure property [{0}] to conform to expression [{1}] because the result is not deterministic.
+UnsupportedTargetFilter(string filter)=Target filter '{0}' is not supported because it does not point out to one single database.
+ParsingError (string input) = Error parsing '{0}'. Make sure string constants are enclosed in single quotes and facet properties are prefixed with '@' sign.
+ParsingArgumentException(string pattern, string message) = Parsing '{0}' - {1}.
+ParsingUnclosedBracketMsg = Unterminated [] set
+ParsingUnclosedParenthesisMsg = Unterminated () set
+ParsingMissingQuotes = Missing quotation marks
+ParsingMissingElement = Missing list element
+ParsingSyntaxError = Syntax error
+ParsingUnquotedDatePart (String input) = Error parsing '{0}'. Policy expressions require the first argument of DATEADD and DATEPART functions to be in single quotes. For example, use "DATEADD('DAY', -7, GETDATE())".
+UnsupportedFunction(string type) = Function '{0}' is not supported in filters on this edition of SQL Server.
+InvalidOperand(string type, string operand) = Type '{0}' cannot be {1}.
+LeftOperand = left operand
+RightOperand = right operand
+NonConfigurableReadOnlyProperty(string propertyName) = Cannot change property [{0}] because it is read-only.
+InvalidInOperator(string operator) = Operator '{0}' must have a value as its left operand and its right operand must be an Array. 
+InvalidList = All items in the list must have the same type.
+FunctionWrongReturnType(string function, string typeReceived, string typeExpected) = Function {0} specified a return value of type {1}. The expected type is {2}.
+FunctionNotASmoObject(string functionName, string targetType) = Function {0} attempted with bad target type {1}.
+FunctionTooManyColumns = Query for scalar function returns more than one column.
+WmiException(string message) = An error has occurred while accessing WMI: {0}.
+CannotProduceScript = Cannot produce configuration script from given object.
+NoConfigureScriptForCompliantObject = Object complies with the policy. 
+PropertyCannotBeSet(string prop) = Property '{0}' cannot be Set.
+
+# Expressions serialization
+CannotMoveToElement = Cannot find the next element.
+UnexpectedElement(string nameRead, string nameExpected) = Element name '{0}' is unexpected. Expected the name '{1}'.
+UnexpectedType(string typeRead, string nameRead, string typeExpected) = Unexpected xml-node type '{0}', name '{1}'. Expected type '(2)'.
+UnexpectedName(string typeRead, string nameRead, string typeExpected, string nameExpected) = Unexpected xml-node type '{0}', name '{1}'. Expected type '(2)', name '{1}'.
+CannotConvertToType(string inputString, string typeName) = String '{0}' cannot be converted to type '{1}'.
+UnsupportedConstantType(string node, string typeName) = {0} does not support type '{1}'.
+
+# Policy import and export
+UnknownPolicy = <unknown policy>
+InvalidOrMissingXMLReader = Invalid or missing XML stream to read from.
+SinglePolicyDeserializationFailed = Single policy deserialization from an XML stream failed.
+PolicyImportFileDoesNotHaveAnyPolicy = Single policy deseralization failed. No policy was found in the given file. 
+SinglePolicyExpected(string policyName, string policyName2) = Policy '{0}' is unexpected. The policy '{1}' was already found and a single policy is expected.
+ReferencedObjectExpected(string objectType, string objectName) = {0} '{1}' is unexpected. This object should be referenced directly by the Policy or by the Object Set.
+PolicyAndConditionNameMismatch(string policyName, string policyCondition, string conditionName) = The condition '{2}' is a mismatch. The policy '{0}' references the condition '{1}'.
+ObjectSetAndConditionFacetMismatch(string objectSetName, string objectSetFacet, string conditionName, string conditionFacet) = Facets mismatch. The Object Set '{0}' references the Management Facet '{1}'. The Condition '{2}' references the Management Facet '{3}'.
+
+# Policy evaluation
+ConditionIsNull = The policy cannot be evaluated because it does not contain a condition.
+ObjectSetIsNull = Policy not associated with active Object Set cannot be evaluated in this mode.
+IncompatiblePolicyEvaluationMode = The policy cannot be evaluated in the given context.
+OnlyOneConditionExpression = The policy cannot be evaluated because it does not contain at least one condition expression.
+OnlyOneTarget(string queryExpression) = The QueryExpression '{0}' should describe one valid target for this method to succeed.
+OnlyInSqlClr=This method can be called only inside SQLCLR.
+MissingPolicy(string name)=Policy '{0}' does not exist.
+MissingProperty(string name)=Property '{0}' does not exist.
+NonRetrievableProperty(string name)=Property value '{0}' is not available.
+RollBack(string policy, string objectQe, string condition, string description, string helpText, string helpLink, string statement)=Policy '{0}' has been violated by '{1}'.\nThis transaction will be rolled back.\nPolicy condition: '{2}'\nPolicy description: '{3}'\nAdditional help: '{4}' : '{5}'\nStatement: '{6}'.
+OnlyInMsdb=The procedure can be executed only in the msdb database.
+OnlyRoleMember(string role)=Only members of the '{0}' role can execute this procedure.
+PolicyEvaluationFailed(string policyName) = Exception encountered while executing policy '{0}'. 
+PolicyEvaluationFailedOnDelegate(string policyName) = Exception encountered in callback while evaluating policy '{0}'. 
+PolicyEvaluationFailedNoException(string policyName) = Exception encountered while evaluating policy '{0}'. Cannot log exception details because exception serialization failed. 
+NullArgInPolicyEvaluation=The policy evaluation procedure cannot be called with null arguments.
+BadEventData(string element, string eventName)=Malformed event data. The value for element '{0}' is wrong. Event body: '{1}'.
+MissingTypeFacetAssociation(string typeName, string facet) = There is no association between type '{0}' and facet '{1}'.
+NoScriptInSqlClr(string policy) = The policy '{0}' will not be evaluated because it references a condition whose evaluation includes executing T-SQL or WQL scripts. 
+PolicyViolated(string policy) = Policy '{0}' has been violated.
+PolicyViolatedTarget(string policy, string targetName) = Policy '{0}' has been violated by target '{1}'.
+FailedToRetrieveImpersonationCookie = Failed to retrieve impersonation cookie.
+CantExecuteLongSqlScriptOn2000 = Cannot evaluate an ExecSql() expression with a script size greater than 4000 characters on a SQL Server 2000 target.
+
+
+# Policy Category subscriptions
+PolicyCategoryAlreadySubscribed = The target '{0}' is already subscribed to the Policy Category '{1}'.
+PolicyCategoryNotSubscribed = The target '{0}' is not subscribed to the Policy Category '{1}'.
+
+#FilterNodeConversion 
+Function = Function
+Operator = Operator
+ConversionNotSupported (string obj, string type) = {0} '{1}' is not supported by Target Set. 
+TypeNotSupported (string type) = Type '{0}' cannot be converted to a filter node.
+
+#Validation
+PolicyWithNoFilters = An automated Policy must have an active Object Set defined. 
+ScheduleDoesntExist (string guid) = Schedule with provided ScheduleUid '{0}' doesn't exist.
+ValidationFailed (string objectType, string objectName) = Validation failed for {0} '{1}'.
+MissingJobSchedule = CheckOnSchedule requires a Schedule. Select an existing Schedule, create a new Schedule, or change the Execution mode.
+StringPropertyTooLong(string propertyName, int maxLength, int currentLength) = String property '{0}' accepts a maximum of {1} characters. {2} characters were provided.
+InvalidHelpLinkMessage = Invalid help link. Help link must start with http://, https:// or mailto:.
+ReferencedConditionsCannotContainScript = Conditions referenced by automated policies cannot contain script.
+FacetNotSupported=Non-system policies/conditions on Utility facets are not supported in [KJ]. 
+
+#Policy health state
+UnknownTargetDatabase(string policy, string name)=The policy '{0}' has listed database '{1}' as a target but this database does not exist.
+UnsupportedTqe(string queryEx)=Target query expression '{0}' is not currently supported because it points to non-SMO objects.
+UnsupportedKey(string key)=Cannot create key for object of type '{0}'. It is not a DMF object.
+UnsupportedTqeProp(string queryEx, string prop)=Target query expression '{0}' is not currently supported because it attempts to filter on {1}.
+
+#Operations - to be used with FailedOperationException
+EnumApplicablePolicies=Enumerate applicable policies
+CalculateHealthState=Calculate health state
+GetAggregatedHealthState=Get aggregated health state
+
+#TargetFilter
+UnsupportedCrudDependencyAction (string action) = '{0}' is not a supported CRUD dependency action.
+InvalidUrnSkeleton (string action) = Invalid Urn Skeleton '{0}'.
+
+#ObjectSet
+TargetSetCountMismatch(string objectSetName, string facetName)=The Object Set '{0}' has an invalid number of Target Sets was specified for Facet '{1}'.
+UnsupportedTargetSetForFacet(string targetSetSkeleton, string objectSetName, string facetName)=The Object Set '{1}' has an unsupported Target Set '{0}' specified for Facet '{2}'.
+NoTargetSetEnabled(string objectSetName)=At least one Target Set needs to be enabled for the Object Set '{0}'.
+ConditionCannotBeUsedForFiltering(string condition)=Condition '{0}' cannot be used for filtering.
+CannotChangeFacet=Changing Facet is not allowed for referenced Conditions.
+CannotChangeFacetForObjectSet=Changing Facet is not allowed for ObjectSet. Drop and create a new one. 
+ObjectSetAlreadyReferenced(string objectSetName, string policyName)=Object Set '{0}' is already referenced by Policy '{1}'. Only one Policy can reference an Object Set.
+
+#Version
+VersionNotSupported(string curVerison, string minVersion)=Connected version '{0}' doesn't support this method. The minimal version for this method is '{1}'. 

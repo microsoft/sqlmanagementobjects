@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExtendedProperty" impl_type="SqlObject" min_major='8' cloud_min_major='12'>
+	<settings>
+		<version min_major='8' max_major='8'>
+			<parent_link>
+				<link parent='Schema' local='Owner' />
+				<link parent='Name' local='ObjName' />
+			</parent_link>
+			<request_parent_select>
+				<field name='Schema' />
+				<field name='Name' />
+			</request_parent_select>
+			<property_link table='#extprops AS p' />
+			<prefix>
+				create table #extprops(owner sysname null, objname sysname null, name sysname, value sql_variant null)
+			</prefix>
+			<prefix>
+				<link_multiple no='4' expression=
+"if not ({0} is null )
+begin
+	insert #extprops (owner, objname, name, value) select null, objname, name, value from ::fn_listextendedproperty (NULL, 'USER', {0}, {1}, {2}, default, default)
+	update #extprops set owner = {0}
+end
+else
+begin
+	declare @owner sysname
+	declare @name sysname
+	
+	declare crs insensitive cursor 
+		for ( {3} ) 
+	for read only 
+	open crs 
+	fetch crs into @owner, @name
+	while @@fetch_status &gt;= 0 
+	begin 
+			insert #extprops (owner, objname, name, value) select null, objname, name, value from ::fn_listextendedproperty (NULL, 'USER', @owner, {1}, @name, default, default)
+			update #extprops set owner = @owner where owner is null
+			fetch crs into @owner, @name
+	end 
+	close crs
+	deallocate crs
+end">
+					<link_field type='parent' field="ObjectSchemaFromFilter" />
+					<link_field type='parent' field="ObjectTypeName"/>
+					<link_field type='parent' field="ObjectNameFromFilter" />
+					<link_field field="ParentSelect" />
+				</link_multiple>
+			</prefix>
+			<postfix>
+				drop table #extprops
+			</postfix>
+		</version>
+	</settings>
+	<properties>
+		<include file ="inc_shilohExtendedProperty.xml"/>
+		<version min_major='8' max_major='8'>		
+			<property name="Owner" type="sysname" hidden="true" cast='true'>cast(p.owner as varbinary(256))</property>
+			<property name="ObjName" type="sysname" hidden="true" cast='true'>cast(p.objname as varbinary(256))</property>
+		</version>
+	</properties>
+</EnumObject>

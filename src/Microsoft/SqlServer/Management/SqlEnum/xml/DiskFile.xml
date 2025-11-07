@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="File" impl_type="SqlObject" min_major='7'>
+  <settings main_table="#filetmpfin">
+    <version min_major='7' max_major='13'>
+      <prefix >
+        create table #filetmpfin (Name nvarchar(255) NOT NULL, IsFile bit NULL, FullName nvarchar(300) not NULL)
+        if(@Name is null)
+        begin
+          if (right(@Path, 1) = '\')
+            select @Path= substring(@Path, 1, len(@Path) - charindex('\', reverse(@Path)))
+          create table #filetmp (Name nvarchar(255) NOT NULL, depth int NOT NULL, IsFile bit NULL )
+          insert #filetmp EXECUTE master.dbo.xp_dirtree @Path, 1, 1
+          insert #filetmpfin select Name, IsFile, @Path + '\' + Name from #filetmp f
+          drop table #filetmp
+        end
+        if(NOT @Name is null)
+        begin
+          declare @FullName nvarchar(300)
+          if(@Path is null)
+            select @FullName = @Name
+          else
+            select @FullName = @Path 	+ '\' + @Name
+          if (right(@FullName, 1) = '\')
+            select @Path= substring(@Path, 1, len(@FullName) - charindex('\', reverse(@FullName)))
+          create table #filetmp2 ( Exist bit NOT NULL, IsDir bit NOT NULL, DirExist bit NULL )
+          insert #filetmp2 EXECUTE master.dbo.xp_fileexist @FullName
+          insert #filetmpfin select @Name, 1-IsDir, @FullName from #filetmp2 where Exist = 1 or IsDir = 1
+          drop table #filetmp2
+        end
+      </prefix>
+    </version>
+    <!-- dm_os_enumerate_filesystem showed up in a SQL 2017 CU -->
+      <version min_major='14' max_major='14'>
+          <prefix >
+            create table #filetmpfin (Name nvarchar(255) NOT NULL, IsFile bit NULL, FullName nvarchar(300) not NULL)
+            declare @FullName nvarchar(300)
+            declare @UseLegacyXPs bit = 1
+
+            if exists (select 1 from sys.all_objects where name = 'dm_os_enumerate_filesystem' and type = 'IF' and is_ms_shipped = 1)
+              select @UseLegacyXPs = IIF((LOWER(@Name) = N'nul') AND (exists (select 1 from sys.dm_os_host_info where host_platform = 'Windows')), 1, 0)
+
+            if @UseLegacyXPs = 0
+              begin
+                if (@Name is null)
+                  begin
+                    insert #filetmpfin select file_or_directory_name, 1 - is_directory, full_filesystem_path from sys.dm_os_enumerate_filesystem(@Path, '*') where [level] = 0
+                  end
+                if (NOT @Name is null)
+                  begin
+                    if(@Path is null)
+                     select @FullName = @Name
+                    else
+                      select @FullName = @Path 	+ convert(nvarchar(1), serverproperty('PathSeparator')) + @Name
+
+                    create table #filetmp3 ( Exist bit NOT NULL, IsDir bit NOT NULL, DirExist bit NULL )
+                    insert #filetmp3 select file_exists, file_is_a_directory, parent_directory_exists from sys.dm_os_file_exists(@FullName)
+                    insert #filetmpfin select @Name, 1-IsDir, @FullName from #filetmp3 where Exist = 1 or IsDir = 1
+                    drop table #filetmp3
+                 end
+              end
+              else
+              begin
+                if(@Name is null)
+                  begin
+                    if (right(@Path, 1) = '\')
+                      select @Path= substring(@Path, 1, len(@Path) - charindex('\', reverse(@Path)))
+                    create table #filetmp (Name nvarchar(255) NOT NULL, depth int NOT NULL, IsFile bit NULL )
+                    insert #filetmp EXECUTE master.dbo.xp_dirtree @Path, 1, 1
+                    insert #filetmpfin select Name, IsFile, @Path + '\' + Name from #filetmp f
+                    drop table #filetmp
+                  end
+                if(NOT @Name is null)
+                  begin
+                    if(@Path is null)
+                      select @FullName = @Name
+                    else
+                      select @FullName = @Path +  '\' + @Name
+                    if (right(@FullName, 1) = '\')
+                      select @Path= substring(@Path, 1, len(@FullName) - charindex('\', reverse(@FullName)))
+                    create table #filetmp2 ( Exist bit NOT NULL, IsDir bit NOT NULL, DirExist bit NULL )
+                    insert #filetmp2 EXECUTE master.dbo.xp_fileexist @FullName
+                    insert #filetmpfin select @Name, 1-IsDir, @FullName from #filetmp2 where Exist = 1 or IsDir = 1
+                    drop table #filetmp2
+                  end
+              end
+          </prefix>
+      </version>
+      <version min_major='15'>
+        <!-- The special case for "nul" on Windows is backward compatibility with xp_fileexist -->
+        <prefix>
+            create table #filetmpfin (Name nvarchar(255) NOT NULL, IsFile bit NULL, FullName nvarchar(300) not NULL)
+            declare @FullName nvarchar(300)
+            if (@Name is null)
+            begin
+              insert #filetmpfin select file_or_directory_name, 1 - is_directory, full_filesystem_path from sys.dm_os_enumerate_filesystem(@Path, '*') where [level] = 0
+            end
+            if (NOT @Name is null)
+            begin
+              if(@Path is null)
+                select @FullName = @Name
+              else
+                select @FullName = @Path 	+ convert(nvarchar(1), serverproperty('PathSeparator')) + @Name
+
+                create table #filetmp3 ( Exist bit NOT NULL, IsDir bit NOT NULL, DirExist bit NULL )                
+                if(LOWER(@FullName) = N'nul' AND (exists (select 1 from sys.dm_os_host_info where host_platform = 'Windows')))
+                  insert #filetmp3 values (1, 0, 0)
+                else
+                  insert #filetmp3 select file_exists, file_is_a_directory, parent_directory_exists from sys.dm_os_file_exists(@FullName)
+
+                insert #filetmpfin select @Name, 1-IsDir, @FullName from #filetmp3 where Exist = 1 or IsDir = 1
+                drop table #filetmp3
+            end
+        </prefix>
+      </version>
+    <postfix>drop table #filetmpfin</postfix>
+  </settings>
+  <properties>
+    <property name="Name" type="nvarchar" size='255' access="Read">Name</property>
+    <property name="FullName" type="nvarchar" size='300' access="Read">FullName</property>
+    <property name="Path" type="nvarchar" size='300' access="Read">@Path</property>
+    <property name="IsFile" type="bit" access="Read">IsFile</property>
+  </properties>
+</EnumObject>
