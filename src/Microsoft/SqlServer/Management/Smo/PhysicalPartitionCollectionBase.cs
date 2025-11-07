@@ -6,25 +6,10 @@ using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
     public partial class PhysicalPartitionCollection
     {
-        /// <summary>
-        /// Copy the content of given PhysicalPartition array to this collection object.
-        /// Staring onward partitionNumberStart.
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="partitionNumberStart"></param>
-        public void CopyTo(PhysicalPartition[] array, Int32 partitionNumberStart)
-        {
-            if ((Int32.MaxValue < partitionNumberStart) || (partitionNumberStart < 1))
-            {
-                throw new SmoException(ExceptionTemplates.PartitionNumberStartOutOfRange(Int32.MaxValue));
-            }
-            ((ICollection)this).CopyTo(array, partitionNumberStart - 1);
-        }
 
         /// <summary>
         /// Copy all content of the given physical partition array in current collection
@@ -421,6 +406,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="isOnAlter">True for ALTER statement, false for CREATE</param>
         /// <param name="isOnTable">True for ALTER/CREATE TABLE statement, false for INDEX
         /// Needed because columnstores have different default compression than rowstores</param>
+        /// <param name="sp"></param>
         internal string GetCompressionCode(bool isOnAlter, bool isOnTable, ScriptingPreferences sp)
         {
             //If you are getting this assert failure that implies you are not checking at very early stage whether
@@ -591,7 +577,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// This method generates the XML_COMPRESSION clause for objects with 1 or more partitions.
         /// </summary>
         /// <param name="isOnAlter">True for ALTER statement, false for CREATE</param>
-        /// <param name="isOnTable">True for ALTER/CREATE TABLE statement, false for INDEX
+        /// <param name="isOnTable">True for ALTER/CREATE TABLE statement, false for INDEX</param>
+        /// <param name="sp"></param>
         internal string GetXmlCompressionCode(bool isOnAlter, bool isOnTable, ScriptingPreferences sp)
         {
             // If you are getting this assert failure that implies you are not checking at very early stage whether

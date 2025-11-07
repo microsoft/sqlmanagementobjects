@@ -90,7 +90,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             //See if any properties that extend SmoCollectionBase aren't in our validated list,
             //fail the test if there are
             var unknownCollections = typeof(Database).GetProperties()
-                .Where(p => typeof(SmoCollectionBase).IsAssignableFrom(p.PropertyType))
+                .Where(p => typeof(ISmoCollection).IsAssignableFrom(p.PropertyType))
                 .Select(pi => pi.PropertyType)
                 .Except(validatedCollections)
                 .OrderBy(t => t.Name);
@@ -100,7 +100,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
 1. Add the new Collection type to the validatedCollections set above
 2. Follow all the instructions listed on the ""Add new property to an existing object"" section of the OneNote
 3. Submit a Code Review with your changes
-3. Get confirmation (preferebly have them sign off in the CR) from a SMO Comitter that your changes are correct
+3. Get confirmation (preferably have them sign off in the CR) from a SMO Committer that your changes are correct
 
 Unexpected Collection Types :
 {0}", string.Join(System.Environment.NewLine, unknownCollections));

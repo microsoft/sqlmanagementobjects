@@ -35,7 +35,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
 
             // filterPredicate is the function to filter the smoCollection.
             //
-            public SmoCollectionMetadataList(Server server, Smo.SmoCollectionBase smoCollection, Func<T, bool> filterPredicate = null)
+            public SmoCollectionMetadataList(Server server, Smo.ISmoCollection smoCollection, Func<T, bool> filterPredicate = null)
             {
                 Debug.Assert(server != null, "SmoMetadataProvider Assert", "server != null");
                 Debug.Assert(smoCollection != null, "SmoMetadataProvider Assert", "smoCollection != null");
@@ -49,7 +49,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 this.count = GetCount(smoCollection, server.IsConnected, filterPredicate);
             }
 
-            private static int GetCount(Smo.SmoCollectionBase smoCollection, bool isConnected, Func<T, bool> filterPredicate = null)
+            private static int GetCount(Smo.ISmoCollection smoCollection, bool isConnected, Func<T, bool> filterPredicate = null)
             {
                 Debug.Assert(smoCollection != null, "SmoMetadataProvider Assert", "smoCollection != null");
 
@@ -73,18 +73,11 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                     // server version is < 10 (pre Katmai)
                     count = 0;
                 }
-                catch (Exception)
+                catch (Exception) when (isConnected) 
                 {
                     //
                     // Suppress all exceptions when working with connected server. 
-                    if (isConnected)
-                    {
-                        count = 0;
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    count = 0;
                 }
 
                 return count;

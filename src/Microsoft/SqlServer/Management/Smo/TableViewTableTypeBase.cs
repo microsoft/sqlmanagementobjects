@@ -5,12 +5,12 @@ using System;
 using System.Collections.Specialized;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    // This class contains the common properties of TableViewBase and UserDefinedTableType
-    // TableViewBase now extends this class
-    public class TableViewTableTypeBase : ScriptSchemaObjectBase, IExtendedProperties, IScriptable
+    /// <summary>
+    /// This class contains the common properties of TableViewBase and UserDefinedTableType
+    /// </summary>
+    public partial class TableViewTableTypeBase : ScriptSchemaObjectBase, IExtendedProperties, IScriptable
     {
         internal TableViewTableTypeBase(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state)
             :
@@ -104,10 +104,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (null == m_Columns)
                 {
                     m_Columns = new ColumnCollection(this);
-                    View v = this as View;
-                    if (null != v)
-                    {
-                        SetCollectionTextMode(v.TextMode, m_Columns);
+                    if (this is ITextObject text) 
+                    { 
+                        SetCollectionTextMode(text.TextMode, m_Columns);
                     }
                 }
                 return m_Columns;
@@ -118,7 +117,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Overrides the permission scripting - No columns added here - TableViewBase will override this method
         /// </summary>
         /// <param name="query"></param>
-        /// <param name="so"></param>
+        /// <param name="sp"></param>
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // add the object-level permissions

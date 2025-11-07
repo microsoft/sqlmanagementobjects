@@ -7,29 +7,20 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
-    /// <summary>
-    /// base class for all generic collections
-    /// </summary>
-    public abstract class NumberedObjectCollectionBase : SortedListCollectionBase
+    public abstract class NumberedObjectCollectionBase : SortedListCollectionBase<NumberedStoredProcedure, StoredProcedure>
     {
 
-        internal NumberedObjectCollectionBase(SqlSmoObject parent) : base(parent)
+        internal NumberedObjectCollectionBase(SqlSmoObject parent) : base((StoredProcedure)parent)
         {
         }
 
-        protected override void InitInnerCollection()
-        {
-            InternalStorage = new SmoSortedList(new NumberedObjectComparer());
-        }
-        
-        public bool Contains(short number) 
-        {
-            return this.Contains(new NumberedObjectKey(number));
-        }
+        protected override void InitInnerCollection() => InternalStorage = new SmoSortedList<NumberedStoredProcedure>(new NumberedObjectComparer());
+
+        public bool Contains(short number) => Contains(new NumberedObjectKey(number));
 
         internal override ObjectKeyBase CreateKeyFromUrn(Urn urn)
         {
-            short number = short.Parse(urn.GetAttribute("Number"), SmoApplication.DefaultCulture);
+            var number = short.Parse(urn.GetAttribute(nameof(NumberedStoredProcedure.Number)), SmoApplication.DefaultCulture);
 
             return new NumberedObjectKey(number);
         }
@@ -41,10 +32,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
         }
 
-        public override int Compare(object obj1, object obj2)
-        {
-            return ((NumberedObjectKey)obj1).Number - ((NumberedObjectKey)obj2).Number;
-        }
+        public override int Compare(object obj1, object obj2) => ((NumberedObjectKey)obj1).Number - ((NumberedObjectKey)obj2).Number;
     }
 
     internal class NumberedObjectKey : ObjectKeyBase
@@ -59,7 +47,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         static NumberedObjectKey()
         {
-            fields.Add("Number");
+            _ = fields.Add(nameof(NumberedStoredProcedure.Number));
         }
 
         internal static readonly StringCollection fields = new StringCollection();
@@ -70,40 +58,25 @@ namespace Microsoft.SqlServer.Management.Smo
             set { number = value; }
         }
 
-        public override string ToString()
-        {
-            return string.Format(SmoApplication.DefaultCulture, "{0}", 
+        public override string ToString() => string.Format(SmoApplication.DefaultCulture, "{0}",
                                             number);
-        }
 
-        public override string UrnFilter
-        {
-            get { return string.Format(SmoApplication.DefaultCulture, "@Number={0}", number); }
-        }
+        public override string UrnFilter => string.Format(SmoApplication.DefaultCulture, "@Number={0}", number);
 
-        public override StringCollection GetFieldNames()
-        {
-            return fields;
-        }
+        public override StringCollection GetFieldNames() => fields;
 
-        public override ObjectKeyBase Clone()
-        {
-            return new NumberedObjectKey(this.Number);
-        }
+        public override ObjectKeyBase Clone() => new NumberedObjectKey(Number);
 
-        public override bool IsNull
-        {
-            get { return false;}
-        }
+        public override bool IsNull => false;
 
-        public override ObjectComparerBase GetComparer(IComparer stringComparer)
-        {
-            return new NumberedObjectComparer();
-        }
+        public override ObjectComparerBase GetComparer(IComparer stringComparer) => new NumberedObjectComparer();
 
     }
 
-    public abstract class PartitionNumberedObjectCollectionBase : SortedListCollectionBase
+    /// <summary>
+    /// Collection of PhysicalPartition objects associated with an index or table
+    /// </summary>
+    public abstract class PartitionNumberedObjectCollectionBase : SortedListCollectionBase<PhysicalPartition, SqlSmoObject>
     {
 
         internal PartitionNumberedObjectCollectionBase(SqlSmoObject parent)
@@ -111,15 +84,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
         }
 
-        protected override void InitInnerCollection()
-        {
-            InternalStorage = new SmoSortedList(new PartitionNumberedObjectComparer());
-        }
+        protected override void InitInnerCollection() => InternalStorage = new SmoSortedList<PhysicalPartition>(new PartitionNumberedObjectComparer());
 
-        public bool Contains(int number)
-        {
-            return this.Contains(new PartitionNumberedObjectKey(number));
-        }
+        /// <summary>
+        /// Returns whether the collection contains a partition identified by the given number
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public bool Contains(int number) => Contains(new PartitionNumberedObjectKey(number));
 
 
         internal override ObjectKeyBase CreateKeyFromUrn(Urn urn)
@@ -137,10 +109,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
         }
 
-        public override int Compare(object obj1, object obj2)
-        {
-            return ((PartitionNumberedObjectKey)obj1).Number - ((PartitionNumberedObjectKey)obj2).Number;
-        }
+        public override int Compare(object obj1, object obj2) => ((PartitionNumberedObjectKey)obj1).Number - ((PartitionNumberedObjectKey)obj2).Number;
     }
 
     internal class PartitionNumberedObjectKey : ObjectKeyBase
@@ -156,11 +125,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
         static PartitionNumberedObjectKey()
         {
-            fields = new StringCollection();
-            fields.Add("PartitionNumber");
+            fields = new StringCollection
+            {
+                nameof(PhysicalPartition.PartitionNumber)
+            };
         }
 
-        internal static StringCollection fields;
+        internal static readonly StringCollection fields;
 
         public int Number
         {
@@ -168,38 +139,18 @@ namespace Microsoft.SqlServer.Management.Smo
             set { number = value; }
         }
 
-        public override string ToString()
-        {
-            return string.Format(SmoApplication.DefaultCulture, "{0}",
+        public override string ToString() => string.Format(SmoApplication.DefaultCulture, "{0}",
                                             number);
-        }
 
-        public override string UrnFilter
-        {
-            get { return string.Format(SmoApplication.DefaultCulture, "@PartitionNumber={0}", number); }
-        }
+        public override string UrnFilter => string.Format(SmoApplication.DefaultCulture, "@PartitionNumber={0}", number);
 
-        public override StringCollection GetFieldNames()
-        {
-            return fields;
-        }
+        public override StringCollection GetFieldNames() => fields;
 
-        public override ObjectKeyBase Clone()
-        {
-            return new PartitionNumberedObjectKey(this.Number);
-        }
+        public override ObjectKeyBase Clone() => new PartitionNumberedObjectKey(Number);
 
-        public override bool IsNull
-        {
-            get { return false; }
-        }
+        public override bool IsNull => false;
 
-        public override ObjectComparerBase GetComparer(IComparer stringComparer)
-        {
-            return new PartitionNumberedObjectComparer();
-        }
+        public override ObjectComparerBase GetComparer(IComparer stringComparer) => new PartitionNumberedObjectComparer();
 
     }
-
-   
-}    
+}

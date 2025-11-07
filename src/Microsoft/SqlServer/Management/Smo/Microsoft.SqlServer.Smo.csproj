@@ -11,6 +11,7 @@
     <CodeGenOutputDir>$(BaseIntermediateOutputPath)$(TargetFramework)\Gen</CodeGenOutputDir>
     <SmoSourceDir>.\</SmoSourceDir>
     <ClsCompliant>true</ClsCompliant>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="DTAClient" Key="$(RealPublicKey)" />
@@ -94,6 +95,7 @@
     <CodeGen Include="HttpProtocol.cs" />
     <CodeGen Include="Index.cs" />
     <CodeGen Include="IndexedColumn.cs" />
+    <CodeGen Include="IndexedJsonPath.cs" />
     <CodeGen Include="IndexedXmlPath.cs" />
     <CodeGen Include="IndexedXmlPathNamespace.cs" />
     <CodeGen Include="Information.cs" />
@@ -241,6 +243,7 @@
     <Compile Include="$(SmoSourceDir)\Collections\FullTextStopListCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\IndexCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\IndexedColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\IndexedJsonPathCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\IndexedXmlPathCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\IndexedXmlPathNamespaceCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\JobCategoryCollection.cs" />
@@ -349,6 +352,7 @@
     <Compile Include="$(SmoSourceDir)\CheckBase.cs" />
     <Compile Include="$(SmoSourceDir)\CollationInfo.cs" />
     <Compile Include="$(SmoSourceDir)\CollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CollectionInterfaces.cs" />
     <Compile Include="$(SmoSourceDir)\ColumnBase.cs" />
     <Compile Include="$(SmoSourceDir)\ColumnEncryptionKeyBase.cs" />
     <Compile Include="$(SmoSourceDir)\ColumnEncryptionKeyValueBase.cs" />
@@ -443,6 +447,7 @@
     <Compile Include="$(SmoSourceDir)\ILoginOptions.cs" />
     <Compile Include="$(SmoSourceDir)\IndexBase.cs" />
     <Compile Include="$(SmoSourceDir)\IndexedColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexedJsonPathBase.cs" />
     <Compile Include="$(SmoSourceDir)\IndexedXmlPathBase.cs" />
     <Compile Include="$(SmoSourceDir)\IndexedXmlPathNamespaceBase.cs" />
     <Compile Include="$(SmoSourceDir)\IndexScripter.cs" />
@@ -645,6 +650,10 @@
     <ProjectReference Include="$(CodeGenSrc)\SmoCodeGen.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <SetTargetFramework>TargetFramework=$(CodeGenPlatform)</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="$(EnlistmentRoot)\src\CollectionGenerator\CollectionGenerator.csproj" OutputItemType="Analyzer">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <PrivateAssets>All</PrivateAssets>
     </ProjectReference>
   </ItemGroup>
    <ItemGroup>

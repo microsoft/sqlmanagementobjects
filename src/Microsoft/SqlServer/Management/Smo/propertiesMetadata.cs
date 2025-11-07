@@ -158,6 +158,7 @@ namespace Microsoft.SqlServer.Management.Smo
             v150 = 9,
             v160 = 10,
             v170 = 11,
+            // VBUMP
         }
 
         /// <summary>
@@ -169,6 +170,7 @@ namespace Microsoft.SqlServer.Management.Smo
             v100 = 0,
             v110 = 1,
             v120 = 2
+            // VBUMP - Note: Cloud versions have different versioning than on-prem
         }
 
         internal static int[] defaultSingletonArray = new int[] { 0, 0, 0, 0, 0, 0, 0 };
@@ -365,6 +367,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             versionIndex = (int)CloudVersionIndex.v120;
                             break;
                         }
+                        // VBUMP
                         default:
                         {
                             //Default to the latest known version for unknown versions since it's
@@ -649,6 +652,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return ssv;
             }
+            // VBUMP
 
             ssv |= SqlServerVersions.Version140;
             if (index >= this.VersionCount[7])
@@ -720,6 +724,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private int GetCountForVersions(SqlServerVersions m_versions)
         {
+            // VBUMP
             if ((m_versions | SqlServerVersions.Version150) == SqlServerVersions.Version150)
             {
                 return this.VersionCount[9];

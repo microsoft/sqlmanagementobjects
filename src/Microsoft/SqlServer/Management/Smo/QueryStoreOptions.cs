@@ -16,7 +16,6 @@ namespace Microsoft.SqlServer.Management.Smo
     /// <summary>
     /// QueryStore Options Smo Object.
     /// </summary>
-    [SfcElementType("QueryStoreOptions")]
     public sealed partial class QueryStoreOptions : SqlSmoObject, IAlterable,  IScriptable
     {
         internal QueryStoreOptions(Database parentdb, ObjectKeyBase key, SqlSmoState state)

@@ -320,7 +320,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
 
                     try
                     {
-                        SmoCollectionBase smoCollection = relationObject as SmoCollectionBase;
+                        var smoCollection = (ISmoCollection)relationObject;
                         smoCollection.Refresh();
                     }
                     catch (EnumeratorException)

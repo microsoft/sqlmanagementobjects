@@ -23,7 +23,7 @@ namespace Microsoft.SqlServer.Management.Smo
     [Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet]
     public partial class Index : ScriptNameObjectBase,
             Cmn::ICreatable, Cmn::IDroppable, Cmn::IDropIfExists, Cmn::IMarkForDrop, Cmn::IAlterable, Cmn::IRenamable,
-            IExtendedProperties, IScriptable
+            IExtendedProperties, IScriptable, IPartitionable
     {
         bool m_bIsOnComputed;
         bool xmlOrSpatialIndex;
@@ -40,6 +40,7 @@ namespace Microsoft.SqlServer.Management.Smo
             base(parentColl, key, state)
         {
             m_IndexedColumns = null;
+            m_IndexedJsonPaths = null;
             m_IndexedXmlPaths = null;
             m_IndexedXmlPathNamespaces = null;
             m_ExtendedProperties = null;
@@ -121,6 +122,31 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
                 return m_IndexedColumns;
+            }
+        }
+
+        /// <summary>
+        /// Collection of IndexedJsonPath objects that represent all the paths
+        /// that are indexed by the JSON Index.
+        /// </summary>
+        private IndexedJsonPathCollection m_IndexedJsonPaths = null;
+
+        /// <summary>
+        /// Collection of IndexedJsonPath objects that represent all the paths
+        /// that are indexed by the JSON Index.
+        /// </summary>
+        [SfcObject(SfcContainerRelationship.ChildContainer, SfcContainerCardinality.OneToAny, typeof(IndexedJsonPath), SfcObjectFlags.Design | SfcObjectFlags.Deploy | SfcObjectFlags.NaturalOrder)]
+        public IndexedJsonPathCollection IndexedJsonPaths
+        {
+            get
+            {
+                CheckObjectState();
+                this.ThrowIfNotSupported(typeof(IndexedJsonPath));
+                if (null == m_IndexedJsonPaths)
+                {
+                    m_IndexedJsonPaths = new IndexedJsonPathCollection(this);
+                }
+                return m_IndexedJsonPaths;
             }
         }
 
@@ -327,6 +353,8 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 m_PartitionSchemeParameters.MarkAllDropped();
             }
+
+            m_IndexedJsonPaths?.MarkAllDropped();
         }
 
         internal bool IsDirty(string property)
@@ -875,12 +903,26 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Raises FailedOperationException if index is a JSON Index.
+        /// </summary>
+        /// <param name="operation">Operation which raised exception</param>
+        private void CheckUnsupportedJsonIndex(string operation)
+        {
+            Nullable<IndexType> indexType = this.GetPropValueOptional<IndexType>("IndexType");
+            if (indexType.HasValue && indexType.Value == IndexType.JsonIndex)
+            {
+                throw new FailedOperationException(operation, this, null, operation);
+            }
+        }
+
+        /// <summary>
         /// Changes the index based on supplied index properties
         /// </summary>
         public void Alter()
         {
 
             CheckUnsupportedSXI(false, true, ExceptionTemplates.Alter, ExceptionTemplates.SecondarySelectiveXmlIndexModify);
+            CheckUnsupportedJsonIndex(ExceptionTemplates.JsonIndexAlter);
 
             if (ParentColl.ParentInstance is UserDefinedTableType)
             {
@@ -897,6 +939,7 @@ namespace Microsoft.SqlServer.Management.Smo
         public void Alter(IndexOperation operation)
         {
             CheckUnsupportedSXI(false, true, ExceptionTemplates.Alter, ExceptionTemplates.SecondarySelectiveXmlIndexModify);
+            CheckUnsupportedJsonIndex(ExceptionTemplates.JsonIndexAlter);
 
             if (ParentColl.ParentInstance is UserDefinedTableType)
             {
@@ -979,6 +1022,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new InvalidSmoOperationException(ExceptionTemplates.OperationNotSupportedWhenPartOfAUDF);
             }
 
+            CheckUnsupportedJsonIndex(ExceptionTemplates.JsonIndexAlter);
 
             // Alter is only supported with the HK hash index.
             //
@@ -2483,7 +2527,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 "IsOptimizedForSequentialKey",
                 nameof(HasXmlCompressedPartitions),
                 nameof(VectorIndexMetric),
-                nameof(VectorIndexType)
+                nameof(VectorIndexType),
+                nameof(OptimizeForArraySearch)
             };
 
             List<string> list = GetSupportedScriptFields(typeof(Index.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
@@ -2679,5 +2724,19 @@ namespace Microsoft.SqlServer.Management.Smo
                 return isSqlDwIndex;
             }
         }
+
+        /// <summary>
+        /// Returns the PartitionSchemeParameters associated with the index partition scheme
+        /// </summary>
+        IEnumerable<PartitionSchemeParameter> IPartitionable.PartitionSchemeParameters => PartitionSchemeParameters;
+        /// <summary>
+        /// Returns the PartitioningScheme associated with this object type
+        /// </summary>
+        public PartitioningScheme SchemeType => PartitioningScheme.Index;
+        /// <summary>
+        /// Returns the ColumnCollection of the parent of the index
+        /// </summary>
+        ColumnCollection IColumns.Columns => ((TableViewBase)Parent).Columns;
+
     }
 }

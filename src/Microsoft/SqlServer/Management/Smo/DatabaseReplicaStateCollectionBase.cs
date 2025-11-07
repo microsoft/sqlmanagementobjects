@@ -10,29 +10,27 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 namespace Microsoft.SqlServer.Management.Smo
 {
     ///<summary>
-    /// this is the class that contains common features of all schema collection classes
+    /// Collection of DatabaseReplicaState objects associated with an AvailabilityGroup
     ///</summary>
-    public class DatabaseReplicaStateCollectionBase : SortedListCollectionBase
+    public class DatabaseReplicaStateCollectionBase : SortedListCollectionBase<DatabaseReplicaState, AvailabilityGroup>
     {
         internal DatabaseReplicaStateCollectionBase(SqlSmoObject parent)
-            : base(parent)
+            : base((AvailabilityGroup)parent)
         {
         }
+
+        protected override string UrnSuffix => DatabaseReplicaState.UrnSuffix;
 
         protected override void InitInnerCollection()
         {
-            InternalStorage = new SmoSortedList(new DatabaseReplicaStateObjectComparer(this.StringComparer));
+            InternalStorage = new SmoSortedList<DatabaseReplicaState>(new DatabaseReplicaStateObjectComparer(StringComparer));
         }
 
-        protected override Type GetCollectionElementType()
-        {
-            return typeof(DatabaseReplicaState);
-        }
 
         internal override ObjectKeyBase CreateKeyFromUrn(Urn urn)
         {
-            string databaseName = urn.GetAttribute("AvailabilityDatabaseName");
-            string replicaName = urn.GetAttribute("AvailabilityReplicaServerName");
+            var databaseName = urn.GetAttribute("AvailabilityDatabaseName");
+            var replicaName = urn.GetAttribute("AvailabilityReplicaServerName");
 
             if (string.IsNullOrEmpty(databaseName))
             {
@@ -46,6 +44,11 @@ namespace Microsoft.SqlServer.Management.Smo
 
             return new DatabaseReplicaStateObjectKey(replicaName, databaseName);
         }
+
+        internal override DatabaseReplicaState GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal class DatabaseReplicaStateObjectComparer : ObjectComparerBase
@@ -57,16 +60,16 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public override int Compare(object obj1, object obj2)
         {
-            DatabaseReplicaStateObjectKey dbr1 = obj1 as DatabaseReplicaStateObjectKey;
-            DatabaseReplicaStateObjectKey dbr2 = obj2 as DatabaseReplicaStateObjectKey;
+            var dbr1 = obj1 as DatabaseReplicaStateObjectKey;
+            var dbr2 = obj2 as DatabaseReplicaStateObjectKey;
 
-            Diagnostics.TraceHelper.Assert((null != dbr1 || null != dbr2), "Can't compare null objects for DatabaseReplicaState");
+            Diagnostics.TraceHelper.Assert(null != dbr1 || null != dbr2, "Can't compare null objects for DatabaseReplicaState");
 
             //We order first by Avaialbility Replica name, then by Database name
-            int replicaNameComparison = this.stringComparer.Compare(dbr1.ReplicaName, dbr2.ReplicaName);
+            var replicaNameComparison = stringComparer.Compare(dbr1.ReplicaName, dbr2.ReplicaName);
             if (replicaNameComparison == 0)
             {
-                return this.stringComparer.Compare(dbr1.DatabaseName, dbr2.DatabaseName);
+                return stringComparer.Compare(dbr1.DatabaseName, dbr2.DatabaseName);
             }
             else
             {
@@ -81,15 +84,17 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public DatabaseReplicaStateObjectKey(string replicaName, string databaseName)
         {
-            this.ReplicaName = replicaName;
-            this.DatabaseName = databaseName;
+            ReplicaName = replicaName;
+            DatabaseName = databaseName;
         }
 
         static DatabaseReplicaStateObjectKey()
         {
-            fields = new StringCollection();
-            fields.Add("AvailabilityReplicaServerName");
-            fields.Add("AvailabilityDatabaseName");
+            fields = new StringCollection
+            {
+                "AvailabilityReplicaServerName",
+                "AvailabilityDatabaseName"
+            };
         }
 
         public string ReplicaName
@@ -108,7 +113,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return string.Format(SmoApplication.DefaultCulture, "@AvailabilityReplicaServerName='{0}' and @AvailabilityDatabaseName='{1}'", SqlSmoObject.SqlString(this.ReplicaName), SqlSmoObject.SqlString(this.DatabaseName));
+                return string.Format(SmoApplication.DefaultCulture, "@AvailabilityReplicaServerName='{0}' and @AvailabilityDatabaseName='{1}'", SqlSmoObject.SqlString(ReplicaName), SqlSmoObject.SqlString(DatabaseName));
             }
         }
 
@@ -119,7 +124,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void Validate(Type objectType)
         {
-            if (string.IsNullOrEmpty(this.ReplicaName) || string.IsNullOrEmpty(this.DatabaseName))
+            if (string.IsNullOrEmpty(ReplicaName) || string.IsNullOrEmpty(DatabaseName))
             {
                 throw new UnsupportedObjectNameException(ExceptionTemplates.UnsupportedObjectNameExceptionText(objectType.ToString())).SetHelpContext("UnsupportedObjectNameExceptionText");
             }
@@ -129,18 +134,18 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return null == this.DatabaseName || null == this.ReplicaName;
+                return null == DatabaseName || null == ReplicaName;
             }
         }
 
         public override string GetExceptionName()
         {
-            return string.Format(SmoApplication.DefaultCulture, "Database {1} in Availability Replica {0}", this.ReplicaName, this.DatabaseName);
+            return string.Format(SmoApplication.DefaultCulture, "Database {1} in Availability Replica {0}", ReplicaName, DatabaseName);
         }
 
         public override ObjectKeyBase Clone()
         {
-            return new DatabaseReplicaStateObjectKey(this.ReplicaName, this.DatabaseName);
+            return new DatabaseReplicaStateObjectKey(ReplicaName, DatabaseName);
         }
 
         public override ObjectComparerBase GetComparer(IComparer stringComparer)
@@ -150,7 +155,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public override string ToString()
         {
-            return string.Format(SmoApplication.DefaultCulture, "{0}/{1}", this.ReplicaName, this.DatabaseName);
+            return string.Format(SmoApplication.DefaultCulture, "{0}/{1}", ReplicaName, DatabaseName);
         }
     }
 }

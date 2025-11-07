@@ -501,10 +501,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if ((bool)newValue)
             {
-                SmoInternalStorage cats = ((FullTextCatalogCollection)ParentColl).InternalStorage;
+                var  cats = ((ISmoInternalCollection)ParentColl).InternalStorage;
                 foreach (FullTextCatalog cat in cats)
                 {
-                    Property pDef = cat.Properties.Get("IsDefault");
+                    var pDef = cat.Properties.Get(nameof(FullTextCatalog.IsDefault));
                     if (this != cat &&
                         (bool)pDef.Value &&
                         cat.State == SqlSmoState.Creating)

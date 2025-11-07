@@ -34,7 +34,7 @@ namespace Microsoft.SqlServer.Management.Smo
         public UserDefinedMessage(Server server, System.Int32 id) : 
             base()
         {
-            this.key = new MessageObjectKey(id, MessageCollectionBase.GetDefaultLanguage());
+            this.key = new MessageObjectKey(id, MessageCollectionBase<UserDefinedMessage>.GetDefaultLanguage());
             this.Parent = server;
         }
 
@@ -347,12 +347,12 @@ namespace Microsoft.SqlServer.Management.Smo
         
         protected override void PostDrop()
         {
-            string language = ((MessageObjectKey)this.key).Language;
+            var language = ((MessageObjectKey)key).Language;
             // if we have just dropped the english message, make sure the other messages 
             // are removed from the collection
             if( language == "us_english" )
             {
-                ((SmoCollectionBase)this.ParentColl).Refresh();
+                Parent.Refresh();
             }
         }
         

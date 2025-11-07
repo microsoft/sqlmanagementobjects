@@ -172,6 +172,19 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             /// <summary>
+            /// Check json properties are not set for non json index
+            /// </summary>
+            protected void CheckJsonProperties()
+            {
+                // Check that JSON index specific properties are not set for non-JSON indexes
+                if (index.IsSupportedProperty(nameof(Index.OptimizeForArraySearch)))
+                {
+                    Exception exception = new SmoException(ExceptionTemplates.UnsupportedNonJsonIndexParameters);
+                    this.CheckProperty(nameof(Index.OptimizeForArraySearch), false, exception);
+                }
+            }
+
+            /// <summary>
             /// Check non clustered properties are not set for non applicable index
             /// </summary>
             protected void CheckNonClusteredProperties()
@@ -438,7 +451,8 @@ namespace Microsoft.SqlServer.Management.Smo
             /// <param name="forCreateIndex"></param>
             protected void ScriptIndexOptionOnline(StringBuilder sb, bool forRebuild, bool forCreateIndex)
             {
-                if (!preferences.TargetEngineIsAzureStretchDb() && index.GetPropValueOptional<IndexType>(nameof(Index.IndexType)) != IndexType.VectorIndex)
+                if (!preferences.TargetEngineIsAzureStretchDb() 
+                    && index.GetPropValueOptional<IndexType>(nameof(Index.IndexType)) != IndexType.VectorIndex)
                 {
                     StringBuilder onlinePropertiesSb = new StringBuilder(GetOnOffValue(index.onlineIndexOperation));
 
@@ -1540,6 +1554,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         return new SpatialIndexScripter(index, sp);
                     case IndexType.VectorIndex:
                         return new VectorIndexScripter(index, sp);
+                    case IndexType.JsonIndex:
+                        return new JsonIndexScripter(index, sp);
                     case IndexType.NonClusteredColumnStoreIndex:
                         return new NonClusteredColumnStoreIndexScripter(index, sp);
                     case IndexType.NonClusteredHashIndex:
@@ -1612,6 +1628,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckNonClusteredProperties();
                 this.CheckXmlProperties();
                 this.CheckVectorProperties();
+                this.CheckJsonProperties();
                 this.CheckSpatialProperties();
             }
 
@@ -1803,6 +1820,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckConflictingProperties();
                 this.CheckXmlProperties();
                 this.CheckVectorProperties();
+                this.CheckJsonProperties();
                 this.CheckSpatialProperties();
             }
 
@@ -2104,6 +2122,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckClusteredProperties();
                 this.CheckNonClusteredProperties();
                 this.CheckSpatialProperties();
+                this.CheckJsonProperties();
+                this.CheckVectorProperties();
             }
 
             protected override void ScriptIndexStorage(StringBuilder sb)
@@ -2229,6 +2249,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckNonClusteredProperties();
                 this.CheckXmlProperties();
                 this.CheckVectorProperties();
+                this.CheckJsonProperties();
             }
 
             protected override void ScriptCreateHeaderDdl(StringBuilder sb)
@@ -2444,6 +2465,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private class VectorIndexScripter : IndexScripter
         {
+            Property vectorIndexMetric;
+            Property vectorIndexType;
+
             public VectorIndexScripter(Index index, ScriptingPreferences sp)
                 : base(index, sp)
             {
@@ -2459,6 +2483,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckNonClusteredProperties();
                 this.CheckXmlProperties();
                 this.CheckSpatialProperties();
+                this.CheckJsonProperties();
             }
 
             protected override void ScriptCreateHeaderDdl(StringBuilder sb)
@@ -2476,19 +2501,21 @@ namespace Microsoft.SqlServer.Management.Smo
 
             private void ScriptVectorIndexOptions(StringBuilder sb)
             {
-                var vectorIndexMetric = index.GetPropValueOptional(nameof(Index.VectorIndexMetric), string.Empty);
-                var vectorIndexType = index.GetPropValueOptional(nameof(Index.VectorIndexType), string.Empty);
+                vectorIndexMetric = index.Properties.Get(nameof(Index.VectorIndexMetric));
+                vectorIndexType = index.Properties.Get(nameof(Index.VectorIndexType));
 
                 // Script METRIC parameter
-                if (!string.IsNullOrEmpty(vectorIndexMetric))
+                var strMetric = vectorIndexMetric.Value as string;
+                var strType = vectorIndexType.Value as string;
+                if (!string.IsNullOrEmpty(strMetric))
                 {
-                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"METRIC = '{SqlSmoObject.SqlString(vectorIndexMetric)}'{Globals.commaspace}");
+                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"METRIC = '{SqlSmoObject.SqlString(strMetric)}'{Globals.commaspace}");
                 }
 
                 // Script TYPE parameter
-                if (!string.IsNullOrEmpty(vectorIndexType))
+                if (!string.IsNullOrEmpty(strType))
                 {
-                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"TYPE = '{SqlSmoObject.SqlString(vectorIndexType)}'{Globals.commaspace}");
+                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"TYPE = '{SqlSmoObject.SqlString(strType)}'{Globals.commaspace}");
                 }
             }
 
@@ -2498,6 +2525,106 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     base.ScriptIndexStorage(sb);
                 }
+            }
+        }
+
+        private class JsonIndexScripter : IndexScripter
+        {
+            public JsonIndexScripter(Index index, ScriptingPreferences sp)
+                : base(index, sp)
+            {
+            }
+
+            protected override void Validate()
+            {
+                this.index.ThrowIfPropertyNotSupported(nameof(Index.OptimizeForArraySearch), preferences);
+
+                this.CheckConstraintProperties();
+                this.CheckRegularIndexProperties();
+                this.CheckClusteredProperties();
+                this.CheckNonClusteredProperties();
+                this.CheckXmlProperties();
+                this.CheckSpatialProperties();
+                this.CheckVectorProperties();
+            }
+
+            protected override void ScriptCreateHeaderDdl(StringBuilder sb)
+            {
+                sb.AppendFormat(SmoApplication.DefaultCulture, "CREATE JSON INDEX {0} ON {1}",
+                    index.FormatFullNameForScripting(preferences),
+                    parent.FormatFullNameForScripting(preferences));
+            }
+
+            protected override void ScriptIndexDetails(StringBuilder sb)
+            {
+                this.ScriptJsonPaths(sb);
+            }
+
+            private void ScriptJsonPaths(StringBuilder sb)
+            {
+                // Script JSON index paths from IndexedJsonPaths collection
+                // Syntax: FOR ("path1", "path2", ...)
+                if (this.index.IndexedJsonPaths?.Count > 0)
+                {
+                    sb.Append(preferences.NewLine);
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "FOR");
+                    sb.Append(preferences.NewLine);
+                    sb.AppendFormat(SmoApplication.DefaultCulture, Globals.LParen);
+
+                    for (int i = 0; i < this.index.IndexedJsonPaths.Count; i++)
+                    {
+                        IndexedJsonPath path = this.index.IndexedJsonPaths[i];
+
+                        // Quote the path value
+                        sb.AppendFormat(SmoApplication.DefaultCulture, $"'{SqlString(path.Path)}'");
+
+                        if (i != this.index.IndexedJsonPaths.Count - 1)
+                        {
+                            sb.AppendFormat(SmoApplication.DefaultCulture, Globals.commaspace);
+                        }
+                    }
+
+                    sb.AppendFormat(SmoApplication.DefaultCulture, Globals.RParen);
+                    sb.Append(preferences.NewLine);
+                }
+            }
+
+            protected override void ScriptIndexOptions(StringBuilder sb)
+            {
+                // Only the following options are valid for json index and need to be scripted:
+                // OPTIMIZE_FOR_ARRAY_SEARCH
+                // PAD_INDEX
+                // FILLFACTOR
+                // ALLOW_PAGE_LOCKS
+                // ALLOW_ROW_LOCKS
+                // DATA_COMPRESSION
+
+                // Script OPTIMIZE_FOR_ARRAY_SEARCH option if set
+                if (index.IsSupportedProperty(nameof(Index.OptimizeForArraySearch)) &&
+                    index.GetPropValueOptional(nameof(Index.OptimizeForArraySearch), false))
+                {
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "OPTIMIZE_FOR_ARRAY_SEARCH = ON");
+                    sb.Append(Globals.commaspace);
+                }
+
+                // Script PAD_INDEX option
+                this.ScriptIndexOption(sb, "PAD_INDEX", GetOnOffValue(index.GetPropValueOptional<bool>(nameof(PadIndex))));
+
+                // Script FILLFACTOR option
+                this.ScriptFillFactor(sb);
+
+                // Script ALLOW_ROW_LOCKS and ALLOW_PAGE_LOCKS options
+                this.ScriptIndexOption(sb, "ALLOW_ROW_LOCKS", GetOnOffValue(RevertMeaning(index.GetPropValueOptional<bool>("DisallowRowLocks"))));
+                this.ScriptIndexOption(sb, "ALLOW_PAGE_LOCKS", GetOnOffValue(RevertMeaning(index.GetPropValueOptional<bool>("DisallowPageLocks"))));
+
+                // Script DATA_COMPRESSION option
+                this.ScriptCompression(sb);
+           }
+
+            protected override void ScriptIndexStorage(StringBuilder sb)
+            {
+                // Filegroup option is not supported for JSON indexes
+                return;
             }
         }
 
@@ -2626,6 +2753,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckXmlProperties();
                 this.CheckSpatialProperties();
                 this.CheckInvalidOptions();
+                this.CheckJsonProperties();
+                this.CheckVectorProperties();
             }
 
             protected override void ScriptCreateHeaderDdl(StringBuilder sb)
@@ -2692,6 +2821,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.CheckNonClusteredProperties();
                     this.CheckXmlProperties();
                     this.CheckSpatialProperties();
+                    this.CheckJsonProperties();
+                    this.CheckVectorProperties();
                 }
             }
 
@@ -2809,6 +2940,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.CheckNonClusteredProperties();
                     this.CheckXmlProperties();
                     this.CheckSpatialProperties();
+                    this.CheckJsonProperties();
                 }
             }
 
@@ -2982,6 +3114,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckNonClusteredProperties();
                 this.CheckSpatialProperties();
                 this.CheckInvalidOptions();
+                this.CheckJsonProperties();
+                this.CheckVectorProperties();
 
                 //Check for more then one default namespace
                 bool defaultNameSpaceFound = false;
@@ -3281,6 +3415,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.CheckNonClusteredProperties();
                 this.CheckSpatialProperties();
                 this.CheckInvalidOptions();
+                this.CheckJsonProperties();
+                this.CheckVectorProperties();
             }
 
             /// <summary>

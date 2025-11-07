@@ -765,23 +765,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (columnNames != null && columnNames.Length != 0)
                     {
-                        ColumnCollection columnCol = null;
-                        switch (obj.GetType().Name)
-                        {
-                            case "Table":
-                                columnCol = ((Table)obj).Columns;
-                                break;
-                            case "View":
-                                columnCol = ((View)obj).Columns;
-                                break;
-                            case "UserDefinedFunction":
-                                columnCol = ((UserDefinedFunction)obj).Columns;
-                                break;
-                        }
+                        var columnCol = ((IColumns)obj).Columns;
 
-                        foreach (string column in columnNames)
+                        foreach (var column in columnNames)
                         {
-                            Column col = columnCol[column];
+                            var col = columnCol[column];
 
                             if (col != null)
                             {
@@ -790,7 +778,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             else
                             {
                                 //throw exception
-                                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist("Column", column));
+                                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(nameof(Column), column));
                             }
                         }
                     }

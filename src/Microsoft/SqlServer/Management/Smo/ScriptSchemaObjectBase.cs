@@ -60,7 +60,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptChangeOwner(StringCollection queries, ScriptingPreferences sp)
         {
-            Property prop = this.GetPropertyOptional("Owner");
+            Property prop = GetPropertyOptional("Owner");
 
             if (!prop.IsNull && (prop.Dirty || !sp.ScriptForAlter))
             {
@@ -69,7 +69,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (sp.TargetServerVersion > SqlServerVersion.Version80)
                 {
                     bool schemaOwned = true;
-                    sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER AUTHORIZATION ON {0}", this.PermissionPrefix);
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER AUTHORIZATION ON {0}", PermissionPrefix);
                     sb.AppendFormat(SmoApplication.DefaultCulture, "{0}", FormatFullNameForScripting(sp));
                     sb.AppendFormat(SmoApplication.DefaultCulture, " TO ");
 
@@ -77,9 +77,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         schemaOwned = ((string)prop.Value == string.Empty);
                     }
-                    else if (this.ServerVersion.Major > 8)
+                    else if (ServerVersion.Major > 8)
                     {
-                        Property isSchemaOwnedProp = this.Properties.Get("IsSchemaOwned");
+                        Property isSchemaOwnedProp = Properties.Get("IsSchemaOwned");
                         if (!isSchemaOwnedProp.IsNull)
                         {
                             schemaOwned = (bool)isSchemaOwnedProp.Value;
@@ -94,7 +94,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                   this.ScriptOwnerForShiloh(sb,sp,(string)prop.Value);
+                   ScriptOwnerForShiloh(sb,sp,(string)prop.Value);
                 }
                 if (sb.Length > 0)
                 {
@@ -111,9 +111,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 return ScriptSchema;
             }
             // use owner name only if it's available
-            else if (null != this.Schema)
+            else if (null != Schema)
             {
-                return this.Schema;
+                return Schema;
             }
 
             return string.Empty;
@@ -136,17 +136,17 @@ namespace Microsoft.SqlServer.Management.Smo
                     throw new SmoException(ExceptionTemplates.InvalidSchema);
                 }
 
-                if (this.State == SqlSmoState.Pending)
+                if (State == SqlSmoState.Pending)
                 {
                     // if the object is in Pending state we can set the schema
                     ((SchemaObjectKey)key).Schema = value;
                     return;
                 }
-                else if (this.State == SqlSmoState.Creating)
+                else if (State == SqlSmoState.Creating)
                 {
                     // if the object is in Existing state we can set the schema only if the object
                     // has not been added to the collection
-                    if (this.ObjectInSpace)
+                    if (ObjectInSpace)
                     {
                         ((SchemaObjectKey)key).Schema = value;
                         return;
@@ -154,7 +154,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 // all other cases are not valid, we have to throw
-                throw new FailedOperationException(ExceptionTemplates.SetSchema, this, new InvalidSmoOperationException(ExceptionTemplates.SetSchema, this.State));
+                throw new FailedOperationException(ExceptionTemplates.SetSchema, this, new InvalidSmoOperationException(ExceptionTemplates.SetSchema, State));
             }
         }
 
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     ValidateName(value);
                     if (ShouldNotifyPropertyChange)
                     {
-                        if (this.Name != value)
+                        if (Name != value)
                         {
                             ((SimpleObjectKey)key).Name = value;
                             OnPropertyChanged("Name");
@@ -213,27 +213,26 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
-            SchemaCollectionBase col = this.ParentColl as SchemaCollectionBase;
-            if (null != this.Schema && this.Schema.Length != 0 && null != col && col.Contains(Name, this.Schema))
+            if (!string.IsNullOrEmpty(Schema) && ParentColl is ISchemaObjectCollection col && col.Contains(Name, Schema))
             {
-                if (bCheckExisting && SqlSmoState.Existing != this.State)
+                if (bCheckExisting && SqlSmoState.Existing != State)
                 {
                     throw new SmoException(ExceptionTemplates.FailedToChangeSchema);
                 }
 
                 //if object is created try to change the schema
-                if (SqlSmoState.Existing == this.State && !this.IsDesignMode)
+                if (SqlSmoState.Existing == State && !IsDesignMode)
                 {
-                    StringCollection queries = ScriptChangeSchema(this.Schema, newSchema);
-                    this.ExecutionManager.ExecuteNonQuery(queries);
+                    StringCollection queries = ScriptChangeSchema(Schema, newSchema);
+                    ExecutionManager.ExecuteNonQuery(queries);
                 }
-                //execution succedded
+                //execution succeeded
                 //rearange in collection: for now for backward compatibility also for existing objects
-                if (!this.ExecutionManager.Recording)
+                if (!ExecutionManager.Recording)
                 {
-                    col.RemoveObject(Name, this.Schema);
+                    ((ISchemaObjectCollectionInternal)col).RemoveObject(Name, Schema);
                     ((SchemaObjectKey)key).Schema = newSchema;
-                    col.AddExisting(this);
+                    ParentColl.AddExisting(this);
                 }
             }
             else
@@ -247,10 +246,10 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             StringCollection queries = new StringCollection();
             // buidl the full name
-            string fullName = string.Format(SmoApplication.DefaultCulture, "[{0}].[{1}]", SqlBraket(oldSchema), SqlBraket(this.Name));
+            string fullName = string.Format(SmoApplication.DefaultCulture, "[{0}].[{1}]", SqlBraket(oldSchema), SqlBraket(Name));
             queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(GetDBName())));
 
-            if (this.ServerVersion.Major < 9)
+            if (ServerVersion.Major < 9)
             {
                 queries.Add(string.Format(SmoApplication.DefaultCulture, "EXEC sp_changeobjectowner @objname=N'{0}', @newowner=N'{1}'",
                     SqlString(fullName), SqlString(newSchema)));
@@ -273,7 +272,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return string.Format(SmoApplication.DefaultCulture, "[{0}].[{1}]", SqlBraket(this.Schema), SqlBraket(this.Name));
+                return string.Format(SmoApplication.DefaultCulture, "[{0}].[{1}]", SqlBraket(Schema), SqlBraket(Name));
             }
         }
 

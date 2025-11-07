@@ -5,19 +5,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Smo.Agent;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    using Microsoft.SqlServer.Management.Smo.Agent;
-
-    public abstract class SmoCollectionBase : AbstractCollectionBase, ICollection
+    /// <summary>
+    /// Base implementation of ICollection for SMO objects
+    /// </summary>
+    /// <typeparam name="TObject"></typeparam>
+    /// <typeparam name="TParent"></typeparam>
+    public abstract class SmoCollectionBase<TObject, TParent> : AbstractCollectionBase, ICollection, IEnumerable<TObject>, ILockableCollection, ISmoInternalCollection, ISmoCollection
+        where TObject : SqlSmoObject
+        where TParent : SqlSmoObject
     {
 
-        private SmoInternalStorage internalStorage = null;
-        internal SmoInternalStorage InternalStorage
+        private SmoInternalStorage<TObject> internalStorage = null;
+        internal SmoInternalStorage<TObject> InternalStorage
         {
             get
             {
@@ -31,44 +35,35 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
 
-        internal SmoCollectionBase(SqlSmoObject parent)
+        internal SmoCollectionBase(TParent parent)
             : base(parent)
         {
         }
 
+        /// <summary>
+        /// Returns the object at the given index after ensuring the collection is initialized
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public TObject this[int index] => GetObjectByIndex(index);
+
         protected abstract void InitInnerCollection();
 
-        protected virtual Type GetCollectionElementType()
-        {
-            return null;
-        }
 
         string m_lockReason = null;
-        internal void LockCollection(string lockReason)
-        {
-            m_lockReason = lockReason;
-        }
+        internal void LockCollection(string lockReason) => m_lockReason = lockReason;
 
-        internal void UnlockCollection()
-        {
-            m_lockReason = null;
-        }
+        internal void UnlockCollection() => m_lockReason = null;
 
         ///<summary>
         /// return true if the collection is locked for updates ( it gets locked
         /// when the parent text object in in text mode )
         ///</summary>
-        internal bool IsCollectionLocked
-        {
-            get
-            {
-                return null != m_lockReason;
-            }
-        }
+        internal bool IsCollectionLocked => null != m_lockReason;
 
         internal void CheckCollectionLock()
         {
-        if (ParentInstance.IsDesignMode)
+            if (ParentInstance.IsDesignMode)
             {
                 return;
             }
@@ -79,105 +74,79 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        internal virtual SqlSmoObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
-        {
-            return null;
-        }
+        internal abstract TObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state);
 
-        public bool IsSynchronized
+        internal override void ImplRemove(ObjectKeyBase key) => InternalStorage.Remove(key);
+
+        internal void Remove(ObjectKeyBase key) => RemoveObj(InternalStorage[key], key);
+
+        internal void RemoveObj(TObject obj, ObjectKeyBase key)
         {
-            get
+            CheckCollectionLock();
+            if (null != obj)
             {
-                return InternalStorage.IsSynchronized;
-            }
+                if (obj.State == SqlSmoState.Creating ||
+                    ((obj is Column) && (obj.ParentColl.ParentInstance is View))
+                )
+                {
+                    InternalStorage.Remove(key);
+                    obj.objectInSpace = true;
+                }
+                else
+                {
+                    throw new InvalidSmoOperationException("Remove", obj.State);
+                }
 
-        }
-
-        public object SyncRoot
-        {
-            get
-            {
-                return InternalStorage.SyncRoot;
-            }
-        }
-
-        internal override void ImplRemove(ObjectKeyBase key)
-        {
-            InternalStorage.Remove(key);
-        }
-
-        internal void Remove(ObjectKeyBase key)
-        {
-            RemoveObj((SqlSmoObject)InternalStorage[key], key);
-        }
-
-    internal void RemoveObj(SqlSmoObject obj, ObjectKeyBase key)
-    {
-        CheckCollectionLock();
-        if( null != obj )
-        {
-            if( obj.State == SqlSmoState.Creating ||
-                ((obj is Column) && (obj.ParentColl.ParentInstance is View )) 
-            )
-            {
-                InternalStorage.Remove(key);
-                obj.objectInSpace = true;
             }
             else
             {
-                throw new InvalidSmoOperationException("Remove", obj.State);
-            }
-
-        }
-        else
-        {
-            if( !key.IsNull )
+                if (!key.IsNull)
                 {
-                    throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(GetCollectionElementType().Name, key.ToString()));
+                    throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(typeof(TObject).Name, key.ToString()));
                 }
                 else
                 {
                     throw new FailedOperationException(ExceptionTemplates.RemoveCollection, this, new ArgumentNullException());
                 }
             }
-    }
+        }
 
-
-
-        internal SqlSmoObject GetNewObject(ObjectKeyBase key)
+        internal TObject GetNewObject(ObjectKeyBase key)
         {
-            key.Validate(GetCollectionElementType());
+            key.Validate(typeof(TObject));
 
-            bool needsValidation = (null == ParentInstance || !ParentInstance.IsObjectInSpace());
+            var needsValidation = null == ParentInstance || !ParentInstance.IsObjectInSpace();
             if ((true == InternalStorage.Contains(key) ||
                 (needsValidation && (null != InitializeChildObject(key)))) &&
-                !this.AcceptDuplicateNames)
+                !AcceptDuplicateNames)
             {
-                throw new SmoException(ExceptionTemplates.CannotAddObject(GetCollectionElementType().ToString(), key.ToString()));
+                throw new SmoException(ExceptionTemplates.CannotAddObject(typeof(TObject).ToString(), key.ToString()));
             }
 
             // instantiate a new child object
             return GetCollectionElementInstance(key, SqlSmoState.Creating);
         }
 
+        internal virtual SqlSmoObject GetObjectByName(string name) => GetObjectByKey(new SimpleObjectKey(name));
+
         // returns wrapped object
-        protected SqlSmoObject GetObjectByIndex(Int32 index)
+        protected TObject GetObjectByIndex(int index)
         {
             if (!initialized && ParentInstance.State == SqlSmoState.Existing)
             {
                 InitializeChildCollection();
             }
 
-            return InternalStorage.GetByIndex(index) as SqlSmoObject;
+            return InternalStorage.GetByIndex(index) as TObject;
         }
 
 
         // returns wrapped object
-        internal virtual SqlSmoObject GetObjectByKey(ObjectKeyBase key)
+        internal virtual TObject GetObjectByKey(ObjectKeyBase key)
         {
             object instanceObject = InternalStorage[key];
 
-            bool needsValidation = (null == ParentInstance || !ParentInstance.IsObjectInSpace()); ;
+            var needsValidation = null == ParentInstance || !ParentInstance.IsObjectInSpace(); ;
 
             if ((null == instanceObject) &&
                 needsValidation &&
@@ -187,7 +156,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 instanceObject = InitializeChildObject(key);
             }
 
-            return instanceObject as SqlSmoObject;
+            return instanceObject as TObject;
         }
 
         /// <summary>
@@ -203,7 +172,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// By setting the parameter to null or empty array, only the default fields will be included in the result</param>
         public void ClearAndInitialize(string filterQuery, IEnumerable<string> extraFields)
         {
-            this.InternalStorage.Clear();
+            InternalStorage.Clear();
             InitializeChildCollection(false, null, filterQuery: filterQuery, extraFields: extraFields);
         }
 
@@ -216,65 +185,43 @@ namespace Microsoft.SqlServer.Management.Smo
             UnlockCollection();
         }
 
-        private void InitializeChildCollection(bool refresh, ScriptingPreferences sp)
-        {
-            InitializeChildCollection(refresh, sp, filterQuery: null, extraFields: null);
-        }
+        private void InitializeChildCollection(bool refresh, ScriptingPreferences sp) => InitializeChildCollection(refresh, sp, filterQuery: null, extraFields: null);
 
         /// <summary>
         /// Initialize the child collection
         /// </summary>
-        protected void InitializeChildCollection()
-        {
-            InitializeChildCollection(false);
-        }
+        protected void InitializeChildCollection() => InitializeChildCollection(false);
 
         /// <summary>
         /// Initializes the child collection, optionally keeping all the old objects
         /// </summary>
         /// <param name="refresh">directs if we discard the old objects</param>
-        protected void InitializeChildCollection(bool refresh)
-        {
-            InitializeChildCollection(refresh, null);
-        }
+        protected void InitializeChildCollection(bool refresh) => InitializeChildCollection(refresh, null);
 
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods",
-            MessageId = "System.Type.InvokeMember")]
+        protected abstract string UrnSuffix { get; }
+
         private void InitializeChildCollection(bool refresh, ScriptingPreferences sp, string filterQuery, IEnumerable<string> extraFields)
         {
-        // In design mode the objects are not retrieved, but are added by the client
-            if (this.ParentInstance.IsDesignMode)
+            // In design mode the objects are not retrieved, but are added by the client
+            if (ParentInstance.IsDesignMode)
             {
-                this.initialized = true;
+                initialized = true;
                 return;
             }
             // keep the old collection, because we'll append all the objects to the new one
-            SmoInternalStorage oldColl = InternalStorage;
+            var oldColl = InternalStorage;
             InitInnerCollection();
-            
-            string urnsuffix = null;
-            if( this.GetCollectionElementType().GetBaseType() == typeof(Parameter) )
-            {
-                urnsuffix = this.GetCollectionElementType().GetBaseType().GetBaseType().InvokeMember("UrnSuffix",
-                    SqlSmoObject.UrnSuffixBindingFlags,
-                    null, null, new object[] {}, SmoApplication.DefaultCulture ) as string;
-            }
-            else
-            {
-                urnsuffix = this.GetCollectionElementType().InvokeMember("UrnSuffix",
-                    SqlSmoObject.UrnSuffixBindingFlags,
-                    null, null, new object[] {}, SmoApplication.DefaultCulture ) as string;
-            }
-            
-            urnsuffix += (string.IsNullOrEmpty(filterQuery) ? string.Empty : filterQuery);
+
+            var urnsuffix = UrnSuffix + (string.IsNullOrEmpty(filterQuery) ? string.Empty : filterQuery);
+
             // init the collection with objects
-            this.ParentInstance.InitChildLevel(urnsuffix, sp ?? new ScriptingPreferences(), forScripting: sp != null, extraFields: extraFields);
-            
+            ParentInstance.InitChildLevel(urnsuffix, sp ?? new ScriptingPreferences(), forScripting: sp != null, extraFields: extraFields);
+
             // now merge the old collection into the new one
-            foreach (SqlSmoObject oldObj in oldColl)
+            foreach (var oldObj in oldColl)
             {
-                ObjectKeyBase sok = oldObj.key.Clone();
-                SqlSmoObject obj = InternalStorage[sok];
+                var sok = oldObj.key.Clone();
+                var obj = InternalStorage[sok];
                 if (null != obj)
                 {
                     InternalStorage[sok] = oldObj;
@@ -296,27 +243,27 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // update the state flag
-            this.initialized = true;
+            initialized = true;
         }
 
-            
+
         // this function tries to instantiate a missing object
         // and if it exists we add it to the collection
         internal object InitializeChildObject(ObjectKeyBase key)
         {
-            if (this.ParentInstance.IsDesignMode)
+            if (ParentInstance.IsDesignMode)
             {
                 // Do not try to get the object while in design mode.
                 return null;
             }
 
-            SqlSmoObject childobj = GetCollectionElementInstance(key, SqlSmoState.Creating);
-            
-            if( childobj.Initialize() )
+            var childobj = GetCollectionElementInstance(key, SqlSmoState.Creating);
+
+            if (childobj.Initialize())
             {
                 // update object's state and add it to the collection
                 childobj.SetState(SqlSmoState.Existing);
-                this.AddExisting(childobj);
+                AddExisting(childobj);
                 return childobj;
             }
             else
@@ -325,22 +272,16 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-            
-
-        
 
         // behaves like this[string].get 
-        internal bool Contains(ObjectKeyBase key)
-        {
-            return null != GetObjectByKey(key);
-        }
+        internal bool Contains(ObjectKeyBase key) => null != GetObjectByKey(key);
 
-        internal bool ContainsKey(ObjectKeyBase key)
-        {
-            return null != InternalStorage[key];
-        }
+        internal bool ContainsKey(ObjectKeyBase key) => null != InternalStorage[key];
 
-        public Int32 Count
+        /// <summary>
+        /// Returns the number of objects in the collection after ensuring the collection is initialized
+        /// </summary>
+        public int Count
         {
             get
             {
@@ -352,27 +293,33 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        public void Refresh()
-        {
-            Refresh(false);
-        }
+        /// <summary>
+        /// Recreates the collection contents from the database without refreshing properties of any existing objects in the collection.
+        /// </summary>
+        public void Refresh() => Refresh(false);
 
+        /// <summary>
+        /// Refreshes the contents of the collection and refreshes the properties of existing objects in the collection
+        /// </summary>
+        /// <param name="refreshChildObjects"></param>
         public void Refresh(bool refreshChildObjects)
         {
             InitializeChildCollection(true);
             if (refreshChildObjects)
             {
-                IEnumerator ienum = this.GetEnumerator();
-
-                if (null != ienum)
+                foreach (var obj in this)
                 {
-                    while (ienum.MoveNext())
-                    {
-                        ((SqlSmoObject)ienum.Current).Refresh();
-                    }
+                    obj.Refresh();
                 }
             }
         }
+
+        /// <summary>
+        /// Returns the item whose numeric ID property matches id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual TObject ItemById(int id) => GetItemById(id);
 
         internal void Clear()
         {
@@ -380,22 +327,17 @@ namespace Microsoft.SqlServer.Management.Smo
             InternalStorage.Clear();
         }
 
-        protected SqlSmoObject GetItemById(int id)
-        {
-            return GetItemById(id, "ID");
-        }
+        protected TObject GetItemById(int id) => GetItemById(id, "ID");
 
-        protected SqlSmoObject GetItemById(int id, string idPropName)
+        protected TObject GetItemById(int id, string idPropName)
         {
-            IEnumerator ie = ((IEnumerable)this).GetEnumerator();
-            while (ie.MoveNext())
+            foreach (var c in this)
             {
-                SqlSmoObject c = (SqlSmoObject)ie.Current;
-                Property p = c.Properties.Get(idPropName);
+                var p = c.Properties.Get(idPropName);
 
                 if (null == p.Value && c.State != SqlSmoState.Creating)
                 {
-                    c.Initialize(true); // initialize the object to get the property value
+                    _ = c.Initialize(true); // initialize the object to get the property value
                 }
 
                 if (null != p.Value && id == Convert.ToInt32(p.Value, SmoApplication.DefaultCulture)) // found object with the right id
@@ -409,10 +351,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal void MarkAllDropped()
         {
-            IEnumerator collenum = this.GetEnumerator();
+            // GetEnumerator returns null if the parent is already marked as Dropped
+            // So we can't use foreach.
+            var collenum = GetEnumerator();
             while (collenum != null && collenum.MoveNext())
-            {
-                ((SqlSmoObject)collenum.Current).MarkDroppedInternal();
+            { 
+                collenum.Current.MarkDroppedInternal();
             }
         }
 
@@ -421,7 +365,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="sp">The optional scripting settings to pass along to each SqlSmoObject.</param>
         /// <returns></returns>
-        internal IEnumerator GetEnumerator(ScriptingPreferences sp)
+        internal IEnumerator<TObject> GetEnumerator(ScriptingPreferences sp)
         {
             //If our parent is dropped we can't get an enumerator 
             //since we depend on its properties (such as DB collation)
@@ -438,60 +382,39 @@ namespace Microsoft.SqlServer.Management.Smo
             return InternalStorage.GetEnumerator();
         }
 
-        /// <summary>
-        /// Returns an enumerator after making sure the collection is initialized with the default properties
-        /// </summary>
-        /// <returns></returns>
-        public virtual IEnumerator GetEnumerator()
-        {
-            return GetEnumerator(null);
-        }
 
-        internal override SqlSmoObject NoFaultLookup(ObjectKeyBase key)
-        {
-            return InternalStorage[key] as SqlSmoObject;
-        }
+        internal override SqlSmoObject NoFaultLookup(ObjectKeyBase key) => InternalStorage[key];
 
-        internal override Int32 NoFaultCount { get { return InternalStorage.Count; } }
+        internal override int NoFaultCount => InternalStorage.Count;
 
-        protected override void ImplAddExisting(SqlSmoObject obj)
-        {
-            InternalStorage.Add(obj.key, obj);
-        }
+        protected override void ImplAddExisting(SqlSmoObject obj) => InternalStorage.Add(obj.key, (TObject)obj);
 
         // implementing ICollection
-        void ICollection.CopyTo(Array array, Int32 index)
+        public void CopyTo(TObject[] array, int index)
         {
-            int idx = index;
-            foreach (SqlSmoObject sp in InternalStorage)
+            foreach (var obj in InternalStorage)
             {
-                array.SetValue(sp, idx++);
+                array[index++] = obj;
             }
         }
 
-        bool acceptDuplicateNames = false;
-        internal bool AcceptDuplicateNames
+        int ICollection.Count => Count;
+        object ICollection.SyncRoot => null;
+        bool ICollection.IsSynchronized => false;
+        void ICollection.CopyTo(Array array, int index)
         {
-            get { return acceptDuplicateNames; }
-            set { acceptDuplicateNames = value; }
-        }
-
-        internal bool CanHaveEmptyName(Urn urn)
-        {
-            //all agent objects can have empty names
-            if (urn.Value.IndexOf("/JobServer", StringComparison.Ordinal) > 0)
+            var idx = index;
+            foreach (var obj in InternalStorage)
             {
-                return true;
+                array.SetValue(obj, idx++);
             }
-            if ((urn.Type == "Login" && urn.Parent.Type == "LinkedServer"))
-            {
-                return true;
-            }
-
-            return false;
         }
+        internal bool AcceptDuplicateNames { get; set; } = false;
+        bool ILockableCollection.IsCollectionLocked => IsCollectionLocked;
 
-        protected void ValidateParentObject(SqlSmoObject obj)
+        internal virtual bool CanHaveEmptyName(Urn urn) => false;
+
+        protected void ValidateParentObject(TObject obj)
         {
             // check to see if the object being added belongs to a 
             // different collection
@@ -501,7 +424,35 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        /// <summary>
+        /// Ensures the collection is initialized and returns a strongly typed IEnumerator using default scripting preferences
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<TObject> GetEnumerator() => GetEnumerator(null);
 
+        /// <summary>
+        /// Ensures the collection is initialized and returns an IEnumerator using default scripting preferences
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        void ILockableCollection.LockCollection(string lockReason) => LockCollection(lockReason);
+
+        void ILockableCollection.UnlockCollection() => UnlockCollection();
+
+        void ILockableCollection.CheckCollectionLock() => CheckCollectionLock();
+
+        SqlSmoObject ISmoInternalCollection.GetObjectByKey(ObjectKeyBase key) => GetObjectByKey(key);
+
+        IEnumerable<SqlSmoObject> ISmoInternalCollection.InternalStorage => InternalStorage;
+        IEnumerator<SqlSmoObject> ISmoInternalCollection.GetEnumerator(ScriptingPreferences sp) => GetEnumerator(sp);
+    }
+
+    internal interface ISmoInternalCollection
+    {
+        SqlSmoObject GetObjectByKey(ObjectKeyBase key);
+        IEnumerable<SqlSmoObject> InternalStorage { get; }
+        IEnumerator<SqlSmoObject> GetEnumerator(ScriptingPreferences sp);
     }
 
     // base class for all comparers
@@ -515,7 +466,7 @@ namespace Microsoft.SqlServer.Management.Smo
             this.stringComparer = stringComparer;
         }
 
-        public virtual int Compare(object obj1, object obj2) { return 0; }
+        public virtual int Compare(object obj1, object obj2) => 0;
     }
 
     internal class ObjectKeyBase
@@ -530,20 +481,11 @@ namespace Microsoft.SqlServer.Management.Smo
         {
         }
 
-        public virtual string UrnFilter
-        {
-            get { return string.Empty; }
-        }
+        public virtual string UrnFilter => string.Empty;
 
-        public virtual StringCollection GetFieldNames()
-        {
-            return new StringCollection();
-        }
+        public virtual StringCollection GetFieldNames() => new StringCollection();
 
-        public virtual bool IsNull
-        {
-            get { return false; }
-        }
+        public virtual bool IsNull => false;
 
         bool writable = true;
         internal bool Writable
@@ -552,15 +494,9 @@ namespace Microsoft.SqlServer.Management.Smo
             set { writable = value; }
         }
 
-        public virtual ObjectComparerBase GetComparer(IComparer stringComparer)
-        {
-            return new ObjectComparerBase(stringComparer);
-        }
+        public virtual ObjectComparerBase GetComparer(IComparer stringComparer) => new ObjectComparerBase(stringComparer);
 
-        public virtual ObjectKeyBase Clone()
-        {
-            return new ObjectKeyBase();
-        }
+        public virtual ObjectKeyBase Clone() => new ObjectKeyBase();
 
         /// <summary>
         /// Returns the name that we will use while displaying an exception 
@@ -569,12 +505,12 @@ namespace Microsoft.SqlServer.Management.Smo
         /// e.g. [dbo].[t1] will be shown as 'dbo.t1'
         /// </summary>
         /// <returns></returns>
-        public virtual string GetExceptionName()
-        {
+        public virtual string GetExceptionName() =>
             // the stock implementation is to return ToString()
-            return ToString();
-        }
+            ToString();
 
+        // TODO: https://github.com/microsoft/sqlmanagementobjects/issues/139
+        // Replace these static factories with instance methods on the collection classes
         internal static StringCollection GetFieldNames(Type t)
         {
             if (t.IsSubclassOf(typeof(ScriptSchemaObjectBase)))
@@ -621,6 +557,10 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return ColumnEncryptionKeyValueObjectKey.fields;
             }
+            else if (t == typeof(IndexedJsonPath))
+            {
+                return IndexedJsonPathObjectKey.fields;
+            }
             else if (t == typeof(ExternalStream))
             {
                 return ExternalStream.RequiredFields;
@@ -629,15 +569,11 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return ExternalStreamingJob.RequiredFields;
             }
-            else
-            {
-                return SimpleObjectKey.fields;
-            }
+            return SimpleObjectKey.fields;
         }
 
         internal static ObjectKeyBase CreateKeyOffset(Type t, System.Data.IDataReader reader, int columnOffset)
         {
-            // TODO: FIX_IN_KATMAI: just say no to special cases
 
             if (t.IsSubclassOf(typeof(ScriptSchemaObjectBase)))
             {
@@ -687,7 +623,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new AvailabilityGroupListenerIPAddressObjectKey(reader.GetString(columnOffset), reader.GetString(columnOffset + 1), reader.GetString(columnOffset + 2));
             }
-            else if(t == typeof(SecurityPredicate))
+            else if (t == typeof(SecurityPredicate))
             {
                 return new SecurityPredicateObjectKey(reader.GetInt32(columnOffset));
             }
@@ -695,52 +631,49 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new ColumnEncryptionKeyValueObjectKey(reader.GetInt32(columnOffset));
             }
-            else
+            else if (t == typeof(IndexedJsonPath))
             {
-                return new SimpleObjectKey(reader.GetString(columnOffset));
+                return new IndexedJsonPathObjectKey(reader.GetString(columnOffset));
             }
+            return new SimpleObjectKey(reader.GetString(columnOffset));
         }
 
     }
 
 
-    internal abstract class SmoInternalStorage : IEnumerable
+    internal abstract class SmoInternalStorage<T> : IEnumerable<T>
+        where T : SqlSmoObject
     {
-        protected IComparer keyComparer = null;
+        protected readonly IComparer keyComparer;
         internal SmoInternalStorage(IComparer keyComparer)
         {
             this.keyComparer = keyComparer;
         }
 
         internal abstract bool Contains(ObjectKeyBase key);
-        internal abstract Int32 LookUp(ObjectKeyBase key);
+        internal abstract int LookUp(ObjectKeyBase key);
 
-        internal abstract SqlSmoObject this[ObjectKeyBase key]
+        internal abstract T this[ObjectKeyBase key]
         {
             get;
             set;
         }
 
-        internal abstract SqlSmoObject GetByIndex(Int32 index);
+        internal abstract T GetByIndex(int index);
 
-        public abstract Int32 Count { get; }
+        public abstract int Count { get; }
 
-        internal abstract void Add(ObjectKeyBase key, SqlSmoObject o);
+        internal abstract void Add(ObjectKeyBase key, T o);
         internal abstract void Remove(ObjectKeyBase key);
 
-        internal abstract void InsertAt(int position, SqlSmoObject o);
+        internal abstract void InsertAt(int position, T o);
         internal abstract void RemoveAt(int position);
 
-        internal abstract bool IsSynchronized { get; }
+        public abstract IEnumerator<T> GetEnumerator();
 
-        internal abstract object SyncRoot { get; }
-
-        public abstract IEnumerator GetEnumerator();
-
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         internal abstract void Clear();
     }
 
-
+    
 }
-
-

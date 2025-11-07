@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <AssemblyMajorVersion Condition="'$(AssemblyMajorVersion)'==''">17</AssemblyMajorVersion>
+    <AssemblyMajorVersion Condition="'$(AssemblyMajorVersion)'==''">18</AssemblyMajorVersion>
     <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'=='' and '$(GacVersion)' == 'true'">0</AssemblyMinorVersion>
     <AssemblyMinorVersion Condition="'$(AssemblyMinorVersion)'==''">100</AssemblyMinorVersion>
     <AssemblyBuildVersion Condition="'$(LocalBuildVersion)'!=''">$(LocalBuildVersion)</AssemblyBuildVersion>
@@ -13,7 +13,7 @@
     <InformationalVersion>$(AssemblyFileVersion)</InformationalVersion>
     <FileVersion>$(AssemblyFileVersion)</FileVersion>
     <Version>$(AssemblyFileVersion)</Version>
-    <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">2</PackageMajorVersionIncrement>
+    <PackageMajorVersionIncrement Condition="'$(PackageMajorVersionIncrement)'==''">0</PackageMajorVersionIncrement>
     <PackageVersion Condition="'$(PackageVersion)' == ''">$(AssemblyMajorVersion)$(PackageMajorVersionIncrement).$(AssemblyBuildVersion).$(AssemblyBuildRevision)</PackageVersion>
     <AssemblyVersion Condition="'$(AssemblyVersion)'==''">$(AssemblyMajorVersion).$(AssemblyMinorVersion).0.0</AssemblyVersion>
   </PropertyGroup>

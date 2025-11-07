@@ -812,7 +812,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
         /// <typeparam name="U">Type of the SMO collection that contains the objects.</typeparam>
         abstract internal class MetadataList<T, U>
             where T : Smo.ScriptSchemaObjectBase
-            where U : Smo.SmoCollectionBase
+            where U : Smo.ISmoCollection
         {
             private static readonly IMetadataList<T> EmptyRange = new EmptyRange<T>();
 

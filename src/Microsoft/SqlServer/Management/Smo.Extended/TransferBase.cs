@@ -1151,7 +1151,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private void AddAllObjects<T>(ICollection<Urn> List, SmoCollectionBase collection)
+        private void AddAllObjects<T>(ICollection<Urn> List, IEnumerable<T> collection)
             where T : SqlSmoObject
         {
 #if DEBUG
@@ -1163,7 +1163,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private void AddAllObjects<T>(ICollection<Urn> List, SmoCollectionBase collection, bool copyAll,
+        private void AddAllObjects<T>(ICollection<Urn> List, IEnumerable<T> collection, bool copyAll,
             Action<ScriptingPreferences> prefetch, Dictionary<Type, StringCollection> originalDefaultFields, params string[] fields)
             where T : SqlSmoObject
         {
@@ -1185,7 +1185,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private void AddAllNonSystemObjects<T>(ICollection<Urn> List, SmoCollectionBase collection, Func<T, bool> filterLedgerObjects)
+        private void AddAllNonSystemObjects<T>(ICollection<Urn> List, IEnumerable<T> collection, Func<T, bool> filterLedgerObjects)
            where T : SqlSmoObject
         {
 #if DEBUG
@@ -1200,7 +1200,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private void AddAllNonSystemObjects<T>(ICollection<Urn> List, SmoCollectionBase collection, bool copyAll,
+        private void AddAllNonSystemObjects<T>(ICollection<Urn> List, IEnumerable<T> collection, bool copyAll,
             Action<ScriptingPreferences> prefetch, Dictionary<Type, StringCollection> originalDefaultFields, Func<T, bool> filterLedgerObjects = null, params string[] fields)
             where T : SqlSmoObject
         {
@@ -1514,7 +1514,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         }
 
-        private bool ContainsUnsupportedType(ParameterCollectionBase parms, SqlServerVersion targetVersion)
+        private bool ContainsUnsupportedType(IEnumerable<Parameter> parms, SqlServerVersion targetVersion)
         {
             foreach (Parameter p in parms)
             {

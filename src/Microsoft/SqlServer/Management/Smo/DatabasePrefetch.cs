@@ -738,10 +738,10 @@ namespace Microsoft.SqlServer.Management.Smo
             this.Database.GetServerObject().SetDefaultInitFields(typeof(T), origInitFields, this.Database.DatabaseEngineEdition);
         }
 
-        private void GetUserAndSystemObjects<T>(SmoCollectionBase collection, ICollection<Urn> userObjects, ICollection<Urn> systemObjects)
+        private void GetUserAndSystemObjects<T>(IEnumerable<T> collection, ICollection<Urn> userObjects, ICollection<Urn> systemObjects)
            where T : SqlSmoObject
         {
-            foreach (T item in collection)
+            foreach (var item in collection)
             {
                 if (!item.GetPropValueOptional<bool>("IsSystemObject", false))
                 {

@@ -9,10 +9,12 @@ using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    public class TableViewBase : TableViewTableTypeBase, IExtendedProperties, IScriptable
+    /// <summary>
+    /// Base class for Tables and Views
+    /// </summary>
+    public partial class TableViewBase : TableViewTableTypeBase, IExtendedProperties, IScriptable
     {
         internal TableViewBase(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)

@@ -655,6 +655,10 @@
       <LogicalName>IndexedColumn.xml</LogicalName>
       <Link>xml\IndexedColumn.xml</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexedJsonPath.xml">
+      <LogicalName>IndexedJsonPath.xml</LogicalName>
+      <Link>xml\IndexedJsonPath.xml</Link>
+    </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\IndexedXmlPath.xml">
       <LogicalName>IndexedXmlPath.xml</LogicalName>
       <Link>xml\IndexedXmlPath.xml</Link>

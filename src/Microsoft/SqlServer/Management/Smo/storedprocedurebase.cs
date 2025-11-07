@@ -795,7 +795,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     throw new PropertyWriteException("TextMode", this.GetType().Name, this.Name,
                         ExceptionTemplates.ReasonNotIntextMode);
                 }
-                SetTextMode(value, new SmoCollectionBase[] { Parameters });
+                SetTextMode(value, new ILockableCollection[] { Parameters });
             }
         }
 

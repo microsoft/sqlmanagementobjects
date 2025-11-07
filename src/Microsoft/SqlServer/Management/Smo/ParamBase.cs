@@ -9,10 +9,12 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    public class ParameterBase : ScriptNameObjectBase, IExtendedProperties, IMarkForDrop
+    /// <summary>
+    /// Base class for Parameters
+    /// </summary>
+    public partial class ParameterBase : ScriptNameObjectBase, IExtendedProperties, IMarkForDrop
     {
         // this is the long under score character which engine allows in a stored proc param name
         const char longUderscoreChar = '\xff3f';
@@ -269,7 +271,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Check if it is for direct execution i.e. create/alter/drop or parent is CLR type
         /// </summary>
-        /// <param name="sp"></param>
         /// <returns></returns>
         protected virtual bool isParentClrImplemented()
         {
@@ -290,7 +291,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
@@ -365,7 +366,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
@@ -403,7 +404,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {

@@ -3,16 +3,24 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
-    public abstract class SortedListCollectionBase : SmoCollectionBase
+    /// <summary>
+    /// A collection class that stores items sorted by key
+    /// </summary>
+    /// <typeparam name="TObject"></typeparam>
+    /// <typeparam name="TParent"></typeparam>
+    public abstract class SortedListCollectionBase<TObject, TParent> : SmoCollectionBase<TObject, TParent>, ISortedListCollection
+        where TObject : SqlSmoObject
+        where TParent : SqlSmoObject
     {
-        internal SortedListCollectionBase(SqlSmoObject parent) : base(parent)
+        internal SortedListCollectionBase(TParent parent) : base(parent)
         {
         }
         
-        protected void AddImpl(SqlSmoObject obj)
+        protected void AddImpl(TObject obj)
         {
             if( null == obj )
             {
@@ -23,18 +31,18 @@ namespace Microsoft.SqlServer.Management.Smo
             
 
             // check if the object already exists, and throw a meaningful exception 
-            SqlSmoObject objLookup = GetObjectByKey(obj.key);
+            var objLookup = GetObjectByKey(obj.key);
             
             if( null != objLookup )
             {
-                throw new SmoException(ExceptionTemplates.CannotAddObject(obj.GetType().Name, obj.key.ToString()));
+                throw new SmoException(ExceptionTemplates.CannotAddObject(typeof(TObject).Name, obj.key.ToString()));
             }
 
             // we can add an object to a collection if it is in Creating state, or if 
             // it is in Pending state and its key has been set 
             if (null == obj.ParentColl)
             {
-                obj.SetParentImpl(this.ParentInstance);
+                obj.SetParentImpl(ParentInstance);
             }
 
             // if the object is in Pending state we should be throwing
@@ -47,125 +55,80 @@ namespace Microsoft.SqlServer.Management.Smo
 
         protected override void ImplAddExisting(SqlSmoObject obj) 
         {
-            InternalStorage.Add(obj.key, obj);
+            InternalStorage.Add(obj.key, (TObject)obj);
             obj.objectInSpace = false;
             obj.ParentColl = this;
         }
     }
-    
-    
 
-    internal class SmoSortedList : SmoInternalStorage
+    internal interface ISortedListCollection
     {
-        SortedList innerCollection = null;
+
+    }
+    internal class SmoSortedList<T> : SmoInternalStorage<T>
+        where T : SqlSmoObject
+    {
+        private readonly SortedList innerCollection = null;
         internal SmoSortedList(IComparer keyComparer) : base(keyComparer)
         {
             innerCollection = new SortedList(keyComparer);
         }
 
-        internal override bool Contains(ObjectKeyBase key)
-        {
-            return innerCollection.Contains(key);
-        }
-        
-        internal override Int32 LookUp(ObjectKeyBase key)
-        {
-            return this.Contains(key)?1:0;
-        }
+        internal override bool Contains(ObjectKeyBase key) => innerCollection.Contains(key);
 
-        internal override SqlSmoObject this[ObjectKeyBase key]
+        internal override int LookUp(ObjectKeyBase key) => Contains(key) ? 1 : 0;
+
+        internal override T this[ObjectKeyBase key]
         { 
-            get { return innerCollection[key] as SqlSmoObject;}
-            set { innerCollection[key] = value as SqlSmoObject; }
-        }
-        
-        internal override SqlSmoObject GetByIndex(Int32 index)
-        {
-            return innerCollection.GetByIndex(index) as SqlSmoObject;
+            get { return innerCollection[key] as T;}
+            set { innerCollection[key] = value as T; }
         }
 
-        public override Int32 Count 
-        { 
-            get { return innerCollection.Count;}
-        }
+        internal override T GetByIndex(int index) => innerCollection.GetByIndex(index) as T;
 
-        internal override void Add(ObjectKeyBase key, SqlSmoObject o)
+        public override int Count => innerCollection.Count;
+
+        internal override void Add(ObjectKeyBase key, T o)
         {
             innerCollection[key] = o;
             o.key.Writable = false;
         }
-        
-        internal override void Remove(ObjectKeyBase key)
-        {
-            innerCollection.Remove(key);
-        }
-        
-        internal override void InsertAt(int position, SqlSmoObject o)
-        {
+
+        internal override void Remove(ObjectKeyBase key) => innerCollection.Remove(key);
+
+        internal override void InsertAt(int position, T o) =>
             // this should never be called
             Diagnostics.TraceHelper.Assert(false);
-        }
-        
-        internal override void RemoveAt(int position)
-        {
-            innerCollection.RemoveAt(position);
-        }
 
-        internal override void Clear()
-        {
-            innerCollection.Clear();
-        }
+        internal override void RemoveAt(int position) => innerCollection.RemoveAt(position);
 
-        internal  override bool IsSynchronized 
-        {
-            get
-            {
-                return innerCollection.IsSynchronized;
-            }
-                
-        }
+        internal override void Clear() => innerCollection.Clear();
 
-        internal override object SyncRoot
-        {
-            get
-            {
-                return innerCollection.SyncRoot;
-            }
-        }
-
-        public override IEnumerator GetEnumerator() 
-        {
-            return new SmoSortedListEnumerator(innerCollection.GetEnumerator());
-        }
+        public override IEnumerator<T> GetEnumerator() => new SmoSortedListEnumerator(innerCollection.GetEnumerator());
 
         // nested enumerator class
         // we need that to override the behaviour of SortedList
         // that exposes an IDictionaryEnumerator interface
-        internal sealed class SmoSortedListEnumerator : IEnumerator 
+        // TODO: https://github.com/microsoft/sqlmanagementobjects/issues/140
+        internal sealed class SmoSortedListEnumerator : IEnumerator<T>
         {
-            private IEnumerator baseEnumerator;
+            private readonly IEnumerator baseEnumerator;
             
             internal SmoSortedListEnumerator(IEnumerator enumerator) 
             {
-                this.baseEnumerator = enumerator;
+                baseEnumerator = enumerator;
             }
 
-            public object Current 
-            {
-                get 
-                {
-                    return ((DictionaryEntry)baseEnumerator.Current).Value;
-                }
-            }
+            public T Current => ((DictionaryEntry)baseEnumerator.Current).Value as T;
 
-            public bool MoveNext() 
+            object IEnumerator.Current => Current;
+
+            public bool MoveNext() => baseEnumerator.MoveNext();
+
+            public void Reset() => baseEnumerator.Reset();
+
+            void IDisposable.Dispose()
             {
-                return baseEnumerator.MoveNext();
-            }
-            
-            public void Reset() 
-            {
-                baseEnumerator.Reset();
             }
         }
     }

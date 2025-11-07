@@ -2,9 +2,12 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Text;
+using System.Xml.Linq;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
@@ -24,7 +27,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal protected ScriptNameObjectBase() : base() { }
 
-        private string m_sScriptName = String.Empty;
+        private string m_sScriptName = string.Empty;
 
         internal virtual string ScriptName
         {
@@ -67,7 +70,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             try
             {
-                return (System.Boolean)this.Properties.GetValueWithNullReplacement("IsSystemNamed");
+                return (bool)this.Properties.GetValueWithNullReplacement("IsSystemNamed");
             }
             catch (Exception) //if property not yet set
             {
@@ -106,7 +109,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (!sp.Table.SystemNamesForConstraints)
             {
-                Object oIsSystemNamed = GetPropValueOptional("IsSystemNamed");
+                object oIsSystemNamed = GetPropValueOptional("IsSystemNamed");
                 if (null != oIsSystemNamed)
                 {
                     bIsSystemNamed = (bool)oIsSystemNamed;
@@ -125,7 +128,7 @@ namespace Microsoft.SqlServer.Management.Smo
             return string.Empty;
         }
 
-        internal void ConstraintScriptCreate(String scriptBody, StringCollection createQuery, ScriptingPreferences sp)
+        internal void ConstraintScriptCreate(string scriptBody, StringCollection createQuery, ScriptingPreferences sp)
         {
             if (scriptBody.Length == 0)
             {
@@ -153,7 +156,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                Object pChecked = GetPropValueOptional("IsChecked");
+                object pChecked = GetPropValueOptional("IsChecked");
                 if (null != pChecked)
                 {
                     bool checkFK = (bool)pChecked;
@@ -171,7 +174,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (ScriptConstraintWithName(sp))
             {
 
-                Object pEnabled = GetPropValueOptional("IsEnabled");
+                object pEnabled = GetPropValueOptional("IsEnabled");
                 if (null != pEnabled)
                 {
                     bool enableFK = (bool)pEnabled;
@@ -406,7 +409,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         bool m_textMode = false;
         bool m_isTextModeInitialized = false;
-        protected void SetTextMode(bool textMode, SmoCollectionBase[] collList)
+        protected void SetTextMode(bool textMode, IEnumerable<ILockableCollection> collList)
         {
             //if the the object is existing and clr we do not support text mode = true
             if (true == m_textMode && false == CheckTextModeSupport())
@@ -732,14 +735,14 @@ namespace Microsoft.SqlServer.Management.Smo
             if (ShouldScriptForNonCreate(scriptHeaderType))
             {
                 //we need to replace CREATE with ALTER/CREATE OR ALTER
-                return CheckAndManipulateText(null != m_textHeader ? m_textHeader : String.Empty,
+                return CheckAndManipulateText(m_textHeader ?? string.Empty,
                                                 null, new ScriptingPreferences(), scriptHeaderType);
             }
 
-            return (null != m_textHeader ? m_textHeader : String.Empty);
+            return m_textHeader ?? string.Empty;
         }
 
-        protected void SetCollectionTextMode(bool newTextModeValue, SmoCollectionBase coll)
+        protected void SetCollectionTextMode(bool newTextModeValue, ILockableCollection coll) 
         {
             if (true == newTextModeValue)
             {
@@ -751,11 +754,11 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        protected void SwitchTextMode(bool newTextModeValue, SmoCollectionBase[] collList)
+        protected void SwitchTextMode(bool newTextModeValue, IEnumerable<ILockableCollection> collList)
         {
             if (null != collList)
             {
-                foreach (SmoCollectionBase coll in collList)
+                foreach (var coll in collList)
                 {
                     SetCollectionTextMode(newTextModeValue, coll);
                 }
@@ -914,7 +917,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //build expectedObjectTypes list
             if (null == expectedObjectTypes)
             {
-                expectedObjectTypes = new String[] { this.GetType().Name };
+                expectedObjectTypes = new string[] { this.GetType().Name };
             }
 
             // CheckAndManipulateText Would check the Name so we don't want BuildText to check the name
@@ -993,10 +996,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 Diagnostics.TraceHelper.Assert(null != textBody, "null == textBody");
 
                 //text header should end in space
-                if (textHeader.Length > 0 && !Char.IsWhiteSpace(textHeader[textHeader.Length - 1]))
+                if (textHeader.Length > 0 && !char.IsWhiteSpace(textHeader[textHeader.Length - 1]))
                 {
                     //else check if the text body ends in space
-                    if (textBody.Length > 0 && !Char.IsWhiteSpace(textBody[0]))
+                    if (textBody.Length > 0 && !char.IsWhiteSpace(textBody[0]))
                     {
                         //else we need to add a space
                         text.Append(sp.NewLine);
@@ -1068,7 +1071,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // if no schema was specified in the text, check that the default schema is what we want
                     ScriptSchemaObjectBase schemaObject = (ScriptSchemaObjectBase)this;
-                    SchemaCollectionBase parentCollection = (SchemaCollectionBase)schemaObject.ParentColl;
+                    var parentCollection =  (ISchemaObjectCollection)schemaObject.ParentColl;
 
                     if (0 != this.StringComparer.Compare(expectedSchema, MakeSqlBraket(parentCollection.GetDefaultSchema())))
                     {
@@ -1129,7 +1132,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 bool bObjectTypeFound = false;
                 foreach (string s in expectedObjectTypes)
                 {
-                    if (0 == String.Compare(s, headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
+                    if (0 == string.Compare(s, headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
                     {
                         bObjectTypeFound = true;
                         break;
@@ -1147,13 +1150,13 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 // if the object has schema, then we'll need to do some extra validation
                 ScriptSchemaObjectBase schemaObject = this as ScriptSchemaObjectBase;
-                String expectedSchema = null != schemaObject ? MakeSqlBraket(schemaObject.Schema) : String.Empty;
+                string expectedSchema = null != schemaObject ? MakeSqlBraket(schemaObject.Schema) : string.Empty;
 
                 CheckNameInTextCorrectness(GetBraketNameForText(), expectedSchema,
                                             headerInfo.name, headerInfo.schema, headerInfo.procedureNumber);
 
                 // if this is a trigger, also check the table name
-                if (0 == String.Compare("TRIGGER", headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
+                if (0 == string.Compare("TRIGGER", headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
                 {
                     Trigger tr = this as Trigger;
 
@@ -1223,7 +1226,7 @@ namespace Microsoft.SqlServer.Management.Smo
         // and if the object doesn't have a schema it returns false.
         private bool IsSchemaNameSame(string schemaName)
         {
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
             {
                 return true;
             }
@@ -1252,7 +1255,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 // if this is a trigger, also fix the table name
                 // note: fix it before the object's name so that the text indexes are not affected
-                if (0 == String.Compare("TRIGGER", headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
+                if (0 == string.Compare("TRIGGER", headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
                 {
                     Diagnostics.TraceHelper.Assert(headerInfo.indexNameStartSecondary > 0 && headerInfo.indexNameEndSecondary > 0
                                 && headerInfo.indexNameEndSecondary > headerInfo.indexNameStartSecondary);
@@ -1623,10 +1626,10 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 sb.AppendFormat(SmoApplication.DefaultCulture, this.m_textHeader);
                 //text header should end in space
-                if (this.m_textHeader.Length > 0 && !Char.IsWhiteSpace(this.m_textHeader[this.m_textHeader.Length - 1]))
+                if (this.m_textHeader.Length > 0 && !char.IsWhiteSpace(this.m_textHeader[this.m_textHeader.Length - 1]))
                 {
                     //else check if the text body starts with space
-                    if (this.m_textBody.Length > 0 && !Char.IsWhiteSpace(this.m_textBody[0]))
+                    if (this.m_textBody.Length > 0 && !char.IsWhiteSpace(this.m_textBody[0]))
                     {
                         //else we need to add a new line
                         sb.AppendFormat(SmoApplication.DefaultCulture, sp.NewLine);

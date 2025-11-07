@@ -284,6 +284,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     "IsUnique",
                     "IsXmlIndex",
                     "NoAutomaticRecomputation",
+                    nameof(Microsoft.SqlServer.Management.Smo.Index.OptimizeForArraySearch),
                     "PadIndex",
                 }
             },
@@ -807,6 +808,7 @@ then add the property to the expectedBooleanPropertiesWithoutValuesForSomeVersio
             typeof(FullTextIndexColumn),
             typeof(HttpProtocol),
             typeof(IndexedColumn),
+            typeof(IndexedJsonPath),
             typeof(IndexedXmlPath),
             typeof(IndexedXmlPathNamespace),
             typeof(Information),

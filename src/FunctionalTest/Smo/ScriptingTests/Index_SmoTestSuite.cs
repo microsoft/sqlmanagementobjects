@@ -16,9 +16,11 @@ using System.Collections.Specialized;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
 using System.Linq;
 using Microsoft.SqlServer.Management.Smo;
 using SFC = Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {
@@ -510,6 +512,312 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             });
         }
 
+        /// <summary>
+        /// Verify JSON index create script without optimized_for_array_search option
+        /// </summary>
+        [DataRow(true)]
+        [DataRow(false)]
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_CreateJsonIndex(bool optimizeForArraySearch)
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    _SMO.Table table = null;
+
+                    // Create our table with JSON column
+                    table = new _SMO.Table(database, "JsonIndexTable_" + Guid.NewGuid());
+                    table.Columns.Add(new _SMO.Column(table, "id", _SMO.DataType.Int) { Nullable = false });
+                    table.Columns.Add(new _SMO.Column(table, "jsonCol", _SMO.DataType.Json) { Nullable = true });
+                    table.Columns.Add(new _SMO.Column(table, "name", _SMO.DataType.NVarChar(100)) { Nullable = true });
+
+                    _SMO.Index pkIdx = new _SMO.Index(table, "PK_" + table.Name) 
+                    { 
+                        IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey, 
+                        IndexType = _SMO.IndexType.ClusteredIndex 
+                    };
+                    pkIdx.IndexedColumns.Add(new _SMO.IndexedColumn(pkIdx, "id"));
+                    table.Indexes.Add(pkIdx);
+                    table.Create();
+
+                    // Create the JSON index
+                    _SMO.Index index = new _SMO.Index(table, "JsonIndex_" + table.Name)
+                    {
+                        IndexType = _SMO.IndexType.JsonIndex
+                    };
+                    _SMO.IndexedColumn jsonColumn = new _SMO.IndexedColumn(index, "jsonCol");
+                    index.IndexedColumns.Add(jsonColumn);
+
+                    if (optimizeForArraySearch)
+                    {
+                        index.OptimizeForArraySearch = true;
+                    }
+                    
+                    try
+                    {
+                        index.Create();
+
+                        // Refresh to get a clean copy of the object from the server
+                        table.Indexes.ClearAndInitialize($"[@Name='{SFC.Urn.EscapeString(index.Name)}']", 
+                            new string[] { nameof(_SMO.Index.OptimizeForArraySearch) });
+                        var newIndex = table.Indexes[index.Name];
+                        Assert.That(newIndex.IndexType, Is.EqualTo(IndexType.JsonIndex));
+                        
+                        Assert.That(newIndex.OptimizeForArraySearch, Is.EqualTo(optimizeForArraySearch), 
+                                "optimizeForArraySearch should be true");
+
+                        // Verify the script contains expected options
+                        string script = ScriptSmoObject(newIndex);
+                        Assert.That(script, Does.Contain("CREATE JSON INDEX"), 
+                            "Script should contain CREATE JSON INDEX");
+                        Assert.That(script, Does.Contain("[jsonCol]"), 
+                            "Script should contain the JSON column");
+
+                        if (optimizeForArraySearch)
+                        {
+                            Assert.That(script, Does.Contain("OPTIMIZE_FOR_ARRAY_SEARCH = ON"),
+                                "Script should contain OPTIMIZE_FOR_ARRAY_SEARCH = ON");
+                        }
+                        else
+                        {
+                            Assert.That(script, Does.Not.Contain("OPTIMIZE_FOR_ARRAY_SEARCH"),
+                                "Script should not contain OPTIMIZE_FOR_ARRAY_SEARCH");
+                        }
+                    }
+                    finally
+                    {
+                        table?.Drop();
+                    }
+            });
+        }
+
+        /// <summary>
+        /// Verify JSON index create script with JSON paths
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_CreateJsonIndex_With_Paths()
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    _SMO.Table table = null;
+
+                    // Create our table with JSON column
+                    table = new _SMO.Table(database, "JsonIndexPathTable_" + Guid.NewGuid());
+                    table.Columns.Add(new _SMO.Column(table, "id", _SMO.DataType.Int) { Nullable = false });
+                    table.Columns.Add(new _SMO.Column(table, "jsonCol", _SMO.DataType.Json) { Nullable = true });
+
+                    _SMO.Index pkIdx = new _SMO.Index(table, "PK_" + table.Name)
+                    {
+                        IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey,
+                        IndexType = _SMO.IndexType.ClusteredIndex
+                    };
+                    pkIdx.IndexedColumns.Add(new _SMO.IndexedColumn(pkIdx, "id"));
+                    table.Indexes.Add(pkIdx);
+                    table.Create();
+
+                    // Create the JSON index with paths using INCLUDING clause
+                    _SMO.Index index = new _SMO.Index(table, "JsonIndex_" + table.Name)
+                    {
+                        IndexType = _SMO.IndexType.JsonIndex,
+                        OptimizeForArraySearch = true
+                    };
+                    _SMO.IndexedColumn jsonColumn = new _SMO.IndexedColumn(index, "jsonCol");
+                    index.IndexedColumns.Add(jsonColumn);
+
+                    // Add multiple JSON paths to the index
+                    var jsonPath1 = new _SMO.IndexedJsonPath(index, "$.customer.name");
+                    var jsonPath2 = new _SMO.IndexedJsonPath(index, "$.order.items");
+                    var jsonPath3 = new _SMO.IndexedJsonPath(index, "$.\"믱吨굮뿁霋\"");
+                    index.IndexedJsonPaths.Add(jsonPath1);
+                    index.IndexedJsonPaths.Add(jsonPath2);
+                    index.IndexedJsonPaths.Add(jsonPath3);
+
+                    try
+                    {
+                        index.Create();
+                        table.Indexes.ClearAndInitialize($"[@Name='{SFC.Urn.EscapeString(index.Name)}']",
+                            new string[] { nameof(_SMO.Index.OptimizeForArraySearch) });
+                        var newIndex = table.Indexes[index.Name];
+                        Assert.That(newIndex.IndexType, Is.EqualTo(IndexType.JsonIndex));
+                        Assert.That(newIndex.OptimizeForArraySearch, Is.EqualTo(true));
+
+                        // Verify the script
+                        string script = ScriptSmoObject(newIndex);
+                        Assert.That(script, Does.Contain("CREATE JSON INDEX"));
+                        Assert.That(script, Does.Contain("OPTIMIZE_FOR_ARRAY_SEARCH = ON"));
+
+                        // Verify that all paths are included in the script
+                        Assert.That(script, Does.Contain("'$.customer.name'"));
+                        Assert.That(script, Does.Contain("'$.order.items'"));
+                        Assert.That(script, Does.Contain("'$.\"믱吨굮뿁霋\"'"));
+
+                    }
+                    finally
+                    {
+                        table?.Drop();
+                    }
+                });
+        }
+
+        /// <summary>
+        /// Verify JSON index create script with multiple options combined
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_CreateJsonIndex_WithMultipleOptions()
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    _SMO.Table table = null;
+
+                    // Create our table with JSON column
+                    table = new _SMO.Table(database, "JsonIndexTable_" + Guid.NewGuid());
+                    table.Columns.Add(new _SMO.Column(table, "id", _SMO.DataType.Int) { Nullable = false });
+                    table.Columns.Add(new _SMO.Column(table, "jsonCol", _SMO.DataType.Json) { Nullable = true });
+
+                    _SMO.Index pkIdx = new _SMO.Index(table, "PK_" + table.Name) 
+                    { 
+                        IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey, 
+                        IndexType = _SMO.IndexType.ClusteredIndex 
+                    };
+                    pkIdx.IndexedColumns.Add(new _SMO.IndexedColumn(pkIdx, "id"));
+                    table.Indexes.Add(pkIdx);
+                    table.Create();
+
+                    // Create the JSON index with multiple options
+                    _SMO.Index index = new _SMO.Index(table, "JsonIndex_" + table.Name)
+                    {
+                        IndexType = _SMO.IndexType.JsonIndex,
+                        OptimizeForArraySearch = true,
+                        FillFactor = 75,
+                        DisallowPageLocks = false,
+                        DisallowRowLocks = false
+                    };
+                    _SMO.IndexedColumn jsonColumn = new _SMO.IndexedColumn(index, "jsonCol");
+                    index.IndexedColumns.Add(jsonColumn);
+ 
+                    try
+                    {                       
+                        index.Create();
+
+                        // Refresh and verify
+                        table.Indexes.ClearAndInitialize($"[@Name='{SFC.Urn.EscapeString(index.Name)}']", 
+                            new string[] { 
+                                nameof(_SMO.Index.OptimizeForArraySearch),
+                                nameof(_SMO.Index.PadIndex), 
+                                nameof(_SMO.Index.DisallowPageLocks),
+                                nameof(_SMO.Index.DisallowRowLocks)
+                            });
+                        var newIndex = table.Indexes[index.Name];
+                        Assert.That(newIndex.IndexType, Is.EqualTo(IndexType.JsonIndex));
+                        Assert.That(newIndex.OptimizeForArraySearch, Is.EqualTo(true), "OptimizeForArraySearch should be true");
+                        //Assert.That(newIndex.PadIndex, Is.EqualTo(true), "PadIndex should be true");
+                        Assert.That(newIndex.FillFactor, Is.EqualTo(75), "FillFactor should be 75");
+
+                        // Verify the script contains expected options
+                        string script = ScriptSmoObject(newIndex);
+                        Assert.That(script, Does.Contain("CREATE JSON INDEX"), 
+                            "Script should contain CREATE JSON INDEX");
+                        Assert.That(script, Does.Contain("OPTIMIZE_FOR_ARRAY_SEARCH = ON"), 
+                            "Script should contain OPTIMIZE_FOR_ARRAY_SEARCH = ON");
+                        Assert.That(script, Does.Contain("FILLFACTOR = 75"), 
+                            "Script should contain FILLFACTOR = 75");
+                        Assert.That(script, Does.Contain("ALLOW_PAGE_LOCKS = ON"), 
+                            "Script should contain ALLOW_PAGE_LOCKS = ON");
+                        Assert.That(script, Does.Contain("ALLOW_ROW_LOCKS = ON"), 
+                            "Script should contain ALLOW_ROW_LOCKS = ON");
+                    }
+                    finally
+                    {
+                        table?.Drop();
+                    }
+            });
+        }
+
+        /// <summary>
+        /// Verify that attempting to alter a JSON index throws an exception.
+        /// Tests Alter(), Alter(IndexOperation), and scripting ALTER operations.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlDatabaseEdge, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Verify_JsonIndex_Alter_ThrowsException()
+        {
+            this.ExecuteFromDbPool(
+                database =>
+                {
+                    _SMO.Table table = null;
+
+                    try
+                    {
+                        // Create table with JSON column
+                        table = new _SMO.Table(database, "JsonIndexTable_" + Guid.NewGuid());
+                        table.Columns.Add(new _SMO.Column(table, "id", _SMO.DataType.Int) { Nullable = false });
+                        table.Columns.Add(new _SMO.Column(table, "jsonCol", _SMO.DataType.Json) { Nullable = true });
+
+                        _SMO.Index pkIdx = new _SMO.Index(table, "PK_" + table.Name)
+                        {
+                            IndexKeyType = _SMO.IndexKeyType.DriPrimaryKey,
+                            IndexType = _SMO.IndexType.ClusteredIndex
+                        };
+                        pkIdx.IndexedColumns.Add(new _SMO.IndexedColumn(pkIdx, "id"));
+                        table.Indexes.Add(pkIdx);
+                        table.Create();
+
+                        // Create the JSON index
+                        _SMO.Index index = new _SMO.Index(table, "JsonIndex_" + table.Name)
+                        {
+                            IndexType = _SMO.IndexType.JsonIndex
+                        };
+                        _SMO.IndexedColumn jsonColumn = new _SMO.IndexedColumn(index, "jsonCol");
+                        index.IndexedColumns.Add(jsonColumn);
+                        index.Create();
+
+                        // Refresh the index to simulate it being loaded from the database
+                        table.Indexes.Refresh();
+                        var createdIndex = table.Indexes[index.Name];
+
+                        // Test 1: Try to alter the index via Alter() - should throw FailedOperationException
+                        createdIndex.FillFactor = 80;
+                        var ex1 = Assert.Throws<_SMO.FailedOperationException>(() => createdIndex.Alter(),
+                            "Altering a JSON index should throw FailedOperationException");
+
+                        Assert.That(ex1.Message, Does.Contain("Altering JSON indexes is not currently supported").IgnoreCase,
+                            "Exception message should mention Altering JSON indexes is not currently supported");
+
+                        // Test 2: Try to alter with Rebuild operation - should throw FailedOperationException
+                        var ex2 = Assert.Throws<_SMO.FailedOperationException>(() => createdIndex.Alter(_SMO.IndexOperation.Rebuild),
+                            "Altering a JSON index with Rebuild operation should throw FailedOperationException");
+
+                        Assert.That(ex2.Message, Does.Contain("Altering JSON indexes is not currently supported").IgnoreCase,
+                            "Exception message should mention Altering JSON indexes is not currently supported");
+
+                        // Test 3: Try to script alter for the index - should throw FailedOperationException
+                        var scripter = new _SMO.Scripter(database.Parent);
+                        scripter.Options.ScriptForAlter = true;
+                        var ex3 = Assert.Throws<_SMO.FailedOperationException>(() => scripter.Script(new _SMO.SqlSmoObject[] { createdIndex }),
+                            "Scripting ALTER for a JSON index should throw FailedOperationException");
+
+                        Assert.That(ex3.Message, Does.Contain("Script failed for Index").IgnoreCase,
+                            "Exception message should mention script failed");
+                    }
+                    finally
+                    {
+                        table?.Drop();
+                    }
+                });
+        }
         #endregion
 
         #region Resumable Operations Tests
@@ -1627,7 +1935,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
 
                 index.Drop();
                 table.Drop();
@@ -1672,7 +1980,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCI_Ordered_Idx"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("CCI_Ordered_Idx"));
 
                 index.Drop();
                 table.Drop();
@@ -1721,7 +2029,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("NCCS_Ordered_Idx"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("NCCS_Ordered_Idx"));
 
                 index.Drop();
                 table.Drop();
@@ -1770,7 +2078,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("NCCS_Ordered_Idx"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("NCCS_Ordered_Idx"));
 
                 index.Drop();
                 table.Drop();
@@ -1811,7 +2119,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("SmoBaselineVerification_CompressedColumnstoreIndexWithCompressionDelay"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("SmoBaselineVerification_CompressedColumnstoreIndexWithCompressionDelay"));
 
                 index.Drop();
                 table.Drop();
@@ -1857,7 +2165,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
 
                 index.Drop();
                 table.Drop();
@@ -1904,7 +2212,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                 index.Create();
                 table.Indexes.ClearAndInitialize(string.Empty, new string[0]);
 
-                Assert.That(table.Indexes.Cast<_SMO.Index>().Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
+                Assert.That(table.Indexes.Select(i => i.Name), Has.Exactly(1).EqualTo("CCS_Idx"));
 
                 index.Drop();
                 table.Drop();

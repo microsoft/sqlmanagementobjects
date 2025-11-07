@@ -1,46 +1,24 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-
-using System;
-using System.Collections;
 namespace Microsoft.SqlServer.Management.Smo
 {
-    ///<summary>
-    /// Strongly typed list of MAPPED_TYPE objects
-    /// Has strongly typed support for all of the methods of the sorted list class
-    ///</summary>
-    public sealed  class SecurityPredicateCollection : SecurityPredicateCollectionBase
+    /// <summary>
+    /// Collection of SecurityPredicate objects associated with a SecurityPolicy
+    /// </summary>
+    public sealed partial class SecurityPredicateCollection : SecurityPredicateCollectionBase
     {
         internal SecurityPredicateCollection(SqlSmoObject parentInstance)  : base(parentInstance)
         {
         }
 
-
         /// <summary>
         /// Returns the parent object
         /// </summary>
-        public SecurityPolicy Parent
-        {
-            get
-            {
-                return this.ParentInstance as SecurityPolicy;
-            }
-        }
+        public SecurityPolicy Parent => ParentInstance as SecurityPolicy;
 
-        
-        /// <summary>
-        /// Returns the security predicate for a given index
-        /// </summary>
-        /// <param name="index">The index in the collection</param>
-        /// <returns>The security predicate at the given index</returns>
-        public SecurityPredicate this[Int32 index]
-        {
-            get
-            {
-                return GetObjectByIndex(index) as SecurityPredicate;
-            }
-        }
+        protected override string UrnSuffix => SecurityPredicate.UrnSuffix;
+
         /// <summary>
         /// Adds the security predicate to the collection.
         /// </summary>
@@ -52,33 +30,14 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             if (InternalStorage.Contains(securityPredicate.key))
             {
-                securityPredicate.SecurityPredicateID = this[this.Count - 1].SecurityPredicateID + 1;
+                securityPredicate.SecurityPredicateID = this[Count - 1].SecurityPredicateID + 1;
                 securityPredicate.key = new SecurityPredicateObjectKey(securityPredicate.SecurityPredicateID);
             }
 
             InternalStorage.Add(securityPredicate.key, securityPredicate);
         }
 
-        /// <summary>
-        /// Copies the collection to an arryay
-        /// </summary>
-        /// <param name="array">The array to copy to</param>
-        /// <param name="index">The zero-based index in array at which copying begins</param>
-        public void CopyTo(SecurityPredicate[] array, int index)
-        {
-            ((ICollection)this).CopyTo(array, index);
-        }
-
-        /// <summary>
-        /// Returns the collection element type
-        /// </summary>
-        /// <returns>The collection element type</returns>
-        protected override Type GetCollectionElementType()
-        {
-            return typeof(SecurityPredicate);
-        }
-
-        internal override SqlSmoObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
+        internal override SecurityPredicate GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
         {
             return  new SecurityPredicate(this, key, state);
         }

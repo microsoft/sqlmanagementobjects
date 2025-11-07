@@ -8,60 +8,44 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
-    // this is the class that contains common features of all schema collection classes
-
-    public class SoapMethodCollectionBase: SimpleObjectCollectionBase
+    public abstract class SoapMethodCollectionBase<TObject,TParent>: SimpleObjectCollectionBase<TObject,TParent>
+        where TObject : SoapMethodObject
+        where TParent : SqlSmoObject
     {
-        internal SoapMethodCollectionBase(SqlSmoObject parent) : base(parent)
-        {
-        }
+        internal SoapMethodCollectionBase(TParent parent) : base(parent) { }
+        protected override void InitInnerCollection() => InternalStorage = new SmoSortedList<TObject>(new SoapMethodComparer(StringComparer));
 
-        protected override void InitInnerCollection()
-        {
-            InternalStorage = new SmoSortedList(new SoapMethodComparer(this.StringComparer));
-        }
+        internal override ObjectKeyBase KeyFromName(string name) => new SoapMethodKey(name, string.Empty);
 
-        public void Remove(string name)
-        {
-            this.Remove(new SoapMethodKey(name, GetDefaultNamespace()));
-        }
-        
-        public void Remove(string name, string methodNamespace)
-        {
-            this.Remove(new SoapMethodKey(name, methodNamespace));
-        }
+        /// <summary>
+        /// Removes the SoapMethod with the give name and namespace from the collection
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="methodNamespace"></param>
+        public void Remove(string name, string methodNamespace) => Remove(new SoapMethodKey(name, methodNamespace));
 
         internal override ObjectKeyBase CreateKeyFromUrn(Urn urn)
         { 
-            string name = urn.GetAttribute("Name");
+            var name = urn.GetAttribute("Name");
             if( null == name || name.Length == 0)
             {
                 throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("Name", urn.Type));
             }
 
-            string methodNamespace = urn.GetAttribute("Namespace");
-            if( null == methodNamespace || methodNamespace.Length == 0)
+            var methodNamespace = urn.GetAttribute("Namespace");
+            if(string.IsNullOrEmpty(methodNamespace))
             {
-                methodNamespace = GetDefaultNamespace();
+                methodNamespace = string.Empty;
             }
 
             return new SoapMethodKey(name, methodNamespace);
         }
 
-        internal static string GetDefaultNamespace()
-        {
-            return string.Empty;
-        }
 
-        public bool Contains(string name, string methodNamespace)
-        {
-            return Contains(new SoapMethodKey(name, methodNamespace));
-        }
+        public bool Contains(string name, string methodNamespace) => Contains(new SoapMethodKey(name, methodNamespace));
 
-        public new bool Contains(string name)
-        {
-            return Contains(new SoapMethodKey(name, GetDefaultNamespace()));
-        }
+        public new bool Contains(string name) => Contains(new SoapMethodKey(name, string.Empty));
+
     }
     
     internal class SoapMethodComparer : ObjectComparerBase
@@ -74,21 +58,21 @@ namespace Microsoft.SqlServer.Management.Smo
         //in SimpleObjectCollectionBase will be called so be prepared to handle SimpleObjectKey
         public override int Compare(object obj1, object obj2)
         {
-            SoapMethodKey x = (SoapMethodKey)obj1;
-            SoapMethodKey y = obj2 as SoapMethodKey;
+            var x = (SoapMethodKey)obj1;
+            var y = obj2 as SoapMethodKey;
 
             //if search schema is null search only by name
             if( null != y )
             {
-                string xnamespace = null != x.Namespace ? x.Namespace : SoapMethodCollectionBase.GetDefaultNamespace();
-                string ynamespace = null != y.Namespace ? y.Namespace : SoapMethodCollectionBase.GetDefaultNamespace();
-                int i = stringComparer.Compare(xnamespace, ynamespace);
+                var xnamespace = x.Namespace ?? string.Empty;
+                var ynamespace = y.Namespace ?? string.Empty;
+                var i = stringComparer.Compare(xnamespace, ynamespace);
                 if (0 != i)
                 {
                     return i;
                 }
             }
-            string yname = null != y ? y.Name : ((SimpleObjectKey)obj2).Name;
+            var yname =  y?.Name ?? ((SimpleObjectKey)obj2).Name;
             return stringComparer.Compare(x.Name, yname);
         }
 
@@ -108,9 +92,11 @@ namespace Microsoft.SqlServer.Management.Smo
         
         static SoapMethodKey()
         {
-            soapMethodFields = new StringCollection();
-            soapMethodFields.Add("Name");
-            soapMethodFields.Add("Namespace");
+            soapMethodFields = new StringCollection
+            {
+                nameof(Name),
+                nameof(Namespace),
+            };
         }
 
         public string Namespace 
@@ -126,30 +112,27 @@ namespace Microsoft.SqlServer.Management.Smo
                 if( null != methodNamespace && methodNamespace.Length > 0 )
                 {
                     return string.Format(SmoApplication.DefaultCulture, "@Name='{0}' and @Namespace='{1}'", 
-                                    Urn.EscapeString(name), Urn.EscapeString(methodNamespace));
+                                    Urn.EscapeString(Name), Urn.EscapeString(methodNamespace));
                 }
                 else
                 {
-                    return string.Format(SmoApplication.DefaultCulture, "@Name='{0}'", Urn.EscapeString(name));
+                    return string.Format(SmoApplication.DefaultCulture, "@Name='{0}'", Urn.EscapeString(Name));
                 }
             }
         }
-            
-        public override StringCollection GetFieldNames()
-        {
-            return fields;
-        }
-            
+
+        public override StringCollection GetFieldNames() => fields;
+
         public override string ToString()
         {
             if( null != methodNamespace && methodNamespace.Length > 0 )
             {
                 return string.Format(SmoApplication.DefaultCulture, "{0}.{1}", 
-                                    SqlSmoObject.MakeSqlBraket(name), SqlSmoObject.MakeSqlBraket(methodNamespace));
+                                    SqlSmoObject.MakeSqlBraket(Name), SqlSmoObject.MakeSqlBraket(methodNamespace));
             }
             else
             {
-                return SqlSmoObject.MakeSqlBraket(name);
+                return SqlSmoObject.MakeSqlBraket(Name);
             }
         }
 
@@ -158,28 +141,22 @@ namespace Microsoft.SqlServer.Management.Smo
             if (null != methodNamespace && methodNamespace.Length > 0)
             {
                 return string.Format(SmoApplication.DefaultCulture, "{0}.{1}",
-                                    name, methodNamespace);
+                                    Name, methodNamespace);
             }
             else
             {
-                return name;
+                return Name;
             }
         }
 
-        public override ObjectKeyBase Clone()
-        {
-            return new SoapMethodKey(this.Name, this.Namespace);
-        }
-            
+        public override ObjectKeyBase Clone() => new SoapMethodKey(this.Name, this.Namespace);
+
         public override bool IsNull
         {
-            get { return (null == name|| null == methodNamespace); }
+            get { return (null == Name|| null == methodNamespace); }
         }
-        
-        public override ObjectComparerBase GetComparer(IComparer stringComparer)
-        {
-            return new SoapMethodComparer(stringComparer);
-        }
+
+        public override ObjectComparerBase GetComparer(IComparer stringComparer) => new SoapMethodComparer(stringComparer);
     }
 
     

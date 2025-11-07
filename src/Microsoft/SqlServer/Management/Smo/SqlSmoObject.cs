@@ -23,8 +23,8 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo.Agent;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using System.Diagnostics;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
     // Given index and value, get/set the appropriate data member in XSchema
@@ -823,10 +823,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// the definition besides the key fields.
         /// </summary>
         /// <param name="urnbuilder">holds the Urn</param>
-        /// <param name="useIdAsKey">Us ID as key instead of the regular key
-        /// fields. If the object does not have this property the regular key
-        /// fields will still be used.</param>
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Type.InvokeMember")]
+        /// <param name="idOption"></param>
         protected virtual void GetUrnRecursive(StringBuilder urnbuilder, UrnIdOption idOption)
         {
             // determine the suffix, which is static member of the class
@@ -973,7 +970,6 @@ namespace Microsoft.SqlServer.Management.Smo
         protected SqlSmoObject singletonParent = null;
 
 
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Type.InvokeMember")]
         internal virtual void ValidateParent(SqlSmoObject newParent)
         {
             // we are going to use the parent to get the child collection where this object is
@@ -988,7 +984,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             try
             {
-                parentColl = GetChildCollection(newParent, urnsuffix, null, newParent.ServerVersion);
+                parentColl = GetChildCollection(newParent, urnsuffix);
             }
             catch(ArgumentException)
             {
@@ -1042,9 +1038,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 ScriptSchemaObjectBase schemaObj = this as ScriptSchemaObjectBase;
                 if (schemaObj != null)
                 {
-                    if (this.key != null && parentColl != null && (null == schemaObj.Schema || schemaObj.Schema.Length == 0))
+                    if (this.key != null && parentColl != null && (string.IsNullOrEmpty(schemaObj.Schema)))
                     {
-                        schemaObj.ChangeSchema(((SchemaCollectionBase)parentColl).GetDefaultSchema(), false);
+                        schemaObj.ChangeSchema(((ISchemaObjectCollection)parentColl).GetDefaultSchema(), false);
                     }
                 }
 
@@ -1088,6 +1084,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// method get called from the create script related method (from derived classes like Table, Index etc..)
         /// </summary>
         /// <param name="queries"></param>
+        /// <param name="sp"></param>
         internal void AddDatabaseContext(StringCollection queries, ScriptingPreferences sp)
         {
             if (DatabaseEngineType.SqlAzureDatabase == sp.TargetDatabaseEngineType)
@@ -1129,7 +1126,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         ///<summary>
         /// changes the object according to the modification of its members
-        ///</sumary>
+        ///</summary>
         protected void AlterImplWorker()
         {
             CheckObjectState();
@@ -1207,7 +1204,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         ///<summary>
         /// changes the object according to the modification of its members
-        ///</sumary>
+        ///</summary>
         protected void AlterImpl()
         {
             try
@@ -1522,8 +1519,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Initializes the object, by reading its properties from the enumerator
         /// </summary>
-        /// <param name="fullPropList">If false, only a specified subset of the properties
-        /// are retrieved with this call</param>
         /// <returns></returns>
         public bool Initialize(bool allProperties)
         {
@@ -2057,7 +2052,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Returns the real value for the property.
         /// </summary>
         /// <param name="prop">The property object</param>
-        /// <param name="value">Old value. If it is null the function queries the
+        /// <param name="oldValue">Old value. If it is null the function queries the
         /// database for the old value.</param>
         /// <returns></returns>
         protected object GetRealValue(Property prop, object oldValue)
@@ -2767,7 +2762,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="sc"></param>
         /// <param name="kind"></param>
-        /// <param name="ver"></param>
         /// <param name="sp"></param>
         internal void AddScriptPermissions(StringCollection sc,
                                     PermissionWorker.PermissionEnumKind kind,
@@ -2818,7 +2812,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Returns permission script corresponding to the permission info passed as parameter.
         /// </summary>
-        /// <param name="obj"></param>
         /// <param name="pi"></param>
         /// <param name="sp"></param>
         /// <returns></returns>
@@ -3694,7 +3687,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Control loop for propagation of actions, works recursively
         /// </summary>
         /// <param name="query"></param>
-        /// <param name="so"></param>
+        /// <param name="sp"></param>
         /// <param name="action"></param>
         internal void PropagateScript(StringCollection query, ScriptingPreferences sp, PropagateAction action)
         {
@@ -3938,9 +3931,10 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Also return the list of Urns from the query, in order, so an iterator can be layered over all this.
         /// Code lifted from InitChildLevel.
         /// </summary>
-        /// <param name="queryUrn"></param>
-        /// <param name="fields"></param>
+        /// <param name="levelFilter"></param>
+        /// <param name="queryFields"></param>
         /// <param name="orderByFields"></param>
+        /// <param name="infrastructureFields"></param>
         /// <returns>The list of string Urn paths that matched the query.</returns>
         internal List<string> InitQueryUrns(Urn levelFilter,
             string[] queryFields, OrderBy[] orderByFields, string[] infrastructureFields)
@@ -3954,9 +3948,12 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Code lifted from InitChildLevel.
         /// We pass the edition as a parameter because prefetch calls this method on a Server object and the edition is tied to the database.
         /// </summary>
-        /// <param name="queryUrn"></param>
-        /// <param name="fields"></param>
+        /// <param name="levelFilter"></param>
+        /// <param name="queryFields"></param>
         /// <param name="orderByFields"></param>
+        /// <param name="infrastructureFields"></param>
+        /// <param name="sp"></param>
+        /// <param name="initializeCollectionsFilter"></param>
         /// <param name="edition">Engine edition of the database being scripted</param>
         /// <returns>The list of string Urn paths that matched the query.</returns>
         internal List<string> InitQueryUrns(Urn levelFilter,
@@ -4355,6 +4352,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             yield return nameof(Index.VectorIndexType);
                             yield return nameof(Index.VectorIndexMetric);
+                            yield return nameof(Index.OptimizeForArraySearch);
+                            yield return nameof(Index.IndexedJsonPaths);
                         }
                     }
                     break;
@@ -4511,7 +4510,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// The function can also initialize a child collection via the regular initialization mechanism
         /// </summary>
         /// <param name="levelFilter"></param>
-        /// <param name="so"></param>
+        /// <param name="sp"></param>
         /// <param name="forScripting"></param>
         internal void InitChildLevel(Urn levelFilter, ScriptingPreferences sp, bool forScripting)
         {
@@ -4528,7 +4527,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// It loads the fields the default for each object and includes the fields passed as extraFields if there are not default fields
         /// </summary>
         /// <param name="levelFilter"></param>
-        /// <param name="so"></param>
+        /// <param name="sp"></param>
         /// <param name="forScripting"></param>
         /// <param name="extraFields"></param>
         internal void InitChildLevel(Urn levelFilter, ScriptingPreferences sp, bool forScripting, IEnumerable<string> extraFields)
@@ -4814,7 +4813,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             AbstractCollectionBase childColl = GetChildCollection(currentSmoObject, levelFilter,
-                filterIdx, GetServerObject().ServerVersion);
+                filterIdx);
 
             if (filterIdx == levelFilter.Length - 1)
             {
@@ -5086,7 +5085,10 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="reader">the query results that we are
         /// transferring to the Smo objects in the tree</param>
         /// <param name="columnIdx">column index in the result table</param>
-        /// <param name="rowIdx">row index in the result table</param>
+        /// <param name="parentRow"></param>
+        /// <param name="forScripting"></param>
+        /// <param name="urnList"></param>
+        /// <param name="startLeafIdx"></param>
         private void InitObjectsFromEnumResultsRec(SqlSmoObject currentSmoObject,
             XPathExpression levelFilter,
             int filterIdx,
@@ -5272,7 +5274,7 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 childColl = GetChildCollection(currentSmoObject, levelFilter,
-                    filterIdx, GetServerObject().ServerVersion);
+                    filterIdx);
             }
             catch (Exception e)
             {
@@ -5301,8 +5303,8 @@ namespace Microsoft.SqlServer.Management.Smo
             // For singletons, we know we are on the leaf level and just need to absorb properties
             if (isNonCollection)
             {
-                SqlSmoObject currObj = GetChildSingleton(currentSmoObject, levelFilter,
-                    filterIdx, GetServerObject().ServerVersion);
+                var currObj = GetChildSingleton(currentSmoObject, levelFilter,
+                    filterIdx);
 
                 if (!AdvanceInitRec(currObj, levelFilter, filterIdx, reader, columnIdx,
                     columnOffset, parentRow, forScripting, urnList, startLeafIdx))
@@ -5332,7 +5334,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         if (CompareRows(reader, parentRow, 0, columnIdx))
                         {
 
-                            int relativeOrder = CompareObjectToRow(currObj,
+                            int relativeOrder = SqlSmoObject.CompareObjectToRow(currObj,
                                 reader,
                                 columnIdx,
                                 isOrderedByID,
@@ -5509,10 +5511,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (skipOrderChecking)
                 {
                     //Since we need to skip order checking we will add objects at the end of collection
-                    ParameterCollectionBase orderedCollection = childColl as ParameterCollectionBase;
-                    if (orderedCollection != null)
+
+                    if (childColl is IOrderedCollectionInternal col)
                     {
-                        orderedCollection.InternalStorage.InsertAt(orderedCollection.InternalStorage.Count, currObj);
+                        col.Append(currObj);
                         return currObj;
                     }
                 }
@@ -5536,10 +5538,10 @@ namespace Microsoft.SqlServer.Management.Smo
         private SqlSmoObject GetExistingOrCreateNewObject(System.Data.IDataReader reader, int columnIdx, Type childType, AbstractCollectionBase childColl, bool isOrderedByID)
         {
             SqlSmoObject sqlSmoObject = null;
-            if (!isOrderedByID && (childColl is SortedListCollectionBase))
+            if (!isOrderedByID && (childColl is ISortedListCollection))
             {
                 //Check if object is already in collection
-                sqlSmoObject = ((SortedListCollectionBase)childColl).NoFaultLookup(ObjectKeyBase.CreateKeyOffset(childType, reader, columnIdx));
+                sqlSmoObject = childColl.NoFaultLookup(ObjectKeyBase.CreateKeyOffset(childType, reader, columnIdx));
             }
 
             if (sqlSmoObject == null)
@@ -5562,6 +5564,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="columnOffset"></param>
         /// <param name="parentRow"></param>
         /// <param name="forScripting"></param>
+        /// <param name="urnList"></param>
+        /// <param name="startLeafIdx"></param>
         /// <returns>true if there are still records to read </returns>
         private bool AdvanceInitRec(SqlSmoObject currentSmoObject,
             XPathExpression levelFilter,
@@ -5623,141 +5627,54 @@ namespace Microsoft.SqlServer.Management.Smo
         // get child collection. This should not fail, since the collection
         // name is hardcoded in internal prefetch calls
         internal static AbstractCollectionBase GetChildCollection(SqlSmoObject parent,
-            XPathExpression levelFilter, int filterIdx, ServerVersion srvVer)
+            XPathExpression levelFilter, int filterIdx)
         {
             return GetChildCollection(
                 parent,
-                levelFilter[filterIdx].Name,
-                levelFilter[filterIdx].GetAttributeFromFilter("CategoryClass"),
-                srvVer);
+                levelFilter[filterIdx].Name);
         }
 
-        // Given a single type name, return plural name for collection of these types
-        internal static string GetPluralName(string name, SqlSmoObject parent)
-        {
-            switch (name)
-            {
-                case "Index": return "Indexes";
-                case "Numbered": return "NumberedStoredProcedures";
-                case "Method": return "SoapPayloadMethods";
-                case "Param": return "Parameters";
-                case "ExtendedProperty": return "ExtendedProperties";
-                case "JobCategory": return "JobCategories";
-                case "AlertCategory": return "AlertCategories";
-                case "OperatorCategory": return "OperatorCategories";
-                case "Column":
-                    if (parent is Statistic)
-                    {
-                        return "StatisticColumns";
-                    }
-                    else
-                    {
-                        return "Columns";
-                    }
-
-                case "Step": return "JobSteps";
-                case "Schedule":
-                    if (parent is Job)
-                    {
-                        return "JobSchedules";
-                    }
-                    else
-                    {
-                        return "SharedSchedules";
-                    }
-
-                case "Login":
-                    if (parent is LinkedServer)
-                    {
-                        return "LinkedServerLogins";
-                    }
-                    else
-                    {
-                        return "Logins";
-                    }
-
-                case "SqlAssembly": return "Assemblies";
-                case nameof(ExternalLanguage): return "ExternalLanguages";
-                case "ExternalLibrary": return "ExternalLibraries";
-                case "FullTextIndexColumn": return "IndexedColumns";
-                case "DdlTrigger": return "Triggers";
-                case "MailProfile": return "Profiles";
-                case "MailAccount": return "Accounts";
-                case "ServiceQueue": return "Queues";
-                case "BrokerService": return "Services";
-                case "BrokerPriority": return "Priorities";
-                case "ServiceRoute": return "Routes";
-                case "EventClass": return "EventClasses";
-                case "NotificationClass": return "NotificationClasses";
-                case "SubscriptionClass": return "SubscriptionClasses";
-                case "SearchProperty": return "SearchProperties";
-                case "SecurityPolicy": return "SecurityPolicies";
-                case "ExternalDataSource": return "ExternalDataSources";
-                case "ExternalFileFormat": return "ExternalFileFormats";
-                case "AvailabilityGroupListenerIPAddress": return "AvailabilityGroupListenerIPAddresses";
-                case "ResumableIndex": return "ResumableIndexes";
-
-                default:
-                    return name + "s";
-            }
-        }
-
-
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Type.InvokeMember")]
         internal static AbstractCollectionBase GetChildCollection(SqlSmoObject parent,
-            string childUrnSuffix, string categorystr, ServerVersion srvVer)
+            string childUrnSuffix)
         {
-            // this actually supposes that all child collection are named like this
-            // For some classes we have to get the gramatically correct plural
-            string childCollectionName = GetPluralName(childUrnSuffix, parent);
-            object childCollection = null;
-
-            // Permissions is an internal property, but we do not want to open the
-            // door to calls to internals methods so we limit the use of
-            // BindingFlags.NonPublic to Permissions
-            if (childCollectionName != "Permissions")
+            if (childUrnSuffix == "Permission")
             {
-                try
-                {
-                    childCollection = parent.GetType().InvokeMember(childCollectionName,
-                                BindingFlags.Default | BindingFlags.GetProperty |
-                                BindingFlags.Instance | BindingFlags.Public,
-                                null, parent, new object[] { }, SmoApplication.DefaultCulture);
-                }
-                catch (MissingMethodException)
-                {
-                    throw new ArgumentException(ExceptionTemplates.InvalidPathChildCollectionNotFound(childUrnSuffix, parent.GetType().Name));
-                }
+                return parent.Permissions;
             }
-            else
-            {
-                childCollection = parent.GetType().InvokeMember(childCollectionName,
-                        BindingFlags.Default | BindingFlags.GetProperty |
-                        BindingFlags.Instance | BindingFlags.NonPublic,
-                        null, parent, new object[] { }, SmoApplication.DefaultCulture);
-            }
-
-            // this should always be true in SMO, a collection will never return null
-            // but it can be empty
-            Diagnostics.TraceHelper.Assert(null != childCollection, "null == childCollection");
-
-            return (AbstractCollectionBase)childCollection;
+            return parent.GetCollectionInstance(childUrnSuffix);
         }
 
+        /// <summary>
+        /// Returns the collection corresponding to the given urn suffix
+        /// </summary>
+        /// <param name="urnSuffix"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        protected virtual AbstractCollectionBase GetCollectionInstance(string urnSuffix)
+        {
+            throw new ArgumentException(ExceptionTemplates.InvalidPathChildCollectionNotFound(urnSuffix, GetType().Name));
+        }
+
+        /// <summary>
+        /// Returns the child object of the given type
+        /// </summary>
+        /// <param name="childTypeName"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        protected virtual SqlSmoObject GetSingletonInstance(string childTypeName)
+        {
+            throw new ArgumentException(ExceptionTemplates.InvalidPathChildSingletonNotFound(childTypeName, GetType().Name));
+        }
         /// <summary>
         ///
         /// </summary>
         /// <param name="parent"></param>
-        /// <param name="filterUrn"></param>
-        /// <param name="categorystr"></param>
-        /// <param name="srvVer"></param>
+        /// <param name="levelFilter"></param>
+        /// <param name="filterIdx"></param>
         /// <returns></returns>
-        SqlSmoObject GetChildSingleton(SqlSmoObject parent,
-            XPathExpression levelFilter, int filterIdx, ServerVersion srvVer)
+        private static SqlSmoObject GetChildSingleton(SqlSmoObject parent,
+            XPathExpression levelFilter, int filterIdx)
         {
-            string propName = null;
-            object childObject = null;
-
             // Map from Urn filter name to the real System.Type name
             // Handle the case where we are asking about Server by itself (only one level node)
             int nodeCount = levelFilter.Length;
@@ -5771,54 +5688,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 return parent;
             }
 
-            // Do we already know what parent property points to the singleton instance?
-            if (!s_SingletonTypeToProperty.TryGetValue(childType, out propName))
-            {
-                SfcMetadataDiscovery metadata = new SfcMetadataDiscovery(parent.GetType());
-                foreach (SfcMetadataRelation relation in metadata.Relations)
-                {
-                    if (relation.Relationship == SfcRelationship.ChildObject ||
-                        relation.Relationship == SfcRelationship.Object)
-                    {
-                        if (childType == relation.Type)
-                        {
-                            // Found it
-                            propName = relation.PropertyName;
-                            break;
-                        }
-                    }
-                }
-
-                // Cache this result for the next time we need to lookup this type.
-                // Propname will be null if we know it isn't possible to use this type.
-                lock (((ICollection)s_SingletonTypeToProperty).SyncRoot)
-                {
-                    s_SingletonTypeToProperty[childType] = propName;
-                }
-            }
-
-            if (propName == null)
-            {
-                throw new ArgumentException(ExceptionTemplates.InvalidPathChildSingletonNotFound(childType.Name, parent.GetType().Name));
-            }
-
-            try
-            {
-                childObject = parent.GetType().InvokeMember(propName,
-                            BindingFlags.Default | BindingFlags.GetProperty |
-                            BindingFlags.Instance | BindingFlags.Public,
-                            null, parent, new object[] { }, SmoApplication.DefaultCulture);
-            }
-            catch (MissingMethodException)
-            {
-                throw new ArgumentException(ExceptionTemplates.InvalidPathChildSingletonNotFound(childType.Name, parent.GetType().Name));
-            }
-
-            return (SqlSmoObject)childObject;
+            return parent.GetSingletonInstance(childType.Name);
         }
 
         // compares the object with the current row
-        private int CompareObjectToRow(SqlSmoObject currObj, System.Data.IDataReader currentRow,
+        private static int CompareObjectToRow(SqlSmoObject currObj, System.Data.IDataReader currentRow,
             int colIdx, bool isOrderedByID,
             XPathExpression xpath, int xpathIdx)
         {
@@ -5900,15 +5774,15 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 // server.Information.Edition should be cached already
                 // since all Object Queries do this as a dummy step in InitQueryUrns().
-                case "Information":
+                case nameof(Information):
                     return new string[] { "Edition" };
 
-                case "Database":
+                case nameof(Database):
                     return new string[] { "CompatibilityLevel", "Collation" };
 
-                case "StoredProcedure":
-                case "UserDefinedFunction":
-                case "Trigger":
+                case nameof(StoredProcedure):
+                case nameof(UserDefinedFunction):
+                case nameof(Trigger):
                 case "DdlTrigger":
                 case "DatabaseDdlTrigger":
                     return new string[] { "ImplementationType" };
@@ -5971,6 +5845,10 @@ namespace Microsoft.SqlServer.Management.Smo
             else if (objType.Equals(typeof(ColumnEncryptionKeyValue)))
             {
                 return new OrderBy[] { new OrderBy("ColumnMasterKeyID", OrderBy.Direction.Asc) };
+            }
+            else if (objType.Equals(typeof(IndexedJsonPath)))
+            {
+                return new OrderBy[] { new OrderBy(nameof(IndexedJsonPath.Path), OrderBy.Direction.Asc) };
             }
             else
             {
@@ -6265,7 +6143,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         ///  this will traverse up the tree for every hit for each instance of Smo Objects
-        //   check if this can turn out to be a performance hit, by any chance
+        ///   check if this can turn out to be a performance hit, by any chance
         /// </summary>
         public virtual ExecutionManager ExecutionManager
         {
@@ -6330,6 +6208,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 9.0 (SQL 2005)
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal void ThrowIfSourceOrDestBelowVersion90(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
@@ -6376,6 +6255,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 10.0 (SQL 2008)
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal void ThrowIfSourceOrDestBelowVersion100(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
@@ -6412,6 +6292,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 11.0 (SQL 2012)
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal void ThrowIfSourceOrDestBelowVersion110(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
@@ -6448,6 +6329,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 12.0 (SQL 2014)
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal void ThrowIfSourceOrDestBelowVersion120(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
@@ -6507,6 +6389,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws an UnsupportedVersionException if either the source or destination server is below 13.0 (SQL 2016)
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal void ThrowIfSourceOrDestBelowVersion130(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             //Source
@@ -6621,7 +6504,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Checks if the target engine type is Cloud, and if so
         /// throw an exception indicating that this is not supported.
         /// </summary>
-        /// <param name="targetVersion"></param>
         internal static void ThrowIfCloud(DatabaseEngineType targetEngineType)
         {
             ThrowIfCloud(targetEngineType, ExceptionTemplates.NotSupportedOnCloud);
@@ -6632,7 +6514,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Checks if the target engine type is cloud, and if so
         /// throws an exception based the exceptionMessage
         /// </summary>
-        /// <param name="targetEngineType"></param>
+        /// <param name="targetDatabaseEngineType"></param>
         /// <param name="exceptionMessage"></param>
         internal static void ThrowIfCloud(DatabaseEngineType targetDatabaseEngineType, string exceptionMessage)
         {
@@ -6646,7 +6528,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Checks if the target engine type is not cloud, and if so
         /// throws an exception based the exceptionMessage
         /// </summary>
-        /// <param name="targetEngineType">The target database engine type.</param>
+        /// <param name="targetDatabaseEngineType"></param>
         /// <param name="exceptionMessage">Message to include in the exception.</param>
         internal static void ThrowIfNotCloud(DatabaseEngineType targetDatabaseEngineType, string exceptionMessage)
         {
@@ -6660,7 +6542,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Checks if the target engine edition is not SQL DW, and if so
         /// throws an exception based the exceptionMessage
         /// </summary>
-        /// <param name="targetEngineType">The target database engine type.</param>
+        /// <param name="targetDatabaseEngineEdition"></param>
         /// <param name="exceptionMessage">Message to include in the exception.</param>
         internal static void ThrowIfNotSqlDw(DatabaseEngineEdition targetDatabaseEngineEdition, string exceptionMessage)
         {
@@ -6708,6 +6590,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion90(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version90, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6718,6 +6601,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion100(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version100, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6728,6 +6612,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion105(SqlServerVersion targetVersion, string exceptionMessage)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version105, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6738,6 +6623,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion170(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version170, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6748,6 +6634,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion110(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version110, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6758,6 +6645,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion120(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version120, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6768,6 +6656,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion130(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version130, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6778,6 +6667,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that this is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfBelowVersion80(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version80, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -6802,7 +6692,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// has a database context then we return the compatibility level
         /// of the database, otherwise the translated server version.
         /// </summary>
-        /// <param name="o"></param>
         /// <returns></returns>
         internal CompatibilityLevel GetCompatibilityLevel()
         {
@@ -6856,6 +6745,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return CompatibilityLevel.Version140;
                 case 15:
                     return CompatibilityLevel.Version150;
+                // VBUMP
                 //Forward Compatibility: An older version SSMS/Smo connecting to a future version sql server database engine.
                 //That is why if the ver(ServerVersion) is unknown, we need to set it according to the latest database engine available,
                 //so that all Latest-Version-Supported-Features in the Tools work seamlessly for the unknown future version database engines too.
@@ -6922,6 +6812,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// throw an exception indicating that create or alter is not supported.
         /// </summary>
         /// <param name="targetVersion"></param>
+        /// <param name="exceptionMessage"></param>
         internal static void ThrowIfCreateOrAlterUnsupported(SqlServerVersion targetVersion, string exceptionMessage = null)
         {
             ThrowIfBelowVersionLimit(targetVersion, SqlServerVersion.Version130, string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.UnsupportedVersionException : exceptionMessage);
@@ -7270,67 +7161,52 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     stmt.AppendFormat(SmoApplication.DefaultCulture, " ON [{0}]", SqlBraket(fileGroupName));
                 }
-                else if (partitionSchemeName.Length > 0)
+                else if (partitionSchemeName.Length > 0 && this is IPartitionable part && (sp.Storage.PartitionSchemeInternal & part.SchemeType) == part.SchemeType)
                 {
-                    if (((this is Table) && ((sp.Storage.PartitionSchemeInternal & PartitioningScheme.Table) == PartitioningScheme.Table)) ||
-                        ((this is Index) && ((sp.Storage.PartitionSchemeInternal & PartitioningScheme.Index) == PartitioningScheme.Index)))
+                    stmt.AppendFormat(SmoApplication.DefaultCulture, " ON [{0}]", SqlBraket(partitionSchemeName));
+                    stmt.AppendFormat(SmoApplication.DefaultCulture, "(");
+
+                    var pspColl = part.PartitionSchemeParameters;
+                    var columns = part.Columns;
+
+                    int pspCount = 0;
+                    foreach (PartitionSchemeParameter psp in pspColl)
                     {
-                        stmt.AppendFormat(SmoApplication.DefaultCulture, " ON [{0}]", SqlBraket(partitionSchemeName));
-                        stmt.AppendFormat(SmoApplication.DefaultCulture, "(");
-                        PartitionSchemeParameterCollection pspColl = null;
-                        ColumnCollection columns = null;
-
-                        if (this is Table)
+                        // we check to see if the specified column exists,
+                        Column colBase = columns[psp.Name];
+                        if (null == colBase)
                         {
-                            pspColl = ((Table)this).PartitionSchemeParameters;
-                            columns = ((Table)this).Columns;
-                        }
-                        else if (this is Index)
-                        {
-                            pspColl = ((Index)this).PartitionSchemeParameters;
-                            columns = ((TableViewBase)((Index)this).Parent).Columns;
-                        }
-
-                        // make sure we have params
-                        if (pspColl.Count == 0)
-                        {
-                            throw new FailedOperationException(ExceptionTemplates.NeedPSParams);
-                        }
-
-                        int pspCount = 0;
-                        foreach (PartitionSchemeParameter psp in pspColl)
-                        {
-                            // we check to see if the specified column exists,
-                            Column colBase = columns[psp.Name];
-                            if (null == colBase)
+                            // for views we only enforce checking if the view is not creating as it may not have the columns populated
+                            if (!(this.ParentColl.ParentInstance.State == SqlSmoState.Creating && this.ParentColl.ParentInstance is View))
                             {
-                                // for views we only enforce checking if the view is not creating as it may not have the columns populated
-                                if (!(this.ParentColl.ParentInstance.State == SqlSmoState.Creating && this.ParentColl.ParentInstance is View))
-                                {
-                                    // the column does not exist, so we need to abort this scripting
-                                    throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(PartitionScheme.UrnSuffix, partitionSchemeName, this.ToString() + ".[" + SqlStringBraket(psp.Name) + "]"));
-                                }
+                                // the column does not exist, so we need to abort this scripting
+                                throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(PartitionScheme.UrnSuffix, partitionSchemeName, this.ToString() + ".[" + SqlStringBraket(psp.Name) + "]"));
                             }
-
-                            // if this column is going to be ignored for scripting skip the whole object
-                            if (colBase.IgnoreForScripting)
-                            {
-                                // flag this object to be ignored for scripting and return from the function
-                                this.IgnoreForScripting = true;
-                                return;
-                            }
-
-                            if (0 < pspCount++)
-                            {
-                                stmt.Append(Globals.commaspace);
-                            }
-
-                            stmt.Append(colBase.FormatFullNameForScripting(sp));
                         }
 
-                        // close the parameter list
-                        stmt.AppendFormat(SmoApplication.DefaultCulture, ")");
+                        // if this column is going to be ignored for scripting skip the whole object
+                        if (colBase.IgnoreForScripting)
+                        {
+                            // flag this object to be ignored for scripting and return from the function
+                            this.IgnoreForScripting = true;
+                            return;
+                        }
+
+                        if (0 < pspCount++)
+                        {
+                            stmt.Append(Globals.commaspace);
+                        }
+
+                        stmt.Append(colBase.FormatFullNameForScripting(sp));
                     }
+
+                    // make sure we have params
+                    if (pspCount == 0)
+                    {
+                        throw new FailedOperationException(ExceptionTemplates.NeedPSParams);
+                    }
+                    // close the parameter list
+                    stmt.AppendFormat(SmoApplication.DefaultCulture, ")");
                 }
             }
 
@@ -7455,10 +7331,10 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Returns an IEnumerable<string> object with the script for the object.
+        /// Returns an IEnumerable&lt;string&gt; object with the script for the object.
         /// </summary>
-        /// <param name="so"></param>
-        /// <returns>an IEnumerable<string> object with the script for the object.</returns>
+        /// <param name="sp"></param>
+        /// <returns>an IEnumerable&lt;string&gt; object with the script for the object.</returns>
         internal IEnumerable<string> EnumScriptImpl(ScriptingPreferences sp)
         {
             CheckObjectState(false);
@@ -7502,9 +7378,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
 
         /// <summary>
-        /// Returns an IEnumerable<string> object with the script for the objects.
+        /// Returns an IEnumerable&lt;string&gt; object with the script for the objects.
         /// </summary>
-        /// <returns>IEnumerable<string> object with the script for objects</returns>
+        /// <returns>IEnumerable&lt;string&gt; object with the script for objects</returns>
         internal IEnumerable<string> EnumScriptImplWorker(ScriptingPreferences sp)
         {
             if (null == sp)
@@ -8484,10 +8360,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         try
                         {
-                            SmoCollectionBase smoCollection = relationObject as SmoCollectionBase;
-                            foreach (object childObject in smoCollection)
+                            var smoCollection = (IEnumerable<SqlSmoObject>)relationObject ;
+                            foreach (var childObject in smoCollection)
                             {
-                                if ((childObject != null) && (childObject.GetType().Name != "SystemMessage") &&
+                                if ((childObject != null) && !(childObject is SystemMessage) &&
                                     !DiscoveryHelper.IsSystemObject(childObject))
                                 {
                                     dependentObjects.Enqueue(childObject);
@@ -8599,6 +8475,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Throws exception if the property is not found.
         /// </summary>
         /// <param name="propertyName"></param>
+        /// <param name="propertyType"></param>
         /// <param name="value"></param>
         void IAlienObject.SetPropertyValue(string propertyName, Type propertyType, object value)
         {
@@ -8642,6 +8519,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Retrieves value for a given property. Throws if property is not found.
         /// </summary>
         /// <param name="propertyName"></param>
+        /// <param name="propertyType"></param>
         /// <returns></returns>
         object IAlienObject.GetPropertyValue(string propertyName, Type propertyType)
         {
@@ -8694,7 +8572,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// always loaded (returns null) into the Properties bag. It must be caused
         /// to load by using reflection.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="t"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
         private bool IsSpeciallyLoaded(Type t, string propertyName)
@@ -8897,6 +8775,9 @@ namespace Microsoft.SqlServer.Management.Smo
         NoId
     }
 
+    /// <summary>
+    /// Interface implemented by objects that have extended properties
+    /// </summary>
     public interface IExtendedProperties
     {
         ExtendedPropertyCollection ExtendedProperties
@@ -8975,13 +8856,30 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 
+    /// <summary>
+    /// Implemented by SqlSmoObject types that have columns
+    /// </summary>
+    public interface IColumns
+    {
+        ColumnCollection Columns { get; }
+    }
+
+    /// <summary>
+    /// Implemented by SqlSmoObject types that can be partitioned
+    /// </summary>
+    public interface IPartitionable : IColumns
+    {
+        IEnumerable<PartitionSchemeParameter> PartitionSchemeParameters { get; }
+        PartitioningScheme SchemeType { get; }
+    }
+
     #region Design Mode Helpers
     internal static class DiscoveryHelper
     {
         internal static bool IsSystemObject(object obj)
         {
-            return (obj is SqlSmoObject) &&
-                   ((SqlSmoObject)obj).IsSystemObjectInternal();
+            return (obj is SqlSmoObject smo) &&
+                   smo.IsSystemObjectInternal();
         }
     }
     #endregion

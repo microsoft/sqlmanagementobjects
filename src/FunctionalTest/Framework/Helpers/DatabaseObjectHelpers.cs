@@ -801,7 +801,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         /// <param name="parent"></param>
         /// <param name="collection"></param>
         /// <param name="predicate">Optional predicate to filter items to drop. Return true for droppable items</param>
-        public static void DropAll<T>(this SqlSmoObject parent, Func<SmoCollectionBase> collection, Func<T, bool> predicate = null) where T : SqlSmoObject, IDroppable
+        public static void DropAll<T>(this SqlSmoObject parent, Func<ISmoCollection> collection, Func<T, bool> predicate = null) where T : SqlSmoObject, IDroppable
         {
             if (parent.IsSupportedObject<T>())
             {

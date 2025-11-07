@@ -1,130 +1,42 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System;
-using System.Collections;
-#pragma warning disable 1590, 1591, 1592, 1573, 1571, 1570, 1572, 1587
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 namespace Microsoft.SqlServer.Management.Smo.Agent
 {
+    /// <summary>
+    /// A collection of JobSchedule objects associated with a TParent instance
+    /// </summary>
+    /// <typeparam name="TParent"></typeparam>
+    public sealed class JobScheduleCollection<TParent> : JobScheduleCollectionBase<TParent>
+        where TParent : SqlSmoObject
+    {
 
-    ///<summary>
-    /// Strongly typed collection of MAPPED_TYPE objects
-    /// Supports indexing objects by their Name and Schema properties
-    ///</summary>
-    public sealed class JobScheduleCollection : JobScheduleCollectionBase
-	{
+        internal JobScheduleCollection(SqlSmoObject parentInstance) : base((TParent)parentInstance)
+        {
+        }
 
-		internal JobScheduleCollection(SqlSmoObject parentInstance)  : base(parentInstance)
-		{
-		}
+        /// <summary>
+        /// Returns the parent object
+        /// </summary>
+		public TParent Parent
+        {
+            get
+            {
+                return ParentInstance as TParent;
+            }
+        }
 
-
-		public SqlSmoObject Parent
-		{
-			get
-			{
-				return this.ParentInstance as SqlSmoObject;
-			}
-		}
-
-
-		public JobSchedule this[Int32 index]
-		{
-			get
-			{ 
-				return GetObjectByIndex(index) as JobSchedule;
-			}
-		}
-
+        /// <summary>
+        /// Return the JobSchedule object with the given name, or null if it's not in the collection
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
 		public JobSchedule this[string name]
-		{
-			get
-			{
-				return GetObjectByKey(new ScheduleObjectKey(name, GetDefaultID())) as JobSchedule;
-			}
-		}
-
-		public void CopyTo(JobSchedule[] array, int index)
-		{
-			((ICollection)this).CopyTo(array, index);
-		}
-
-		public JobSchedule ItemById(int id)
-		{
-			IEnumerator ie = ((IEnumerable)this).GetEnumerator();
-			while (ie.MoveNext())
-			{
-				JobSchedule c = (JobSchedule)ie.Current;
-
-				if (c.ID == id) // found object with the right id
-					return c;
-			}
-			return null;
-
-		}
-
-		protected override Type GetCollectionElementType()
-		{
-			return typeof(JobSchedule);
-		}
-
-		internal override SqlSmoObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
-		{
-			return new JobSchedule(this, key, state);
-		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-		internal SqlSmoObject GetObjectByName(string name)
-		{
-			return GetObjectByKey(new ScheduleObjectKey(name, GetDefaultID()));
-		}
-
-	}
+        {
+            get
+            {
+                return GetObjectByKey(new ScheduleObjectKey(name, GetDefaultID())) as JobSchedule;
+            }
+        }
+    }
 }

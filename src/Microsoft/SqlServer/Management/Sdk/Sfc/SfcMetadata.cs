@@ -771,13 +771,12 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                     if (obj is Attribute)
                     {
                         Type t = obj.GetType();
-                        if (t == typeof(SfcObjectAttribute))
+                        if (obj is SfcObjectAttribute o)
                         {
                             if (relationship != SfcRelationship.None || flags != SfcPropertyFlags.None || isReference || isReferenceCollection)
                             {
                                 ConflictReporting(customAttributes, sfcType.Name, property.Name);
                             }
-                            SfcObjectAttribute o = obj as SfcObjectAttribute;
                             relationship = o.Relationship;
                             if (relationship == SfcRelationship.ChildContainer || relationship == SfcRelationship.ObjectContainer)
                             {

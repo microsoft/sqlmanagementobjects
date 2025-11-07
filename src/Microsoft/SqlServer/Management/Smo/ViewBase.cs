@@ -12,7 +12,7 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
+
 namespace Microsoft.SqlServer.Management.Smo
 {
 
@@ -42,7 +42,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         private ResumableIndexCollection m_ResumableIndexes;
-        [SfcObject(SfcContainerRelationship.ChildContainer, SfcContainerCardinality.ZeroToAny, typeof(Index), SfcObjectFlags.Deploy)]
+        [SfcObject(SfcContainerRelationship.ChildContainer, SfcContainerCardinality.ZeroToAny, typeof(ResumableIndex), SfcObjectFlags.Deploy)]
         public ResumableIndexCollection ResumableIndexes
         {
             get
@@ -506,7 +506,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Overrides the permission scripting.
         /// </summary>
         /// <param name="query"></param>
-        /// <param name="so"></param>
+        /// <param name="sp"></param>
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // on 7.0 we do not have permissions on views
@@ -597,13 +597,13 @@ namespace Microsoft.SqlServer.Management.Smo
         public bool TextMode
         {
             get { CheckObjectState(); return GetTextMode(); }
-            set { CheckObjectState(); SetTextMode(value, new SmoCollectionBase [] { Columns }); }
+            set { CheckObjectState(); SetTextMode(value, new ILockableCollection [] { Columns }); }
         }
 
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {

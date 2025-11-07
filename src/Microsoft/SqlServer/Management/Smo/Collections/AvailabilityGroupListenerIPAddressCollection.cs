@@ -2,44 +2,18 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Collections;
-#pragma warning disable 1590, 1591, 1592, 1573, 1571, 1570, 1572, 1587
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 namespace Microsoft.SqlServer.Management.Smo
 {
 
     ///<summary>
-    /// Strongly typed collection of MAPPED_TYPE objects
+    /// Strongly typed collection of AvailabilityGroupListenerIPAddress objects
     /// Supports indexing objects by their IPAddress and SubnetMask and SubnetIP properties
     ///</summary>
     public sealed class AvailabilityGroupListenerIPAddressCollection : AvailabilityGroupListenerIPAddressCollectionBase
     {
 
-        internal AvailabilityGroupListenerIPAddressCollection(SqlSmoObject parentInstance)  : base(parentInstance)
+        internal AvailabilityGroupListenerIPAddressCollection(SqlSmoObject parentInstance) : base(parentInstance)
         {
         }
 
@@ -53,14 +27,6 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
 
-        public AvailabilityGroupListenerIPAddress this[Int32 index]
-        {
-            get
-            { 
-                return GetObjectByIndex(index) as AvailabilityGroupListenerIPAddress;
-            }
-        }
-
         public AvailabilityGroupListenerIPAddress this[string ipAddress, string subnetMask, string subnetIP]
         {
             get
@@ -70,51 +36,12 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        public void CopyTo(AvailabilityGroupListenerIPAddress[] array, int index)
+        public void Add(AvailabilityGroupListenerIPAddress availabilityGroupListenerIPAddress)
         {
-            ((ICollection)this).CopyTo(array, index);
+            if (null == availabilityGroupListenerIPAddress)
+                throw new FailedOperationException(ExceptionTemplates.AddCollection, this, new ArgumentNullException(nameof(availabilityGroupListenerIPAddress)));
+
+            AddImpl(availabilityGroupListenerIPAddress);
         }
-
-
-        public AvailabilityGroupListenerIPAddress ItemById(int id)
-        {
-            return (AvailabilityGroupListenerIPAddress)GetItemById(id);
-        }
-
-
-        protected override Type GetCollectionElementType()
-        {
-            return typeof(AvailabilityGroupListenerIPAddress);
-        }
-
-        internal override SqlSmoObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
-        {
-            return new AvailabilityGroupListenerIPAddress(this, key, state);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            public void Add(AvailabilityGroupListenerIPAddress AvailabilityGroupListenerIPAddress) 
-            {
-                if( null == AvailabilityGroupListenerIPAddress )
-                    throw new FailedOperationException(ExceptionTemplates.AddCollection, this, new ArgumentNullException("AvailabilityGroupListenerIPAddress"));
-            
-                AddImpl(AvailabilityGroupListenerIPAddress);
-            }
     }
 }

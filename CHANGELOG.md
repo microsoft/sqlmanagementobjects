@@ -3,8 +3,16 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 180.10.0
+
+- Change SMO collections to implement IEnumerator<T>
+- Create a C# source generator to emit SMO collection class implementations
+- Create a C# source generator to emit code that replaces reflection calls for finding collection and single properties on SqlSmoObject implementations
+- Increment package major version to 180
+
 ## 172.87.0
 
+- Add Json index support
 - Add Vector index support
 - Use vector_dimensions instead of max_length for Vector columns
 - Support Order Clause for NonClustered Columnstore Indexes
@@ -71,14 +79,11 @@ Once we push a new version to nuget.org add a double hash header for that versio
 - Add `OwnerLoginName` property to `JobSchedule` per [issue 120](https://github.com/microsoft/sqlmanagementobjects/issues/120)
 - Fixed the `Database.AvailabilityDatabaseSynchronizationState` property to reflect the correct synchronization state of MI databases in Managed Instance Link
 
-## 170.18.0
-
-- Add `SearchPropertyList` support for Azure SQL Database
-
-## 170.17.0, 161.48044.0
+## 170.18.0, 161.48044.0
 
 - Fix issue where `Table.Create` and `View.Create` were querying the server for indexes
-- Add option to generate scripts exclusively for Data Classification, Create a new SMO object `SensitivityClassification` under `Database`
+- Add option to generate scripts exclusively for Data Classification
+- Create a new SMO object `SensitivityClassification` under `Database`
 - Add support for creating Certificate objects using binary-encoded certificate bytes (https://github.com/microsoft/sqlmanagementobjects/issues/132)
 - Fix for incorrect scripting of Database objects targeting SQL Managed Instances
 

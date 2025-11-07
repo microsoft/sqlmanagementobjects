@@ -1063,6 +1063,7 @@
     </object>
     <object class_name="Index" collection_name="Indexes" urn="Server[@Name='']/Database/Table/Index" is_design_mode="true" parent_type="SqlSmoObject" parent_mode="Design" possible_parents="Table;UserDefinedTableType;UserDefinedFunction;View" gen_body="index,server_events"  support_xschema="true">
       <collection element_type="IndexedColumn" />
+      <collection element_type="IndexedJsonPath" />
       <collection element_type="IndexedXmlPath" />
       <collection element_type="IndexedXmlPathNamespace" />
       <collection element_type="ExtendedProperty" />
@@ -1120,6 +1121,9 @@
       <property name="VectorIndexMetric" generate="true" is_intrinsic="true" />
       <property name="VectorIndexType" generate="true" is_intrinsic="true" />
 
+      <!--JSON Index properties-->
+      <property name="OptimizeForArraySearch" generate="true" is_intrinsic="false" />
+
       <!--Hekaton properties-->
       <property name="BucketCount" generate="true" is_intrinsic="false"/>
       <property name="IndexedXmlPathName" generate="true" is_intrinsic="true" />
@@ -1169,6 +1173,12 @@
       <property name="Uri" generate="true" is_intrinsic="true" />
       <property name="IsDefaultUri" generate="true" is_intrinsic="true" />
 
+    </object>
+
+    <object class_name="IndexedJsonPath" collection_name="IndexedJsonPaths" urn="Server[@Name='']/Database/Table/Index/IndexedJsonPath" parent_type="Index" parent_mode="Design" is_design_mode="true" has_constructors="false">
+      <property name="Path" generate="true" is_intrinsic="true" />
+      <property name="TableID" generate="true" is_intrinsic="true" />
+      <property name="IndexID" generate="true" is_intrinsic="true" />
     </object>
 
     <object class_name="DistributionColumn" collection_name="DistributionColumnCollection" urn="Server[@Name='']/Database/Table/Index/DistributionColumn" is_design_mode="true" parent_type="Index" has_constructors="true" support_xschema="true">

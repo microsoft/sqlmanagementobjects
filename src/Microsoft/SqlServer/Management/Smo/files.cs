@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Text;
@@ -11,7 +10,6 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
     ///<summary>
@@ -51,9 +49,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            bool bSuppressDirtyCheck = sp.SuppressDirtyCheck;
+            var bSuppressDirtyCheck = sp.SuppressDirtyCheck;
 
-            StringBuilder statement = new StringBuilder();
+            var statement = new StringBuilder();
             statement.AppendFormat(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] ADD LOG FILE ",
                                                             SqlBraket(ParentColl.ParentInstance.InternalName));
 
@@ -109,10 +107,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            bool bSuppressDirtyCheck = sp.SuppressDirtyCheck;
+            var bSuppressDirtyCheck = sp.SuppressDirtyCheck;
 
-            StringBuilder statement = new StringBuilder();
-            string dbName = ParentColl.ParentInstance.ParentColl.ParentInstance.InternalName;
+            var statement = new StringBuilder();
+            var dbName = ParentColl.ParentInstance.ParentColl.ParentInstance.InternalName;
             statement.AppendFormat(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] ADD FILE ",
                                         SqlBraket(dbName));
 
@@ -133,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal static void Validate_set_IsPrimaryFile(Property prop, object newValue)
         {
-            DataFile thisObj = (DataFile)prop.Parent.m_parent;
+            var thisObj = (DataFile)prop.Parent.m_parent;
             // throw if parent already created
             if (thisObj.State != SqlSmoState.Creating)
             {
@@ -150,10 +148,10 @@ namespace Microsoft.SqlServer.Management.Smo
             // check if other files are set to be primary
             if ((bool)newValue)
             {
-                SmoInternalStorage files = ((DataFileCollection)thisObj.ParentColl).InternalStorage;
-                foreach (DataFile f in files)
+                var files = ((DataFileCollection)thisObj.ParentColl).InternalStorage;
+                foreach (var f in files)
                 {
-                    Property pPrim = f.Properties.Get("IsPrimaryFile");
+                    var pPrim = f.Properties.Get(nameof(DataFile.IsPrimaryFile));
                     if (thisObj != f && pPrim.Value != null && (bool)pPrim.Value)
                     {
                         throw new SmoException(ExceptionTemplates.OnlyOnePrimaryFile);
@@ -165,7 +163,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
@@ -215,7 +213,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 "IsPrimaryFile",
             };
-            List<string> list = GetSupportedScriptFields(typeof(Database.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
+            var list = GetSupportedScriptFields(typeof(Database.PropertyMetadataProvider), fields, version, databaseEngineType, databaseEngineEdition);
             return list.ToArray();
         }
     }
@@ -264,8 +262,8 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             ddl.Append(Globals.LParen);
 
-            int changeCount = 0;
-            bool isManagedInstance = sp.TargetDatabaseEngineEdition == Microsoft.SqlServer.Management.Common.DatabaseEngineEdition.SqlManagedInstance;
+            var changeCount = 0;
+            var isManagedInstance = sp.TargetDatabaseEngineEdition == Microsoft.SqlServer.Management.Common.DatabaseEngineEdition.SqlManagedInstance;
 
             ddl.AppendFormat(SmoApplication.DefaultCulture, " NAME = N'{0}'", SqlString(this.Name));
 
@@ -341,7 +339,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void AppendSize(ScriptingPreferences sp, StringBuilder ddl, double size)
         {
 
-            bool isTransformed = false;
+            var isTransformed = false;
             if (size > Int32.MaxValue)
             {
                 // transform KB into  GB 
@@ -369,7 +367,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void ScriptSize(ScriptingPreferences sp, StringBuilder ddl,
                                 bool bSuppressDirtyCheck, ref int changeCount)
         {
-            Property pSize = Properties.Get("Size");
+            var pSize = Properties.Get("Size");
 
             //Size cannot be specified for filestream filegroups.
             if (this.IsFileStreamBasedFile())
@@ -393,7 +391,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void ScriptMaxSize(ScriptingPreferences sp, StringBuilder ddl,
                                 bool bSuppressDirtyCheck, ref int changeCount)
         {
-            Property pMaxSize = Properties.Get("MaxSize");
+            var pMaxSize = Properties.Get("MaxSize");
 
             if (this.IsFileStreamBasedFile() && sp.TargetServerVersion < SqlServerVersion.Version110)
             {
@@ -426,8 +424,8 @@ namespace Microsoft.SqlServer.Management.Smo
         private void ScriptGrowth(ScriptingPreferences sp, StringBuilder ddl, bool bSuppressDirtyCheck,
                                     bool scriptCreate, ref int changeCount)
         {
-            Property pGrowthType = this.Properties.Get("GrowthType");
-            Property pGrowth = this.Properties.Get("Growth");
+            var pGrowthType = this.Properties.Get("GrowthType");
+            var pGrowth = this.Properties.Get("Growth");
 
             if (this.IsFileStreamBasedFile())
             {
@@ -455,14 +453,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
-            bool isGrowthPercent = (pGrowthType.Value != null &&
+            var isGrowthPercent = (pGrowthType.Value != null &&
                                     FileGrowthType.Percent == (FileGrowthType)pGrowthType.Value);
 
 
             if (pGrowth.Value != null && (bSuppressDirtyCheck || pGrowth.Dirty || pGrowthType.Dirty))
             {
                 ddl.AppendFormat(SmoApplication.DefaultCulture, ", FILEGROWTH = ");
-                double growth = (double)pGrowth.Value;
+                var growth = (double)pGrowth.Value;
                 if (isGrowthPercent)
                 {
                     if (1 > growth)
@@ -489,10 +487,10 @@ namespace Microsoft.SqlServer.Management.Smo
                                     bool scriptCreate, ref int changeCount)
         {
             // FileName must not be missing
-            Property pFileName = Properties.Get("FileName");
+            var pFileName = Properties.Get("FileName");
             if (pFileName.Value != null && (bSuppressDirtyCheck || pFileName.Dirty))
             {
-                string fileName = (string)pFileName.Value;
+                var fileName = (string)pFileName.Value;
 
                 ddl.AppendFormat(SmoApplication.DefaultCulture, ", FILENAME = N'{0}' ", SqlString(fileName));
 
@@ -514,13 +512,13 @@ namespace Microsoft.SqlServer.Management.Smo
         // these are either file stream groups or file groups containing memory optimized data
         private bool IsFileStreamBasedFile()
         {
-            DataFile df = this as DataFile;
+            var df = this as DataFile;
             if (df == null)
             {
                 return false;
             }
 
-            FileGroup parentfg = df.Parent;
+            var parentfg = df.Parent;
 
             switch (parentfg.FileGroupType)
             {
@@ -545,7 +543,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptAlter(StringCollection alterQuery, ScriptingPreferences sp)
         {
             // TODO make sure it does nothing when no property has been modified
-            StringBuilder statement = new StringBuilder();
+            var statement = new StringBuilder();
 
             // for 7.0 we have to generate multiple alter statements
             // because this is how T-SQL works 
@@ -625,16 +623,16 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 CheckObjectState();
-                StringCollection query = new StringCollection();
+                var query = new StringCollection();
 
-                StringBuilder statement = new StringBuilder();
-                Urn urn = this.Urn;
+                var statement = new StringBuilder();
+                var urn = this.Urn;
                 statement.AppendFormat(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(urn.GetNameForType("Database")));
                 query.Add(statement.ToString());
 
                 statement.Remove(0, statement.Length);
                 statement.Append("DBCC");
-                string filename = this.Name;
+                var filename = this.Name;
                 switch (shrinkType)
                 {
                     case ShrinkMethod.Default:
@@ -794,19 +792,19 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptAlter(StringCollection alterQuery, ScriptingPreferences sp)
         {
-            StringBuilder statement = new StringBuilder();
-            string dbName = ParentColl.ParentInstance.InternalName;
-            string filegroup = this.Name;
+            var statement = new StringBuilder();
+            var dbName = ParentColl.ParentInstance.InternalName;
+            var filegroup = this.Name;
 
             // remember the number of properties modified
-            int propMod = 0;
+            var propMod = 0;
 
-            Property p = Properties.Get("ReadOnly");
+            var p = Properties.Get("ReadOnly");
             if (p.Dirty && p.Value != null)
             {
-                bool readOnly = (bool)p.Value;
+                var readOnly = (bool)p.Value;
                 statement.Length = 0;
-                string statementfmt = "declare @readonly bit{5}SELECT @readonly=convert(bit, (status & 0x08)) FROM sysfilegroups WHERE groupname=N'{0}'{5}if(@readonly={1}){5}	ALTER DATABASE [{2}] MODIFY FILEGROUP [{3}] {4}";
+                var statementfmt = "declare @readonly bit{5}SELECT @readonly=convert(bit, (status & 0x08)) FROM sysfilegroups WHERE groupname=N'{0}'{5}if(@readonly={1}){5}	ALTER DATABASE [{2}] MODIFY FILEGROUP [{3}] {4}";
 
                 statement.AppendFormat(SmoApplication.DefaultCulture, statementfmt, 
                                         SqlString(filegroup), // {0}
@@ -826,9 +824,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 p = Properties.Get("AutogrowAllFiles");
                 if (p.Dirty && p.Value != null)
                 {
-                    bool autogrowAllFiles = (bool)p.Value;
+                    var autogrowAllFiles = (bool)p.Value;
                     statement.Length = 0;
-                    string statementfmt = "declare @autogrow bit\r\nSELECT @autogrow=convert(bit, is_autogrow_all_files) FROM sys.filegroups WHERE name=N'{0}'\r\nif(@autogrow={1})\r\n	ALTER DATABASE [{2}] MODIFY FILEGROUP [{3}] {4}";
+                    var statementfmt = "declare @autogrow bit\r\nSELECT @autogrow=convert(bit, is_autogrow_all_files) FROM sys.filegroups WHERE name=N'{0}'\r\nif(@autogrow={1})\r\n	ALTER DATABASE [{2}] MODIFY FILEGROUP [{3}] {4}";
                     statement.AppendFormat(SmoApplication.DefaultCulture, statementfmt, SqlString(filegroup), autogrowAllFiles ? 0 : 1,
                                             SqlBraket(dbName), SqlBraket(filegroup), autogrowAllFiles ? "AUTOGROW_ALL_FILES" : "AUTOGROW_SINGLE_FILE");
 
@@ -844,7 +842,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     statement.Length = 0;
 
-                    string statementfmt = "declare @isdefault bit{3}SELECT @isdefault=convert(bit, (status & 0x10)) FROM sysfilegroups WHERE groupname=N'{0}'{3}if(@isdefault=0){3}	ALTER DATABASE [{1}] MODIFY FILEGROUP [{2}] DEFAULT";
+                    var statementfmt = "declare @isdefault bit{3}SELECT @isdefault=convert(bit, (status & 0x10)) FROM sysfilegroups WHERE groupname=N'{0}'{3}if(@isdefault=0){3}	ALTER DATABASE [{1}] MODIFY FILEGROUP [{2}] DEFAULT";
                     statement.AppendFormat(SmoApplication.DefaultCulture, statementfmt, SqlString(filegroup), SqlBraket(dbName), SqlBraket(filegroup), sp.NewLine);
                     //This property need to be set this database as current context unlike other properties need of use master
                     alterQuery.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(dbName)));
@@ -866,10 +864,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
-            bool bSuppressDirtyCheck = sp.SuppressDirtyCheck;
+            var bSuppressDirtyCheck = sp.SuppressDirtyCheck;
 
-            StringBuilder statement = new StringBuilder();
-            Database parentdb = (Database)ParentColl.ParentInstance;
+            var statement = new StringBuilder();
+            var parentdb = (Database)ParentColl.ParentInstance;
             statement.AppendFormat(SmoApplication.DefaultCulture, "ALTER DATABASE {0} ADD FILEGROUP [{1}]",
                                     parentdb.FormatFullNameForScripting(sp), SqlBraket(this.Name));
 
@@ -900,9 +898,9 @@ namespace Microsoft.SqlServer.Management.Smo
             // first drop all the contained files
             // we make a roundtrip to the server, but otherwise we would have failed
             // We don't check if there are files to save roundtrips
-            for (int i = 0; i < Files.Count; i++)
+            for (var i = 0; i < Files.Count; i++)
             {
-                DataFile f = Files[i];
+                var f = Files[i];
                 f.ScriptDropInternal(dropQuery, sp);
             }
 
@@ -922,12 +920,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void ScriptFileGroupFiles(ScriptingPreferences sp, StringBuilder ddl, bool databaseIsView)
         {
-            bool firstFileScripted = false;
+            var firstFileScripted = false;
 
             // script the primary file first
-            foreach (DataFile df in this.Files)
+            foreach (var df in this.Files)
             {
-                bool isPrimary = df.GetPropValueOptional("IsPrimaryFile", false);
+                var isPrimary = df.GetPropValueOptional("IsPrimaryFile", false);
                 if (isPrimary)
                 {
                     ddl.Append(Globals.newline);
@@ -938,9 +936,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
 
             // script all others afterwards
-            foreach (DataFile df in this.Files)
+            foreach (var df in this.Files)
             {
-                bool isPrimary = df.GetPropValueOptional("IsPrimaryFile", false);
+                var isPrimary = df.GetPropValueOptional("IsPrimaryFile", false);
                 if (isPrimary)
                 {
                     // we should have dealt with this
@@ -1003,8 +1001,8 @@ namespace Microsoft.SqlServer.Management.Smo
          */
         internal void ScriptDdl(ScriptingPreferences sp, StringBuilder ddl, bool databaseIsView)
         {
-            string fgName = this.Name;
-            Property pDefault = Properties.Get("IsDefault");
+            var fgName = this.Name;
+            var pDefault = Properties.Get("IsDefault");
 
             if (string.Compare(fgName, "PRIMARY", StringComparison.Ordinal) == 0)
             {
@@ -1014,9 +1012,9 @@ namespace Microsoft.SqlServer.Management.Smo
             // go into File group files scripting
             else if (!databaseIsView) // creating a database snapshot does not include all the complicated file stream options
             {
-                string filegroupTypeScript = string.Empty;
-                string filegroupDefaultScript = this.IsDefault ? " DEFAULT" : string.Empty;
-                string filegroupNameScript = string.Format(SmoApplication.DefaultCulture, " FILEGROUP [{0}] ",
+                var filegroupTypeScript = string.Empty;
+                var filegroupDefaultScript = this.IsDefault ? " DEFAULT" : string.Empty;
+                var filegroupNameScript = string.Format(SmoApplication.DefaultCulture, " FILEGROUP [{0}] ",
                                                     SqlBraket(fgName));
 
                 switch (this.FileGroupType)
@@ -1064,7 +1062,7 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 CheckObjectState();
-                StringCollection queries = new StringCollection();
+                var queries = new StringCollection();
                 queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(ParentColl.ParentInstance.InternalName)));
                 queries.Add(string.Format(SmoApplication.DefaultCulture, "DBCC CHECKFILEGROUP( N'{0}' ) WITH NO_INFOMSGS", SqlString(Name)));
 
@@ -1083,7 +1081,7 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 CheckObjectState();
-                StringCollection queries = new StringCollection();
+                var queries = new StringCollection();
                 queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(ParentColl.ParentInstance.InternalName)));
                 queries.Add(string.Format(SmoApplication.DefaultCulture, "DBCC CHECKFILEGROUP( N'{0}', NOINDEX ) WITH NO_INFOMSGS", SqlString(Name)));
 
@@ -1100,9 +1098,9 @@ namespace Microsoft.SqlServer.Management.Smo
         void AddObjects(String partialUrn, ArrayList list)
         {
             String dbUrn = this.ParentColl.ParentInstance.Urn;
-            String term = string.Format(SmoApplication.DefaultCulture, "[@FileGroup='{0}']", Urn.EscapeString(this.Name));
+            var term = string.Format(SmoApplication.DefaultCulture, "[@FileGroup='{0}']", Urn.EscapeString(this.Name));
 
-            DataTable dt = this.ExecutionManager.GetEnumeratorData(new Request(dbUrn + partialUrn + term, new string[] { "Urn" }));
+            var dt = this.ExecutionManager.GetEnumeratorData(new Request(dbUrn + partialUrn + term, new string[] { "Urn" }));
 
             foreach (DataRow dr in dt.Rows)
             {
@@ -1114,7 +1112,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             CheckObjectState();
 
-            ArrayList list = new ArrayList();
+            var list = new ArrayList();
             // get the tables stored on the filegroup
             AddObjects("/Table", list);
 
@@ -1127,10 +1125,10 @@ namespace Microsoft.SqlServer.Management.Smo
             // get the statistics stored on the filegroup
             AddObjects("/Table/Statistic", list);
 
-            SqlSmoObject[] retval = new SqlSmoObject[list.Count];
-            int idx = 0;
-            Server srv = GetServerObject();
-            foreach (object o in list)
+            var retval = new SqlSmoObject[list.Count];
+            var idx = 0;
+            var srv = GetServerObject();
+            foreach (var o in list)
             {
                 retval[idx++] = srv.GetSmoObject((Urn)(string)o);
             }

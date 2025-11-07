@@ -9,10 +9,12 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    public class DefaultRuleBase : ScriptSchemaObjectBase, Cmn.ICreatable, Cmn.IDroppable, Cmn.IDropIfExists, Cmn.IAlterable, IExtendedProperties, IScriptable, ITextObject
+    /// <summary>
+    /// Base class for Rules
+    /// </summary>
+    public partial class DefaultRuleBase : ScriptSchemaObjectBase, Cmn.ICreatable, Cmn.IDroppable, Cmn.IDropIfExists, Cmn.IAlterable, IExtendedProperties, IScriptable, ITextObject
     {
         internal DefaultRuleBase(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)

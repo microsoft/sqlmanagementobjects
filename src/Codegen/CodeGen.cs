@@ -214,6 +214,7 @@ public class CodeGen
         v10_0 = 1,
         v11_0 = 2,
         v12_0 = 4,
+        // VBUMP - Note: Cloud versions have different versioning than on-prem
     }
 
     private static KeyValuePair<ServerVersion, int>[] m_CloudSupportedVersion =
@@ -221,6 +222,7 @@ public class CodeGen
         new KeyValuePair<ServerVersion, int>(new ServerVersion(10,0), (int)CloudSupportedVersionFlags.v10_0),
         new KeyValuePair<ServerVersion, int>(new ServerVersion(11,0), (int)CloudSupportedVersionFlags.v11_0),
         new KeyValuePair<ServerVersion, int>(new ServerVersion(12,0), (int)CloudSupportedVersionFlags.v12_0)
+        // VBUMP
     };
 
     //Note - Datawarehouse is a special case since it doesn't currently actually have
