@@ -1961,8 +1961,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         private void ValidatePropertyChangeForText(Property prop, object value)
         {
-            SmoCollectionBase scb = this.ParentColl as SmoCollectionBase;
-            if (null != scb && scb.IsCollectionLocked)
+            if (ParentColl is ILockableCollection scb && scb.IsCollectionLocked)
             {
                 Validate_set_ChildTextObjectDDLProperty(prop, value);
             }

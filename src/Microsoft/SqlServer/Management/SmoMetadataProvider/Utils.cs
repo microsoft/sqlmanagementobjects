@@ -856,7 +856,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
             /// given metadata parameter collection.
             /// </returns>
             public static ParameterCollection CreateParameterCollection(
-                Database database, Smo.ParameterCollectionBase metadataCollection, IDictionary<string, object> moduleInfo)
+                Database database, Smo.ISmoCollection metadataCollection, IDictionary<string, object> moduleInfo)
             {
                 Debug.Assert(database != null, "SmoMetadataProvider Assert", "database != null");
                 Debug.Assert(metadataCollection != null, "SmoMetadataProvider Assert", "metadataCollection != null");

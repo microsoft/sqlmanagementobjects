@@ -709,7 +709,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             var propertyNames =
                 IsSupportedProperty("BasicAvailabilityGroup") && BasicAvailabilityGroup
-                ? BasicAlterableGroupPropertyNames
+                ? BasicAlterableGroupPropertyNames.Where(propertyName => IsSupportedProperty(propertyName))
                 : AlterableGroupPropertyNames.Where(propertyName => IsSupportedProperty(propertyName));
 
             foreach (var propertyName in propertyNames)
@@ -898,7 +898,10 @@ namespace Microsoft.SqlServer.Management.Smo
             DatabaseHealthTriggerPropertyName,
             FailureConditionLevelPropertyName,
             HealthCheckTimeoutPropertyName,
-            DtcSupportEnabledPropertyName
+            DtcSupportEnabledPropertyName,
+
+            // SQL 2025+
+            ClusterConnectionOptionsPropertyName
         };
 
         /// <summary>

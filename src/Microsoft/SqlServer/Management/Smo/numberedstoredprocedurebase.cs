@@ -351,7 +351,7 @@ namespace Microsoft.SqlServer.Management.Smo
             set
             {
                 CheckObjectState();
-                SetTextMode(value, new SmoCollectionBase[] {Parameters});
+                SetTextMode(value, new ILockableCollection[] {Parameters});
             }
         }
 

@@ -188,14 +188,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
 
                 //saving the expensive initialization process of
-                //collection class (esp PhyisicalPartitionCollection) inside next foreach loop
+                //collection class (esp PhysicalPartitionCollection) inside next foreach loop
                 if (pi.bWithScript || pi.bPropagateScriptToChildLevel)
                 {
                     IEnumerator enumerator;
-                    var smoCollection = smoObjCol as SmoCollectionBase;
-                    if (smoCollection != null)
+                    if (smoObjCol is ISmoInternalCollection smoCollection)
                     {
-                        enumerator = smoCollection.GetEnumerator(this.Preferences);
+                        enumerator = smoCollection.GetEnumerator(Preferences);
                     }
                     else
                     {

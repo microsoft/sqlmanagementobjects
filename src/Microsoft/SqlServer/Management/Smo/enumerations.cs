@@ -282,6 +282,7 @@ namespace Microsoft.SqlServer.Management.Smo
         Version130 = 128,
         Version140 = 256,
         Version150 = 512
+        // VBUMP
     }
 
     public enum SortOrder

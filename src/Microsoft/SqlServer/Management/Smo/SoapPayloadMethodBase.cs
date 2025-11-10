@@ -19,7 +19,7 @@ namespace Microsoft.SqlServer.Management.Smo
             : base()
         {
             ValidateName(name);
-            this.key = new SoapMethodKey(name, SoapMethodCollectionBase.GetDefaultNamespace());
+            this.key = new SoapMethodKey(name, string.Empty);
             this.Parent = soapPayload;
         }
 
@@ -43,7 +43,7 @@ namespace Microsoft.SqlServer.Management.Smo
             : base()
         {
             ValidateName(name);
-            this.key = new SoapMethodKey(name, SoapMethodCollectionBase.GetDefaultNamespace());
+            this.key = new SoapMethodKey(name, string.Empty);
             this.Parent = soapPayload;
             this.SetSqlMethod(database, schema, sqlMethod);
         }

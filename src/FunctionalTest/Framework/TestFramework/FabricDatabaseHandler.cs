@@ -57,6 +57,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                 var dbName = string.IsNullOrEmpty(sqlConnectionStringBuilder.InitialCatalog) ? fabricDbName : sqlConnectionStringBuilder.InitialCatalog;
                 db = ServerContext.Databases[dbName];
                 DatabaseDisplayName = fabricDbName;
+                if (!string.IsNullOrEmpty(dbParameters?.BackupFile))
+                {
+                    // Restore DB from the specified backup file
+                    db = ServerContext.RestoreDatabaseFromBackup(dbParameters.BackupFile, dbName, ConnectionHelpers.GetAzureKeyVaultHelper().StorageHelper);
+                }
             }
             catch
             {

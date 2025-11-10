@@ -921,7 +921,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 
-    public sealed partial class EndpointCollection : SimpleObjectCollectionBase
+    public sealed partial class EndpointCollection
     {
         public Endpoint[] EnumEndpoints(EndpointType endpointType)
         {

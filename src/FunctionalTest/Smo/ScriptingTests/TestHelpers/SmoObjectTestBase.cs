@@ -220,7 +220,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// <param name="collection">The collection to verify.</param>
         /// <param name="expectedCount">The expected count.</param>
         /// <param name="additionalComments">Additional test related comments.</param>
-        protected void VerifySmoCollectionCount(_SMO.SmoCollectionBase collection, int expectedCount, params string[] additionalComments)
+        protected void VerifySmoCollectionCount(_SMO.ISmoCollection collection, int expectedCount, params string[] additionalComments)
         {
             if (collection == null)
             {

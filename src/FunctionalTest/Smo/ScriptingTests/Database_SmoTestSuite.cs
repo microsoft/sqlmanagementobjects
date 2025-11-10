@@ -1002,7 +1002,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// %BASEDIR%\src\Microsoft\SqlServer\Management\Smo\files.cs
         /// </remarks>
         [TestMethod]
-        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise | DatabaseEngineEdition.SqlManagedInstance)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         public void SmoDatabase_AddFilesAndFilegroups()
         {
@@ -1021,9 +1022,13 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     // Add new filegroup
                     FileGroup newFileGroup = new FileGroup(database, "NewFileGroup", isFileStream: false);
                     database.FileGroups.Add(newFileGroup);
+                    // testing that the filegroup can be removed from the collection because it doesn't exist yet
+                    database.FileGroups.Remove(newFileGroup);
+                    Assert.That(database.FileGroups.Select(fg => fg.Name), Has.No.Member("NewFileGroup"), "Filegroup should not be in the collection after calling Remove");
+                    database.FileGroups.Add(newFileGroup);
                     database.Alter();
                     Assert.That(database.FileGroups["NewFileGroup"], Is.Not.Null, "Filegroup not properly created");
-
+                    Assert.Throws<InvalidSmoOperationException>(() => database.FileGroups.Remove("NewFileGroup"), "Filegroup should not be removable after being created");
                     // Add new file with a couple of properties set
                     var fileWithProperties = new DataFile(database.FileGroups["NewFileGroup"], "FileWithProperties", filenameFileWithProperties)
                     {

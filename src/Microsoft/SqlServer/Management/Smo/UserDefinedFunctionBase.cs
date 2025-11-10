@@ -9,8 +9,6 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
     [Facets.StateChangeEvent("CREATE_FUNCTION", "FUNCTION")]
@@ -22,7 +20,7 @@ namespace Microsoft.SqlServer.Management.Smo
     [Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet(PhysicalFacetOptions.ReadOnly)]
     public partial class UserDefinedFunction : ScriptSchemaObjectBase,
         Cmn.ICreatable, Cmn.IAlterable, Cmn.ICreateOrAlterable, Cmn.IRenamable, Cmn.IDroppable, Cmn.IDropIfExists,
-        IExtendedProperties, IScriptable, ITextObject
+        IExtendedProperties, IScriptable, ITextObject, IColumns
     {
         internal UserDefinedFunction(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)
@@ -70,7 +68,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Overrides the permission scripting.
         /// </summary>
         /// <param name="query"></param>
-        /// <param name="so"></param>
+        /// <param name="sp"></param>
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
             // add the object-level permissions
@@ -666,7 +664,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (null == m_Columns)
                 {
                     m_Columns = new ColumnCollection(this);
-                    SetCollectionTextMode(this.TextMode, m_Columns);
+                    SetCollectionTextMode(TextMode, m_Columns);
                 }
                 return m_Columns;
             }
@@ -879,13 +877,13 @@ namespace Microsoft.SqlServer.Management.Smo
         public bool TextMode
         {
             get { CheckObjectState(); return GetTextMode(); }
-            set { CheckObjectState(); SetTextMode(value, new SmoCollectionBase [] { Parameters, Columns, Checks }); }
+            set { CheckObjectState(); SetTextMode(value, new ILockableCollection [] { Parameters, Columns, Checks }); }
         }
 
         /// <summary>
         /// Validate property values that are coming from the users.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="prop"></param>
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {

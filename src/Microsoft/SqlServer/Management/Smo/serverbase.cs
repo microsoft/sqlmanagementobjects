@@ -652,19 +652,15 @@ namespace Microsoft.SqlServer.Management.Smo
             // retrieve the child collection
             object childCollection = SqlSmoObject.GetChildCollection(parentNode,
                 urn.XPathExpression,
-                urn.XPathExpression.Length - 1,
-                ServerVersion);
+                urn.XPathExpression.Length - 1);
 
             // transform the Urn filter into a key
             ObjectKeyBase childKey = ((AbstractCollectionBase)childCollection).CreateKeyFromUrn(urn);
             // get the child object from child collection
-            SqlSmoObject thisNode = ((SmoCollectionBase)childCollection).GetObjectByKey(childKey) as SqlSmoObject;
-            if (null == thisNode)
-            {
-                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(GetTypeName(nodeType), childKey.ToString()));
-            }
-
-            return thisNode;
+            var thisNode = ((ISmoInternalCollection)childCollection).GetObjectByKey(childKey);
+            return null == thisNode
+                ? throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(GetTypeName(nodeType), childKey.ToString()))
+                : thisNode;
         }
 
         /// <summary>
@@ -3101,6 +3097,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 yield return "XmlSchemaNamespaceSchema";
                 yield return nameof(DataType.XmlDocumentConstraint);
                 yield return "DataTypeSchema";
+            }
+            if (typeObject == typeof(IndexedJsonPath))
+            {
+                yield return nameof(IndexedJsonPath.Path);
             }
         }
 

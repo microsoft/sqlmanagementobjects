@@ -58,6 +58,11 @@
       <property_link fields='#VectorIndexMetric#VectorIndexType#' left_join="#vectorindexes AS vi">i.object_id = vi.object_id AND i.index_id = vi.index_id</property_link>
     </version>
 
+    <!-- JSON Index support added in SQL Server 2025 (version 17) -->
+    <version min_major='17' min_build="950" cloud_min_major='12'>
+      <property_link fields='#OptimizeForArraySearch#' left_join="#jsonindexes AS ji">i.object_id = ji.object_id AND i.index_id = ji.index_id</property_link>
+    </version>
+
     <!-- Selective XML Index (SXI) was introduced in SP1. First build with SXI was SQL11_PCU_Main 11.0.2813 -->
     <version min_major ="11"  min_build='2813' cloud_min_major='12'>
       <property_link fields='#IndexedXmlPathName#' left_join="sys.selective_xml_index_paths AS indexedpaths">xi.object_id = indexedpaths.object_id AND xi.using_xml_index_id = indexedpaths.index_id AND xi.path_id = indexedpaths.path_id</property_link>
@@ -80,8 +85,22 @@
         begin catch
         end catch
       </prefix>
+      <prefix fields='#OptimizeForArraySearch#'>
+        create table #jsonindexes (object_id int, index_id int, optimize_for_array_search bit);
+        begin try
+          exec sp_executesql N'
+          insert into #jsonindexes (object_id, index_id, optimize_for_array_search)
+          select object_id, index_id, optimize_for_array_search
+          from sys.json_indexes'
+        end try
+        begin catch
+        end catch
+      </prefix>
       <postfix fields='#VectorIndexMetric#VectorIndexType#'>
         drop table #vectorindexes
+      </postfix>
+      <postfix fields='#OptimizeForArraySearch#'>
+        drop table #jsonindexes
       </postfix>
     </version>
   </settings>
@@ -421,6 +440,14 @@
     <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
       <property name="VectorIndexMetric" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">ISNULL(vi.distance_metric, N'')</property>
       <property name="VectorIndexType" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">ISNULL(vi.vector_index_type, N'')</property>
+    </version>
+
+    <!-- JSON Index properties added in SQL Server 2025 -->
+    <version min_major='17' max_major='17' min_minor='0' max_minor='0' max_build="949">
+      <property name="OptimizeForArraySearch" type="bit" cast='true' read_only_after_creation="true">0</property>
+    </version>
+    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+      <property name="OptimizeForArraySearch" type="bit" cast='true' read_only_after_creation="true">ISNULL(ji.optimize_for_array_search, 0)</property>
     </version>
   </properties>
 </EnumObject>

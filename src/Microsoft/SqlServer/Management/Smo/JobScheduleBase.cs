@@ -9,7 +9,6 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
-#pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo.Agent
 {
     public class ScheduleBase : AgentObjectBase
@@ -22,7 +21,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         internal protected ScheduleBase() : base() { }
 
         [SfcProperty(SfcPropertyFlags.Standalone)]
-        public Int32 ID
+        public int ID
         {
             get
             {
@@ -30,8 +29,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 // different, then the one in the 'key' takes precedence.
                 // The user can only change the ID through the property bag,
                 // so inconsistency should not be a problem.
-                int id = ((ScheduleObjectKey)key).ID;
-                if( id == JobScheduleCollectionBase.GetDefaultID() )
+                var id = ((ScheduleObjectKey)key).ID;
+                if( id == JobScheduleConstants.DefaultID)
                 {
                     Property propID = Properties["ID"];
                     if( propID.Retrieved || propID.Dirty )
@@ -50,7 +49,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         internal override ObjectKeyBase GetEmptyKey()
         {
-            return new ScheduleObjectKey(null, JobScheduleCollectionBase.GetDefaultID());
+            return new ScheduleObjectKey(null, JobScheduleConstants.DefaultID);
         }
         
     }
@@ -63,7 +62,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         public JobSchedule(SqlSmoObject parent, string name) : base()
         {
             ValidateName(name);
-            key = new ScheduleObjectKey(name, JobScheduleCollectionBase.GetDefaultID());
+            key = new ScheduleObjectKey(name, JobScheduleConstants.DefaultID);
             Parent = parent;
         }
 
@@ -72,7 +71,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
         }
 
-        // returns the name of the type in the urn expression
+        /// <summary>
+        /// Returns the name of the type in the urn expression 
+        /// </summary>
         public static string UrnSuffix
         {
             get 
@@ -380,7 +381,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 r.Fields = new string[]{};
                 r.ParentPropertiesRequests = new PropertiesRequest[1];
                 PropertiesRequest parentProps = new PropertiesRequest();
-                parentProps.Fields = new String[]{ "JobID"};
+                parentProps.Fields = new string[]{ "JobID"};
                 r.ParentPropertiesRequests[0] = parentProps;
         
                 DataTable jobs = ExecutionManager.GetEnumeratorData( r );

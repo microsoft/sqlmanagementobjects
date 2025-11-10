@@ -165,12 +165,22 @@ else
                 dataAdapter.SelectCommand = sqlCommand;
                 dataAdapter.Fill(dataSet);
 
+
+                // NOTE: Dynamics CRM databases have unique restrictions (master not accessible, CREATE TABLE not permitted) that make
+                // neither SqlDatabase or Unknown editions usable.  Because adding it as a defined DatabaseEngineEdition would result in
+                // cascading changes elsewhere (query construction for SMO types, designer exemptions) and the previous behavior
+                // (where this went unconverted) was functioning correctly for MSSQL and Azure Data Studio, we treat it as a special case here.
+                const DatabaseEngineEdition dynamicsCrmEdition = (DatabaseEngineEdition)1000;
+
                 var engineType = (DatabaseEngineType)dataSet.Tables[0].Rows[0]["DatabaseEngineType"];
                 var edition = (DatabaseEngineEdition)dataSet.Tables[0].Rows[0]["DatabaseEngineEdition"];
                 // Treat unknown editions from Azure the same as Azure SQL database
                 if (engineType == DatabaseEngineType.SqlAzureDatabase && !validEditions.Contains(edition))
                 {
-                    edition = DatabaseEngineEdition.SqlDatabase;
+                    if (edition != dynamicsCrmEdition) // Dynamics CRM databases have additional restrictions; don't treat them as Azure SQL DB.  See note above.
+                    {
+                        edition = DatabaseEngineEdition.SqlDatabase;
+                    }
                 }
                 // If we're on Managed Instance, don't treat it as a "Sql Azure", but as "Standalone"
                 // Also, determine the underlying engine version.

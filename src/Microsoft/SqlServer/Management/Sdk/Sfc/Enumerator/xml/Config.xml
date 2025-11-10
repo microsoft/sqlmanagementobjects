@@ -537,6 +537,7 @@
           </object>
           <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2IndexExtendedProperty.xml" />
           <object type="IndexedColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedColumn.xml" />
+          <object type="IndexedJsonPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedJsonPath.xml" />
           <object type="IndexedXmlPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPath.xml" />
           <object type="IndexedXmlPathNamespace" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPathNamespace.xml" />
           <object type="DistributionColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DistributionColumn.xml" />
@@ -599,6 +600,7 @@
           </object>
           <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="Level2IndexExtendedProperty.xml" />
           <object type="IndexedColumn" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedColumn.xml" />
+          <object type="IndexedJsonPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedJsonPath.xml" />
           <object type="IndexedXmlPath" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPath.xml" />          
           <object type="IndexedXmlPathNamespace" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="IndexedXmlPathNamespace.xml" />
         </object>

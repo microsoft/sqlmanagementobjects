@@ -8,6 +8,7 @@ using Cmn = Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
+    [SfcElementType("Param")]
     public partial class UserDefinedAggregateParameter : ParameterBase
     {
         internal UserDefinedAggregateParameter(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :

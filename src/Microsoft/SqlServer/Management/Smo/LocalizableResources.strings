@@ -1446,7 +1446,22 @@ Index_VectorIndexMetricDesc=Gets or sets the vector index metric type for a vect
 Index_VectorIndexTypeName=Vector Index Type
 Index_VectorIndexTypeDesc=Gets or sets the vector index type for a vector index.
 
+Index_OptimizeForArraySearchName=Optimize for Array Search
+Index_OptimizeForArraySearchDesc=Gets or sets whether the JSON index is optimized for array search operations.
+
 ######## End Index
+
+####### Begin IndexedJsonPath
+IndexedJsonPath_PathName=Path
+IndexedJsonPath_PathDesc=Gets or sets the JSON path expression for the indexed path.
+
+IndexedJsonPath_TableIDName=Table ID
+IndexedJsonPath_TableIDDesc=Gets the ID of the table that contains the index.
+
+IndexedJsonPath_IndexIDName=Index ID
+IndexedJsonPath_IndexIDDesc=Gets the ID of the index that contains this path.
+
+####### End IndexedJsonPath
 
 
 ####### Begin Rule

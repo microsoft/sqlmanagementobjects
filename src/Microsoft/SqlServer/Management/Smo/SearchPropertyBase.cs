@@ -16,11 +16,6 @@ namespace Microsoft.SqlServer.Management.Smo
     /// SMO class for Search Properties in a Search Property List
     /// 
     /// </summary>
-
-
-    //TODO: Uncomment the below attributes when we handle Facets in full, in later Improvements (VSTS task #280171)
-    //[Facets.EvaluationMode(Dmf.AutomatedPolicyEvaluationMode.CheckOnSchedule)]
-    //[Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet]
     public partial class SearchProperty : ScriptNameObjectBase, Cmn.ICreatable, Cmn.IDroppable, IScriptable
     {
         internal SearchProperty(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :

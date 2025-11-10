@@ -90,13 +90,14 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 {
                     Audit serverAudit = new Audit(server, auditName);
                 });
-                Assert.IsInstanceOf<TargetInvocationException>(exception.InnerException, "Unexpected inner exception");
-                Assert.IsInstanceOf<UnsupportedVersionException>(exception.InnerException.InnerException, "Unexpected inner exception");
+                
+                var unsupportedException = exception.FirstInstanceOf<UnsupportedVersionException>();
+                Assert.That(unsupportedException, Is.Not.Null, $"Unexpected exception: {exception.BuildRecursiveExceptionMessage()}");
 
                 string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.NotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
                     ExceptionTemplates.NotSupportedOnCloudWithDetails(typeof(Audit).Name);
 
-                Assert.That(exception.InnerException.InnerException.Message, Is.EqualTo(errorMsg), "Unexpected exception message");
+                Assert.That(unsupportedException.Message, Is.EqualTo(errorMsg), "Unexpected exception message");
             });
         }
 
@@ -128,10 +129,9 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 
                 if (server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand || server.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                 {
-                    Assert.IsInstanceOf<TargetInvocationException>(exception.InnerException, "Unexpected inner exception for SqlOnDemand");
 
-                    Exception sqlOnDemandError = exception.InnerException.InnerException;
-                    Assert.IsInstanceOf<UnsupportedVersionException>(sqlOnDemandError, "Unexpected error for SqlOnDemand");
+                    var sqlOnDemandError = exception.FirstInstanceOf<UnsupportedVersionException>();
+                    Assert.That(sqlOnDemandError, Is.Not.Null, $"Unexpected error for SqlOnDemand: {exception.BuildRecursiveExceptionMessage()}");
 
                     string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.NotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
                         ExceptionTemplates.NotSupportedOnCloudWithDetails(typeof(Audit).Name);
@@ -175,10 +175,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 
                 if (server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand || server.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                 {
-                    Assert.IsInstanceOf<TargetInvocationException>(exception.InnerException, "Unexpected inner exception for SqlOnDemand");
-
-                    Exception sqlOnDemandError = exception.InnerException.InnerException;
-                    Assert.IsInstanceOf<UnsupportedVersionException>(sqlOnDemandError, "Unexpected error for SqlOnDemand");
+                    var sqlOnDemandError = exception.FirstInstanceOf<UnsupportedVersionException>();
+                    Assert.That(sqlOnDemandError, Is.Not.Null, $"Unexpected error for SqlOnDemand: {exception.BuildRecursiveExceptionMessage()}");
 
                     string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.NotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
                         ExceptionTemplates.NotSupportedOnCloudWithDetails(typeof(Audit).Name);

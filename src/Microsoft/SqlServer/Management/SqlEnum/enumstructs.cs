@@ -138,7 +138,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         [TsqlSyntaxString("JSON INDEX")]
         [LocDisplayName("Json")]
-        JsonIndex = 12
+        JsonIndex = 12,
     }
 
 

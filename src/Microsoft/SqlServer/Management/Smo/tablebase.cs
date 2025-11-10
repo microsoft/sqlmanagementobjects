@@ -50,7 +50,7 @@ namespace Microsoft.SqlServer.Management.Smo
     [Facets.EvaluationMode(Dmf.AutomatedPolicyEvaluationMode.CheckOnSchedule)]
     [Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet]
     public partial class Table : TableViewBase, Cmn.ICreatable, Cmn.IAlterable, Cmn.IDroppable,
-        Cmn.IDropIfExists, Cmn.IRenamable, ITableOptions
+        Cmn.IDropIfExists, Cmn.IRenamable, ITableOptions, IPartitionable
     {
         internal Table(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)
@@ -139,12 +139,12 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private Boolean m_OnlineHeapOperation = false;
+        private bool m_OnlineHeapOperation = false;
 
         /// <summary>
         /// Online property for rebuild heap
         /// </summary>
-        public Boolean OnlineHeapOperation
+        public bool OnlineHeapOperation
         {
             get
             {
@@ -244,8 +244,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             public void Reset()
             {
-                this.m_StartColumnName = String.Empty;
-                this.m_EndColumnName = String.Empty;
+                this.m_StartColumnName = string.Empty;
+                this.m_EndColumnName = string.Empty;
                 this.m_MarkedForCreate = false;
             }
 
@@ -288,13 +288,13 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        private Int32 m_MaximumDegreeOfParallelism = -1;
+        private int m_MaximumDegreeOfParallelism = -1;
 
         /// <summary>
         /// Property for setting maximum number of processors that can be used when running
         /// rebuild heap
         /// </summary>
-        public Int32 MaximumDegreeOfParallelism
+        public int MaximumDegreeOfParallelism
         {
             get
             {
@@ -314,11 +314,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Whether this table is a node table.
         /// </summary>
         [SfcProperty(SfcPropertyFlags.SqlAzureDatabase | SfcPropertyFlags.Standalone)]
-        public Boolean IsNode
+        public bool IsNode
         {
             get
             {
-                return (Boolean)this.Properties.GetValueWithNullReplacement("IsNode");
+                return (bool)this.Properties.GetValueWithNullReplacement("IsNode");
             }
             set
             {
@@ -331,11 +331,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Whether this Table is an edge table.
         /// </summary>
         [SfcProperty(SfcPropertyFlags.SqlAzureDatabase | SfcPropertyFlags.Standalone)]
-        public Boolean IsEdge
+        public bool IsEdge
         {
             get
             {
-                return (Boolean)this.Properties.GetValueWithNullReplacement("IsEdge");
+                return (bool)this.Properties.GetValueWithNullReplacement("IsEdge");
             }
             set
             {
@@ -810,12 +810,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 var isSqlDw = CheckIsSqlDwTable();
 
                 // for [Memory-Optimized|External|SQL DW] tables skip the file table checks
-                Boolean isFileTable = false;
+                bool isFileTable = false;
                 if (!isMemoryOptimized && !isExternal && !isSqlDw)
                 {
                     if (IsSupportedProperty("IsFileTable"))
                     {
-                        Boolean isFileTableProp = this.GetPropValueOptional("IsFileTable", false);
+                        bool isFileTableProp = this.GetPropValueOptional("IsFileTable", false);
                         if (isFileTableProp)
                         {
                             // IsFileTable is supported as a hard coded 0 on Azure; we can't script file table to that target
@@ -1008,7 +1008,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             string systemVersioningWithClauseContent = GenerateSystemVersioningWithClauseContent(sp);
 
-            if (!String.IsNullOrEmpty(systemVersioningWithClauseContent))
+            if (!string.IsNullOrEmpty(systemVersioningWithClauseContent))
             {
                 sb.AppendFormat(
                     Scripts.WITH_MEMORY_OPTIMIZED_AND_DURABILITY_AND_TEMPORAL_SYSTEM_VERSIONING,
@@ -1353,8 +1353,8 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Diagnostics.TraceHelper.Assert(IsSupportedProperty("HasSystemTimePeriod"));
 
-            string startCol = String.Empty;
-            string endCol = String.Empty;
+            string startCol = string.Empty;
+            string endCol = string.Empty;
             bool hasPeriod = false;
 
             hasPeriod = GetPropValueOptional<bool>("HasSystemTimePeriod", false);
@@ -2742,7 +2742,7 @@ namespace Microsoft.SqlServer.Management.Smo
             return false;
         }
 
-        internal static void ScriptTableInternal(ScriptingPreferences sp, StringBuilder sb, ColumnCollection columns, ICollection indexes, bool isEdgeTable = false)
+        internal static void ScriptTableInternal(ScriptingPreferences sp, StringBuilder sb, IEnumerable<Column> columns, ICollection indexes, bool isEdgeTable = false)
         {
             Diagnostics.TraceHelper.Assert(null != sp);
             Diagnostics.TraceHelper.Assert(null != sb);
@@ -2753,7 +2753,7 @@ namespace Microsoft.SqlServer.Management.Smo
             GeneratePkUkInCreateTable(sb, sp, indexes, true);
         }
 
-        private static void ScriptColumns(ScriptingPreferences sp, StringBuilder sb, ColumnCollection columns, bool isEdgeTable = false)
+        private static void ScriptColumns(ScriptingPreferences sp, StringBuilder sb, IEnumerable<Column> columns, bool isEdgeTable = false)
         {
             StringCollection col_strings = new StringCollection();
 
@@ -2814,7 +2814,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="isEdgeTable">True to indicate the table is an edge table, False otherwise.</param>
         /// <param name="columns">The list of columns.</param>
         /// <returns>True if a parenthesis should be emitted.</returns>
-        private static bool ShouldEmitColumnListParenthesis(bool isEdgeTable, ColumnCollection columns)
+        private static bool ShouldEmitColumnListParenthesis(bool isEdgeTable, IEnumerable<Column> columns)
         {
             if (!isEdgeTable)
             {
@@ -3642,7 +3642,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     req.Urn.Value += string.Format(SmoApplication.DefaultCulture, "[@Name='{0}']", Urn.EscapeString(statname));
                 }
 
-                req.Fields = new String[] { "Name", "LastUpdated" };
+                req.Fields = new string[] { "Name", "LastUpdated" };
                 return this.ExecutionManager.GetEnumeratorData(req);
             }
             catch (Exception e)
@@ -3669,7 +3669,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 req.ParentPropertiesRequests = new PropertiesRequest[1];
                 PropertiesRequest parentProps = new PropertiesRequest();
-                parentProps.Fields = new String[] { "Schema", "Name" };
+                parentProps.Fields = new string[] { "Schema", "Name" };
                 parentProps.OrderByList = new OrderBy[] {   new OrderBy("Schema", OrderBy.Direction.Asc),
                                                             new OrderBy("Name", OrderBy.Direction.Asc) };
                 req.ParentPropertiesRequests[0] = parentProps;
@@ -3913,7 +3913,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (addPeriod)
             {
-                if (String.IsNullOrEmpty(periodStartColumn) || String.IsNullOrEmpty(periodEndColumn))
+                if (string.IsNullOrEmpty(periodStartColumn) || string.IsNullOrEmpty(periodEndColumn))
                 {
                     throw new SmoException(ExceptionTemplates.InvalidPeriodColumnName);
                 }
@@ -4527,11 +4527,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Whether decimal data is stored in variable-length fields in the table
         /// </summary>
         [SfcProperty(SfcPropertyFlags.Expensive | SfcPropertyFlags.Deploy | SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
-        public System.Boolean IsVarDecimalStorageFormatEnabled
+        public bool IsVarDecimalStorageFormatEnabled
         {
             get
             {
-                return (System.Boolean)this.Properties.GetValueWithNullReplacement("IsVarDecimalStorageFormatEnabled");
+                return (bool)this.Properties.GetValueWithNullReplacement("IsVarDecimalStorageFormatEnabled");
             }
 
             set
@@ -4544,6 +4544,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.Properties.SetValueWithConsistencyCheck("IsVarDecimalStorageFormatEnabled", value);
             }
         }
+
+        /// <summary>
+        /// Returns the PartitioningScheme that can be used for a Table
+        /// </summary>
+        public PartitioningScheme SchemeType => PartitioningScheme.Table;
+
+        IEnumerable<PartitionSchemeParameter> IPartitionable.PartitionSchemeParameters => PartitionSchemeParameters;
 
         /// <summary>
         /// Emit script to set vardecimal storage format for the table
@@ -4586,7 +4593,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
-            Boolean isFileTable = this.GetPropValueOptional("IsFileTable", false);
+            bool isFileTable = this.GetPropValueOptional("IsFileTable", false);
             Property fileTableNamespaceEnabled = this.GetPropertyOptional("FileTableNamespaceEnabled");
             Property fileTableDirectoryName = this.GetPropertyOptional("FileTableDirectoryName");
 
@@ -4709,8 +4716,8 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             bool isSystemVersioned = false;
-            string histTableName = String.Empty;
-            string histTableSchema = String.Empty;
+            string histTableName = string.Empty;
+            string histTableSchema = string.Empty;
 
             if (!systemVersioning.IsNull)
             {
@@ -4743,7 +4750,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
 
                     ScriptStringBuilder systemVersioningClauseBuilder = new ScriptStringBuilder(
-                        String.Format(
+                        string.Format(
                             "SYSTEM_VERSIONING = {0}",
                             isSystemVersioned ? "ON" : "OFF"));
 
@@ -4766,12 +4773,12 @@ namespace Microsoft.SqlServer.Management.Smo
                             throw new SmoException(ExceptionTemplates.BothHistoryTableNameAndSchemaMustBeProvided);
                         }
 
-                        if (!String.IsNullOrEmpty(histTableName))
+                        if (!string.IsNullOrEmpty(histTableName))
                         {
                             string schemaPart = MakeSqlBraket(histTableSchema);
                             string tablePart = MakeSqlBraket(histTableName);
 
-                            systemVersioningClauseBuilder.SetParameter("HISTORY_TABLE", String.Format("{0}.{1}", schemaPart, tablePart), ParameterValueFormat.NotString);
+                            systemVersioningClauseBuilder.SetParameter("HISTORY_TABLE", string.Format("{0}.{1}", schemaPart, tablePart), ParameterValueFormat.NotString);
                         }
 
                         // Script only if set to default, otherwise it defaults to TRUE if not specified
@@ -4825,13 +4832,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
                                 systemVersioningClauseBuilder.SetParameter(
                                     "HISTORY_RETENTION_PERIOD",
-                                    String.Format(SmoApplication.DefaultCulture, "{0} {1}", historyRetentionPeriod.ToString(), unit),
+                                    string.Format(SmoApplication.DefaultCulture, "{0} {1}", historyRetentionPeriod.ToString(), unit),
                                     ParameterValueFormat.NotString);
                             }
                         }
                     }
 
-                    sbSystemVersioning.Append(String.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} SET ( {1} )",
+                    sbSystemVersioning.Append(string.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} SET ( {1} )",
                             this.FormatFullNameForScripting(sp),
                             systemVersioningClauseBuilder.ToString(scriptSemiColon: false)));
 
@@ -4854,7 +4861,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 else if (this.m_systemTimePeriodInfo.m_MarkedForDrop)
                 {
                     // dropping PERIOD
-                    query.Add(String.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} DROP PERIOD FOR SYSTEM_TIME", this.FormatFullNameForScripting(sp)));
+                    query.Add(string.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} DROP PERIOD FOR SYSTEM_TIME", this.FormatFullNameForScripting(sp)));
                 }
             }
             else
@@ -4862,7 +4869,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (this.m_systemTimePeriodInfo.m_MarkedForCreate)
                 {
                     // adding a PERIOD
-                    query.Add(String.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} ADD PERIOD FOR SYSTEM_TIME ( [{1}], [{2}] )",
+                    query.Add(string.Format(SmoApplication.DefaultCulture, "ALTER TABLE {0} ADD PERIOD FOR SYSTEM_TIME ( [{1}], [{2}] )",
                         this.FormatFullNameForScripting(sp),
                         Util.EscapeString(this.m_systemTimePeriodInfo.m_StartColumnName, ']'),
                         Util.EscapeString(this.m_systemTimePeriodInfo.m_EndColumnName, ']')));

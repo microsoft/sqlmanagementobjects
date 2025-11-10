@@ -769,9 +769,9 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             }
         }
 
-        private JobScheduleCollection sharedSchedules;
+        private JobScheduleCollection<JobServer> sharedSchedules;
         [SfcObject( SfcContainerRelationship.ObjectContainer, SfcContainerCardinality.ZeroToAny, typeof(JobSchedule))]
-        public JobScheduleCollection SharedSchedules
+        public JobScheduleCollection<JobServer> SharedSchedules
         {
             get 
             {
@@ -779,7 +779,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 ThrowIfBelowVersion90();
                 if( null == sharedSchedules )
                 {
-                    sharedSchedules = new JobScheduleCollection(this)
+                    sharedSchedules = new JobScheduleCollection<JobServer>(this)
                     {
                         AcceptDuplicateNames = true
                     };

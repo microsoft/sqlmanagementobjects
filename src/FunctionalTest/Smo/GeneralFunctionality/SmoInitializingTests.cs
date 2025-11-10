@@ -66,9 +66,9 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
     }
 
-    static class CollectionExtensions
+    internal static class CollectionExtensions
     {
-        public static IList<string> GetNames(this SchemaCollectionBase collection) 
+        public static IList<string> GetNames(this IEnumerable<SqlSmoObject> collection) 
         {
             return collection.Cast<NamedSmoObject>().Select(o => o.Name).ToList();
         }

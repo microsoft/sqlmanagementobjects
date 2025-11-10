@@ -87,6 +87,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     case nameof(ExternalLanguage):
                         return false;
+                    case nameof(IndexedJsonPath):
+                        if (serverVersion.Major < 17)
+                        {
+                            return false;
+                        }
+                        break;
                 }
             }
             if (databaseEngineType == DatabaseEngineType.Standalone)
@@ -112,6 +118,14 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
+                if (serverVersion.Major < 17)
+                {
+                    switch (type.Name)
+                    {
+                        case nameof(IndexedJsonPath):
+                            return false;
+                    }
+                }
                 if (serverVersion.Major < 15)
                 {
                     switch (type.Name)
@@ -312,6 +326,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(ColumnEncryptionKey) :
                     case nameof(ColumnEncryptionKeyValue) :
                     case nameof(ColumnMasterKey) :
+                    case nameof(DatabaseScopedConfiguration):
                     case nameof(DatabaseScopedCredential) :
                     case nameof(Default) :
                     case nameof(ExtendedProperty):
@@ -321,6 +336,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(FullTextIndexColumn) :
                     case nameof(FullTextService) :
                     case nameof(FullTextStopList) :
+                    case nameof(IndexedJsonPath):
                     case nameof(MasterKey) :
                     case nameof(NumberedStoredProcedure) :
                     case nameof(PartitionFunction) :
@@ -336,7 +352,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(SecurityPolicy) :
                     case nameof(SecurityPredicate) :
                     case nameof(SensitivityClassification) :
-                    case nameof(DatabaseScopedConfiguration):
                     case nameof(Sequence) :
                     case nameof(SqlAssembly) :
                     case nameof(SymmetricKey) :
@@ -344,7 +359,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(UserDefinedAggregateParameter) :
                     case nameof(UserDefinedType) :
                     case nameof(UserOptions) :
-                    case nameof(XmlSchemaCollection) :
+                    case nameof(XmlSchemaCollection):
                         return true;
                     case nameof(ExternalFileFormat):
                     case nameof(WorkloadManagementWorkloadGroup):
@@ -495,6 +510,11 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         message = string.IsNullOrEmpty(message) ? ExceptionTemplates.NotSupportedOnSqlEdge(type.Name) : message;
                         throw new UnsupportedVersionException(message).SetHelpContext("NotSupportedOnSqlEdge");
+                    }
+                    if (minSupportedVersion.Major == 17)
+                    { 
+                        message = string.IsNullOrEmpty(message) ? ExceptionTemplates.SupportedOnlyOn170 : message;
+                        throw new UnsupportedVersionException(message).SetHelpContext("SupportedOnlyOn170");
                     }
                     if (minSupportedVersion.Major == 15)
                     {

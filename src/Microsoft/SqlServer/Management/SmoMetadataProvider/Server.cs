@@ -335,7 +335,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
             }
         }
 
-        public void TryRefreshSmoCollection(Smo.SmoCollectionBase collection, Config.SmoInitFields initFields)
+        public void TryRefreshSmoCollection(Smo.ISmoCollection collection, Config.SmoInitFields initFields)
         {
             TraceHelper.TraceContext.Assert(collection != null, "MetadataProvider Assert", "collection != null");
             using (var methodTrace = TraceHelper.TraceContext.GetMethodContext("TryRefreshSmoCollection"))

@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Data;
 
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -71,9 +72,11 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         static JobObjectKey()
         {
-            jobObjectKeySingleton.jobKeyFields = new StringCollection();
-            jobObjectKeySingleton.jobKeyFields.Add("Name");
-            jobObjectKeySingleton.jobKeyFields.Add("CategoryID");
+            jobObjectKeySingleton.jobKeyFields = new StringCollection
+            {
+                nameof(Name),
+                nameof(CategoryID)
+            };
         }
 
         /// <summary>
@@ -82,7 +85,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <returns></returns>
         public override string ToString()
         {
-            return name;
+            return Name;
         }
 
         /// <summary>
@@ -96,11 +99,11 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 if (this.categoryID == -1)
                 {
                     // This should never get called when all clients are fixed
-                    return string.Format(SmoApplication.DefaultCulture, "@Name='{0}'", Urn.EscapeString(name));
+                    return string.Format(SmoApplication.DefaultCulture, "@Name='{0}'", Urn.EscapeString(Name));
                 }
                 else
                 {
-                    return string.Format(SmoApplication.DefaultCulture, "@Name='{0}' and @CategoryID='{1}'", Urn.EscapeString(name), this.categoryID.ToString(SmoApplication.DefaultCulture));
+                    return string.Format(SmoApplication.DefaultCulture, "@Name='{0}' and @CategoryID='{1}'", Urn.EscapeString(Name), this.categoryID.ToString(SmoApplication.DefaultCulture));
                 }
             }
         }
@@ -120,7 +123,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// <returns></returns>
         public override ObjectKeyBase Clone()
         {
-            return new JobObjectKey(this.name, this.categoryID);
+            return new JobObjectKey(Name, categoryID);
         }
 
         internal override void Validate(Type objectType)
@@ -147,12 +150,13 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         }
     }
 
-    // here we have this customized collection
-
-    public class JobCollection : ArrayListCollectionBase
+    /// <summary>
+    /// A collection of Job objects associated with a JobServer
+    /// </summary>
+    public class JobCollection : ArrayListCollectionBase<Job, JobServer>
     {
         internal JobCollection(SqlSmoObject parent)
-            : base(parent)
+            : base((JobServer)parent)
         {
         }
 
@@ -161,7 +165,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         /// </summary>
         protected override void InitInnerCollection()
         {
-            InternalStorage = new SmoArrayList(new JobObjectComparer(this.StringComparer), this);
+            InternalStorage = new SmoArrayList<Job, JobServer>(new JobObjectComparer(this.StringComparer), this);
         }
 
         public bool Contains(string name)
@@ -248,13 +252,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             }
         }
 
-        public Job this[Int32 index]
-        {
-            get
-            {
-                return GetObjectByIndex(index) as Job;
-            }
-        }
+        protected override string UrnSuffix => Job.UrnSuffix;
+
 
         public Job this[string name]
         {
@@ -282,14 +281,10 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             }
         }
 
-        public void CopyTo(Job[] array, int index)
-        {
-            ((ICollection)this).CopyTo(array, index);
-        }
 
         public StringCollection Script()
         {
-            return this.Script(new ScriptingOptions());
+            return Script(new ScriptingOptions());
         }
 
         public StringCollection Script(ScriptingOptions scriptingOptions)
@@ -310,37 +305,17 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             return scr.Script(scriptList);
         }
 
-        protected override Type GetCollectionElementType()
-        {
-            return typeof(Job);
-        }
-
-        internal override SqlSmoObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
-        {
-            return new Job(this, key, state);
-        }
 
         public void Add(Job job)
         {
             AddImpl(job);
         }
 
-        internal SqlSmoObject GetObjectByName(string name)
+        internal override SqlSmoObject GetObjectByName(string name)
         {
-            IEnumerator ie = GetEnumerator();
-            while (ie.MoveNext())
-            {
-                Job mt = (Job)ie.Current;
-                if (this.StringComparer.Compare(mt.Name, name) == 0)
-                {
-                    return mt;
-                }
-            }
-
-            return null;
+            return this.FirstOrDefault(j => StringComparer.Compare(j.Name, name) == 0);
         }
-
-        internal override SqlSmoObject GetObjectByKey(ObjectKeyBase key)
+        internal override Job GetObjectByKey(ObjectKeyBase key)
         {
             JobObjectKey jkey = (JobObjectKey)key;
             // Find the best match
@@ -369,6 +344,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
         }
 
+        internal override Job GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state) => new Job(this, key, state);
     }
 
     public partial class Job : AgentObjectBase, Cmn.IAlterable, Cmn.ICreatable, Cmn.IDroppable, Cmn.IDropIfExists, Cmn.IRenamable, IScriptable
@@ -949,21 +925,23 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             }
         }
 
-        private JobScheduleCollection jobSchedules;
+        private JobScheduleCollection<Job> jobSchedules;
         /// <summary>
         /// JobSchedules
         /// </summary>
         /// <value></value>
         [SfcObject(SfcContainerRelationship.ChildContainer, SfcContainerCardinality.ZeroToAny, typeof(JobSchedule))]
-        public JobScheduleCollection JobSchedules
+        public JobScheduleCollection<Job> JobSchedules
         {
             get
             {
                 CheckObjectState();
                 if (null == jobSchedules)
                 {
-                    jobSchedules = new JobScheduleCollection(this);
-                    jobSchedules.AcceptDuplicateNames = true;
+                    jobSchedules = new JobScheduleCollection<Job>(this)
+                    {
+                        AcceptDuplicateNames = true
+                    };
                 }
                 return jobSchedules;
             }

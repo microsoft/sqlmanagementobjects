@@ -9,32 +9,34 @@ using Microsoft.SqlServer.Management.Sdk.Sfc;
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    // this is the class that contains common features of all schema collection classes
-    public class AvailabilityGroupListenerIPAddressCollectionBase : SortedListCollectionBase
+    /// <summary>
+    /// Collection of AvailabilityGroupListenerIPAddress objects associated with an AvailabilityGroupListener
+    /// </summary>
+    public class AvailabilityGroupListenerIPAddressCollectionBase : SortedListCollectionBase<AvailabilityGroupListenerIPAddress, AvailabilityGroupListener>
     {
         internal AvailabilityGroupListenerIPAddressCollectionBase(SqlSmoObject parent)
-            : base(parent)
+            : base((AvailabilityGroupListener)parent)
         {
         }
+
+        protected override string UrnSuffix => AvailabilityGroupListenerIPAddress.UrnSuffix;
 
         protected override void InitInnerCollection()
         {
-            InternalStorage = new SmoSortedList(new AvailabilityGroupListenerIPAddressObjectComparer(this.StringComparer));
+            InternalStorage = new SmoSortedList<AvailabilityGroupListenerIPAddress>(new AvailabilityGroupListenerIPAddressObjectComparer(StringComparer));
         }
 
-        protected override Type GetCollectionElementType()
-        {
-            return typeof(AvailabilityGroupListenerIPAddress);
-        }
 
         internal override ObjectKeyBase CreateKeyFromUrn(Urn urn)
         {
-            string ipAddress = urn.GetAttribute("IPAddress");
-            string subnetMask = urn.GetAttribute("SubnetMask");
-            string subnetIP = urn.GetAttribute("SubnetIP");
+            var ipAddress = urn.GetAttribute("IPAddress");
+            var subnetMask = urn.GetAttribute("SubnetMask");
+            var subnetIP = urn.GetAttribute("SubnetIP");
 
             return new AvailabilityGroupListenerIPAddressObjectKey(ipAddress, subnetMask, subnetIP);
         }
+
+        internal override AvailabilityGroupListenerIPAddress GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state) => new AvailabilityGroupListenerIPAddress(this, key, state);
     }
 
     internal class AvailabilityGroupListenerIPAddressObjectComparer : ObjectComparerBase
@@ -46,8 +48,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public override int Compare(object obj1, object obj2)
         {
-            AvailabilityGroupListenerIPAddressObjectKey dbr1 = obj1 as AvailabilityGroupListenerIPAddressObjectKey;
-            AvailabilityGroupListenerIPAddressObjectKey dbr2 = obj2 as AvailabilityGroupListenerIPAddressObjectKey;
+            var dbr1 = obj1 as AvailabilityGroupListenerIPAddressObjectKey;
+            var dbr2 = obj2 as AvailabilityGroupListenerIPAddressObjectKey;
 
             if (dbr1 == null && dbr2 == null)
             {
@@ -63,13 +65,13 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // We order first by IP address, SubnetIP and then SubnetMask.
-            int ipAddressComparison = this.stringComparer.Compare(dbr1.IPAddress, dbr2.IPAddress);
+            var ipAddressComparison = stringComparer.Compare(dbr1.IPAddress, dbr2.IPAddress);
             if (ipAddressComparison == 0)
             {
-                int subnetMaskComparison = this.stringComparer.Compare(dbr1.SubnetMask, dbr2.SubnetMask);
+                var subnetMaskComparison = stringComparer.Compare(dbr1.SubnetMask, dbr2.SubnetMask);
                 if (subnetMaskComparison == 0)
                 {
-                    return this.stringComparer.Compare(dbr1.SubnetIP, dbr2.SubnetIP);
+                    return stringComparer.Compare(dbr1.SubnetIP, dbr2.SubnetIP);
                 }
 
                 return subnetMaskComparison;
@@ -93,9 +95,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public AvailabilityGroupListenerIPAddressObjectKey(string ipAddress, string subnetMask, string subnetIP)
         {
-            this.IPAddress = ipAddress;
-            this.SubnetMask = subnetMask;
-            this.SubnetIP = subnetIP;
+            IPAddress = ipAddress;
+            SubnetMask = subnetMask;
+            SubnetIP = subnetIP;
         }
 
         static AvailabilityGroupListenerIPAddressObjectKey()
@@ -129,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Smo
             get
             {
                 return string.Format(SmoApplication.DefaultCulture, "@IPAddress='{0}' and @SubnetMask='{1}' and @SubnetIP='{2}'",
-                    SqlSmoObject.SqlString(this.IPAddress), SqlSmoObject.SqlString(this.SubnetMask), SqlSmoObject.SqlString(this.SubnetIP));
+                    SqlSmoObject.SqlString(IPAddress), SqlSmoObject.SqlString(SubnetMask), SqlSmoObject.SqlString(SubnetIP));
             }
         }
 
@@ -146,18 +148,18 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return null == this.IPAddress || null == this.SubnetMask || null == this.SubnetIP;
+                return null == IPAddress || null == SubnetMask || null == SubnetIP;
             }
         }
 
         public override string GetExceptionName()
         {
-            return string.Format(SmoApplication.DefaultCulture, "IPaddress {0} of Subnet mask {1} and SubnetIP {2}", this.IPAddress, this.SubnetMask, this.SubnetIP);
+            return string.Format(SmoApplication.DefaultCulture, "IPaddress {0} of Subnet mask {1} and SubnetIP {2}", IPAddress, SubnetMask, SubnetIP);
         }
 
         public override ObjectKeyBase Clone()
         {
-            return new AvailabilityGroupListenerIPAddressObjectKey(this.IPAddress, this.SubnetMask, this.SubnetIP);
+            return new AvailabilityGroupListenerIPAddressObjectKey(IPAddress, SubnetMask, SubnetIP);
         }
 
         public override ObjectComparerBase GetComparer(IComparer stringComparer)
@@ -167,7 +169,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         public override string ToString()
         {
-            return string.Format(SmoApplication.DefaultCulture, "{0}/{1}/{2}", this.IPAddress, this.SubnetMask, this.SubnetIP);
+            return string.Format(SmoApplication.DefaultCulture, "{0}/{1}/{2}", IPAddress, SubnetMask, SubnetIP);
         }
     }
 }

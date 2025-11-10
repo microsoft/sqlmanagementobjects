@@ -13,7 +13,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NUnit.Framework;
-using Assert=NUnit.Framework.Assert;
+using Assert = NUnit.Framework.Assert;
 
 
 namespace Microsoft.SqlServer.ConnectionInfoUnitTests
@@ -115,6 +115,44 @@ else
             connectMock.VerifyAll();
         }
 
+        [TestMethod]
+        [TestCategory("Unit")]
+        [DataTestMethod]
+        [DataRow(DatabaseEngineEdition.SqlDatabase, DatabaseEngineEdition.SqlDatabase)] // Server reports self as Azure SQL Database edition, should remain unchanged
+        [DataRow((DatabaseEngineEdition)1000, (DatabaseEngineEdition)1000)] // Server reports self as Dynamics, should remain unchanged
+        [DataRow((DatabaseEngineEdition)555, DatabaseEngineEdition.SqlDatabase)] // Server reports self as unknown SqlAzureDatabase edition, should be converted to SqlDatabase
+        public void Edition_is_handled_properly_for_Azure_servers(DatabaseEngineEdition engineEdition, DatabaseEngineEdition expectedEdition)
+        {
+            // NOTE: Dynamics CRM databases have unique restrictions (master not accessible, CREATE TABLE not permitted) that make
+            // neither SqlDatabase or Unknown editions usable.  Because adding it as a defined DatabaseEngineEdition would result in
+            // cascading changes elsewhere (query construction for SMO types, designer exemptions) and the previous behavior
+            // (where this went unconverted) was functioning correctly for MSSQL and Azure Data Studio, we treat it as a special case.
+            // This test validates that special casing.
+
+            const string versionString = "12.00.6024.0";
+
+            var connectMock = new Mock<IDbConnection>();
+            var commandMock = new Mock<IDbCommand>();
+            var dataAdapterMock = new Mock<IDbDataAdapter>();
+
+            connectMock.Setup(c => c.CreateCommand()).Returns(commandMock.Object);
+            dataAdapterMock.SetupSet(d => d.SelectCommand = commandMock.Object);
+
+            dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
+                (DataSet ds) =>
+                {
+                    // Simulate Azure SQL Database returning various editions
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, engineEdition, 0x10000FA0, HostPlatformNames.Windows, "TCP", false);
+                });
+
+            var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
+
+            // Verify that edition is converted as expected
+            Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Engine type should be SqlAzureDatabase");
+            Assert.That(si.DatabaseEngineEdition, Is.EqualTo(expectedEdition), $"Edition {engineEdition} from Azure should convert to {engineEdition}");
+
+        }
+
         private void FillTestDataSet(DataSet ds, string productVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition,
             int microsoftVersion, string hostPlatform, string protocol, bool isFabricServer)
         {
@@ -130,7 +168,7 @@ else
             ds.Tables["Table2"].Columns.Add(new DataColumn("host_platform", typeof(string)));
             ds.Tables["Table2"].Rows.Add(hostPlatform);
             ds.Tables.Add("Table3");
-            ds.Tables["Table3"].Columns.Add(new DataColumn("ConnectionProtocol", typeof (string)));
+            ds.Tables["Table3"].Columns.Add(new DataColumn("ConnectionProtocol", typeof(string)));
             ds.Tables["Table3"].Rows.Add(protocol);
             ds.AcceptChanges();
             Trace.TraceInformation("Tables: {0}", string.Join(",", ds.Tables.OfType<DataTable>().Select(dt => dt.TableName).ToArray()));

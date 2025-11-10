@@ -1,113 +1,47 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
-
 using System;
-using System.Collections;
 
-using Microsoft.SqlServer.Management.Sdk.Sfc;
-
-namespace Microsoft.SqlServer.Management.Smo
+namespace Microsoft.SqlServer.Management.Smo 
 {
-
-    ///<summary>
-    /// DatabaseScopedConfigurationCollection
-    ///</summary>
-    public sealed class DatabaseScopedConfigurationCollection : SimpleObjectCollectionBase
+    public sealed partial class DatabaseScopedConfigurationCollection : SimpleObjectCollectionBase<DatabaseScopedConfiguration, Database>
     {
-        internal DatabaseScopedConfigurationCollection(SqlSmoObject parentInstance)
-            : base(parentInstance)
+        ///<summary>
+        ///Returns a DatabaseScopedConfiguration identified by the given name. 
+        ///If the parent object is in Creating state and the configuration object is not in the collection,
+        ///and new configuration with the given name and empty value will be added to the collection and returned.
+        ///If the parent object is not in Creating state and the named configuration  is not found, 
+        ///a SmoException will be thrown.
+        ///</summary> 
+        internal override SqlSmoObject GetObjectByName(string name)
         {
-        }
-
-        public Database Parent
-        {
-            get
+            if (!this.ContainsKey(new SimpleObjectKey(name)))
             {
-                return this.ParentInstance as Database;
-            }
-        }
-
-        public DatabaseScopedConfiguration this[Int32 index]
-        {
-            get
-            {
-                return GetObjectByIndex(index) as DatabaseScopedConfiguration;
-            }
-        }
-
-        public DatabaseScopedConfiguration this[string name]
-        {
-            get
-            {
-                if (!this.Contains(name))
+                // The unknown configuration would be saved first on the offline scenario.
+                if (Parent.State == SqlSmoState.Creating)
                 {
-                    // The unknown configuration would be saved first on the offline scenario.
-                    if (Parent.State == SqlSmoState.Creating)
+                    DatabaseScopedConfiguration newConfig = new DatabaseScopedConfiguration(Parent, name)
                     {
-                        DatabaseScopedConfiguration newConfig = new DatabaseScopedConfiguration(Parent, name);
-                        newConfig.Value = string.Empty;
-                        newConfig.ValueForSecondary = string.Empty;
-                        this.Add(newConfig);
+                        Value = string.Empty,
+                        ValueForSecondary = string.Empty
+                    };
+                    InternalStorage.Add(newConfig.key, newConfig);
+                }
+                else
+                {
+                    if (Parent.State == SqlSmoState.Existing)
+                    {
+                        this.Refresh();
                     }
-                    else
-                    {
-                        if (Parent.State == SqlSmoState.Existing)
-                        {
-                            this.Refresh();
-                        }
 
-                        if (!this.Contains(name))
-                        {
-                            throw new SmoException(ExceptionTemplates.UnsupportedDatabaseScopedConfiguration(name));
-                        }
+                    if (!this.Contains(name))
+                    {
+                        throw new SmoException(ExceptionTemplates.UnsupportedDatabaseScopedConfiguration(name));
                     }
                 }
-
-                return GetObjectByName(name) as DatabaseScopedConfiguration;
-            }
-        }
-
-        public void CopyTo(DatabaseScopedConfiguration[] array, int index)
-        {
-            ((ICollection)this).CopyTo(array, index);
-        }
-
-        public DatabaseScopedConfiguration ItemById(int id)
-        {
-            return (DatabaseScopedConfiguration)GetItemById(id);
-        }
-
-        protected override Type GetCollectionElementType()
-        {
-            return typeof(DatabaseScopedConfiguration);
-        }
-
-        internal override SqlSmoObject GetCollectionElementInstance(ObjectKeyBase key, SqlSmoState state)
-        {
-            return new DatabaseScopedConfiguration(this, key, state);
-        }
-
-        public void Add(DatabaseScopedConfiguration databaseScopedConfiguration)
-        {
-            AddImpl(databaseScopedConfiguration);
-        }
-
-        internal SqlSmoObject GetObjectByName(string name)
-        {
-            return GetObjectByKey(new SimpleObjectKey(name));
-        }
-
-        internal override ObjectKeyBase CreateKeyFromUrn(Urn urn)
-        {
-            string name = urn.GetAttribute("Name");
-
-            if (null == name || name.Length == 0)
-            {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("Name", urn.Type));
             }
 
-            return new SimpleObjectKey(name);
+            return base.GetObjectByName(name) as DatabaseScopedConfiguration;
         }
 
         /// <summary>
@@ -115,7 +49,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         protected override void InitInnerCollection()
         {
-            InternalStorage = new SmoSortedList(new DatabaseScopedConfigurationObjectComparer());
+            InternalStorage = new SmoSortedList<DatabaseScopedConfiguration>(new DatabaseScopedConfigurationObjectComparer());
         }
     }
 
