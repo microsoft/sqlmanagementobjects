@@ -81,6 +81,7 @@ Once we push a new version to nuget.org add a double hash header for that versio
 
 ## 170.18.0, 161.48044.0
 
+- Add `SearchPropertyList` support for Azure SQL Database
 - Fix issue where `Table.Create` and `View.Create` were querying the server for indexes
 - Add option to generate scripts exclusively for Data Classification
 - Create a new SMO object `SensitivityClassification` under `Database`
