@@ -29,12 +29,12 @@ begin
 		</prefix>
 		<version min_major = '7' max_major = '8'>
 			<prefix> 
-	exec('use ' + @db_name + ' INSERT #loginmappings select suser_sname(u.sid), db_name(), u.name, null from dbo.sysusers u where suser_sname(u.sid) is not null')
+	exec('use ' + @db_name + ' INSERT #loginmappings select login_name, db_name(), u.name, null from dbo.sysusers u CROSS APPLY (SELECT suser_sname(u.sid) AS login_name) AS ln where ln.login_name is not null')
 			</prefix>
 		</version>
 		<version min_major = '9' >
 			<prefix> 
-	exec('use ' + @db_name + ' INSERT #loginmappings select suser_sname(u.sid), db_name(), u.name, null from sys.database_principals AS u where suser_sname(u.sid) is not null')
+	exec('use ' + @db_name + ' INSERT #loginmappings select login_name, db_name(), u.name, null from sys.database_principals AS u CROSS APPLY (SELECT suser_sname(u.sid) AS login_name) AS ln where ln.login_name is not null')
 			</prefix>
 		</version>
 		<prefix> 
