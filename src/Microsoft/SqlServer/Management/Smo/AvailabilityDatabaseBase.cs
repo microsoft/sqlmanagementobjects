@@ -99,7 +99,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// This action assumes the instance is already an availability replica in the group
         /// and the local copy is a locally restored copy of the database on the primary replica.
         /// </summary>
-        public void JoinAvailablityGroup()
+        public void JoinAvailabilityGroup()
         {
             this.CheckObjectState(!this.ExecutionManager.Recording); //make sure the object has been retrieved from the backend if we are going to execute the script
             string availabilityGroupName = this.Parent.Name;
