@@ -1,0 +1,22 @@
+<!-- This repo relies on the CentralPackageVersions SDK
+     See https://github.com/Microsoft/MSBuildSdks/tree/main/src/CentralPackageVersions
+     This file lists every nuget package dependency and its required version. 
+     Do not put Version attributes on PackageReference tags in individual projects.
+     The binlog viewer will show both versions being copied to the output folder as a double write.
+     This file is separate from the copy in the root of the repo because these packages are only needed by tests.
+-->
+<Project>
+ <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Packages.props', '$(MSBuildThisFileDirectory)../'))" />
+  <ItemGroup>
+    <!--
+        When adding new package dependencies here, make sure to also add those packages to
+        Microsoft.SqlServer.Smo.TestUtils.nuspec if they affect any of the related test utilities.
+        -->
+    <PackageVersion Include="Azure.Core" Version="1.47.1" />
+    <PackageVersion Include="Azure.Identity" Version="1.14.2" />
+    <PackageVersion Include="Azure.ResourceManager" Version="1.8.0" />
+    <PackageVersion Include="Azure.ResourceManager.Storage" Version="1.1.1" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.20.0" />
+    <PackageVersion Include="Azure.Security.KeyVault.Secrets" Version="4.4.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <RootNamespace>Microsoft.SqlServer.Management.Common</RootNamespace>
+    <ClsCompliant>true</ClsCompliant>
+    <DefineConstants Condition="'$(UseNativeBatchParser)'=='true'">$(DefineConstants);NATIVEBATCHPARSER</DefineConstants>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.ConnectionInfoExtended" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.DTEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.RegisteredServers" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.XEventDbScoped" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.ReplEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Rmo" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SmoExtended" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.ConnectionInfoUnitTests" Key="$(TestPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.WmiEnum" Key="$(RealPublicKey)"/>
+  </ItemGroup>
+  <ItemGroup>
+    <SqlStringResource Include="StringConnectionInfo.strings" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseNativeBatchParser)'!='true'">
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\Data\Tools.Sql.BatchParser\Microsoft.Data.Tools.Sql.BatchParser.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)'=='netfx'">
+      <Reference Include="System.Data"/>
+      <Reference Include="System.Management" />
+      <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\SqlClrProvider\Microsoft.SqlServer.SqlClrProvider.csproj"/>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <PackageReference Include="System.Security.Principal.Windows"  />
+    <PackageReference Include="System.Management"  />
+    <PackageReference Include="System.Data.OleDb"  />
+  </ItemGroup>
+</Project>

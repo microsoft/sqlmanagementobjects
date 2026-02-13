@@ -1,0 +1,687 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <NoWarn>$(NoWarn);0169;0414;0649;3021</NoWarn>
+    <RootNamespace>Microsoft.SqlServer.Management.Smo</RootNamespace>
+    <CodeGenOutputDir>$(BaseIntermediateOutputPath)$(TargetFramework)\Gen</CodeGenOutputDir>
+    <SmoSourceDir>.\</SmoSourceDir>
+    <ClsCompliant>true</ClsCompliant>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DTAClient" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.MaintenancePlanTasks" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.MaintenancePlanTasksUI" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.MaintenancePlanWizard" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Dmf" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.SqlScriptPublish" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.SqlScriptPublishModel" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Replication" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo.Notebook" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo.UnitTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SmoExtended" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlWmiManagement" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.Manageability.Utils" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SMO" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SMOInternal" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoNotebookUnitTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.TransferObjectsTask" Key="$(RealPublicKey)" />
+  </ItemGroup>
+  <ItemGroup Label="GeneratedCsFiles">
+    <CodeGen Include="Alert.cs" />
+    <CodeGen Include="AlertCategory.cs" />
+    <CodeGen Include="AlertSystem.cs" />
+    <CodeGen Include="applicationrole.cs" />
+    <CodeGen Include="AsymmetricKey.cs" />
+    <CodeGen Include="Audit.cs" />
+    <CodeGen Include="AvailabilityDatabase.cs" />
+    <CodeGen Include="AvailabilityGroup.cs" />
+    <CodeGen Include="AvailabilityGroupListener.cs" />
+    <CodeGen Include="AvailabilityGroupListenerIPAddress.cs" />
+    <CodeGen Include="AvailabilityReplica.cs" />
+    <CodeGen Include="BackupDevice.cs" />
+    <CodeGen Include="BrokerPriority.cs" />
+    <CodeGen Include="BrokerService.cs" />
+    <CodeGen Include="Certificate.cs" />
+    <CodeGen Include="Check.cs" />
+    <CodeGen Include="column.cs" />
+    <CodeGen Include="ColumnEncryptionKey.cs" />
+    <CodeGen Include="ColumnEncryptionKeyValue.cs" />
+    <CodeGen Include="ColumnMasterKey.cs" />
+    <CodeGen Include="ConfigurationValue.cs" />
+    <CodeGen Include="Credential.cs" />
+    <CodeGen Include="DatabaseScopedCredential.cs" />
+    <CodeGen Include="CryptographicProvider.cs" />
+    <CodeGen Include="Database.cs" />
+    <CodeGen Include="DatabaseAuditSpecification.cs" />
+    <CodeGen Include="DatabaseDdlTrigger.cs" />
+    <CodeGen Include="DatabaseEncryptionKey.cs" />
+    <CodeGen Include="DatabaseMirroringPayload.cs" />
+    <CodeGen Include="DatabaseOptions.cs" />
+    <CodeGen Include="DatabaseReplicaState.cs" />
+    <CodeGen Include="databaserole.cs" />
+    <CodeGen Include="SensitivityClassification.cs" />
+    <CodeGen Include="DataFile.cs" />
+    <CodeGen Include="Default.cs" />
+    <CodeGen Include="DefaultConstraint.cs" />
+    <CodeGen Include="EdgeConstraint.cs" />
+    <CodeGen Include="EdgeConstraintClause.cs" />
+    <CodeGen Include="Endpoint.cs" />
+    <CodeGen Include="ExtendedProperty.cs" />
+    <CodeGen Include="extendedstoredprocedure.cs" />
+    <CodeGen Include="ExternalDataSource.cs" />
+    <CodeGen Include="ExternalFileFormat.cs" />
+    <CodeGen Include="ExternalLanguage.cs" />
+    <CodeGen Include="ExternalLanguageFile.cs" />
+    <CodeGen Include="ExternalLibrary.cs" />
+    <CodeGen Include="ExternalLibraryFile.cs" />
+    <CodeGen Include="ExternalResourcePool.cs" />
+    <CodeGen Include="ExternalStream.cs" />
+    <CodeGen Include="ExternalStreamingJob.cs" />
+    <CodeGen Include="ExternalModel.cs" />
+    <CodeGen Include="FileGroup.cs" />
+    <CodeGen Include="ForeignKey.cs" />
+    <CodeGen Include="ForeignKeyColumn.cs" />
+    <CodeGen Include="FullTextCatalog.cs" />
+    <CodeGen Include="FullTextIndex.cs" />
+    <CodeGen Include="FullTextIndexColumn.cs" />
+    <CodeGen Include="FullTextService.cs" />
+    <CodeGen Include="FullTextStopList.cs" />
+    <CodeGen Include="HttpProtocol.cs" />
+    <CodeGen Include="Index.cs" />
+    <CodeGen Include="IndexedColumn.cs" />
+    <CodeGen Include="IndexedJsonPath.cs" />
+    <CodeGen Include="IndexedXmlPath.cs" />
+    <CodeGen Include="IndexedXmlPathNamespace.cs" />
+    <CodeGen Include="Information.cs" />
+    <CodeGen Include="job.cs" />
+    <CodeGen Include="JobCategory.cs" />
+    <CodeGen Include="JobSchedule.cs" />
+    <CodeGen Include="jobserver.cs" />
+    <CodeGen Include="JobStep.cs" />
+    <CodeGen Include="language.cs" />
+    <CodeGen Include="linkedserver.cs" />
+    <CodeGen Include="LinkedServerLogin.cs" />
+    <CodeGen Include="LogFile.cs" />
+    <CodeGen Include="login.cs" />
+    <CodeGen Include="MailAccount.cs" />
+    <CodeGen Include="MailProfile.cs" />
+    <CodeGen Include="MailServer.cs" />
+    <CodeGen Include="MasterKey.cs" />
+    <CodeGen Include="MessageType.cs" />
+    <CodeGen Include="MessageTypeMapping.cs" />
+    <CodeGen Include="NumberedStoredProcedure.cs" />
+    <CodeGen Include="NumberedStoredProcedureParameter.cs" />
+    <CodeGen Include="OleDbProviderSettings.cs" />
+    <CodeGen Include="Operator.cs" />
+    <CodeGen Include="OperatorCategory.cs" />
+    <CodeGen Include="orderColumn.cs" />
+    <CodeGen Include="Parameter.cs" />
+    <CodeGen Include="PartitionFunction.cs" />
+    <CodeGen Include="PartitionFunctionParameter.cs" />
+    <CodeGen Include="PartitionScheme.cs" />
+    <CodeGen Include="PartitionSchemeParameter.cs" />
+    <CodeGen Include="PhysicalPartition.cs" />
+    <CodeGen Include="PlanGuide.cs" />
+    <CodeGen Include="ProxyAccount.cs" />
+    <CodeGen Include="QueryStoreOptions.cs" />
+    <CodeGen Include="RemoteServiceBinding.cs" />
+    <CodeGen Include="ResourceGovernor.cs" />
+    <CodeGen Include="ResourcePool.cs" />
+    <CodeGen Include="ResumableIndex.cs" />
+    <CodeGen Include="Rule.cs" />
+    <CodeGen Include="Schema.cs" />
+    <CodeGen Include="SearchProperty.cs" />
+    <CodeGen Include="SearchPropertyList.cs" />
+    <CodeGen Include="SecurityPolicy.cs" />
+    <CodeGen Include="SecurityPredicate.cs" />
+    <CodeGen Include="DatabaseScopedConfiguration.cs" />
+    <CodeGen Include="Sequence.cs" />
+    <CodeGen Include="server.cs" />
+    <CodeGen Include="ServerAuditSpecification.cs" />
+    <CodeGen Include="ServerDdlTrigger.cs" />
+    <CodeGen Include="ServerProxyAccount.cs" />
+    <CodeGen Include="serverrole.cs" />
+    <CodeGen Include="ServiceBroker.cs" />
+    <CodeGen Include="ServiceBrokerPayload.cs" />
+    <CodeGen Include="ServiceContract.cs" />
+    <CodeGen Include="ServiceContractMapping.cs" />
+    <CodeGen Include="ServiceMasterKey.cs" />
+    <CodeGen Include="ServiceQueue.cs" />
+    <CodeGen Include="ServiceRoute.cs" />
+    <CodeGen Include="Settings.cs" />
+    <CodeGen Include="SmartAdmin.cs" />
+    <CodeGen Include="SoapPayload.cs" />
+    <CodeGen Include="SoapPayloadMethod.cs" />
+    <CodeGen Include="SqlAssembly.cs" />
+    <CodeGen Include="SqlAssemblyFile.cs" />
+    <CodeGen Include="SqlMail.cs" />
+    <CodeGen Include="Statistic.cs" />
+    <CodeGen Include="StatisticColumn.cs" />
+    <CodeGen Include="storedprocedure.cs" />
+    <CodeGen Include="storedprocedureparameter.cs" />
+    <CodeGen Include="SymmetricKey.cs" />
+    <CodeGen Include="Synonym.cs" />
+    <CodeGen Include="SystemDataType.cs" />
+    <CodeGen Include="SystemMessage.cs" />
+    <CodeGen Include="table.cs" />
+    <CodeGen Include="TargetServer.cs" />
+    <CodeGen Include="TargetServerGroup.cs" />
+    <CodeGen Include="TcpProtocol.cs" />
+    <CodeGen Include="Trigger.cs" />
+    <CodeGen Include="user.cs" />
+    <CodeGen Include="UserDefinedAggregate.cs" />
+    <CodeGen Include="UserDefinedAggregateParameter.cs" />
+    <CodeGen Include="UserDefinedDataType.cs" />
+    <CodeGen Include="UserDefinedFunction.cs" />
+    <CodeGen Include="UserDefinedFunctionParameter.cs" />
+    <CodeGen Include="UserDefinedMessage.cs" />
+    <CodeGen Include="UserDefinedTableType.cs" />
+    <CodeGen Include="UserDefinedType.cs" />
+    <CodeGen Include="UserOptions.cs" />
+    <CodeGen Include="view.cs" />
+    <CodeGen Include="WorkloadGroup.cs" />
+    <CodeGen Include="WorkloadManagementWorkloadClassifier.cs" />
+    <CodeGen Include="WorkloadManagementWorkloadGroup.cs" />
+    <CodeGen Include="XmlSchemaCollection.cs" />
+  </ItemGroup>
+  <ItemGroup Label="CollectionCodeFiles">
+    <Compile Include="$(SmoSourceDir)\Collections\AlertCategoryCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AlertCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ApplicationRoleCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AsymmetricKeyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AuditCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AvailabilityDatabaseCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AvailabilityGroupCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AvailabilityGroupListenerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AvailabilityGroupListenerIPAddressCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\AvailabilityReplicaCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\BackupDeviceCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\BrokerPriorityCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\BrokerServiceCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\CertificateCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\CheckCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ColumnEncryptionKeyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ColumnEncryptionKeyValueCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ColumnMasterKeyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ConfigurationValueCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\CredentialCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\CryptographicProviderCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseAuditSpecificationCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseDdlTriggerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseReplicaStateCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseRoleCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseScopedConfigurationCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DatabaseScopedCredentialCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DataFileCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\DefaultCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\EdgeConstraintCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\EdgeConstraintClauseCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\EndpointCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExtendedPropertyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExtendedStoredProcedureCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalDataSourceCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalFileFormatCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalLanguageCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalLanguageFileCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalLibraryCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalStreamCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalModelCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalStreamingJobCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalResourcePoolCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\FileGroupCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ForeignKeyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ForeignKeyColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\FullTextCatalogCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\FullTextIndexColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\FullTextStopListCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\IndexCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\IndexedColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\IndexedJsonPathCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\IndexedXmlPathCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\IndexedXmlPathNamespaceCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\JobCategoryCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\JobScheduleCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\JobStepCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\LanguageCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\LinkedServerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\LinkedServerLoginCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\LogFileCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\LoginCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\MailAccountCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\MailProfileCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\MailServerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\MessageTypeCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\MessageTypeMappingCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\NumberedStoredProcedureCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\NumberedStoredProcedureParameterCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\OleDbProviderSettingsCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\OperatorCategoryCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\OperatorCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\OrderColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\PartitionFunctionCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\PartitionFunctionParameterCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\PartitionSchemeCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\PartitionSchemeParameterCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\PhysicalPartitionCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\PlanGuideCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ProxyAccountCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\RemoteServiceBindingCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ResourcePoolCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ResumableIndexCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\RuleCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SchemaCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SearchPropertyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SearchPropertyListCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SecurityPolicyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SecurityPredicateCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SequenceCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServerAuditSpecificationCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServerDdlTriggerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServerRoleCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServiceContractCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServiceContractMappingCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServiceQueueCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ServiceRouteCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SoapPayloadMethodCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SqlAssemblyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SqlAssemblyFileCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\StatisticCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\StatisticColumnCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\StoredProcedureCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\StoredProcedureParameterCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SymmetricKeyCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SynonymCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SystemDataTypeCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SystemMessageCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\TableCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\SensitivityClassificationCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\TargetServerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\TargetServerGroupCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\TriggerCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedAggregateCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedAggregateParameterCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedDataTypeCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedFunctionCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedFunctionParameterCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedMessageCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedTableTypeCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\UserDefinedTypeCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ViewCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\WorkloadGroupCollection.cs" />
+	  <Compile Include="$(SmoSourceDir)\Collections\WorkloadManagementWorkloadClassifierCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\WorkloadManagementWorkloadGroupCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\XmlSchemaCollectionCollection.cs" />
+  </ItemGroup>
+  <ItemGroup Label="Static sources">
+    <Compile Include="$(SmoSourceDir)\AbstractCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AffinityInfo.cs" />
+    <Compile Include="$(SmoSourceDir)\AffinityInfoBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AffinityInfoCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\AlertBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AlertCategoryBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AlertSystemBase.cs" />
+    <Compile Include="$(SmoSourceDir)\application.cs" />
+    <Compile Include="$(SmoSourceDir)\applicationrolebase.cs" />
+    <Compile Include="$(SmoSourceDir)\AssemblyInfo.cs" />
+    <Compile Include="$(SmoSourceDir)\AsymmetricKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AuditBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AuditExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\AuditSpecification.cs" />
+    <Compile Include="$(SmoSourceDir)\AvailabilityDatabaseBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AvailabilityGroupBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AvailabilityGroupListenerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AvailabilityGroupListenerIPAddressBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AvailabilityGroupListenerIPAddressCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\AvailabilityReplicaBase.cs" />
+    <Compile Include="$(SmoSourceDir)\BackupDeviceBase.cs" />
+    <Compile Include="$(SmoSourceDir)\BackupMedia.cs" />
+    <Compile Include="$(SmoSourceDir)\BackupSet.cs" />
+    <Compile Include="$(SmoSourceDir)\BackupSetCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\BrokerPriorityBase.cs" />
+    <Compile Include="$(SmoSourceDir)\BrokerServiceBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CategoryBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CertificateBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CheckBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CollationInfo.cs" />
+    <Compile Include="$(SmoSourceDir)\CollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CollectionInterfaces.cs" />
+    <Compile Include="$(SmoSourceDir)\ColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ColumnEncryptionKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ColumnEncryptionKeyValueBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ColumnEncryptionKeyValueCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ColumnMasterKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ConfigProperty.cs" />
+    <Compile Include="$(SmoSourceDir)\Configuration.cs" />
+    <Compile Include="$(SmoSourceDir)\ConfigurationBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ConfigurationValueBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CPUBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CredentialBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SensitivityClassificationBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseScopedCredentialBase.cs" />
+    <Compile Include="$(SmoSourceDir)\CryptographicProviderBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseAuditSpecificationBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseAuditSpecificationExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseDdlTriggerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseEncryptionKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseEncryptionKeyExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseFileMappingsDictionary.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseMirroringPayloadBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseOptionsBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabasePrefetch.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseReplicaStateBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseReplicaStateCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseRoleBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseScopedConfigurationBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DatabaseSnapshotExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\DataClassificationScriptGenerator.cs" />
+    <Compile Include="$(SmoSourceDir)\DataEnumerator.cs" />
+    <Compile Include="$(SmoSourceDir)\DataScriptCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\DataType.cs" />
+    <Compile Include="$(SmoSourceDir)\DdlTriggerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DefaultBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DefaultConstraintBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DefaultRuleBase.cs" />
+    <Compile Include="$(SmoSourceDir)\DependencyList.cs" />
+    <Compile Include="$(SmoSourceDir)\DependencyTree.cs" />
+    <Compile Include="$(SmoSourceDir)\DependencyWalker.cs" />
+    <Compile Include="$(SmoSourceDir)\dmf.cs" />
+    <Compile Include="$(SmoSourceDir)\EdgeConstraintBase.cs" />
+    <Compile Include="$(SmoSourceDir)\EdgeConstraintClauseBase.cs" />
+    <Compile Include="$(SmoSourceDir)\EndpointBase.cs" />
+    <Compile Include="$(SmoSourceDir)\EnumerableContainer.cs" />
+    <Compile Include="$(SmoSourceDir)\enumerations.cs" />
+    <Compile Include="$(SmoSourceDir)\EnumeratorContainer.cs" />
+    <Compile Include="$(SmoSourceDir)\exception.cs" />
+    <Compile Include="$(SmoSourceDir)\ExceptionTemplates.cs" />
+    <Compile Include="$(SmoSourceDir)\ExecutionManager.cs" />
+    <Compile Include="$(SmoSourceDir)\ExtendedPropertyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\extendedstoredprocedurebase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalDataSourceBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalFileFormatBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalLanguageBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalLanguageFileBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalLibraryBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalLibraryFileBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalResourcePoolAffinityInfo.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalResourcePoolBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalStreamBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalStreamingJobBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalModelBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExtensionClass.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\AvailabilityGroupState.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\DatabaseAdapter.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\DatabaseMaintenance.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\DatabasePerformance.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\DatabaseSecurity.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\MultiPartName.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\Name.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerAdapter.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerAudit.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerConfiguration.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerPerformance.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerSecurity.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerSelection.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerSetup.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\ServerSurfaceArea.cs" />
+    <Compile Include="$(SmoSourceDir)\Facets\SmartAdminState.cs" />
+    <Compile Include="$(SmoSourceDir)\FilePerObjectWriter.cs" />
+    <Compile Include="$(SmoSourceDir)\files.cs" />
+    <Compile Include="$(SmoSourceDir)\ForeignKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ForeignKeyColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\FullTextCatalogBase.cs" />
+    <Compile Include="$(SmoSourceDir)\FullTextIndexBase.cs" />
+    <Compile Include="$(SmoSourceDir)\FullTextIndexColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\FullTextServiceBase.cs" />
+    <Compile Include="$(SmoSourceDir)\FullTextStopListBase.cs" />
+    <Compile Include="$(SmoSourceDir)\FxCopExclusions.cs" />
+    <Compile Include="$(SmoSourceDir)\HttpProtocolBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IDatabaseOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\ILoginOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexedColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexedJsonPathBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexedXmlPathBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexedXmlPathNamespaceBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IndexScripter.cs" />
+    <Compile Include="$(SmoSourceDir)\InformationBase.cs" />
+    <Compile Include="$(SmoSourceDir)\IServerInformation.cs" />
+    <Compile Include="$(SmoSourceDir)\IServerSettings.cs" />
+    <Compile Include="$(SmoSourceDir)\ITableOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\IUserOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\IViewOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\JobBase.cs" />
+    <Compile Include="$(SmoSourceDir)\JobCategoryBase.cs" />
+    <Compile Include="$(SmoSourceDir)\JobScheduleBase.cs" />
+    <Compile Include="$(SmoSourceDir)\JobScheduleCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\JobServerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\JobStepBase.cs" />
+    <Compile Include="$(SmoSourceDir)\LanguageBase.cs" />
+    <Compile Include="$(SmoSourceDir)\LinkedServerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\LinkedServerLoginBase.cs" />
+    <Compile Include="$(SmoSourceDir)\LoginBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MailAccountBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MailProfileBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MailServerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MasterKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MessageCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MessageObjectBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MessageTypeBase.cs" />
+    <Compile Include="$(SmoSourceDir)\MessageTypeMappingBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ModuleSuppressions.cs" />
+    <Compile Include="$(SmoSourceDir)\NetCoreHelpers.cs" />
+    <Compile Include="$(SmoSourceDir)\NumaNodeBase.cs" />
+    <Compile Include="$(SmoSourceDir)\NumberedCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\NumberedStoredProcedureBase.cs" />
+    <Compile Include="$(SmoSourceDir)\OleDbProviderSettingsBase.cs" />
+    <Compile Include="$(SmoSourceDir)\OperatorBase.cs" />
+    <Compile Include="$(SmoSourceDir)\OperatorCategoryBase.cs" />
+    <Compile Include="$(SmoSourceDir)\orderColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ParamBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ParameterCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PartitionFunctionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PartitionFunctionParameterBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PartitionSchemeBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PartitionSchemeParameterBase.cs" />
+    <Compile Include="$(SmoSourceDir)\permissionInterfaces.cs" />
+    <Compile Include="$(SmoSourceDir)\permissionOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\permissionWorker.cs" />
+    <Compile Include="$(SmoSourceDir)\PhysicalPartitionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PhysicalPartitionCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PlanGuideBase.cs" />
+    <Compile Include="$(SmoSourceDir)\PlanGuideExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\properties.cs" />
+    <Compile Include="$(SmoSourceDir)\propertiesCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\propertiesMetadata.cs" />
+    <Compile Include="$(SmoSourceDir)\ProxyAccountBase.cs" />
+    <Compile Include="$(SmoSourceDir)\RemoteDataArchiveMigrationState.cs" />
+    <Compile Include="$(SmoSourceDir)\RemoteDataArchiveMigrationStatusReport.cs" />
+    <Compile Include="$(SmoSourceDir)\RemoteDatabaseMigrationStatistics.cs" />
+    <Compile Include="$(SmoSourceDir)\RemoteTableMigrationStatistics.cs" />
+    <Compile Include="$(SmoSourceDir)\RemoteServiceBindingBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ResourceGovernorBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ResourcePoolAffinityInfo.cs" />
+    <Compile Include="$(SmoSourceDir)\ResourcePoolBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ResumableIndexBase.cs" />
+    <Compile Include="$(SmoSourceDir)\RuleBase.cs" />
+    <Compile Include="$(SmoSourceDir)\QueryStoreEnums.cs" />
+    <Compile Include="$(SmoSourceDir)\QueryStoreOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\SchedulerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\Schemabase.cs" />
+    <Compile Include="$(SmoSourceDir)\SchemaCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptContainer.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptContainerFactory.cs" />
+    <Compile Include="$(SmoSourceDir)\Scripter.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptingInterfaces.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptingOptions.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptingPreferences.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptMaker.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptNameObjectBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptSchemaObjectBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptStringBuilder\IScriptStringBuilderParameter.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptStringBuilder\ScriptStringBuilder.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptStringBuilder\ScriptStringBuilderObjectParameter.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptStringBuilder\ScriptStringBuilderParameter.cs" />
+    <Compile Include="$(SmoSourceDir)\ScriptStringBuilder\ParameterValueFormat.cs" />
+    <Compile Include="$(SmoSourceDir)\script_patterns.cs" />
+    <Compile Include="$(SmoSourceDir)\SearchPropertyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SearchPropertyListBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SearchPropertyListConstants.cs" />
+    <Compile Include="$(SmoSourceDir)\SearchPropertyListExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\SearchPropertyListValidator.cs" />
+    <Compile Include="$(SmoSourceDir)\SecurityPolicyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SecurityPredicateBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SecurityPredicateCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SecurityUtils.cs" />
+    <Compile Include="$(SmoSourceDir)\Sequencebase.cs" />
+    <Compile Include="$(SmoSourceDir)\SequenceExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\SerializationAdapters.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerAuditSpecificationBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerAuditSpecificationExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerDdlTriggerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerEventsWorker.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerProxyAccountBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerRoleBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServerRoleExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceBrokerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceBrokerExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceBrokerPayloadBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceContractBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceContractMappingBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceMasterKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceQueueBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ServiceRouteBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SettingsBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SfcResolver.cs" />
+    <Compile Include="$(SmoSourceDir)\SingleFileWriterBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SingleFileWriter.cs" />
+    <Compile Include="$(SmoSourceDir)\SmartAdminBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoArrayList.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoComparer.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoDependencyDiscoverer.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoDependencyOrderer.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoDiffAdapters.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoObjectBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoObjectExtender.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoSet.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoSortedList.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoStringWriter.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoUrnFilter.cs" />
+    <Compile Include="$(SmoSourceDir)\SmoUtility.cs" />
+    <Compile Include="$(SmoSourceDir)\SoapMethodCollectionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SoapMethodObject.cs" />
+    <Compile Include="$(SmoSourceDir)\SoapPayloadBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SoapPayloadMethodBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SqlAssemblyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SqlAssemblyFileBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SqlMailBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SqlSmoObject.cs" />
+    <Compile Include="$(SmoSourceDir)\StatisticBase.cs" />
+    <Compile Include="$(SmoSourceDir)\StatisticColumnBase.cs" />
+    <Compile Include="$(SmoSourceDir)\storedprocedurebase.cs" />
+    <Compile Include="$(SmoSourceDir)\SymmetricKeyBase.cs" />
+    <Compile Include="$(SmoSourceDir)\Synonymbase.cs" />
+    <Compile Include="$(SmoSourceDir)\SystemDataTypeBase.cs" />
+    <Compile Include="$(SmoSourceDir)\SystemMessageBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TableBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TableViewBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TableViewTableTypeBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TargetServerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TargetServerGroupBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TcpProtocolBase.cs" />
+    <Compile Include="$(SmoSourceDir)\TraceHelper.cs" />
+    <Compile Include="$(SmoSourceDir)\TriggerBase.cs" />
+    <Compile Include="$(SmoSourceDir)\uddtbase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserDefinedAggregateBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserDefinedAggregateParameterBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserDefinedFunctionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserDefinedMessageBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserDefinedTableTypebase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserDefinedTypeBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserOptionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserPermission.cs" />
+    <Compile Include="$(SmoSourceDir)\UserPermissionBase.cs" />
+    <Compile Include="$(SmoSourceDir)\UserPermissionCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\VersionUtils.cs" />
+    <Compile Include="$(SmoSourceDir)\ViewBase.cs" />
+    <Compile Include="$(SmoSourceDir)\WorkloadGroupBase.cs" />
+    <Compile Include="$(SmoSourceDir)\WorkloadManagementWorkloadClassifierBase.cs" />
+    <Compile Include="$(SmoSourceDir)\WorkloadManagementWorkloadGroupBase.cs" />
+    <Compile Include="$(SmoSourceDir)\XmlSchemaCollectionBase.cs" />
+  </ItemGroup>
+  <ItemGroup Label="string resources">
+    <SqlStringResource Include="$(SmoSourceDir)\BrokerLocalizableResources.strings">
+        <logicalname>Microsoft.SqlServer.Management.Smo.Broker.BrokerLocalizableResources.resources</logicalname>
+    </SqlStringResource>
+    <SqlStringResource Include="$(SmoSourceDir)\ExceptionTemplatesImpl.strings" />
+    <SqlStringResource Include="$(SmoSourceDir)\FacetSR.strings" />
+    <SqlStringResource Include="$(SmoSourceDir)\LocalizableResources.strings" />
+    <None Include="..\..\..\..\..\docs\README.md" Link="README.md" />
+    <None Include="@(SqlStringResource)" />
+  </ItemGroup>
+  <ItemGroup>
+    <EventsFileName Include="ServerEvents.cs">
+      <ClassEnumTemplate>class_template</ClassEnumTemplate>
+      <EventEnumTemplate>smoevt_template</EventEnumTemplate>
+      <GenType>main</GenType>
+    </EventsFileName>
+  </ItemGroup>
+  <Import Project="$(BuildPropsDir)\DdlEvents.targets" />
+  <PropertyGroup>
+      <CodeGenPlatform Condition="'$(TargetGroup)' == 'netfx'">$(TargetFramework)</CodeGenPlatform>
+      <CodeGenPlatform Condition="'$(TargetGroup)' != 'netfx'">net8.0</CodeGenPlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(BrokerEnumSrc)\Microsoft.SqlServer.ServiceBrokerEnum.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
+    <ProjectReference Include="$(DmfCommonSrc)\Microsoft.SqlServer.Dmf.Common.csproj" />
+    <ProjectReference Include="$(CodeGenSrc)\SmoCodeGen.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SetTargetFramework>TargetFramework=$(CodeGenPlatform)</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="$(EnlistmentRoot)\src\CollectionGenerator\CollectionGenerator.csproj" OutputItemType="Analyzer">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+   <ItemGroup>
+     <CodeGenInput Include="$(SfcSrc)\Enumerator\*.cs" />
+     <CodeGenInput Include="$(SfcSrc)\Enumerator\*.strings" />
+     <CodeGenInput Include="$(SfcSrc)\Enumerator\xml\**\*.xml" />
+     <CodeGenInput Include="$(SqlEnumSrc)\xml\**\*.xml" />
+     <CodeGenInput Include="$(CodeGenSrc)\*" />
+     <Compile Include="@(CodeGen->'$(CodeGenOutputDir)\%(filename).cs')" />
+   </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
+      <Reference Include="System.Management" />
+  </ItemGroup>
+  <Target Name="RunCodeGen"
+    BeforeTargets="CoreResGen"
+    Condition="'$(BuildingInsideVisualStudio)'!='true' and '@(CodeGen)' != ''"
+    Inputs="$(MSBuildAllProjects);@(CodeGenInput)"
+    Outputs="@(CodeGen->'$(CodeGenOutputDir)\%(filename).cs')"
+    >
+      <PropertyGroup>
+        <CodeGenCmd Condition="'$(TargetGroup)' == 'netfx'">"$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.exe"</CodeGenCmd>
+        <CodeGenCmd Condition="'$(CodeGenCmd)' == ''">dotnet --roll-forward LatestMajor "$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.dll"</CodeGenCmd>
+      </PropertyGroup>
+      <Message Importance="high" Text="$(CodeGenCmd)  &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" />
+      <Exec Command="$(CodeGenCmd) &quot;$(SfcSrc)\Enumerator&quot; &quot;$(CodeGenSrc)\cfg.xml&quot; &quot;$(CodeGenSrc)\gen.xml&quot; &quot;$(CodeGenOutputDir)&quot;" />
+
+  </Target>
+</Project>

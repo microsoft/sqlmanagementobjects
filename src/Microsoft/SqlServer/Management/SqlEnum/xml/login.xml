@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<EnumObject type="Login" impl_type="SqlObject" min_major='10'   cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10' >
+			<property_link table='sys.server_principals AS log'>log.type in ('U', 'G', 'S', 'C', 'K', 'E', 'X') AND log.principal_id not between 101 and 255 AND log.name &lt;&gt; N'##MS_AgentSigningCertificate##'</property_link>
+			<property_link fields="#LanguageAlias#" left_join="sys.syslanguages AS l">l.name = log.default_language_name</property_link>
+			<property_link fields="#PasswordPolicyEnforced#PasswordExpirationEnabled#" 
+					left_join="sys.sql_logins" alias = 'sqllog'>sqllog.principal_id = log.principal_id</property_link>
+      <property_link fields="#DenyWindowsLogin#WindowsLoginAccessType#HasAccess#" left_join="sys.server_permissions AS sp">sp.grantee_principal_id = log.principal_id and sp.type = N'COSQ'</property_link>
+      <property_link fields="#Certificate#" left_join="master.sys.certificates AS cert">cert.sid = log.sid</property_link>
+      <property_link fields="#AsymmetricKey#" left_join="master.sys.asymmetric_keys AS ak">ak.sid = log.sid</property_link>
+      <property_link fields="#Credential#" left_join="sys.credentials AS c">c.credential_id = log.credential_id</property_link>
+    </version>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link table='tmp_logins AS sqllog'></property_link>
+      <property_link fields="#LanguageAlias#" left_join="sys.syslanguages AS l">l.name = sqllog.default_language_name</property_link>
+      <prefix>
+WITH tmp_logins AS 
+( 
+  SELECT 
+    sl.name collate catalog_default AS name,
+    sl.default_language_name collate catalog_default  AS default_language_name, 
+    sl.default_database_name collate catalog_default  AS default_database_name,
+    sl.type collate catalog_default AS type, 
+    sid, 
+    create_date, 
+    modify_date, 
+    principal_id, 
+    is_disabled,
+    is_policy_checked,
+    is_expiration_checked
+  FROM sys.sql_logins as sl
+UNION  
+  SELECT 
+    sp.name collate catalog_default AS name,
+    sp.default_language_name collate catalog_default AS default_language_name,
+    sp.default_database_name collate catalog_default AS default_database_name,
+    sp.type collate catalog_default AS type, 
+    sid, 
+    create_date, 
+    modify_date, 
+    principal_id, 
+    is_disabled,
+    0 AS is_policy_checked,
+    0 AS  is_expiration_checked
+  FROM sys.server_principals as sp
+  where (type ='X' or type='E') and principal_id >=256
+)
+      </prefix>
+    </version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<version min_major='10' >
+      <property name="Name" type="sysname">log.name</property>
+      <property name="Language" type="sysname">ISNULL(log.default_language_name,N'')</property>
+      <property name="LanguageAlias" type="sysname" access='Read'>l.alias</property>
+      <property name="DefaultDatabase" type="sysname">ISNULL(log.default_database_name, N'')</property>
+      <property name="DenyWindowsLogin" type="bit" cast='true'>CASE sp.state WHEN N'D' THEN 1 ELSE 0 END</property>
+      <property name="LoginType" type="int" report_type="LoginType" read_only_after_creation="true">CASE WHEN N'U' = log.type THEN 0 WHEN N'G' = log.type THEN 1 WHEN N'S' = log.type THEN 2 WHEN N'C' = log.type THEN 3 WHEN N'K' = log.type THEN 4  WHEN N'E' = log.type THEN 5 WHEN N'X' = log.type THEN 6 END</property>
+      <property name="WindowsLoginAccessType" type="int" report_type="WindowsLoginAccessType" access='Read'>CASE WHEN (N'U' != log.type AND N'G' != log.type) THEN 99 WHEN (sp.state is null) THEN 0 WHEN (N'G'=sp.state) THEN 1 ELSE 2 END</property>
+      <property name="HasAccess" type="bit" access='Read' cast='true'>CASE WHEN (sp.state is null) THEN 0 ELSE 1 END</property>
+      <property name="Sid" type="varbinary" size = "85" read_only_after_creation="true">log.sid</property>
+      <property name="CreateDate" type="datetime" access='Read'>log.create_date</property>
+      <property name="DateLastModified" type="datetime" access='Read'>log.modify_date</property>
+      <property name="IsLocked" type="bit" access='Read' cast='true'>LOGINPROPERTY(log.name, N'IsLocked')</property>
+      <property name="IsPasswordExpired" type="bit" access='Read' cast='true'>LOGINPROPERTY(log.name, N'IsExpired')</property>
+      <property name="MustChangePassword" type="bit" access='Read' cast='true'>LOGINPROPERTY(log.name, N'IsMustChange')</property>
+      <property name="ID" type="int" access='Read'>log.principal_id</property>
+      <property name="Credential" type="sysname">ISNULL(c.name,N'')</property>
+      <property name="Certificate" type="sysname" read_only_after_creation="true">ISNULL(cert.name,N'')</property>
+      <property name="AsymmetricKey" type="sysname" read_only_after_creation="true">ISNULL(ak.name,N'')</property>
+      <property name="IsDisabled" type="bit" access="Read">log.is_disabled</property>
+      
+
+      <!-- enable permissions -->
+      <property name="IsSystemObject" type="bit" cast='true' access='Read'>CASE WHEN log.principal_id &lt; 256 THEN 1 ELSE 0 END</property>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <!-- enable permissions -->
+      <property name="PermissionClass" type="int" hidden='true'>101</property>      
+      <property name="PasswordExpirationEnabled" type="bit" cast = "true">ISNULL(sqllog.is_expiration_checked, 0)</property>
+      <property name="PasswordPolicyEnforced" type="bit" cast = "true" >ISNULL(sqllog.is_policy_checked, 0)</property>
+    </version>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="Name" type="sysname">sqllog.name</property>
+      <property name="Language" type="sysname">ISNULL(sqllog.default_language_name,N'')</property>
+      <property name="LanguageAlias" type="sysname" access='Read' expensive="true">l.alias</property>
+      <property name="DefaultDatabase" type="sysname">ISNULL(sqllog.default_database_name, N'')</property>
+      <property name="LoginType" type="int" report_type="LoginType" read_only_after_creation="true">CASE WHEN N'S' = sqllog.type THEN 2 WHEN N'E' = sqllog.type THEN 5 WHEN N'X' = sqllog.type THEN 6 END</property>
+      <property name="Sid" type="varbinary" size = "85" read_only_after_creation="true">sqllog.sid</property>
+      <property name="CreateDate" type="datetime" access='Read'>sqllog.create_date</property>
+      <property name="DateLastModified" type="datetime" access='Read'>sqllog.modify_date</property>
+      <property name="ID" type="int" access='Read'>sqllog.principal_id</property>
+      <property name="IsDisabled" type="bit" access="Read" cast ="true">sqllog.is_disabled</property>
+      
+      <property name="IsSystemObject" type="bit" cast='true' access='Read'>0</property>
+    </version>
+    <version min_major='11'>
+      <property name="PasswordHashAlgorithm" type="int" access='Read' cast='true' report_type='PasswordHashAlgorithm'>
+        ISNULL(LOGINPROPERTY(log.name, N'PasswordHashAlgorithm'), 0)
+      </property>
+      <property name="SidHexString" type="nvarchar" size="256" access='Read'>
+        sys.fn_varbintohexsubstring(0,log.sid, 1, 0)
+      </property>
+    </version>
+		<version min_major='10' >
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>

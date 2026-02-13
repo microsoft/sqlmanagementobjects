@@ -1,0 +1,25 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpTargetservergroup' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='#tmp_sp_help_targetservergroup' alias='tsht'/>
+		<prefix>
+create table #tmp_sp_help_targetservergroup
+(servergroup_id int null, name nvarchar(128) null)
+insert into #tmp_sp_help_targetservergroup exec msdb..sp_help_targetservergroup
+		</prefix>
+		<postfix>
+drop table #tmp_sp_help_targetservergroup
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='nvarchar' size = '128'>tsht.name</property>		
+		<property name='ID' type='int'>tsht.servergroup_id</property>
+		
+		<property name="ParentUrn" type="nvarchar" size="600" hidden='true'>
+			<link_multiple no='1' expression="{0}" hidden = 'true'>
+				<link_field type='parent' field="Urn" />
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

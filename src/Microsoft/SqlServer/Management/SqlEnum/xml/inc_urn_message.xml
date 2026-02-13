@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_urn_message" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='4' expression="{0} + '/{1}[@ID=' + cast ({2} as nvarchar(20)) + ' and @Language=' + quotename({3},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field field="NType" />				
+				<link_field type='local' field="ID" />
+				<link_field type='local' field="Language" />
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

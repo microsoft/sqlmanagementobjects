@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalResourcePoolAffinityInfo" impl_type="SqlObject" min_major='13' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <property_link table="sys.resource_governor_external_resource_pools" alias= "[pls]"/>
+        <property_link join="[sys].[dm_os_memory_nodes] AS [mn]">
+                        [mn].[memory_node_id] &lt; (CASE WHEN @@version like '%(X64)%' THEN 64 ELSE 32 END)
+        </property_link>
+        <property_link left_join="[sys].[resource_governor_external_resource_pool_affinity] AS [plaff]">
+                        [pls].[external_pool_id] = [plaff].[external_pool_id]
+                        AND [mn].[processor_group] = [plaff].[processor_group]
+        </property_link>
+    </settings>
+    <properties>
+        <property name="PoolID" type="int" access="Read">[pls].[external_pool_id]</property>
+        <property name="CpuIds" type="bigint" access="Read">[mn].[cpu_affinity_mask]</property>
+        <property name="GroupID" type="int" access="Read">[mn].[processor_group]</property>
+        <property name="NumaNodeId" type="int" access="Read">[mn].[memory_node_id]</property>
+        <property name="AffinityType" type="int">
+            CASE WHEN [plaff].[external_pool_id] IS NULL
+            THEN 2 ELSE 1
+            END
+        </property>
+        <property name="CpuAffinityMask" type="bigint" access="Read">ISNULL([plaff].[cpu_mask], 0)</property>
+    </properties>
+</EnumObject>

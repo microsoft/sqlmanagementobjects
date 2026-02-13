@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  
+  <!-- Root element: namespaces -->
+  <xs:element name="namespaces">
+    <xs:annotation>
+      <xs:documentation>
+        Root element containing all namespace definitions for SMO code generation.
+        Defines the object model structure for SQL Server Management Objects.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="namespace" type="NamespaceType" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="min_ver" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum SQL Server major version supported.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="max_ver" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum SQL Server major version supported.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Namespace type -->
+  <xs:complexType name="NamespaceType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a .NET namespace containing SMO object class definitions.
+        Example: Microsoft.SqlServer.Management.Smo, Microsoft.SqlServer.Management.Smo.Broker
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="object" type="ObjectType" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The fully qualified .NET namespace name (e.g., "Microsoft.SqlServer.Management.Smo").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Object type -->
+  <xs:complexType name="ObjectType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a class in the SMO object model with its properties and collections.
+        CodeGen.exe processes these definitions to generate partial class files.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="additional_property_bag" type="AdditionalPropertyBagType"/>
+      <xs:element name="property" type="PropertyType"/>
+      <xs:element name="collection" type="CollectionType"/>
+    </xs:choice>
+    <xs:attribute name="class_name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the class being generated (e.g., "Table", "Database", "Index").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="collection_name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The parent class's name for the object collection containing instances of this object.
+          Typically the pluralization of the class name (e.g., "Tables", "Databases", "Indexes").
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="parent_type" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The type of the Parent property. If not defined, the Parent property will not be generated.
+          Example: "Server" for Database, "Database" for Table.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="urn" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The SFC (SQL Foundation Classes) URN skeleton for the object.
+          Defines the hierarchical path to this object type.
+          Example: "Server[@Name='']/Database/Table"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ctor_parent" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          If it exists and the value isn't AbstractCollectionBase, the "new" keyword is added to the Parent property signature (public new T Parent).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="new_on_get_parent" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, appends the "new" keyword to the Parent property declaration.
+          Same as ctor_parent but uses a boolean value.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="base_class" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The base class for the object. If not specified, uses the default base class for the object type.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="has_schema" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, sets the key (for collection lookups) to SchemaObjectKey(name, schema) and generates a constructor that takes a schema parameter.
+          If false (default), the key will be SimpleObjectKey.
+          Should be true if the object is schema-owned (e.g., Table, View, StoredProcedure).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="has_constructors" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether the basic constructors are public (default true).
+          Set to false for singleton objects or objects with custom constructor logic.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="implements" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The list of interfaces that this class implements (comma delimited).
+          Common interfaces: IObjectPermission (if the object is a securable), IColumnPermission (for column-level permissions).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sealed" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether the class has the "sealed" keyword (default true).
+          Set to false if the class is designed to be inherited from.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="gen_body" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Uses gen.xml to insert commonly-used code snippets with minor differences.
+          Format: "attrib1,body1;attrib2,body2;..."
+          
+          For IObjectPermission objects, must contain "obj1,1;obj2,1;enobj,2" to generate permission accessors (deny/grant/revoke methods).
+          
+          Each set contains an attribute ID (mapping to gen.xml attributes) and body ID (mapping to gen.xml body templates).
+          The attribute defines variables used to fill in the body template.
+          
+          Example: "obj1,1;obj2,1;enobj,2;table,server_events"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="has_new" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>Flag for code generation behavior (see gen.xml for details).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="singleton" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, this object is a singleton (only one instance exists per parent).
+          Examples: DatabaseOptions, FullTextService, Information.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="parent_has_setter" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>If true, the Parent property will have a setter in addition to a getter.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="is_design_mode" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Set to true to allow your object to participate in DesignMode.
+          Such objects can be unit tested with an offline connection.
+          Most objects should have this set to true.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="parent_mode" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the mode(s) in which the parent is available.
+          Possible values include "Design", "Deploy", "Design;Deploy".
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="possible_parents" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Semicolon-delimited list of possible parent types for objects that can belong to multiple parent types.
+          Example: "Table;View" for Column, "Table;UserDefinedTableType;UserDefinedFunction" for Check.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="support_xschema" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>Whether this object supports extended schema metadata operations.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="gen_metadata" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, generates XSchemaProps and XRuntimeProps metadata classes for this object.
+          Controls whether is_intrinsic attribute on properties matters.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="remove_name" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>If true, removes the Name property from the generated class.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="init_defaults" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether to initialize default values for properties during object construction.
+          When true, properties with default values will be set during object initialization.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Property type -->
+  <xs:complexType name="PropertyType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a property within a class definition.
+        CodeGen.exe processes these to generate property declarations in the partial class files.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the property (e.g., "Name", "ID", "Collation").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="generate" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Controls whether the property is automatically generated by CodeGen.exe.
+          If false, you must define the property in a partial class (usually in SMO\Main\src).
+          Default: true
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="is_intrinsic" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Controls whether the property belongs to XSchemaProps (true) or XRuntimeProps (false) class.
+          Only matters if the object's gen_metadata attribute is true.
+          
+          Intrinsic properties are prefetched in batch queries (via GetScriptFields() and stored in XSchemaProps).
+          Non-intrinsic properties are fetched on-demand (stored in XRuntimeProps).
+          
+          Mark as true if the property is commonly needed for scripting and should be batched during enumeration.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dmf_ignore" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, this property is ignored by DMF (Declarative Management Framework) facets.
+          Use when a property should not be exposed in policy-based management.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="default" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The default value returned when GetPropertyDefaultValue is called.
+          Used when the object is in Creating state or in Design mode.
+          Will also add the default value to the SfcProperty attribute.
+          
+          Example: default="SQL_Latin1_General_CP1_CI_AS" for Database.Collation
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="suppress_sfc_attribute" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>If true, suppresses writing the SFC (SQL Foundation Classes) attributes for this property.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reference_type" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The type of the referenced object for SfcReference attribute generation.
+          Used when this property references another object but isn't an instance of that object (e.g., property is just a name).
+          
+          Example: reference_type="ExternalFileFormat" for Table.FileFormatName property.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reference_template" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The URN template for constructing a link to the referenced object during SFC serialization.
+          Uses {0}, {1}, etc. as placeholders that are filled from reference_template_parameters.
+          
+          Example: "Server[@Name = '{0}']/Database[@Name = '{1}']/ExternalFileFormat[@Name='{2}']"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reference_template_parameters" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Comma-separated list of property paths evaluated using reflection to fill reference_template placeholders.
+          Properties are evaluated as properties of the current object.
+          
+          Example: "Parent.Parent.ConnectionContext.TrueName,Parent.Name,FileFormatName"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="required" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, this property is required and must be set during object creation or configuration.
+          Typically used for properties that are essential for the object's identity or basic functionality.
+          
+          Example: Identity property on Credential, DllPath on CryptographicProvider.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The .NET type of the property.
+          Can be a primitive type (e.g., "System.String", "System.Int32", "System.Boolean") or a complex type.
+          If not specified, the type is inferred from metadata or defaults to appropriate type based on context.
+          
+          Example: type="System.String", type="System.Boolean", type="Microsoft.SqlServer.Management.Smo.Wmi.ServiceState"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="readonly" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, the property is read-only and does not have a setter.
+          Read-only properties can only be queried, not modified.
+          
+          Example: readonly="true" for ID properties, system-calculated values, or metadata properties.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expensive" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, indicates that retrieving this property requires an expensive operation such as a separate query or significant computation.
+          Expensive properties are typically fetched individually on-demand rather than being batched with other properties.
+          Used to optimize performance by avoiding unnecessary expensive operations when the property isn't needed.
+          
+          Example: Properties that require complex joins, aggregations, or large data retrieval operations.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Collection type -->
+  <xs:complexType name="CollectionType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a child collection property on the parent object.
+        Indicates that this object type can contain a collection of the specified element type.
+        
+        Example: A Database object has collections of Tables, Views, StoredProcedures, etc.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="element_type" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The type of elements in the collection (e.g., "Table", "Column", "Index").
+          Must correspond to a class_name defined elsewhere in the configuration.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Additional property bag type -->
+  <xs:complexType name="AdditionalPropertyBagType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines an additional property bag for an object that provides access to advanced or extended properties.
+        Used to group related properties that are queried from a separate URN or have special access patterns.
+        
+        Example: Service object has an additional_property_bag for ServiceAdvancedProperty which provides advanced configuration properties.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="property" type="PropertyType" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="urn" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The SFC URN for the additional property bag.
+          Defines the path used to query these extended properties.
+          
+          Example: "ManagedComputer[@Name='']/ServiceAdvancedProperty"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="suffix" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The suffix appended to property accessor names in the property bag.
+          
+          Example: suffix="Advanced" creates an "Advanced" property bag accessor.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+</xs:schema>

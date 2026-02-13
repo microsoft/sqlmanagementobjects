@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<EnumObject type="Text" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings main_table="dbo.syscomments c">
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+			<link local="Number" parent="ParentNumber" />
+		</parent_link>
+	</settings>
+	<properties>
+		<property name="ID" type="smallint">c.colid</property>
+		<property name="Number" type="int">case when c.number > 1 then c.number else 0 end</property>
+		<property name="Text" type="varchar" size='8000' access="Read">c.text</property>
+		<property name="ObjectIdentifier" type="nvarchar" size='300' 
+			access="Read">cast(c.id as nvarchar(20)) + N'_' + cast(db_id() as nvarchar(20)) + N'_' + cast(case when c.number > 1 then c.number else 0 end as nvarchar(20))</property>
+		<property name="ParentID" type="int" hidden='true'>c.id</property>
+	</properties>
+</EnumObject>

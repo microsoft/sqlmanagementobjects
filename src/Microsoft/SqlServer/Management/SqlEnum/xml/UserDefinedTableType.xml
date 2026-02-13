@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<EnumObject type="UserDefinedTableType" impl_type="SqlObject" min_major='10' cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table="sys.table_types AS tt" />
+		<property_link fields='#CreateDate#DateLastModified#ParentID#' left_join="sys.objects AS obj">obj.object_id = tt.type_table_object_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn_schema.xml' />
+    <include file='inc_type_reference.xml' alias='tt' for='#Owner#IsSchemaOwned#' />
+		<property name="Name" type="sysname" mode="design">tt.name</property>
+		<property name="ID" type="int" access='Read'>tt.type_table_object_id</property>
+		<property name="Schema" type="sysname" mode="design">SCHEMA_NAME(tt.schema_id)</property>
+		<property name="CreateDate" type="datetime" access='Read'>obj.create_date</property>
+		<property name="DateLastModified" type="datetime" access='Read'>obj.modify_date</property>
+		<property name="ParentID" type="int" hidden='true'>obj.parent_object_id</property>
+		<property name="MaxLength" type="smallint" access="Read">tt.max_length</property>
+		<property name="Nullable" type="bit" read_only_after_creation="true">tt.is_nullable</property>
+		<property name="Collation" type="sysname" access="Read">ISNULL(tt.collation_name, N'')</property>
+		<property name="IsUserDefined" type="bit" cast='true' read_only_after_creation="true" mode="design">case when tt.is_user_defined = 1 then 1 else 0 end</property>
+		<!-- extended properties support -->
+		<property name="ExtPropClass" type="int" hidden='true'>6</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>tt.user_type_id</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+		<property name="ExtPropClassforColumn" type="int" hidden='true'>8</property>
+		<property name="ExtPropMajorIDforColumn" type="int" hidden='true'>tt.user_type_id</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+    
+    <!-- Hekaton properties -->        
+    <version min_major='12' cloud_min_major='12'>        
+        <property name="IsMemoryOptimized" type="bit" cast="true" read_only_after_creation="true">tt.is_memory_optimized</property>
+    </version>
+  </properties>
+</EnumObject>

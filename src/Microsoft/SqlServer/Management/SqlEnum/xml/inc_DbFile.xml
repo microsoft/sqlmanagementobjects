@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<EnumObject type="DbFile" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major="10" min_minor='50'>
+		<post_process fields='#VolumeFreeSpace#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessFileProperties'
+				triggered_fields='#DatabaseName2#FileId2#'/>
+	</version>
+  </settings>
+	<properties>
+		<version min_major='10'>
+			<property name="Name" type="nvarchar" size="256">s.name</property>
+			<property name="ID" type="int">s.file_id</property>
+      <property name="MaxSize" type="float">CASE when s.max_size=-1 then -1 else s.max_size * CONVERT(float,8) END</property>
+      <property name="Growth" type="float" cast='true'>CASE s.is_percent_growth WHEN 1 THEN s.growth ELSE s.growth*CONVERT(float,8) END</property>
+      <property name="IsReadOnlyMedia" type="bit" access = 'Read'>s.is_media_read_only</property>
+      <property name="IsReadOnly" type="bit" access = 'Read'>s.is_read_only</property>
+      <property name="IsOffline" type="bit" access = 'Read' cast = 'true'>case s.state when 6 then 1 else 0 end</property>
+      <property name="IsSparse" type="bit" access = 'Read'>s.is_sparse</property>
+      <property name="GroupID" type="int" access='Read' hidden = 'true'>s.data_space_id</property>
+        </version>
+
+        <version min_major='10' min_minor='50'>
+          <property name ="VolumeFreeSpace" type ="bigint" access="Read" expensive='true'>null</property>
+          <property name="DatabaseName2" type="nvarchar" size="520" hidden="true">db_name()</property>
+          <property name="FileId2" type="int" hidden="true">s.file_id</property>
+        </version>
+
+    <version min_major='10'>
+      <property name="FileName" type="nvarchar" size="520" read_only_after_creation="true">s.physical_name</property>
+      <property name="Size" type="float">s.size * CONVERT(float,8)</property>
+      <property name="NumberOfDiskReads" type="bigint" access = 'Read' expensive='true'>ISNULL(fs.num_of_reads, 0)</property>
+      <property name="NumberOfDiskWrites" type="bigint" access = 'Read' expensive='true'>ISNULL(fs.num_of_writes, 0)</property>
+      <property name="BytesReadFromDisk" type="bigint" access = 'Read' expensive='true'>ISNULL(fs.num_of_bytes_read, 0)</property>
+      <property name="BytesWrittenToDisk" type="bigint" access = 'Read' expensive='true'>ISNULL(fs.num_of_bytes_written, 0)</property>
+    </version>
+    <version min_major='10'>
+			<property name="GrowthType" type="int" report_type='FileGrowthType' cast='true'>CASE when s.growth=0 THEN (CASE WHEN s.type = 2 THEN 0 ELSE 99 END) ELSE s.is_percent_growth END</property>
+		</version>
+    <version min_major='11'>
+      <!--Name2, GroupID2, Size2 will be consumed in File.xml's postprocess PostProcessFile-->
+      <property name="Name2" type="nvarchar" size="256" hidden = 'true'>s.name</property>
+      <property name="GroupID2" type="int" access='Read' hidden = 'true'>s.data_space_id</property>
+      <property name="Size2" type="float" hidden = 'true'>s.size * CONVERT(float,8)</property>
+      <property name="FileDatabaseName" type="nvarchar" size="520" hidden="true">db_name()</property>
+    </version>
+	</properties>
+</EnumObject>

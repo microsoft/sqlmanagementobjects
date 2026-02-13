@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<EnumObject type="Collation" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10'  cloud_min_major='10'>
+			<property_link table = 'sys.fn_helpcollations() cl'/>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">cl.name</property>
+		<property name="CodePage" type="int" cast='true'>COLLATIONPROPERTY(name, 'CodePage')</property>
+		<property name="LocaleID" type="int" cast='true'>COLLATIONPROPERTY(name, 'LCID')</property>
+		<property name="ComparisonStyle" type="int" cast='true'>COLLATIONPROPERTY(name, 'ComparisonStyle')</property>
+		<property name="Description" type="nvarchar" size='1000'>cl.description</property>
+
+		<version min_major='10'  cloud_min_major='10'>
+				  <property name="CollationVersion" type="int" report_type="CollationVersion" cast='true'>COLLATIONPROPERTY(name, 'Version')</property>
+		</version>
+	</properties>
+</EnumObject>
+ 

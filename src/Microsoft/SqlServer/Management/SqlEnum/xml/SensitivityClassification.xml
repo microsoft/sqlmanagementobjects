@@ -1,0 +1,99 @@
+<?xml version="1.0" ?>
+<EnumObject type="SensitivityClassification" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings distinct='true'>
+
+    <!--Sensitivity CLassifications are a part of the Extended properties.-->
+    <version min_major='10' max_major='14'>
+      <property_link table='#tmp_classified_columns' alias='clmns' />
+    </version>
+
+    <!--Sensitivity CLassifications are a part of the Column Properties.-->
+    <version min_major='15' cloud_min_major='12'>
+      <property_link table='sys.sensitivity_classifications AS sc' />
+      <property_link left_join='sys.all_columns AS clmns'>sc.major_id = clmns.object_id and sc.minor_id = clmns.column_id</property_link>
+      <property_link left_join='sys.objects as objs'>objs.object_id = clmns.object_id</property_link>
+      <property_link left_join='sys.schemas as s'>s.schema_id = objs.schema_id</property_link>
+    </version>
+
+    <!--Sensitivity CLassifications are a part of the Extended properties, but these versions do not have temporal tables.-->
+    <version min_major='10' max_major='12'>
+      <prefix>
+        SELECT  s.name AS schema_name,
+                t.name AS table_name,
+                c.name AS column_name,
+                EP1.value AS information_type_name,
+                EP2.value AS information_type_id,
+                EP3.value AS sensitivity_label_name,
+                EP4.value AS sensitivity_label_id,
+                sensitivity_rank = NULL
+        INTO #tmp_classified_columns
+        FROM sys.columns c
+        LEFT JOIN sys.tables t ON t.object_id = c.object_id
+        LEFT JOIN sys.schemas s ON s.schema_id = t.schema_id
+        LEFT JOIN sys.extended_properties EP1 ON c.object_id = EP1.major_id AND c.column_id = EP1.minor_id and EP1.name = 'sys_information_type_name'
+        LEFT JOIN sys.extended_properties EP2 ON c.object_id = EP2.major_id AND c.column_id = EP2.minor_id and EP2.name = 'sys_information_type_id'
+        LEFT JOIN sys.extended_properties EP3 ON c.object_id = EP3.major_id AND c.column_id = EP3.minor_id and EP3.name = 'sys_sensitivity_label_name'
+        LEFT JOIN sys.extended_properties EP4 ON c.object_id = EP4.major_id AND c.column_id = EP4.minor_id and EP4.name = 'sys_sensitivity_label_id'
+        WHERE (EP1.value IS NOT NULL OR EP2.value IS NOT NULL OR EP3.value IS NOT NULL OR EP4.value IS NOT NULL)
+      </prefix>
+    </version>
+
+    <!--Sensitivity CLassifications are a part of the Extended properties and we need to exclude temporal tables.-->
+    <version min_major='13' max_major='14'>
+      <prefix>
+        SELECT  s.name AS schema_name,
+                t.name AS table_name,
+                c.name AS column_name,
+                EP1.value AS information_type_name,
+                EP2.value AS information_type_id,
+                EP3.value AS sensitivity_label_name,
+                EP4.value AS sensitivity_label_id,
+                sensitivity_rank = NULL
+        INTO #tmp_classified_columns
+        FROM sys.columns c
+        LEFT JOIN sys.tables t ON t.object_id = c.object_id
+        LEFT JOIN sys.schemas s ON s.schema_id = t.schema_id
+        LEFT JOIN sys.extended_properties EP1 ON c.object_id = EP1.major_id AND c.column_id = EP1.minor_id and EP1.name = 'sys_information_type_name'
+        LEFT JOIN sys.extended_properties EP2 ON c.object_id = EP2.major_id AND c.column_id = EP2.minor_id and EP2.name = 'sys_information_type_id'
+        LEFT JOIN sys.extended_properties EP3 ON c.object_id = EP3.major_id AND c.column_id = EP3.minor_id and EP3.name = 'sys_sensitivity_label_name'
+        LEFT JOIN sys.extended_properties EP4 ON c.object_id = EP4.major_id AND c.column_id = EP4.minor_id and EP4.name = 'sys_sensitivity_label_id'
+        WHERE (EP1.value IS NOT NULL OR EP2.value IS NOT NULL OR EP3.value IS NOT NULL OR EP4.value IS NOT NULL) AND t.temporal_type != 1
+      </prefix>
+    </version>
+
+    <version min_major='10' max_major='14'>
+      <postfix>
+        DROP TABLE #tmp_classified_columns
+      </postfix>
+    </version>
+
+  </settings>
+  
+  
+  <properties>
+    <include file='inc_urn.xml' />
+      
+    <version min_major='10' max_major='14'>
+      <property name="Name" type="nvarchar" size="386" access="Read">clmns.schema_name + '.' + clmns.table_name + '.' + clmns.column_name</property>
+      <property name='ReferencedColumn' type='sysname' access='Read'>clmns.column_name</property>
+      <property name='ReferencedTable' type='sysname' access='Read'>clmns.table_name</property>
+      <property name='ReferencedTableSchema' type='sysname' access='Read'>clmns.schema_name</property>
+      <property name="SensitivityLabelName" type="sysname" access='Read'>ISNULL(clmns.sensitivity_label_name, N'')</property>
+      <property name="SensitivityLabelId" type="sysname" access='Read'>ISNULL(clmns.sensitivity_label_id, N'')</property>
+      <property name="SensitivityInformationTypeName" type="sysname" access='Read'>ISNULL(clmns.information_type_name, N'')</property>
+      <property name="SensitivityInformationTypeId" type="sysname" access='Read'>ISNULL(clmns.information_type_id, N'')</property>
+    </version>
+
+    <version min_major='15' cloud_min_major='12'>
+      <property name="Name" type="nvarchar" size="386" access="Read">s.name + '.' + objs.name + '.' + clmns.name</property>
+      <property name='ReferencedColumn' type='sysname' access='Read'>clmns.name</property>
+      <property name='ReferencedTable' type='sysname' access='Read'>objs.name</property>
+      <property name='ReferencedTableSchema' type='sysname' access='Read'>s.name</property>
+      <property name="SensitivityLabelName" type="sysname" access='Read'>ISNULL(sc.label, N'')</property>
+      <property name="SensitivityLabelId" type="sysname" access='Read'>ISNULL(sc.label_id, N'')</property>
+      <property name="SensitivityInformationTypeName" type="sysname" access='Read'>ISNULL(sc.information_type, N'')</property>
+      <property name="SensitivityInformationTypeId" type="sysname" access='Read'>ISNULL(sc.information_type_id, N'')</property>
+      <property name="SensitivityRank" type="int" access='Read' report_type="SensitivityRank">ISNULL(sc.rank, -1)</property>
+    </version>
+  </properties>
+</EnumObject>

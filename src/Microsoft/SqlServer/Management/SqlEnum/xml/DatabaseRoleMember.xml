@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<EnumObject type="Member" impl_type="SqlObject" min_major='10' cloud_min_major="10" datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent='ID' local='RoleID' />
+    </parent_link>
+    <request_parent_select>
+      <field name='ID' />
+    </request_parent_select>
+    <version min_major='10' cloud_min_major="10" datawarehouse_enabled='true'>
+      <property_link table='#tmp_role_member_ids AS m' />
+      <property_link join='sys.database_principals AS u'>u.principal_id = m.id</property_link>
+      <prefix>
+        <!--
+        For below sql statements we need to replace @@ROWCOUNT since it's not currently supported by Azure
+        SQL DW database. Here we use @@ROWCOUNT mainly to count if there's any rows being inserted into the
+        temporary table in each iteration, if no insertions found, then end the while loop. According to
+        this, we can rewrite @@ROWCOUNT by recording temp table row count for both before and after each
+        insertion, and use the difference of these 2 row counts to represent number of rows being inserted.
+        -->
+        <link_multiple no='1' expression="
+set NOCOUNT OFF
+CREATE TABLE #tmp_role_member_ids (id int not null, role_id int null, sub_role_id int null, generation int null)
+declare @generation int
+set @generation = 0
+INSERT INTO #tmp_role_member_ids (id) {0}
+UPDATE #tmp_role_member_ids SET role_id = id, sub_role_id = id, generation=@generation
+declare @row_count_previous int
+declare @row_count_current int
+set @row_count_previous = (SELECT COUNT(*) FROM #tmp_role_member_ids)
+WHILE ( 1=1 )
+BEGIN
+  INSERT INTO #tmp_role_member_ids (id, role_id, sub_role_id, generation)
+    SELECT a.member_principal_id, b.role_id, a.role_principal_id, @generation + 1
+      FROM sys.database_role_members AS a INNER JOIN #tmp_role_member_ids AS b
+      ON a.role_principal_id = b.id
+      WHERE b.generation = @generation
+  set @row_count_current = (SELECT COUNT(*) FROM #tmp_role_member_ids)
+  if @row_count_current - @row_count_previous &lt;= 0
+    break
+  set @generation = @generation + 1
+  set @row_count_previous = @row_count_current
+END
+DELETE #tmp_role_member_ids WHERE id in ({0})
+UPDATE #tmp_role_member_ids SET generation = 0;
+INSERT INTO #tmp_role_member_ids (id, role_id, generation)
+    SELECT distinct id, role_id, 1 FROM #tmp_role_member_ids
+DELETE #tmp_role_member_ids WHERE generation = 0
+">
+          <link_field field="ParentSelect" />
+        </link_multiple>
+      </prefix>
+      <postfix>
+        drop table #tmp_role_member_ids
+      </postfix>
+    </version>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="{0} + '/' + {1}+ '[@Name=' + quotename({2},'''') + ']'">
+        <link_field type='parent' field="DatabaseUrn" />
+        <link_field type='local' field="MemberType" />
+        <link_field type='local' field="Name" />
+      </link_multiple>
+    </property>
+    <property name="Name" type="sysname">u.name</property>
+    <version min_major='10' cloud_min_major="10" datawarehouse_enabled='true'>
+      <property name="ID" type="int">u.principal_id</property>
+      <property name="MemberType" type="sysname" hidden='true'>
+        (CASE u.type
+        WHEN 'A' THEN N'ApplicationRole'
+        WHEN 'R' THEN N'Role'
+        ELSE N'User' END)
+      </property>
+      <property name="RoleID" type="sysname" hidden='true'>m.role_id</property>
+    </version>
+    <version min_major='10'>
+      <property name="Login" type="sysname">suser_sname(u.sid)</property>
+    </version>
+    <version cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Login" type="sysname">0</property>
+    </version>
+  </properties>
+</EnumObject>

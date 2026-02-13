@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="HttpEndpoint" impl_type="SqlObject" min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="EndpointID" local="EndpointID" />
+		</parent_link>
+		<property_link table='sys.endpoint_webmethods AS ewm' />
+	</settings>
+	<properties>
+		<include file='inc_urn_soapmethod.xml' />
+		<property name="Name" type="sysname">ewm.method_alias</property>
+		<property name="Namespace" type="nvarchar" size="384">ISNULL(ewm.namespace,'')</property>
+		<property name="ResultFormat" type="int" cast="true" report_type="ResultFormat" >ewm.result_format</property>		
+		<property name="SqlMethod" type="nvarchar" size="776" access = "Read">ewm.object_name</property>
+		<property name="MethodXsdSchemaOption" type="int" cast="true" report_type="MethodXsdSchemaOption" >ewm.result_schema</property>
+		<property name="EndpointID" type="int" hidden="true">ewm.endpoint_id</property>			
+		<property name="MethodLoginType" type="int" cast="true" report_type="MethodLoginType">case upper(se.login_type) when 'WINDOWS' then 2 else 1 end</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when ewm.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>
+

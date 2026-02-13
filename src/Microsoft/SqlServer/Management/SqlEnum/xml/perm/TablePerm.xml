@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<include file='ShilohYukonPerm.xml' />
+		<version min_major = '7' max_major = '8'>
+			<property_link table = 'master.dbo.spt_values a'>
+				(( prmssn.action in (193, 197) and ((prmssn.columns &amp; 1) = 1) ) or ( prmssn.action in (195, 196, 224, 26) ))
+				and (convert(tinyint, substring( isnull(prmssn.columns, 0x01), a.low, 1)) &amp; a.high != 0)
+				and a.type = N'P'
+				and a.number = 0
+			</property_link>
+		</version>
+		<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+			<property_link>prmssn.minor_id = 0</property_link>
+		</version>
+	</settings>
+	<properties>
+		<property name="Dummy" type="nvarchar" size="300" hidden='true'/>
+	</properties>
+</EnumObject>

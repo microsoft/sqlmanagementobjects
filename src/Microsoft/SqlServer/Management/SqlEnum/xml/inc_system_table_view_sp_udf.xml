@@ -1,0 +1,34 @@
+<?xml version="1.0"  encoding="us-ascii" ?>
+<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+   </settings>
+  <properties>
+    <version min_major='10' cloud_min_major='12'>
+      <property name="IsSystemObject" type="bit" access='Read' cast = 'true'>
+ case 
+    when {0}.is_ms_shipped = 1 then 1
+    when exists (
+        select 
+            1
+        from 
+            sys.extended_properties 
+        where 
+            major_id = {0}.object_id and 
+            minor_id = 0 and 
+            class = 1 and 
+            name = N'microsoft_database_tools_support') 
+        then 1
+    else 0
+end          
+            </property>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property name="IsSystemObject" type="bit" access='Read' cast = 'true'>
+        case
+          when {0}.is_ms_shipped = 1 then 1
+          else 0
+        end
+      </property>
+    </version>
+  </properties>
+</EnumObject>

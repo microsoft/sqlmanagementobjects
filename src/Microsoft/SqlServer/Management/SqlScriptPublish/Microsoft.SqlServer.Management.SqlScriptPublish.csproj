@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.SqlScriptPublish</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <SqlStringResource Include="SR.strings" />
+    <SqlStringResource Include="SqlScriptOptionsSR.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(NotebookSrc)\Microsoft.SqlServer.Smo.Notebook.csproj" />
+  </ItemGroup>
+    <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SqlScriptPublishTests" Key="$(RealPublicKey)"/>
+	</ItemGroup>
+</Project>

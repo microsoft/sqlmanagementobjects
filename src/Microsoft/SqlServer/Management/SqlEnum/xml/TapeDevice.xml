@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<EnumObject type="TapeDevice" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings main_table="#tpdv">
+		<prefix>create table #tpdv ( Name nvarchar(512) NOT NULL) 
+			insert #tpdv (Name) EXECUTE master.dbo.xp_get_tape_devices
+		</prefix>
+		<postfix> drop table #tpdv</postfix>
+	</settings>
+	<properties>
+		<property name="Name" type="nvarchar" size='512' access="Read">Name</property>
+	</properties>
+</EnumObject>

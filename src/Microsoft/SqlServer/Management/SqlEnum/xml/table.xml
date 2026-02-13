@@ -1,0 +1,542 @@
+<?xml version="1.0" ?>
+<EnumObject type="Table" impl_type="SqlObject" min_major='10' cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
+      <property_link table="sys.tables AS tbl" />
+    </version>
+    <version min_major='10' max_major='11' cloud_min_major='10' cloud_max_major='11'>
+      <property_link fields='#DataSpaceID#HasClusteredIndex#HasPrimaryClusteredIndex#IndexID#IndexIDForPartition#FileStreamFileGroup#FileStreamPartitionScheme#DistributionPolicy#' join="sys.indexes AS idx">
+        idx.object_id = tbl.object_id and (idx.index_id &lt; &lt;msparam&gt;2&lt;/msparam&gt;)
+      </property_link>
+    </version>
+    <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
+      <!--For an index of Hekaton table, index_id is different-->
+      <!--The index_id selected below for memory optimized tables is either the clustered index in the HKCS case or the index with the smallest id.
+          This is because tables that are memory optimized will always have an index, but if the table has a clustered index we need to populate the
+          'HasClusteredIndex' and 'HasClusteredColumnStoreIndex' properties correctly.-->
+      <property_link fields='#DataSpaceID#HasClusteredIndex#HasPrimaryClusteredIndex#IndexID#IndexIDForPartition#FileStreamFileGroup#FileStreamPartitionScheme#DistributionPolicy#HasClusteredColumnStoreIndex#HasHeapIndex#' join="sys.indexes AS idx">
+        idx.object_id = tbl.object_id and (idx.index_id &lt; &lt;msparam&gt;2&lt;/msparam&gt;  or (tbl.is_memory_optimized = 1 and idx.index_id = (select min(index_id) from sys.indexes where object_id = tbl.object_id)))
+      </property_link>
+    </version>
+    <!--Polybase and GQ external tables are available using sys.external_tables -->
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link
+          fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#'
+          left_join='#external_data AS edt'>edt.object_id = tbl.object_id</property_link>
+    </version>
+    <!-- ShardingColumnName has to join on sys.columns AFTER #external_data because this join references edt -->
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields='#ShardingColumnName#' left_join='sys.columns AS sc'>sc.object_id = tbl.object_id AND sc.column_id = edt.sharding_col_id</property_link>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property_link fields='#RejectedRowLocation#' left_join="sys.external_tables as et">et.object_id = tbl.object_id</property_link>
+      <property_link fields='#DwTableDistribution#' left_join="sys.pdw_table_distribution_properties as tdp">tdp.object_id = tbl.object_id</property_link>
+    </version>
+    <version min_major='13' cloud_min_major='12'>
+      <!-- Temporal Tables -->
+      <property_link fields='#HasSystemTimePeriod#SystemTimePeriodStartColumn#SystemTimePeriodEndColumn# ' left_join='sys.periods as periods'>periods.object_id = tbl.object_id</property_link>
+      <property_link fields='#HistoryTableName#HistoryTableSchema#HistoryTableID#' left_join='sys.tables as historyTable'>historyTable.object_id = tbl.history_table_id</property_link>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields='#TextFileGroup#' left_join='sys.data_spaces AS dstext '>tbl.lob_data_space_id = dstext.data_space_id</property_link>
+    </version>
+    <!-- Change Tracking Properties for Table info is available in sys.change_tracking_tables-->
+    <version min_major='10' cloud_min_major='12'>
+      <property_link fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'
+        left_join="#change_tracking_tables AS ctt">ctt.object_id = tbl.object_id </property_link>
+    </version>
+    <version min_major='11'>
+      <property_link fields = 'FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'
+        left_join='#file_tables AS ft'>ft.object_id = tbl.object_id</property_link>
+    </version>
+    <version min_major='15'>
+      <property_link fields='#DataRetentionPeriod#DataRetentionPeriodUnit#DataRetentionEnabled#DataRetentionFilterColumnName#'
+        left_join='#temp_data_retention_table_property AS dr_tbl'>
+        dr_tbl.object_id = tbl.object_id
+      </property_link>
+    </version>
+    <version min_major='16' cloud_min_major='12'>
+      <property_link fields='#LedgerViewName#LedgerViewSchema#' left_join="#tmp_ledger_details AS ledgertbl">ledgertbl.table_object_id = tbl.object_id</property_link>
+      <property_link fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#' left_join="#tmp_ledger_view_column_names AS ledgerviewcoltbl">ledgerviewcoltbl.table_object_id = tbl.object_id</property_link>
+    </version>
+    <version min_major='10' cloud_min_major='12'>
+        <prefix fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'>
+            create table #change_tracking_tables
+            (object_id int not null primary key, is_track_columns_updated_on bit null)
+            insert into #change_tracking_tables
+            select t.object_id, c.is_track_columns_updated_on
+            from sys.tables t
+            inner join sys.change_tracking_tables as c on c.object_id = t.object_id
+        </prefix>
+    </version>
+    <version min_major="11">
+        <prefix fields='FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'>
+            CREATE TABLE #file_tables
+            (object_id int not null primary key, is_enabled bit null, directory_name nvarchar(256) null, filename_collation_name nvarchar(129) null)
+            insert into #file_tables
+            select t.object_id, f.is_enabled, f.directory_name, f.filename_collation_name
+            from sys.tables as t
+            inner join sys.filetables as f on t.object_id = f.object_id
+        </prefix>
+    </version>
+    <version min_major='16' cloud_min_major='12'>
+      <prefix fields="#LedgerViewName#LedgerViewSchema#">
+        CREATE TABLE #tmp_ledger_details
+        (table_object_id int not null primary key, ledger_view_name sysname null, ledger_view_schema_name sysname null)
+        INSERT INTO #tmp_ledger_details
+        SELECT t.object_id, v.name, s.name
+        from sys.tables as t
+        INNER JOIN sys.views as v ON v.object_id = t.ledger_view_id
+        INNER JOIN sys.schemas as s ON s.schema_id = v.schema_id
+      </prefix>
+      <prefix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#'>
+        CREATE TABLE #tmp_ledger_view_column_names
+        (table_object_id int not null primary key, ledger_transaction_id_column_name sysname null, ledger_sequence_number_column_name sysname null, ledger_operation_type_column_name sysname null, ledger_operation_type_desc_column_name sysname null)
+        INSERT INTO #tmp_ledger_view_column_names
+        SELECT
+        t_obj_id,
+        [ledger_transaction_id_column_name] = MAX(CASE WHEN ledger_view_column_type = 1 THEN c_name ELSE NULL END),
+        [ledger_sequence_number_column_name] =MAX(CASE WHEN ledger_view_column_type = 2 THEN c_name ELSE NULL END),
+        [ledger_operation_type_column_name] = MAX(CASE WHEN ledger_view_column_type = 3 THEN c_name ELSE NULL END),
+        [ledger_operation_type_desc_column_name] = MAX(CASE WHEN ledger_view_column_type = 4 THEN c_name ELSE NULL END)
+        FROM
+        (
+        SELECT t.object_id as t_obj_id, c.name as c_name, c.ledger_view_column_type FROM sys.tables as t
+        INNER JOIN sys.columns AS c ON c.object_id = t.ledger_view_id
+        WHERE t.ledger_view_id != 0 AND c.ledger_view_column_type != 0 AND t.is_dropped_ledger_table=0
+        ) as x
+        GROUP BY x.t_obj_id
+      </prefix>
+    </version>
+    <version min_major='13' cloud_min_major='12'>
+      <prefix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
+        create table #external_data (object_id int not null primary key, data_source_id int , file_format_id int , [location] nvarchar(4000), reject_type nvarchar(20), reject_value float, reject_sample_value float, datasource_name nvarchar(128), fileformat_name nvarchar(128), sharding_col_id int, distribution_type tinyint, remote_schema_name nvarchar(128), remote_object_name nvarchar(128))
+        insert into #external_data
+        select tbl.object_id, eds.data_source_id, eff.file_format_id, et.location, et.reject_type, et.reject_value, et.reject_sample_value, eds.name, eff.name, et.sharding_col_id, et.distribution_type, et.remote_schema_name, et.remote_object_name
+        from sys.tables tbl
+        INNER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
+        LEFT OUTER JOIN sys.external_data_sources AS eds ON eds.data_source_id = et.data_source_id
+        LEFT OUTER JOIN sys.external_file_formats AS eff ON eff.file_format_id = et.file_format_id
+        WHERE
+        (tbl.is_external = 1)
+      </prefix>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <prefix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
+        create table #external_data (object_id int not null, data_source_id int , file_format_id int , [location] nvarchar(4000), reject_type nvarchar(20), reject_value float, reject_sample_value float, datasource_name nvarchar(128), fileformat_name nvarchar(128), sharding_col_id int, distribution_type tinyint, remote_schema_name nvarchar(128), remote_object_name nvarchar(128))
+        insert into #external_data
+        select tbl.object_id, eds.data_source_id, eff.file_format_id, et.location, et.reject_type, et.reject_value, et.reject_sample_value, eds.name, eff.name, et.sharding_col_id, et.distribution_type, et.remote_schema_name, et.remote_object_name
+        from sys.tables tbl
+        INNER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
+        LEFT OUTER JOIN sys.external_data_sources AS eds ON eds.data_source_id = et.data_source_id
+        LEFT OUTER JOIN sys.external_file_formats AS eff ON eff.file_format_id = et.file_format_id
+        WHERE
+        (tbl.is_external = 1)
+      </prefix>
+    </version>
+    <version min_major='10'>
+      <prefix fields='#IndexSpaceUsed#DataSpaceUsed#'>
+        declare @PageSize float
+        select @PageSize=v.low/1024.0 from master.dbo.spt_values v where v.number=&lt;msparam&gt;1&lt;/msparam&gt; and v.type=&lt;msparam&gt;E&lt;/msparam&gt;
+      </prefix>
+    </version>
+    <version min_major='15'>
+      <prefix fields='#DataRetentionPeriod#DataRetentionPeriodUnit#DataRetentionEnabled#DataRetentionFilterColumnName#'>
+        create table #temp_data_retention_table_property (object_id int not null, data_retention_period int not null, data_retention_period_unit int not null, data_deletion_filter_column_name sysname not null)
+        if serverproperty('engineedition') = 9
+        exec sp_executesql N'insert into #temp_data_retention_table_property
+        select dr_tbl.object_id, dr_tbl.data_retention_period, dr_tbl.data_retention_period_unit, col.name
+        from sys.tables dr_tbl join sys.columns col on col.object_id = dr_tbl.object_id
+        where col.is_data_deletion_filter_column = 1'
+      </prefix>
+    </version>
+    <!-- Since we have a postfix above, we can't introduce anymore prefix tags from here on in the file -->
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <postfix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
+        drop table #external_data
+      </postfix>
+    </version>
+    <version min_major='15'>
+      <postfix fields='#DataRetentionPeriod#DataRetentionPeriodUnit#DataRetentionEnabled#DataRetentionFilterColumnName#'>
+        drop table #temp_data_retention_table_property
+      </postfix>
+    </version>
+    <version min_major='16' cloud_min_major='12'>
+      <postfix fields='#LedgerViewName#LedgerViewSchema#'>
+        DROP TABLE #tmp_ledger_details
+      </postfix>
+      <postfix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#'>
+        DROP TABLE #tmp_ledger_view_column_names
+      </postfix>
+    </version>
+    <version min_major='11'>
+        <postfix fields='FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'>
+            DROP TABLE #file_tables
+        </postfix>
+    </version>
+    <version min_major='10' cloud_min_major='12'>
+        <postfix fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'>
+            DROP TABLE #change_tracking_tables
+        </postfix>
+    </version>
+    <!--Hekaton memory usage properties have post processing calculations-->
+    <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
+      <post_process fields = '#RowCount#'
+                    class_name='Microsoft.SqlServer.Management.Smo.PostProcessTable'
+                    triggered_fields='#DatabaseName#SchemaName#TableName#'/>
+    </version>
+    <version cloud_min_major='12' datawarehouse_enabled='true' min_major='10'>
+      <special_query database = 'tempdb' hint="">tbl.name not like '#%'</special_query>
+    </version>
+  </settings>
+  <properties>
+    <include alias='tbl' file='inc_object.xml' />
+    <include alias='tbl' file='inc_system_table_view_sp_udf.xml' for="#IsSystemObject#" />
+    <include file='inc_objprop_table_view.xml' />
+
+    <version min_major='15'>
+      <property name='DataRetentionEnabled' type='bit' cast='true' expensive='true'>
+        CASE WHEN SERVERPROPERTY('EngineEdition') = 9 THEN
+            CASE WHEN dr_tbl.data_deletion_filter_column_name = ''
+                THEN 0
+            ELSE
+                CASE WHEN dr_tbl.data_deletion_filter_column_name is null THEN 0 ELSE 1 END
+            END
+        END
+      </property>
+      <property name='DataRetentionPeriod' type='int' expensive='true'>
+        CASE WHEN SERVERPROPERTY('EngineEdition') = 9 THEN 
+           ISNULL(dr_tbl.data_retention_period, -1)
+        END
+      </property>
+      <property name='DataRetentionPeriodUnit' type='int' report_type="DataRetentionPeriodUnit" expensive='true'>
+        CASE WHEN SERVERPROPERTY('EngineEdition') = 9 THEN 
+           ISNULL(dr_tbl.data_retention_period_unit, -1)
+        END
+      </property>
+      <property name='DataRetentionFilterColumnName' type='sysname' expensive='true'>
+        CASE WHEN SERVERPROPERTY('EngineEdition') = 9 THEN 
+           ISNULL(dr_tbl.data_deletion_filter_column_name,'')
+        END
+      </property>
+    </version>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="HasClusteredIndex" type="bit" access='Read' cast='true'>CASE idx.index_id WHEN 1 THEN 1 ELSE 0 END</property>
+      <property name="HasNonClusteredIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.indexes ind where ind.object_id = tbl.object_id and ind.type &gt; 1 and ind.is_hypothetical = 0 ), 0)</property>
+      <property name="HasPrimaryClusteredIndex" type="bit" access='Read' cast='true'>case idx.index_id when 1 then case when (idx.is_primary_key + 2*idx.is_unique_constraint = 1) then 1 else 0 end else 0 end</property>
+      <property name="HasNonClusteredColumnStoreIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.indexes ind where ind.object_id = tbl.object_id and ind.type = 6 and ind.is_hypothetical = 0 ), 0)</property>
+      <property name="HasXmlIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.indexes ind where ind.object_id = tbl.object_id and ind.type = 3 and ind.is_hypothetical = 0 ), 0)</property>
+      <property name="HasHeapIndex" type="bit" access='Read' cast='true'>CASE idx.type WHEN 0 THEN 1 ELSE 0 END</property>
+      <property name="HasXmlData" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.all_columns as clmns join sys.types as usrt on usrt.user_type_id = clmns.user_type_id where clmns.object_id = tbl.object_id and usrt.name = N'xml'), 0)</property>
+      <property name="HasSpatialData" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.all_columns as clmns join sys.types as usrt on usrt.user_type_id = clmns.user_type_id where clmns.object_id = tbl.object_id and usrt.name in (N'geometry', N'geography')), 0)</property>
+      <property name="AnsiNullsStatus" type="bit" read_only_after_creation="true" mode="design">tbl.uses_ansi_nulls</property>
+      <property name="QuotedIdentifierStatus" type="bit" cast='true' read_only_after_creation="true" mode="design">ISNULL(OBJECTPROPERTY(tbl.object_id,N'IsQuotedIdentOn'),1)</property>
+      <property name="FakeSystemTable" type="bit" cast='true' access='Read'>0</property>
+      <!-- used for link with PartitionSchemeParameter, inc_storage -->
+      <property name="IndexID" type="int" hidden='true'>idx.index_id</property>
+      <!-- used for link with PartitionSchemeParameter -->
+      <property name="TableID" type="int" hidden='true' cast='true'>tbl.object_id</property>
+    </version>
+
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="TextFileGroup" type="sysname" read_only_after_creation="true">ISNULL(dstext.name,N'')</property>
+      <property name="DataSpaceID" type="int" hidden='true'>idx.data_space_id</property>
+    </version>
+
+    <version min_major='10' >
+      <property name='IsVarDecimalStorageFormatEnabled' type='bit' cast='true' expensive ='true' mode="deploy">
+        case
+        when databasepropertyex(DB_NAME(), 'version') &lt; 612 then 0
+        else ISNULL(objectproperty(tbl.object_id, 'TableHasVarDecimalStorageFormat'),0)
+        end
+      </property>
+    </version>
+    <version min_major='10' max_major='15'>
+      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >0</property>
+      <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
+    </version>
+
+    <version min_major='10' max_major='11'>
+      <property name="RowCount" type="bigint" access='Read'>ISNULL( ( select sum (spart.rows) from sys.partitions spart where spart.object_id = tbl.object_id and spart.index_id &lt; &lt;msparam&gt;2&lt;/msparam&gt;), 0)</property>
+      <!--when modify check datatabase.xml DataSpaceUsed for consistency -->
+      <property name="DataSpaceUsed" type="float" access='Read' expensive='true'>
+        ISNULL((select @PageSize * SUM(CASE WHEN a.type &lt;&gt; 1 THEN a.used_pages WHEN p.index_id &lt; 2 THEN a.data_pages ELSE 0 END)
+        FROM sys.indexes as i
+        JOIN sys.partitions as p ON p.object_id = i.object_id and p.index_id = i.index_id
+        JOIN sys.allocation_units as a ON a.container_id = p.partition_id
+        where i.object_id = tbl.object_id),0.0)
+      </property>
+      <!--when modify check datatabase.xml IndexSpaceUsed and index.xml SpaceUsed for consistency -->
+      <property name="IndexSpaceUsed" type="float" access='Read' expensive='true'>
+        ISNULL((select @PageSize * SUM(a.used_pages - CASE WHEN a.type &lt;&gt; 1 THEN a.used_pages WHEN p.index_id &lt; 2 THEN a.data_pages ELSE 0 END)
+        FROM sys.indexes as i
+        JOIN sys.partitions as p ON p.object_id = i.object_id and p.index_id = i.index_id
+        JOIN sys.allocation_units as a ON a.container_id = p.partition_id
+        where i.object_id = tbl.object_id),0.0)
+      </property>
+    </version>
+
+    <!-- data classification support -->
+    <version min_major='10' max_major='14'>
+      <property name="HasClassifiedColumn" type="bit" access='Read' expensive='true' cast='true'>ISNULL((select top 1 1 from sys.extended_properties where major_id = tbl.object_id and name in ('sys_sensitivity_label_name', 'sys_sensitivity_label_id', 'sys_information_type_name', 'sys_information_type_id') and value is not null), 0)</property>
+    </version>
+
+    <version min_major='15' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="HasClassifiedColumn" type="bit" access='Read' expensive='true' cast='true'>ISNULL((select top 1 1 from sys.sensitivity_classifications where major_id = tbl.object_id), 0)</property>
+    </version>
+    <!--Following properties are shared between Hekaton tables and regular tables-->
+    <!--based on the is_memory_optimized property we need to perform different calculations-->
+    <version min_major='12'>
+      <!--when modify check datatabase.xml DataSpaceUsed for consistency -->
+      <property name="DataSpaceUsed" type="float" access='Read' expensive='true'>
+        case
+        when (tbl.is_memory_optimized=0) then
+        ISNULL((select @PageSize * SUM(CASE WHEN a.type &lt;&gt; 1 THEN a.used_pages WHEN p.index_id &lt; 2 THEN a.data_pages ELSE 0 END)
+        FROM sys.indexes as i
+        JOIN sys.partitions as p ON p.object_id = i.object_id and p.index_id = i.index_id
+        JOIN sys.allocation_units as a ON a.container_id = p.partition_id
+        where i.object_id = tbl.object_id),0.0)
+        else
+        isnull((select (tms.[memory_used_by_table_kb])
+        from [sys].[dm_db_xtp_table_memory_stats] tms
+        where tms.object_id = tbl.object_id), 0.0)
+        end
+      </property>
+
+      <!--when modify check datatabase.xml IndexSpaceUsed and index.xml SpaceUsed for consistency -->
+      <!--Index space usage calculation is based on following query that matches sp_spaceused (VSTS#1202674)-->
+      <!--we are fixing the query in SQL14 only, that is why the query here doesn't match (min_major='9' max_major='10')-->
+      <property name="IndexSpaceUsed" type="float" access='Read' expensive='true'>
+        case
+        when (tbl.is_memory_optimized=0) then
+        ISNULL((
+        (SELECT SUM (used_page_count) FROM sys.dm_db_partition_stats ps WHERE ps.object_id = tbl.object_id)
+        + ( CASE (SELECT count(*) FROM sys.internal_tables WHERE parent_id = tbl.object_id AND internal_type IN (202,204,207,211,212,213,214,215,216,221,222))
+        WHEN 0 THEN 0
+        ELSE (
+        SELECT sum(p.used_page_count)
+        FROM sys.dm_db_partition_stats p, sys.internal_tables it
+        WHERE it.parent_id = tbl.object_id AND it.internal_type IN (202,204,207,211,212,213,214,215,216,221,222) AND p.object_id = it.object_id)
+        END )
+        - (SELECT SUM (CASE WHEN(index_id &lt; 2) THEN (in_row_data_page_count + lob_used_page_count + row_overflow_used_page_count) ELSE 0 END)
+        FROM sys.dm_db_partition_stats WHERE object_id = tbl.object_id)
+        ) * @PageSize, 0.0)
+        else
+        isnull((select (tms.[memory_used_by_indexes_kb])
+        from [sys].[dm_db_xtp_table_memory_stats] tms
+        where tms.object_id = tbl.object_id), 0.0)
+        end
+      </property>
+    </version>
+
+    <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="DatabaseName" type="sysname" hidden='true'>DB_NAME()</property>
+      <property name="SchemaName" type="sysname" hidden='true'>SCHEMA_NAME(tbl.schema_id)</property>
+      <property name="TableName" type="sysname" hidden='true'>tbl.name</property>
+      <property name="RowCount" type="bigint" access='Read' expensive='true'> 0 </property>
+
+      <!--Hekaton properties-->
+      <property name="IsMemoryOptimized" type="bit" cast="true" read_only_after_creation="true">tbl.is_memory_optimized</property>
+      <property name="Durability" type="bit" report_type="DurabilityType" read_only_after_creation="true">case when (tbl.durability=1) then 0 else 1 end</property>
+    </version>
+
+    <version cloud_min_major='10' cloud_max_major='11'>
+      <!-- Azure V1 doesn't have the sys.partitions view so we use sys.dm_db_partition_stats instead -->
+      <property name="RowCount" type="bigint" access='Read' expensive='true'>
+        ISNULL((SELECT SUM(ps.row_count)
+        FROM sys.dm_db_partition_stats as ps
+        WHERE ps.object_id = tbl.object_id),0)
+      </property>
+    </version>
+
+    <version min_major='10' cloud_min_major='10'>
+      <property name="Replicated" type="bit" access='Read'>tbl.is_replicated</property>
+    </version>
+    <!-- Properties for Change Tracking and Lock Escalation improvements-->
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="LockEscalation" type="tinyint" report_type='LockEscalationType'  mode="deploy">tbl.lock_escalation</property>
+      <property name="ExtPropClassforColumn" type="int" hidden='true'>1</property>
+      <property name="ExtPropMajorIDforColumn" type="int" hidden='true'>tbl.object_id</property>
+    </version>
+
+    <property name="ThreePartName" type="nvarchar" size='600' hidden='true'>
+      <link_multiple no='3' expression="quotename({0}, ']')+'.'+quotename({1}, ']')+'.'+quotename({2}, ']')">
+        <link_field type='parent' field="Name" />
+        <link_field type='local' field="Schema" />
+        <link_field type='local' field="Name" />
+      </link_multiple>
+    </property>
+
+    <version min_major='10' cloud_min_major='12'>
+      <property name="ChangeTrackingEnabled" type="bit" cast='true' mode="deploy">case when ctt.object_id is null then 0 else 1  end</property>
+      <property name="TrackColumnsUpdatedEnabled" type="bit" cast='true' mode="deploy">ISNULL(ctt.is_track_columns_updated_on,0)</property>
+    </version>
+
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <!-- used for link with PhysicalPartition -->
+      <property name="IndexIDForPartition" type="int" hidden='true'>idx.index_id</property>
+      <!-- used for link with PhysicalPartition -->
+      <property name="TableIDForPartition" type="int" hidden='true' cast='true'>tbl.object_id</property>
+      <!-- sparse columns -->
+      <property name="HasSparseColumn" type="bit" cast='true' access='Read' expensive='true'>
+        ISNULL((SELECT distinct 1 from sys.all_columns
+        WHERE object_id = tbl.object_id
+        AND is_sparse = 1), 0)
+      </property>
+    </version>
+
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="HasCompressedPartitions" type="bit" access='Read' cast='true' expensive='true'>
+        case when ((SELECT  MAX(data_compression) FROM sys.partitions  WHERE object_id = tbl.object_id AND index_id &lt; 2) &gt; 0) then 1 else 0 end
+      </property>
+    </version>
+
+    <version min_major='16'>
+      <property name="HasXmlCompressedPartitions" type="bit" access='Read' cast='true' expensive='true'>
+        case when ((SELECT  MAX(case when xml_compression = 1 then 1 else 0 end) FROM sys.partitions  WHERE object_id = tbl.object_id) &gt; 0) then 1 else 0 end
+      </property>
+    </version>
+
+    <version min_major='16' cloud_min_major='12'>
+      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true">CASE tbl.ledger_type WHEN 2 THEN 1 WHEN 3 THEN 1 ELSE 0 END</property>
+      <property name="LedgerType" type="int" cast="true" read_only_after_creation="true" report_type="LedgerTableType">ISNULL(tbl.ledger_type, 0)</property>
+      <property name="LedgerViewName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgertbl.ledger_view_name, N'')</property>
+      <property name="LedgerViewSchema" type="sysname" cast="true" read_only_after_creation="true" expensive="true">ISNULL(ledgertbl.ledger_view_schema_name, N'')</property>
+      <property name="IsDroppedLedgerTable" type="bit" cast="true" access="Read">ISNULL(tbl.is_dropped_ledger_table, 0)</property>
+      <property name="LedgerViewTransactionIdColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_transaction_id_column_name, N'')</property>
+      <property name="LedgerViewSequenceNumberColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_sequence_number_column_name, N'')</property>
+      <property name="LedgerViewOperationTypeColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_operation_type_column_name, N'')</property>
+      <property name="LedgerViewOperationTypeDescColumnName" type="sysname" read_only_after_creation="true" expensive="true">ISNULL(ledgerviewcoltbl.ledger_operation_type_desc_column_name, N'')</property>
+      <!-- System Versioned Property -->
+      <property name="IsSystemVersioned" type="bit" cast="true" read_only_after_creation="true">CASE WHEN (tbl.temporal_type = 2) OR (tbl.ledger_type = 2) THEN 1 ELSE 0 END</property>
+    </version>
+
+    <version min_major='11'>
+      <property name="IsFileTable" type="bit" read_only_after_creation="true">tbl.is_filetable</property>
+      <property name="FileTableDirectoryName" type="nvarchar" size="256">ISNULL(ft.directory_name,N'')</property>
+      <property name="FileTableNameColumnCollation" type="nvarchar" size="129" read_only_after_creation="true">ISNULL(ft.filename_collation_name,N'')</property>
+      <property name="FileTableNamespaceEnabled" type="bit" cast="true">ISNULL(ft.is_enabled,0)</property>
+    </version>
+    <version cloud_min_major='12'>
+      <property name="IsFileTable" type="bit" read_only_after_creation="true">CAST(0 as bit)</property>
+      <property name="FileTableDirectoryName" type="nvarchar" size="256">N''</property>
+      <property name="FileTableNameColumnCollation" type="nvarchar" size="129" read_only_after_creation="true">N''</property>
+      <property name="FileTableNamespaceEnabled" type="bit" cast="true">0</property>
+    </version>
+
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <include alias='idx' file='inc_storage.xml'/>
+    </version>
+
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+
+    <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="HasClusteredColumnStoreIndex" type="bit" access='Read' cast='true'>CASE idx.type WHEN 5 THEN 1 ELSE 0 END</property>
+    </version>
+
+    <version min_major='13' cloud_min_major='12'>
+      <!-- Temporal Properties -->
+      <property name="HistoryTableName" type="sysname" cast="true" read_only_after_creation="false">ISNULL(historyTable.name, N'')</property>
+      <property name="HistoryTableSchema" type="sysname" cast="true" read_only_after_creation="false">ISNULL(SCHEMA_NAME(historyTable.schema_id), N'')</property>
+      <property name="HistoryTableID" type="int" cast="true" read_only_after_creation="false" access="read">ISNULL(historyTable.object_id, 0)</property>
+      <property name="HasSystemTimePeriod" type="bit" cast='true' access='Read'>CASE WHEN periods.start_column_id IS NULL THEN 0 ELSE 1 END</property>
+      <property name="SystemTimePeriodStartColumn" type="sysname" cast='true' access='Read'>
+        ISNULL((SELECT cols.name
+        FROM sys.columns cols
+        WHERE periods.object_id = tbl.object_id
+        AND cols.object_id = tbl.object_id
+        AND cols.column_id = periods.start_column_id), N'')
+      </property>
+      <property name="SystemTimePeriodEndColumn" type="sysname" cast='true' access='Read'>
+        ISNULL((SELECT cols.name
+        FROM sys.columns cols
+        WHERE periods.object_id = tbl.object_id
+        AND cols.object_id = tbl.object_id
+        AND cols.column_id = periods.end_column_id), N'')
+      </property>
+    </version>
+
+    <version cloud_min_major='12'>
+      <!-- History Table Properties -->
+      <property name="HistoryRetentionPeriod" type="int" cast="true">ISNULL(tbl.history_retention_period, 0)</property>
+      <property name="HistoryRetentionPeriodUnit" type="int" report_type="TemporalHistoryRetentionPeriodUnit">ISNULL(tbl.history_retention_period_unit, -2)</property>
+    </version>
+
+    <!-- Common Temporal Properties -->
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="TemporalType" type="tinyint" report_type="TableTemporalType" read_only_after_creation="false" access='Read'>tbl.temporal_type</property>
+    </version>
+
+    <version min_major='13' max_major='15'>
+      <!-- System Versioned Property -->
+      <property name="IsSystemVersioned" type="bit" cast="true" read_only_after_creation="false">CASE tbl.temporal_type WHEN 2 THEN 1 ELSE 0 END</property>
+    </version>
+    <version min_major='13'>
+      <!-- Halligan (Stretch DB) Properties -->
+      <property name="RemoteDataArchiveEnabled" type="bit" cast="true" read_only_after_creation="false">0</property>
+      <property name="RemoteDataArchiveDataMigrationState" type="tinyint" report_type="RemoteDataArchiveMigrationState" cast="true" read_only_after_creation="false">0</property>
+      <property name="RemoteDataArchiveFilterPredicate" type="varchar" size="4000" cast="true" read_only_after_creation="false">''</property>
+      <property name="RemoteTableName" type="sysname" cast="true" read_only_after_creation="true">N''</property>
+      <property name="RemoteTableProvisioned" type="bit" cast="true" read_only_after_creation="true">0</property>
+    </version>
+
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="IsExternal" type="bit" cast="true">tbl.is_external</property>
+      <property name="DataSourceName" type="sysname" expensive="true">ISNULL(edt.datasource_name, N'')</property>
+    </version>
+    <version cloud_min_major="12">
+      <property name="FileFormatNameOd" type="sysname" access="read" expensive="true">ISNULL(edt.fileformat_name,N'')</property>
+      <property name="LocationOd" type="nvarchar" access="read" size="4000" expensive="true">ISNULL(edt.location,N'')</property>
+    </version>
+    <version min_major='13' datawarehouse_enabled='true'>
+      <property name="FileFormatName" type="sysname" expensive="true">ISNULL(edt.fileformat_name,N'')</property>
+      <property name="Location" type="nvarchar" size="4000" expensive="true">ISNULL(edt.location,N'')</property>
+      <property name="RejectType" type="tinyint" report_type="ExternalTableRejectType" expensive="true">
+        CASE WHEN edt.reject_type IS NULL THEN 255
+        ELSE CASE edt.reject_type
+        WHEN 'VALUE'      THEN 0
+        WHEN 'PERCENTAGE' THEN 1
+        ELSE 255
+        END
+        END
+      </property>
+      <property name="RejectValue" type="float" expensive="true">ISNULL(edt.reject_value,0)</property>
+      <property name="RejectSampleValue" type="float" expensive="true">ISNULL(edt.reject_sample_value,-1)</property>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property name="RejectedRowLocation" type="nvarchar" size="4000" expensive="true" read_only_after_creation="true">ISNULL(et.rejected_row_location,N'')</property>
+    </version>
+    <!-- these properties support elastic DB query on sql server -->
+    <version min_major="13" cloud_min_major="12">
+      <property name="ExternalTableDistribution" type="tinyint" report_type="ExternalTableDistributionType" expensive="true">
+        CASE
+        WHEN edt.distribution_type IS NOT NULL THEN edt.distribution_type
+        ELSE 255
+        END
+      </property>
+      <property name="ShardingColumnName" type="sysname" expensive="true">ISNULL(sc.name, N'')</property>
+      <property name="RemoteSchemaName" type="sysname" expensive="true">ISNULL(edt.remote_schema_name,'')</property>
+      <property name="RemoteObjectName" type="sysname" expensive="true">ISNULL(edt.remote_object_name,'')</property>
+    </version>
+
+    <!-- SQL DW table type.-->
+    <version datawarehouse_enabled='true'>
+      <property name="DwTableDistribution" type="tinyint" report_type="DwTableDistributionType">ISNULL(tdp.distribution_policy, 0)</property>
+      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >0</property>
+      <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
+    </version>
+
+    <!--SQL GraphDB properties.-->
+    <version min_major="7" max_major="13">
+      <!-- Default to false for versions that don't support graph -->
+      <property name="IsNode" type="bit" cast="true" read_only_after_creation="true">0</property>
+      <property name="IsEdge" type="bit" cast="true" read_only_after_creation="true">0</property>
+    </version>
+    <version min_major="14" cloud_min_major="12" datawarehouse_enabled="true">
+      <property name="IsNode" type="bit" cast="true" read_only_after_creation="true">tbl.is_node</property>
+      <property name="IsEdge" type="bit" cast="true" read_only_after_creation="true">tbl.is_edge</property>
+    </version>
+  </properties>
+</EnumObject>

@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<EnumObject type="Database" impl_type="Database" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <version min_major='10' >
+            <property_link fields = '#MirroringRedoQueueMaxSize#MirroringTimeout#'
+					left_join='sys.database_mirroring AS dmi'>dmi.database_id = dtb.database_id</property_link>
+        </version>
+        <!-- add this empty prefix to force inclusion of the sysdatabases table from the parent-->
+        <prefix>
+            <link_multiple no='1' expression="">
+                <link_field type='parent' field="ID" />
+            </link_multiple>
+        </prefix>
+      <version min_major='15'>
+        <prefix fields='#DataRetentionEnabled#'>
+          create table #temp_data_retention_property2 (db_id int not null, is_data_retention_enabled bit)
+
+          if serverproperty('engineedition') = 9
+          exec sp_executesql N'insert into #temp_data_retention_property2
+          select dr_db.database_id, dr_db.is_data_retention_enabled
+          from sys.databases dr_db'
+        </prefix>
+
+        <postfix fields='#DataRetentionEnabled#'>
+          drop table #temp_data_retention_property2
+        </postfix>
+      </version>
+        </settings>
+    <properties>
+        <version min_major='15'>
+            <!--  Property only available on SQL EDGE i.e EngineEdition == 9 -->
+            <property name="DataRetentionEnabled" type="bit" cast='true'>ISNULL((select is_data_retention_enabled from #temp_data_retention_property2 as tdrp where tdrp.db_id = dtb.database_id),0)</property>
+        </version>
+        <version min_major='12'>
+            <property name="AutoCreateStatisticsIncremental" type="bit">dtb.is_auto_create_stats_incremental_on</property>
+        </version>
+
+        <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+            <property name="AnsiNullDefault" type="bit">dtb.is_ansi_null_default_on</property>
+            <property name="AnsiNullsEnabled" type="bit">dtb.is_ansi_nulls_on</property>
+            <property name="AnsiPaddingEnabled" type="bit">dtb.is_ansi_padding_on</property>
+            <property name="AnsiWarningsEnabled" type="bit">dtb.is_ansi_warnings_on</property>
+            <property name="ArithmeticAbortEnabled" type="bit">dtb.is_arithabort_on</property>
+            <property name="AutoCreateStatistics" type="bit">dtb.is_auto_create_stats_on</property>
+            <property name="AutoShrink" type="bit">dtb.is_auto_shrink_on</property>
+            <property name="AutoUpdateStatistics" type="bit">dtb.is_auto_update_stats_on</property>
+            <property name="CloseCursorsOnCommitEnabled" type="bit">dtb.is_cursor_close_on_commit_on</property>
+            <property name="ConcatenateNullYieldsNull" type="bit">dtb.is_concat_null_yields_null_on</property>
+            <property name="NumericRoundAbortEnabled" type="bit">dtb.is_numeric_roundabort_on</property>
+            <property name="QuotedIdentifiersEnabled" type="bit">dtb.is_quoted_identifier_on</property>
+            <property name="ReadOnly" type="bit">dtb.is_read_only</property>
+            <property name="RecursiveTriggersEnabled" type="bit">dtb.is_recursive_triggers_on</property>
+            <property name="LocalCursorsDefault" type="bit">dtb.is_local_cursor_default</property>
+            <property name="PageVerify" type="tinyint" report_type = 'PageVerify'>dtb.page_verify_option</property>
+            <property name="RecoveryModel" type="int" report_type="RecoveryModel">dtb.recovery_model</property>
+            <property name="UserAccess" type="int" report_type = 'DatabaseUserAccess'>dtb.user_access</property>
+            <property name="SnapshotIsolationState" type="tinyint" report_type="SnapshotIsolationState" access="Read">dtb.snapshot_isolation_state</property>
+            <property name="DatabaseOwnershipChaining" type="bit">dtb.is_db_chaining_on</property>
+            <property name="AutoUpdateStatisticsAsync" type="bit">dtb.is_auto_update_stats_async_on</property>
+            <property name="DateCorrelationOptimization" type="bit">dtb.is_date_correlation_on</property>
+            <property name="BrokerEnabled" type="bit">dtb.is_broker_enabled</property>
+            <property name="Trustworthy" type="bit">dtb.is_trustworthy_on</property>
+            <property name="IsParameterizationForced" type="bit">dtb.is_parameterization_forced</property>
+        </version>
+        <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
+          <property name="AutoClose" type="bit">dtb.is_auto_close_on</property>
+	</version>
+	<version min_major='10'>
+          <property name="MirroringRedoQueueMaxSize" type="int" access="read">ISNULL((case dmi.mirroring_redo_queue_type when N'UNLIMITED' then 0 else dmi.mirroring_redo_queue end),0)</property>
+          <property name="MirroringTimeout" type="int">ISNULL(dmi.mirroring_connection_timeout,0)</property>
+        </version>
+        </properties>
+</EnumObject>

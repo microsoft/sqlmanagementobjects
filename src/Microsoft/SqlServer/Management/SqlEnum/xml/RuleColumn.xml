@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="RuleID" />
+		</parent_link>
+		<version min_major='10'>
+			<property_link join = 'sys.columns AS c'/>
+		</version>
+	</settings>
+	<properties>
+		<version min_major='10'>
+			<!--needed for children inc_DefaultRule_column-->
+			<property name="RuleID" type="int" hidden='true'>c.rule_object_id</property>
+		</version>
+		<include file='inc_column_reference.xml' alias='c'/>
+	</properties>
+</EnumObject>

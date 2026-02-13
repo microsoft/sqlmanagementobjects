@@ -1,0 +1,624 @@
+<?xml version="1.0" ?>
+<EnumObject type="Database" impl_type="Database" min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major ='10'>
+      <include file='inc_hadr_setting.xml' />
+    </version>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link table="sys.databases AS dtb"/>
+    </version>
+
+
+    <version min_major='10'>
+      <property_link table="master.sys.databases AS dtb"/>
+      <property_link fields = '#MirroringPartner#MirroringPartnerInstance#MirroringTimeout#MirroringRedoQueueMaxSize#MirroringRole#MirroringSafetyLevel#MirroringStatus#MirroringWitness#MirroringWitnessStatus#IsMirroringEnabled#MirroringID#MirroringRoleSequence#MirroringSafetySequence#MirroringFailoverLogSequenceNumber#'
+    left_join="sys.database_mirroring AS dmi">dmi.database_id = dtb.database_id</property_link>
+      <property_link fields = '#RecoveryForkGuid#DatabaseGuid#HasFullBackup#'
+    left_join="sys.database_recovery_status AS drs">drs.database_id = dtb.database_id</property_link>
+      <property_link fields = '#IsVarDecimalStorageFormatEnabled#'
+              left_join='#tmp_sp_db_vardecimal_storage_format as vardec'>dtb.database_id = db_id(vardec.dbname)</property_link>
+    </version>
+
+    <!-- SLO information in sys.database_service_objectives -->
+
+    <version cloud_min_major='12'>
+      <property_link fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#' left_join="#dso dso">dso.database_id = dtb.database_id</property_link>
+    </version>
+
+    <version min_major='10'>
+      <property_link fields = '#PrimaryFilePath#'
+      left_join="sys.master_files AS df">df.database_id = dtb.database_id and 1=df.data_space_id and 1 = df.file_id</property_link>
+    </version>
+
+    <!--  Change tracking info for databases exist in sys.change_tracking_databases-->
+    <version min_major='10' cloud_min_major='12'>
+      <property_link fields = '#ChangeTrackingEnabled#ChangeTrackingAutoCleanUp#ChangeTrackingRetentionPeriod#ChangeTrackingRetentionPeriodUnits#'
+  left_join="sys.change_tracking_databases AS ctb">ctb.database_id = dtb.database_id </property_link>
+    </version>
+
+    <!--Transparent Data Encryption(TDE) Properties-->
+    <version min_major='10'>
+      <property_link fields = '#HasDatabaseEncryptionKey#'
+  left_join="#tmp_db_encryption_keys AS dek">dek.database_id = dtb.database_id </property_link>
+    </version>
+
+    <!--HADR Properties-->
+    <version min_major='11'>
+      <property_link fields = '#AvailabilityGroupName#'
+              left_join="#tmp_db_ars AS ars">dtb.replica_id = ars.replica_id</property_link>
+      <property_link fields = '#AvailabilityGroupName#'
+              left_join="#tmp_db_ags AS ags">ars.group_id = ags.group_id</property_link>
+
+      <property_link fields = '#AvailabilityDatabaseSynchronizationState#'
+              left_join="#tmp_sync_states AS sync_state">dtb.database_id = sync_state.database_id</property_link>
+    </version>
+
+    <version min_major='11'>
+      <property_link fields = '#FilestreamDirectoryName#FilestreamNonTransactedAccess#' left_join="sys.database_filestream_options AS fsopt">fsopt.database_id = dtb.database_id</property_link>
+    </version>
+
+    <version min_major='15' cloud_min_major='12'>
+      <property_link fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#" 
+             left_join="#pvsfilegroups as pfg">pfg.database_id = dtb.database_id</property_link>
+    </version>
+    <!-- Prefix and post fix fields will be defined after all the table and field links are defined-->
+    <version cloud_min_major='12'>
+      <!-- sys.database_service_objectives may fail sometimes and raise an exception. We only return master in that case.
+      When the query is run in a user database, sys.database_service_objectives doesn't return a row for master.
+      Also - sometimes sys.database_service_objectives has the wrong database_id so we leverage the fact there's only 1 
+      row in that view in the user database
+      -->
+      <prefix fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#'>
+        create table #dso (database_id int primary key, azureEdition sysname null, engineEdition int)
+        if serverproperty('EngineEdition') = 11
+        BEGIN
+        insert into #dso select database_id, NULL, 11 from sys.databases
+        END
+        ELSE
+        BEGIN TRY
+        if db_name() = 'master'
+        BEGIN
+        exec sp_executesql N'
+        insert into #dso select database_id, edition,
+        case when edition = ''DataWarehouse'' then 6 else 5 end
+        from sys.database_service_objectives'
+        END
+        ELSE
+        BEGIN
+        exec sp_executesql N'
+        DECLARE @databaseId INT
+        select @databaseId = database_id from sys.databases where name=db_name()
+        insert into #dso select top 1 @databaseId, edition, 
+        case when edition = ''DataWarehouse'' then 6 else 5 end
+        from sys.database_service_objectives'
+        END
+        END TRY
+        BEGIN CATCH
+        insert into #dso select database_id, N'', case when [name] = 'master' then 5 else 0 end from sys.databases
+        END CATCH
+
+      </prefix>
+    </version>
+
+    <version min_major='15' cloud_min_major='12'>
+      <!-- Fabric DW throws an error trying to query sys.dm_tran_persistent_version_store_stats -->
+      <prefix fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#">
+        create table #pvsfilegroups (name sysname, persistent_version_store_size_kb bigint, database_id int primary key)
+        BEGIN TRY
+        exec sp_executesql N'insert into #pvsfilegroups select fg.name, tvs.persistent_version_store_size_kb, d.database_id from sys.databases d
+        join sys.dm_tran_persistent_version_store_stats tvs on tvs.database_id = d.database_id
+        join sys.filegroups fg on fg.data_space_id = tvs.pvs_filegroup_id'
+        END TRY
+        BEGIN CATCH
+        END CATCH
+      </prefix>
+    </version>
+
+    <version min_major='15'>
+        <prefix fields='#DataRetentionEnabled#'>
+            create table #temp_data_retention_property (db_id int not null, is_data_retention_enabled bit)
+            if serverproperty('engineedition') = 9
+            exec sp_executesql N'insert into #temp_data_retention_property
+            select dr_db.database_id, dr_db.is_data_retention_enabled
+            from sys.databases dr_db'
+        </prefix>
+    </version>
+
+    <version min_major='10'>
+
+      <prefix fields="#IsVarDecimalStorageFormatEnabled#">
+        create table #tmp_sp_db_vardecimal_storage_format (dbname sysname null, vardecimal_enabled varchar(3) null)
+        if exists (select o.object_id from sys.system_objects o where o.name=N'sp_db_vardecimal_storage_format') AND SERVERPROPERTY('EngineEdition') != 11
+        begin
+        insert into #tmp_sp_db_vardecimal_storage_format exec sys.sp_db_vardecimal_storage_format
+        end
+      </prefix>
+      <prefix fields="#LastBackupDate#LastDifferentialBackupDate#LastLogBackupDate#">
+        create table #tempbackup (database_name nvarchar(128), [type] char(1), backup_finish_date datetime)
+        insert into #tempbackup select database_name, [type], max(backup_finish_date) from msdb..backupset where [type] = 'D' or [type] = 'L' or [type] = 'I' group by database_name, [type]
+      </prefix>
+      <postfix fields="#IsVarDecimalStorageFormatEnabled#">
+        drop table #tmp_sp_db_vardecimal_storage_format
+      </postfix>
+      <postfix fields="#LastBackupDate#LastDifferentialBackupDate#LastLogBackupDate#">
+        drop table #tempbackup
+      </postfix>
+    </version>
+
+    <version min_major='15' cloud_min_major='12'>
+      <postfix fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#">
+        drop table #pvsfilegroups
+      </postfix>
+    </version>
+
+    <version min_major='15' >
+        <postfix fields='#DataRetentionEnabled#'>
+            drop table #temp_data_retention_property
+        </postfix>
+    </version>
+
+    <version cloud_min_major='12'>
+      <postfix fields='#IsSqlDwEdition#AzureEdition#RealEngineEdition#'>
+        drop table #dso
+      </postfix>
+    </version>    
+    <version min_major='10'>
+      <post_process fields = '#IsManagementDataWarehouse#IsDbDenyDatawriter#IsDbDenyDatareader#IsDbDdlAdmin#IsDbSecurityAdmin#IsDbOwner#IsDbDatawriter#IsDbDatareader#IsDbBackupOperator#IsDbAccessAdmin#SpaceAvailable#Size#DataSpaceUsage#IndexSpaceUsage#UserName#DboLogin#DefaultSchema#PrimaryFilePath#DefaultFileGroup#IsMailHost#DefaultFileStreamFileGroup#'
+        class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+        triggered_fields='#DatabaseName#'/>
+    </version>
+
+
+    <post_process fields = '#Collation#Version#CompatibilityLevel#CaseSensitive#TargetRecoveryTime#DelayedDurability#'
+              class_name='Microsoft.SqlServer.Management.Smo.PostProcessAutoCloseProperties'
+              triggered_fields='#DatabaseName2#'/>
+
+    <version min_major='11'>
+      <post_process fields = '#DefaultLanguageLcid#DefaultLanguageName#DefaultFullTextLanguageLcid#DefaultFullTextLanguageName#NestedTriggersEnabled#TransformNoiseWords#TwoDigitYearCutoff#'
+              class_name='Microsoft.SqlServer.Management.Smo.PostProcessContainedDbProperties'
+              triggered_fields='#ContainmentType2#'/>
+    </version>
+
+    <!--Hekaton memory usage properties have post processing calculations-->
+    <version min_major='12' cloud_min_major='12'>
+      <post_process fields = '#HasMemoryOptimizedObjects#MemoryAllocatedToMemoryOptimizedObjectsInKB#MemoryUsedByMemoryOptimizedObjectsInKB#'
+                    class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+                    triggered_fields='#DatabaseName3#'/>
+    </version>
+
+    <version min_major='12' cloud_min_major='12'>
+      <post_process fields = '#HasFileInCloud#'
+                    class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+                    triggered_fields='#DatabaseName4#'/>
+    </version>
+
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <post_process fields = '#IsDbDenyDatawriter#IsDbDenyDatareader#IsDbDdlAdmin#IsDbSecurityAdmin#IsDbOwner#IsDbDatawriter#IsDbDatareader#IsDbBackupOperator#IsDbAccessAdmin#UserName#DefaultFileGroup#'
+        class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+        triggered_fields='#DatabaseName#'/>
+      <post_process fields = '#Owner#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessOwner' triggered_fields='#Sid1#'></post_process>
+    </version>
+
+    <!--DB Scoped configurations have post processing calculations.-->
+    <version min_major='13' cloud_min_major='12'>
+      <post_process fields = '#MaxDop#MaxDopForSecondary#LegacyCardinalityEstimation#LegacyCardinalityEstimationForSecondary#ParameterSniffing#ParameterSniffingForSecondary#QueryOptimizerHotfixes#QueryOptimizerHotfixesForSecondary#'
+                    class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+                    triggered_fields='#DatabaseName6#'/>
+    </version>
+
+    <version cloud_min_major='12'>
+      <post_process fields = '#Size#IsLedger#'
+                    class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseInsideAttribs'
+                    triggered_fields='#DatabaseName7#'/>
+    </version>
+    <version cloud_min_major='12' >
+      <!-- Ignore entries without a SLO. Either sys.database_service_objectives failed or the database didn't have an entry. -->
+      <special_query fields='#RealEngineEdition#'>dso.engineEdition != 0</special_query>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml'/>
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <!--IsSystemObject check by name + if it is distributor-->
+      <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when dtb.name in ('master') then 1 else dtb.is_distributor end</property>
+      <property name="DefaultSchema" type="sysname" expensive='true'>(select schema_name())</property>
+      <property name="Owner" type="sysname" read_only_after_creation="true" expensive='true'>0</property>
+      <property name="Sid1" type="sysname" access="Read" hidden='true'>ISNULL(convert(nvarchar(85), dtb.owner_sid, 1),N'')</property>
+      <property name="DboLogin" type="bit" access="Read" cast='true' expensive='true'>(select is_member(N'db_owner'))</property>
+      <property name="IsDbManager" type="bit" access="Read" cast='true' expensive='true'>(select isnull(is_member(N'dbmanager'), 0))</property>
+      <property name="IsLoginManager" type="bit" access="Read" cast='true' expensive='true'>(select isnull(is_member(N'loginmanager'), 0))</property>
+      <property name="IsUpdateable" type="bit" access="Read" cast='true'>( case dtb.is_read_only when 1 then 0 else 1 end)</property>
+    </version>
+
+    <!-- These properties are available from both logical master and user database -->
+    <version cloud_min_major = '12'>
+      <property name="IsSqlDwEdition" type="bit" access="read" cast="true">case when isnull(dso.engineEdition, 0) = 6 then 1 else 0 end</property>
+      <property name="AzureEdition" type="nvarchar" cast='true'>ISNULL(dso.azureEdition, N'')</property>
+      <property name='RealEngineEdition' type='int' access='read'>case when dtb.name = 'master' then ISNULL(dso.engineEdition, 5) else ISNULL(dso.engineEdition, 0) end</property>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property name='RealEngineEdition' type='int' access='read'>6</property>
+    </version>
+    <version cloud_min_major = '12'>
+      <property name="DefaultFullTextCatalog" type="sysname" expensive='true'>ISNULL((select top 1 ftc.name from sys.fulltext_catalogs as ftc where ftc.is_default=1),N'')</property>
+    </version>
+
+    <version min_major='10'>
+      <property name="MirroringRedoQueueMaxSize" type="int" access="read" expensive="true">ISNULL((case dmi.mirroring_redo_queue_type when N'UNLIMITED' then 0 else dmi.mirroring_redo_queue end),0)</property>
+      <property name="MirroringTimeout" type="int" expensive="true">ISNULL(dmi.mirroring_connection_timeout,0)</property>
+      <property name='MirroringPartner' type='nvarchar' size = '128' expensive="true"
+                                            >ISNULL(dmi.mirroring_partner_name,'')</property>
+      <property name='MirroringPartnerInstance' type='nvarchar' size = '128' access='Read' expensive="true"
+                                            >ISNULL(dmi.mirroring_partner_instance,'')</property>
+      <property name='MirroringRole' type='tinyint' report_type = 'MirroringRole'
+                                            access='Read' expensive="true">ISNULL(dmi.mirroring_role,0)</property>
+      <property name='MirroringSafetyLevel' type='int' report_type = 'MirroringSafetyLevel' expensive="true"
+                                            >ISNULL(dmi.mirroring_safety_level + 1, 0)</property>
+      <property name='MirroringStatus' type='tinyint' report_type = 'MirroringStatus'
+                access='Read' expensive="true">ISNULL(dmi.mirroring_state + 1, 0)</property>
+      <property name='MirroringWitness' type='nvarchar' size = '128' expensive="true"
+                                            >ISNULL(dmi.mirroring_witness_name,'')</property>
+      <property name='MirroringWitnessStatus' type='int' report_type = 'MirroringWitnessStatus'
+                access='Read' expensive="true">ISNULL(dmi.mirroring_witness_state + 1, 0)</property>
+      <property name='IsMirroringEnabled' type='bit' cast='true'
+                access='Read' expensive="true">case when dmi.mirroring_partner_name is null then 0 else 1 end</property>
+      <property name='MirroringID' type='uniqueidentifier'
+                access='Read' expensive="true">ISNULL(dmi.mirroring_guid,'00000000-0000-0000-0000-0000000000000000')</property>
+      <property name='MirroringRoleSequence' type='int'
+                access='Read' expensive="true">ISNULL(dmi.mirroring_role_sequence,0)</property>
+      <property name='MirroringSafetySequence' type='int'
+                access='Read' expensive="true">ISNULL(dmi.mirroring_safety_sequence,0)</property>
+      <property name='MirroringFailoverLogSequenceNumber' type='numeric'
+                access='Read' expensive="true">ISNULL(dmi.mirroring_failover_lsn,0)</property>
+      <property name="DefaultFullTextCatalog" type="sysname" expensive='true'>ISNULL((select top 1 ftc.name from sys.fulltext_catalogs as ftc where ftc.is_default=1),N'')</property>
+      <property name="PrimaryFilePath" type="nvarchar" size='520' access="Read" expensive='true'>ISNULL(df.physical_name, N'')</property>
+    </version>
+    <version min_major="7" max_major="8" cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name='IsMirroringEnabled' type='bit' cast='true' access='Read' expensive="true">0</property>
+    </version>
+    <!-- Azure DB doesn't support recovery models or local cursors default-->
+    <version min_major='10'   cloud_min_major='12' datawarehouse_enabled='true'>
+      <!--Adding options property here. Earlier use to in databaseoptions.xml-->
+      <property name="AnsiNullDefault" type="bit" mode="design">dtb.is_ansi_null_default_on</property>
+      <property name="AnsiNullsEnabled" type="bit" mode="design">dtb.is_ansi_nulls_on</property>
+      <property name="AnsiPaddingEnabled" type="bit" mode="design">dtb.is_ansi_padding_on</property>
+      <property name="AnsiWarningsEnabled" type="bit" mode="design">dtb.is_ansi_warnings_on</property>
+      <property name="ArithmeticAbortEnabled" type="bit" mode="design">dtb.is_arithabort_on</property>
+      <property name="AutoShrink" type="bit" mode="deploy">dtb.is_auto_shrink_on</property>
+      <property name="CloseCursorsOnCommitEnabled" type="bit" mode="deploy">dtb.is_cursor_close_on_commit_on</property>
+      <property name="ConcatenateNullYieldsNull" type="bit" mode="design">dtb.is_concat_null_yields_null_on</property>
+      <property name="NumericRoundAbortEnabled" type="bit" mode="design">dtb.is_numeric_roundabort_on</property>
+      <property name="QuotedIdentifiersEnabled" type="bit" mode="design">dtb.is_quoted_identifier_on</property>
+      <property name="ReadOnly" type="bit" mode="design">dtb.is_read_only</property>
+      <property name="RecursiveTriggersEnabled" type="bit" mode="design">dtb.is_recursive_triggers_on</property>
+      <property name="UserAccess" type="int" report_type = 'DatabaseUserAccess' mode="deploy">dtb.user_access</property>
+      <property name="DatabaseOwnershipChaining" type="bit" mode="deploy">dtb.is_db_chaining_on</property>
+      <property name="AutoUpdateStatisticsAsync" type="bit" mode="deploy">dtb.is_auto_update_stats_async_on</property>
+      <property name="DateCorrelationOptimization" type="bit" mode="deploy">dtb.is_date_correlation_on</property>
+      <property name="Trustworthy" type="bit" mode="design">dtb.is_trustworthy_on</property>
+      <property name="Name" type="sysname">dtb.name</property>
+      <property name="ID" type="int">dtb.database_id</property>
+      <property name="CreateDate" type="datetime" access="Read">dtb.create_date</property>
+      <property name="Collation" type="sysname" expensive='true' mode="design">dtb.collation_name</property>
+      <property name="AutoCreateStatisticsEnabled" type="bit" mode="deploy">dtb.is_auto_create_stats_on</property>
+      <property name="AutoUpdateStatisticsEnabled" type="bit" mode="deploy">dtb.is_auto_update_stats_on</property>
+      <property name="IsParameterizationForced" type="bit" mode="deploy">dtb.is_parameterization_forced</property>
+      <property name="CompatibilityLevel" type="tinyint" report_type="CompatibilityLevel" expensive='true' mode="design">dtb.compatibility_level</property>
+      <property name="IsReadCommittedSnapshotOn" type="bit" mode="deploy">dtb.is_read_committed_snapshot_on</property>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <!--database view-->
+      <property name="IsDatabaseSnapshot" type="bit" cast='true' access='Read'>isnull(dtb.source_database_id, 0)</property>
+      <property name="IsDatabaseSnapshotBase" type="bit" cast='true' access='Read' expensive='true'>(select count(1) from sys.databases dtbmir where dtbmir.source_database_id = dtb.database_id)</property>
+      <property name="DatabaseSnapshotBaseName" type="sysname" read_only_after_creation="true">ISNULL(DB_NAME(dtb.source_database_id), N'')</property>
+       <!-- We use the SERVERPROPERTY for MI since is_fulltext_enabled does not have the correct value in some cases.
+            This column actually shouldn't be used at all for anything (it's hardcoded in many cases, or otherwise incorrect),
+            but scoping the change to just MI for now to reduce chance of unintended side effects -->
+      <property name="IsFullTextEnabled" type="bit">case when SERVERPROPERTY('EngineEdition') = 8 then SERVERPROPERTY('IsFullTextInstalled') else dtb.is_fulltext_enabled end</property>
+      <property name="ServiceBrokerGuid" type="uniqueidentifier" access='Read'>dtb.service_broker_guid</property>
+      <property name="SnapshotIsolationState" type="tinyint" report_type="SnapshotIsolationState" access="Read">dtb.snapshot_isolation_state</property>
+      <property name="ReplicationOptions" type="int"  report_type='ReplicationOptions' access = 'Read'>(dtb.is_published*1+dtb.is_subscribed*2+dtb.is_merge_published*4)</property>
+    </version>
+
+    <version min_major='10'>
+      <property name="LocalCursorsDefault" type="bit" mode="design">dtb.is_local_cursor_default</property>
+      <property name="PageVerify" type="tinyint" report_type = 'PageVerify' mode="design">dtb.page_verify_option</property>
+      <property name="RecoveryModel" type="int" report_type="RecoveryModel" mode="deploy">dtb.recovery_model</property>
+      <property name="AutoClose" type="bit" mode="deploy">dtb.is_auto_close_on</property>
+      <property name="BrokerEnabled" type="bit">dtb.is_broker_enabled</property>
+      <property name="Owner" type="sysname" access="Read">ISNULL(suser_sname(dtb.owner_sid),'')</property>
+      <property name="Size" type="float" access="Read" cast='true' expensive='true'>0</property>
+      <property name="SpaceAvailable" type="float" access="Read" cast='true' expensive='true'>0</property>
+      <property name="DataSpaceUsage" type="float" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IndexSpaceUsage" type="float" access="Read" cast='true' expensive='true'>0</property>
+      <property name="DboLogin" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="ActiveConnections" type="int" access="Read" expensive="true">(select count(*) from master.dbo.sysprocesses p where dtb.database_id=p.dbid)</property>
+      <property name="DefaultSchema" type="sysname" expensive='true' mode="design">''</property>
+      <property name="IsMailHost" type="bit" expensive='true' access='Read'>0</property>
+      <property name="IsVarDecimalStorageFormatEnabled" type="bit" expensive="true" mode="deploy">
+        case
+        when vardec.vardecimal_enabled = 'ON' then cast(1 as bit)
+        else cast(0 as bit)
+        end
+      </property>
+
+      <!--database mirroring-->
+
+      <property name='LogReuseWaitStatus' type='tinyint' report_type = 'LogReuseWaitStatus'
+                access='Read'>ISNULL(dtb.log_reuse_wait,0)</property>
+
+      <property name="RecoveryForkGuid" type="uniqueidentifier" access='Read'>drs.recovery_fork_guid</property>
+      <property name="DatabaseGuid" type="uniqueidentifier" access='Read'>drs.database_guid</property>
+      <property name="HasFullBackup" type="bit" cast='true'>(case when drs.last_log_backup_lsn is not null then 1 else 0 end)</property>
+
+      <!--IsSystemObject check by name + if it is distributor-->
+      <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when dtb.name in ('master','model','msdb','tempdb') then 1 else dtb.is_distributor end</property>
+    </version>
+
+    <version min_major='10'>
+      <property name="IsManagementDataWarehouse" type="bit" access="Read" cast='true' expensive='true'>0</property>
+    </version>
+    <version min_major='10'>
+      <property name="DefaultFileStreamFileGroup" type="sysname" expensive='true' access='Read'>N''</property>
+    </version>
+    <!-- Change Tracking properties-->
+    <version min_major='10' cloud_min_major='12'>
+      <property name="ChangeTrackingEnabled" type="bit" cast='true' mode="deploy">case when ctb.database_id is null then 0 else 1  end</property>
+      <property name="ChangeTrackingAutoCleanUp" type="bit" cast='true' mode="deploy">ISNULL(ctb.is_auto_cleanup_on,0)</property>
+      <property name="ChangeTrackingRetentionPeriod" type="int" mode="deploy">ISNULL(ctb.retention_period,0)</property>
+      <property name="ChangeTrackingRetentionPeriodUnits" type="tinyint" cast='true' report_type ='RetentionPeriodUnits' mode="deploy">ISNULL(ctb.retention_period_units,0)</property>
+    </version>
+
+    <!-- Transparent Data Encryption(TDE) Properties-->
+    <version min_major='10'>
+      <property name="HasDatabaseEncryptionKey" type="bit" access='Read' cast='true' expensive ='true'>(case when dek.database_id is not null then 1 else 0 end)</property>
+    </version>
+
+    <version min_major='11'>
+      <property name="ContainmentType" type="int" report_type='ContainmentType'>dtb.containment</property>
+      <property name="ContainmentType2" type="int" hidden='true'>dtb.containment</property>
+      <property name="DefaultLanguageLcid" type="int">dtb.default_language_lcid</property>
+      <property name="DefaultLanguageName" type="nvarchar" size='256'>dtb.default_language_name</property>
+      <property name="DefaultFullTextLanguageLcid" type="int">dtb.default_fulltext_language_lcid</property>
+      <!-- Default full text language name can be null for a contained database -->
+      <property name="DefaultFullTextLanguageName" type="nvarchar" size='256'>ISNULL(dtb.default_fulltext_language_name,N'')</property>
+      <property name="NestedTriggersEnabled" type="bit" cast='true'>dtb.is_nested_triggers_on</property>
+      <property name="TransformNoiseWords" type="bit" cast='true'>dtb.is_transform_noise_words_on</property>
+      <property name="TwoDigitYearCutoff" type="int">dtb.two_digit_year_cutoff</property>
+      <property name="TargetRecoveryTime" type="int">dtb.target_recovery_time_in_seconds</property>
+    </version>
+
+    <!-- Hekaton properties -->
+    <version min_major='12' cloud_min_major='12'>
+      <!--Property indicates whether the database has any hekaton objects-->
+      <!--TODO: this property is pending on engine to provide data in sys.databases-->
+      <property name="HasMemoryOptimizedObjects" type="bit" access='Read' expensive='true'>0</property>
+
+      <!--Property specifies the amount of memory allocated to Hekaton tables in db-->
+      <property name="MemoryAllocatedToMemoryOptimizedObjectsInKB" type="float" cast='true' access='Read' expensive='true'>0</property>
+
+      <!--Property specifies the amount of memory used by Hekaton tables in db -->
+      <property name="MemoryUsedByMemoryOptimizedObjectsInKB" type="float" cast='true' access='Read' expensive='true'>0</property>
+      <property name="DatabaseName3" type="sysname" hidden='true'>dtb.name</property>
+
+      <property name="HasFileInCloud" type="bit" access='Read' expensive='true'>0</property>
+      <property name="DatabaseName4" type="sysname" hidden='true'>dtb.name</property>
+
+    </version>
+
+    <version min_major='12'>
+      <property name="DelayedDurability" type="int" report_type="DelayedDurability">dtb.delayed_durability</property>
+    </version>
+
+    <version min_major='12' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="AutoCreateIncrementalStatisticsEnabled" type="bit" mode="deploy">dtb.is_auto_create_stats_incremental_on</property>
+    </version>
+
+    <version min_major='16' cloud_min_major='12'>
+      <property name="IsLedger" type="bit" cast='true' read_only_after_creation="true">ISNULL(dtb.is_ledger_on, 0)</property>
+    </version>
+    
+    <!-- DATABASEPROPERTY obtained properties -->
+    <!-- common to 8.0 and 7.0  see above for meanings of the bits we are ORing together here -->
+    <!--properties imported from databaseoptions.xml-->
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      
+      <!-- Size should be returned in MB -->
+      <property name="Size" type="float" access="Read">CONVERT(float, ISNULL(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'), 0)) / 1024.0 / 1024.0</property>
+      <!-- MaxSize may be settable on Azure -->
+      <property name="MaxSizeInBytes" type="float">CONVERT(float, ISNULL(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'), 0))</property>
+      <!-- IsMaxSizeApplicable is to check if MaxSize is required/applicable in scripts -->
+      <property name="IsMaxSizeApplicable" type="bit" access="Read" cast='true'>(CASE WHEN 0 > CONVERT(float, ISNULL(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes'), 0)) THEN 0 ELSE 1 END)</property>
+    </version>
+    <version cloud_min_major='12'>
+      <property name="SpaceAvailable" type="float" access="Read" cast='true' expensive='true'>(SELECT IIF(databasepropertyex(dtb.name,'Edition') = 'Hyperscale', 0, (SELECT ((CAST(DATABASEPROPERTYEX(dtb.Name, 'MaxSizeInBytes') AS float) / 1024.0) - (SUM(reserved_page_count)*8.0 )) / 1024.0 FROM sys.dm_db_partition_stats)))</property>
+    </version>
+
+    <version datawarehouse_enabled='true'>
+      <property name="SpaceAvailable" type="float" access="Read" cast='true' expensive='true'>0</property>
+      <property name="AzureEdition" type="nvarchar" cast='true'>N'DataWarehouse'</property>
+    </version>
+
+    <version cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="AzureServiceObjective" type="nvarchar">ISNULL(DATABASEPROPERTYEX(dtb.name, 'ServiceObjective'), N'')</property>
+    </version>
+
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="CaseSensitive" type="bit" access="Read" cast='true' expensive='true'>
+        case when CHARINDEX(N'_CS_', dtb.collation_name) > 0 then 1
+        when CHARINDEX(N'_BIN', dtb.collation_name) > 0 then 1
+        else 0 end
+      </property>
+
+      <!-- Database state, a mask of:
+                DatabaseStatus enum
+                Normal			= 0x000001
+                Restoring		= 0x000002
+                RecoveryPending = 0x000004
+                Recovering		= 0x000008
+                Suspect			= 0x000010
+                Offline			= 0x000020
+                Standby			= 0x000040
+                Shutdown		= 0x000080
+                EmergencyMode	= 0x000100
+                AutoClosed      = 0x000200  
+
+                state column				
+                0 = ONLINE
+                1 = RESTORING
+                2 = RECOVERING
+                3 = RECOVERY_PENDING
+                4 = SUSPECT	
+                5 = EMERGENCY
+                6 = OFFLINE
+
+                NULL collation means AutoClosed status. -->
+      <property name="Status" type="int" report_type="DatabaseStatus" access="Read">
+        case
+        when dtb.collation_name is null then 0x200
+        else 0
+        end |
+        case
+        when 1 = dtb.is_in_standby then 0x40
+        else 0
+        end |
+        case dtb.state
+        when 1 then 0x2
+        when 2 then 0x8
+        when 3 then 0x4
+        when 4 then 0x10
+        when 5 then 0x100
+        when 6 then 0x20
+        else 1
+        end
+      </property>
+
+    </version>
+
+    <version min_major='10'>
+      <property name="IsUpdateable" type="bit" access="Read" cast='true'>( case LOWER(convert( nvarchar(128), DATABASEPROPERTYEX(dtb.name, 'Updateability'))) when 'read_write' then 1 else 0 end)</property>
+      <property name="Version" type="int" access="Read" cast='true' expensive='true'>DATABASEPROPERTYEX(dtb.name, 'Version')</property>
+    </version>
+    <version min_major='10' cloud_min_major = '12' datawarehouse_enabled='true'>
+      <property name="EncryptionEnabled" type="bit" cast="true">dtb.is_encrypted</property>
+      <property name="HonorBrokerPriority" type="bit" cast="true">dtb.is_honor_broker_priority_on</property>
+    </version>
+
+    <!--common in all versions -->
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="DatabaseName" type="sysname" hidden='true'>dtb.name</property>
+      <property name="IsDbAccessAdmin" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbBackupOperator" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbDatareader" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbDatawriter" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbDdlAdmin" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbDenyDatareader" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbDenyDatawriter" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbOwner" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="IsDbSecurityAdmin" type="bit" access="Read" cast='true' expensive='true'>0</property>
+      <property name="UserName" type="sysname" expensive='true' access='Read'>''</property>
+      <property name="IsSqlDw" type="bit" cast="true">
+        case
+        when SERVERPROPERTY('EngineEdition') = 6 then cast(1 as bit)
+        else cast(0 as bit)
+        end
+      </property>
+    </version>
+
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="IsAccessible" type="bit" cast='true' access = 'Read'>has_dbaccess(dtb.name)</property>
+      <property name="DefaultFileGroup" type="sysname" expensive='true' access='Read'>N''</property>
+    </version>
+
+    <version min_major='10'>
+      <property name="LastLogBackupDate" type="datetime" access = 'Read' expensive='true'>(select backup_finish_date from #tempbackup where type = &lt;msparam&gt;L&lt;/msparam&gt; and db_id(database_name) = dtb.database_id)</property>
+      <property name="LastBackupDate" type="datetime" access = 'Read' expensive='true'>(select backup_finish_date from #tempbackup where type = &lt;msparam&gt;D&lt;/msparam&gt; and db_id(database_name) = dtb.database_id)</property>
+      <property name="LastDifferentialBackupDate" type="datetime" access = 'Read' expensive='true'>(select backup_finish_date from #tempbackup where type = &lt;msparam&gt;I&lt;/msparam&gt; and db_id(database_name) = dtb.database_id)</property>
+    </version>
+
+    <version min_major='11'>
+      <property name="FilestreamDirectoryName" type="nvarchar" size="256">ISNULL(fsopt.directory_name , N'')</property>
+      <property name="FilestreamNonTransactedAccess" type="tinyint" report_type="FilestreamNonTransactedAccessType">ISNULL(fsopt.non_transacted_access , 0)</property>
+    </version>
+
+    <!--common in all versions -->
+    <property name="DatabaseName2" type="sysname" hidden='true'>dtb.name</property>
+
+
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+    <!--HADR Properties-->
+    <version min_major='11'>
+      <property name="AvailabilityGroupName" type="sysname" access="Read" expensive ="true">ISNULL(ags.name, '')</property>
+      <property name="AvailabilityDatabaseSynchronizationState" type="tinyint" report_type="AvailabilityDatabaseSynchronizationState" access="Read" expensive ="true">sync_state.sync_state</property>
+    </version>
+
+    <version min_major='13'>
+      <!-- Halligan (Stretch DB) properties -->
+
+      <property name="RemoteDataArchiveEnabled" type="bit" cast="true" read_only_after_creation="false">0</property>
+      <property name="RemoteDataArchiveEndpoint" type="nvarchar" size="4000" read_only_after_creation="false" expensive="true">N''</property>
+      <property name="RemoteDataArchiveLinkedServer" type="sysname" read_only_after_creation="true" expensive="true">N''</property>
+      <property name="RemoteDatabaseName" type="sysname" read_only_after_creation="true" expensive="true">N''</property>
+      <property name="RemoteDataArchiveUseFederatedServiceAccount" type="bit" read_only_after_creation="false" cast="true" expensive="true">0</property>
+      <property name="RemoteDataArchiveCredential" type="sysname" read_only_after_creation="false" expensive="true">N''</property>
+    </version>
+
+    <version min_major='13' cloud_min_major='12'>
+      <property name="MaxDop" type="int">0</property>
+      <property name="MaxDopForSecondary" type="int">NULL</property>
+      <property name="LegacyCardinalityEstimation" type="int" report_type="DatabaseScopedConfigurationOnOff">0</property>
+      <property name="LegacyCardinalityEstimationForSecondary" type="int" report_type="DatabaseScopedConfigurationOnOff">2</property>
+      <property name="ParameterSniffing" type="int" report_type="DatabaseScopedConfigurationOnOff">0</property>
+      <property name="ParameterSniffingForSecondary" type="int" report_type="DatabaseScopedConfigurationOnOff">2</property>
+      <property name="QueryOptimizerHotfixes" type="int" report_type="DatabaseScopedConfigurationOnOff">0</property>
+      <property name="QueryOptimizerHotfixesForSecondary" type="int" report_type="DatabaseScopedConfigurationOnOff">2</property>
+      <property name="DatabaseName6" type="sysname" hidden='true'>dtb.name</property>
+    </version>
+
+    <version cloud_min_major='12'>
+      <!-- Temporal properties -->
+      <property name="TemporalHistoryRetentionEnabled" type="bit" cast="true">dtb.is_temporal_history_retention_enabled</property>
+      <!-- Used to compute 'Size' property in PostProcessing -->
+      <property name="DatabaseName7" type="sysname" hidden='true'>dtb.name</property>
+    </version>
+
+    <version min_major ='15' cloud_min_major='12'>
+      <property name="CatalogCollation" type="int" report_type="CatalogCollationType" read_only_after_creation="true">dtb.catalog_collation_type</property>
+    </version>
+
+    <version min_major="8" cloud_min_major="12" datawarehouse_enabled='true'>
+      <property name='LastGoodCheckDbTime' type='datetime' cast='true' access='read'>ISNULL(DATABASEPROPERTYEX(dtb.name, 'lastgoodcheckdbtime'), 0)</property>
+    </version>
+      
+    <version min_major="15" cloud_min_major="12">
+        <property name="PersistentVersionStoreFileGroup" expensive="true" type="sysname">ISNULL(pfg.name, N'')</property>
+        <property name="PersistentVersionStoreSizeKB" expensive="true" type="bigint" access="read">ISNULL(pfg.persistent_version_store_size_kb, 0)</property>
+    </version>
+      
+    <version min_major="15">
+      <!--  Property only available on SQL EDGE i.e EngineEdition == 9 -->
+      <property name="DataRetentionEnabled" type="bit" cast="true">ISNULL((select is_data_retention_enabled from #temp_data_retention_property as tdrp where tdrp.db_id = dtb.database_id),0)</property>
+    </version>
+
+    <version min_major="15" cloud_min_major="12" datawarehouse_enabled='true'>
+      <property name="AcceleratedRecoveryEnabled" type="bit" cast="true">ISNULL(dtb.is_accelerated_database_recovery_on, 0)</property>
+    </version>
+    
+    <version min_major="17" cloud_min_major="12" datawarehouse_enabled='true'>
+      <property name="OptimizedLockingOn" type="bit" cast="true">ISNULL(dtb.is_optimized_locking_on, 0)</property>
+    </version>
+    <version cloud_min_major="12">
+      <property name="IsFabricDatabase" type="bit" cast="true" access="read" expensive="true">case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end</property>
+    </version>
+    <version min_major="7" datawarehouse_enabled='true'>
+      <property name="IsFabricDatabase" type="bit" cast="true" access="read" expensive="true">0</property>
+    </version>
+  </properties>
+
+  <!-- extended properties support -->
+  <property name="ExtPropClass" type="int" hidden='true'>0</property>
+  <property name="ExtPropMajorID" type="int" hidden='true'>0</property>
+  <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+</EnumObject>

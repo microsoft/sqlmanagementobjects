@@ -1,0 +1,66 @@
+<?xml version='1.0' ?>
+<EnumObject type='PerfInfo' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='#temp_agent_perf_info AS spi'/>
+		<version min_major='10'>
+			<prefix>
+				DECLARE @instance_name sysname
+				SELECT @instance_name = CONVERT(sysname, SERVERPROPERTY('InstanceName'))
+
+				IF @instance_name IS NULL
+				SELECT @instance_name = N'SQLAgent:'
+				ELSE
+				SELECT @instance_name = N'MSSQLAgent$' + @instance_name + N':'
+			</prefix>
+		</version>
+		<prefix>
+			CREATE TABLE #temp_agent_perf_info(object_name nvarchar(256), counter_name nvarchar(256), instance_name nvarchar(256))
+			CREATE TABLE #temp_job_instances (instance_name nvarchar(20))
+
+			INSERT INTO #temp_job_instances VALUES(N'_Total')
+			INSERT INTO #temp_job_instances VALUES(N'Schedules')
+			INSERT INTO #temp_job_instances VALUES(N'Alerts')
+			INSERT INTO #temp_job_instances VALUES(N'Others')
+
+			-- Job object
+			INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'Jobs' , N'Active Jobs',	s.instance_name FROM #temp_job_instances s
+			INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'Jobs' , N'Successful jobs',	s.instance_name FROM #temp_job_instances s
+			INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'Jobs' , N'Failed jobs',	s.instance_name FROM #temp_job_instances s
+			INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'Jobs' , N'Successful jobs ratio',	s.instance_name FROM #temp_job_instances s
+			INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'Jobs' , N'Jobs launched/min',	s.instance_name FROM #temp_job_instances s
+			INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'Jobs' , N'Queued jobs',	s.instance_name FROM #temp_job_instances s
+
+			--JobStep object
+		</prefix>
+		<version min_major='10'>
+			<prefix>
+CREATE TABLE #temp_jobstep_instances (subsystem          NVARCHAR(40)   NULL, description        NVARCHAR(80)   NULL, subsystem_dll      NVARCHAR(255)  NULL, agent_exe          NVARCHAR(80)   NULL, start_entry_point  NVARCHAR(30)   NULL, event_entry_point  NVARCHAR(30)   NULL, stop_entry_point   NVARCHAR(30)   NULL, max_worker_threads INT           NULL, subsystem_id       INT			  NULL)
+INSERT #temp_jobstep_instances EXEC msdb.dbo.sp_enum_sqlagent_subsystems 			
+			</prefix>
+		</version>
+		<prefix>
+INSERT #temp_jobstep_instances ( subsystem ) VALUES (N'_Total') 
+
+INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'JobSteps' , N'Active steps',	s.subsystem FROM #temp_jobstep_instances s 
+INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'JobSteps' , N'Queued steps',	s.subsystem FROM #temp_jobstep_instances s 
+INSERT INTO #temp_agent_perf_info SELECT @instance_name + N'JobSteps' , N'Total Step Retries',	s.subsystem FROM #temp_jobstep_instances s 
+
+--Alert object
+INSERT INTO #temp_agent_perf_info VALUES(@instance_name + N'Alert' , N'Activated Alerts',	NULL)
+INSERT INTO #temp_agent_perf_info VALUES(@instance_name + N'Alert' , N'Alerts/min',	NULL)
+
+--General object
+INSERT INTO #temp_agent_perf_info VALUES(@instance_name + N'Statistics' , N'Server Restarted',	NULL)
+		</prefix>
+		<postfix>
+DROP TABLE #temp_job_instances
+DROP TABLE #temp_agent_perf_info
+DROP TABLE #temp_jobstep_instances
+		</postfix>
+	</settings>
+	<properties>
+		<property name='ObjectName' type='nchar' size = '256'>spi.object_name</property>
+		<property name='CounterName' type='nchar' size = '256'>spi.counter_name</property>
+		<property name='InstanceName' type='nchar' size = '256'>ISNULL(spi.instance_name,N'')</property>
+	</properties>
+</EnumObject>

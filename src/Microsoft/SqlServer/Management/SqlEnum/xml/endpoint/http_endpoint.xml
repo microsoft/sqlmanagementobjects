@@ -1,0 +1,28 @@
+<?xml version='1.0' ?>
+<EnumObject type='HttpEndpoints' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="EndpointID" />
+		</parent_link>
+	
+		<property_link table='sys.http_endpoints' alias='he'/>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='AuthenticationRealm' type='nvarchar' size = '128'>ISNULL(he.authorization_realm,N'')</property>
+		<property name='ClearPort' type='int'>he.clear_port</property>
+		<property name='DefaultLogonDomain' type='nvarchar' size = '128'>ISNULL(he.default_logon_domain,N'')</property>
+		<property name="HttpPortTypes" type="int" report_type="HttpPortTypes" >1*he.is_ssl_port_enabled + 2*is_clear_port_enabled</property>
+		<property name='SslPort' type='int'>he.ssl_port</property>
+		<property name='WebSiteUrlPath' type='nvarchar' size = '4000'>he.url_path</property>
+		<property name='WebSite' type='nvarchar' size = '128'>he.site</property>
+		<property name='IsCompressionEnabled' type='bit'>he.is_compression_enabled</property>
+		<property name="HttpAuthenticationModes" type="int" report_type="HttpAuthenticationModes">1*is_anonymous_enabled + 2*is_basic_auth_enabled + 4*is_digest_auth_enabled + 8*is_integrated_auth_enabled + 16*is_ntlm_auth_enabled + 32*is_kerberos_auth_enabled</property>				
+		
+		<property name='EndpointID' type='int' hidden='true'>he.endpoint_id</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when he.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>

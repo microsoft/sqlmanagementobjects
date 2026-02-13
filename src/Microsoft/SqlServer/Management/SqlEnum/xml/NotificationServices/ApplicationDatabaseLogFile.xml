@@ -1,0 +1,28 @@
+<?xml version='1.0' ?>
+<EnumObject type='AppLogFile' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<property_link table='#tmp_AppLogFiles' alias='alf'/>
+		<prefix>
+CREATE TABLE #tmp_AppLogFiles (
+    LogicalName nvarchar(128),
+    FilePath nvarchar(260),
+    FileGroupName nvarchar(128),
+    InitialSize nvarchar(32),
+    MaxSize nvarchar(32),
+    GrowthIncrement nvarchar(16)
+)
+INSERT INTO #tmp_AppLogFiles EXEC [SchemaPrefix].NSGetDatabaseFiles 'LOG_ONLY'
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_AppLogFiles
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '128'>alf.LogicalName</property>
+		<property name='FileName' type='nvarchar' size = '260'>alf.FilePath</property>
+		<property name='InitialSize' type='nvarchar' size = '32'>alf.InitialSize</property>
+		<property name='MaxSize' type='nvarchar' size = '32'>alf.MaxSize</property>
+		<property name='GrowthIncrement' type='nvarchar' size = '16'>alf.GrowthIncrement</property>
+	</properties>
+</EnumObject>

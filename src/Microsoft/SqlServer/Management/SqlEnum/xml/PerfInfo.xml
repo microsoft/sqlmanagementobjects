@@ -1,0 +1,16 @@
+<?xml version='1.0' ?>
+<EnumObject type='PerfInfo' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10' max_major='10'>
+      <property_link table='sys.dm_os_performance_counters AS spi'>spi.cntr_type != 1073939712</property_link>
+    </version>
+    <version min_major='11' >
+      <property_link table='msdb.dbo.sysalerts_performance_counters_view AS spi'>spi.cntr_type != 1073939712</property_link>
+    </version>
+  </settings>
+	<properties>
+		<property name='ObjectName' type='nchar' size = '256'>spi.object_name</property>
+		<property name='CounterName' type='nchar' size = '256'>spi.counter_name</property>
+		<property name='InstanceName' type='nchar' size = '256'>ISNULL(spi.instance_name,N'')</property>
+	</properties>
+</EnumObject>

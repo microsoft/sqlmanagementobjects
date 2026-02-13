@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<EnumObject type="Table" impl_type="SqlObject" min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields='#FileGroup#PartitionScheme#IsPartitioned#' left_join='sys.data_spaces AS ds{0}'>
+        <link_multiple no='1' expression="ds{0}.data_space_id = {0}.data_space_id">
+          <!--used just to trigger the parent property link -->
+          <link_field type='local' field="IndexID" />
+        </link_multiple>
+      </property_link>
+    </version>
+    <version min_major='10'>
+      <property_link fields='#FileStreamFileGroup#FileStreamPartitionScheme#' left_join='sys.tables AS t'>t.object_id = {0}.object_id</property_link>
+    </version>
+    <version min_major='10' max_major='10'>
+      <property_link fields='#FileStreamFileGroup#FileStreamPartitionScheme#' left_join='sys.data_spaces AS dstbl'>
+        <link_multiple no='1' expression="dstbl.data_space_id = t.Filestream_data_space_id and ({0}.index_id &lt; 2)">
+          <!--used just to trigger the parent property link -->
+          <link_field type='local' field="IndexID" />
+        </link_multiple>
+      </property_link>
+    </version>
+    <version min_major='11'>
+      <property_link fields='#FileStreamFileGroup#FileStreamPartitionScheme#' left_join='sys.data_spaces AS dstbl'>
+        <!--Consideration for Hekaton objects where index type is hash(7) -->
+        <link_multiple no='1' expression="dstbl.data_space_id = t.Filestream_data_space_id and ({0}.index_id &lt; 2 or ({0}.type = 7 and {0}.index_id &lt; 3))">
+          <!--used just to trigger the parent property link -->
+          <link_field type='local' field="IndexID" />
+        </link_multiple>
+      </property_link>
+    </version>
+  </settings>
+  <properties>
+    <version min_major='10'  max_major='11'>
+      <property name="FileGroup" type="sysname" read_only_after_creation="true">CASE WHEN 'FG'=ds{0}.type THEN ds{0}.name ELSE N'' END</property>
+    </version>
+    <version min_major='12' cloud_min_major='12'>
+      <property name="FileGroup" type="sysname" read_only_after_creation="true" expensive="true">
+        CASE WHEN ((SELECT tbl{0}.is_memory_optimized FROM sys.tables tbl{0} WHERE tbl{0}.object_id = {0}.object_id)=1 or
+        (SELECT tt{0}.is_memory_optimized FROM sys.table_types tt{0} WHERE tt{0}.type_table_object_id = {0}.object_id)=1)
+        THEN ISNULL((SELECT ds.name FROM sys.data_spaces AS ds WHERE ds.type='FX'), N'')
+        ELSE CASE WHEN 'FG'=ds{0}.type THEN ds{0}.name ELSE N'' END
+        END
+      </property>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <property name="FileGroup" type="sysname" read_only_after_creation="true" expensive="true">
+        CASE WHEN 'FG'=ds{0}.type 
+        THEN ds{0}.name ELSE N'' 
+        END
+      </property>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="PartitionScheme" type="sysname" read_only_after_creation="true">CASE WHEN 'PS'=ds{0}.type THEN ds{0}.name ELSE N'' END</property>
+      <property name="IsPartitioned" type="bit" cast='true' access="Read">CASE WHEN 'PS'=ds{0}.type THEN 1 ELSE 0 END</property>
+    </version>
+    <version min_major='10'>
+      <property name="FileStreamFileGroup" type="sysname">CASE WHEN 'FD'=dstbl.type THEN dstbl.name ELSE N'' END</property>
+      <property name="FileStreamPartitionScheme" type="sysname">CASE WHEN 'PS'=dstbl.type THEN dstbl.name ELSE N'' END</property>
+    </version>
+    <version cloud_min_major='12'>
+      <property name="FileStreamFileGroup" type="sysname">N''</property>
+      <property name="FileStreamPartitionScheme" type="sysname">N''</property>
+    </version>
+  </properties>
+</EnumObject>

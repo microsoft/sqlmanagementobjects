@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Import this props file to take dependencies on the proper version of Microsoft.Data.SqlClient and its upstream dependencies -->
+  <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj' and '$(UseMicrosoftData)' != 'false'">
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+  <PropertyGroup>
+     <SqlClientReferenceImported>true</SqlClientReferenceImported>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetGroup)'=='netfx'">
+    <Reference Include="System.Data" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<EnumObject type="LinkedServer" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10' >
+			<property_link table='sys.servers AS srv'>srv.server_id != 0</property_link>
+		</version>
+		<post_process fields="#ProviderString#" class_name="Microsoft.SqlServer.Management.Smo.PostProcessCreateSqlSecureString" triggered_fields="#ProviderStringIn#" />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<!-- those need to be ported to 7.0, but we obtain them differently -->
+		<version min_major='10'>
+			<property name="Name" type="sysname">srv.name</property>
+			<property name="ID" type="int" cast='true'>srv.server_id</property>
+			<property name="Catalog" type="sysname" read_only_after_creation="true">ISNULL(srv.catalog,N'')</property>
+			<property name="DataSource" type="sysname" read_only_after_creation="true">ISNULL(srv.data_source,N'')</property>
+			<property name="Location" type="sysname" read_only_after_creation="true">ISNULL(srv.location,N'')</property>
+			<property name="ProductName" type="sysname" read_only_after_creation="true">srv.product</property>
+			<property name="ProviderName" type="sysname" read_only_after_creation="true">srv.provider</property>
+			<property name="CollationCompatible" type="bit" cast='true'>srv.is_collation_compatible</property>
+			<property name="DataAccess" type="bit" cast='true'>srv.is_data_access_enabled</property>
+			<property name="Distributor" type="bit" cast='true'>srv.is_distributor</property>
+      <!-- DistPublisher defaults to 0 because we need to have this property 
+           in the property bag for Yukon -->
+			<property name="DistPublisher" type="bit" cast='true'>0</property>
+			<property name="Publisher" type="bit" cast='true'>srv.is_publisher</property>
+			<property name="Rpc" type="bit" cast='true'>srv.is_remote_login_enabled</property>
+			<property name="RpcOut" type="bit" cast='true'>srv.is_rpc_out_enabled</property>
+			<property name="Subscriber" type="bit" cast='true'>srv.is_subscriber</property>
+			<property name="CollationName" type="sysname">ISNULL(srv.collation_name,N'')</property>
+			<property name="ConnectTimeout" type="int">srv.connect_timeout</property>
+			<property name="LazySchemaValidation" type="bit">srv.lazy_schema_validation</property>
+			<property name="QueryTimeout" type="int">srv.query_timeout</property>
+			<property name="UseRemoteCollation" type="bit">srv.uses_remote_collation</property>
+			<property name="DateLastModified" type="datetime" access='Read'>srv.modify_date</property>
+			<property name="ProviderStringIn" type="sysname" hidden="true">srv.provider_string</property>
+			<property name="ProviderString" type="sysname" report_type="Internal.SqlSecureString" read_only_after_creation="true">null</property>
+		</version>
+		<version min_major='10' >
+			<property name="IsPromotionofDistributedTransactionsForRPCEnabled" type="bit" cast='true'>srv.is_remote_proc_transaction_promotion_enabled</property>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+	</properties>
+</EnumObject>

@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<EnumObject type="PhysicalPartition" impl_type="SqlObject" min_major='10' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <parent_link>
+        <link parent="TableIDForPartition" local="TableID" />
+        <link parent="IndexIDForPartition" local="IndexID" />
+      </parent_link>
+    </version>
+    <version min_major ='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link table="sys.partitions AS p"></property_link>
+    </version>
+    <version min_major='10'  cloud_min_major='12'>
+      <property_link left_join = "sys.destination_data_spaces AS dds">
+        <link_multiple no='1' expression="dds.partition_scheme_id = {0} and dds.destination_id = p.partition_number">
+          <link_field type='parent' field="DataSpaceID" />
+        </link_multiple>
+      </property_link>
+      <property_link fields="#FileGroupName#" left_join="sys.filegroups AS fg">
+        <link_multiple no='1' expression="fg.data_space_id = dds.data_space_id or fg.data_space_id = {0}">
+          <link_field type='parent' field="DataSpaceID" />
+        </link_multiple>
+      </property_link>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link left_join = "sys.partition_schemes AS ps">
+        <link_multiple no='1' expression="ps.data_space_id = {0}">
+          <link_field type='parent' field="DataSpaceID" />
+        </link_multiple>
+      </property_link>
+      <property_link fields="#RightBoundaryValue#RangeType#" left_join="sys.partition_range_values AS prv">prv.boundary_id = p.partition_number and prv.function_id = ps.function_id</property_link>
+      <property_link fields="#RangeType#" left_join="sys.partition_functions AS pf"> pf.function_id = prv.function_id</property_link>
+    </version>
+  </settings>
+  <properties>
+    <version min_major='10'  cloud_min_major='12'>
+      <property name="FileGroupName" type="sysname" >fg.name</property>
+    </version>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="IndexID" type="int" hidden='true'>p.index_id</property>
+      <property name="TableID" type="int" hidden='true'>p.object_id</property>
+      <property name="PartitionNumber" type="int" >p.partition_number</property>
+      <property name="RightBoundaryValue" type="sql_variant">prv.value</property>
+      <property name="RangeType" type="int" report_type="RangeType" cast='true' >pf.boundary_value_on_right</property>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="RowCount" type="float" access='Read' cast='true'>p.rows</property>
+    </version>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+      <property name="DataCompression" type="int" report_type="DataCompressionType" >p.data_compression</property>
+    </version>
+    <version min_major='16' datawarehouse_enabled='false'>
+      <property name="XmlCompression" type="int" report_type="XmlCompressionType" >p.xml_compression</property>
+    </version>
+  </properties>
+</EnumObject>

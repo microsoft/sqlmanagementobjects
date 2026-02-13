@@ -1,0 +1,12 @@
+<?xml version="1.0"  encoding="us-ascii" ?>
+<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='10'   cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+ 	</settings>
+	<properties>
+		<version min_major='10'   cloud_min_major='10'>
+			<property name="IsSystemObject" type="bit" access='Read' cast = 'true'>
+                {0}.is_ms_shipped
+           </property>
+		</version>
+	</properties>
+</EnumObject>

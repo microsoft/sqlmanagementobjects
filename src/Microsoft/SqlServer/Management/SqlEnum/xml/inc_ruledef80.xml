@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="RuleDefault" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		</settings>
+	<properties>
+		<include file='inc_urn_schema.xml' />
+		<include alias='obj' file='inc_object.xml' />
+		<!-- TypeSelection is used for inc_sql_module_main -->
+		<property name="TypeSelection" type="sysname" hidden='true'>
+			<link_multiple no = '1' expression="obj.type = {0} and not(obj.parent_object_id > 0)">
+				<link_field type='local' field="XType" />
+			</link_multiple>
+		</property>
+		<include file='inc_sql_module_main.xml' />
+		<include file='inc_sql_module_JustText.xml' />
+		<include file='inc_text.xml' />
+	</properties>
+</EnumObject>

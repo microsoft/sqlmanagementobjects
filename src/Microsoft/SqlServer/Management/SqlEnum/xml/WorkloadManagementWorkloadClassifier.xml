@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<EnumObject type="WorkloadManagementWorkloadClassifier" impl_type="SqlObject" datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table="#tmp_pivot_classifier_details_table" alias="wc"/>
+    <prefix>
+      CREATE TABLE #tmp_pivot_classifier_details_table WITH (DISTRIBUTION = ROUND_ROBIN) AS SELECT * FROM
+        (SELECT c.classifier_id, name, group_name, importance, classifier_type, classifier_value FROM sys.workload_management_workload_classifiers c
+        INNER JOIN sys.workload_management_workload_classifier_details cd
+        ON c.classifier_id = cd.classifier_id) AS src
+        PIVOT
+        (
+          MAX(classifier_value)
+          for classifier_type in (membername, wlm_context, wlm_label, start_time, end_time)
+        ) AS piv;
+    </prefix>
+    <postfix>DROP TABLE #tmp_pivot_classifier_details_table</postfix>
+  </settings>
+
+  <properties>
+    <version datawarehouse_enabled='true'>
+      <property name="Id" type="int" cast='true'>wc.classifier_id</property>
+      <property name="GroupName" type="sysname">wc.group_name</property>
+      <property name="Name" type="sysname">wc.name</property>
+      <property name="Importance" type="int" report_type="WorkloadManagementImportance">CASE WHEN N'Low' = wc.importance THEN 0 WHEN N'Below_Normal' = wc.importance THEN 1 WHEN N'Normal' = wc.importance THEN 2 WHEN N'Above_Normal' = wc.importance THEN 3 WHEN N'High' = wc.importance THEN 4 ELSE 2 END</property>
+      <property name="MemberName" type="sysname">wc.membername</property>
+      <property name="WlmLabel" type="sysname">ISNULL(wc.wlm_label, '')</property>
+      <property name="WlmContext" type="sysname">ISNULL(wc.wlm_context, '')</property>
+      <property name="StartTime" type="sysname">ISNULL(wc.start_time, '')</property>
+      <property name="EndTime" type="sysname">ISNULL(wc.end_time, '')</property> 
+    </version>
+  </properties>
+</EnumObject>
