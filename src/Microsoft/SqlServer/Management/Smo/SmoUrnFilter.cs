@@ -89,6 +89,7 @@ namespace Microsoft.SqlServer.Management.Smo
         externalfileformat,
         externalStream,
         externalStreamingJob,
+        externalModel,
         columnmasterkey,
         columnencryptionkey,
         columnencryptionkeyvalue,

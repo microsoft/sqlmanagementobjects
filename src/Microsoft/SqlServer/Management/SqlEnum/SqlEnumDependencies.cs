@@ -746,89 +746,48 @@ namespace Microsoft.SqlServer.Management.Smo
         ///build a DependencyChainCollection based on the result from the dependency discovery tsql</summary>
         DependencyChainCollection BuildResult(DataTable dt)
         {
-            DependencyChainCollection deferredLink = new DependencyChainCollection();
             DependencyChainCollection deps = new DependencyChainCollection();
             Type dbnull = typeof(System.DBNull);
 
-            if (m_targetVersion.Major >= 10)      // only for >= Katmai
+            foreach (DataRow row in dt.Rows)
             {
-                foreach (DataRow row in dt.Rows)
+                ServerDbSchemaName objectKey = BuildKey(row, true);
+
+                Dependency dep = (Dependency)m_tempDependencies[objectKey];
+
+                if (null == dep)
                 {
-                    ServerDbSchemaName objectKey = BuildKey(row, true);
+                    //have to build the urn
+                    String surn = null;
+                    surn = BuildUrn(row, true);
 
-                    Dependency dep = (Dependency)m_tempDependencies[objectKey];
-
-                    if (null == dep)
+                    dep = new Dependency();
+                    dep.Urn = surn;
+                    m_tempDependencies[objectKey] = dep;
+                    deps.Add(dep);
+                }
+                // Dependency of object might already exist with the IsSchemaBound value not set
+                // Always set the IsSchemaBound for the object with the parent
+                dep.IsSchemaBound = (bool)row["schema_bound"];
+                ServerDbSchemaName relativeKey = BuildKey(row, false);
+                if (objectKey.CompareTo(relativeKey) != 0)
+                {
+                    Dependency d = (Dependency)m_tempDependencies[relativeKey];
+                    if (null != d)
                     {
-                        //have to build the urn
-                        String surn = null;
-                        surn = BuildUrn(row, true);
-
-                        dep = new Dependency();
-                        dep.Urn = surn;
-                        m_tempDependencies[objectKey] = dep;
-                        deps.Add(dep);
+                        d.Links.Add(dep);
                     }
-                    // Dependency of object might already exist with the IsSchemaBound value not set
-                    // Always set the IsSchemaBound for the object with the parent
-                    dep.IsSchemaBound = (bool)row["schema_bound"];
-                    ServerDbSchemaName relativeKey = BuildKey(row, false);
-                    if (objectKey.CompareTo(relativeKey) != 0)
+                    else
                     {
-                        Dependency d = (Dependency)m_tempDependencies[relativeKey];
-                        if (null != d)
-                        {
-                            d.Links.Add(dep);
-                        }
-                        else
-                        {
-                            d = new Dependency();
-                            d.Urn = BuildUrn(row, false);
-                            m_tempDependencies[relativeKey] = d;
-                            deps.Add(d);
-                            d.Links.Add(dep);
-                        }
+                        d = new Dependency();
+                        d.Urn = BuildUrn(row, false);
+                        m_tempDependencies[relativeKey] = d;
+                        deps.Add(d);
+                        d.Links.Add(dep);
                     }
                 }
-                deps.Reverse();
             }
-            else
-            {
-                foreach (DataRow row in dt.Rows)
-                {
-                    IDKey idk = BuildIDKey(row, false);
-
-                    Dependency dep = (Dependency)m_tempDependencies[idk];
-
-                    if (null == dep)
-                    {
-                        //have to build the urn
-                        String surn = null;
-                        surn = BuildUrn(idk.type, row);
-
-                        dep = new Dependency();
-                        dep.Urn = surn;
-                        m_tempDependencies[idk] = dep;
-                        deps.Add(dep);
-                    }
-                    if (dbnull != row["relative_id"].GetType())
-                    {
-                        idk = BuildIDKey(row, true);
-                        Dependency d = (Dependency)m_tempDependencies[idk];
-                        if (null != d)
-                        {
-                            dep.Links.Add(d);
-                        }
-                        else
-                        {
-                            //object not yet added. Defer resolution of key until all objects are added
-                            dep.Links.Add(idk);
-                            deferredLink.Add(dep);
-                        }
-                    }
-                }
-                ResolveDeferredLinks(deferredLink);
-            }
+            deps.Reverse();
             return deps;
         }
 
@@ -893,25 +852,6 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        ///resolve links which were defered</summary>
-        void ResolveDeferredLinks(DependencyChainCollection deferredLink)
-        {
-            TraceHelper.Assert(m_targetVersion.Major < 10, "ResolvedDeferredLinks should not be called for version >= Katmai");
-
-            foreach (Dependency dep in deferredLink)
-            {
-                for (int i = 0; i < dep.Links.Count; i++)
-                {
-                    IDKey idk = ((ArrayList)dep.Links)[i] as IDKey;
-                    if (null != idk)
-                    {
-                        ((ArrayList)dep.Links)[i] = m_tempDependencies[idk];
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         ///given an idkey get the urn for that object: 
         ///expensive, makes query to resolve the urn from id
         ///no longer used, replaced by the BuildUrn function</summary>
@@ -936,51 +876,8 @@ namespace Microsoft.SqlServer.Management.Smo
             return (String)dt.Rows[0][0];
         }
 
-        /// <summary>
-        ///builds urn based on the data row returned from dependency discovery</summary>
-        Urn BuildUrn(int type, DataRow row)
-        {
-            TraceHelper.Assert(m_targetVersion.Major < 10, "BuildUrn should never be called by server version >= Katmai");
-
-            SqlTypeConvert stc = FindByNo(type);
-            string surn = null;
-
-            if (null != m_server)
-            {
-                surn = String.Format(CultureInfo.InvariantCulture, "Server[@Name='{0}']/Database[@Name='{1}']/", Urn.EscapeString(m_server), Urn.EscapeString(m_database));
-            }
-            else
-            {
-                surn = String.Format(CultureInfo.InvariantCulture, "Server/Database[@Name='{0}']/", Urn.EscapeString(m_database));
-            }
-            try
-            {
-
-                if ("Trigger" == stc.Name)
-                {
-                    surn += $"{FindByNo(((short)(row["relative_type"]))).Name}[@Name='{Urn.EscapeString((string)row["relative_name"])}' and @Schema='{Urn.EscapeString((string)row["relative_schema"])}']/{stc.Name}[@Name='{Urn.EscapeString((string)row["object_name"])}']";
-                    return surn;
-                }
-                if (typeof(System.DBNull) == row["object_schema"].GetType())
-                {
-                    surn += String.Format(CultureInfo.InvariantCulture, "{0}[@Name='{1}']", stc.Name, Urn.EscapeString((string)row["object_name"]));
-                    return surn;
-                }
-                surn += String.Format(CultureInfo.InvariantCulture, "{0}[@Name='{1}' and @Schema='{2}']",
-                    stc.Name, Urn.EscapeString((string)row["object_name"]), Urn.EscapeString((string)row["object_schema"]));
-            }
-            catch (InvalidCastException e)
-            {
-                throw new InternalEnumeratorException(StringSqlEnumerator.CouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
-            }
-            return surn;
-        }
-
-
         Urn BuildUrn(DataRow row, bool forParent)
         {
-            TraceHelper.Assert(m_targetVersion.Major >= 10, "BuildUrn should be called by server version >= Katmai only");
-
             string surn = null;
             string serverName = forParent ? (string)row["object_svr"] : (string)row["relative_svr"];
             string dbName = forParent ? (string)row["object_db"] : (string)row["relative_db"];

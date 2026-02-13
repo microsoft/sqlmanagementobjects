@@ -87,6 +87,11 @@ namespace Microsoft.SqlServer.Management.HadrModel
                 availabilityGroup.IsContained = this.availabilityGroupData.IsContained;
             }
 
+            if (availabilityGroup.IsSupportedProperty(nameof(availabilityGroup.ClusterConnectionOptions)))
+            {
+                availabilityGroup.ClusterConnectionOptions = this.availabilityGroupData.ClusterConnectionOptions;
+            }
+
             foreach (var db in this.availabilityGroupData.NewAvailabilityDatabases)
             {
                 availabilityGroup.AvailabilityDatabases.Add(new SMO.AvailabilityDatabase(availabilityGroup, db.Name));

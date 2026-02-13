@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Member" impl_type="SqlObject" min_major='7' cloud_min_major="10" datawarehouse_enabled='true'>
+<EnumObject type="Member" impl_type="SqlObject" min_major='10' cloud_min_major="10" datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent='ID' local='RoleID' />
@@ -7,42 +7,7 @@
     <request_parent_select>
       <field name='ID' />
     </request_parent_select>
-    <version min_major='7' max_major='8'>
-      <property_link table='#tmp_role_member_ids AS m' />
-      <property_link join='dbo.sysusers AS u'>u.uid = m.id</property_link>
-      <prefix>
-        <link_multiple no='1' expression="
-set NOCOUNT OFF
-CREATE TABLE #tmp_role_member_ids (id int not null, role_id int null, sub_role_id int null, generation int null)
-declare @generation int
-set @generation = 0
-INSERT INTO #tmp_role_member_ids (id) {0}
-UPDATE #tmp_role_member_ids SET role_id = id, sub_role_id = id, generation=@generation
-WHILE ( 1=1 )
-BEGIN
-  INSERT INTO #tmp_role_member_ids (id, role_id, sub_role_id, generation)
-    SELECT a.memberuid, b.role_id, a.groupuid, @generation + 1
-      FROM sysmembers AS a INNER JOIN #tmp_role_member_ids AS b
-      ON a.groupuid = b.id
-      WHERE b.generation = @generation
-  if @@ROWCOUNT &lt;= 0
-    break
-  set @generation = @generation + 1
-END
-delete #tmp_role_member_ids WHERE id in ({0})
-UPDATE #tmp_role_member_ids SET generation = 0;
-INSERT INTO #tmp_role_member_ids (id, role_id, generation)
-    SELECT distinct id, role_id, 1 FROM #tmp_role_member_ids
-DELETE #tmp_role_member_ids WHERE generation = 0
-">
-          <link_field field="ParentSelect" />
-        </link_multiple>
-      </prefix>
-      <postfix>
-        drop table #tmp_role_member_ids
-      </postfix>
-    </version>
-    <version min_major='9' cloud_min_major="10" datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major="10" datawarehouse_enabled='true'>
       <property_link table='#tmp_role_member_ids AS m' />
       <property_link join='sys.database_principals AS u'>u.principal_id = m.id</property_link>
       <prefix>
@@ -99,18 +64,7 @@ DELETE #tmp_role_member_ids WHERE generation = 0
       </link_multiple>
     </property>
     <property name="Name" type="sysname">u.name</property>
-    <version min_major='7' max_major='8'>
-      <property name="ID" type="int">u.uid</property>
-      <property name="Login" type="sysname">suser_sname(u.sid)</property>
-      <property name="MemberType" type="sysname" hidden='true'>
-        (CASE
-        WHEN u.issqlrole = 1 THEN N'Role'
-        WHEN u.isapprole = 1 THEN N'ApplicationRole'
-        ELSE N'User' END)
-      </property>
-      <property name="RoleID" type="sysname" hidden='true'>m.role_id</property>
-    </version>
-    <version min_major='9' cloud_min_major="10" datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major="10" datawarehouse_enabled='true'>
       <property name="ID" type="int">u.principal_id</property>
       <property name="MemberType" type="sysname" hidden='true'>
         (CASE u.type
@@ -120,7 +74,7 @@ DELETE #tmp_role_member_ids WHERE generation = 0
       </property>
       <property name="RoleID" type="sysname" hidden='true'>m.role_id</property>
     </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="Login" type="sysname">suser_sname(u.sid)</property>
     </version>
     <version cloud_min_major='10' datawarehouse_enabled='true'>

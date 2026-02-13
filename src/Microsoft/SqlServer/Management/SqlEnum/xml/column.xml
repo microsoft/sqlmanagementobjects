@@ -1,19 +1,10 @@
 <?xml version="1.0" ?>
-<EnumObject type="Column" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Column" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent="ID" local="ParentID" />
     </parent_link>
-    <version min_major='7' max_major='8'>
-      <property_link table='dbo.syscolumns AS clmns' />
-      <property_link fields='#InPrimaryKey#' left_join='dbo.sysindexes AS ik'>ik.id = clmns.id and 0 != ik.status &amp; 0x0800</property_link>
-      <property_link fields='#InPrimaryKey#' left_join='dbo.sysindexkeys AS cik'>cik.indid = ik.indid and cik.colid = clmns.colid and cik.id = clmns.id</property_link>
-      <property_link fields='#Default#DefaultSchema#' left_join='dbo.sysobjects AS d'>d.id = clmns.cdefault and 0=d.category &amp; 0x0800</property_link>
-      <property_link fields='#Rule#RuleSchema#' left_join='dbo.sysobjects AS r'>r.id = clmns.domain</property_link>
-      <property_link fields='#DefaultConstraintName#' left_join='dbo.sysobjects AS dc'>dc.xtype='D' and dc.name not like N'#%%' and 0!=convert(bit,cstr.category &amp; 0x0800)</property_link>
-      <post_process fields='#ComputedText#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessText' />
-    </version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property_link table='sys.all_columns AS clmns' />
       <property_link fields='#IdentitySeed#IdentityIncrement#IdentitySeedAsDecimal#IdentityIncrementAsDecimal#NotForReplication#' left_join='sys.identity_columns AS ic'>ic.object_id = clmns.object_id and ic.column_id = clmns.column_id</property_link>
       <property_link fields='#ComputedText#IsPersisted#' left_join='sys.computed_columns AS cc'>cc.object_id = clmns.object_id and cc.column_id = clmns.column_id</property_link>
@@ -43,88 +34,7 @@
   </settings>
   <properties>
     <include file='inc_urn.xml' />
-    <version min_major='7' max_major='8'>
-      <property name="Name" type="sysname" mode="design">clmns.name</property>
-      <property name="ID" type="int" access="Read" cast='true'>clmns.colid</property>
-      <!-- column specific props-->
-      <property name="Nullable" type="bit" cast='true' mode="design">clmns.isnullable</property>
-      <property name="Computed" type="bit" cast='true' read_only_after_creation="true" mode="design">clmns.iscomputed</property>
-      <property name="InPrimaryKey" type="bit" access='read' cast='true'>ISNULL(cik.colid, 0)</property>
-      <property name="AnsiPaddingStatus" type="bit" cast='true' access='read'>ISNULL(COLUMNPROPERTY(clmns.id, clmns.name, N'UsesAnsiTrim'),0)</property>
-      <property name="RowGuidCol" type="bit" cast='true' mode="design">clmns.colstat &amp; 2</property>
-      <property name="NotForReplication" type="bit" cast='true' read_only_after_creation="true" mode="deploy">clmns.colstat &amp; 8</property>
-      <property name="IsFullTextIndexed" type="bit" cast='true' access='read' >COLUMNPROPERTY(clmns.id, clmns.name, N'IsFulltextIndexed')</property>
-      <property name="ComputedText" type="nvarchar" size='4000' expensive='true' read_only_after_creation="true" mode="design">cast(clmns.id as nvarchar(20)) + '_' + cast(clmns.colid as nvarchar(20)) + '_' + cast(db_id() as nvarchar(20)) + '_0'</property>
-      <property name="Identity" type="bit" cast='true' read_only_after_creation="true" mode="design">COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity')</property>
-      <property name="IsForeignKey" type="bit" cast='true'
-        access='read' >ISNULL((select top 1 1 from dbo.sysforeignkeys AS colfk where colfk.fkey = clmns.colid and colfk.fkeyid = clmns.id), 0)</property>
-      <version min_major='8' max_major='8'>
-        <property name="Collation" type="sysname" mode="design">ISNULL(clmns.collation, N'')</property>
-
-        <property name="IdentitySeed" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-        <property name="IdentityIncrement" type="bigint" cast='true' read_only_after_creation="true" mode="design" expensive="true">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-        <property name="IdentitySeedAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-        <property name="IdentityIncrementAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-      </version>
-      <version min_major='7' max_major='7'>
-        <property name="IdentitySeed" type="int" report_type2 = 'System.Int64' cast='true' read_only_after_creation="true" mode="design" expensive="true">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-        <property name="IdentityIncrement" type="int" report_type2 = 'System.Int64' cast='true' read_only_after_creation="true" mode="design" expensive="true">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-        <property name="IdentitySeedAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-        <property name="IdentityIncrementAsDecimal" type="numeric" size="38" cast='true' read_only_after_creation="true" mode="design">
-          <link_multiple no='1' expression="case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_incr({0}) else 0 end">
-            <link_field type='parent' field="FullName" />
-          </link_multiple>
-        </property>
-      </version>
-
-      <!-- default section -->
-      <property name="ColumnDefaultID" type="int" hidden='true'>clmns.cdefault</property>
-      <property name="ParentID" type="int" hidden="true">clmns.id</property>
-      <property name="Default" type="sysname" read_only_after_creation="true">(case when clmns.cdefault = 0 then N'' else d.name end)</property>
-      <property name="DefaultSchema" type="sysname" read_only_after_creation="true">(case when clmns.cdefault = 0 then N'' else user_name(d.uid) end)</property>
-      <!-- "Default" refers to a default bound by sp_bindefault. "DefaultConstraintName" refers to the name of a modern default constraint.
-        We have this property to enable the DefaultConstraint property to short circuit its value to null during scripting and avoid a SQL query
-      -->
-      <property name="DefaultConstraintName" type="sysname" read_only_after_creation='true'>ISNULL(dc.Name, N'')</property>
-      <!-- rule section -->
-      <property name="Rule" type="sysname" read_only_after_creation="true">(case when clmns.domain = 0 then N'' else r.name end)</property>
-      <property name="RuleSchema" type="sysname" read_only_after_creation="true">(case when clmns.domain = 0 then N'' else user_name(r.uid) end)</property>
-
-      <!-- extended properties support : commented out: sysproperties is not accessible to regular users
-      <property name="ExtPropClass" type="int" hidden='true'>4</property>
-      -->
-      <property name="ObjectTypeName" type="sysname" hidden='true'>N'COLUMN'</property>
-      <include file ="inc_level2SupportProperties.xml"/>
-    </version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="Name" type="sysname" mode="design">clmns.name</property>
       <property name="ID" type="int">clmns.column_id</property>
       <!-- column specific props-->
@@ -155,25 +65,19 @@
       <property name="Rule" type="sysname" read_only_after_creation="true">(case when clmns.rule_object_id = 0 then N'' else r.name end)</property>
       <property name="RuleSchema" type="sysname" read_only_after_creation="true">(case when clmns.rule_object_id = 0 then N'' else schema_name(r.schema_id) end)</property>
     </version>
-        <version min_major='9'  cloud_min_major='10'>
+        <version min_major='10'  cloud_min_major='10'>
       <property name="IsDeterministic" type="bit" cast='true' access='read'>ISNULL(COLUMNPROPERTY(clmns.object_id, clmns.name, N'IsDeterministic'),0)</property>
       <property name="IsPrecise" type="bit" cast='true' access='read'>ISNULL(COLUMNPROPERTY(clmns.object_id, clmns.name, N'IsPrecise'),0)</property>
     </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="NotForReplication" type="bit" read_only_after_creation="true" mode="deploy">ISNULL(ic.is_not_for_replication, 0)</property>
     </version>
-    <version min_major='9' cloud_min_major='10'>
+    <version min_major='10' cloud_min_major='10'>
       <property name="IsFullTextIndexed" type="bit" cast='true' access='read'>COLUMNPROPERTY(clmns.object_id, clmns.name, N'IsFulltextIndexed')</property>
     </version>
     <version min_major='11'>
       <property name="StatisticalSemantics" type="int" cast="true" access="read">COLUMNPROPERTY(clmns.object_id, clmns.name, N'StatisticalSemantics')</property>
     </version>
-    <version min_major='9' max_major='9'>
-      <!-- extended properties support -->
-      <property name="ExtPropClass" type="int" hidden='true'>1</property>
-      <property name="ParentID" type="int" hidden="true">clmns.object_id</property>
-    </version>
-
     <version min_major='13' cloud_min_major='12'>
       <!--TCE specific props-->
       <property name="EncryptionType" type="int" report_type="ColumnEncryptionType" cast='true' read_only_after_creation="true">clmns.encryption_type</property>
@@ -199,19 +103,6 @@
     <include alias = 'clmns' file='inc_type.xml' />
 
     <!-- extended properties support -->
-    <version min_major='7' max_major='9'>
-      <property name="ExtPropMajorID" type="int" hidden='true'>
-        <link_multiple no='1' expression="{0}">
-          <link_field type='local' field="ParentID" />
-        </link_multiple>
-      </property>
-      <property name="ExtPropMinorID" type="int" hidden='true'>
-        <link_multiple no='1' expression="{0}">
-          <link_field type='local' field="ID" />
-        </link_multiple>
-      </property>
-    </version>
-
     <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="ExtPropMajorID" type="int" hidden='true'>
         <link_multiple no='1' expression="{0}">
@@ -244,7 +135,7 @@
     </version>
 
     <!-- ledger support -->
-    <version min_major='7' max_major='15' datawarehouse_enabled='true'>
+    <version min_major='10' max_major='15' datawarehouse_enabled='true'>
       <property name="IsDroppedLedgerColumn" type="bit" access="read" cast="true">0</property>
     </version>
     <version min_major='16' cloud_min_major='12'>
@@ -307,7 +198,8 @@
     </version>
 
     <version min_major='17' cloud_min_major='12'>
-      <property name="VectorDimensions" type="int" mode="design">ISNULL(clmns.vector_dimensions, 0)</property>
+      <!-- Some versions of this DMV have vector_dimensions as a tinyint, which causes us to fail casting. So ensure this is always a full int -->
+      <property name="VectorDimensions" type="int" cast="true" mode="design">ISNULL(clmns.vector_dimensions, 0)</property>
       <property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(clmns.vector_base_type_desc, N'')</property>
     </version>
   </properties>

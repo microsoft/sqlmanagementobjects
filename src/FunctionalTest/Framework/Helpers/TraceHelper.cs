@@ -34,7 +34,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <param name="message"></param>
         public static void TraceInformation(string message)
         {
-           Trace.TraceInformation($"{DateTime.Now.ToString("o")} - {message}");
+           Trace.TraceInformation(AddTimestamp(message));
         }
 
         /// <summary>
@@ -44,7 +44,36 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <param name="args"></param>
         public static void TraceInformation(string format, params object[] args)
         {
-           Trace.TraceInformation($"{DateTime.Now.ToString("o")} - {format}", args);
+           Trace.TraceInformation(AddTimestamp(format), args);
+        }
+
+        /// <summary>
+        /// The default trace output lacks timestamps, this adds it
+        /// </summary>
+        /// <param name="message"></param>
+        public static void TraceWarning(string message)
+        {
+           Trace.TraceWarning(AddTimestamp(message));
+        }
+
+        /// <summary>
+        /// The default trace output lacks timestamps, this adds it
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="args"></param>
+        public static void TraceWarning(string format, params object[] args)
+        {
+           Trace.TraceWarning(AddTimestamp(format), args);
+        }
+
+        /// <summary>
+        /// Helper method to add timestamp prefix to messages
+        /// </summary>
+        /// <param name="message">The message or format string</param>
+        /// <returns>Message with timestamp prefix</returns>
+        private static string AddTimestamp(string message)
+        {
+            return $"{DateTime.Now:o} - {message}";
         }
     }
 }

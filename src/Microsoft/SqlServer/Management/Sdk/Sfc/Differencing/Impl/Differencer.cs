@@ -4,7 +4,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Differencing.SPI;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -16,8 +19,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
     /// </summary>
     internal class Differencer : IDifferencer
     {
-        internal const string ComponentName = "Differencing";
-
         // A default available value provider that always return true
         private readonly static AvailablePropertyValueProvider DEFAULT_AVAILABLE_PROPERTY_VALUE_PROVIDER
             = new DefaultAvailablePropertyValueProvider();
@@ -38,6 +39,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
         // option to indicate what type to emit
         private DiffType emittedChangeType;
+
+        /// <summary>
+        /// Helper method to log differencing trace messages with performance optimization.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        /// <param name="args">Optional format arguments.</param>
+        private static void LogTrace(string message, params object[] args)
+        {
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Verbose, SmoEventSource.Keywords.Differencing))
+            {
+                string formattedMessage = args.Length == 0 ? message : string.Format(message, args);
+                SmoEventSource.Log.DifferencingTrace(formattedMessage);
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -72,28 +87,28 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
         // implement the diff method
         public IDiffgram CompareGraphs(Object source, Object target)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: entering public method.");
+            LogTrace("CompareGraphs: entering public method.");
             if (source == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: argument null 'source'.");
+                LogTrace("CompareGraphs: argument null 'source'.");
                 throw new ArgumentNullException("source");
             }
             if (target == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: argument null 'target'.");
+                LogTrace("CompareGraphs: argument null 'target'.");
                 throw new ArgumentNullException("target");
             }
 
             if (source.GetType() != target.GetType())
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: argument types do not match.");
+                LogTrace("CompareGraphs: argument types do not match.");
                 throw new ArgumentException(StringDifferencing.MismatchType(source.ToString(), target.ToString()));
             }
 
             SfcNodeAdapterProvider nodeAdapter = FindNodeAdapterProvider(source);
             if (nodeAdapter == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: cannot find node adapter that can navigate the specified input.");
+                LogTrace("CompareGraphs: cannot find node adapter that can navigate the specified input.");
                 throw new ArgumentException(StringDifferencing.NotRecognizedGraph);
             }
 
@@ -102,40 +117,40 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             NodeItemNamesAdapterProvider nameProvider = FindNameProvider(sourceAdapted);
             if (nameProvider == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: cannot find name (metadata) provider that can navigate the specified input.");
+                LogTrace("CompareGraphs: cannot find name (metadata) provider that can navigate the specified input.");
                 throw new ArgumentException(StringDifferencing.CannotFindMetadataProvider);
             }
             AvailablePropertyValueProvider sourceValueProvider = FindAvailableValueProvider(sourceAdapted);
             if (sourceValueProvider == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: cannot find value available provider. default is used.");
+                LogTrace("CompareGraphs: cannot find value available provider. default is used.");
                 sourceValueProvider = DEFAULT_AVAILABLE_PROPERTY_VALUE_PROVIDER;
             }
             AvailablePropertyValueProvider targetValueProvider = FindAvailableValueProvider(targetAdapted);
             if (targetValueProvider == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: cannot find value available provider. default is used.");
+                LogTrace("CompareGraphs: cannot find value available provider. default is used.");
                 targetValueProvider = DEFAULT_AVAILABLE_PROPERTY_VALUE_PROVIDER;
             }
             PropertyComparerProvider propComparer = FindPropertyComparerProvider(sourceAdapted, targetAdapted);
             if (propComparer == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: cannot find property comparer provider. default is used.");
+                LogTrace("CompareGraphs: cannot find property comparer provider. default is used.");
                 propComparer = DEFAULT_PROP_COMPARER;
             }
             ContainerSortingProvider sortProvider = FindContainerSortingProvider(sourceAdapted, targetAdapted);
             if (sortProvider == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: cannot find value sorting provider. default is used.");
+                LogTrace("CompareGraphs: cannot find value sorting provider. default is used.");
                 sortProvider = DEFAULT_SORT_PROVIDER;
             }
 
-            TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: parameter verified.");
-            LateActivatedDiffgram result = new LateActivatedDiffgram(this, nameProvider, 
+            LogTrace("CompareGraphs: parameter verified.");
+            LateActivatedDiffgram result = new LateActivatedDiffgram(this, nameProvider,
                 sourceValueProvider, targetValueProvider, sortProvider, propComparer,
                 emittedChangeType, sourceAdapted, targetAdapted);
 
-            TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: exiting public method.");
+            LogTrace("CompareGraphs: exiting public method.");
             return result;
         }
 
@@ -186,31 +201,31 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
         protected void CompareNodes(IDiffContext context, ISfcSimpleNode source, ISfcSimpleNode target)
         {
-            TraceHelper.Assert(source != null && target != null, "assert input nodes are not null");
-            TraceHelper.Assert(source.Urn != null && target.Urn != null, "assert input nodes' Urns are not null");
-            TraceHelper.Trace(Differencer.ComponentName, "CompareNodes: comparing two nodes {0} and {1}.", source.Urn, target.Urn);
+            Debug.Assert(source != null && target != null, "assert input nodes are not null");
+            Debug.Assert(source.Urn != null && target.Urn != null, "assert input nodes' Urns are not null");
+            LogTrace("CompareNodes: comparing two nodes {0} and {1}.", source.Urn, target.Urn);
 
             CompareProperties(context, source, target);
 
             // Compare each children list
-            TraceHelper.Trace(Differencer.ComponentName, "CompareNodes: looping all related containers (collection) of the node.");
+            LogTrace("CompareNodes: looping all related containers (collection) of the node.");
             foreach (string name in GetRelatedContainerNames(context.NodeItemNamesAdapterProvider, source))
             {
                 bool naturalOrder = GetNaturalOrder(context.NodeItemNamesAdapterProvider, source, name);
                 CompareRelatedContainer(context, source.RelatedContainers[name], target.RelatedContainers[name], naturalOrder);
             }
-            TraceHelper.Trace(Differencer.ComponentName, "CompareNodes: looped all related containers (collection) of the node.");
+            LogTrace("CompareNodes: looped all related containers (collection) of the node.");
 
             // Compare each children singleton
-            TraceHelper.Trace(Differencer.ComponentName, "CompareNodes: looping all related object (singleton) of the node.");
+            LogTrace("CompareNodes: looping all related object (singleton) of the node.");
             foreach (string name in GetRelatedObjectNames(context.NodeItemNamesAdapterProvider, source))
             {
                 CompareRelatedObject(context, source.RelatedObjects[name], target.RelatedObjects[name]);
             }
 
-            TraceHelper.Trace(Differencer.ComponentName, "CompareNodes: looped all related object (singleton) of the node.");
+            LogTrace("CompareNodes: looped all related object (singleton) of the node.");
 
-            TraceHelper.Trace(Differencer.ComponentName, "CompareNodes: compared two nodes.");
+            LogTrace("CompareNodes: compared two nodes.");
         }
 
         protected void CompareRelatedContainer(IDiffContext context, ISfcSimpleList source, ISfcSimpleList target, bool naturalOrder)
@@ -225,15 +240,16 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             // moved. Vice versa for the (-) case.
             // The implementation uses IEnumerator instead of arrays and cursors.
 
-            TraceHelper.Assert(source != null && target != null, "assert input is not null");
-            TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: comparing element in two container.");
+            Debug.Assert(source != null && target != null, "assert input is not null");
+            LogTrace("CompareRelatedContainer: comparing element in two container.");
 
             IEnumerator<ISfcSimpleNode> leftEnum = null;
             IEnumerator<ISfcSimpleNode> rightEnum = null;
-            try {
+            try
+            {
                 if (naturalOrder)
                 {
-                    TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: use natural order (no sorting).");
+                    LogTrace("CompareRelatedContainer: use natural order (no sorting).");
                     leftEnum = source.GetEnumerator();
                     rightEnum = target.GetEnumerator();
                 }
@@ -258,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
                         if (hasSourceElement && hasTargetElement)
                         {
-                            TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: use sorting.");
+                            LogTrace("CompareRelatedContainer: use sorting.");
                             IEnumerable<ISfcSimpleNode> leftList = null;
                             IEnumerable<ISfcSimpleNode> rightList = null;
                             GetSortedLists(context.ContainerSortingProvider, source, target, out leftList,
@@ -289,7 +305,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                     // nesting, to make it shorter and to increase readablity.
 
                     // move cursor
-                    TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: move cursor.");
+                    LogTrace("CompareRelatedContainer: move cursor.");
                     if (left == null && leftEnum.MoveNext())
                     {
                         left = leftEnum.Current;
@@ -328,20 +344,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                     // process each of the 4 cases
                     if (comp < 0)  // case: created
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: could not find matched element on the other side (created case).");
+                        LogTrace("CompareRelatedContainer: could not find matched element on the other side (created case).");
                         EmitCreatedEntry(context, left);
                         left = null; // clear the pointer so that we will move the cursor at the next round
                         continue; // = exit =
                     }
                     else if (comp > 0)   // case: deleted
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: could not find matched element on the other side (deleted case).");
+                        LogTrace("CompareRelatedContainer: could not find matched element on the other side (deleted case).");
                         EmitDeletedEntry(context, right);
                         right = null; // clear the pointer so that we will move the cursor at the next round
                         continue; // = exit =
                     }
 
-                    TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: found matched elements. push for later comparison (breadth first)");
+                    LogTrace("CompareRelatedContainer: found matched elements. push for later comparison (breadth first)");
                     // case: updated (or unchanged) --> Push to the stack
                     context.Push(left, right);
 
@@ -349,12 +365,12 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                     right = null;
                 }
             }
-            finally 
+            finally
             {
                 Dispose(leftEnum);
                 Dispose(rightEnum);
             }
-            TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: compared element in two containers.");
+            LogTrace("CompareRelatedContainer: compared element in two containers.");
         }
 
         protected void CompareRelatedObject(IDiffContext context, ISfcSimpleNode source, ISfcSimpleNode target)
@@ -363,21 +379,21 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 // no object to compare
                 return;
-            } 
+            }
             else if (target == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedObject: related object is null (create case).");
+                LogTrace("CompareRelatedObject: related object is null (create case).");
                 EmitCreatedEntry(context, source);
             }
             else if (source == null)
             {
-                TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedObject: related object is null (delete case).");
+                LogTrace("CompareRelatedObject: related object is null (delete case).");
                 EmitDeletedEntry(context, target);
             }
             else
             {
                 // need to look deeper to see if they are Equivalent or Updated
-                TraceHelper.Trace(Differencer.ComponentName, "CompareRelatedContainer: found matched elements. push for later comparison (breadth first)");
+                LogTrace("CompareRelatedContainer: found matched elements. push for later comparison (breadth first)");
                 context.Push(source, target);
             }
         }
@@ -387,7 +403,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             // Assumption: to this diff service, Property lists are always a static list. It is defined 
             // by the type of the graphs, and they're always fixed. New Property cannot be added or removed.
             // It is specified in the API that only structurally identical graphs can be compared.
-            TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: comparing properties of two nodes.");
+            LogTrace("CompareGraphs: comparing properties of two nodes.");
 
             IDictionary<string, IPair<Object>> pairedProps = null;
             foreach (string name in GetPropertyNames(context.NodeItemNamesAdapterProvider, source))
@@ -424,7 +440,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 EmitEquivalentEntry(context, source, target);
             }
 
-            TraceHelper.Trace(Differencer.ComponentName, "CompareGraphs: compared properties of two nodes.");
+            LogTrace("CompareGraphs: compared properties of two nodes.");
         }
 
         protected int CompareIdentities(ISfcSimpleNode left, ISfcSimpleNode right, IComparer<ISfcSimpleNode> comparer)
@@ -539,8 +555,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
 
                 // otherwise simple log and return
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "Exception occurs in cleanup: {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace($"Exception occurs in cleanup: {e}");
 
             }
         }
@@ -548,23 +564,23 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
         #region Provider
         protected ISfcSimpleNode AdaptNode(SfcNodeAdapterProvider provider, Object node)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: obtaining adapter for node {0}.", node);
+            LogTrace("AdaptNode: obtaining adapter for node {0}.", node);
             try
             {
                 ISfcSimpleNode result = provider.GetGraphAdapter(node);
-                TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: obtained adapter for node {0}.", node);
+                LogTrace("AdaptNode: obtained adapter for node {0}.", node);
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("AdaptNode: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("AdaptNode: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -574,22 +590,23 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
         {
             // It calls to provider code that is outside of our control. Should handle exception in 
             // every calls to provider.
-            TraceHelper.Trace(Differencer.ComponentName, "GetRelatedContainerNames: obtaining container (meta) names provider {0}.", node);
-            try {
+            LogTrace("GetRelatedContainerNames: obtaining container (meta) names provider {0}.", node);
+            try
+            {
                 IEnumerable<string> result = provider.GetRelatedContainerNames(node);
-                TraceHelper.Trace(Differencer.ComponentName, "GetRelatedContainerNames: obtained container (meta) names provider {0}.", node);
+                LogTrace("GetRelatedContainerNames: obtained container (meta) names provider {0}.", node);
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetRelatedContainerNames: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetRelatedContainerNames: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetRelatedContainerNames: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetRelatedContainerNames: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -599,23 +616,23 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
         {
             // It calls to provider code that is outside of our control. Should handle exception in 
             // every calls to provider.
-            TraceHelper.Trace(Differencer.ComponentName, "GetNaturalOrder: determining if it is natural order {0}.", node);
+            LogTrace("GetNaturalOrder: determining if it is natural order {0}.", node);
             try
             {
                 bool result = provider.IsContainerInNatrualOrder(node, name);
-                TraceHelper.Trace(Differencer.ComponentName, "GetNaturalOrder: determined {0}.", result);
+                LogTrace("GetNaturalOrder: determined {0}.", result);
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetNaturalOrder: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetNaturalOrder: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetNaturalOrder: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetNaturalOrder: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -625,34 +642,34 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
         {
             // It calls to provider code that is outside of our control. Should handle exception in 
             // every calls to provider.
-            TraceHelper.Trace(Differencer.ComponentName, "GetIsValueAvailable: determining if it property is available {0}.", node);
+            LogTrace("GetIsValueAvailable: determining if it property is available {0}.", node);
             try
             {
                 bool result = provider.IsValueAvailable(node, name);
-                TraceHelper.Trace(Differencer.ComponentName, "GetIsValueAvailable: determined {0}.", result);
+                LogTrace("GetIsValueAvailable: determined {0}.", result);
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetIsValueAvailable: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetIsValueAvailable: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetIsValueAvailable: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetIsValueAvailable: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
 
-        protected void GetSortedLists(ContainerSortingProvider provider, ISfcSimpleList source, ISfcSimpleList target, 
+        protected void GetSortedLists(ContainerSortingProvider provider, ISfcSimpleList source, ISfcSimpleList target,
             out IEnumerable<ISfcSimpleNode> sortedSource, out IEnumerable<ISfcSimpleNode> sortedTarget)
         {
             // It calls to provider code that is outside of our control. Should handle exception in 
             // every calls to provider.
-            TraceHelper.Trace(Differencer.ComponentName, "GetSortedLists: obtaining sorted lists {0} and {1}.", source, target);
+            LogTrace("GetSortedLists: obtaining sorted lists {0} and {1}.", source, target);
             try
             {
                 IEnumerable<ISfcSimpleNode> sourceResult = null;
@@ -663,18 +680,18 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 // delay the change-of-state unless we know we don't get an exception
                 sortedSource = sourceResult;
                 sortedTarget = targetResult;
-                TraceHelper.Trace(Differencer.ComponentName, "GetSortedLists: obtained sorted lists {0}.", source);
+                LogTrace("GetSortedLists: obtained sorted lists {0}.", source);
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetSortedList: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetSortedList: exception occurred {0}.", ae);
                 throw new ArgumentException("list", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetSortedList: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetSortedList: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), source.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -684,23 +701,23 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
         {
             // It calls to provider code that is outside of our control. Should handle exception in 
             // every calls to provider.
-            TraceHelper.Trace(Differencer.ComponentName, "GetComparer: obtaining comparer {0}.", list);
+            LogTrace("GetComparer: obtaining comparer {0}.", list);
             try
             {
                 IComparer<ISfcSimpleNode> result = provider.GetComparer(list, list2);
-                TraceHelper.Trace(Differencer.ComponentName, "GetComparer: obtained comparer {0}.", list);
+                LogTrace("GetComparer: obtained comparer {0}.", list);
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetComparer: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetComparer: exception occurred {0}.", ae);
                 throw new ArgumentException("list", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetComparer: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetComparer: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), list.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -708,23 +725,23 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
         protected IEnumerable<string> GetRelatedObjectNames(NodeItemNamesAdapterProvider provider, ISfcSimpleNode node)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "GetRelatedObjectNames: obtaining related object name for node {0}.", node);
-            try 
+            LogTrace("GetRelatedObjectNames: obtaining related object name for node {0}.", node);
+            try
             {
                 IEnumerable<string> result = provider.GetRelatedObjectNames(node);
-                TraceHelper.Trace(Differencer.ComponentName, "GetRelatedObjectNames: obtained related object name for node.");
+                LogTrace("GetRelatedObjectNames: obtained related object name for node.");
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetRelatedObjectNames: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetRelatedObjectNames: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetRelatedObjectNames: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetRelatedObjectNames: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -732,23 +749,23 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
         protected IEnumerable<string> GetPropertyNames(NodeItemNamesAdapterProvider provider, ISfcSimpleNode node)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "GetPropertyNames: obtaining prop names for node {0}.", node);
+            LogTrace("GetPropertyNames: obtaining prop names for node {0}.", node);
             try
             {
                 IEnumerable<string> result = provider.GetPropertyNames(node);
-                TraceHelper.Trace(Differencer.ComponentName, "GetPropertyNames: obtained prop names for node.");
+                LogTrace("GetPropertyNames: obtained prop names for node.");
                 return result;
             }
             catch (ArgumentException ae)
             {
-                TraceHelper.LogExCatch(ae);
-                TraceHelper.Trace(Differencer.ComponentName, "GetPropertyNames: exception occurred {0}.", ae);
+                SmoEventSource.Log.DifferencingException(ae);
+                LogTrace("GetPropertyNames: exception occurred {0}.", ae);
                 throw new ArgumentException("node", ae);
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
-                TraceHelper.Trace(Differencer.ComponentName, "GetPropertyNames: exception occurred {0}.", e);
+                SmoEventSource.Log.DifferencingException(e);
+                LogTrace("GetPropertyNames: exception occurred {0}.", e);
                 String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
@@ -756,126 +773,126 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
         protected SfcNodeAdapterProvider FindNodeAdapterProvider(Object node)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: finding adapter for node {0}.", node);
+            LogTrace("AdaptNode: finding adapter for node {0}.", node);
             foreach (SfcNodeAdapterProvider provider in registry.SfcNodeAdapterProviders)
             {
                 try
                 {
                     if (provider.IsGraphSupported(node))
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: found adapter for node.");
+                        LogTrace("AdaptNode: found adapter for node.");
                         return provider;
                     }
                 }
                 catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    TraceHelper.LogExCatch(e);
-                    TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: exception occurred {0}.", e);
+                    SmoEventSource.Log.DifferencingException(e);
+                    LogTrace("AdaptNode: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
-            TraceHelper.Trace(Differencer.ComponentName, "AdaptNode: not found");
+            LogTrace("AdaptNode: not found");
             return null;
         }
 
         protected NodeItemNamesAdapterProvider FindNameProvider(ISfcSimpleNode node)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "FindNameProvider: finding name provider for node {0}.", node);
+            LogTrace("FindNameProvider: finding name provider for node {0}.", node);
             foreach (NodeItemNamesAdapterProvider provider in registry.NodeItemNameAdapterProviders)
             {
                 try
                 {
                     if (provider.IsGraphSupported(node))
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "FindNameProvider: found name provider for node.");
+                        LogTrace("FindNameProvider: found name provider for node.");
                         return provider;
                     }
                 }
                 catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    TraceHelper.LogExCatch(e);
-                    TraceHelper.Trace(Differencer.ComponentName, "FindNameProvider: exception occurred {0}.", e);
+                    SmoEventSource.Log.DifferencingException(e);
+                    LogTrace("FindNameProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
-            TraceHelper.Trace(Differencer.ComponentName, "FindNameProvider: not found");
+            LogTrace("FindNameProvider: not found");
             return null;
         }
 
         protected AvailablePropertyValueProvider FindAvailableValueProvider(ISfcSimpleNode node)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "FindAvailableValueProvider: finding provider for node {0}.", node);
+            LogTrace("FindAvailableValueProvider: finding provider for node {0}.", node);
             foreach (AvailablePropertyValueProvider provider in registry.AvailablePropertyValueProviders)
             {
                 try
                 {
                     if (provider.IsGraphSupported(node))
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "FindAvailableValueProvider: found provider for node.");
+                        LogTrace("FindAvailableValueProvider: found provider for node.");
                         return provider;
                     }
                 }
                 catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    TraceHelper.LogExCatch(e);
-                    TraceHelper.Trace(Differencer.ComponentName, "FindAvailableValueProvider: exception occurred {0}.", e);
+                    SmoEventSource.Log.DifferencingException(e);
+                    LogTrace("FindAvailableValueProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
-            TraceHelper.Trace(Differencer.ComponentName, "FindAvailableValueProvider: not found");
+            LogTrace("FindAvailableValueProvider: not found");
             return null;
         }
 
         protected ContainerSortingProvider FindContainerSortingProvider(ISfcSimpleNode source, ISfcSimpleNode target)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "FindContainerSortingProvider: finding provider for node {0} and {1}.", source, target);
+            LogTrace("FindContainerSortingProvider: finding provider for node {0} and {1}.", source, target);
             foreach (ContainerSortingProvider provider in registry.ContainerSortingProviders)
             {
                 try
                 {
                     if (provider.AreGraphsSupported(source, target))
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "FindContainerSortingProvider: found provider for node {0} and {1}.", source, target);
+                        LogTrace("FindContainerSortingProvider: found provider for node {0} and {1}.", source, target);
                         return provider;
                     }
                 }
                 catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    TraceHelper.LogExCatch(e);
-                    TraceHelper.Trace(Differencer.ComponentName, "FindContainerSortingProvider: exception occurred {0}.", e);
+                    SmoEventSource.Log.DifferencingException(e);
+                    LogTrace("FindContainerSortingProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), source.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
-            TraceHelper.Trace(Differencer.ComponentName, "FindContainerSortingProvider: not found");
+            LogTrace("FindContainerSortingProvider: not found");
             return null;
         }
 
         protected PropertyComparerProvider FindPropertyComparerProvider(ISfcSimpleNode source, ISfcSimpleNode target)
         {
-            TraceHelper.Trace(Differencer.ComponentName, "FindPropertyComparerProvider: finding provider for node {0} and {1}.", source, target);
+            LogTrace("FindPropertyComparerProvider: finding provider for node {0} and {1}.", source, target);
             foreach (PropertyComparerProvider provider in registry.PropertyComparerProviders)
             {
                 try
                 {
                     if (provider.AreGraphsSupported(source, target))
                     {
-                        TraceHelper.Trace(Differencer.ComponentName, "FindPropertyComparerProvider: found provider for node {0} and {1}.", source, target);
+                        LogTrace("FindPropertyComparerProvider: found provider for node {0} and {1}.", source, target);
                         return provider;
                     }
                 }
                 catch (Exception e) when (!IsSystemGeneratedException(e))
                 {
-                    TraceHelper.LogExCatch(e);
-                    TraceHelper.Trace(Differencer.ComponentName, "FindPropertyComparerProvider: exception occurred {0}.", e);
+                    SmoEventSource.Log.DifferencingException(e);
+                    LogTrace("FindPropertyComparerProvider: exception occurred {0}.", e);
                     String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), source.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
-            TraceHelper.Trace(Differencer.ComponentName, "FindPropertyComparerProvider: not found");
+            LogTrace("FindPropertyComparerProvider: not found");
             return null;
         }
 
@@ -948,7 +965,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             private AvailablePropertyValueProvider sourceValueProvider;
 
             private AvailablePropertyValueProvider targetValueProvider;
-            
+
             private ContainerSortingProvider sortProvider;
 
             private PropertyComparerProvider propComparer;
@@ -957,10 +974,10 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
             private ISfcSimpleNode target;
 
-            public LateActivatedDiffgram(Differencer differencer, 
+            public LateActivatedDiffgram(Differencer differencer,
                 NodeItemNamesAdapterProvider nameProvider,
-                AvailablePropertyValueProvider sourceValueProvider, 
-                AvailablePropertyValueProvider targetValueProvider, 
+                AvailablePropertyValueProvider sourceValueProvider,
+                AvailablePropertyValueProvider targetValueProvider,
                 ContainerSortingProvider sortProvider,
                 PropertyComparerProvider propComparer,
                 DiffType emitDiffTypes,
@@ -977,7 +994,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 this.source = source;
                 this.target = target;
 
-                TraceHelper.Trace(Differencer.ComponentName, "Diffgram: created late-activated diffgram.");
+                LogTrace("Diffgram: created late-activated diffgram.");
             }
 
             public Differencer Differencer
@@ -1059,10 +1076,10 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 
             public override IEnumerator<IDiffEntry> GetEnumerator()
             {
-                TraceHelper.Trace(Differencer.ComponentName, "Diffgram: entering GetEnumerator");
+                LogTrace("Diffgram: entering GetEnumerator");
                 LateActivatedDiffEntryEnumerator e = new LateActivatedDiffEntryEnumerator(this);
                 e.Push(SourceSimpleNode, TargetSimpleNode);
-                TraceHelper.Trace(Differencer.ComponentName, "Diffgram: exiting GetEnumerator");
+                LogTrace("Diffgram: exiting GetEnumerator");
                 return e;
             }
         }
@@ -1128,7 +1145,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                     return envelope.TargetAvailablePropertyValueProvider;
                 }
             }
-            
+
             public ContainerSortingProvider ContainerSortingProvider
             {
                 get
@@ -1157,20 +1174,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             /// <param name="target"></param>
             public void Push(ISfcSimpleNode source, ISfcSimpleNode target)
             {
-                TraceHelper.Assert(source != null && target != null, "assert added node is not null");
-                TraceHelper.Assert(source.Urn != null && target.Urn != null, "assert added node's urn is not null");
-                TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: pushing a pair {0} and {1} for later comparison.", source.Urn, target.Urn);
+                Debug.Assert(source != null && target != null, "assert added node is not null");
+                Debug.Assert(source.Urn != null && target.Urn != null, "assert added node's urn is not null");
+                LogTrace("DiffEntryEnumerator: pushing a pair {0} and {1} for later comparison.", source.Urn, target.Urn);
 
                 Pair<ISfcSimpleNode> newPair = new Pair<ISfcSimpleNode>(source, target);
                 stack.Push(newPair);
-                TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: pushed.");
+                LogTrace("DiffEntryEnumerator: pushed.");
             }
             public void Add(IDiffEntry entry)
             {
-                TraceHelper.Assert(entry != null, "assert enqueueing entry is not null");
-                TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: enqueueing result {0}.", entry);
+                Debug.Assert(entry != null, "assert enqueueing entry is not null");
+                LogTrace("DiffEntryEnumerator: enqueueing result {0}.", entry);
                 result.Enqueue(entry);
-                TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: enqueued result.");
+                LogTrace("DiffEntryEnumerator: enqueued result.");
             }
             public IDiffEntry Current
             {
@@ -1204,20 +1221,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             /// </summary>
             public bool MoveNext()
             {
-                TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: entering MoveNext.");
+                LogTrace("DiffEntryEnumerator: entering MoveNext.");
                 current = null;
                 while (true)
                 {
                     if (result.Count > 0)
                     {
                         current = result.Dequeue();
-                        TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: exiting MoveNext (returning true).");
+                        LogTrace("DiffEntryEnumerator: exiting MoveNext (returning true).");
                         return true;
                     }
                     if (stack.Count <= 0)
                     {
                         // if stack is empty, we reach the end
-                        TraceHelper.Trace(Differencer.ComponentName, "DiffEntryEnumerator: exiting MoveNext (no more to compare. returning false.).");
+                        LogTrace("DiffEntryEnumerator: exiting MoveNext (no more to compare. returning false.).");
                         return false;
                     }
                     Pair<ISfcSimpleNode> pair = stack.Pop();

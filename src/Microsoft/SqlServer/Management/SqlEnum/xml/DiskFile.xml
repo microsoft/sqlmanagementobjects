@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="File" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="File" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings main_table="#filetmpfin">
-    <version min_major='7' max_major='13'>
+    <version min_major='10' max_major='13'>
       <prefix >
         create table #filetmpfin (Name nvarchar(255) NOT NULL, IsFile bit NULL, FullName nvarchar(300) not NULL)
         if(@Name is null)

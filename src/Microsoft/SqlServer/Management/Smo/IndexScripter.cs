@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 #if MICROSOFTDATA
 #else
 using System.Data.SqlClient;
@@ -36,7 +37,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 this.index = index;
                 this.parent = (ScriptSchemaObjectBase)index.ParentColl.ParentInstance;
-                Diagnostics.TraceHelper.Assert(null != this.parent, "parent == null");
+                Debug.Assert(null != this.parent, "parent == null");
 
                 this.preferences = sp;
 
@@ -54,7 +55,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    Diagnostics.TraceHelper.Assert(false, "Invalid parent");
+                    Debug.Assert(false, "Invalid parent");
                 }
             }
 
@@ -419,7 +420,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             this.ScriptIndexOptionOnline(sb, forRebuild, forCreateIndex);
                         }
 
-                        if (index.ServerVersion.Major >= 9 && index.MaximumDegreeOfParallelism > 0)
+                        if (index.MaximumDegreeOfParallelism > 0)
                         {
                             this.ScriptIndexOption(sb, "MAXDOP", index.MaximumDegreeOfParallelism);
                         }
@@ -837,7 +838,7 @@ namespace Microsoft.SqlServer.Management.Smo
             protected virtual bool ScriptColumn(IndexedColumn col, StringBuilder sb)
             {
                 //IsIncludedColumnSupported
-                if (index.ServerVersion.Major > 9 && col.GetPropValueOptional<bool>("IsIncluded", false) && !this.IsIncludedColumnSupported)
+                if (col.GetPropValueOptional<bool>("IsIncluded", false) && !this.IsIncludedColumnSupported)
                 {
                     throw new WrongPropertyValueException(ExceptionTemplates.IncludedColumnNotSupported);
                 }
@@ -1086,7 +1087,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 //this.Validate();
 
-                if (index.ServerVersion.Major < 9 || (parent is View && ((View)parent).Parent.CompatibilityLevel < CompatibilityLevel.Version90))
+                if (parent is View && ((View)parent).Parent.CompatibilityLevel < CompatibilityLevel.Version90)
                 {
                     return Rebuild80(allIndexes);
                 }
@@ -1720,7 +1721,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         this.ScriptIndexOption(sb, "ALLOW_PAGE_LOCKS", GetOnOffValue(RevertMeaning(index.GetPropValueOptional<bool>("DisallowPageLocks"))));
                     }
 
-                    if (alterTableScript && index.ServerVersion.Major >= 9 && index.MaximumDegreeOfParallelism > 0)
+                    if (alterTableScript && index.MaximumDegreeOfParallelism > 0)
                     {
                         this.ScriptIndexOption(sb, "MAXDOP", index.MaximumDegreeOfParallelism);
                     }
@@ -1915,7 +1916,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override bool ScriptColumn(IndexedColumn col, StringBuilder sb)
             {
-                if (index.ServerVersion.Major < 9 || !col.GetPropValueOptional<bool>("IsIncluded", false))
+                if (!col.GetPropValueOptional<bool>("IsIncluded", false))
                 {
                     return base.ScriptColumn(col, sb);
                 }
@@ -2465,9 +2466,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private class VectorIndexScripter : IndexScripter
         {
-            Property vectorIndexMetric;
-            Property vectorIndexType;
-
             public VectorIndexScripter(Index index, ScriptingPreferences sp)
                 : base(index, sp)
             {
@@ -2501,21 +2499,19 @@ namespace Microsoft.SqlServer.Management.Smo
 
             private void ScriptVectorIndexOptions(StringBuilder sb)
             {
-                vectorIndexMetric = index.Properties.Get(nameof(Index.VectorIndexMetric));
-                vectorIndexType = index.Properties.Get(nameof(Index.VectorIndexType));
+                var vectorIndexMetric = index.GetPropValueOptional(nameof(Index.VectorIndexMetric), string.Empty);
+                var vectorIndexType = index.GetPropValueOptional(nameof(Index.VectorIndexType), string.Empty);
 
                 // Script METRIC parameter
-                var strMetric = vectorIndexMetric.Value as string;
-                var strType = vectorIndexType.Value as string;
-                if (!string.IsNullOrEmpty(strMetric))
+                if (!string.IsNullOrEmpty(vectorIndexMetric))
                 {
-                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"METRIC = '{SqlSmoObject.SqlString(strMetric)}'{Globals.commaspace}");
+                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"METRIC = '{SqlSmoObject.SqlString(vectorIndexMetric)}'{Globals.commaspace}");
                 }
 
                 // Script TYPE parameter
-                if (!string.IsNullOrEmpty(strType))
+                if (!string.IsNullOrEmpty(vectorIndexType))
                 {
-                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"TYPE = '{SqlSmoObject.SqlString(strType)}'{Globals.commaspace}");
+                    _ = sb.AppendFormat(SmoApplication.DefaultCulture, $"TYPE = '{SqlSmoObject.SqlString(vectorIndexType)}'{Globals.commaspace}");
                 }
             }
 

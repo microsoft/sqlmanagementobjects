@@ -1,11 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link table='dbo.sysusers AS rl'>rl.issqlrole = 1</property_link>
-			<property_link fields = '#Owner#' join='dbo.sysusers ou'>ou.uid = rl.altuid</property_link>
-		</version>
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property_link table='sys.database_principals AS rl'>rl.type = 'R'</property_link>
 			<property_link fields = '#Owner#' join='sys.database_principals AS ou'>ou.principal_id = rl.owning_principal_id</property_link>
 		</version>
@@ -13,16 +9,7 @@
 	<properties>
 		<include file='inc_urn.xml' />
 		<property name="Name" type="sysname" mode="design">rl.name</property>
-    <version min_major='7' max_major='8'>
-			<property name="ID" type="int" cast='true'>rl.uid</property>
-			
-			<property name="CreateDate" type="datetime" access='Read'>rl.createdate</property>
-			<property name="DateLastModified" type="datetime" access='Read'>rl.updatedate</property>
-			
-			<!-- extended properties support -->
-			<property name="ExtPropClass" type="int" hidden='true'>2</property>			
-		</version>
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="ID" type="int">rl.principal_id</property>
 			
 			<property name="CreateDate" type="datetime" access='Read'>rl.create_date</property>

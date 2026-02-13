@@ -478,17 +478,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             String query = null;
             //BackupMediaSet properties
-            if (this.server.Version.Major < 9)
-            {
-                query = string.Format(SmoApplication.DefaultCulture,
-                    "SELECT bkms.media_uuid, bkms.name, bkms.description, bkms.media_family_count FROM msdb.dbo.backupmediaset bkms WHERE bkms.media_set_id = {0}", mediaSetID);
-            }
-            else if (this.server.Version.Major == 9)
-            {
-                query = string.Format(SmoApplication.DefaultCulture,
-                    "SELECT bkms.media_uuid, bkms.name, bkms.description, bkms.media_family_count, bkms.mirror_count FROM msdb.dbo.backupmediaset bkms WHERE bkms.media_set_id = {0}", mediaSetID);
-            }
-            else if (this.server.Version.Major <= 11)
+            if (this.server.Version.Major <= 11)
             {
                 query = string.Format(SmoApplication.DefaultCulture,
                     "SELECT bkms.media_uuid, bkms.name, bkms.description, bkms.media_family_count, bkms.mirror_count, bkms.is_compressed FROM msdb.dbo.backupmediaset bkms WHERE bkms.media_set_id = {0}", mediaSetID);
@@ -513,22 +503,12 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 this.mediaSetGuid = (Guid)datarow["media_uuid"];
             }
-            if (this.server.Version.Major >= 9)
-            {
-                this.mirrorCount = (byte)datarow["mirror_count"];
-            }
+            this.mirrorCount = (byte)datarow["mirror_count"];
 
             //BackupMedia properties
-            if (this.server.Version.Major < 9)
-            {
-                query = string.Format(SmoApplication.DefaultCulture,
-                "SELECT bkms.logical_device_name, bkms.physical_device_name, bkms.device_type, family_sequence_number FROM msdb.dbo.backupmediafamily bkms WHERE bkms.media_set_id = {0} ORDER BY bkms.family_sequence_number", mediaSetID);
-            }
-            else
-            {
-                query = string.Format(SmoApplication.DefaultCulture,
+            query = string.Format(SmoApplication.DefaultCulture,
                 "SELECT bkms.logical_device_name, bkms.physical_device_name, bkms.device_type, family_sequence_number, mirror FROM msdb.dbo.backupmediafamily bkms WHERE bkms.media_set_id = {0} ORDER BY bkms.family_sequence_number, bkms.mirror", mediaSetID);
-            }
+
 
             DataSet ds = server.ExecutionManager.ExecuteWithResults(query);
             foreach (DataRow dr1 in ds.Tables[0].Rows)
@@ -563,10 +543,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             this.description = (string)datarow["MediaDescription"];
                         }
                         this.familyCount = (byte)(int)datarow["FamilyCount"];
-                        if (this.server.Version.Major >= 9)
-                        {
-                            this.mirrorCount = (byte)(int)datarow["MirrorCount"];
-                        }
+                        this.mirrorCount = (byte)(int)datarow["MirrorCount"];
                         if (datarow["MediaSetId"] is Guid)
                         {
                             this.mediaSetGuid = (Guid)datarow["MediaSetId"];

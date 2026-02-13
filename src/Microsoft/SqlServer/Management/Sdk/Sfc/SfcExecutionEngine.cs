@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
+    using System.Diagnostics;
 #if MICROSOFTDATA
     using Microsoft.Data.SqlClient;
 #else
@@ -49,7 +50,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         object dataSet = connection.ExecuteWithResults(script);
                         return dataSet;
                     default:
-                        TraceHelper.Assert(false, "Unknown ExecutionMode supplied");
+                        Debug.Assert(false, "Unknown ExecutionMode supplied");
                         return null;
                 }
             }

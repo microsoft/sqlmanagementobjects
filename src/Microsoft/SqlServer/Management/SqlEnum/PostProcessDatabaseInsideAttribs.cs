@@ -56,9 +56,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if ( null == sqlQuery )
                 {
-                    sqlQuery = ExecuteSql.GetServerVersion(this.ConnectionInfo).Major < 9 ?
-                        BuildSqlStatementLess90() :
-                        BuildSqlStatementMoreEqual90();
+                    sqlQuery = BuildSqlStatementMoreEqual90();
                     sqlQuery = String.Format(CultureInfo.InvariantCulture, sqlQuery, Util.EscapeString(this.databaseName, '\''));
                 }
                 return sqlQuery;
@@ -289,63 +287,13 @@ namespace Microsoft.SqlServer.Management.Smo
             return sb.SqlStatement;
         }
 
-        private string BuildSqlStatementLess90()
-        {
-            var sb = new StatementBuilder();
-
-            BuildCommonSql(sb);
-
-            if ( GetIsFieldHit("SpaceAvailable") || GetIsFieldHit("Size") )
-            {
-                sb.AddProperty("DbSize", "(select sum(convert(float,size)) from dbo.sysfiles where (status & 64 = 0))");
-            }
-            if ( GetIsFieldHit("SpaceAvailable") )
-            {
-                sb.AddProperty("SpaceUsed", "(select sum(convert(float,reserved)) from dbo.sysindexes where indid in (0, 1, 255))");
-            }
-            if ( GetIsFieldHit("Size") )
-            {
-                sb.AddProperty("LogSize", "(select sum(convert(float,size)) from dbo.sysfiles where (status & 64 <> 0))");
-            }
-            if ( GetIsFieldHit("DataSpaceUsage") || GetIsFieldHit("IndexSpaceUsage") )
-            {
-                sb.AddProperty("DataSpaceUsage", "((select sum(convert(float,dpages)) from dbo.sysindexes where indid < 2) + (select isnull(sum(convert(float,used)), 0) from dbo.sysindexes where indid = 255))");
-            }
-            if ( GetIsFieldHit("IndexSpaceUsage") )
-            {
-                sb.AddProperty("IndexSpaceTotal", "(select sum(convert(float,used)) from dbo.sysindexes where indid in (0, 1, 255))");
-            }
-            if ( GetIsFieldHit("DefaultSchema") )
-            {
-                sb.AddProperty("DefaultSchema", "user_name()");
-            }
-            if (GetIsFieldHit("DefaultFileGroup"))
-            {
-                sb.AddProperty("DefaultFileGroup", "(select top 1 fg.groupname from dbo.sysfilegroups as fg where fg.status & 0x10 <> 0)");
-            }
-            ServerVersion sv = ExecuteSql.GetServerVersion(this.ConnectionInfo);
-            if ( sv.Major >= 8 && sv.BuildNumber >= 760 ) //db chaining implmented starting with build 760
-            {
-                AddDbChaining(sb);
-            }
-            
-            return sb.SqlStatement;
-        }
 
         private void AddDbChaining(StatementBuilder sb)
         {
             if ( GetIsFieldHit("DatabaseOwnershipChaining"))
             {
                 sb.AddPrefix("create table #tmpdbchaining( name sysname , dbc sysname )");
-                ServerVersion sv = ExecuteSql.GetServerVersion(this.ConnectionInfo);
-                if (sv.Major < 9)
-                {
-                    sb.AddPrefix("insert into #tmpdbchaining exec dbo.sp_dboption N'{0}', 'db chaining'\n");
-                }
-                else
-                {
-                    sb.AddPrefix("insert into #tmpdbchaining SELECT 'db chaining' AS 'OptionName', CASE WHEN (SELECT is_db_chaining_on FROM sys.databases WHERE name=N'{0}') = 1 THEN 'ON' ELSE 'OFF' END AS 'CurrentSetting'\n");
-                }
+                sb.AddPrefix("insert into #tmpdbchaining SELECT 'db chaining' AS 'OptionName', CASE WHEN (SELECT is_db_chaining_on FROM sys.databases WHERE name=N'{0}') = 1 THEN 'ON' ELSE 'OFF' END AS 'CurrentSetting'\n");
                 sb.AddPrefix("declare @DBChaining bit\nset @DBChaining = null\nselect @DBChaining = case LOWER(dbc) when 'off' then 0 else 1 end from #tmpdbchaining");
                 sb.AddProperty("DatabaseOwnershipChaining", "@DBChaining");
                 sb.AddPostfix("drop table #tmpdbchaining");
@@ -373,14 +321,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             logSpaceAvailable = (double)data;
                         }
-                        if (sv.Major < 9)
-                        {
-                            data = ((double)this.rowResults[0]["DbSize"] - (double)this.rowResults[0]["SpaceUsed"]) * this.BytesPerPage + logSpaceAvailable;
-                        }
-                        else
-                        {
-                            data = ((double)this.rowResults[0]["DbSize"] - (Int64)this.rowResults[0]["SpaceUsed"]) * this.BytesPerPage + logSpaceAvailable;
-                        }
+                        data = ((double)this.rowResults[0]["DbSize"] - (Int64)this.rowResults[0]["SpaceUsed"]) * this.BytesPerPage + logSpaceAvailable;
                         if ((double)data < 0)
                         {
                             data = (double)0;
@@ -404,14 +345,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
                     //when modify check table.xml DataSpaceUsed for consistency
                     case "DataSpaceUsage":
-                        if (sv.Major < 9)
-                        {
-                            data = ((double)this.rowResults[0]["DataSpaceUsage"]) * this.BytesPerPage;
-                        }
-                        else
-                        {
-                            data = ((Int64)this.rowResults[0]["DataSpaceUsage"]) * this.BytesPerPage;
-                        }
+                        data = ((Int64)this.rowResults[0]["DataSpaceUsage"]) * this.BytesPerPage;
                         break;
 
                     // Property indicates whether database has Hekaton objects or not by checking for existence of memory optimized filegroup
@@ -452,14 +386,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
                     //when modify check table.xml IndexSpaceUsed and index.xml IndexSpaceUsed for consistency
                     case "IndexSpaceUsage":
-                        if (sv.Major < 9)
-                        {
-                            data = ((double)this.rowResults[0]["IndexSpaceTotal"] - (double)this.rowResults[0]["DataSpaceUsage"]) * this.BytesPerPage;
-                        }
-                        else
-                        {
-                            data = ((Int64)this.rowResults[0]["IndexSpaceTotal"] - (Int64)this.rowResults[0]["DataSpaceUsage"]) * this.BytesPerPage;
-                        }
+                        data = ((Int64)this.rowResults[0]["IndexSpaceTotal"] - (Int64)this.rowResults[0]["DataSpaceUsage"]) * this.BytesPerPage;
                         break;
                     case "UserName":
                     case "IsMailHost":
@@ -486,52 +413,30 @@ namespace Microsoft.SqlServer.Management.Smo
                         data = this.rowResults[0][name];
                         break;
                     case "DefaultFileStreamFileGroup":
-                        if (sv.Major >= 10)
-                        {
-                            data = this.rowResults[0]["DefaultFileStreamFileGroup"];
-                        }
+                        data = this.rowResults[0]["DefaultFileStreamFileGroup"];
                         break;
                     case "DatabaseOwnershipChaining":
-                        if (sv.Major >= 8 && sv.BuildNumber >= 760) //db chaining implmented starting with build 760
-                        {
-                            data = this.rowResults[0]["DatabaseOwnershipChaining"];
-                        }
+                        // db chaining implemented starting with build 760 of SQL Server 2000 (version 8)
+                        // Since minimum supported version is now SQL Server 2008 (version 10), this check is always true
+                        data = this.rowResults[0]["DatabaseOwnershipChaining"];
                         break;
                     case "IsManagementDataWarehouse":
                         // Data Collector is a Katmai feature
-                        if (sv.Major >= 10)
-                        {
-                            data = this.rowResults[0]["IsManagementDataWarehouse"];
-                        }
+                        data = this.rowResults[0]["IsManagementDataWarehouse"];
                         break;
                     case "PrimaryFilePath":
-                        if (sv.Major < 9)
+                        if (ExecuteSql.IsContainedAuthentication(this.ConnectionInfo))
                         {
-                            if (IsNull(data))
-                            {
-                                return data;
-                            }
-                            else
-                            {
-                                //cut the file name
-                                data = GetPath((string)data);
-                            }
+                            data = this.rowResults[0]["PrimaryFilePath"];
+                        }
+
+                        if (IsNull(data))
+                        {
+                            return String.Empty;
                         }
                         else
                         {
-                            if (ExecuteSql.IsContainedAuthentication(this.ConnectionInfo))
-                            {
-                                data = this.rowResults[0]["PrimaryFilePath"];
-                            }
-
-                            if (IsNull(data))
-                            {
-                                return String.Empty;
-                            }
-                            else
-                            {
-                                data = GetPath((string)data);
-                            }
+                            data = GetPath((string)data);
                         }
                         break;
                 }
@@ -582,13 +487,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     queryInDb = "SELECT dtb.collation_name AS [Collation], CAST(DATABASEPROPERTYEX(dtb.name, 'Version') AS int) AS [Version], dtb.compatibility_level AS [CompatibilityLevel], CAST(CHARINDEX(N'_CS_', dtb.collation_name) AS bit) AS [CaseSensitive], dtb.target_recovery_time_in_seconds AS [TargetRecoveryTime] FROM master.sys.databases AS dtb where name = db_name()";
                 }
-                else if (sv.Major >= 9)
-                {
-                    queryInDb = "SELECT dtb.collation_name AS [Collation], CAST(DATABASEPROPERTYEX(dtb.name, 'Version') AS int) AS [Version], dtb.compatibility_level AS [CompatibilityLevel], CAST(CHARINDEX(N'_CS_', dtb.collation_name) AS bit) AS [CaseSensitive] FROM master.sys.databases AS dtb where name = db_name()";
-                }
                 else
                 {
-                    queryInDb = "SELECT CAST(DATABASEPROPERTYEX(dtb.name, 'Collation') AS sysname) AS [Collation], CAST(DATABASEPROPERTYEX(dtb.name, 'Version') AS int) AS [Version], dtb.cmptlevel AS [CompatibilityLevel], CAST(CHARINDEX(N'_CS_', CAST(DATABASEPROPERTYEX(dtb.name, 'Collation') AS nvarchar(255))) AS bit) AS [CaseSensitive] FROM master.dbo.sysdatabases AS dtb where name = db_name()";
+                    queryInDb = "SELECT dtb.collation_name AS [Collation], CAST(DATABASEPROPERTYEX(dtb.name, 'Version') AS int) AS [Version], dtb.compatibility_level AS [CompatibilityLevel], CAST(CHARINDEX(N'_CS_', dtb.collation_name) AS bit) AS [CaseSensitive] FROM master.sys.databases AS dtb where name = db_name()";
                 }
 
                 return queryInDb;

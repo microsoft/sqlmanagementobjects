@@ -1,15 +1,6 @@
-﻿<?xml version="1.0"?>
-<EnumObject type="FullTextService" impl_type="SqlObject" min_major='7' cloud_min_major='12' >
+<?xml version="1.0"?>
+<EnumObject type="FullTextService" impl_type="SqlObject" min_major='10' cloud_min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major = '7' max_major = '9'>
-      <prefix fields="#DefaultPath#">
-        DECLARE @FullTextDefaultPath NVARCHAR(512)
-        EXECUTE master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE',
-        N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer',
-        N'FullTextDefaultPath',
-        @FullTextDefaultPath OUTPUT
-      </prefix>
-    </version>
     <version min_major = '10'>
       <prefix fields="#DefaultPath#" >
         DECLARE @FullTextDefaultPath NVARCHAR(512)
@@ -28,24 +19,20 @@
   </settings>
   <properties>
     <include file='inc_urn.xml'/>
-    <version min_major = '7' max_major = '7' cloud_min_major='12' >
+    <version cloud_min_major='12' max_major='9'>
       <property name="Name" type="sysname">@@SERVERNAME</property>
     </version>
-    <version min_major = '8'>
+    <version min_major = '10'>
       <property name="Name" type="sysname" cast='true'>serverproperty(N'Servername')</property>
     </version>
 
-    <version min_major='7' cloud_min_major='12' >
+    <version min_major='10' cloud_min_major='12' >
       <property name="ConnectTimeout" type="int" report_type2='System.TimeSpan'>ISNULL(FULLTEXTSERVICEPROPERTY('ConnectTimeout'),0) * 10000000</property>
       <property name="DefaultPath" type="nvarchar" size="512" access="Read">ISNULL(@FullTextDefaultPath, N'')</property>
       <property name="ResourceUsage" type="int" report_type="ResourceUsage">ISNULL(FULLTEXTSERVICEPROPERTY('ResourceUsage'), 0)</property>
     </version>
 
-    <version min_major='8' max_major='8' >
-      <property name="DataTimeout" type="int" report_type2='System.TimeSpan'>ISNULL(FULLTEXTSERVICEPROPERTY('DataTimeout'),0) * 10000000</property>
-    </version>
-
-    <version min_major='9' cloud_min_major='12' >
+    <version min_major='10' cloud_min_major='12' >
       <property name="DataTimeout" type="int" report_type2='System.TimeSpan'>0</property>
       <property name="AllowUnsignedBinaries" type="bit" cast='true'>
         CASE

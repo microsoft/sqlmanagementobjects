@@ -1,24 +1,11 @@
 <?xml version="1.0" ?>
-<EnumObject type="inc_object" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="inc_object" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link fields = '#Schema#' join='sysusers AS s{0}'>s{0}.uid = {0}.uid</property_link>
-		</version>
-	</settings>
+		</settings>
 	<properties>
 		<include file='inc_urn_schema.xml' />
 		<include alias='{0}' file='inc_named_object.xml' />
-		<version min_major='7' max_major='8'>
-			<property name="Schema" type="sysname" mode="design">s{0}.name</property>
-      <property name="Owner" type="sysname" mode="design">s{0}.name</property>
-			<!-- extended properties support -->
-			<property name="ObjectSchemaFromFilter" type="sysname" hidden='true'>
-				<link_multiple no='1' expression="{{0}}">
-					<link_field type='filter' field="Schema" default_value="null"/>
-				</link_multiple>
-			</property>
-		</version>
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="Schema" type="sysname" mode="design">SCHEMA_NAME({0}.schema_id)</property>
 		</version>
 	</properties>

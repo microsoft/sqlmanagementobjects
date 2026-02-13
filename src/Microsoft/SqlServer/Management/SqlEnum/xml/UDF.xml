@@ -1,12 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject type="UserDefinedFunction" impl_type="SqlObject" min_major='8'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="UserDefinedFunction" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='8' max_major='8'>
-			<property_link table="dbo.sysobjects AS udf">udf.xtype in ( 'TF', 'FN', 'IF') and udf.name not like N'#%%'</property_link>
-			<property_link fields='#TableVariableName#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#XmlSchemaNamespace#'
-					left_join='syscolumns AS ret_param'>ret_param.id = udf.id and ret_param.number = &lt;msparam&gt;0&lt;/msparam&gt; and ret_param.name=''</property_link>
-		</version>
-		<version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'   cloud_min_major='10' datawarehouse_enabled='true'>
 			<!--FN = SQL Scalar-Function
 				IF = SQL Inlined-table-valued-Function
 				TF = SQL Table-valued-Function
@@ -28,16 +23,7 @@
 		<include file='mixed_module_link.xml' alias='udf'
 			for='#ReturnsNullOnNullInput#ExecutionContextPrincipal#ExecutionContext#MethodName#ClassName#AssemblyName#AnsiNullsStatus#IsSchemaBound#IsEncrypted#Text#TextBody#BodyStartIndex#'/>
 
-		<version min_major='7' max_major='8'>
-			<property name="IsDeterministic" type="bit" access="Read" cast='true'>OBJECTPROPERTY(udf.id, N'IsDeterministic')</property>
-			<property name="FunctionType" type="int" report_type='UserDefinedFunctionType' mode="design">(case when 1 = OBJECTPROPERTY(udf.id, N'IsScalarFunction') then 1 when 1 = OBJECTPROPERTY(udf.id, N'IsInlineFunction') then 3 when 1 = OBJECTPROPERTY(udf.id, N'IsTableFunction') then 2 else 0 end)</property>
-			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">1</property>
-			<property name="QuotedIdentifierStatus" type="bit" cast='true' mode="design">isnull(OBJECTPROPERTYEX(udf.id, N'IsQuotedIdentOn'),1)</property>
-
-			<!-- extended properties support -->
-			<property name="ObjectTypeName" type="sysname" hidden="true">N'FUNCTION'</property>
-		</version>
-		<version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'   cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="IsDeterministic" type="bit" access="Read" cast='true'>OBJECTPROPERTYEX(udf.object_id, N'IsDeterministic')</property>
 			<property name="FunctionType" type="int" report_type='UserDefinedFunctionType' mode="design">(case when 'FN' = udf.type then 1 when 'FS' = udf.type then 1 when 'IF' = udf.type then 3 when 'TF' = udf.type then 2 when 'FT' = udf.type then 2 else 0 end)</property>
 			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">CASE WHEN udf.type IN ('FN','IF','TF') THEN 1 WHEN udf.type IN ('FS','FT') THEN 2 ELSE 1 END</property>
@@ -53,7 +39,7 @@
 			<include file='inc_policy_health_state.xml'/>
 		</version>
 
-		<version min_major='7' max_major='14'>
+		<version min_major='10' max_major='14'>
 			<property name="IsInlineable" type="bit" access="Read" cast= 'true'>0</property>
 		</version>
 		<version min_major ='13' cloud_min_major='12' datawarehouse_enabled='true'>
@@ -64,7 +50,8 @@
 			<property name="IsInlineable" type="bit" access="Read" cast= 'true' >ISNULL(sm.is_inlineable,0)</property>
 		</version>
 		<version min_major='17' cloud_min_major='12'>
-			<property name="VectorDimensions" type="int" mode="design">ISNULL(ret_param.vector_dimensions, 0)</property>
+			<!-- Some versions of this DMV have vector_dimensions as a tinyint, which causes us to fail casting. So ensure this is always a full int -->
+			<property name="VectorDimensions" type="int" cast="true" mode="design">ISNULL(ret_param.vector_dimensions, 0)</property>
 			<property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(ret_param.vector_base_type_desc, N'')</property>
 		</version>
 	</properties>

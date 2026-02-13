@@ -4,9 +4,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
 {
@@ -240,7 +242,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             MethodInfo resolverFactoryMethod = resolverType.GetMethod(SfcReferenceAttribute.SfcReferenceResolverFactoryMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
             // Not optional and a bug if not defined
-            TraceHelper.Assert(resolverFactoryMethod != null, String.Format(System.Globalization.CultureInfo.InvariantCulture,
+            Debug.Assert(resolverFactoryMethod != null, String.Format(System.Globalization.CultureInfo.InvariantCulture,
                 "{0} resolver factory method on type '{1}' not found. Note: this method must be defined as a static method.", SfcReferenceAttribute.SfcReferenceResolverFactoryMethodName, resolverType.FullName));
 
             Delegate factory = resolverFactoryMethod.CreateDelegate(typeof(SfcReferenceResolverFactoryDelegate));
@@ -307,7 +309,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             MethodInfo resolver = resolverType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
             // Not optional and a bug if not defined
-            TraceHelper.Assert(resolver != null, String.Format(System.Globalization.CultureInfo.InvariantCulture,
+            Debug.Assert(resolver != null, String.Format(System.Globalization.CultureInfo.InvariantCulture,
                 "{0} method on type {1} not found. Note: this method must be defined as a static method.", methodName, resolverType.FullName));
 
             m_resolver = resolver.CreateDelegate(typeof(ReferenceResolverDelegate));
@@ -490,7 +492,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                     string domainRoot = objectUrn.XPathExpression[0].Name;
                     if(string.Compare(domainRoot,"Server",StringComparison.OrdinalIgnoreCase) == 0)//SMO
                     {
-                        TraceHelper.Assert(false); // can't happen any more
+                        Debug.Assert(false); // can't happen any more
                     }
                     else
                     {
@@ -668,7 +670,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             MethodInfo resolverFactoryMethod = resolverType.GetMethod(SfcReferenceAttribute.SfcReferenceCollectionResolverFactoryMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
             // Not optional and a bug if not defined
-            TraceHelper.Assert(resolverFactoryMethod != null, String.Format(System.Globalization.CultureInfo.InvariantCulture,
+            Debug.Assert(resolverFactoryMethod != null, String.Format(System.Globalization.CultureInfo.InvariantCulture,
                 "{0} resolver factory method on type '{1}' not found. Note: this method must be defined as a static method.", SfcReferenceAttribute.SfcReferenceCollectionResolverFactoryMethodName, resolverType.FullName));
 
             Delegate factory = resolverFactoryMethod.CreateDelegate(typeof(SfcReferenceCollectionResolverFactoryDelegate));

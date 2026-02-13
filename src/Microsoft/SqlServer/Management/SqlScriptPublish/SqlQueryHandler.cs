@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Diagnostics;
@@ -84,7 +85,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                 children = new List<KeyValuePair<string, string>>();
 
                 QueryInfo info = dicTypes[objectType];
-                SqlScriptPublishModelTraceHelper.Assert(info != null, "Unsupported object type:" + objectType);
+                Debug.Assert(info != null, "Unsupported object type:" + objectType);
                 if (info == null)
                 {
                     throw new SqlScriptPublishException(SR.InvalidObjectType(objectType.ToString()));

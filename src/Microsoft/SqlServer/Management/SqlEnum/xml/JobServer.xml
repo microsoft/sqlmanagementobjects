@@ -1,24 +1,6 @@
-﻿  <EnumObject type='SPGetSqlagentProperties' impl_type='SqlObject' min_major='7' >
+﻿  <EnumObject type='SPGetSqlagentProperties' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major = '7' max_major='8'>
-      <property_link table='#tmp_sp_get_sqlagent_properties' alias='tsgsp' fields="#MsxServerName#SqlServerRestart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#MsxServerName#SqlAgentAutoStart#"/>
-      <prefix fields="#MsxServerName#SqlServerRestart#SqlAgentAutoStart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#MsxServerName">
-        create table #tmp_sp_get_sqlagent_properties
-        (auto_start int null, msx_server_name sysname null, sqlagent_type int null, startup_account nvarchar(255) null, sqlserver_restart int null, jobhistory_max_rows int null, jobhistory_max_rows_per_job int null, errorlog_file nvarchar(255) null, errorlogging_level int null, error_recipient nvarchar(30) null, monitor_autostart int null, local_host_server sysname null, job_shutdown_timeout int null, cmdexec_account varbinary(64) null, regular_connections int null, host_login_name nvarchar(128) null, host_login_password varbinary(512) null, login_timeout int null, idle_cpu_percent int null, idle_cpu_duration int null, oem_errorlog int null, sysadmin_only int null, email_profile nvarchar(64) null, email_save_in_sent_folder int null, cpu_poller_enabled int null)
-        insert into #tmp_sp_get_sqlagent_properties(auto_start, msx_server_name, sqlagent_type, startup_account, sqlserver_restart, jobhistory_max_rows, jobhistory_max_rows_per_job, errorlog_file, errorlogging_level, error_recipient, monitor_autostart, local_host_server, job_shutdown_timeout, cmdexec_account, regular_connections, host_login_name, host_login_password, login_timeout, idle_cpu_percent, idle_cpu_duration, oem_errorlog, sysadmin_only, email_profile, email_save_in_sent_folder, cpu_poller_enabled)
-        exec msdb.dbo.sp_get_sqlagent_properties
-      </prefix>
-
-      <prefix fields="#MsxAccountName#">
-        create table #tmpMsxAccountName ( domain nvarchar(255) null, username nvarchar(255) null)
-        if ( ( (@@microsoftversion / power(2, 24) = 8) and (@@microsoftversion &amp; 0xffff &gt;= 760) ) or (@@microsoftversion / power(2, 24) &gt; 8))
-        begin
-        insert into #tmpMsxAccountName(domain, username) exec master.dbo.xp_sqlagent_msx_account N'GET'
-        end
-      </prefix>
-    </version>
-
-    <version min_major = '9' >
+    <version min_major = '10' >
       <property_link table='#tmp_sp_get_sqlagent_properties' alias='tsgsp' fields="#MsxServerName#SqlServerRestart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#MsxServerName#SqlAgentAutoStart#ReplaceAlertTokensEnabled#"/>
 
       <prefix fields="#MsxServerName#SqlServerRestart#SqlAgentAutoStart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#ReplaceAlertTokensEnabled#">
@@ -68,10 +50,7 @@ drop table #tmpMsxAccountName
 	</settings>
 	<properties>
 		<include file='inc_urn_single.xml'/>
-		<version min_major = '7' max_major = '7'>
-      <property name="Name" type="sysname">@@SERVERNAME</property>
-    </version> 
-    <version min_major = '8' >
+		<version min_major = '10' >
       <property name="Name" type="sysname" cast='true'>serverproperty(N'Servername')</property>
     </version>
 
@@ -96,13 +75,7 @@ drop table #tmpMsxAccountName
     <property name='LocalHostAlias' type='sysname'>ISNULL(tsgsp.local_host_server,N'')</property>
     <property name="SqlAgentAutoStart" type="bit" cast='true'>tsgsp.auto_start</property>
 
-    <version min_major = '7' max_major = '8'>
-			<property name="MsxAccountName" type="nvarchar" size = "255" access="Read"
-				expensive="true">ISNULL((select top 1 ISNULL(domain + N'\', N'') + username as [UserName] from #tmpMsxAccountName),N'')</property>
-			<property name='SysAdminOnly' type='bit' cast='true' access="Read">tsgsp.sysadmin_only</property>
-		</version>
-
-		<version min_major = '9' >
+    <version min_major = '10' >
             <property name='ReplaceAlertTokensEnabled' type='bit' cast='true'>tsgsp.replace_alert_tokens_enabled</property>
 			<property name="MsxAccountName" type="nvarchar" size = "255" access="Read"
 				expensive="true">ISNULL((select top 1 msx_login_name from #tmpMsxAccountName),N'')</property>

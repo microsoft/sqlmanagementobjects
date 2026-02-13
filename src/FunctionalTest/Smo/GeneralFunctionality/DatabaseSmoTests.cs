@@ -54,7 +54,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
 
                     // Get path to the backup file
                     backupfile = Path.Combine(db.Parent.BackupDirectory, $"{db.Name}.bak");
-                    
+
                     // Restore database with NORECOVERY (in OE, it shos as "Restoring..."
                     restoringDb = DatabaseObjectHelpers.RestoreDatabaseFromBackup(db.Parent, backupfile, db.Name + "_new", withNoRecovery: true);
 
@@ -211,7 +211,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         public void Database_SpaceAvailable_Is_Zero_For_DW()
         {
             ExecuteTest(
-                srv => {
+                srv =>
+                {
                     Database_SpaceAvailable_Is_Zero(AzureDatabaseEdition.DataWarehouse);
                 });
         }
@@ -226,7 +227,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         public void Database_SpaceAvailable_Is_Zero_For_Hyperscale()
         {
             ExecuteTest(
-                srv => {
+                srv =>
+                {
                     Database_SpaceAvailable_Is_Zero(AzureDatabaseEdition.Hyperscale);
                 });
         }
@@ -286,7 +288,7 @@ END");
                         "DatabaseEncryptionKey.State post-Alter");
                     // We can't immediately toggle encryption until the first change is done
                     var maxWaits = 300;
-                    while (maxWaits-- > 0 && 
+                    while (maxWaits-- > 0 &&
                     (db.DatabaseEncryptionKey.EncryptionState == DatabaseEncryptionState.EncryptionInProgress || db.DatabaseEncryptionKey.EncryptionState == DatabaseEncryptionState.DecryptionInProgress))
                     {
                         Thread.Sleep(100);
@@ -372,13 +374,13 @@ END");
             {
                 // make sure we have a table
                 _ = db.CreateTable("Prefetch");
-                
+
                 {
                     fetchExtendedProperties = db.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase;
                 }
-                var scriptingOptions = fetchExtendedProperties.HasValue ? 
+                var scriptingOptions = fetchExtendedProperties.HasValue ?
                   new ScriptingOptions { ExtendedProperties = fetchExtendedProperties.Value } : null;
-                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId) { EnableTraceLogging = false })
                 {
                     eventRecorder.Start();
                     if (scriptingOptions != null)
@@ -391,23 +393,10 @@ END");
                     }
                     eventRecorder.Stop();
                     var messages = string.Join(Environment.NewLine, eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString()));
-                    messages = messages.Replace(@"CAST(
- case 
-    when tbl.is_ms_shipped = 1 then 1
-    when (
-        select 
-            major_id 
+                    messages = messages.Replace(@"select 
+            1
         from 
-            sys.extended_properties 
-        where 
-            major_id = tbl.object_id and 
-            minor_id = 0 and 
-            class = 1 and 
-            name = N'microsoft_database_tools_support') 
-        is not null then 1
-    else 0
-end          
-             AS bit) AS [IsSystemObject],".FixNewLines(), "");
+            sys.extended_properties".FixNewLines(), "");
                     if (fetchExtendedProperties ?? true)
                     {
                         Assert.That(messages, Does.Contain("extended_properties"), "PrefetchObjects(Table, ScriptingOptions) should fetch extended properties");
@@ -437,7 +426,8 @@ end
             typeof(SymmetricKey),
             typeof(AsymmetricKey),
             typeof(ApplicationRole),
-            typeof(ExternalLanguage)
+            typeof(ExternalLanguage),
+            typeof(ExternalModel)
         };
 
         private static readonly IEnumerable<Type> extraPrefetchedTypes = new[]
@@ -483,7 +473,7 @@ end
                 }), "CheckTablesDataOnly() messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, NOINDEX)" }),
                 "CheckTablesDataOnly");
-            commands = db.ExecutionManager.RecordQueryText(() => 
+            commands = db.ExecutionManager.RecordQueryText(() =>
                 messages = db.CheckTablesDataOnly(RepairOptions.AllErrorMessages |
                                               RepairOptions.ExtendedLogicalChecks |
                                               RepairOptions.NoInformationMessages | RepairOptions.TableLock |
@@ -550,13 +540,13 @@ end
             Assert.That(messages, Is.Empty, "CheckTables(RepairType.Fast) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_FAST)  WITH NO_INFOMSGS" }),
                 "CheckTables(RepairType.Fast");
-            commands = db.ExecutionManager.RecordQueryText(() => 
+            commands = db.ExecutionManager.RecordQueryText(() =>
                 messages = db.CheckTables(RepairType.AllowDataLoss).Cast<string>().ToList(), alsoExecute: true)
                 .Cast<string>().ToList();
             Assert.That(messages, Is.Empty, "CheckTables(RepairType.AllowDataLoss) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_ALLOW_DATA_LOSS)  WITH NO_INFOMSGS" }),
                 "CheckTables(RepairType.AllowDataLoss");
-            commands = db.ExecutionManager.RecordQueryText(() => 
+            commands = db.ExecutionManager.RecordQueryText(() =>
                 messages = db.CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity).Cast<string>().ToList(), alsoExecute: true)
                 .Cast<string>().ToList();
             Assert.That(messages.Take(1), Is.EqualTo(new object[]
@@ -565,7 +555,7 @@ end
             }), "CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity) messages");
             Assert.That(commands, Is.EqualTo(new[] { $"DBCC CHECKDB(N{db.Name.SqlSingleQuoteString()}, REPAIR_ALLOW_DATA_LOSS)  WITH  DATA_PURITY  " }),
                 "CheckTables(RepairType.AllowDataLoss, RepairStructure.DataPurity");
-            commands = db.ExecutionManager.RecordQueryText(() => 
+            commands = db.ExecutionManager.RecordQueryText(() =>
                 messages = db.CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly).Cast<string>().ToList(), alsoExecute: true)
                 .Cast<string>().ToList();
             Assert.That(messages, Has.Member("DBCC execution completed. If DBCC printed error messages, contact your system administrator."), "CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly) messages");
@@ -573,7 +563,7 @@ end
                 "CheckTables(RepairType.AllowDataLoss, RepairOptions.EstimateOnly");
             if (db.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase || db.Parent.VersionMajor > 12)
             {
-                commands = db.ExecutionManager.RecordQueryText( () => 
+                commands = db.ExecutionManager.RecordQueryText(() =>
                     messages = db.CheckTables(RepairType.None, RepairOptions.None,
                                               RepairStructure.PhysicalOnly, maxDOP: 2).Cast<string>().ToList(), alsoExecute: true)
                     .Cast<string>().ToList();
@@ -599,7 +589,7 @@ end
         private static void CheckAllocationsAllRepairTypes(Database db)
         {
             var messages = Enumerable.Empty<string>();
-            var commands = db.ExecutionManager.RecordQueryText(() => 
+            var commands = db.ExecutionManager.RecordQueryText(() =>
                 messages = db.CheckAllocations(RepairType.None).Cast<string>().ToList(), alsoExecute: true)
                 .Cast<string>();
             Assert.That(messages, Is.Empty, "CheckAllocations(RepairType.None) messages");
@@ -760,9 +750,9 @@ end
         public void Database_SetDefaultFileStreamFileGroup_succeeds()
         {
             ExecuteWithDbDrop(db =>
-            {                
-                var fileGroup = new FileGroup(db, "filegroup1", isFileStream:false);
-                fileGroup.Files.Add(new DataFile(fileGroup, "datafile1", System.IO.Path.Combine(db.PrimaryFilePath, "filename1.mdf")));
+            {
+                var fileGroup = new FileGroup(db, "filegroup1", isFileStream: false);
+                fileGroup.Files.Add(new DataFile(fileGroup, "datafile1", System.IO.Path.Combine(db.PrimaryFilePath, $"{db.Name}_FN1.mdf")));
                 db.FileGroups.Add(fileGroup);
                 db.Alter();
                 Assert.That(() => db.SetDefaultFileStreamFileGroup(fileGroup.Name), Throws.Nothing, $"SetDefaultFileStreamFileGroup({fileGroup.Name})");
@@ -795,7 +785,7 @@ end
             ExecuteFromDbPool(db =>
             {
                 var expected = db.DatabaseEngineType != DatabaseEngineType.SqlAzureDatabase && db.IsSupportedProperty(nameof(db.AvailabilityGroupName)) && !string.IsNullOrEmpty(db.AvailabilityGroupName);
-                Assert.That(db.IsLocalPrimaryReplica, Is.EqualTo(expected), "IsLocalPrimaryReplica");                
+                Assert.That(db.IsLocalPrimaryReplica, Is.EqualTo(expected), "IsLocalPrimaryReplica");
             });
         }
 
@@ -1063,7 +1053,7 @@ end
                 db.Alter();
                 db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AcceleratedRecoveryEnabled) });
                 db = db.Parent.Databases[db.Name];
-                
+
                 // Accelerated recovery should always be 'true'
                 //
                 Assert.IsTrue(
@@ -1088,6 +1078,36 @@ end
                 db.Alter();
                 db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.OptimizedLockingOn) });
                 db = db.Parent.Databases[db.Name];
+                Assert.That(db.OptimizedLockingOn, Is.False, "OptimizedLockingOn set to false by Alter");
+            });
+        }
+
+        /// <summary>
+        /// If at any point we attempt to run an alter command that would result in AcceleratedDatabaseRecovery (ADR)
+        /// being disabled while OptimizedLocking (OL) is enabled, we will get an error, as OL cannot be enabled without ADR.
+        /// This means that when both features get enabled, ADR must be enabled first, whereas when both features 
+        /// get disabled, OL must be disabled first. If this order is not respected, we should see an error in this test.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 17)]
+        public void Database_Alter_accelerated_database_recovery_and_optimized_locking_get_scripted_in_right_order()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                var adrAndOl = new string[] { nameof(Database.AcceleratedRecoveryEnabled), nameof(Database.OptimizedLockingOn) };
+                db.AcceleratedRecoveryEnabled = true;
+                db.OptimizedLockingOn = true;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), adrAndOl);
+                db = db.Parent.Databases[db.Name];
+                Assert.That(db.AcceleratedRecoveryEnabled, Is.True, "AcceleratedRecoveryEnabled set to true by Alter");
+                Assert.That(db.OptimizedLockingOn, Is.True, "OptimizedLockingOn set to true by Alter");
+                db.AcceleratedRecoveryEnabled = false;
+                db.OptimizedLockingOn = false;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), adrAndOl);
+                db = db.Parent.Databases[db.Name];
+                Assert.That(db.OptimizedLockingOn, Is.False, "AcceleratedRecoveryEnabled set to false by Alter");
                 Assert.That(db.OptimizedLockingOn, Is.False, "OptimizedLockingOn set to false by Alter");
             });
         }
@@ -1189,7 +1209,7 @@ end
 
 #if MICROSOFTDATA
         [TestMethod]
-        [SupportedServerVersionRange(Edition=DatabaseEngineEdition.SqlDatabase)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedFeature(SqlFeature.Fabric)]
         public void Database_enumerating_databases_does_not_login_to_each_database()
         {
@@ -1197,16 +1217,16 @@ end
             {
                 // Get the server's DatabaseEngineType first so that query doesn't get made during the collection enumeration
                 Manageability.Utils.Helpers.TraceHelper.TraceInformation($"Main connection engine type: {ServerContext.DatabaseEngineType}");
-                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId) { EnableTraceLogging = false })
                 {
                     eventRecorder.Start();
-                    ServerContext.Databases.ClearAndInitialize("[@IsSystemObject = false()]", new[] {nameof(Database.Status)});
+                    ServerContext.Databases.ClearAndInitialize("[@IsSystemObject = false()]", new[] { nameof(Database.Status) });
                     eventRecorder.Stop();
                     var messages = eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
                     Assert.That(messages, Has.None.Contains("sc.TdsParser.SendPreLoginHandshake"), "No logins should have occurred - Status only");
                     Assert.That(messages, Has.None.Contains("SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,"), "No query for DatabaseEngineEdition should have been made - Status only");
                 }
-                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId) { EnableTraceLogging = false })
                 {
                     eventRecorder.Start();
                     ServerContext.Databases.ClearAndInitialize(string.Empty, Enumerable.Empty<string>());
@@ -1214,10 +1234,10 @@ end
                     var messages = eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString());
                     Assert.That(messages, Has.None.Contains("sc.TdsParser.SendPreLoginHandshake"), "No logins should have occurred - No properties");
                     Assert.That(messages, Has.None.Contains("SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,"), "No query for DatabaseEngineEdition should have been made - No properties");
-                    Assert.That(ServerContext.Databases.Cast<Database>().Select( d=> d.Name), Has.Member("master"), "Should have at least master");
+                    Assert.That(ServerContext.Databases.Cast<Database>().Select(d => d.Name), Has.Member("master"), "Should have at least master");
                 }
                 // Querying for Status and other properties goes through a different path. Don't use any PostProcess properties for the test, as they require a login to the user db.
-                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId))
+                using (var eventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId) { EnableTraceLogging = false })
                 {
                     eventRecorder.Start();
                     ServerContext.Databases.ClearAndInitialize("[@IsSystemObject = false()]", new[] { nameof(Database.Status), nameof(Database.ChangeTrackingEnabled) });
@@ -1228,8 +1248,6 @@ end
                 }
             });
         }
-
 #endif
     }
-
 }

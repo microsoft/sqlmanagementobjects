@@ -284,7 +284,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
             }
 
             if (sp.TargetServerVersion >= SqlServerVersion.Version105 &&
-               (this.ServerVersion.Major > 10 || (this.ServerVersion.Major >= 10 && this.ServerVersion.Minor >= 50)))
+               (this.ServerVersion.Major > 10 || this.ServerVersion.Minor >= 50))
             {
                 object isPoisonMessageHandlingEnabled = GetPropValueOptional("IsPoisonMessageHandlingEnabled");
                 if (null != isPoisonMessageHandlingEnabled)

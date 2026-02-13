@@ -73,9 +73,9 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             DataSet ds = null;
             String query = null;
-            var snapshotClause = (this.server.ServerVersion.Major < 9 || includeSnapshotBackups) ? string.Empty : "and bkps.is_snapshot = 0";
+            var snapshotClause = includeSnapshotBackups ? string.Empty : "and bkps.is_snapshot = 0";
 
-            if (this.server.ServerVersion.Major < 9 || parent == null || this.parent.Status == DatabaseStatus.Offline)
+            if (parent == null || this.parent.Status == DatabaseStatus.Offline)
             {
                 query = string.Format(SmoApplication.DefaultCulture,
                     "SELECT bkps.backup_set_uuid FROM msdb.dbo.backupset bkps WHERE bkps.database_name = {0} {1} ORDER BY bkps.backup_set_id ASC",

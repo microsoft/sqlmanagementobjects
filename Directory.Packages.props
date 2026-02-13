@@ -6,7 +6,7 @@
 -->
 <Project>
   <PropertyGroup>
-    <DotNetPackagesVersion>6.0.0</DotNetPackagesVersion>
+    <DotNetPackagesVersion>8.0.0</DotNetPackagesVersion>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
@@ -14,20 +14,18 @@
     <!--
         When adding new package dependencies here, make sure to also add those packages to
         Microsoft.SqlServer.Smo.TestUtils.nuspec if they affect any of the related test utilities.
+        When to pin a specific version:
+        - If the package is directly used by the code in this repo (i.e. there is a using statement for it)
+        - If the package is not frequently updated and we want to avoid unintentional version upgrades
+        - Component Governance reports a vulnerability in a transitive dependency
+        - Prevent double writes from multiple conflicting transitive versions (e.g. System.Runtime.CompilerServices.Unsafe)
         -->
-    <PackageVersion Include="Azure.Core" Version="1.41.0" />
-    <PackageVersion Include="Azure.Identity" Version="1.12.0" />
-    <PackageVersion Include="Azure.ResourceManager" Version="1.8.0" />
-    <PackageVersion Include="Azure.ResourceManager.Storage" Version="1.1.1" />
-    <PackageVersion Include="Azure.Storage.Blobs" Version="12.20.0" />
-    <PackageVersion Include="Azure.Security.KeyVault.Secrets" Version="4.4.0" />
-    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.5" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="$(SqlClientPackageVersion)" />
     <PackageVersion Include="Microsoft.Data.Tools.StringResourceTool" Version="3.2.0" />
-    <PackageVersion Include="Microsoft.Identity.Client" Version="4.61.3" />
-    <PackageVersion Include="Microsoft.Identity.Client.Desktop" Version="4.61.3" />
+    <PackageVersion Include="Microsoft.Identity.Client" Version="4.79.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
     <PackageVersion Include="Microsoft.SqlServer.ADO.Identity" Version="171.38.0" />
     <!-- Assessment version needs to match in Microsoft.SqlServer.Management.Assessment.nuspec -->
@@ -38,21 +36,20 @@
     <PackageVersion Include="MSTest.TestFramework" Version="2.2.10" />
     <PackageVersion Include="NewtonSoft.Json" Version="13.0.1" />
     <PackageVersion Include="NUnit" Version="3.11.0" />
-    <PackageVersion Include="System.Buffers" Version="4.5.1" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <PackageVersion Include="System.Data.OleDb" Version="$(DotNetPackagesVersion)" />
-    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="6.0.1" />
-    <PackageVersion Include="System.Management" Version="$(DotNetPackagesVersion)" />
-    <PackageVersion Include="System.Memory" Version="4.5.5" />
-    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="$(DotNetPackagesVersion)" />
-    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="$(DotNetPackagesVersion)" />
-    <PackageVersion Include="System.Security.Permissions" Version="$(DotNetPackagesVersion)" />
-    <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />
-    <PackageVersion Include="System.Text.Encodings.Web" Version="8.0.0" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
-    <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageVersion Include="System.ValueTuple" Version="4.5.0" />
+    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" /> <!-- prevent double writes -->
+    <PackageVersion Include="System.Security.AccessControl" Version="6.0.1" />
+    <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.5" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <PackageVersion Include="System.Data.OleDb" Version="$(DotNetPackagesVersion)" />
+    <PackageVersion Include="System.Management" Version="$(DotNetPackagesVersion)" />
+    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="9.0.4" />
+    <PackageVersion Include="System.Security.Permissions" Version="$(DotNetPackagesVersion)" />
+    <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />  
+  </ItemGroup>
+
   <ItemGroup>
     <!-- GlobalPackageReference packages are installed and processed by msbuild but are not referenced by the C# compiler -->
     <GlobalPackageReference Include="Microsoft.TestPlatform" Version="17.6.0" GeneratePathProperty="true" />

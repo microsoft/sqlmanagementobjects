@@ -142,18 +142,26 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                         workloadGroup.GroupMaximumTempdbDataPercent = -1;
                     }
 
-                    var commands = server.ExecutionManager.RecordQueryText(workloadGroup.Create, false).Cast<string>();
+                    var createCommand = server.ExecutionManager.RecordQueryText(workloadGroup.Create, false).Cast<string>().ToList();
                         
-                    // When properties are set to -1, they should be excluded from the script (treated as null)
-                    string expected = $"CREATE WORKLOAD GROUP [WorkloadTempdbMinusOne_] USING [default]";
-                    Assert.That(commands, Has.Member(expected), "Invalid Query to Create Workload Group - TempDB properties with -1 should be excluded from script");
-                        
-                    // Verify that the script does NOT contain the TempDB properties when set to -1
-                    foreach (string command in commands)
-                    {
-                        Assert.That(command, Does.Not.Contain("group_max_tempdb_data_mb"), "Script should not contain group_max_tempdb_data_mb when set to -1");
-                        Assert.That(command, Does.Not.Contain("group_max_tempdb_data_percent"), "Script should not contain group_max_tempdb_data_percent when set to -1");
-                    }
+                    // Find the CREATE WORKLOAD GROUP statement (may be preceded by USE statement)
+                    var createStatement = createCommand.FirstOrDefault(c => c.Contains("CREATE WORKLOAD GROUP"));
+                    Assert.That(createStatement, Is.Not.Null, "CREATE WORKLOAD GROUP statement not found in script");
+                    
+                    // When properties are set to -1, they should be included in the script (treated as null)
+                    Assert.That(createStatement, Does.Contain("group_max_tempdb_data_mb=null"), "Script should contain group_max_tempdb_data_mb=null when set to -1");
+                    Assert.That(createStatement, Does.Contain("group_max_tempdb_data_percent=null"), "Script should contain group_max_tempdb_data_percent=null when set to -1");
+                    Assert.That(createStatement, Does.Contain("USING [default]"), "Script should specify USING [default]");
+
+                    var alterCommand = server.ExecutionManager.RecordQueryText(workloadGroup.Alter, false).Cast<string>().ToList();
+
+                    // Find the ALTER WORKLOAD GROUP statement (may be preceded by USE statement)
+                    var alterStatement = alterCommand.FirstOrDefault(c => c.Contains("ALTER WORKLOAD GROUP"));
+                    Assert.That(alterStatement, Is.Not.Null, "ALTER WORKLOAD GROUP statement not found in script");
+
+                    // When properties are set to -1, they should be included in the script (treated as null)
+                    Assert.That(alterStatement, Does.Contain("group_max_tempdb_data_mb=null"), "Script should contain group_max_tempdb_data_mb=null when set to -1");
+                    Assert.That(alterStatement, Does.Contain("group_max_tempdb_data_percent=null"), "Script should contain group_max_tempdb_data_percent=null when set to -1");
                 });
         }
     }

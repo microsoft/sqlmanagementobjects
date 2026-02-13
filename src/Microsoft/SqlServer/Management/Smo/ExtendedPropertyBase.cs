@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Specialized;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
 using Cmn = Microsoft.SqlServer.Management.Common;
@@ -67,14 +68,14 @@ namespace Microsoft.SqlServer.Management.Smo
             // Fills in the slot of typeNames_ pair array
             private void SetTypeNamePair(int level, string type, string name)
             {
-                Diagnostics.TraceHelper.Assert(level >= 0 && level <= 2);
+                Debug.Assert(level >= 0 && level <= 2);
 
                 // Trying to fill higher slots when lower are not filled indicates a bug
 #if DEBUG
                 for (int i = 0; i < level; ++i)
                 {
-                    Diagnostics.TraceHelper.Assert(typeNames_[i].type != null);
-                    Diagnostics.TraceHelper.Assert(typeNames_[i].name != null);
+                    Debug.Assert(typeNames_[i].type != null);
+                    Debug.Assert(typeNames_[i].name != null);
                 }
 #endif
 
@@ -258,6 +259,9 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
                     case "ExternalLibrary":
                         SetTypeNamePair(0, "EXTERNAL LIBRARY", objParent.InternalName);
+                        break;
+                    case nameof(ExternalModel):
+                        SetTypeNamePair(0, "EXTERNAL MODEL", objParent.InternalName);
                         break;
                     case "UserDefinedType":
                         SetSchema(objParent, sp);

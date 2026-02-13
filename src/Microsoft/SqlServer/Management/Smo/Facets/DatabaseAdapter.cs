@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Facets;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -227,7 +228,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         protected bool DataFileVolumeNotIn(List<string> checkVolumes)
         {
-            Diagnostics.TraceHelper.Assert(checkVolumes != null, "DataFileVolumeNotIn parameter checkVolumes should not be null");
+            Debug.Assert(checkVolumes != null, "DataFileVolumeNotIn parameter checkVolumes should not be null");
 
             bool dataNotInCheck = true;
             if (checkVolumes.Count > 0)  // skip the check if there are no dives to compare against.

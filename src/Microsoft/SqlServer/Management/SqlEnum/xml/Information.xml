@@ -1,62 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject type="Server" impl_type="Server" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Server" impl_type="Server" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major='7' max_major='7'>
-      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#VersionString#OSVersion#Language#">
-        create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
-        insert #SVer exec master.dbo.xp_msver
-      </prefix>
-      <prefix fields="#NetName#">
-        declare @NetName sysname
-        exec master.dbo.xp_getnetname @NetName OUTPUT
-      </prefix>
-      <prefix fields="#RootDirectory#">
-        declare @SmoRoot nvarchar(512)
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Setup', N'SQLPath', @SmoRoot OUTPUT
-      </prefix>
-      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
-        declare @RegPathParams sysname
-        declare @Arg sysname
-        declare @Param sysname
-        declare @MasterPath nvarchar(512)
-        declare @LogPath nvarchar(512)
-        declare @ErrorLogPath nvarchar(512)
-        declare @n int
-
-        select @n=0
-        select @RegPathParams=N'Software\Microsoft\MSSQLServer\MSSQLServer'+'\Parameters'
-        select @Param='dummy'
-        while(not @Param is null)
-        begin
-        select @Param=null
-        select @Arg='SqlArg'+convert(nvarchar,@n)
-
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @RegPathParams, @Arg, @Param OUTPUT
-        if(@Param like '-d%')
-        begin
-        select @Param=substring(@Param, 3, 255)
-        select @MasterPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
-        end
-        else if(@Param like '-l%')
-        begin
-        select @Param=substring(@Param, 3, 255)
-        select @LogPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
-        end
-        else if(@Param like '-e%')
-        begin
-        select @Param=substring(@Param, 3, 255)
-        select @ErrorLogPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
-        end
-
-        select @n=@n+1
-        end
-      </prefix>
-      <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#VersionString#OSVersion#Language#">
-        drop table #SVer
-      </postfix>
-    </version>
-
-    <version min_major='8' max_major='10'>
+    <version min_major='10' max_major='10'>
       <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
         declare @RegPathParams sysname
         declare @Arg sysname
@@ -96,14 +41,14 @@
       </prefix>
     </version>
 
-    <version min_major='8' max_major='13'>
+    <version min_major='10' max_major='13'>
       <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#">
         create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
         insert #SVer exec master.dbo.xp_msver
       </prefix>
     </version>
 
-    <version min_major='8'>
+    <version min_major='10'>
       <prefix fields="#RootDirectory#">
         declare @SmoRoot nvarchar(512)
         exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Setup', N'SQLPath', @SmoRoot OUTPUT
@@ -259,7 +204,7 @@
         exec master.dbo.xp_getnetname @FullyQualifiedNetName OUTPUT, 1
       </prefix>
     </version> 
-    <version min_major='8' max_major='13'>
+    <version min_major='10' max_major='13'>
       <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#">
        drop table #SVer
       </postfix>
@@ -283,7 +228,7 @@
     <property name="IsCaseSensitive" type="bit" access="Read" cast='true'>case when 'a' &lt;&gt; 'A' then 1 else 0 end</property>
     <property name="MaxPrecision" type="tinyint" access="Read">@@MAX_PRECISION</property>
 
-    <version min_major='7'>
+    <version min_major='10'>
       <property name="Product" type="nvarchar" size="512" access="Read" expensive='true'>(select Value from #SVer where Name = N'ProductName')</property>
       <property name="OSVersion" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'WindowsVersion')</property>
       <property name="Language" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'Language')</property>
@@ -308,23 +253,18 @@
       <property name="PathSeparator" type="nvarchar" size="1" access="Read">SERVERPROPERTY('PathSeparator')</property>
     </version>
 
-    <version min_major='7' cloud_min_major='12' >
+    <version min_major='10' cloud_min_major='12' >
       <property name="IsFullTextInstalled" type="bit" cast='true' access="Read">FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')</property>
     </version>
     <version datawarehouse_enabled='true' >
       <property name="IsFullTextInstalled" type="bit" cast='true' access="Read">0</property>
     </version>
-    <version min_major='7'>
+    <version min_major='10'>
       <property name="MasterDBLogPath" type="nvarchar" size="512" access="Read">@LogPath</property>
       <property name="MasterDBPath" type="nvarchar" size="512" access="Read">@MasterPath</property>
     </version>
 
-    <version min_major='7' max_major='7'>
-      <property name="VersionString" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'ProductVersion')</property>
-      <property name="NetName" type="sysname" access="Read" expensive='true'>@NetName</property>
-      <property name="Edition" type="sysname" access="Read" cast='true'>SUBSTRING(@@version,PATINDEX(N'%Corporation%',@@version)+DATALENGTH('Corporation')+2,PATINDEX(N'% on %',@@version)-(PATINDEX(N'%Corporation%',@@version)+DATALENGTH('Corporation')+2))</property>
-    </version>
-    <version min_major='8'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="VersionString" type="sysname" access="Read">SERVERPROPERTY(N'ProductVersion')</property>
       <property name="Edition" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'Edition')</property>
       <property name="ProductLevel" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'ProductLevel')</property>
@@ -333,7 +273,7 @@
       <property name="EngineEdition" type="int" access='Read' cast='true'>SERVERPROPERTY('EngineEdition')</property>
       <property name="Collation" type="sysname" access="Read">convert(sysname, serverproperty(N'collation'))</property>
     </version>
-    <version min_major='8' max_major='13'>
+    <version min_major='10' max_major='13'>
       <property name="NetName" type="sysname" access="Read" cast = 'true'>SERVERPROPERTY(N'MachineName')</property>
       <property name="IsClustered" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsClustered')</property>
     </version>
@@ -342,10 +282,7 @@
       <property name="NetName" type="sysname" access="Read" cast = 'true'>ISNULL(SERVERPROPERTY(N'MachineName'),N'')</property>
       <property name="IsClustered" type="bit" access="Read" cast='true'>ISNULL(SERVERPROPERTY('IsClustered'),N'')</property>
     </version>
-    <version min_major='7' max_major='8'>
-      <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>case when (select password from master.dbo.syslogins where sid = 0x01) is null then 1 else 0 end</property>
-    </version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="ResourceVersionString" type="sysname" access="Read">SERVERPROPERTY(N'ResourceVersion')</property>
       <property name="ResourceLastUpdateDateTime" type="datetime" access="Read">SERVERPROPERTY(N'ResourceLastUpdateDateTime')</property>
       <property name="CollationID" type="int" access="Read">SERVERPROPERTY(N'CollationID')</property>
@@ -355,11 +292,11 @@
       <property name="SqlSortOrder" type="int" report_type2="System.Int16" access="Read">SERVERPROPERTY(N'SqlSortOrder')</property>
       <property name="SqlSortOrderName" type="sysname" access="Read">SERVERPROPERTY(N'SqlSortOrderName')</property>
     </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>null</property>
       <property name="BuildClrVersionString" type="sysname" access="Read">SERVERPROPERTY(N'BuildClrVersion')</property>
     </version>
-    <version min_major='9' max_major='13'>
+    <version min_major='10' max_major='13'>
       <property name="ComputerNamePhysicalNetBIOS" type="sysname" access="Read">SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS')</property>
     </version>
     <version min_major='14'>
@@ -389,7 +326,7 @@
     </version>
 
     <!-- Fabric properties -->
-    <version min_major='7' datawarehouse_enabled='true'>
+    <version min_major='10' datawarehouse_enabled='true'>
       <property name="IsFabricServer" type="bit" cast="true" access="read">0</property>
     </version>
     <version cloud_min_major="12">

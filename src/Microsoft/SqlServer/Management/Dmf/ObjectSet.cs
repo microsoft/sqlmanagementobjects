@@ -254,9 +254,8 @@ namespace Microsoft.SqlServer.Management.Dmf
                 }
 
                 PolicyCategory pc = null;
-                if (!String.IsNullOrEmpty(policyCategory) && sqlStoreConnection.ServerVersion.Major >= 10)
+                if (!String.IsNullOrEmpty(policyCategory))
                 {
-                    // if target is downlevel, we ignore policyCategory
 
                     if (this.Parent.SqlStoreConnection == null || this.Parent.SqlStoreConnection != sqlStoreConnection)
                     {

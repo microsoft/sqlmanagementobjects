@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='DatabaseDiagram' impl_type='SqlObject' min_major='9'  cloud_min_major="12">
+<EnumObject type='DatabaseDiagram' impl_type='SqlObject' min_major='10'  cloud_min_major="12" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='#tmp_sp_helpdiagrams' alias='tshd'/>
 		<prefix>

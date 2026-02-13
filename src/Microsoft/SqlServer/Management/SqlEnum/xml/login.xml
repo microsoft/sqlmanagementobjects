@@ -1,11 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject type="Login" impl_type="SqlObject" min_major='7'   cloud_min_major='12' datawarehouse_enabled='true'>
+<EnumObject type="Login" impl_type="SqlObject" min_major='10'   cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link table='master.dbo.syslogins AS log' />
-			<property_link fields="#LanguageAlias#" left_join="master.dbo.syslanguages AS l">log.language = l.name</property_link>
-		</version>
-		<version min_major='9' >
+		<version min_major='10' >
 			<property_link table='sys.server_principals AS log'>log.type in ('U', 'G', 'S', 'C', 'K', 'E', 'X') AND log.principal_id not between 101 and 255 AND log.name &lt;&gt; N'##MS_AgentSigningCertificate##'</property_link>
 			<property_link fields="#LanguageAlias#" left_join="sys.syslanguages AS l">l.name = log.default_language_name</property_link>
 			<property_link fields="#PasswordPolicyEnforced#PasswordExpirationEnabled#" 
@@ -55,22 +51,7 @@ UNION
 	</settings>
 	<properties>
 		<include file='inc_urn.xml' />
-		<version min_major='7' max_major='8'>
-			<property name="Name" type="sysname">log.loginname</property>
-			<property name="Language" type="sysname">ISNULL(log.language, N'')</property>
-			<property name="LanguageAlias" type="sysname" access='Read'>l.alias</property>
-			<property name="DefaultDatabase" type="sysname">ISNULL(log.dbname,N'')</property>
-			<property name="DenyWindowsLogin" type="bit" cast='true'>log.denylogin</property>
-			<property name="LoginType" type="int" report_type="LoginType" read_only_after_creation="true">CASE WHEN 0 &lt;&gt; log.isntuser THEN 0 WHEN 0 &lt;&gt; log.isntgroup THEN 1 ELSE 2 END</property>
-			<property name="WindowsLoginAccessType" type="int" report_type="WindowsLoginAccessType" access='Read'>CASE WHEN (0 = log.isntuser AND 0 = log.isntgroup) THEN 99 WHEN (0 = log.denylogin and 0 = log.hasaccess) THEN 0 WHEN (0 = log.denylogin ) THEN 1 ELSE 2 END</property>
-			<property name="HasAccess" type="bit" access='Read' cast='true'>log.hasaccess</property>
-			<property name="Sid" type="varbinary" size = "85" read_only_after_creation="true">log.sid</property>
-			<property name="CreateDate" type="datetime" access='Read'>log.createdate</property>
-			<property name="DateLastModified" type="datetime" access='Read'>log.updatedate</property>
-			<property name="IsSystemObject" type="bit" cast='true' access='Read'>CASE log.sid WHEN 0x01 THEN 1 ELSE 0 END</property>
-		</version>
-
-    <version min_major='9' >
+		<version min_major='10' >
       <property name="Name" type="sysname">log.name</property>
       <property name="Language" type="sysname">ISNULL(log.default_language_name,N'')</property>
       <property name="LanguageAlias" type="sysname" access='Read'>l.alias</property>
@@ -95,7 +76,7 @@ UNION
       <!-- enable permissions -->
       <property name="IsSystemObject" type="bit" cast='true' access='Read'>CASE WHEN log.principal_id &lt; 256 THEN 1 ELSE 0 END</property>
     </version>
-    <version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
       <!-- enable permissions -->
       <property name="PermissionClass" type="int" hidden='true'>101</property>      
       <property name="PasswordExpirationEnabled" type="bit" cast = "true">ISNULL(sqllog.is_expiration_checked, 0)</property>

@@ -21,12 +21,6 @@ namespace Microsoft.SqlServer.Management.Common
     /// </summary>
     internal class ServerInformation
     {
-        private readonly ServerVersion serverVersion;
-        private readonly Version productVersion;
-        private readonly DatabaseEngineType databaseEngineType;
-        private readonly DatabaseEngineEdition databaseEngineEdition;
-        private readonly string hostPlatform;
-        private readonly NetworkProtocol connectionProtocol;
 
         /// <summary>
         /// Constructs a new ServerInformation object with the given values and HostPlatform of Windows
@@ -37,7 +31,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="dt"></param>
         /// <param name="databaseEngineEdition"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition)
-            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, isFabricServer: false)
+            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, isFabricServer: false, collation: string.Empty)
         {
 
         }
@@ -52,66 +46,50 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="hostPlatform"></param>
         /// <param name="connectionProtocol">net_transport value from dm_exec_connections for the current spid</param>
         /// <param name="isFabricServer"></param>
+        /// <param name="collation"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition,
-            string hostPlatform, NetworkProtocol connectionProtocol, bool isFabricServer)
+            string hostPlatform, NetworkProtocol connectionProtocol, bool isFabricServer, string collation)
         {
-            serverVersion = sv;
-            this.productVersion = productVersion;
-            databaseEngineType = dt;
-            this.databaseEngineEdition = databaseEngineEdition;
-            this.hostPlatform = hostPlatform;
-            this.connectionProtocol = connectionProtocol;
+            ServerVersion = sv;
+            ProductVersion = productVersion;
+            DatabaseEngineType = dt;
+            DatabaseEngineEdition = databaseEngineEdition;
+            HostPlatform = hostPlatform;
+            ConnectionProtocol = connectionProtocol;
             IsFabricServer = isFabricServer;
+            Collation = collation;
         }
 
         /// <summary>
         /// The host platform of the connection as given by select host_platform from sys.dm_os_host_info
         /// </summary>
         /// <remarks>Returns Windows prior to 2016 (when this DMV was introduced)</remarks>
-        public string HostPlatform
-        {
-            get { return this.hostPlatform; }
-        }
+        public string HostPlatform { get; }
 
         /// <summary>
         /// The server version string given when this was initialized
         /// </summary>
-        public ServerVersion ServerVersion
-        {
-            get { return serverVersion; }
-        }
+        public ServerVersion ServerVersion { get; }
 
         /// <summary>
         /// The Product Version as given by SERVERPROPERTY('ProductVersion')
         /// </summary>
-        public Version ProductVersion
-        {
-            get { return productVersion;  }
-        }
+        public Version ProductVersion { get; }
 
         /// <summary>
         /// The DatabaseEngineType of the connection as given by SERVERPROPERTY('EDITION')
         /// </summary>
-        public DatabaseEngineType DatabaseEngineType
-        {
-            get { return databaseEngineType; }
-        }
+        public DatabaseEngineType DatabaseEngineType { get; }
 
         /// <summary>
         /// The DatabaseEngineEdition of the connection as given by SERVERPROPERTY('EngineEdition')
         /// </summary>
-        public DatabaseEngineEdition DatabaseEngineEdition
-        {
-            get { return databaseEngineEdition; }
-        }
+        public DatabaseEngineEdition DatabaseEngineEdition { get; }
 
         /// <summary>
         /// Protocol used for the connection. 
         /// </summary>
-        public NetworkProtocol ConnectionProtocol
-        {
-            get { return connectionProtocol; }
-        }
+        public NetworkProtocol ConnectionProtocol { get; }
 
         /// <summary>
         /// Returns true if the server is running in Microsoft Fabric
@@ -121,6 +99,11 @@ namespace Microsoft.SqlServer.Management.Common
             get;
         }
 
+        /// <summary>
+        /// The server collation as given by SERVERPROPERTY('Collation')
+        /// </summary>
+        public string Collation { get; }
+
         private static readonly HashSet<DatabaseEngineEdition> validEditions = new HashSet<DatabaseEngineEdition>(Enum.GetValues(typeof(DatabaseEngineEdition)).Cast<DatabaseEngineEdition>());
         // this query needs to be safe on all platforms. DW and Sql2005 don't support CONNECTIONPROPERTY
         private const string serverVersionQuery = @"DECLARE @edition sysname;
@@ -129,7 +112,8 @@ SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineTyp
 SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
 SERVERPROPERTY('ProductVersion') AS ProductVersion,
 @@MICROSOFTVERSION AS MicrosoftVersion,
-case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer;
+case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,
+convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
 ";
         static public ServerInformation GetServerInformation(IDbConnection sqlConnection, IDbDataAdapter dataAdapter, string serverVersionString)
         {
@@ -146,17 +130,10 @@ case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('Engin
                 cmdBuilder.AppendLine(@"select N'Windows' as host_platform");
             }
                 
-            if (serverVersion.Major >= 10)
-            {
-                cmdBuilder.AppendLine(@"if @edition = N'SQL Azure' 
+            cmdBuilder.AppendLine(@"if @edition = N'SQL Azure' 
   select 'TCP' as ConnectionProtocol
 else
   exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')");
-            }
-            else
-            {
-                cmdBuilder.AppendLine("select NULL as ConnectionProtocol");
-            }
 
             using (var sqlCommand = sqlConnection.CreateCommand())
             {
@@ -196,6 +173,7 @@ else
                 }
                 var isFabricServer = Convert.ToBoolean(dataSet.Tables[0].Rows[0]["IsFabricServer"]);
                 var connectionProtocol = dataSet.Tables[2].Rows[0]["ConnectionProtocol"];
+                var collation = (string)dataSet.Tables[0].Rows[0]["Collation"];
 
                 return new ServerInformation(serverVersion,
                     new Version((string)dataSet.Tables[0].Rows[0]["ProductVersion"]),
@@ -203,7 +181,8 @@ else
                     edition,
                     (string)dataSet.Tables[1].Rows[0]["host_platform"],
                     connectionProtocol == DBNull.Value ? NetworkProtocol.NotSpecified : ProtocolFromNetTransport((string)connectionProtocol),
-                    isFabricServer
+                    isFabricServer,
+                    collation
                     );
             }
         }

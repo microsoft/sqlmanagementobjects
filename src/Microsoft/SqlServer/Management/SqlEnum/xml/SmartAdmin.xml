@@ -1,12 +1,11 @@
 <?xml version="1.0" ?>
-<EnumObject type="SmartAdmin" impl_type="SmartAdmin" min_major='12' >
+<EnumObject type="SmartAdmin" impl_type="SmartAdmin" min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table="msdb.smart_admin.fn_backup_instance_config () AS ic"/>
   </settings>
   <properties>
     <include file='inc_urn_single.xml' />
     <property name="MasterSwitch" type="bit">(SELECT ISNULL(msdb.smart_admin.fn_is_master_switch_on (), 0))</property>
-    ISNULL(msdb.smart_admin.fn_is_master_switch_on (), 0)
     <property name='BackupEnabled' type='bit' cast='true'>ISNULL(ic.is_managed_backup_enabled, 0)</property>
     <property name="CredentialName" type="sysname">ISNULL(ic.credential_name, N'')</property>
     <property name="BackupRetentionPeriodInDays" type="int">ISNULL(ic.retention_days, 0)</property>

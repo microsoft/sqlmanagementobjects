@@ -4,6 +4,7 @@
 using System;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Microsoft.SqlServer.Management.Facets;
@@ -59,7 +60,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                Diagnostics.TraceHelper.Assert(this.Database.Parent != null, "Database Security Adapter database Parent is null");
+                Debug.Assert(this.Database.Parent != null, "Database Security Adapter database Parent is null");
 
                 // Owner can be lost for attached database
                 //
@@ -98,7 +99,7 @@ namespace Microsoft.SqlServer.Management.Smo
             this.Database.SymmetricKeys.Refresh();
             this.Database.AsymmetricKeys.Refresh();
 
-            Diagnostics.TraceHelper.Assert(this.Database.Parent != null, "Database Security Adapter database Parent is null");
+            Debug.Assert(this.Database.Parent != null, "Database Security Adapter database Parent is null");
             this.Database.Parent.Logins.Refresh();
         }
         #endregion

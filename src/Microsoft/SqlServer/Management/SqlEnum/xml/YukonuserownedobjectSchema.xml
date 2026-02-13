@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="OwnedObject" impl_type="SqlObject" min_major='9'>
+<EnumObject type="OwnedObject" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<union>
 		<settings>
 			<parent_link>
@@ -7,7 +7,7 @@
 			</parent_link>
 		
 			<!-- filter out all objects which in their enumerator representation don't have a schema property -->
-      <version min_major='9'>
+      <version min_major='10'>
         <property_link table="sys.all_objects AS ownobj">ownobj.type not in ('PK', 'C ', 'F ', 'UQ') and ( ownobj.type != 'D' or 0 = ownobj.parent_object_id)</property_link>
       </version>
 

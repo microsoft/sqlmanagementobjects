@@ -223,16 +223,13 @@ namespace Microsoft.SqlServer.Management.Smo
             sc.Add("NotForReplication");
             sc.Add("ImplementationType");
 
-            if( this.ServerVersion.Major >= 9 )
+            sc.Add("ExecutionContext");
+            sc.Add("ExecutionContextPrincipal");
+            if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
             {
-                sc.Add("ExecutionContext");
-                sc.Add("ExecutionContextPrincipal");
-                if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
-                {
-                    sc.Add("AssemblyName");
-                    sc.Add("ClassName");
-                    sc.Add("MethodName");
-                }
+                sc.Add("AssemblyName");
+                sc.Add("ClassName");
+                sc.Add("MethodName");
             }
 
             if (this.Properties.ArePropertiesDirty(sc))
@@ -330,11 +327,8 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (ImplementationType.SqlClr == (ImplementationType)property.Value)
                 {
-                    // CLR triggers are not supported on versions prior to 9.0
-                    if (ServerVersion.Major < 9)
-                    {
-                        throw new WrongPropertyValueException(ExceptionTemplates.ClrNotSupported("ImplementationType", ServerVersion.ToString()));
-                    }
+                    // CLR triggers were introduced in SQL Server 2005 (version 9.0).
+                    // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
 
                     bTransactSql = false;
 
@@ -402,7 +396,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         AppendWithOption(sbTmp, "IsEncrypted", "ENCRYPTION", ref bNeedsComma);
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         AddScriptExecuteAs(sbTmp, sp, this.Properties, ref bNeedsComma);
                     }

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Diagnostics;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -72,7 +73,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             if (this.expression.ToString().StartsWith("Server", StringComparison.Ordinal))
             {
                 // Can't do that any more for SMO types. Caller beware!
-                TraceHelper.Assert(false);
+                Debug.Assert(false);
             }
 
             return this.expression.Type;

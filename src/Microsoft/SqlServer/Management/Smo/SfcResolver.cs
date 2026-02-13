@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
@@ -29,11 +30,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 Type t = cur.GetType();
                 PropertyInfo pi = t.GetProperty("Parent");
 
-                Diagnostics.TraceHelper.Assert(pi != null, String.Format("{0} is missing Parent property.", t.FullName));
+                Debug.Assert(pi != null, String.Format("{0} is missing Parent property.", t.FullName));
 
                 cur = pi.GetValue(cur, null);
 
-                Diagnostics.TraceHelper.Assert(cur != null, String.Format("{0}.Parent property returned null.", t.FullName));
+                Debug.Assert(cur != null, String.Format("{0}.Parent property returned null.", t.FullName));
 
                 if (cur.GetType() == typeof(Database))
                 {
@@ -69,11 +70,11 @@ namespace Microsoft.SqlServer.Management.Smo
             Type t = obj.GetType();
             PropertyInfo pi = t.GetProperty("Schema");
 
-            Diagnostics.TraceHelper.Assert(pi != null, String.Format("{0} is missing Schema property.", t.FullName));
+            Debug.Assert(pi != null, String.Format("{0} is missing Schema property.", t.FullName));
 
             string name = (string)pi.GetValue(obj, null);
 
-            Diagnostics.TraceHelper.Assert(name != null, String.Format("{0}.Schema property returned null.", t.FullName));
+            Debug.Assert(name != null, String.Format("{0}.Schema property returned null.", t.FullName));
 
             return name;
         }

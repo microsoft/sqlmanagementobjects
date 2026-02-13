@@ -147,18 +147,6 @@ namespace Microsoft.SqlServer.Management.Smo
             return smoCode;
         }
 
-        private int GetSmoCodeFromSqlCodeShiloh(string sqlCode)
-        {
-            int smoCode;
-            sqlCode = sqlCode.TrimEnd();
-
-            if (!GetSmoCodeFromSqlCode(sqlCode, out smoCode))
-            {
-                smoCode = (int)PermissionDecode.ToPermissionSetValueEnum<ObjectPermissionSetValue>(sqlCode);
-            }
-
-            return smoCode;
-        }
 
         /// <summary>
         /// Gets server or database permission code
@@ -188,35 +176,9 @@ namespace Microsoft.SqlServer.Management.Smo
             return result;
         }
 
-        string ShilohToYukonPermission(int permType)
-        {
-            switch (permType)
-            {
-                case 26: return "RF";       //References
-                case 178: return "CRFN";     //Create Function
-                case 193: return "SL";       //Select
-                case 195: return "IN";       //Insert
-                case 196: return "DL";       //Delete
-                case 197: return "UP";       //Update
-                case 198: return "CRTB";     //Create Table
-                case 203: return "CRDB";     //Create Database
-                case 207: return "CRVW";     //Create View
-                case 222: return "CRPR";     //Create Procedure
-                case 224: return "EX";       //Execute
-                case 228: return "BADB";     //Backup Database
-                case 233: return "CRDF";     //Create Default
-                case 235: return "BALO";     //Backup Transaction ( LOG )
-                case 236: return "CRRU";     //Create Rule       
-            }
-            return "";
-        }
 
         public override object GetColumnData(string name, object data, DataProvider dp)
         {
-            if (ExecuteSql.GetServerVersion(this.ConnectionInfo).Major < 9)
-            {
-                return GetSmoCodeFromSqlCodeShiloh(ShilohToYukonPermission(GetTriggeredInt32(dp, 0)));
-            }
             return GetSmoCodeFromSqlCodeYukon(GetTriggeredString(dp, 0), (ObjectClass)GetTriggeredInt32(dp, 1));
         }
     }

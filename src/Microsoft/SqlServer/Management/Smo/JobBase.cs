@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
+using System.Diagnostics;
 
 using System.Globalization;
 using System.Linq;
@@ -433,7 +434,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         // consructor and Alter/Create
         private void UpdateCategoryIDFromCategoryProperty()
         {
-            Diagnostics.TraceHelper.Assert(this.Parent != null);
+            Debug.Assert(this.Parent != null);
 
             string categoryName = (string)Properties.Get("Category").Value;
 

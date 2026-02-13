@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Diagnostics;
 
 using Microsoft.SqlServer.Management.Common;
 namespace Microsoft.SqlServer.Management.Smo
@@ -528,7 +529,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 StringBuilder sb = GetCertificateBuilder("ALTER", sp);
 
                 //cannot be null if dirty
-                Diagnostics.TraceHelper.Assert(null != prop.Value);
+                Debug.Assert(null != prop.Value);
 
                 AddToStringBuilderIfNotNull(sb, " WITH ACTIVE FOR BEGIN_DIALOG = ", prop.Value, false);
 
@@ -601,7 +602,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // add the source
-            Diagnostics.TraceHelper.Assert(null != certificateSource, "certificateSource cannot be null");
+            Debug.Assert(null != certificateSource, "certificateSource cannot be null");
             sb.Append(" FROM ");
             switch (sourceType)
             {

@@ -1,17 +1,8 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings />
 	<properties>
-		<version min_major='7' max_major='8'>
-			<property name="AnsiNullsStatus" type="bit" cast='true' mode="design">OBJECTPROPERTY({0}.id,N'ExecIsAnsiNullsOn')</property>
-			<property name="QuotedIdentifierStatus" type="bit" cast='true' mode="design">OBJECTPROPERTY({0}.id,N'ExecIsQuotedIdentOn')</property>
-			<property name="IsSchemaBound" type="bit" cast='true' mode="design">ISNULL(OBJECTPROPERTY({0}.id, N'IsSchemaBound'), 0)</property>
-			<property name="IsEncrypted" type="bit" cast='true' mode="deploy">(SELECT TOP 1 encrypted FROM dbo.syscomments p WHERE {0}.id = p.id AND p.colid=1 and p.number &lt; 2)</property>
-			<property name="Recompile" type="bit" cast='true' mode="design">{0}.status &amp; 4</property>
-			<!-- on 7-8 Definition is just a pointer to the text-->
-			<property name="Definition" type="nvarchar" size='80' hidden='true'>cast({0}.id as nvarchar(20)) + '_' + cast(db_id() as nvarchar(20)) + '_0'</property>
-		</version>
-		<version min_major='9'   cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'   cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="IsEncrypted" type="bit" cast='true' mode="deploy">CASE WHEN ISNULL({0}.definition, s{0}.definition) IS NULL THEN 1 ELSE 0 END</property>
 			<property name="Recompile" type="bit" cast='true' mode="design">ISNULL({0}.is_recompiled, s{0}.is_recompiled)</property>
 			<!-- here we just offer support for text, every object will do whatever it sees fit

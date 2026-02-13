@@ -203,8 +203,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             GetParameter(statement, sp, "LoginTimeout", "@login_timeout={0}", ref count);
             GetStringParameter(statement, sp, "LocalHostAlias", "@local_host_server=N'{0}'", ref count);
 
-            if (this.ServerVersion.Major >= 9 &&
-                sp.TargetServerVersion >= SqlServerVersion.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 GetBoolParameter(statement, sp, "ReplaceAlertTokensEnabled", "@alert_replace_runtime_tokens={0}", ref count);
             }
@@ -463,30 +462,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             try
             {
-                ThrowIfBelowVersion80SP3();
-                if (this.ServerVersion.Major >= 9)
-                {
-                    throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-                }
-                if( null == account )
-                {
-                    throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("account"));
-                }
-
-                if ( null == password )
-                {
-                    throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("password"));
-                }
-
-                var domainName = new StringBuilder();
-                var userName = new StringBuilder();
-                ParseAccountName( account, domainName, userName );
-                this.ExecutionManager.ExecuteNonQuery( string.Format(
-                                                                     SmoApplication.DefaultCulture, 
-                                                                     "EXEC master.dbo.xp_sqlagent_msx_account N'SET', N'{0}', N'{1}', N'{2}'", 
-                                                                     SqlString( domainName.ToString()), 
-                                                                     SqlString(userName.ToString()), 
-                                                                     SqlString(password)));
+                // This method is not supported on SQL Server 2008 and later
+                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
             }
             catch(Exception e)
             {
@@ -811,11 +788,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
         {
             get
             {
-                if (this.ServerVersion.Major >= 9) // Property is not supported on Yukon server
-                {
-                    throw new PropertyCannotBeRetrievedException("SysAdminOnly", this, ExceptionTemplates.ReasonPropertyIsNotSupportedOnCurrentServerVersion);
-                }
-                return (bool)this.Properties.GetValueWithNullReplacement("SysAdminOnly");
+                // Property is not supported on SQL Server 2008 and later
+                throw new PropertyCannotBeRetrievedException("SysAdminOnly", this, ExceptionTemplates.ReasonPropertyIsNotSupportedOnCurrentServerVersion);
             }
         }
 

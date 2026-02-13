@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="ResourcePoolAffinityInfo" impl_type="SqlObject" min_major='11'>
+<EnumObject type="ResourcePoolAffinityInfo" impl_type="SqlObject" min_major='11' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
 	<version min_major='11'>
       <property_link table="sys.dm_resource_governor_resource_pools" alias= "[pls]"/>

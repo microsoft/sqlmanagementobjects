@@ -22,19 +22,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         ///<summary>
         /// enumerator common trace function
         ///</summary>
-        [Conditional("DEBUG")]
         static public void TraceInfo(string trace)
         {
-            TraceHelper.Trace("w", SQLToolsCommonTraceLvl.L1, "{0}", trace);
+            SmoEventSource.Log.SfcTrace("Enumerator", trace);
         }
 
         ///<summary>
         /// enumerator common trace function		
         ///</summary>
-        [Conditional("DEBUG")]
         static public void TraceInfo(string strFormat, params Object[] arg)
         {
-            TraceHelper.Trace("w", SQLToolsCommonTraceLvl.L1, strFormat, arg);
+            if (SmoEventSource.Log.IsEnabled(System.Diagnostics.Tracing.EventLevel.Verbose, SmoEventSource.Keywords.Sfc))
+            {
+                SmoEventSource.Log.SfcTrace("Enumerator", string.Format(strFormat, arg));
+            }
         }
 
         /// <summary>

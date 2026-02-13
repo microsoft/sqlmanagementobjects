@@ -6,6 +6,7 @@ namespace Microsoft.SqlServer.Management.Smo
     using System;
     using System.Collections.Specialized;
     using System.Data;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Reflection;
@@ -301,7 +302,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 // if we are going to escape this character, then sb should not be null
-                TraceHelper.Assert(!escape || sb != null);
+                Debug.Assert(!escape || sb != null);
 
 
                 if (escape)

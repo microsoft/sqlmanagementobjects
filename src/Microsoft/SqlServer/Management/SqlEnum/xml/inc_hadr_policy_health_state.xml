@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="inc_policy_health_state" impl_type="SqlObject" min_major='11' >
+<?xml version="1.0" ?>
+<EnumObject type="inc_policy_health_state" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <version min_major='11' >
       <prefix fields="#PolicyHealthState#">

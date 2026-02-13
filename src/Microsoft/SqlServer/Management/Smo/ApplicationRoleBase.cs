@@ -50,20 +50,14 @@ namespace Microsoft.SqlServer.Management.Smo
         private SqlSecureString password;
 
         /// <summary>
-        /// Scripts permissions for this object. returns without scripting anything if source version is less
-        /// than 9 since permissions on AppRoles were not supported in 8.
+        /// Scripts permissions for this object.
         /// </summary>
         /// <param name="query"></param>
         /// <param name="so"></param>
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
-            // return if source version is less than 9 because permissions on ApplicationRoles were
-            // not supported prior to that
-            if(Parent.Parent.Information.Version.Major < 9)
-            {
-                return;
-            }
-
+            // Permissions on ApplicationRoles were introduced in SQL Server 2005 (version 9).
+            // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
             base.AddScriptPermission(query, sp);
         }
 
@@ -353,12 +347,8 @@ namespace Microsoft.SqlServer.Management.Smo
                                                    new ArgumentNullException("password"));
             }
 
-            if (this.ServerVersion.Major < 9)
-            {
-                throw new FailedOperationException(ExceptionTemplates.ChangePassword,
-                                                   this,
-                                                   new InvalidVersionSmoOperationException(this.ServerVersion));
-            }
+            // ChangePassword was introduced in SQL Server 2005 (version 9).
+            // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
 
             try
             {

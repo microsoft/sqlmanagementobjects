@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='backupset' impl_type='SqlObject' min_major='7'>
+<EnumObject type='backupset' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='msdb.dbo.backupset bkps' />
 	</settings>
@@ -40,13 +40,13 @@
     		<property name='DatabaseName' type='nvarchar' size='128'>bkps.database_name</property>
 		<property name='ServerName' type='nvarchar' size='128'>bkps.server_name</property>
 		<property name='MachineName' type='nvarchar' size='128'>bkps.machine_name</property>
-		<version min_major='8'>
+		<version min_major='10'>
 			<property name='BackupSetFlags' type='int'>bkps.flags</property>
 			<property name='UnicodeLocale' type='int'>bkps.unicode_locale</property>
 			<property name='UnicodeCompareStyle' type='int'>bkps.unicode_compare_style</property>
 			<property name='CollationName' type='nvarchar' size='128'>bkps.collation_name</property>
 		</version>
-		<version min_major='9'>
+		<version min_major='10'>
       			<property name='IsDamaged' type='bit'>bkps.is_damaged</property>
       			<property name='IsCopyOnly' type='bit'>bkps.is_copy_only</property>
       			<property name='IsSnapShot' type='bit'>bkps.is_snapshot</property>

@@ -3,6 +3,25 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 181.12.0
+
+- Remove SQL Server 2005 and prior version support:
+  - Updated XML metadata files to require minimum SQL Server version 10 (SQL Server 2008)
+  - Removed version checks and conditional code for SQL Server versions 7, 8, and 9
+  - Simplified version-specific logic in ConnectionInfo, Sdk.Sfc, Smo, and SqlEnum projects
+  - Preserved all public API constants and enumerations for backward compatibility
+- Major version bump of packages to 181
+- Upgrade SqlClient to 6.1
+- Support vector and json value scripting natively
+- Support external models
+- Fix scripting of objects with columns for Synapse Serverless servers
+- Add GroupMaximumTempdbDataMB and GroupMaximumTempdbDataPercent parameter in CREATE WORKLOAD GROUP script
+- Fix the format of ALTER WORKLOAD GROUP script
+- Remove unneeded CAST from vector and json INSERT script generation
+- Use `DataReader.GetString` to retrieve formatted vector data for INSERT script generation
+- Expose the MAX_DURATION property of event session.
+
+
 ## 180.10.0
 
 - Change SMO collections to implement IEnumerator<T>

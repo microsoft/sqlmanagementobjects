@@ -147,27 +147,21 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, Edition = DatabaseEngineEdition.SqlManagedInstance)]
         public void SmoDatabase_AvailabilityDatabaseSynchronizationState_ManagedInstance()
         {
-            ExecuteTest(
-                server =>
+            ExecuteFromDbPool(db =>
+            {
+                _ = Assert.Throws<PropertyCannotBeRetrievedException>(() => { var state = db.AvailabilityDatabaseSynchronizationState; },
+                            "Accessing the property AvailabilityDatabaseSynchronizationState should throw an exception when it's not applicable.");
+                var databasesWithNonNullSyncState = GetDatabasesWithNonNullSynchronizationState(db.Parent);
+                foreach (Database nullSyncDb in db.Parent.Databases)
                 {
-                    var databasesWithNonNullSyncState = GetDatabasesWithNonNullSynchronizationState(server);
-
-                    foreach (_SMO.Database db in server.Databases)
+                    if (databasesWithNonNullSyncState.Contains(nullSyncDb.Name))
                     {
-                        if (databasesWithNonNullSyncState.Contains(db.Name))
-                        {
-                            Assert.That(() => db.AvailabilityDatabaseSynchronizationState,
-                                Is.EqualTo(AvailabilityDatabaseSynchronizationState.Synchronized),
-                                "AvailabilityDatabaseSynchronizationState should be Synchronized.");
-                        }
-                        else
-                        {
-                            Assert.Throws<PropertyCannotBeRetrievedException>(() => { var state = db.AvailabilityDatabaseSynchronizationState; },
-                                "Accessing the property AvailabilityDatabaseSynchronizationState should throw an exception when it's not applicable.");
-                        }
+                        Assert.That(() => db.AvailabilityDatabaseSynchronizationState,
+                            Is.EqualTo(AvailabilityDatabaseSynchronizationState.Synchronized),
+                            "AvailabilityDatabaseSynchronizationState should be Synchronized.");
                     }
-
-                });
+                }
+            });
         }
 
         private static List<string> GetDatabasesWithNonNullSynchronizationState(_SMO.Server server)
@@ -415,7 +409,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     if (database.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase)
                     {
                         database.MaxSizeInBytes = 250.0 * 1024 * 1024 * 1024;
-                        database.AzureServiceObjective = database.AzureEdition == "Standard" ? "P0" : "S0";
+                        database.AzureServiceObjective = database.AzureEdition == "Standard" ? "P1" : "S0";
                         database.AzureEdition = database.AzureEdition == "Standard" ? "Premium" : "Standard";
                     }
                     database.Alter();

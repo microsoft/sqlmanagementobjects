@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="LinkedServerCatalog" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="LinkedServerCatalog" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <!-- 
           Logic: For getting a value from the parent
@@ -21,56 +21,7 @@
           2) If catalog support is not exist then return default as the catalog name and set IsCatalogSupport to "0"
           3) For sql servers IsSysObject should be set to 1 if catalog is in ('master','model','msdb','tempdb')
         -->
-        <version min_major='7' max_major='8'>
-            <prefix>
-                <link_multiple no='1' expression="
-                create table #tmp_sp_catalogs (is_catalog_support bit null,server_name nvarchar(128) null, product_name nvarchar(128) null,provider_name nvarchar(128) null,catalog_name nvarchar(128) null, description nvarchar(4000) null)
-                declare @ServerName sysname
-                declare @ProductName sysname
-                        declare @ProviderName sysname
-                declare crs cursor local fast_forward
-                for ( {0} ) 
-                open crs 
-                fetch crs into @ServerName,@ProductName,@ProviderName
-                while @@fetch_status &gt;= 0 
-                begin       
-                create table #tmp_catalog_exist_test (id int null,description sysname null,flags varchar null)
-                        DECLARE @IsCatalogSupport bit  
-                if (UPPER(@ProviderName) like 'SQLNCLI%' ) 
-                          begin  
-                   set @IsCatalogSupport = 1
-                end
-                else
-                begin
-                    insert into #tmp_catalog_exist_test(id,description,flags) EXEC master.dbo.xp_prop_oledb_provider @ProviderName
-                    select @IsCatalogSupport = count(*) from #tmp_catalog_exist_test  where id = 233  
-                end
-          if (@IsCatalogSupport = 0)
-                    begin
-                    insert into #tmp_sp_catalogs (catalog_name,is_catalog_support) values ('default',0)
-                    end
-                    else
-                    begin                   
-                    insert into #tmp_sp_catalogs (catalog_name,description) EXEC master.dbo.sp_catalogs @server_name = @ServerName
-                    update #tmp_sp_catalogs set is_catalog_support = 1
-                    insert into #tmp_sp_catalogs (catalog_name,is_catalog_support) values ('default',0)
-                    end
-                    update #tmp_sp_catalogs set server_name = @ServerName
-                    update #tmp_sp_catalogs set product_name = @ProductName
-                    update #tmp_sp_catalogs set provider_name = @ProviderName
-                    fetch crs into @ServerName,@ProductName,@ProviderName
-                end
-                close crs
-                deallocate crs">
-                    <link_field field="ParentSelect" />
-                </link_multiple>
-            </prefix>
-            <postfix>
-                drop table #tmp_sp_catalogs
-                drop table #tmp_catalog_exist_test
-            </postfix>
-        </version>
-        <version min_major='9'>
+        <version min_major='10'>
             <prefix>
                 <link_multiple no='1' expression="
                 create table #tmp_sp_catalogs (is_catalog_support bit null,server_name nvarchar(128) null, product_name nvarchar(128) null,provider_name nvarchar(128) null,catalog_name nvarchar(128) null, description nvarchar(4000) null)

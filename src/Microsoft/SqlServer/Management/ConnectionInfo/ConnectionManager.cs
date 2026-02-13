@@ -15,6 +15,7 @@ namespace Microsoft.SqlServer.Management.Common
 #endif
     using System.Globalization;
     using System.Diagnostics;
+    using System.Diagnostics.Tracing;
     using Microsoft.SqlServer.Server;
 
     ///<summary>
@@ -330,6 +331,26 @@ namespace Microsoft.SqlServer.Management.Common
         }
 
         /// <summary>
+        /// Returns the server collation
+        /// </summary>
+        public string Collation
+        {
+            get => m_collationOverride ?? GetServerInformation().Collation;
+            set
+            {
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_collationOverride != value)
+                {
+                    m_collationOverride = value;
+                    m_serverInformation = null;
+                }
+            }
+        }
+
+        /// <summary>
         /// The host platform of the server (Linux/Windows/etc)
         /// </summary>
         public string HostPlatform
@@ -420,7 +441,7 @@ namespace Microsoft.SqlServer.Management.Common
                 }
                 else //Not Connected because of Offline/Design Mode.
                 {
-                    m_serverInformation = new ServerInformation(m_serverVersionOverride,new Version(m_serverVersionOverride.Major, m_serverVersionOverride.Minor, m_serverVersionOverride.BuildNumber),  m_databaseEngineTypeOverride ?? DatabaseEngineType.Standalone, m_databaseEngineEditionOverride ?? DatabaseEngineEdition.Unknown, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, m_isFabricServerOverride?? false);
+                    m_serverInformation = new ServerInformation(m_serverVersionOverride,new Version(m_serverVersionOverride.Major, m_serverVersionOverride.Minor, m_serverVersionOverride.BuildNumber),  m_databaseEngineTypeOverride ?? DatabaseEngineType.Standalone, m_databaseEngineEditionOverride ?? DatabaseEngineEdition.Unknown, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, m_isFabricServerOverride?? false, m_collationOverride ?? "SQL_Latin1_General_CP1_CI_AS");
                 }
             }
             return m_serverInformation;
@@ -648,6 +669,16 @@ end;";
 
                 return;
             }
+
+            var startTime = System.Diagnostics.Stopwatch.StartNew();
+            SqlConnectionStringBuilder connectionBuilder = null;
+            
+            // Log connection attempt (only parse connection string if logging is enabled)
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Connection))
+            {
+                connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                SmoEventSource.Log.ConnectionAttemptStarted(connectionBuilder.DataSource ?? "", connectionBuilder.InitialCatalog ?? "");
+            }
             SqlConnection sqlConnection = null;
 
             try
@@ -672,9 +703,31 @@ end;";
                 this.BlockUpdates = true;
                 m_InUse = true;
 
+                // Log successful connection
+                startTime.Stop();
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Connection))
+                {
+                    if (connectionBuilder == null)
+                    {
+                        connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                    }
+                    SmoEventSource.Log.ConnectionEstablished(startTime.ElapsedMilliseconds, connectionBuilder.DataSource ?? "", connectionBuilder.InitialCatalog ?? "");
+                }
+
             }
             catch (Exception e)
             {
+                // Log connection failure
+                startTime.Stop();
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Warning, SmoEventSource.Keywords.Connection))
+                {
+                    if (connectionBuilder == null)
+                    {
+                        connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                    }
+                    SmoEventSource.Log.ConnectionFailure(false, connectionBuilder.DataSource ?? "", e.Message);
+                }
+
                 // Note: We cannot use 'this.ServerInstance' because it may not be be initialized
                 // (i.e. it would have the default value of "(local)" which may be totally unrelated
                 // to the ConnectionString value and thus provide an error message that would be
@@ -723,29 +776,72 @@ end;";
                                 bool catchException)
         {
             //Connection should already be open.
+            var startTime = System.Diagnostics.Stopwatch.StartNew();
+            string queryText = "";
+            int commandTimeout = 0;
+
+            // Extract query info for logging
+            if (execObject is SqlCommand cmd)
+            {
+                queryText = cmd.CommandText?.Length > 100 ? cmd.CommandText.Substring(0, 100) + "..." : cmd.CommandText ?? "";
+                commandTimeout = cmd.CommandTimeout;
+            }
 
             try
             {
+                object result;
                 switch (action)
                 {
                     case ExecuteTSqlAction.FillDataSet:
-                        return (execObject as SqlDataAdapter).Fill(fillDataSet);
+                        result = (execObject as SqlDataAdapter).Fill(fillDataSet);
+                        break;
                     case ExecuteTSqlAction.ExecuteNonQuery:
-                        return (execObject as SqlCommand).ExecuteNonQuery();
+                        result = (execObject as SqlCommand).ExecuteNonQuery();
+                        break;
                     case ExecuteTSqlAction.ExecuteReader:
-                        return (execObject as SqlCommand).ExecuteReader();
+                        result = (execObject as SqlCommand).ExecuteReader();
+                        break;
                     case ExecuteTSqlAction.ExecuteScalar:
-                        return (execObject as SqlCommand).ExecuteScalar();
+                        result = (execObject as SqlCommand).ExecuteScalar();
+                        break;
                     default:
                         return null;
                 }
+
+                startTime.Stop();
+
+                // Log performance metrics (only if performance logging is enabled)
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Verbose, SmoEventSource.Keywords.Performance))
+                {
+                    int rowsAffected = (result is int) ? (int)result : -1;
+                    SmoEventSource.Log.QueryExecutionCompleted(startTime.ElapsedMilliseconds, rowsAffected, queryText);
+
+                    // Check for long-running queries (configurable threshold, defaulting to 5 seconds)
+                    const long longRunningThreshold = 5000;
+                    if (startTime.ElapsedMilliseconds > longRunningThreshold)
+                    {
+                        SmoEventSource.Log.LongRunningQuery(startTime.ElapsedMilliseconds, longRunningThreshold, queryText);
+                    }
+                }
+                return result;
             }
             catch (SqlException exc) when (HandleExecuteException(exc, action,
                                 execObject,
                                 catchException,
                                 fillDataSet, out object result))
             {
+
+                // Check for timeout errors
+                if (exc.Number == -2) // Timeout error
+                {
+                    SmoEventSource.Log.ConnectionTimeout(commandTimeout, $"SQL execution ({action})");
+                }
+
                 return result;
+            }
+            finally
+            {
+                startTime.Stop();
             }
         }
 
@@ -803,11 +899,7 @@ end;";
                 }
                 catch (SqlException caughtException) //Catch exceptions occuring in retries.
                 {
-                    Trace.TraceError(string.Format(
-                                            CultureInfo.CurrentCulture,
-                                            "Exception caught and not thrown while connection retry: {0}",
-                                            caughtException.Message)
-                                            );
+                    SmoEventSource.Log.ConnectionRetryException(caughtException.Message);
                 }
             }
             result = null;
@@ -832,11 +924,7 @@ end;";
             }
             catch (SqlException exp)
             {
-                Trace.TraceError(string.Format(
-                                        System.Globalization.CultureInfo.CurrentCulture,
-                                        "Exception caught and not thrown while connection retry: {0}",
-                                        exp.Message)
-                                        );
+                SmoEventSource.Log.ConnectionRetryException(exp.Message);
                 return false;
             }
         }
@@ -873,6 +961,13 @@ end;";
                 sqlConnection.Close();
             }
             bIsUserConnected = false;
+            
+            // Log connection closure (only parse connection string if logging is enabled)
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Connection))
+            {
+                var connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                SmoEventSource.Log.ConnectionClosed(connectionBuilder.DataSource ?? "", "User requested disconnect");
+            }
         }
 
         /// <summary>
@@ -1017,6 +1112,7 @@ end;";
         private DatabaseEngineType? m_databaseEngineTypeOverride;
         private DatabaseEngineEdition? m_databaseEngineEditionOverride;
         private bool? m_isFabricServerOverride;
+        private string m_collationOverride;
 
         public event StatementEventHandler StatementExecuted
         {

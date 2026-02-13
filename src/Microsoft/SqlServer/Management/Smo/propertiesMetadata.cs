@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -268,23 +268,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (databaseEngineType == DatabaseEngineType.Standalone)
             {
                 switch (sv.Major)
-                {
-                    case 7:
-                        {
-                            versionIndex = (int)StandaloneVersionIndex.v70;
-                            break;
-                        }
-                    case 8:
-                        {
-                            versionIndex = (int)StandaloneVersionIndex.v80;
-                            break;
-                        }
-                    case 9:
-                        {
-                            versionIndex = (int)StandaloneVersionIndex.v90;
-                            break;
-                        }
-                    case 10:
+                {case 10:
                         {
                             if (sv.Minor == 0)
                             {
@@ -381,7 +365,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             { //Unknown DatabaseEngineType, just return the default value in this case since it's not a critical issue
-                Diagnostics.TraceHelper.Assert(false, string.Format(CultureInfo.InvariantCulture, "Unknown DatabaseEngineType {0} when getting current version index", databaseEngineType.ToString()));
+                Debug.Assert(false, string.Format(CultureInfo.InvariantCulture, "Unknown DatabaseEngineType {0} when getting current version index", databaseEngineType.ToString()));
             }
 
             return versionIndex;
@@ -485,10 +469,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
         /// <summary>
         /// The exception text should be:
-        ///     Cannot read property {0}.IsSparse. This property is not available on {1}.
-        ///     Cannot write property {0}.IsSparse. This property is not available on {1}.
+        ///     Cannot read property ?{0}.IsSparse?. This property is not available on {1}.
+        ///     Cannot write property ?{0}.IsSparse?. This property is not available on {1}.
         ///     {0} = class (as there are 2 classes that have IsSparse)
-        ///     {1} = SQL Server 7.0 or SQL Server 2000 or SQL Server 2005
+        ///     {1} = ?SQL Server 7.0? or ?SQL Server 2000? or ?SQL Server 2005?
         ///     Of course, if a property is Unknown (through indexer/getter) then it still be the same old 'Unknown' error message.
         /// </summary>
         /// <param name="propertyName"></param>
@@ -606,7 +590,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     default:
                     // VBUMP
                     { //Index is unknown, leave as default value but log the error since it shouldn't happen
-                        Diagnostics.TraceHelper.Assert(false, string.Format(CultureInfo.InvariantCulture, "Unknown server version index {0}", index));
+                        Debug.Assert(false, string.Format(CultureInfo.InvariantCulture, "Unknown server version index {0}", index));
                         break;
                     }
                 }
@@ -625,7 +609,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             { //Just leave as default version but log the error since this shouldn't happen normally
-                Diagnostics.TraceHelper.Assert(false, string.Format(CultureInfo.InvariantCulture, "Unknown DatabaseEngineType {0}", this.databaseEngineType));
+                Debug.Assert(false, string.Format(CultureInfo.InvariantCulture, "Unknown DatabaseEngineType {0}", this.databaseEngineType));
             }
 
             return versionName;
@@ -640,7 +624,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private SqlServerVersions GetSupportedVersions(int index)
         {
             //check out of range
-            Diagnostics.TraceHelper.Assert(index >= 0 && index < this.VersionCount[this.VersionCount.Length - 1]
+            Debug.Assert(index >= 0 && index < this.VersionCount[this.VersionCount.Length - 1]
                                         , "SuportedVersions: index out of range");
             if (index < 0 || index >= this.VersionCount[this.VersionCount.Length - 1])
             {

@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -198,7 +199,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string[] fields = new string[] { "Name" };
             Request request = new Request(urn, fields);
             DataTable dt = this.ExecutionManager.GetEnumeratorData(request);
-            Diagnostics.TraceHelper.Assert(dt.Rows.Count <= 1, "There can be max one ServerAuditSpecification per Audit");
+            Debug.Assert(dt.Rows.Count <= 1, "There can be max one ServerAuditSpecification per Audit");
             if (dt.Rows.Count == 1)
             {
                 return dt.Rows[0]["Name"].ToString();

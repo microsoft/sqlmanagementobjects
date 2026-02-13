@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<EnumObject type="Audit" impl_type="SqlObject" min_major="10">
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="Audit" impl_type="SqlObject" min_major="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table='sys.server_audits AS au'></property_link>
     <property_link fields='#FileName#MaximumFileSize#ReserveDiskSpace#MaximumRolloverFiles#MaximumFiles#' left_join='sys.server_file_audits AS fileau'>fileau.audit_id = au.audit_id AND fileau.audit_guid = au.audit_guid</property_link>

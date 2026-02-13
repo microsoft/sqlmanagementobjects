@@ -70,14 +70,12 @@ namespace Microsoft.SqlServer.Management.Smo
             // Check if exists check should be included
             if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
-                strBuilder.Append((sp.TargetServerVersion >= SqlServerVersion.Version90) ? Scripts.INCLUDE_EXISTS_ROLE_MEMBERS90 : Scripts.INCLUDE_EXISTS_ROLE_MEMBERS80);
+                strBuilder.Append(Scripts.INCLUDE_EXISTS_ROLE_MEMBERS90);
             }
 
             //Check if not a Fixed role or 'public'
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
-            {
-                strBuilder.Append(Scripts.IS_DBROLE_FIXED_OR_PUBLIC_90);
-            }
+            strBuilder.Append(Scripts.IS_DBROLE_FIXED_OR_PUBLIC_90);
+
 
             bool isSqlDw = this.Parent.GetPropValueOptional("IsSqlDw", false);
 
@@ -91,9 +89,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 strBuilder.Append(
                     VersionUtils.IsTargetServerVersionSQl11OrLater(sp.TargetServerVersion)
                     ? Scripts.DROP_DATABASEROLE_MEMBERS_110
-                    : (sp.TargetServerVersion >= SqlServerVersion.Version90)
-                        ? Scripts.DROP_DATABASEROLE_MEMBERS_90
-                        : Scripts.DROP_DATABASEROLE_MEMBERS_80
+                    : Scripts.DROP_DATABASEROLE_MEMBERS_90
                     );
             }
 
@@ -109,23 +105,15 @@ namespace Microsoft.SqlServer.Management.Smo
             {
 
                 strBuilder.Append(string.Format(SmoApplication.DefaultCulture,
-                    sp.TargetServerVersion < SqlServerVersion.Version90 ? Scripts.INCLUDE_EXISTS_DBROLE80 : Scripts.INCLUDE_EXISTS_DBROLE90,
+                    Scripts.INCLUDE_EXISTS_DBROLE90,
                                                         "", FormatFullNameForScripting(sp, false)));
                 strBuilder.Append(sp.NewLine);
             }
 
 
-            //if 7.0, 8.0
-            if (SqlServerVersion.Version90 > sp.TargetServerVersion)
-            {
-                strBuilder.Append("EXEC dbo.sp_droprole @rolename = " + FormatFullNameForScripting(sp, false));
-            }
-            else // > 9.0
-            {
-                strBuilder.Append("DROP ROLE " +
-                    ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty) +
-                    FormatFullNameForScripting(sp, true));
-            }
+            strBuilder.Append("DROP ROLE " +
+                ((sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion >= SqlServerVersion.Version130) ? "IF EXISTS " : string.Empty) +
+                FormatFullNameForScripting(sp, true));
 
             dropQuery.Add(strBuilder.ToString());
         }
@@ -183,7 +171,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.IncludeScripts.ExistenceCheck)
             {
                 statement.AppendFormat(SmoApplication.DefaultCulture,
-                    sp.TargetServerVersion < SqlServerVersion.Version90 ? Scripts.INCLUDE_EXISTS_DBROLE80 : Scripts.INCLUDE_EXISTS_DBROLE90,
+                    Scripts.INCLUDE_EXISTS_DBROLE90,
                     "NOT", FormatFullNameForScripting(sp, false));
                 statement.Append(sp.NewLine);
             }
@@ -340,30 +328,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     myrolename = MakeSqlString(this.Name);
                 }
 
-                string prefix;
-
-		if (sp != null)
-		{
-			if (sp.TargetServerVersion >= SqlServerVersion.Version90)
-                	{
-                	    prefix = "sys";
-	                }
-        	        else
-                	{
-	                    prefix = "dbo";
-        	        }
-		}
-		else
-            	{
-                	if (this.ServerVersion.Major >= 9)
-                	{
-                    		prefix = "sys";
-                	}
-                	else
-                	{
-                    		prefix = "dbo";
-                	}
-		}
+                string prefix = "sys";
 
                 return string.Format(SmoApplication.DefaultCulture,
                     "EXEC {0}.sp_addrolemember @rolename = {1}, @membername = {2}",
@@ -432,20 +397,10 @@ namespace Microsoft.SqlServer.Management.Smo
             //Work for cloud as the context is same database.
             AddDatabaseContext(query);
 
-            if (this.ServerVersion.Major >= 9)
-            {
-                statement.AppendLine("SELECT p1.name FROM sys.database_role_members as r ");
-                statement.AppendLine("JOIN sys.database_principals as p1 on p1.principal_id = r.role_principal_id ");
-                statement.AppendLine("JOIN sys.database_principals as p2 on p2.principal_id = r.member_principal_id ");
-                statement.AppendFormat(SmoApplication.DefaultCulture, "WHERE p2.name = {0}", MakeSqlString(this.Name));
-            }
-            else
-            {
-                statement.AppendLine("SELECT g.name FROM sysusers u, sysusers g, sysmembers m ");
-                statement.AppendFormat(SmoApplication.DefaultCulture, 
-                    "WHERE u.name = {0} AND u.uid = m.memberuid AND g.uid = m.groupuid AND u.issqlrole = 1 ", 
-                    MakeSqlString(this.Name));
-            }
+            statement.AppendLine("SELECT p1.name FROM sys.database_role_members as r ");
+            statement.AppendLine("JOIN sys.database_principals as p1 on p1.principal_id = r.role_principal_id ");
+            statement.AppendLine("JOIN sys.database_principals as p2 on p2.principal_id = r.member_principal_id ");
+            statement.AppendFormat(SmoApplication.DefaultCulture, "WHERE p2.name = {0}", MakeSqlString(this.Name));
             query.Add(statement.ToString());
             DataTable dt = this.ExecutionManager.ExecuteWithResults(query).Tables[0];
 #endif
@@ -481,11 +436,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptRename(StringCollection renameQuery, ScriptingPreferences sp, string newName)
         {
-            if (this.ServerVersion.Major < 9)
-            {
-                throw new InvalidVersionSmoOperationException(this.ServerVersion);
-            }
-
             this.AddDatabaseContext(renameQuery, sp);
             renameQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER ROLE {0} WITH NAME={1}",
                 FormatFullNameForScripting(new ScriptingPreferences()), MakeSqlBraket(newName)));
@@ -554,7 +504,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (this.DatabaseEngineType != Microsoft.SqlServer.Management.Common.DatabaseEngineType.SqlAzureDatabase)
             {
-                return new PropagateInfo[] { new PropagateInfo(ServerVersion.Major <= 8 ? null : ExtendedProperties, true, ExtendedProperty.UrnSuffix) };
+                return new PropagateInfo[] { new PropagateInfo(ExtendedProperties, true, ExtendedProperty.UrnSuffix) };
             }
             return null;
             
@@ -567,13 +517,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so"></param>
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
-            // on 8.0 and below we do not have permissions on database roles
-            if (sp.TargetServerVersion <= SqlServerVersion.Version80 ||
-                this.ServerVersion.Major <= 8)
-            {
-                return;
-            }
-
             base.AddScriptPermission(query, sp);
         }
 

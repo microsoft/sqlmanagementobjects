@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Table" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+<EnumObject type="Table" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link fields='#FileGroup#PartitionScheme#IsPartitioned#' join='sys.data_spaces ds'>
 			<link_multiple no = '1' expression = 'ds.data_space_id = {0}'>

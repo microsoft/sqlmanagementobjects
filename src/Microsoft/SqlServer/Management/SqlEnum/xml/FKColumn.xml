@@ -1,17 +1,10 @@
 <?xml version="1.0" ?>
-<EnumObject type="FKColumn" impl_type="SqlObject" min_major='7'  cloud_min_major='10'>
+<EnumObject type="FKColumn" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local='FK_ID' />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table="dbo.sysforeignkeys AS fk" />
-			<property_link fields='#ID#Name#' 
-				join="dbo.syscolumns AS cfk">cfk.colid=fk.fkey and cfk.id = fk.fkeyid</property_link>
-			<property_link fields='#ReferencedColumn#' 
-				join="dbo.syscolumns AS crk">crk.colid=fk.rkey and crk.id = fk.rkeyid</property_link>
-		</version>
-		<version min_major='9'  cloud_min_major='10'>
+		<version min_major='10'  cloud_min_major='10'>
 			<property_link table="sys.foreign_key_columns AS fk" />
 			<property_link fields='#ID#Name#' 
 				join="sys.columns AS cfk">fk.parent_column_id = cfk.column_id and fk.parent_object_id = cfk.object_id</property_link>
@@ -21,13 +14,7 @@
 	</settings>
 	<properties>
 		<include file='inc_urn.xml' />
-		<version min_major='7' max_major='8'>
-			<property name="Name" type="sysname" mode="design">cfk.name</property>
-			<property name="ID" type="int" cast='true'>fk.keyno</property>
-			<property name="ReferencedColumn" type="sysname" mode="design">crk.name</property>
-			<property name="FK_ID" type="int" hidden='true'>fk.constid</property>
-		</version>
-		<version min_major='9'  cloud_min_major='10'>
+		<version min_major='10'  cloud_min_major='10'>
 			<property name="Name" type="sysname" mode="design">cfk.name</property>
 			<property name="ID" type="int">fk.constraint_column_id</property>
 			<property name="ReferencedColumn" type="sysname" mode="design">crk.name</property>

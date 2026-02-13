@@ -157,11 +157,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 CheckObjectState();
-                //Yukon only
-                if(ServerVersion.Major < 9)
-                {
-                    throw new UnsupportedVersionException(ExceptionTemplates.InvalidParamForVersion("EnumFragmentation", "partitionNumber", GetSqlServerVersionName())).SetHelpContext("InvalidParamForVersion");
-                }
 
                 string urn = string.Format(SmoApplication.DefaultCulture, 
                     "{0}/Index/{1}[@PartitionNumber={2}]", this.Urn.Value, GetFragOptionString(fragmentationOption), partitionNumber);

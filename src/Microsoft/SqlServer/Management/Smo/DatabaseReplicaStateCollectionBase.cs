@@ -1,9 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -63,7 +64,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var dbr1 = obj1 as DatabaseReplicaStateObjectKey;
             var dbr2 = obj2 as DatabaseReplicaStateObjectKey;
 
-            Diagnostics.TraceHelper.Assert(null != dbr1 || null != dbr2, "Can't compare null objects for DatabaseReplicaState");
+            Debug.Assert(null != dbr1 || null != dbr2, "Can't compare null objects for DatabaseReplicaState");
 
             //We order first by Avaialbility Replica name, then by Database name
             var replicaNameComparison = stringComparer.Compare(dbr1.ReplicaName, dbr2.ReplicaName);

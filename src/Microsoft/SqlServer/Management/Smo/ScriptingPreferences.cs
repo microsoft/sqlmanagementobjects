@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -171,22 +171,13 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             this.VersionDirty = true;
             switch (ver.Major)
-            {
-                case 8:
-                    m_eTargetServerVersion = SqlServerVersion.Version80;
-                    break;
-
-                case 9:
-                    m_eTargetServerVersion = SqlServerVersion.Version90;
-                    break;
-
-                case 10:
+            {case 10:
                     if (ver.Minor == 0)
                     {
                         m_eTargetServerVersion = SqlServerVersion.Version100;
                         break;
                     }
-                    Diagnostics.TraceHelper.Assert(ver.Minor == 50, "unexpected server version");
+                    Debug.Assert(ver.Minor == 50, "unexpected server version");
                     m_eTargetServerVersion = SqlServerVersion.Version105;
                     break;
 

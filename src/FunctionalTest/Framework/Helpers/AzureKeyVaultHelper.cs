@@ -40,6 +40,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         public static readonly string SSMS_TEST_SECRET_PREFIX = "SQLA-SSMS-Test-";
 
         private SecretClient secretClient = null;
+        private static readonly bool isAzureVM;
+
+        static AzureKeyVaultHelper()
+        {
+            isAzureVM = DetectAzureVM();
+        }
 
         /// <summary>
         /// Constructs a new AzureKeyVaultHelper that relies on an instance of Azure.Identity.DefaultAzureCredential to access the given vault.
@@ -109,8 +115,17 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         public Azure.Core.TokenCredential GetCredential()
         {
             TraceHelper.TraceInformation($"Getting credential for Azure in tenant {AzureTenantId}");
-            // prefer managed identity then local user on dev machine over the certificate
-            var credentials = new List<Azure.Core.TokenCredential>() { new ManagedIdentityCredential(AzureManagedIdentityClientId), new DefaultAzureCredential(new DefaultAzureCredentialOptions { ExcludeManagedIdentityCredential = true, TenantId = AzureTenantId }) };
+            var credentials = new List<Azure.Core.TokenCredential>();
+            
+            // Only add ManagedIdentityCredential if we're running on an Azure VM
+            if (isAzureVM)
+            {
+                TraceHelper.TraceInformation("Detected Azure VM environment. Adding ManagedIdentityCredential.");
+                credentials.Add(new ManagedIdentityCredential(AzureManagedIdentityClientId));
+            }
+            
+            credentials.Add(new DefaultAzureCredential(new DefaultAzureCredentialOptions { ExcludeManagedIdentityCredential = true, TenantId = AzureTenantId }));
+            
             var options = new AzureDevOpsFederatedTokenCredentialOptions() { TenantId = AzureTenantId, ClientId = AzureApplicationId };
             if (options.ServiceConnectionId != null)
             {
@@ -118,6 +133,57 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 credentials.Insert(0, new AzurePipelinesCredential(options.TenantId, options.ClientId, options.ServiceConnectionId, options.SystemAccessToken));
             }
             return new ChainedTokenCredential(credentials.ToArray());
+        }
+
+        /// <summary>
+        /// Detects whether the current environment is an Azure VM by checking for the Azure Instance Metadata Service (IMDS).
+        /// </summary>
+        /// <returns>True if running on an Azure VM, false otherwise.</returns>
+        private static bool DetectAzureVM()
+        {
+            // Check for well-known environment variables that indicate Azure VM/App Service/Container Instances
+            var azureEnvironmentVariables = new[]
+            {
+                "WEBSITE_INSTANCE_ID",           // Azure App Service
+                "CONTAINER_APP_NAME",             // Azure Container Apps
+                "ACI_ENVIRONMENT",                // Azure Container Instances
+                "IDENTITY_ENDPOINT",              // Managed Identity endpoint
+                "IMDS_ENDPOINT"                   // Azure Instance Metadata Service
+            };
+
+            foreach (var envVar in azureEnvironmentVariables)
+            {
+                if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable(envVar)))
+                {
+                    TraceHelper.TraceInformation($"Azure environment detected via {envVar} environment variable.");
+                    return true;
+                }
+            }
+
+            // Try to reach the Azure Instance Metadata Service (IMDS)
+            // IMDS is available at a well-known, non-routable IP address (169.254.169.254)
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(2);
+                    client.DefaultRequestHeaders.Add("Metadata", "true");
+                    
+                    var response = client.GetAsync("http://169.254.169.254/metadata/instance?api-version=2021-02-01").Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TraceHelper.TraceInformation("Azure VM detected via IMDS endpoint.");
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceHelper.TraceInformation($"IMDS check failed (not running on Azure VM): {ex.Message}");
+            }
+
+            TraceHelper.TraceInformation("Not running on Azure VM.");
+            return false;
         }
 
         /// <summary>

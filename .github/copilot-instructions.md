@@ -19,15 +19,13 @@ Use the `#solution` context keyword in Copilot Chat to supply full solution-wide
 ## 2. Tech Stack & Build
 Language: C# (.NET).
 Build system: MSBuild / `dotnet build` via solution `dirs.sln` (aggregator) or project-level builds.
-Delay-signed assemblies are required for testing inside SSMS.
 Generated / intermediate content lives under `obj/` and must never be edited directly.
 When invoking "dotnet build" or "dotnet test" set DOTNET_ROLL_FORWARD=Major to avoid SDK version mismatches.
-If localization projects fail to build, you can use `/p:EnableLocalization=false` to skip them.
 
 ### Build Shortcuts (via init.cmd)
 After running `init.cmd`, these doskey aliases are available:
-- `bsmont` - Build SMO without tests (faster when you don't need test assemblies)
-- `msb` - MSBuild with localization disabled
+- `bsmo` - Build SMO
+- `msb` - MSBuild
 - `rtests` - Run tests from bin\debug\net472
 
 ### Key Directories
@@ -73,7 +71,6 @@ Framework: NUnit (assert style) with VSTest discovery attributes (`[TestClass]`,
 
 Rules:
 - Every bug fix must ship with at least one test that fails prior to the fix and passes after.
-- Tests using internal infrastructure or tenant resources must live in the `SmoInternal` project.
 - Long, descriptive test method names: Start with the SMO object type being tested, then scenario, then expected outcome.
 - Always include assertion messages clarifying intent & expected result.
 - Logs should make failures diagnosable without rerunning with a debugger.
@@ -89,11 +86,8 @@ public void Table_CreateWithFileGroup_IncludesFileGroupInScript() { /* ... */ }
 - Use `[SupportedServerVersionRange]` to specify version ranges (MinMajor, MaxMajor, Edition, HostPlatform).
 
 ### Test Environment Notes
-- Only delay-signed binaries can be loaded in SSMS for integration-style validation.
-- Running tests against the SQL Managed Instance does not work over AzVpn except from an Azure VM.
-- Test resources live in the TME tenant. Authenticate first:
-	- `az login --tenant 70a036f6-8e4d-4615-bad6-149c02e7720d`
-	- Or sign in via Visual Studio to that tenant.
+
+- Test servers are long lived. Tests that create files, such as filegroups, must clean up after themselves.
 
 ## 6. Coding Guidelines
 - Prefer `nameof(PropertyOrType)` over hard-coded strings.
@@ -101,6 +95,7 @@ public void Table_CreateWithFileGroup_IncludesFileGroupInScript() { /* ... */ }
 - Keep public API surface stable; if change is unavoidable, document rationale in the PR description + changelog.
 - Follow existing nullability / exception patterns in similar classes before introducing new patterns.
 - Use expressive NUnit constraint assertions (`Assert.That(x, Is.Not.Null, "...context...")`).
+- All `if` and `else` blocks must be enclosed in {}
 
 ## 7. Common Tasks for Copilot
 | Task | Guidance |
@@ -108,7 +103,6 @@ public void Table_CreateWithFileGroup_IncludesFileGroupInScript() { /* ... */ }
 | Add new SMO property | Follow Section 3; add tests per Section 5. |
 | Add new specialized index type | Follow Section 4A step-by-step; reference Vector Index implementation as example. |
 | Fix bug in scripting | Reproduce with a failing test; fix; ensure deterministic script ordering. |
-| Add integration test hitting internal MI | Place in `SmoInternal`; guard with environment/tenant checks. |
 | Refactor constant string names | Replace with `nameof`; ensure no breaking rename side-effects. |
 | Improve test diagnostics | Add assertion messages & context logging (but no secrets). |
 | Add version-specific helper | Add `ThrowIfBelowVersionXXX()` to SqlSmoObject.cs following existing pattern. |
@@ -178,4 +172,3 @@ Concise Canonical Rules (TL;DR):
 2. Use `nameof` not magic strings.
 3. Never edit `obj/` or include internal links.
 4. Properties: update `cfg.xml` + corresponding XML metadata.
-

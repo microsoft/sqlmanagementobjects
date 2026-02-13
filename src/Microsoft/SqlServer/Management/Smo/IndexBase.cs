@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Globalization;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -647,8 +648,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private bool IsCompressionCodeRequired(bool bAlter)
         {
-            Diagnostics.TraceHelper.Assert(this.ServerVersion.Major >= 10);
-            Diagnostics.TraceHelper.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
+            Debug.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
             if (this.State == SqlSmoState.Creating)
             {
                 if (m_PhysicalPartitions != null)
@@ -683,7 +683,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return false;
             }
 
-            Diagnostics.TraceHelper.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
+            Debug.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
 
             if (this.State == SqlSmoState.Creating)
             {
@@ -706,8 +706,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal bool HasXmlColumn(bool throwIfNotSet)
         {
-            // XML indexes supported only on version 9.0
-            if (this.ServerVersion.Major < 9 || this.DatabaseEngineType != Microsoft.SqlServer.Management.Common.DatabaseEngineType.Standalone)
+            // XML indexes were introduced in SQL Server 2005 (version 9.0).
+            // Since minimum supported version is now SQL Server 2008 (version 10), only check database engine type.
+            if (this.DatabaseEngineType != Microsoft.SqlServer.Management.Common.DatabaseEngineType.Standalone)
             {
                 return false;
             }
@@ -724,8 +725,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal bool HasSpatialColumn(bool throwIfNotSet)
         {
-            // Spatial indexes supported only on version 10.0
-            if (this.ServerVersion.Major < 10 || this.DatabaseEngineType != Microsoft.SqlServer.Management.Common.DatabaseEngineType.Standalone)
+            if (this.DatabaseEngineType != Microsoft.SqlServer.Management.Common.DatabaseEngineType.Standalone)
             {
                 return false;
             }
@@ -1308,8 +1308,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 this.GetContextDB().AddUseDb(queries, sp);
 
-                if (ServerVersion.Major < 9 ||
-                    (this.Parent is View && ((View)this.Parent).Parent.CompatibilityLevel < CompatibilityLevel.Version90))
+                if (this.Parent is View && ((View)this.Parent).Parent.CompatibilityLevel < CompatibilityLevel.Version90)
                 {
                     TableViewTableTypeBase tvp = this.Parent as TableViewTableTypeBase;
                     if (null != tvp)
@@ -1341,8 +1340,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new FailedOperationException(ExceptionTemplates.Rebuild, this, e);
             }
 
-            if ((this.ServerVersion.Major >= 9)
-                && (null != m_PhysicalPartitions)
+            if ((null != m_PhysicalPartitions)
                 && (scripter is RegularIndexScripter
                 || (scripter is SpatialIndexScripter && this.ServerVersion.Major >= 11)))
             {
@@ -1597,7 +1595,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 //Disabled nonclustered or columnstore index do not have any physical partitions
                 //So,refreshing the physical partitions collection
-                if (this.ServerVersion.Major > 9 && this.PhysicalPartitions != null && !this.ExecutionManager.Recording)
+                if (this.PhysicalPartitions != null && !this.ExecutionManager.Recording)
                 {
                     var indexType = this.InferredIndexType;
 
@@ -1852,7 +1850,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new PropagateInfo[]
             {
-                new PropagateInfo(ServerVersion.Major < 10 ? null : m_PhysicalPartitions, false, false),
+                new PropagateInfo(m_PhysicalPartitions, false, false),
                 new PropagateInfo(IndexedColumns, false,false),
                 new PropagateInfo(SXIsupported ? IndexedXmlPaths : null, false,false),
                 new PropagateInfo(SXIsupported ? IndexedXmlPathNamespaces : null, false,false),
@@ -2240,12 +2238,6 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 CheckObjectState();
 
-                //Yukon only
-                if (ServerVersion.Major < 9)
-                {
-                    throw new UnsupportedVersionException(ExceptionTemplates.InvalidParamForVersion("EnumFragmentation", "partitionNumber", GetSqlServerVersionName())).SetHelpContext("InvalidParamForVersion");
-                }
-
                 string urn = string.Format(SmoApplication.DefaultCulture,
                                           "{0}/{1}[@PartitionNumber={2}]", this.Urn.Value, GetFragOptionString(fragmentationOption), partitionNumber);
                 Request req = new Request(urn);
@@ -2549,7 +2541,6 @@ namespace Microsoft.SqlServer.Management.Smo
         internal static string[] GetScriptFields2(Type parentType, Cmn.ServerVersion version, Cmn.DatabaseEngineType databaseEngineType, Cmn.DatabaseEngineEdition databaseEngineEdition, bool defaultTextMode, ScriptingPreferences sp)
         {
             if (((parentType.Name == "Table") || (parentType.Name == "View"))
-                && (version.Major > 9)
                 && (sp.TargetServerVersion > SqlServerVersion.Version90)
                 && (sp.Storage.DataCompression))
             {
@@ -2598,8 +2589,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                if (this.ServerVersion.Major < 9
-                    || this.GetServerObject().Information.EngineEdition != Edition.EnterpriseOrDeveloper
+                if (this.GetServerObject().Information.EngineEdition != Edition.EnterpriseOrDeveloper
                     || !(this.Parent is TableViewBase))
                 {
                     return false;

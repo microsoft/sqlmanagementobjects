@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
-<EnumObject type="File" impl_type="SqlObject" min_major='7' >
+<EnumObject type="File" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="GroupID" />
 		</parent_link>
 		
-		<version min_major='9' >
+		<version min_major='10' >
 			<property_link table="sys.database_files AS s">((s.type = 4) AND (s.drop_lsn IS NULL))</property_link>
 		</version>
 	</settings>

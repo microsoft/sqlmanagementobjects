@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="DatabaseMapping" impl_type="SqlObject" min_major='7' >
+<?xml version="1.0" ?>
+<EnumObject type="DatabaseMapping" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="Name" local="LoginName" />
@@ -10,12 +10,7 @@ create table #loginmappings( LoginName sysname NULL, DBName sysname NULL, UserNa
 declare @db_name nvarchar(512)
 declare crs cursor local fast_forward
 	</prefix>
-		<version min_major = '7' max_major = '8'>
-			<prefix> 
-	for ( select name from master.dbo.sysdatabases where 1 = has_dbaccess(name)) 
-			</prefix>
-		</version>
-		<version min_major = '9'>
+		<version min_major = '10'>
 			<prefix> 
 	for ( select name from sys.databases where 1 = has_dbaccess(name)) 
 			</prefix>
@@ -27,12 +22,7 @@ while @@fetch_status &gt;= 0
 begin 
 	set @db_name = quotename(@db_name)
 		</prefix>
-		<version min_major = '7' max_major = '8'>
-			<prefix> 
-	exec('use ' + @db_name + ' INSERT #loginmappings select suser_sname(u.sid), db_name(), u.name, null from dbo.sysusers u where suser_sname(u.sid) is not null')
-			</prefix>
-		</version>
-		<version min_major = '9' >
+		<version min_major = '10' >
 			<prefix> 
 	exec('use ' + @db_name + ' INSERT #loginmappings select suser_sname(u.sid), db_name(), u.name, null from sys.database_principals AS u where suser_sname(u.sid) is not null')
 			</prefix>

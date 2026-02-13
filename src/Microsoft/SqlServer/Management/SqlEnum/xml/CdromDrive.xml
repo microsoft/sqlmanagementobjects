@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="CdromDrive" impl_type="SqlObject" min_major='9'>
+<EnumObject type="CdromDrive" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings main_table="#cdromdrv">
 		<prefix>
             create table #cdromdrv ( Name sysname NOT NULL, Size int NOT NULL ) insert #cdromdrv EXECUTE master.dbo.xp_fixeddrives 3

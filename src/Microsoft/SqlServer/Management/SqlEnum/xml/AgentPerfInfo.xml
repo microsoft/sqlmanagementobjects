@@ -1,15 +1,8 @@
 <?xml version='1.0' ?>
-<EnumObject type='PerfInfo' impl_type='SqlObject' min_major='7'>
+<EnumObject type='PerfInfo' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='#temp_agent_perf_info AS spi'/>
-		<version min_major='7' max_major='7'>
-			<prefix>
-DECLARE @instance_name sysname
-SELECT @instance_name = null
-SELECT @instance_name = N'SQLAgent:'
-	        </prefix>
-		</version>
-		<version min_major='8'>
+		<version min_major='10'>
 			<prefix>
 				DECLARE @instance_name sysname
 				SELECT @instance_name = CONVERT(sysname, SERVERPROPERTY('InstanceName'))
@@ -39,49 +32,7 @@ SELECT @instance_name = N'SQLAgent:'
 
 			--JobStep object
 		</prefix>
-		<version min_major='7' max_major='8'>
-			<prefix>
-				CREATE TABLE #temp_jobstep_instances (subsystem NVARCHAR(40)   NULL)
-
-				insert #temp_jobstep_instances values('ActiveScripting')
-				insert #temp_jobstep_instances values('CmdExec')
-				insert #temp_jobstep_instances values('TSQL')
-
-				-- Check if replication is installed
-				DECLARE @replication_installed int
-			</prefix>
-		</version>
-		<version min_major='7' max_major='7'>
-			<prefix>
-				EXECUTE master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Replication', N'IsInstalled', @replication_installed OUTPUT, N'no_output'
-			</prefix>
-		</version>
-		<version min_major='8' max_major='8'>
-			<prefix>
-				EXECUTE master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Replication', N'IsInstalled', @replication_installed OUTPUT, N'no_output'
-			</prefix>
-		</version>
-		<version min_major='7' max_major='8'>
-			<prefix>
-				SELECT @replication_installed = ISNULL(@replication_installed, 0)
-				if 1 = @replication_installed
-				begin
-				insert #temp_jobstep_instances values('Distribution')
-				insert #temp_jobstep_instances values('LogReader')
-				insert #temp_jobstep_instances values('Merge')
-				insert #temp_jobstep_instances values('Snapshot')
-				end
-			</prefix>
-		</version>
-		<version min_major='8' max_major='8'>
-			<prefix>
-				if 1 = @replication_installed
-				begin
-				insert #temp_jobstep_instances values('QueueReader')
-				end
-			</prefix>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<prefix>
 CREATE TABLE #temp_jobstep_instances (subsystem          NVARCHAR(40)   NULL, description        NVARCHAR(80)   NULL, subsystem_dll      NVARCHAR(255)  NULL, agent_exe          NVARCHAR(80)   NULL, start_entry_point  NVARCHAR(30)   NULL, event_entry_point  NVARCHAR(30)   NULL, stop_entry_point   NVARCHAR(30)   NULL, max_worker_threads INT           NULL, subsystem_id       INT			  NULL)
 INSERT #temp_jobstep_instances EXEC msdb.dbo.sp_enum_sqlagent_subsystems 			

@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 using System;
-
-using Microsoft.SqlServer.Management.Sdk.Sfc;
+using System.Diagnostics.Tracing;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Differencing.Impl;
 using Microsoft.SqlServer.Management.Sdk.Differencing.SPI;
 
@@ -82,7 +82,10 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing
             }
             else
             {
-                TraceHelper.Trace(Differencer.ComponentName, "The type of provider, '{0}', is not in recognized.", provider.GetType().Name);
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Verbose, SmoEventSource.Keywords.Differencing))
+                {
+                    SmoEventSource.Log.DifferencingTrace($"The type of provider, '{provider.GetType().Name}', is not recognized.");
+                }
             }
         }
 
@@ -97,13 +100,13 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing
                 }
                 else
                 {
-                    TraceHelper.Trace(Differencer.ComponentName, "The type of provider, '{0}', is not in recognized.", name);
+                    SmoEventSource.Log.DifferencingTrace($"The type of provider, '{name}', is not recognized.");
                     return null;
                 }
             }
             catch (Exception e) when (!Differencer.IsSystemGeneratedException(e))
             {
-                TraceHelper.Trace(Differencer.ComponentName, "Exception loading provider, '{0}'.", name);
+                SmoEventSource.Log.DifferencingTrace($"Exception loading provider, '{name}'.");
                 return null;
             }
         }

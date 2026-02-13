@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?> 
-<EnumObject type='NotificationClassProtocol' impl_type='SqlObject' min_major='9' >
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NotificationClassProtocol' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
 	<settings>
 		<parent_link>
 			<link parent="Id" local="NotificationClassId" /> 

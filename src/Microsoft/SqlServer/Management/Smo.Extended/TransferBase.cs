@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
@@ -135,6 +136,7 @@ namespace Microsoft.SqlServer.Management.Smo
         public bool CopyAllLogins { get; set; }
         public bool CopyAllExternalLanguages { get; set; }
         public bool CopyAllExternalLibraries { get; set; }
+        public bool CopyAllExternalModels { get; set; }
         public bool CopySchema { get; set; }
         public bool CopyData { get; set; }
         public bool DropDestinationObjectsFirst { get; set; }
@@ -381,10 +383,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             try
             {
-#if DEBUG
-                SqlSmoObject.Trace("Transfer: Entering");
-                SqlSmoObject.Trace("Transfer: Script all discovered objects");
-#endif
+                SmoEventSource.Log.TransferScriptingObjects();
                 EnumerableContainer queryEnumerable = new EnumerableContainer();
                 this.Scripter.PrefetchObjects = false;
                 this.Options.IncludeDatabaseContext = false;
@@ -562,15 +561,13 @@ namespace Microsoft.SqlServer.Management.Smo
             HashSet<Urn> result = new HashSet<Urn>();
             // Get the list of objects in the right order with
             // Dependency discovery
-#if DEBUG
-            SqlSmoObject.Trace("Transfer: Discovering dependencies");
-#endif
+            SmoEventSource.Log.TransferDiscoveringDependencies();
 #if INCLUDE_PERF_COUNT
                     DateTime now = DateTime.Now;
 #endif
             // if no filtering is needed then we don't have to redo
             // the topological sorting on the client side
-            Sdk.Sfc.TraceHelper.Assert(null != this.Database, "null == this.Database");
+            Debug.Assert(null != this.Database, "null == this.Database");
 
             bool getDropDependencies = this.Options.ScriptSchema && this.Options.ScriptDrops;
             Urn[] urnArray = new Urn[depDiscInputList.Count];
@@ -579,7 +576,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             DependencyChainCollection deps = depTree.Dependencies;
 
-            Sdk.Sfc.TraceHelper.Assert(null != deps, "GetDependencies() returned null");
+            Debug.Assert(null != deps, "GetDependencies() returned null");
 
             // generate flat dependencies list for scripting
             HashSet<Urn> orderedList = new HashSet<Urn>();
@@ -1120,6 +1117,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     CopyAllExternalLibraries, Database.PrefetchExternalLibraries, null);
             }
 
+            if (this.IsSupportedObject<ExternalModel>(preferences))
+            {
+                this.AddAllObjects<ExternalModel>(depDiscInputList, Database.ExternalModels,
+                    CopyAllExternalModels, Database.PrefetchExternalModels, null);
+            }
+
             if (this.IsSupportedObject<UserDefinedDataType>(preferences))
             {
                 this.AddAllObjects<UserDefinedDataType>(depDiscInputList, Database.UserDefinedDataTypes,
@@ -1154,9 +1157,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void AddAllObjects<T>(ICollection<Urn> List, IEnumerable<T> collection)
             where T : SqlSmoObject
         {
-#if DEBUG
-            SqlSmoObject.Trace(string.Format(SmoApplication.DefaultCulture, "Transfer: Adding all objects {0} to dependency list", collection.GetType().Name));
-#endif
+            SmoEventSource.Log.TransferVisitingObject(false, collection.GetType().Name);
             foreach (T item in collection)
             {
                 List.Add(item.Urn);
@@ -1188,9 +1189,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void AddAllNonSystemObjects<T>(ICollection<Urn> List, IEnumerable<T> collection, Func<T, bool> filterLedgerObjects)
            where T : SqlSmoObject
         {
-#if DEBUG
-            SqlSmoObject.Trace(string.Format(SmoApplication.DefaultCulture, "Transfer: Adding all objects in {0} to dependency list", collection.GetType().Name));
-#endif
+            SmoEventSource.Log.TransferVisitingObject(true, collection.GetType().Name);
             foreach (T item in collection)
             {
                 if (!item.GetPropValueOptional<bool>("IsSystemObject", false) && filterLedgerObjects(item))
@@ -1208,10 +1207,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (PrefetchObjects && CopySchema)
                 {
-                    if (prefetch != null)
-                    {
-                        prefetch(this.Options.GetScriptingPreferences());
-                    }
+                    prefetch?.Invoke(this.Options.GetScriptingPreferences());
                 }
                 else if (originalDefaultFields != null)
                 {
@@ -1423,7 +1419,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private bool CanScriptDownlevel(Urn urn, SqlServerVersion targetVersion)
         {
-            Sdk.Sfc.TraceHelper.Assert(null != urn, "null == urn");
+            Debug.Assert(null != urn, "null == urn");
 
             SqlSmoObject smoObject = this.Database.Parent.GetSmoObject(urn);
 
@@ -1579,7 +1575,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     //Change data entries to table entries
 
-                    Sdk.Sfc.TraceHelper.Assert((urn.Type.Equals("Special") && urn.Parent.Type == "Data"), "only data entries expected");
+                    Debug.Assert((urn.Type.Equals("Special") && urn.Parent.Type == "Data"), "only data entries expected");
 
                     result.Add(new DependencyCollectionNode(urn.Parent.Parent, true, true));
                 }

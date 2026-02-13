@@ -35,7 +35,7 @@ namespace Microsoft.SqlServer.Management.Common
             if (!returnValue)
             {
                     var ret = Marshal.GetLastWin32Error();
-                    Trace.TraceInformation("LogonUser failed with error code : {0}", ret);
+                    SmoEventSource.Log.ExecutionMessage($"LogonUser failed with error code : {ret}");
                     throw new System.ComponentModel.Win32Exception(ret);                
             }
             return safeAccessTokenHandle;

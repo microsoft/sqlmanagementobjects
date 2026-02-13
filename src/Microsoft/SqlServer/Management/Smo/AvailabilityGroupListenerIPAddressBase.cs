@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Globalization;
 using System.Text;
-using Microsoft.SqlServer.Diagnostics.STrace;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -210,7 +209,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptCreate(System.Collections.Specialized.StringCollection query, ScriptingPreferences sp)
         {
             // sanity checks
-            tc.Assert(null != query, "String collection should not be null");
+            System.Diagnostics.Debug.Assert(null != query, "String collection should not be null");
 
             /*
              * ALTER AVAILABILITY GROUP 'group_name'
@@ -278,7 +277,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptDrop(StringCollection query, ScriptingPreferences sp)
         {
             // sanity checks
-            tc.Assert(query != null, "String collection for the drop query should not be null");
+            System.Diagnostics.Debug.Assert(query != null, "String collection for the drop query should not be null");
 
             /*
              * ALTER AVAILABILITY GROUP 'group_name'
@@ -402,7 +401,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         #region private members
 
-        private static readonly TraceContext tc = TraceContext.GetTraceContext(SmoApplication.ModuleName, "AvailabilityGroupListenerIPAddress");
         private const string IPScript = "IP";
 
         #endregion

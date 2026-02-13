@@ -1,10 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="SystemDataType" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<?xml version="1.0" ?>
+<EnumObject type="SystemDataType" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major = '7' max_major = '8'>
-			<property_link table="dbo.systypes AS st">st.xusertype = st.xtype or st.name=N'sysname'</property_link>
-		</version>
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property_link table="sys.types AS st">st.schema_id=4</property_link>
 		</version>
 	</settings>
@@ -23,17 +20,7 @@
 		<property name="AllowIdentity" type="bit" access="Read" cast='true'>CASE WHEN st.name IN (N'decimal', N'int', N'numeric', N'smallint', N'tinyint', N'bigint') THEN 1 ELSE 0 END</property>
 		<property name="AllowLength" type="bit" access="Read" cast='true'>CASE WHEN st.name IN ( N'char', N'varchar', N'binary', N'varbinary', N'nchar', N'nvarchar' ) THEN 1 ELSE 0 END</property>
 				
-		<version min_major = '7' max_major='8'>
-			<property name="AllowNulls" type="bit" access="Read">st.allownulls</property>
-			<property name="MaximumLength" type="int" access="Read" cast='true'>CASE WHEN st.name IN (N'char', N'varchar', N'binary', N'varbinary', N'nchar', N'nvarchar') THEN st.prec ELSE st.length END</property>
-			<property name="NumericPrecision" type="int" cast='true' access="Read">st.xprec</property>
-			<property name="NumericScale" type="int" cast='true' access="Read">st.xscale</property>
-		</version>
-		<version min_major = '8' max_major='8'>
-			<property name="Collation" type="sysname" access="Read">ISNULL(st.collation,N'')</property>
-		</version>
-		
-		<version min_major = '9'   cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major = '10'   cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="AllowNulls" type="bit" access="Read">st.is_nullable</property>
 			<property name="MaximumLength" type="int" access="Read" 
 				cast='true'>CASE WHEN st.name IN (N'nchar', N'nvarchar') THEN st.max_length/2 ELSE st.max_length END</property>

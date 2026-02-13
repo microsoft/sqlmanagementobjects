@@ -4,6 +4,8 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <DefineConstants Condition="'$(DebugCollectionGenerator)' != ''">$(DefineConstants);DEBUGCOLLECTIONGENERATOR</DefineConstants>
+    <!-- SqlClient no longer has a netstandard2 binary. Suppress the related error -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 <ItemGroup>
   <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />

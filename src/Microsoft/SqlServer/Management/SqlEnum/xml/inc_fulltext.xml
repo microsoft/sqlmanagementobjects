@@ -1,19 +1,9 @@
 <?xml version="1.0" ?>
-<EnumObject type="inc_text" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="inc_text" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<post_process fields='#Text#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessText'/>
-		</version>			
-	</settings>
+		</settings>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<property name="Text" type="varchar" size='300' expensive='true' mode="design">
-				<link_multiple no='1' expression="cast({{0}} as varchar(20)) + '_' + cast(db_id() as varchar(20)) + '_0'">
-					<link_field type='local' field="ID" />
-				</link_multiple>
-			</property>		
-		</version>
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="Text" type="nvarchar" size='max' expensive='true' mode="design">{0}.definition</property>
 		</version>
 	</properties>

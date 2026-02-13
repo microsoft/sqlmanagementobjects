@@ -293,6 +293,24 @@ namespace Microsoft.SqlServer.Management.XEvent
                 sb.Append(",");
             }
 
+            // Include MAX_DURATION in the script when:
+            // 1. It's dirty (user explicitly set it), OR
+            // 2. We're scripting an existing session and the value is not the default (0/UNLIMITED)
+            bool includeMaxDuration = this.session.Properties[Session.MaxDurationProperty].Dirty || 
+                                    (scriptCreateForExistingSession && this.session.MaxDuration != Session.UnlimitedDuration);
+
+            if (includeMaxDuration)
+            {
+                if (this.session.MaxDuration == Session.UnlimitedDuration)
+                {
+                    sb.Append("MAX_DURATION=UNLIMITED,");
+                }
+                else
+                {
+                   sb.Append($"MAX_DURATION={this.session.MaxDuration} SECONDS,");
+                }
+            }
+
             if (sb.Length > 0)
             {
                 // remove the last comma

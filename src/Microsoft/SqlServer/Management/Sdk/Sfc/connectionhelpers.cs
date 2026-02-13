@@ -117,7 +117,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                                 && (sqlExc.Number == 916 //The server principal is not able to access the database under the current security context.
                                 || sqlExc.Number == 911)) //Database does not exist. Make sure that the name is entered correctly.)
                     {
-                        TraceHelper.LogExCatch(exc);
+                        SmoEventSource.Log.SfcConnectionException(exc);
                     }
                     finally
                     {

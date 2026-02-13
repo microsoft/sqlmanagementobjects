@@ -1,14 +1,9 @@
 <?xml version="1.0"  encoding="us-ascii" ?>
-<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='7'   cloud_min_major='10'>
+<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='10'   cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
  	</settings>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<property name="IsSystemObject" type="bit" access='Read' cast='true'>
-				CASE WHEN (OBJECTPROPERTY({0}.id, N'IsMSShipped')=1) THEN 1 WHEN 1 = OBJECTPROPERTY({0}.id, N'IsSystemTable') THEN 1 ELSE 0 END
-			</property>
-		</version>
-		<version min_major='9'   cloud_min_major='10'>
+		<version min_major='10'   cloud_min_major='10'>
 			<property name="IsSystemObject" type="bit" access='Read' cast = 'true'>
                 {0}.is_ms_shipped
            </property>

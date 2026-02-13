@@ -985,8 +985,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             //Default not allowed for primary filegroup at time of creation of database as it is default automatically.
             if (Properties.Get("IsDefault").Value != null && this.Properties["IsDefault"].Dirty && this.IsDefault 
-                && sp.TargetServerVersion >= SqlServerVersion.Version100 &&
-                this.ServerVersion.Major >= 10)
+                && sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 throw new SmoException(ExceptionTemplates.PrimaryAlreadyDefault);
             }

@@ -1,53 +1,10 @@
 <?xml version="1.0" ?>
-<EnumObject type="Server" impl_type="Server" min_major='7'>
+<EnumObject type="Server" impl_type="Server" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <!--
     this code will truncate paths longer than 512 unicode chars
     -->
   <settings>
-    <version min_major='7' max_major='7'>
-      <prefix fields="#NumberOfLogFiles#"> 
-        declare @NumErrorLogs int
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'NumErrorLogs', @NumErrorLogs OUTPUT
-      </prefix>
-      <prefix fields="#DefaultFile#">
-        declare @SmoDefaultFile nvarchar(512)
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'DefaultData', @SmoDefaultFile OUTPUT
-      </prefix>
-      <prefix fields="#DefaultLog#">
-        declare @SmoDefaultLog nvarchar(512)
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'DefaultLog', @SmoDefaultLog OUTPUT
-      </prefix>
-      <prefix fields="#LoginMode#">
-        declare @SmoLoginMode int
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', @SmoLoginMode OUTPUT
-      </prefix>
-      <prefix fields="#AuditLevel#">
-        declare @SmoAuditLevel int
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'AuditLevel', @SmoAuditLevel OUTPUT
-      </prefix>
-      <prefix fields="#TapeLoadWaitTime#">
-        declare @SmoTapeLoadWaitTime int
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'Tapeloadwaittime', @SmoTapeLoadWaitTime OUTPUT
-      </prefix>
-      <prefix fields="#BackupDirectory#">
-        declare @BackupDirectory nvarchar(512)
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'BackupDirectory', @BackupDirectory OUTPUT
-      </prefix>
-      <prefix fields="#MailProfile#">
-        declare @SmoMailProfile nvarchar(512)
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'MailAccountName', @SmoMailProfile OUTPUT
-      </prefix>
-      <prefix fields="#PerfMonMode#">
-        declare @SmoPerfMonMode int
-        exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'Performance', @SmoPerfMonMode OUTPUT
-
-        if @SmoPerfMonMode is null
-        begin 
-          set @SmoPerfMonMode = 1000
-        end
-      </prefix>
-    </version>
-    <version min_major='8'>
+    <version min_major='10'>
       <prefix fields="#NumberOfLogFiles#"> 
         declare @NumErrorLogs int
         exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'NumErrorLogs', @NumErrorLogs OUTPUT
@@ -81,13 +38,7 @@
         end
       </prefix>
     </version>
-    <version min_major='8' max_major='9'>
-      <prefix fields="#TapeLoadWaitTime#">
-        declare @SmoTapeLoadWaitTime int
-        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'Tapeloadwaittime', @SmoTapeLoadWaitTime OUTPUT
-      </prefix>
-    </version>
-    <version min_major='8' max_major='10'>
+    <version min_major='10' max_major='10'>
       <prefix fields="#DefaultFile#">
         declare @SmoDefaultFile nvarchar(512)
         exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'DefaultData', @SmoDefaultFile OUTPUT
@@ -116,7 +67,7 @@
     <property name="AuditLevel" type="int"  report_type='AuditLevel'>@SmoAuditLevel</property>
     <property name="NumberOfLogFiles" type="int">ISNULL(@NumErrorLogs, -1)</property>
     <property name="LoginMode" type="int" report_type='ServerLoginMode'>(case when @SmoLoginMode &lt; 3 then @SmoLoginMode else 9 end)</property>
-    <version min_major='7' max_major='10'>
+    <version min_major='10' max_major='10'>
       <property name="DefaultFile" type="nvarchar" size="512">ISNULL(@SmoDefaultFile,N'')</property>
       <property name="DefaultLog" type="nvarchar" size="512">ISNULL(@SmoDefaultLog,N'')</property>
     </version>
@@ -124,9 +75,6 @@
       <property name="DefaultFile" type="nvarchar" size="512">ISNULL(SERVERPROPERTY('instancedefaultdatapath'),'')</property>
       <property name="DefaultLog" type="nvarchar" size="512">SERVERPROPERTY('instancedefaultlogpath')</property>
       <property name="ErrorLogSizeKb" type="int">ISNULL(@ErrorLogSizeKb, 0)</property>
-    </version>
-    <version min_major='7' max_major='9'>
-      <property name="TapeLoadWaitTime" type="int">@SmoTapeLoadWaitTime</property>
     </version>
     <version min_major='10'>
       <property name="TapeLoadWaitTime" type="int">-1</property>

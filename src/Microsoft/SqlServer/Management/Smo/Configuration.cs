@@ -583,11 +583,6 @@ namespace Microsoft.SqlServer.Management.Smo
         get
         {
             Version serverVersion = Parent.Version;
-            if(serverVersion.Major < 10)
-            {
-                return new ConfigProperty(this, 16389);
-            }
-            
             //web assistant XPs have been removed since SQL Server 2008.
             throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(serverVersion.Major.ToString()));
         }

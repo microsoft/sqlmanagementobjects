@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="UserDefinedTableType" impl_type="SqlObject" min_major='10' cloud_min_major='10'>
+<EnumObject type="UserDefinedTableType" impl_type="SqlObject" min_major='10' cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table="sys.table_types AS tt" />
 		<property_link fields='#CreateDate#DateLastModified#ParentID#' left_join="sys.objects AS obj">obj.object_id = tt.type_table_object_id</property_link>

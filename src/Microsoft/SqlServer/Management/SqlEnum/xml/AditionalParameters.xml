@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="AditionalParameters" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="AditionalParameters" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table = '#srvargs arg'/>
 		<prefix > 
@@ -18,12 +18,7 @@ begin
 	select @Arg='SqlArg'+convert(nvarchar,@n)
 
 		</prefix>
-		<version min_major = '7' max_major = '7'>
-			<prefix > 
-	exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer\Parameters', @Arg, @Param OUTPUT
-			</prefix>
-		</version>
-		<version min_major = '8'>
+		<version min_major = '10'>
 			<prefix > 
 	exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer\Parameters', @Arg, @Param OUTPUT
 			</prefix>

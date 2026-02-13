@@ -15,7 +15,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.SqlServer.Assessment" 
         GeneratePathProperty="true"/>
-    <PackageReference Include="Newtonsoft.json" />
   </ItemGroup>
   
   <ItemGroup>

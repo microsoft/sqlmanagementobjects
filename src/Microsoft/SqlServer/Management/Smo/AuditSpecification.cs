@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -101,7 +102,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {                
                 if (!isInitialized)
                 {
-                    Diagnostics.TraceHelper.Assert(this.Urn.Value != null, "The Urn value is null");
+                    Debug.Assert(this.Urn.Value != null, "The Urn value is null");
                     Urn urn = new Urn(this.Urn.Value + "/" + this.Urn.Type + "Detail");
                     Request req = new Request(urn);
                     DataTable dt = this.ExecutionManager.GetEnumeratorData(req);

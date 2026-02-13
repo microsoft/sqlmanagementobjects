@@ -136,6 +136,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         // This IDisposable manages the lifetime of the assert messages raised during our test.
         private IDisposable nUnitDisposable;
 
+        // Event recorders for capturing SQL Client and SMO events during test execution
+        private SqlClientEventRecorder sqlClientEventRecorder;
+        private SmoTraceEventRecorder smoTraceEventRecorder;
+
         // Specific to Azure databases, represent all edition types
         public enum AzureDatabaseEdition
         {
@@ -160,20 +164,34 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             //We need to get the Assembly containing the implementation of this type so GetType will resolve it correctly
             //as FullyQualifiedTestClassName only contains the type name and not the assembly info (and GetType only
             //looks in mscorlib and the current executing assembly)
-            Type testClass = this.GetType().GetTypeInfo().Assembly.GetType(this.TestContext.FullyQualifiedTestClassName);
-            this.TestMethod = testClass.GetMethod(this.TestContext.TestName);
+            var testClass = this.GetType().GetTypeInfo().Assembly.GetType(TestContext.FullyQualifiedTestClassName);
+            TestMethod = testClass.GetMethod(TestContext.TestName);
             nUnitDisposable = new NUnit.Framework.Internal.TestExecutionContext.IsolatedContext();
+
+            // Initialize event recorders to capture SQL Client and SMO events during test execution
+            // Disable trace logging by default to reduce performance overhead
+            sqlClientEventRecorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId);
+            sqlClientEventRecorder.Start();
+
+            smoTraceEventRecorder = new SmoTraceEventRecorder(Environment.CurrentManagedThreadId);
+            smoTraceEventRecorder.Start();
+            
             MyTestInitialize();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            if (nUnitDisposable != null)
-            {
-                nUnitDisposable.Dispose();
-            }
+            sqlClientEventRecorder.Stop();
+            sqlClientEventRecorder.Dispose();
+            sqlClientEventRecorder = null;
+            smoTraceEventRecorder.Stop();
+            smoTraceEventRecorder.Dispose();
+            smoTraceEventRecorder = null;
+
+            nUnitDisposable.Dispose();
         }
+
         public virtual void MyTestInitialize()
         {
         }
@@ -254,11 +272,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
                         // Fabric databases do not support have server context or master database, hence creating database
                         if (databaseHandler is FabricDatabaseHandler)
                         {
-                            var dbParameters = new DatabaseParameters
-                            {
-                                UseEscapedCharacters = UseEscapedCharactersInDatabaseNames
-                            };
-                            db = databaseHandler.HandleDatabaseCreation(dbParameters);
+                            db = databaseHandler.HandleDatabaseCreation(new DatabaseParameters());
                         }
                         this.ServerContext = databaseHandler.ServerContext;
                         this.SqlConnectionStringBuilder = new SqlConnectionStringBuilder(this.ServerContext.ConnectionContext.ConnectionString);

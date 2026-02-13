@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Text;
 using System.Xml.Linq;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Cmn = Microsoft.SqlServer.Management.Common;
 
@@ -504,7 +505,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             if (ScriptDDLPartialOptions.ScriptHeaderForAlter == options)
             {
-                TraceHelper.Assert(queries.Count > 0, "queries.Count > 0 failed. queries.Count=" + queries.Count);
+                Debug.Assert(queries.Count > 0, "queries.Count > 0 failed. queries.Count=" + queries.Count);
 
                 // modify for alter
                 // header starts at index 0, there are no commentaries
@@ -512,7 +513,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else if (ScriptDDLPartialOptions.ScriptHeaderForCreateOrAlter == options)
             {
-                Diagnostics.TraceHelper.Assert(queries.Count > 0, "queries.Count > 0 failed. queries.Count=" + queries.Count);
+                Debug.Assert(queries.Count > 0, "queries.Count > 0 failed. queries.Count=" + queries.Count);
 
                 // modify for alter
                 // header starts at index 0, there are no commentaries
@@ -828,10 +829,10 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             //callers should take actions to ensure the validity
             //and report the runtime error for the following 2 assertions
-            Diagnostics.TraceHelper.Assert(indexCreate >= 0, "indexCreate >= 0 failed, indexCreate=" + indexCreate);
-            Diagnostics.TraceHelper.Assert(indexCreate <= text.Length - Scripts.CREATE.Length,
+            Debug.Assert(indexCreate >= 0, "indexCreate >= 0 failed, indexCreate=" + indexCreate);
+            Debug.Assert(indexCreate <= text.Length - Scripts.CREATE.Length,
                                         "The statement \"" + text + "\" is shorter than \"" + Scripts.CREATE + "\"");
-            Diagnostics.TraceHelper.Assert(Scripts.CREATE == text.Substring(indexCreate, Scripts.CREATE.Length).ToUpper(SmoApplication.DefaultCulture),
+            Debug.Assert(Scripts.CREATE == text.Substring(indexCreate, Scripts.CREATE.Length).ToUpper(SmoApplication.DefaultCulture),
                                         "\"CREATE\" == text.Substring(indexCreate, 6).ToUpper() failed. text=" + text);
 
             text = text.Remove(indexCreate, Scripts.CREATE.Length/*CREATE length*/);
@@ -882,7 +883,7 @@ namespace Microsoft.SqlServer.Management.Smo
         //it should be only called when we script with TextMode = true;
         internal string GetTextForScript(ScriptingPreferences sp, string[] expectedObjectTypes, bool forceCheckNameAndManipulateIfRequired, ScriptHeaderType scriptHeaderType)
         {
-            Diagnostics.TraceHelper.Assert(true == GetTextMode(), "true == GetTextMode() failed");
+            Debug.Assert(true == GetTextMode(), "true == GetTextMode() failed");
 
             //if for scripting and we don't enforce scripting options
             if (!sp.ForDirectExecution && !sp.OldOptions.EnforceScriptingPreferences)
@@ -962,7 +963,7 @@ namespace Microsoft.SqlServer.Management.Smo
         //we are preparing to script, "create" or "alter" or "create or alter"
         string BuildText(ScriptingPreferences sp)
         {
-            Diagnostics.TraceHelper.Assert(true == GetTextMode(), "true == GetTextMode() failed");
+            Debug.Assert(true == GetTextMode(), "true == GetTextMode() failed");
 
             //if text is not dirty and it must not be cut , just return it
             if (false == GetIsTextDirty() && !(sp.OldOptions.DdlBodyOnly || sp.OldOptions.DdlHeaderOnly))
@@ -978,7 +979,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!sp.OldOptions.DdlBodyOnly)
             {
                 textHeader =  GetTextHeader(false);
-                Diagnostics.TraceHelper.Assert(null != textHeader, "null == textHeader");
+                Debug.Assert(null != textHeader, "null == textHeader");
 
                 //text header cannot be empty
                 if (textHeader.Length <= 0)
@@ -993,7 +994,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!sp.OldOptions.DdlHeaderOnly)
             {
                 textBody = GetTextBody();
-                Diagnostics.TraceHelper.Assert(null != textBody, "null == textBody");
+                Debug.Assert(null != textBody, "null == textBody");
 
                 //text header should end in space
                 if (textHeader.Length > 0 && !char.IsWhiteSpace(textHeader[textHeader.Length - 1]))
@@ -1022,16 +1023,16 @@ namespace Microsoft.SqlServer.Management.Smo
         internal void CheckNameInTextCorrectness(string expectedName, string expectedSchema, string foundName,
                                                 string foundSchema, string foundProcedureNumber)
         {
-            Diagnostics.TraceHelper.Assert(true == GetTextMode(), "true == GetTextMode() failed");
-            Diagnostics.TraceHelper.Assert(null != expectedName && expectedName.Length > 1 && expectedName[0] == '[');
-            Diagnostics.TraceHelper.Assert(null != expectedSchema && (expectedSchema.Length == 0
+            Debug.Assert(true == GetTextMode(), "true == GetTextMode() failed");
+            Debug.Assert(null != expectedName && expectedName.Length > 1 && expectedName[0] == '[');
+            Debug.Assert(null != expectedSchema && (expectedSchema.Length == 0
                             || (expectedSchema.Length > 1 && expectedSchema[0] == '[')));
-            Diagnostics.TraceHelper.Assert(null != foundName && foundName.Length > 1 && foundName[0] == '[');
-            Diagnostics.TraceHelper.Assert(null != foundSchema && (foundSchema.Length == 0
+            Debug.Assert(null != foundName && foundName.Length > 1 && foundName[0] == '[');
+            Debug.Assert(null != foundSchema && (foundSchema.Length == 0
                             || (foundSchema.Length > 1 && foundSchema[0] == '[')));
-            Diagnostics.TraceHelper.Assert(null != foundProcedureNumber && (foundProcedureNumber.Length == 0
+            Debug.Assert(null != foundProcedureNumber && (foundProcedureNumber.Length == 0
                             || (foundProcedureNumber.Length > 1 && foundProcedureNumber[0] == ';')));
-            Diagnostics.TraceHelper.Assert((this is ScriptSchemaObjectBase && expectedSchema.Length > 0) ||
+            Debug.Assert((this is ScriptSchemaObjectBase && expectedSchema.Length > 0) ||
                             (!(this is ScriptSchemaObjectBase) && expectedSchema.Length == 0 && foundSchema.Length == 0)
                             || this.State == SqlSmoState.Creating || this is Trigger);
             //
@@ -1057,7 +1058,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             if (expectedSchema.Length > 0)
             {
-                Diagnostics.TraceHelper.Assert(this is ScriptSchemaObjectBase);
+                Debug.Assert(this is ScriptSchemaObjectBase);
 
                 if (foundSchema.Length > 0)
                 {
@@ -1108,7 +1109,7 @@ namespace Microsoft.SqlServer.Management.Smo
         protected void CheckTextCorrectness(string ddlText, bool enforceCreate, bool checkName, bool isOrAlterSupported,
                                 string[] expectedObjectTypes, out DdlTextParserHeaderInfo headerInfo)
         {
-            Diagnostics.TraceHelper.Assert(true == GetTextMode(), "true == GetTextMode() failed");
+            Debug.Assert(true == GetTextMode(), "true == GetTextMode() failed");
 
             // PARSE and check syntax, get header info, extract text info
             // like object type, name and schema as found in text
@@ -1176,7 +1177,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private string CheckAndManipulateText(string ddlText, string[] expectedObjectTypes, ScriptingPreferences sp, ScriptHeaderType scriptHeaderType)
         {
             //it should be only called when we script with TextMode = true;
-            Diagnostics.TraceHelper.Assert(true == GetTextMode(), "true == GetTextMode() failed");
+            Debug.Assert(true == GetTextMode(), "true == GetTextMode() failed");
 
             //
             //check text corectness
@@ -1257,7 +1258,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // note: fix it before the object's name so that the text indexes are not affected
                 if (0 == string.Compare("TRIGGER", headerInfo.objectType, StringComparison.OrdinalIgnoreCase))
                 {
-                    Diagnostics.TraceHelper.Assert(headerInfo.indexNameStartSecondary > 0 && headerInfo.indexNameEndSecondary > 0
+                    Debug.Assert(headerInfo.indexNameStartSecondary > 0 && headerInfo.indexNameEndSecondary > 0
                                 && headerInfo.indexNameEndSecondary > headerInfo.indexNameStartSecondary);
 
                     Trigger tr = this as Trigger;
@@ -1286,7 +1287,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
                 // fix the object name
-                Diagnostics.TraceHelper.Assert(headerInfo.indexNameStart > 0 && headerInfo.indexNameEnd > 0
+                Debug.Assert(headerInfo.indexNameStart > 0 && headerInfo.indexNameEnd > 0
                                 && headerInfo.indexNameEnd > headerInfo.indexNameStart);
 
                 ddlText = ddlText.Remove(headerInfo.indexNameStart, headerInfo.indexNameEnd - headerInfo.indexNameStart);
@@ -1466,14 +1467,6 @@ namespace Microsoft.SqlServer.Management.Smo
         if (this.IsDesignMode)
             {
                 return GetTextPropertyDesignMode(requestingProperty, sp, bThrowIfCreating);
-            }
-
-            if (this.ServerVersion.Major < 9 && State != SqlSmoState.Creating)
-            {
-                if (this.Properties.Contains("IsEncrypted") && true == (bool)GetPropValue("IsEncrypted"))
-                {
-                    throw new PropertyCannotBeRetrievedException(requestingProperty, this, ExceptionTemplates.ReasonTextIsEncrypted);
-                }
             }
 
             string text = (string)this.GetPropValueOptional("Text");

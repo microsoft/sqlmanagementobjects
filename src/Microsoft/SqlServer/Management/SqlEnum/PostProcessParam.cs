@@ -150,25 +150,7 @@ END
 
 		String GetText(int id, String sDatabase, int number, Object ci, ref bool bQI)
 		{
-			String query = null;
-
-            ServerVersion sVersion = ExecuteSql.GetServerVersion(ci);
-
-            if (sVersion.Major >= 9)  //Yukon or later
-            {
-                query = String.Format(CultureInfo.InvariantCulture, "select c.definition,convert(bit,OBJECTPROPERTY(c.object_id,N'ExecIsQuotedIdentOn')) from [{0}].sys.sql_modules c where c.object_id = <msparam>{1}</msparam>", Util.EscapeString(sDatabase, ']'), id);
-            }
-            else //Shiloh or earlier
-            {
-                if (number > 0)
-                {
-                    query = String.Format(CultureInfo.InvariantCulture, "select c.text,convert(bit,OBJECTPROPERTY(c.id,N'ExecIsQuotedIdentOn')) from [{0}].dbo.syscomments c where c.id = <msparam>{1}</msparam> and c.number = <msparam>{2}</msparam> order by c.colid", Util.EscapeString(sDatabase, ']'), id, number);
-                }
-                else
-                {
-                    query = String.Format(CultureInfo.InvariantCulture, "select c.text,convert(bit,OBJECTPROPERTY(c.id,N'ExecIsQuotedIdentOn')) from [{0}].dbo.syscomments c where c.id = <msparam>{1}</msparam> order by c.colid", Util.EscapeString(sDatabase, ']'), id);
-                }
-            }
+			String query = String.Format(CultureInfo.InvariantCulture, "select c.definition,convert(bit,OBJECTPROPERTY(c.object_id,N'ExecIsQuotedIdentOn')) from [{0}].sys.sql_modules c where c.object_id = <msparam>{1}</msparam>", Util.EscapeString(sDatabase, ']'), id);
 
 			DataTable dtText = ExecuteSql.ExecuteWithResults(query, ci);
 

@@ -1,24 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="FullTextIndex" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+<?xml version="1.0" ?>
+<EnumObject type="FullTextIndex" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<parent_link>
-				<link parent="HasFullTextCatalog" local="HasFullTextCatalog" />
-			</parent_link>
-			
-			<property_link fields='#CatalogName#' join='sysfulltextcatalogs AS cat'>
-				<link_multiple no='1' expression="cat.ftcatid=OBJECTPROPERTY({0}, 'TableFullTextCatalogId')">
-					<link_field type='parent' field="ID" />
-				</link_multiple>
-			</property_link>
-			<property_link fields='#UniqueIndexName#IsEnabled#PopulationStatus#ChangeTracking#' join='sysindexes AS si'>
-				<link_multiple no='1' expression="si.id = {0} and INDEXPROPERTY({0}, si.name, 'IsFulltextKey') &lt;&gt; 0">
-					<link_field type='parent' field="ID" />
-				</link_multiple>
-			</property_link>
-		</version>
-	
-		<version min_major='9' cloud_min_major='12'>
+		<version min_major='10' cloud_min_major='12'>
 			<parent_link>
 				<link parent="ID" local="ParentID" />
 			</parent_link>
@@ -55,33 +38,7 @@
 		
 		<property name="CatalogName" type="sysname" read_only_after_creation="true">cat.name</property>
 		
-		<version min_major='7' max_major='8'>
-			<property name="IsEnabled" type="bit" cast='true' access='Read'>
-				<link_multiple no='1' expression="OBJECTPROPERTY({0},'TableHasActiveFulltextIndex')">
-					<link_field type='parent' field="ID" />
-				</link_multiple>
-			</property>
-			<property name="PopulationStatus" type="int" report_type="IndexPopulationStatus" access='Read'>
-				<link_multiple no='1' expression="ISNULL(OBJECTPROPERTY({0},'TableFullTextPopulateStatus'),0)">
-					<link_field type='parent' field="ID" />
-				</link_multiple>
-			</property>
-			<property name="ChangeTracking" type="int" report_type="ChangeTracking" >
-				<link_multiple no='1' expression="ISNULL(OBJECTPROPERTY({0},'TableFullTextBackgroundUpdateIndexOn'),0) + ISNULL(OBJECTPROPERTY({0},'TableFullTextChangeTrackingOn'),0)">
-					<link_field type='parent' field="ID" />
-				</link_multiple>
-			</property>
-			
-			<property name="ParentID" type="int" hidden='true'>
-				<link_multiple no='1' expression="{0}">
-					<link_field type='parent' field="ID" />
-				</link_multiple>
-			</property>
-			
-			<property name="HasFullTextCatalog" type="bit" hidden='true'>1</property>	
-		</version>
-		
-		<version min_major='9' cloud_min_major='12'>
+		<version min_major='10' cloud_min_major='12'>
 			<property name="IsEnabled" type="bit" cast='true' access='Read'>fti.is_enabled</property>
 			<property name="PopulationStatus" type="int" report_type="IndexPopulationStatus" access='Read'>OBJECTPROPERTY(fti.object_id,'TableFullTextPopulateStatus')</property>
 			<property name="ChangeTracking" type="int" report_type="ChangeTracking" >(case change_tracking_state when 'M' then 1 when 'A' then 2 else 0 end)</property>

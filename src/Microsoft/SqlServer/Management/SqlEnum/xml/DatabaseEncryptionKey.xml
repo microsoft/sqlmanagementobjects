@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="DatabaseEncryptionKey" impl_type="SqlObject" min_major='10'>
+<EnumObject type="DatabaseEncryptionKey" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<!--joining DEK catalog with itself on database_id to get the DEK object of the current database-->
 		<property_link table='sys.dm_database_encryption_keys AS dek'>DB_ID()=dek.database_id</property_link>

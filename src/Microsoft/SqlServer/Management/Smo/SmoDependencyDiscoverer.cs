@@ -1,9 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -243,7 +244,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case ScriptBehavior.DropAndCreate:
                     return SqlSmoObject.PropagateAction.Create;
                 default:
-                    Diagnostics.TraceHelper.Assert(false, "Invalid Condition");
+                    Debug.Assert(false, "Invalid Condition");
                     return SqlSmoObject.PropagateAction.Create;
             }
         }
@@ -327,6 +328,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "SqlAssembly":
                 case nameof(ExternalLanguage):
                 case "ExternalLibrary":
+                case nameof(ExternalModel):
                 case "PartitionScheme":
                 case "PartitionFunction":
                 case "UserDefinedTableType":

@@ -482,7 +482,11 @@
         <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
         <object type="ExternalLanguageFile" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalLanguageFile.xml" />
       </object>
-      <object type="Lock" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseLocks.xml" />
+      <object type="ExternalModel" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExternalModel.xml">
+        <object type="Permission" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="YukonObjectPerm.xml" />
+        <object type="ExtendedProperty" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="ExtendedProperty.xml" />
+      </object>
+        <object type="Lock" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="DatabaseLocks.xml" />
       <object type="FileGroup" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="FileGroup.xml">
         <object type="File" assembly="Microsoft.SqlServer.SqlEnum" implement="Microsoft.SqlServer.Management.Smo.SqlObject" cfg="File.xml" >
         </object>

@@ -126,7 +126,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         string GetSchema()
         {
-            return m_server.ServerVersion.Major < 9 ? "master.dbo" : "sys";
+            return "sys";
         }
 
         private void ScriptAlterWithStatistics(StringCollection configStrings,

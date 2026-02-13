@@ -19,7 +19,6 @@
     <Compile Include="$(ConnectionInfoSrc)\ConnectionSettings.cs" />
     <Compile Include="$(ConnectionInfoSrc)\EncryptionUtility.cs" />
     <Compile Include="$(ConnectionInfoSrc)\ExecutionCache.cs" />
-    <Compile Include="$(ConnectionInfoSrc)\FxCopSupressions.cs" />
     <Compile Include="$(ConnectionInfoSrc)\interfaces.cs" />
     <Compile Include="$(ConnectionInfoSrc)\irenewabletoken.cs" />
     <Compile Include="$(ConnectionInfoSrc)\ISfcConnection.cs" />
@@ -29,6 +28,7 @@
     <Compile Include="$(ConnectionInfoSrc)\ServerConnection.cs" />
     <Compile Include="$(ConnectionInfoSrc)\ServerInformation.cs" />
     <Compile Include="$(ConnectionInfoSrc)\ServerVersion.cs" />
+    <Compile Include="$(ConnectionInfoSrc)\SmoEventSource.cs" />
     <Compile Include="$(ConnectionInfoSrc)\SqlConnectionInfo.cs" />
     <Compile Include="$(ConnectionInfoSrc)\SqlConnectionInfoWithConnection.cs" />
     <Compile Include="$(ConnectionInfoSrc)\SqlContext.cs" />
@@ -133,9 +133,6 @@
   <ItemGroup>
     <None Include="cfg.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
-  </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
     <Compile Include="$(SqlClrSrc)\FxCopExclusions.cs" />
     <Compile Include="$(SqlClrSrc)\SqlClrProvider.cs" />
@@ -145,4 +142,9 @@
     <ProjectReference Include="$(BatchParserSrc)\Microsoft.Data.Tools.Sql.BatchParser.csproj" />
     <PackageReference Include="System.Security.Principal.Windows" />  
   </ItemGroup>
+  <!-- Validate the cfg.xml before the build.
+       The file is framework independent so we only run it once for netfx to avoid duplication of errors when doing a full build -->
+  <Target Name="ValidateCfgXml" Condition="'$(TargetFramework)'=='$(NetfxVersion)'" BeforeTargets="BeforeBuild">
+    <Exec Command="powershell -NoProfile -File &quot;$(EnlistmentRoot)\.scripts\ValidateXmlSchema.ps1&quot; -XmlFilesFolder &quot;$(MSBuildProjectDirectory)&quot; -SchemaFile &quot;$(CodeGenSrc)\cfg.xsd&quot; -Include cfg.xml" />
+  </Target>
 </Project>

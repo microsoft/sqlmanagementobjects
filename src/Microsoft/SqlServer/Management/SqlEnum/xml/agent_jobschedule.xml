@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='sysjobschedules' impl_type='SqlObject' min_major='9' >
+<EnumObject type='sysjobschedules' impl_type='SqlObject' min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <parent_link>
             <link parent="JobID" local="JobID" />
@@ -10,7 +10,7 @@
 
         <property_link table='#tmp_sp_help_jobschedule' alias='tshj'/>
         <property_link fields='#OwnerLoginName#' left_join='msdb.dbo.sysschedules_localserver_view' alias='sslv' >tshj.schedule_id = sslv.schedule_id</property_link>
-        <version min_major = '9' >
+        <version min_major = '10' >
             <prefix>
                 <link_multiple no='1' expression="
 create table #tmp_sp_help_jobschedule

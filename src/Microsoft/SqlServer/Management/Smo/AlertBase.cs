@@ -106,12 +106,8 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             GetStringParameter(sb, sp, "CategoryName", "@category_name=N'{0}'", ref count);
             GetStringParameter(sb, sp, "PerformanceCondition", "@performance_condition=N'{0}'", ref count);
 
-            // add wmi parameters only if version 9.0+
-            if (ServerVersion.Major >= 9)
-            {
-                GetStringParameter(sb, sp, "WmiEventNamespace", "@wmi_namespace=N'{0}'", ref count);
-                GetStringParameter(sb, sp, "WmiEventQuery", "@wmi_query=N'{0}'", ref count);
-            }
+            GetStringParameter(sb, sp, "WmiEventNamespace", "@wmi_namespace=N'{0}'", ref count);
+            GetStringParameter(sb, sp, "WmiEventQuery", "@wmi_query=N'{0}'", ref count);
 
             // Attempt to script JobName only if corresponding scripting option is set, 
             // if fail still script job id instead

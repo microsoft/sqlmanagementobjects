@@ -274,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 AddScriptExecuteAs(sb, sp, this.Properties, ref bNeedsComma);
             }
@@ -350,12 +350,8 @@ namespace Microsoft.SqlServer.Management.Smo
             object obj = this.GetPropValueOptional("ImplementationType");
             if (this.DatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase && obj != null && (ImplementationType)obj == ImplementationType.SqlClr)
             {
-                // CLR procedures are not supported on versions prior to 9.0
-                // so throw an error saying we can't create it there
-                if (ServerVersion.Major < 9)
-                {
-                    throw new WrongPropertyValueException(ExceptionTemplates.ClrNotSupported("ImplementationType", ServerVersion.ToString()));
-                }
+                // CLR procedures were introduced in SQL Server 2005 (version 9.0).
+                // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
 
                 // this check ensures we can't script a CLR Stored Proc that targets Cloud Engine
                 ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.ClrStoredProcedureDownlevel(
@@ -806,44 +802,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
-            switch (this.ServerVersion.Major)
-            {
-                case 7:
-                    switch (prop.Name)
-                    {
-                        case "Recompile":
-                            Validate_set_TextObjectDDLProperty(prop, value);
-                            break;
-                        case "ForReplication": goto case "Recompile";
-                        case "IsEncrypted": goto case "Recompile";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
-                    break;
-                case 8: goto case 7;
-                case 9:
-                    switch (prop.Name)
-                    {
-                        case "Recompile":
-                            Validate_set_TextObjectDDLProperty(prop, value);
-                            break;
-                        case "ForReplication": goto case "Recompile";
-                        case "IsEncrypted": goto case "Recompile";
-                        case "ExecutionContext": goto case "Recompile";
-                        case "ExecutionContextPrincipal": goto case "Recompile";
-                        case "AssemblyName": goto case "Recompile";
-                        case "ClassName": goto case "Recompile";
-                        case "MethodName": goto case "Recompile";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
-                    break;
-                default: goto case 9;
-            }
+            // No version-specific validation needed for SQL Server 2008+
         }
 
         // after object creation we do not support text mode = true

@@ -45,6 +45,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             typeof(ExternalFileFormatCollection),
             typeof(ExternalLanguageCollection),
             typeof(ExternalLibraryCollection),
+            typeof(ExternalModelCollection),
             typeof(ExternalStreamCollection),
             typeof(ExternalStreamingJobCollection),
             typeof(FileGroupCollection),

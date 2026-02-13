@@ -1,23 +1,24 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-namespace Microsoft.SqlServer.Management.Smo
-{
-    using System;
-    using System.Globalization;
-    using System.Data;
+using System;
+using System.Globalization;
+using System.Data;
 #if MICROSOFTDATA
-    using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;
 #endif
-    using System.Collections.Specialized;
-    using System.Threading;
-    using Microsoft.SqlServer.Management.Common;
-    using Microsoft.SqlServer.Server;
-    using Microsoft.SqlServer.Management.Sdk.Sfc;
-    using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
+using System.Collections.Specialized;
+using System.Diagnostics.Tracing;
+using System.Threading;
+using Microsoft.SqlServer.Management.Common;
+using EventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
+using Microsoft.SqlServer.Server;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
 
+namespace Microsoft.SqlServer.Management.Smo
+{
 #pragma warning disable 1590, 1591, 1592, 1573, 1571, 1570, 1572, 1587
 
     /// <summary>
@@ -88,10 +89,11 @@ using System.Data.SqlClient;
 #endif
             try
             {
-#if DEBUG
-                Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, 
-                "get data for urn: {0}", req.Urn);
-#endif
+                // Only convert URN to string if execution logging is enabled
+                if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
+                {
+                    EventSource.Log.GetDataForUrn(req.Urn.ToString());
+                }
                 return new Enumerator().Process(this.ConnectionContext, req);
             }
             finally
@@ -116,8 +118,7 @@ using System.Data.SqlClient;
                                 framepath.Append(mi.Name);
                         }
                     }
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                        framepath.ToString());
+                    SmoEventSource.Log.ExecutionMessage(framepath.ToString());
                 }
 #endif
         }
@@ -138,8 +139,11 @@ using System.Data.SqlClient;
 #endif
             try
             {
-                Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                    "get data for urn: {0}", req.Urn);
+                // Only convert URN to string if execution logging is enabled
+                if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
+                {
+                    EventSource.Log.GetDataForUrn(req.Urn.ToString());
+                }
                 return EnumResult.ConvertToDataReader(Enumerator.GetData(this.ConnectionContext, req));
             }
             finally
@@ -164,8 +168,7 @@ using System.Data.SqlClient;
                                 framepath.Append(mi.Name);
                         }
                     }
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                        framepath.ToString());
+                    EventSource.Log.ExecutionMessage(framepath.ToString());
                 }
 #endif
             }
@@ -184,8 +187,11 @@ using System.Data.SqlClient;
             if( PerformanceCounters.DoCount )
                 PerformanceCounters.ObjectInfoRequestCount++;
 #endif
-            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, 
-                "get object info for urn: {0}", roi.Urn);
+            // Only format string if execution logging is enabled
+            if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
+            {
+                EventSource.Log.ExecutionMessage($"get object info for urn: {roi.Urn}");
+            }
             return new Enumerator().Process(this.ConnectionContext, roi);
         }
 
@@ -203,7 +209,7 @@ using System.Data.SqlClient;
 #endif
             try
             {
-                Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "get dependencies ");
+                EventSource.Log.GetDependencies();
                 return new Enumerator().EnumDependencies(this.ConnectionContext, dependencyRequest);
             }
             catch(ConnectionException e)
@@ -307,8 +313,7 @@ using System.Data.SqlClient;
                 BeforeSql();
                 foreach(string q in queries)
                 {
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                        "execute sql: " + q);
+                    EventSource.Log.ExecutionMessage("execute sql: " + q);
                 }
 #endif
             foreach(string q in queries)
@@ -338,7 +343,7 @@ using System.Data.SqlClient;
         {
 #if INCLUDE_PERF_COUNT
                 BeforeSql();
-                Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "execute sql: " + sqlCommand);
+                EventSource.Log.ExecuteSql(sqlCommand);
 #endif
             DumpTraceString("execute sql: " + sqlCommand);
 
@@ -762,8 +767,7 @@ using System.Data.SqlClient;
             get
             {
 #if DEBUGTRACE
-                Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                    "recording: " + (SqlExecutionModes.ExecuteSql != ( SqlExecutionModes.ExecuteSql & this.ConnectionContext.SqlExecutionModes )).ToString(SmoApplication.DefaultCulture));
+                EventSource.Log.ExecutionMessage("recording: " + (SqlExecutionModes.ExecuteSql != ( SqlExecutionModes.ExecuteSql & this.ConnectionContext.SqlExecutionModes )).ToString(SmoApplication.DefaultCulture));
 #endif
                 return SqlExecutionModes.ExecuteSql != ( SqlExecutionModes.ExecuteSql & this.ConnectionContext.SqlExecutionModes );
             }
@@ -832,12 +836,16 @@ using System.Data.SqlClient;
 
         private void DumpTraceString(string s)
         {
-            if (s.ToLower(SmoApplication.DefaultCulture).Contains("password"))
+            // Only perform expensive string operations if execution logging is enabled
+            if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
             {
-                s = "This statement contains sensitive information and has been replaced for security reasons.";
-            }
+                if (s.ToLower(SmoApplication.DefaultCulture).Contains("password"))
+                {
+                    s = "This statement contains sensitive information and has been replaced for security reasons.";
+                }
 
-            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "{0}", s);
+                EventSource.Log.ExecutionMessage(s);
+            }
         }
 
 #if INCLUDE_PERF_COUNT

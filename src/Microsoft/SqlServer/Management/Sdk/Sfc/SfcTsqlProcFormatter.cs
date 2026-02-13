@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Diagnostics;
+
 #if !NETCOREAPP
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 #endif
@@ -31,7 +33,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             public SprocArg(string name, string property, bool required, bool output)
             {
                 this.argName = name;
-                TraceHelper.Assert(!String.IsNullOrEmpty(property));
+                Debug.Assert(!String.IsNullOrEmpty(property));
                 this.property = property;
                 this.required = required;
                 this.output = output;
@@ -191,7 +193,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
                     if (hasOutput)
                     {
-                        TraceHelper.Assert(false, "More than one OUTPUT parameters specified!");
+                        Debug.Assert(false, "More than one OUTPUT parameters specified!");
                     }
                     else
                     {
@@ -223,7 +225,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                             }
                             else
                             {
-                                TraceHelper.Assert(false, "Unexpected OUTPUT parameter type!");
+                                Debug.Assert(false, "Unexpected OUTPUT parameter type!");
                             }
 
                             sb.AppendLine();
@@ -266,7 +268,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
                 if (String.IsNullOrEmpty(arg.property))
                 {
-                    TraceHelper.Assert(!(null == runtimeArgsEnum), String.Format("No runtimeArgsEnum but there is no property with the name '!{0}", arg.argName));
+                    Debug.Assert(!(null == runtimeArgsEnum), String.Format("No runtimeArgsEnum but there is no property with the name '!{0}", arg.argName));
                     RuntimeArg runtime = runtimeArgsEnum.Current;
                     runtimeArgsEnum.MoveNext();
                     type = runtime.type;

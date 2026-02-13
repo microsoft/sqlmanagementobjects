@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
@@ -144,7 +145,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 m_shadow.Add(obj.AbstractIdentityKey as K, obj);
                 // The object must already be parented correctly
-                TraceHelper.Assert(obj.Parent == this.Parent);
+                Debug.Assert(obj.Parent == this.Parent);
                 return true;
             }
             return false;

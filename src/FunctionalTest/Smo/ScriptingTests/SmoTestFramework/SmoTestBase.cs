@@ -13,7 +13,7 @@ using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 
 // We can run our tests in parallel, scoped at the class level.
 // We set Workers to 3 because a higher value led to issues such as exceeding the DTU limit and being throttled on our Azure test servers including MI
-[assembly: Microsoft.VisualStudio.TestTools.UnitTesting.Parallelize(Scope = Microsoft.VisualStudio.TestTools.UnitTesting.ExecutionScope.ClassLevel, Workers = 3)]
+[assembly: Microsoft.VisualStudio.TestTools.UnitTesting.Parallelize(Scope = Microsoft.VisualStudio.TestTools.UnitTesting.ExecutionScope.ClassLevel, Workers = 4)]
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 {

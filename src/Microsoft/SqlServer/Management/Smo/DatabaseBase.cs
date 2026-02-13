@@ -1,9 +1,10 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Text;
 using System.Data;
+using System.Diagnostics;
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
@@ -186,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Smo
                            (State == SqlSmoState.Creating && se.Number == 18456))
                         {
                             // Pass args as params since cfe may contain {#} in it which will cause formatting to fail if inserted directly
-                            Diagnostics.TraceHelper.Trace("Database SMO Object", "Failed to connect for edition fetch, defaulting to Unknown edition. State: {0} PropertyBagState: {1} {2}", State, propertyBagState, cfe);
+                            SmoEventSource.Log.DatabaseConnectionFailure(State.ToString(), propertyBagState.ToString(), cfe.ToString());
                             // - 916 is "Cannot open database <...> requested by the login.. The login failed....
                             // - 18456 is Login failed for user <...>
                             // - 4060 is "Database not accessible" error. It might still be in sys.databases but being deleted.
@@ -199,7 +200,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            Diagnostics.TraceHelper.Trace("Database SMO Object", $"Failed to connect for edition fetch. State: {State}, SqlException number: {(cfe.InnerException as SqlException)?.Number}");
+                            SmoEventSource.Log.DatabaseSqlException((cfe.InnerException as SqlException)?.Number ?? 0, State.ToString());
                             throw;
                         }
                     }
@@ -261,22 +262,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 else
                 {
                     switch (this.ServerVersion.Major)
-                    {
-                        // SMO that is external to users exposes versions greater than 8, so there are no cases less than 8
-                        case 8:  // Shiloh
-                            if ((CompatibilityLevel)value <= CompatibilityLevel.Version80)
-                            {
-                                compatIsValid = true; // we're fine
-                            }
-                            break;
-
-                        case 9: // Yukon
-                            if ((CompatibilityLevel)value <= CompatibilityLevel.Version90)
-                            {
-                                compatIsValid = true; // we're fine
-                            }
-                            break;
-                        case 10: // Katmai
+                    {case 10: // Katmai
                             if ((CompatibilityLevel)value <= CompatibilityLevel.Version100)
                             {
                                 compatIsValid = true; // we're fine
@@ -556,12 +542,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                if (sp.TargetServerVersion < SqlServerVersion.Version90)
-                {
-                    throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyOn90).SetHelpContext(
-                        "SupportedOnlyOn90");
-                }
-
                 sbStatement.AppendFormat(SmoApplication.DefaultCulture,
                     " AS SNAPSHOT OF [{0}]", SqlBraket(viewName));
             }
@@ -636,11 +616,8 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // enable vardecimal compression as needed
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
-            {
-                bool forCreateScript = true;
-                ScriptVardecimalCompression(createQuery, sp, forCreateScript);
-            }
+            bool forCreateScript = true;
+            ScriptVardecimalCompression(createQuery, sp, forCreateScript);
 
             // Script for Change tracking options on database
             if (IsSupportedProperty("ChangeTrackingEnabled", sp) && sp.Data.ChangeTracking)
@@ -1023,10 +1000,8 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!isAzureDb && IsSupportedProperty("IsFullTextEnabled", sp))
             {
                 Property propFullTextEnabled = Properties.Get("IsFullTextEnabled");
-                // The last line of the condition is to only avoid emitting the statement for scripts/create when version80
                 if (null != propFullTextEnabled.Value &&
-                     (propFullTextEnabled.Dirty || !sp.ScriptForAlter) &&
-                     (sp.TargetServerVersion >= SqlServerVersion.Version90 || sp.ScriptForAlter || (bool)propFullTextEnabled.Value))
+                     (propFullTextEnabled.Dirty || !sp.ScriptForAlter))
                 {
                     query.Add(string.Format(SmoApplication.DefaultCulture,
                         "IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')){0}begin{0}EXEC {1}.[dbo].[sp_fulltext_database] @action = '{2}'{0}end",
@@ -1085,16 +1060,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     (sp.TargetServerVersion == SqlServerVersion.Version100) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 100);
 
-                bool isVersion90WithCompatLevelLessThan90 =
-                    (sp.TargetServerVersion == SqlServerVersion.Version90) &&
-                    ((int)(CompatibilityLevel)propCompat.Value <= 90);
-
-                bool isVersion80WithCompatLevelLessThan80 =
-                    (sp.TargetServerVersion == SqlServerVersion.Version80) &&
-                    ((int)(CompatibilityLevel)propCompat.Value <= 80);
-
-                bool isVersion80Or90WithLowerCompatLevel = isVersion90WithCompatLevelLessThan90 || isVersion80WithCompatLevelLessThan80;
-
                 bool isVersionWithLowerCompatLevel =
                     isVersion105WithCompatLevelLessThan105 ||
                     isVersion100WithCompatLevelLessThan100 ||
@@ -1110,7 +1075,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 //script only if compatibility level is less than the target server
                 // on Alter() we just script it and let the server fail if it is not correct
-                if (IsSupportedProperty("CompatibilityLevel", sp) && (sp.ScriptForAlter || isVersionWithLowerCompatLevel || isVersion80Or90WithLowerCompatLevel))
+                if (IsSupportedProperty("CompatibilityLevel", sp) && (sp.ScriptForAlter || isVersionWithLowerCompatLevel))
                 {
                     CompatibilityLevel upgradedCompatLevel = UpgradeCompatibilityValueIfRequired(sp, (CompatibilityLevel)propCompat.Value);
                     if (isVersionWithLowerCompatLevel)
@@ -1120,15 +1085,6 @@ namespace Microsoft.SqlServer.Management.Smo
                             SmoApplication.DefaultCulture,
                             "ALTER DATABASE {0} SET COMPATIBILITY_LEVEL = {1}",
                             FormatFullNameForScripting(sp),
-                            Enum.Format(typeof(CompatibilityLevel), upgradedCompatLevel, "d")));
-                    }
-                    else if (isVersion80Or90WithLowerCompatLevel)
-                    {
-                        query.Add(
-                            string.Format(
-                            SmoApplication.DefaultCulture,
-                            "EXEC dbo.sp_dbcmptlevel @dbname={0}, @new_cmptlevel={1}",
-                            this.FormatFullNameForScripting(sp, false),
                             Enum.Format(typeof(CompatibilityLevel), upgradedCompatLevel, "d")));
                     }
                 }
@@ -1151,11 +1107,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 return CompatibilityLevel.Version80;
             }
 
-            //Return Compatibility level 70 if it is less when Scripting for Server version 90
-            if (sp.TargetServerVersion == SqlServerVersion.Version90 && compatibilityLevel <= CompatibilityLevel.Version65)
-            {
-                return CompatibilityLevel.Version70;
-            }
             return compatibilityLevel;
         }
 
@@ -1183,11 +1134,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 pi = piList.ToArray();
             }
             
-            // bWithScript flag is only set to true for Database.Alter()
-            // therefore it's sufficient to check for the current server
-            // version to be Yukon or higher. Otherwise FullTextCatalog object
-            // cannot be altered
-            else if (this.ServerVersion.Major >= 9)
+            else
             {
                 //for mirroring -> propagate only if exists
                 if (action == PropagateAction.Alter)
@@ -1199,7 +1146,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             new PropagateInfo(m_LogFiles, bWithScript, bWithScript),
                             new PropagateInfo(m_FullTextCatalogs, bWithScript, bWithScript),
                             //Propagating the DEK object is taken care in the ScriptAlter method
-                            new PropagateInfo((ServerVersion.Major < 10)? (FullTextStopListCollection)null : m_FullTextStopLists, bWithScript, bWithScript)
+                            new PropagateInfo(m_FullTextStopLists, bWithScript, bWithScript)
                         };
                 }
                 else
@@ -1218,30 +1165,11 @@ namespace Microsoft.SqlServer.Management.Smo
                             new PropagateInfo(LogFiles, bWithScript, bWithScript),
                             new PropagateInfo(m_FullTextCatalogs, bWithScript, bWithScript),
                             //Propagating the DEK object is taken care in the ScriptCreate method
-                            new PropagateInfo((ServerVersion.Major < 10)? null : m_FullTextStopLists, bWithScript, bWithScript)
+                            new PropagateInfo(m_FullTextStopLists, bWithScript, bWithScript)
 
                             //Propagating the DEK object is taken care in the ScriptCreate method
                         };
                 }
-            }
-            else if (this.ServerVersion.Major >= 8)
-            {
-                //fisrt parameter controls if the next level is scripted
-                //second parameter controls if the levels after the first level is scripted
-                pi = new PropagateInfo[] {
-                    new PropagateInfo(ServerVersion.Major < 8 ? null : ExtendedProperties, true, ExtendedProperty.UrnSuffix ),
-                    new PropagateInfo(FileGroups, bWithScript, bWithScript),
-                    new PropagateInfo(LogFiles, bWithScript, bWithScript)
-                };
-            }
-            else
-            {
-                //fisrt parameter controls if the next level is scripted
-                //second parameter controls if the levels after the first level is scripted
-                pi = new PropagateInfo[] {
-                    new PropagateInfo(FileGroups, bWithScript, bWithScript),
-                    new PropagateInfo(LogFiles, bWithScript, bWithScript)
-                };
             }
 
             return pi;
@@ -1280,11 +1208,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (State == SqlSmoState.Creating)
                 {
                     throw new InvalidSmoOperationException("SetSnapshotIsolation", State);
-                }
-
-                if (ServerVersion.Major < 9)
-                {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
                 }
 
                 this.ExecutionManager.ExecuteNonQuery(
@@ -1852,11 +1775,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
-            {
-                bool forCreateScript = false;
-                ScriptVardecimalCompression(alterQuery, sp, forCreateScript);
-            }
+            bool forCreateScript = false;
+            ScriptVardecimalCompression(alterQuery, sp, forCreateScript);
 
             // Script for change tracking options on database
             if (sp.Data.ChangeTracking && IsSupportedProperty("ChangeTrackingEnabled", sp))
@@ -2615,6 +2535,23 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        //ExternalModels collection
+        ExternalModelCollection m_ExternalModels;
+        [SfcObject(SfcContainerRelationship.ObjectContainer, SfcContainerCardinality.ZeroToAny, typeof(ExternalModel))]
+        public ExternalModelCollection ExternalModels
+        {
+            get
+            {
+                CheckObjectState();
+                this.ThrowIfNotSupported(typeof(ExternalModel));
+                if (m_ExternalModels == null)
+                {
+                    m_ExternalModels = new ExternalModelCollection(this);
+                }
+                return m_ExternalModels;
+            }
+        }
+
         UserDefinedTypeCollection m_UserDefinedTypes;
         [SfcObject(SfcContainerRelationship.ObjectContainer, SfcContainerCardinality.ZeroToAny, typeof(UserDefinedType))]
         public UserDefinedTypeCollection UserDefinedTypes
@@ -2947,7 +2884,7 @@ namespace Microsoft.SqlServer.Management.Smo
                          sqlExc.Number == 262 ))  //No permission in Database
                     {
                         // In case user doesn't have permission to view sys.dm_database_encryption_keys, we shall only return false instead of throwing exception.
-                        Diagnostics.TraceHelper.Trace("Database SMO Object", exc.Message);
+                        SmoEventSource.Log.DatabaseOperation(exc.Message);
                     }
                     else
                     {
@@ -4621,6 +4558,18 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        internal void PrefetchExternalModels(ScriptingPreferences options)
+        {
+            if (this.IsSupportedObject<ExternalModel>(options))
+            {
+                InitChildLevel(ExternalModel.UrnSuffix, options, true);
+                if (options.IncludeScripts.ExtendedProperties && this.IsSupportedObject<ExtendedProperty>(options))
+                {
+                    InitChildLevel("ExternalModel/ExtendedProperty", options, true);
+                }
+            }
+        }
+
         internal void PrefetchUserDefinedFunctions(ScriptingPreferences options)
         {
             if (this.IsSupportedObject<UserDefinedFunction>(options))
@@ -5103,6 +5052,7 @@ namespace Microsoft.SqlServer.Management.Smo
             PrefetchUserDefinedTypes(options);
             PrefetchExternalLanguages(options);
             PrefetchExternalLibraries(options);
+            PrefetchExternalModels(options);
             PrefetchUserDefinedTableTypes(options);
             PrefetchUserDefinedAggregates(options);
             PrefetchXmlSchemaCollections(options);
@@ -5160,10 +5110,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     throw new InvalidSmoOperationException("EnumTransactions", State);
                 }
 
-                if (ServerVersion.Major < 9)
-                {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-                }
 
                 return this.ExecutionManager.GetEnumeratorData(new Request("Server/Transaction" + GetTranFilterExpr(transactionType)));
             }
@@ -5347,31 +5293,14 @@ namespace Microsoft.SqlServer.Management.Smo
         private StringCollection GetDefaultFileGroupScript(ScriptingPreferences sp, string dataSpaceName)
         {
             StringCollection results = new StringCollection();
-            if (sp.TargetServerVersion == SqlServerVersion.Version80)
-            {
-                // we check whether the filegroup exists and is already default.  engine throws if
-                // we try to make set default on a filegroup that is already default.
-                this.AddUseDb(results, sp);
-                results.Add(string.Format(SmoApplication.DefaultCulture,
-                                           "IF NOT EXISTS (SELECT groupname FROM dbo.sysfilegroups WHERE (status & 0x10) != 0 AND groupname = {2}) ALTER DATABASE {0} MODIFY FILEGROUP [{1}] DEFAULT",
-                                           this.FormatFullNameForScripting(sp),
-                                           SqlBraket(dataSpaceName),
-                                           MakeSqlString(dataSpaceName)));
-            }
-            else
-            {
-                // Yukon - we could have other data spaces become default, but there is
-                // no DDL support for this yet.
-                //
-                // we check whether the filegroup exists and is already default.  engine throws if
-                // we try to make set default on a filegroup that is already default.
-                this.AddUseDb(results, sp);
-                results.Add(string.Format(SmoApplication.DefaultCulture,
-                                           "IF NOT EXISTS (SELECT name FROM sys.filegroups WHERE is_default=1 AND name = {2}) ALTER DATABASE {0} MODIFY FILEGROUP [{1}] DEFAULT",
-                                           this.FormatFullNameForScripting(sp),
-                                           SqlBraket(dataSpaceName),
-                                           MakeSqlString(dataSpaceName)));
-            }
+            // we check whether the filegroup exists and is already default.  engine throws if
+            // we try to make set default on a filegroup that is already default.
+            this.AddUseDb(results, sp);
+            results.Add(string.Format(SmoApplication.DefaultCulture,
+                                       "IF NOT EXISTS (SELECT name FROM sys.filegroups WHERE is_default=1 AND name = {2}) ALTER DATABASE {0} MODIFY FILEGROUP [{1}] DEFAULT",
+                                       this.FormatFullNameForScripting(sp),
+                                       SqlBraket(dataSpaceName),
+                                       MakeSqlString(dataSpaceName)));
 
             return results;
         }
@@ -5560,8 +5489,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (dt.Rows.Count > 0)
                     {
                         //assert that we have schema on the first column and name on second
-                        Diagnostics.TraceHelper.Assert("View_Schema" == dt.Columns[0].Caption);
-                        Diagnostics.TraceHelper.Assert("View_Name" == dt.Columns[1].Caption);
+                        Debug.Assert("View_Schema" == dt.Columns[0].Caption);
+                        Debug.Assert("View_Name" == dt.Columns[1].Caption);
 
                         // iterate through the list of views, it may contain duplicates
                         string schema = string.Empty;
@@ -5844,27 +5773,10 @@ SortedList list = new SortedList();
         /// <summary>
         /// Truncate log.  This is supported in SQL Server 2005 for backwards compatibility reasons.
         /// </summary>
+        [Obsolete]
         public void TruncateLog()
         {
-            if (this.ServerVersion.Major >= 10)
-            {
-                throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyBelow100).SetHelpContext("SupportedOnlyBelow100");
-            }
-
-            try
-            {
-                CheckObjectState();
-
-                string stmt = string.Format(SmoApplication.DefaultCulture, "BACKUP LOG {0} WITH TRUNCATE_ONLY ",
-                                            this.FormatFullNameForScripting(new ScriptingPreferences()));
-                this.ExecutionManager.ExecuteNonQuery(stmt);
-            }
-            catch (Exception e)
-            {
-                FilterException(e);
-
-                throw new FailedOperationException(ExceptionTemplates.TruncateLog, this, e);
-            }
+            throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyBelow100).SetHelpContext("SupportedOnlyBelow100");
         }
 
         /// <summary>
@@ -6164,52 +6076,48 @@ SortedList list = new SortedList();
             ScriptAlterPropBool("QuotedIdentifiersEnabled", "QUOTED_IDENTIFIER", sp, query);
             ScriptAlterPropBool("RecursiveTriggersEnabled", "RECURSIVE_TRIGGERS", sp, query);
 
-            //script only if we are on Yukon or target Yukon and later
-            if (this.ServerVersion.Major >= 9 &&
-                sp.TargetServerVersion >= SqlServerVersion.Version90)
+            // Don't script for Managed Instances - not supported
+            //
+            if (IsSupportedProperty("BrokerEnabled", sp) && !targetEditionIsManagedServer)
             {
-                // Don't script for Managed Instances - not supported
-                //
-                if (IsSupportedProperty("BrokerEnabled", sp) && !targetEditionIsManagedServer)
-                {
-                    ScriptAlterPropBool("BrokerEnabled", string.Empty, sp, query, "ENABLE_BROKER", "DISABLE_BROKER");
-                }
-                ScriptAlterPropBool("AutoUpdateStatisticsAsync", "AUTO_UPDATE_STATISTICS_ASYNC", sp, query);
+                ScriptAlterPropBool("BrokerEnabled", string.Empty, sp, query, "ENABLE_BROKER", "DISABLE_BROKER");
+            }
+            ScriptAlterPropBool("AutoUpdateStatisticsAsync", "AUTO_UPDATE_STATISTICS_ASYNC", sp, query);
 
-                // trying to enable or disable date_correlation_optimization on Azure also hangs indefinitely
-                if (!targetEditionIsManagedServer && !isAzureDb)
-                {
-                    ScriptAlterPropBool("DateCorrelationOptimization", "DATE_CORRELATION_OPTIMIZATION", sp, query);
-                }
+            // trying to enable or disable date_correlation_optimization on Azure also hangs indefinitely
+            if (!targetEditionIsManagedServer && !isAzureDb)
+            {
+                ScriptAlterPropBool("DateCorrelationOptimization", "DATE_CORRELATION_OPTIMIZATION", sp, query);
+            }
 
-                if (!isAzureDb)
-                {
-                    ScriptAlterPropBool("Trustworthy", "TRUSTWORTHY", sp, query);
-                }
-                if (IsSupportedProperty("SnapshotIsolationState", sp))
-                {
-                    ScriptSnapshotIsolationState(sp, query);
-                }
-                ScriptAlterPropBool("IsParameterizationForced", "PARAMETERIZATION", sp, query, "FORCED", "SIMPLE");
-                ScriptAlterPropBool("IsReadCommittedSnapshotOn", "READ_COMMITTED_SNAPSHOT", sp, query);
+            if (!isAzureDb)
+            {
+                ScriptAlterPropBool("Trustworthy", "TRUSTWORTHY", sp, query);
+            }
+            if (IsSupportedProperty("SnapshotIsolationState", sp))
+            {
+                ScriptSnapshotIsolationState(sp, query);
+            }
+            ScriptAlterPropBool("IsParameterizationForced", "PARAMETERIZATION", sp, query, "FORCED", "SIMPLE");
+            ScriptAlterPropBool("IsReadCommittedSnapshotOn", "READ_COMMITTED_SNAPSHOT", sp, query);
 
-                if (IsSupportedProperty("MirroringPartner", sp))
+
+            if (IsSupportedProperty("MirroringPartner", sp))
+            {
+                if (this.GetPropValueOptional("IsMirroringEnabled", false))
                 {
-                    if (this.GetPropValueOptional("IsMirroringEnabled", false))
+                    Property propMirroringTimeout = Properties.Get("MirroringTimeout");
+                    if (null != propMirroringTimeout.Value && (propMirroringTimeout.Dirty || !sp.ForDirectExecution))
                     {
-                        Property propMirroringTimeout = Properties.Get("MirroringTimeout");
-                        if (null != propMirroringTimeout.Value && (propMirroringTimeout.Dirty || !sp.ForDirectExecution))
-                        {
-                            query.Add(string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE {0} SET PARTNER TIMEOUT {1} {2}",
-                                this.FormatFullNameForScripting(sp),
-                                Convert.ToInt32(propMirroringTimeout.Value, SmoApplication.DefaultCulture),
-                                null != optionTerminationStatement ? optionTerminationStatement.GetTerminationScript() : ""));
-                        }
+                        query.Add(string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE {0} SET PARTNER TIMEOUT {1} {2}",
+                            this.FormatFullNameForScripting(sp),
+                            Convert.ToInt32(propMirroringTimeout.Value, SmoApplication.DefaultCulture),
+                            null != optionTerminationStatement ? optionTerminationStatement.GetTerminationScript() : ""));
                     }
                 }
-
-
             }
+
+
             if (IsSupportedProperty("HonorBrokerPriority", sp) && !isAzureDb && !targetEditionIsManagedServer)
             {
                 ScriptAlterPropBool("HonorBrokerPriority", "HONOR_BROKER_PRIORITY", sp, query);
@@ -6280,20 +6188,7 @@ SortedList list = new SortedList();
                 ScriptPageVerify(sp, query);
             }
 
-            if (sp.TargetServerVersion < SqlServerVersion.Version90)//for 8.0
-            {
-                Property propDbChaining = Properties.Get("DatabaseOwnershipChaining");
-                if (null != propDbChaining.Value &&
-                    (propDbChaining.Dirty || !sp.ForDirectExecution))
-                {
-                    query.Add(string.Format(SmoApplication.DefaultCulture,
-                        "if ( ((@@microsoftversion / power(2, 24) = 8) and (@@microsoftversion & 0xffff >= 760)) or \n\t\t(@@microsoftversion / power(2, 24) >= 9) )" +
-                        "begin \n\texec dbo.sp_dboption @dbname =  {0}, @optname = 'db chaining', @optvalue = '{1}'\n end",
-                        this.FormatFullNameForScripting(sp, false),
-                        (bool)propDbChaining.Value ? "ON" : "OFF"));
-                }
-            }
-            else if (!isAzureDb)//for 9.0
+            if (!isAzureDb)
             {
                 ScriptAlterPropBool("DatabaseOwnershipChaining", "DB_CHAINING", sp, query);
             }
@@ -6366,9 +6261,35 @@ SortedList list = new SortedList();
                 }
             }
 
-            // eg: ALTER DATABASE [MyDatabase] SET ACCELERATED_DATABASE_RECOVERY = ON (PERSISTENT_VERSION_STORE_FILEGROUP = [VersionStoreFG])
-            // The filegroup can only be changed if one disables ADR first
-            // https://docs.microsoft.com/sql/relational-databases/accelerated-database-recovery-management?view=sql-server-ver15
+            /// If at any point we attempt to run an alter command that would result in AcceleratedDatabaseRecovery (ADR)
+            /// being disabled while OptimizedLocking (OL) is enabled, we will get an error, as OL cannot be enabled without ADR.
+            /// This means that when both features get enabled, ADR must be enabled first, whereas when both features 
+            /// get disabled, OL must be disabled first.
+            /// So we check if ADR is being disabled and in that case we process OL first, otherwise we process ADR first.
+            /// Of course there are more scenarios than just enabling/disabling them both simoultaneously, but in those cases
+            /// the order is not going to make a difference. For instance, if ADR gets disabled while OL gets enabled, that will
+            /// still result in an error no matter the order, but that behavior would be expected.
+            if (IsSupportedProperty(nameof(AcceleratedRecoveryEnabled), sp)
+                && Properties.Get(nameof(AcceleratedRecoveryEnabled)).Value != null
+                && ! (bool)Properties.Get(nameof(AcceleratedRecoveryEnabled)).Value)
+            {
+                ScriptAlterOptimizedLocking(sp, query, isAzureDb, targetEditionIsManagedServer);
+                ScriptAlterAcceleratedDatabaseRecovery(sp, query, isAzureDb, targetEditionIsManagedServer);
+            } 
+            else
+            {
+                ScriptAlterAcceleratedDatabaseRecovery(sp, query, isAzureDb, targetEditionIsManagedServer);
+                ScriptAlterOptimizedLocking(sp, query, isAzureDb, targetEditionIsManagedServer);
+            }
+
+            ScriptAlterPropBool(nameof(DataRetentionEnabled), "DATA_RETENTION", sp, query, false);
+        }
+
+        // eg: ALTER DATABASE [MyDatabase] SET ACCELERATED_DATABASE_RECOVERY = ON (PERSISTENT_VERSION_STORE_FILEGROUP = [VersionStoreFG])
+        // The filegroup can only be changed if one disables ADR first
+        // https://docs.microsoft.com/sql/relational-databases/accelerated-database-recovery-management?view=sql-server-ver15
+        private void ScriptAlterAcceleratedDatabaseRecovery(ScriptingPreferences sp, StringCollection query, bool isAzureDb, bool targetEditionIsManagedServer)
+        {
             if (IsSupportedProperty(nameof(AcceleratedRecoveryEnabled), sp) && !isAzureDb && !targetEditionIsManagedServer)
             {
                 var propAdr = Properties.Get(nameof(AcceleratedRecoveryEnabled));
@@ -6393,14 +6314,15 @@ SortedList list = new SortedList();
                         useEqualityOperator: true);
                 }
             }
+        }
 
-            // https://docs.microsoft.com/en-us/sql/relational-databases/performance/optimized-locking?view=sql-server-ver17
+        // https://docs.microsoft.com/en-us/sql/relational-databases/performance/optimized-locking?view=sql-server-ver17
+        private void ScriptAlterOptimizedLocking(ScriptingPreferences sp, StringCollection query, bool isAzureDb, bool targetEditionIsManagedServer)
+        {
             if (IsSupportedProperty(nameof(OptimizedLockingOn), sp) && !isAzureDb && !targetEditionIsManagedServer)
             {
                 ScriptAlterPropBool(nameof(OptimizedLockingOn), "OPTIMIZED_LOCKING", sp, query, true);
             }
-
-            ScriptAlterPropBool(nameof(DataRetentionEnabled), "DATA_RETENTION", sp, query, false);
         }
 
         private void ScriptAlterFileStreamProp(ScriptingPreferences sp,StringCollection query )
@@ -6555,55 +6477,32 @@ SortedList list = new SortedList();
         {
             if (IsSupportedProperty("PageVerify", sp))
             {
-                if (sp.TargetServerVersion < SqlServerVersion.Version90) //for 8.0
+                Property prop = Properties.Get("PageVerify");
+                if (null == prop.Value || !(prop.Dirty || !sp.ForDirectExecution))
                 {
-                    string dbName = this.FormatFullNameForScripting(sp, false);
-                    switch (GetPageVerify(sp))
-                    {
-                        case PageVerify.TornPageDetection:
-                            ScriptAlterPropBool("PageVerify", "TORN_PAGE_DETECTION", sp, queries, "ON");
-                            break;
-                        case PageVerify.None:
-                            ScriptAlterPropBool("PageVerify", "TORN_PAGE_DETECTION", sp, queries, "OFF");
-                            break;
-                        default:
-                            //throw if for direct execution, ignore if for scripting
-                            if (sp.ScriptForCreateDrop)
-                            {
-                                throw new WrongPropertyValueException(Properties.Get("PageVerify"));
-                            }
-                            break;
-                    }
+                    return;
                 }
-                else //for 9.0
+                string valPageVerify = string.Empty;
+                switch (GetPageVerify(sp))
                 {
-                    Property prop = Properties.Get("PageVerify");
-                    if (null == prop.Value || !(prop.Dirty || !sp.ForDirectExecution))
-                    {
-                        return;
-                    }
-                    string valPageVerify = string.Empty;
-                    switch (GetPageVerify(sp))
-                    {
-                        case PageVerify.TornPageDetection:
-                            valPageVerify = "TORN_PAGE_DETECTION ";
-                            break;
-                        case PageVerify.Checksum:
-                            valPageVerify = "CHECKSUM ";
-                            break;
-                        case PageVerify.None:
-                            valPageVerify = "NONE ";
-                            break;
-                        default:
-                            //throw if for direct execution, ignore if for scripting
-                            if (sp.ScriptForCreateDrop)
-                            {
-                                throw new WrongPropertyValueException(prop);
-                            }
-                            break;
-                    }
-                    ScriptAlterPropBool("PageVerify", "PAGE_VERIFY", sp, queries, valPageVerify);
+                    case PageVerify.TornPageDetection:
+                        valPageVerify = "TORN_PAGE_DETECTION ";
+                        break;
+                    case PageVerify.Checksum:
+                        valPageVerify = "CHECKSUM ";
+                        break;
+                    case PageVerify.None:
+                        valPageVerify = "NONE ";
+                        break;
+                    default:
+                        //throw if for direct execution, ignore if for scripting
+                        if (sp.ScriptForCreateDrop)
+                        {
+                            throw new WrongPropertyValueException(prop);
+                        }
+                        break;
                 }
+                ScriptAlterPropBool("PageVerify", "PAGE_VERIFY", sp, queries, valPageVerify);
             }
         }
 
@@ -6797,7 +6696,7 @@ SortedList list = new SortedList();
             }
             catch (Exception e)
             {
-                Diagnostics.TraceHelper.Trace("Database SMO Object", "Unable to query sys.fn_hadr_is_primary_replica. {0} {1}", e.Message, e.InnerException?.Message ?? "");
+                SmoEventSource.Log.HadrQueryFailure(e.Message, e.InnerException?.Message ?? "");
             }
             // If the query fails for some reason fall back to the old behavior
             var primaryReplicaServerName = ag.PrimaryReplicaServerName;
@@ -6868,10 +6767,6 @@ SortedList list = new SortedList();
 
                     m_edition = (DatabaseEngineEdition)reader["RealEngineEdition"];
                 }
-#if DEBUG
-                var name = (string)reader["Name"];
-                TraceHelper.Trace("SMO", "Database: {0} Edition: {1} ", name, m_edition?.ToString() ?? "<NULL>");
-#endif
             }
             base.AddObjectPropsFromDataReader(reader, skipIfDirty, startColIdx, endColIdx);
         }

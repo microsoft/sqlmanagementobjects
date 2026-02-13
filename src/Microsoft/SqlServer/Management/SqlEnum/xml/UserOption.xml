@@ -1,13 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="UserOption" impl_type="UserOption" min_major='7' cloud_min_major='12'>
+<?xml version="1.0" ?>
+<EnumObject type="UserOption" impl_type="UserOption" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
-        <version min_major='7' max_major='8'>
-            <prefix>
-                declare @UserOption int
-                select @UserOption=c.value from master.dbo.sysconfigures c, master.dbo.spt_values v where v.type = 'C  ' and not c.status is null and v.number = c.config and v.name='user options'
-            </prefix>
-        </version>
-        <version min_major='9' cloud_min_major='12'>
+        <version min_major='10' cloud_min_major='12'>
             <prefix>
         declare @UserOption int
         select @UserOption=convert(int, c.value) from sys.configurations c where c.name='user options'

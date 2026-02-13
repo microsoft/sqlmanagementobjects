@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='Endpoints' impl_type='SqlObject' min_major='9'>
+<EnumObject type='Endpoints' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
 	<settings>
 		<property_link table='sys.endpoints' alias='e'/>
 		<property_link fields='#Owner#' join='sys.server_principals AS sp'>sp.principal_id = e.principal_id</property_link>		

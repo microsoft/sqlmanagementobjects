@@ -249,21 +249,13 @@ namespace Microsoft.SqlServer.Management.Smo
             string fullName = string.Format(SmoApplication.DefaultCulture, "[{0}].[{1}]", SqlBraket(oldSchema), SqlBraket(Name));
             queries.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(GetDBName())));
 
-            if (ServerVersion.Major < 9)
+            if (this is UserDefinedType)
             {
-                queries.Add(string.Format(SmoApplication.DefaultCulture, "EXEC sp_changeobjectowner @objname=N'{0}', @newowner=N'{1}'",
-                    SqlString(fullName), SqlString(newSchema)));
+                queries.Add(string.Format(SmoApplication.DefaultCulture, "ALTER SCHEMA {0} TRANSFER TYPE :: {1}", MakeSqlBraket(newSchema), fullName));
             }
-            else //version >= 9
+            else
             {
-                if (this is UserDefinedType)
-                {
-                    queries.Add(string.Format(SmoApplication.DefaultCulture, "ALTER SCHEMA {0} TRANSFER TYPE :: {1}", MakeSqlBraket(newSchema), fullName));
-                }
-                else
-                {
-                    queries.Add(string.Format(SmoApplication.DefaultCulture, "ALTER SCHEMA {0} TRANSFER {1}", MakeSqlBraket(newSchema), fullName));
-                }
+                queries.Add(string.Format(SmoApplication.DefaultCulture, "ALTER SCHEMA {0} TRANSFER {1}", MakeSqlBraket(newSchema), fullName));
             }
             return queries;
         }

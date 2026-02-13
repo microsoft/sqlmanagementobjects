@@ -1,8 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Linq;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using System.Data;
@@ -1305,7 +1306,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             //Not supported for version less than 9 
 
-            Diagnostics.TraceHelper.Assert(first != null && second != null);
+            Debug.Assert(first != null && second != null);
             stopAtLsn = 0m;
             errMsg = null;
             errSource = null;

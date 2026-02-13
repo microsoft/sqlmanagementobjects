@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="UserDefinedAggregate" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+<EnumObject type="UserDefinedAggregate" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table="sys.objects AS obj">obj.type=N'AF'</property_link>
 		<property_link fields='#ClassName#AssemblyName#' table="sys.assembly_modules AS am">am.object_id = obj.object_id</property_link>
@@ -10,7 +10,7 @@
 	<properties>
         <include file='inc_object.xml' alias='obj' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#'/>
         <include file='inc_type.xml' alias='ret_param' />
-    <version min_major='9' cloud_min_major='12'>
+    <version min_major='10' cloud_min_major='12'>
         <property name="AssemblyName" type="sysname">asmbl.name</property>
         <property name="ClassName" type="sysname">am.assembly_class</property>
     </version>

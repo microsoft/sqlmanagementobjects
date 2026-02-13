@@ -1,9 +1,10 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 using System.Data;
 using System.Linq;
@@ -597,7 +598,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 jsonIndex.Add(index);
                                 break;
                             default:
-                                Diagnostics.TraceHelper.Assert(false, "Invalid IndexType");
+                                Debug.Assert(false, "Invalid IndexType");
                                 break;
                         }
                     }
@@ -718,7 +719,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 foreach (ForeignKey item in foreignKeyList)
                 {
-                    Diagnostics.TraceHelper.Assert(item.Urn.Parent.Equals(table.Urn), "invalid call");
+                    Debug.Assert(item.Urn.Parent.Equals(table.Urn), "invalid call");
                     table.AddToEmbeddedForeignKeyChecksList(item);
                 }
             }
@@ -728,7 +729,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 foreach (Check item in checkContraintsList)
                 {
-                    Diagnostics.TraceHelper.Assert(item.Urn.Parent.Equals(table.Urn), "invalid call");
+                    Debug.Assert(item.Urn.Parent.Equals(table.Urn), "invalid call");
                     table.AddToEmbeddedForeignKeyChecksList(item);
                 }
             }
@@ -738,7 +739,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 foreach (DefaultConstraint item in defaultContraintsList)
                 {
-                    Diagnostics.TraceHelper.Assert(item.Urn.Parent.Parent.Equals(table.Urn), "invalid call");
+                    Debug.Assert(item.Urn.Parent.Parent.Equals(table.Urn), "invalid call");
                     item.forceEmbedDefaultConstraint = true;
                 }
             }
@@ -1130,8 +1131,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void OrderAndStoreSchemaBoundInSingleDatabase(List<Urn> list, string query)
         {
-            Diagnostics.TraceHelper.Assert(list.Count > 0);
-            Diagnostics.TraceHelper.Assert(this.urnTypeDictionary.ContainsKey(new UrnTypeKey(SmoDependencyOrderer.TABLEVIEWUDF)));
+            Debug.Assert(list.Count > 0);
+            Debug.Assert(this.urnTypeDictionary.ContainsKey(new UrnTypeKey(SmoDependencyOrderer.TABLEVIEWUDF)));
 
             List<Urn> objectList = this.urnTypeDictionary[new UrnTypeKey(SmoDependencyOrderer.TABLEVIEWUDF)];
 

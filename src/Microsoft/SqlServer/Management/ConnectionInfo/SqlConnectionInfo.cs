@@ -71,7 +71,14 @@ namespace Microsoft.SqlServer.Management.Common
             /// sequentially to acquire an access token. This method does not fallback to the
             /// Active Directory Interactive authentication method.
             /// </summary>
-            ActiveDirectoryDefault = 9
+            ActiveDirectoryDefault = 9,
+            /// <summary>
+            ///     The authentication method uses Active Directory Workload Identity. Use a federated
+            ///     User Assigned Managed Identity to connect to SQL Database from Azure client environments
+            ///     that have enabled support for Workload Identity. The 'User Id' or 'UID' is required
+            ///    to be set to the "client ID" of the user identity.
+            /// </summary>
+            ActiveDirectoryWorkloadIdentity = 10
         }
 
         private StringBuilder m_sbApplicationName = null;

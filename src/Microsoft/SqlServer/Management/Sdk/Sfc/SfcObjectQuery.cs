@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
@@ -171,11 +172,11 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
             // Any connection sent into OQ must be a SfcConnection-derived one
             ISfcHasConnection hasConn = domain as ISfcHasConnection;
-            TraceHelper.Assert(null != hasConn);
+            Debug.Assert(null != hasConn);
 
             // The connection can be null if we are Offline (disconnected)
             this.domainConn = hasConn.GetConnection();
-            TraceHelper.Assert(null != domainConn || this.domain.ConnectionContext.Mode == SfcConnectionContextMode.Offline);
+            Debug.Assert(null != domainConn || this.domain.ConnectionContext.Mode == SfcConnectionContextMode.Offline);
         }
 
         // Validate the query string.

@@ -15,6 +15,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo.Internal;
 using System.IO;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using System.Diagnostics;
 
 
 namespace Microsoft.SqlServer.Management.Smo
@@ -479,7 +480,7 @@ END", SqlStatement.ToString());
 #endif
         protected void GetDevicesScript(StringBuilder query, BackupDeviceList devices, ServerVersion targetVersion)
         {
-            Sdk.Sfc.TraceHelper.Assert(null != devices);
+            Debug.Assert(null != devices);
             string format = string.Empty;
             bool isIdentifier = false;
             bool first = true;
@@ -539,7 +540,7 @@ END", SqlStatement.ToString());
                     first = false;
                 }
 
-                Sdk.Sfc.TraceHelper.Assert(null != bd.Name);
+                Debug.Assert(null != bd.Name);
                 query.AppendFormat(SmoApplication.DefaultCulture, format,
                             isIdentifier ? SqlSmoObject.SqlBraket(bd.Name) : SqlSmoObject.SqlString(bd.Name));
 
@@ -1296,8 +1297,8 @@ END", SqlStatement.ToString());
 
         internal static void CheckType(object obj, string operation, object thisptr)
         {
-            Sdk.Sfc.TraceHelper.Assert(null != operation && operation.Length > 0);
-            Sdk.Sfc.TraceHelper.Assert(null != thisptr);
+            Debug.Assert(null != operation && operation.Length > 0);
+            Debug.Assert(null != thisptr);
             if (null == obj)
                 throw new FailedOperationException(operation, thisptr, new ArgumentNullException());
 

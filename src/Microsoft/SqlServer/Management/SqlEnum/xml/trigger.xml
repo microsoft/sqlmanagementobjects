@@ -1,12 +1,9 @@
-<EnumObject type="Trigger" impl_type="SqlObject" min_major='7'  cloud_min_major='10'>
+<EnumObject type="Trigger" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="ParentID" />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table='dbo.sysobjects AS tr'>tr.type = &lt;msparam&gt;TR&lt;/msparam&gt;</property_link>
-		</version>
-		<version min_major='9'  cloud_min_major='10'>
+		<version min_major='10'  cloud_min_major='10'>
 			<property_link table='sys.objects AS tr'>tr.type in (&lt;msparam&gt;TR&lt;/msparam&gt;, &lt;msparam&gt;TA&lt;/msparam&gt;)</property_link>
 			<property_link table='sys.triggers AS trr'
 				fields='#IsEnabled#InsteadOf#NotForReplication#'>trr.object_id = tr.object_id</property_link>
@@ -14,8 +11,8 @@
 			<property_link fields='#Update#UpdateOrder#' left_join='sys.trigger_events AS teu'>teu.object_id = tr.object_id and teu.type=&lt;msparam&gt;2&lt;/msparam&gt;</property_link>
 			<property_link fields='#Delete#DeleteOrder#' left_join='sys.trigger_events AS ted'>ted.object_id = tr.object_id and ted.type=&lt;msparam&gt;3&lt;/msparam&gt;</property_link>
 		</version>
-		<version min_major='9'>
-		  <property_link fileds='#ClassName#MethodName#AssemblyName#'
+		<version min_major='10'>
+		  <property_link fields='#ClassName#MethodName#AssemblyName#'
 								left_join='sys.assembly_modules AS mod'>mod.object_id = tr.object_id</property_link>
 		  <property_link fields='#AssemblyName#'
 								left_join='sys.assemblies AS asmbl'>asmbl.assembly_id = mod.assembly_id</property_link>
@@ -30,29 +27,8 @@
         <include file='inc_system_object.xml' alias='tr' for="#IsSystemObject#" />
 		<include file='mixed_module_link.xml' alias='tr' 
 			for='#ExecutionContextPrincipal#ExecutionContext#MethodName#ClassName#AssemblyName#AnsiNullsStatus#QuotedIdentifierStatus#Text#BodyStartIndex#IsEncrypted#' />
-    <version min_major='7' max_major='8'>
-			<property name="IsEnabled" type="bit" cast='true' mode="design">1-OBJECTPROPERTY(tr.id,N'ExecIsTriggerDisabled')</property>
-			<property name="InsteadOf" type="bit" cast='true' mode="design">OBJECTPROPERTY(tr.id, N'ExecIsInsteadOfTrigger')</property>
-			<property name="Insert" type="bit" cast='true' mode="design">OBJECTPROPERTY(tr.id,N'ExecIsInsertTrigger')</property>
-			<property name="InsertOrder" type="int"
-				report_type="Agent.ActivationOrder" mode="design">CASE WHEN OBJECTPROPERTY(tr.id, N'ExecIsFirstInsertTrigger') = 1 THEN 0 WHEN OBJECTPROPERTY(tr.id, N'ExecIsLastInsertTrigger') = 1 THEN 2 ELSE 1 END</property>
-			<property name="Update" type="bit" cast='true' mode="design">OBJECTPROPERTY(tr.id,N'ExecIsUpdateTrigger')</property>
-			<property name="UpdateOrder" type="int"
-				report_type="Agent.ActivationOrder" mode="design">CASE WHEN OBJECTPROPERTY(tr.id, N'ExecIsFirstUpdateTrigger') = 1 THEN 0 WHEN OBJECTPROPERTY(tr.id, N'ExecIsLastUpdateTrigger') = 1 THEN 2 ELSE 1 END</property>
-			<property name="Delete" type="bit" cast='true' mode="design">OBJECTPROPERTY(tr.id,N'ExecIsDeleteTrigger')</property>
-			<property name="DeleteOrder" type="int"
-				report_type="Agent.ActivationOrder" mode="design">CASE WHEN OBJECTPROPERTY(tr.id, N'ExecIsFirstDeleteTrigger') = 1 THEN 0 WHEN OBJECTPROPERTY(tr.id, N'ExecIsLastDeleteTrigger') = 1 THEN 2 ELSE 1 END</property>
-			<property name="NotForReplication" type="bit" cast='true' mode="deploy">OBJECTPROPERTY(tr.id,N'ExecIsTriggerNotForRepl')</property>
-			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">1</property>
-		</version>
-		
-		<!-- extended properties support-->		
-		<version min_major='8' max_major='8'>
-			<property name="ObjectTypeName" type="sysname" hidden='true'>N'TRIGGER'</property>
-			<include file ="inc_level2SupportProperties.xml"/>
-		</version>
-		
-		<version min_major='9'   cloud_min_major='10'>
+    <!-- extended properties support-->		
+		<version min_major='10'   cloud_min_major='10'>
 			<property name="IsEnabled" type="bit" mode="design">~trr.is_disabled</property>
 			<property name="InsteadOf" type="bit" mode="design">trr.is_instead_of_trigger</property>
 			<property name="Insert" type="bit" cast='true' mode="design">ISNULL(tei.object_id,0)</property>
@@ -63,7 +39,7 @@
 			<property name="DeleteOrder" type="int" report_type="Agent.ActivationOrder" mode="design">CASE WHEN ted.is_first = 1 THEN 0 WHEN ted.is_last = 1 THEN 2	ELSE 1 END</property>
 			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">CASE WHEN tr.type = N'TR' THEN 1 WHEN tr.type = N'TA' THEN 2 ELSE 1 END</property>
 		</version>
-		<version min_major='9' cloud_min_major='10'>
+		<version min_major='10' cloud_min_major='10'>
 			<property name="NotForReplication" type="bit" mode="deploy">trr.is_not_for_replication</property>
 		</version>
 		<version min_major='10'>

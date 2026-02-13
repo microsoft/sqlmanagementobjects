@@ -1,16 +1,6 @@
 <?xml version="1.0" ?>
-<EnumObject type="UserDefinedDataType" impl_type="SqlObject" min_major='7' cloud_min_major='10'>
+<EnumObject type="UserDefinedDataType" impl_type="SqlObject" min_major='10' cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link table="systypes AS st">st.xusertype != st.xtype and st.name != N'sysname'</property_link>
-			<property_link fields='#Default#DefaultSchema#' left_join="sysobjects AS def">def.id = st.tdefault</property_link>
-			<property_link fields='#Rule#RuleSchema#' left_join="sysobjects AS rul">rul.id = st.domain</property_link>
-		</version>
-		<version min_major='9' max_major='9'>
-			<property_link table="sys.types AS st">st.schema_id!=4 and st.system_type_id!=240 and st.user_type_id != st.system_type_id</property_link>
-			<property_link fields='#Default#DefaultSchema#' left_join="sys.objects AS def">def.object_id = st.default_object_id</property_link>
-			<property_link fields='#Rule#RuleSchema#' left_join="sys.objects AS rul">rul.object_id = st.rule_object_id</property_link>
-		</version>
 		<version min_major='10' cloud_min_major='10'>
 			<property_link table="sys.types AS st">st.schema_id!=4 and st.system_type_id!=240 and st.user_type_id != st.system_type_id and st.is_table_type != 1</property_link>
 			<property_link fields='#Default#DefaultSchema#' left_join="sys.objects AS def">def.object_id = st.default_object_id</property_link>
@@ -20,10 +10,7 @@
 	<properties>
 		<include file='inc_urn_schema.xml' />
 		<include file='inc_type_reference.xml' alias='st' />
-		<version min_major='7' max_major='8'>
-			<property name="ID" type="int" cast='true'>st.xusertype</property>
-		</version>
-		<version min_major='9' cloud_min_major='10'>
+		<version min_major='10' cloud_min_major='10'>
 			<property name="ID" type="int">st.user_type_id</property>
 		</version>
 		<include file='inc_type.xml' alias='st' for='#Length#NumericPrecision#NumericScale#' ro_after_creation='#Length#NumericPrecision#NumericScale#'/>
@@ -32,31 +19,7 @@
 				<link_field type='local' field="SystemType" />
 			</link_multiple>
 		</property>
-		<version min_major='7' max_major='8'>
-			<property name="MaxLength" type="smallint" access="Read">st.length</property>
-			<property name="Nullable" type="bit" read_only_after_creation="true" mode="design">st.allownulls</property>
-			<property name="VariableLength" type="bit" access="Read">st.variable</property>
-			<property name="Default" type="sysname" read_only_after_creation="true">(case when st.tdefault = 0 then N'' else def.name end)</property>
-			<property name="DefaultSchema" type="sysname" read_only_after_creation="true">(case when st.tdefault = 0 then N'' else user_name(def.uid) end)</property>
-			<property name="Rule" type="sysname" read_only_after_creation="true">(case when st.domain = 0 then N'' else rul.name end)</property>
-			<property name="RuleSchema" type="sysname" read_only_after_creation="true">(case when st.domain = 0 then N'' else user_name(rul.uid) end)</property>
-			<!-- extended properties support : commented out: sysproperties is not accessible to regular users
-			<property name="ExtPropClass" type="int" hidden='true'>1</property>
-			<property name="ExtPropMajorID" type="int" hidden='true'>0</property>
-			<property name="ExtPropMinorID" type="int" hidden='true'>st.xusertype</property>
-			-->
-			<!-- extended properties support -->
-			<property name="ObjectTypeName" type="sysname" hidden="true">N'TYPE'</property>
-			<property name="ObjectNameFromFilter" type="sysname" hidden='true'>
-				<link_multiple no='1' expression="{0}">
-					<link_field type='filter' field="Name" default_value="default"/>
-				</link_multiple>
-			</property>
-		</version>
-		<version min_major='8' max_major='8'>
-			<property name="Collation" type="sysname" access="Read">ISNULL(st.collation, N'')</property>
-		</version>
-		<version min_major='9' cloud_min_major='10'>
+		<version min_major='10' cloud_min_major='10'>
 			<property name="MaxLength" type="smallint" access="Read">st.max_length</property>
 			<property name="Nullable" type="bit" read_only_after_creation="true" mode="design">st.is_nullable</property>
 			<property name="Default" type="sysname" read_only_after_creation="true">(case when st.default_object_id = 0 then N'' else def.name end)</property>

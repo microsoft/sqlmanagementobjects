@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="PartitionSchemeFileGroup" impl_type="SqlObject" min_major='9' cloud_min_major='12'>
+<EnumObject type="PartitionSchemeFileGroup" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link join='sys.destination_data_spaces AS sdd'>
 			<link_multiple no='2' expression="sdd.partition_scheme_id = {0} and sdd.destination_id &lt;= {1}">

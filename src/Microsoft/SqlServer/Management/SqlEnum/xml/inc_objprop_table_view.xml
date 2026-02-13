@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings/>
   <properties>
-    <version min_major='8'  cloud_min_major='10'>
+    <version min_major='10'  cloud_min_major='10'>
       <property name="HasAfterTrigger" type="bit" access="Read" cast='true'>
         <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'HasAfterTrigger')">
           <link_field type='local' field="ID" />
@@ -30,7 +30,7 @@
       </property>
     </version>
         
-    <version min_major='8'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="HasIndex" type="bit" access="Read" cast='true'>
         <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'IsIndexed')">
           <link_field type='local' field="ID" />
@@ -43,7 +43,7 @@
       </property>
     </version>
      
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <!-- fragmentation info support -->
       <property name="TableNameFromFilter" type="sysname" hidden='true'>
         <link_multiple no='2' expression="quotename({1}) + N'.' + quotename({0})">

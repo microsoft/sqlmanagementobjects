@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
-<EnumObject type="Trigger" impl_type="SqlObject" min_major='9'>
+<EnumObject type="Trigger" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='master.sys.server_triggers AS tr'>tr.parent_class = 100</property_link>
-		<property_link fileds='#ClassName#MethodName#AssemblyName#ExecutionContextLogin#ExecutionContext#' 
+		<property_link fields='#ClassName#MethodName#AssemblyName#ExecutionContextLogin#ExecutionContext#' 
 						left_join='master.sys.server_assembly_modules AS mod'>mod.object_id = tr.object_id</property_link>
 		<property_link fields='#ExecutionContext#' 
 						left_join='sys.assembly_modules' alias='am2tr'>am2tr.object_id = tr.object_id</property_link>

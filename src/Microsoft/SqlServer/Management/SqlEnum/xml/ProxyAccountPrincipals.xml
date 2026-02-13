@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="ProxyAccountPrincipal " impl_type="SqlObject" min_major='9'>
+<?xml version="1.0" ?>
+<EnumObject type="ProxyAccountPrincipal " impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
-    	<version min_major='9'>
+    	<version min_major='10'>
 			<parent_link>
 				<link parent="ID" local="ParentID" />
 			</parent_link>
@@ -20,12 +20,10 @@
 	<properties>
 		<include file='inc_urn.xml' />
 		<property name="NType" type="sysname" access='Read' hidden='true'>ProxyAccountPrincipal</property>
-		<version min_major='9'>
+		<version min_major='10'>
     		<property name="Name" type="sysname">spl.name</property>
     		<property name="Flag" type="int">spl.flags</property>
             <property name="ParentID" type="int" hidden='true'>spl.proxy_id</property>
         </version>
 	</properties>
 </EnumObject>
-
-

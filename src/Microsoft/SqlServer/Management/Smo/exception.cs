@@ -1111,20 +1111,44 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (null != version)
                 {
-                    if (this.version.Major >= 9)
-                    {
-                        return ExceptionTemplates.InvalidVersionSmoOperation(LocalizableResources.ServerYukon);
-                    }
-                    else if (this.version.Major == 8)
-                    {
-                        return ExceptionTemplates.InvalidVersionSmoOperation(LocalizableResources.ServerShiloh);
-                    }
-                    else if (this.version.Major == 7)
-                    {
-                        return ExceptionTemplates.InvalidVersionSmoOperation(LocalizableResources.ServerSphinx);
-                    }
+                    string versionName = GetVersionName(this.version);
+                    return ExceptionTemplates.InvalidVersionSmoOperation(versionName);
                 }
                 return string.Empty;
+            }
+        }
+
+        private string GetVersionName(ServerVersion version)
+        {
+            switch (version.Major)
+            {
+                case 10:
+                    if (version.Minor == 0)
+                    {
+                        return LocalizableResources.ServerKatmai;
+                    }
+                    else if (version.Minor == 50)
+                    {
+                        return LocalizableResources.ServerKilimanjaro;
+                    }
+                    return version.ToString();
+                case 11:
+                    return LocalizableResources.ServerDenali;
+                case 12:
+                    return LocalizableResources.ServerSQL14;
+                case 13:
+                    return LocalizableResources.ServerSQL15;
+                case 14:
+                    return LocalizableResources.ServerSQL2017;
+                case 15:
+                    return LocalizableResources.ServerSQLv150;
+                case 16:
+                    return LocalizableResources.ServerSQLv160;
+                case 17:
+                    return LocalizableResources.ServerSQLv170;
+                default:
+                    // VBUMP
+                    return version.ToString();
             }
         }
 

@@ -6,6 +6,7 @@ namespace Microsoft.SqlServer.Management.Smo
     using System;
     using System.Collections.Specialized;
     using System.Data;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Reflection;
     using System.Runtime.InteropServices;
@@ -169,7 +170,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal DataTable GetRequestedDatabases(SqlEnumResult serParent)
         {
-            TraceHelper.Assert( true == m_bForChildren, "should only be called when this is an intermediate level");
+            Debug.Assert( true == m_bForChildren, "should only be called when this is an intermediate level");
 
             // if database name is available in the filter use it directly
             string database = this.GetFixedStringProperty(this.NameProperty, removeEscape:true);
@@ -249,7 +250,7 @@ namespace Microsoft.SqlServer.Management.Smo
         ///</summary>
         private bool IsDatabaseNameOrDerivate(string fieldName)
         {
-            TraceHelper.Assert( true == m_bForChildren, "should only be called when this is an intermediate level");
+            Debug.Assert( true == m_bForChildren, "should only be called when this is an intermediate level");
                         
             //check if it is the database name
             if( fieldName == this.NameProperty )
@@ -287,7 +288,7 @@ namespace Microsoft.SqlServer.Management.Smo
         ///</summary>
         private void CleanupFilter()
         {
-            TraceHelper.Assert( true == m_bForChildren, "should only be called when this is an intermediate level");
+            Debug.Assert( true == m_bForChildren, "should only be called when this is an intermediate level");
             
             if( ( null == this.SqlRequest.Fields || 0 == this.SqlRequest.Fields.Length || 2 > this.SqlRequest.Fields.Length )
                 && ( null == this.SqlRequest.LinkFields || 0 == this.SqlRequest.LinkFields.Count || 2 > this.SqlRequest.LinkFields.Count ) )

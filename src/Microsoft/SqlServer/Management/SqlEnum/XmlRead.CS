@@ -561,13 +561,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         switch (this.Version.Major)
                         {
-                            case 9:
-                                throw new InvalidVersionEnumeratorException(
-                                    StringSqlEnumerator.InvalidSqlServer(StringSqlEnumerator.SqlServer90Name));
-                            case 8:
-                                throw new InvalidVersionEnumeratorException(
-                                    StringSqlEnumerator.InvalidSqlServer(StringSqlEnumerator.SqlServer80Name));
-                            //version 7.0 or earlier is not supported, therefore verion number is used.
                             default:
                                 if (this.DatabaseEngineType == DatabaseEngineType.Standalone)
                                 {

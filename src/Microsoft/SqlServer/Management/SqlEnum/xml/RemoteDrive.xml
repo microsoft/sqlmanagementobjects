@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="RemoteDrive" impl_type="SqlObject" min_major='7'>
+<EnumObject type="RemoteDrive" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings main_table="#fixdrv">
 		<prefix> 
 create table #fixdrv ( Name sysname NOT NULL, Size int NOT NULL ) insert #fixdrv EXECUTE master.dbo.xp_fixeddrives 1

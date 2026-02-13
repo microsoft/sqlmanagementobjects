@@ -477,19 +477,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
                     if (minMajor > this.Version.Major || maxMajor < this.Version.Major)
                     {
-                        switch (this.Version.Major)
-                        {
-                            case 9:
-                                throw new InvalidVersionEnumeratorException(
-                                    SfcStrings.InvalidSqlServer(SfcStrings.SqlServer90Name));
-                            case 8:
-                                throw new InvalidVersionEnumeratorException(
-                                    SfcStrings.InvalidSqlServer(SfcStrings.SqlServer80Name));
-                            //version 7.0 or earlier is not supported, therefore verion number is used.
-                            default:
-                                throw new InvalidVersionEnumeratorException(
-                                    SfcStrings.InvalidVersion(this.Version.ToString()));
-                        }
+                        throw new InvalidVersionEnumeratorException(
+                            SfcStrings.InvalidVersion(this.Version.ToString()));
                     }
                 }
 

@@ -345,8 +345,8 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 throw new ArgumentNullException("right");
             }
-            Diagnostics.TraceHelper.Assert(left.ObjectReference != null, "Expect non-null left.ObjectReference");
-            Diagnostics.TraceHelper.Assert(right.ObjectReference != null, "Expect non-null right.ObjectReference");
+            Debug.Assert(left.ObjectReference != null, "Expect non-null left.ObjectReference");
+            Debug.Assert(right.ObjectReference != null, "Expect non-null right.ObjectReference");
 
             if (left.ObjectReference is SqlSmoObject && right.ObjectReference is SqlSmoObject)
             {
@@ -370,8 +370,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new ArgumentNullException("propName");
             }
 
-            Diagnostics.TraceHelper.Assert(left.ObjectReference != null, "Expect non-null left.ObjectReference");
-            Diagnostics.TraceHelper.Assert(right.ObjectReference != null, "Expect non-null right.ObjectReference");
+            Debug.Assert(left.ObjectReference != null, "Expect non-null left.ObjectReference");
+            Debug.Assert(right.ObjectReference != null, "Expect non-null right.ObjectReference");
 
             Object leftValue = left.Properties[propName];
             Object rightValue = right.Properties[propName];
@@ -393,8 +393,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private static bool CompareDataTypeWorkaround(Column leftCol, Column rightCol)
         {
-            Diagnostics.TraceHelper.Assert(leftCol != null, "Expect non-null leftCol");
-            Diagnostics.TraceHelper.Assert(rightCol != null, "Expect non-null rightCol");
+            Debug.Assert(leftCol != null, "Expect non-null leftCol");
+            Debug.Assert(rightCol != null, "Expect non-null rightCol");
 
             DataType designMode = null;
             DataType connectedMode = null;

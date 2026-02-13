@@ -89,7 +89,7 @@ namespace Microsoft.SqlServer.Management.Smo
             
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 if (sp.IncludeScripts.Header)
                 {
@@ -159,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
             bool scriptAlter = false;
-            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 //We need this if we try to alter the DEK object from the Alter method of the Database as it needs the database's context
                 if (sp.IncludeScripts.DatabaseContext)
@@ -230,7 +230,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 if (sp.IncludeScripts.Header)
                 {

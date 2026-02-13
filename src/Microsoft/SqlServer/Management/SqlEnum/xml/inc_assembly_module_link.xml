@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='9'  cloud_min_major='12'>
+<EnumObject min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='9'  cloud_min_major='12'>
+		<version min_major='10'  cloud_min_major='12'>
 			<property_link fields='#ClassName#MethodName#AssemblyName#ExecutionContext#ExecutionContextPrincipal#ReturnsNullOnNullInput#' 
 						left_join='sys.assembly_modules' alias='am{0}'>am{0}.object_id = {0}.object_id</property_link>
 			<property_link fields='#AssemblyName#' 

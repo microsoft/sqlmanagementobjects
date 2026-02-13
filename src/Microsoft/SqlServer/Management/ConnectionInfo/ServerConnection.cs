@@ -9,6 +9,7 @@ namespace Microsoft.SqlServer.Management.Common
     using System.Collections;
     using System.Data;
     using System.Diagnostics;
+    using System.Diagnostics.Tracing;
     using System.Globalization;
     using System.Reflection;
     using System.Security;
@@ -819,6 +820,8 @@ namespace Microsoft.SqlServer.Management.Common
             if (SqlExecutionModes.CaptureSql == (SqlExecutionModes.CaptureSql & this.SqlExecutionModes))
             {
                 this.CapturedSql.Add(query);
+                // Log SQL capture for debugging
+                SmoEventSource.Log.ExecutionMessage($"SQL statement captured for replay: {query})");
             }
         }
 

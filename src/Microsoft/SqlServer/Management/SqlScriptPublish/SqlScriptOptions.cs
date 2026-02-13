@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -224,7 +225,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             // VBUMP
             else
             {
-                SqlScriptPublishModelTraceHelper.Assert(false, "Unexpected server version. Setting Compatibility Mode to 17.0!");
+                Debug.Assert(false, "Unexpected server version. Setting Compatibility Mode to 17.0!");
                 compatMode = ScriptCompatibilityOptions.Script170Compat;
             }
 
@@ -847,7 +848,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     }
                     else
                     {
-                        SqlScriptPublishModelTraceHelper.Assert(this.engineType == ScriptDatabaseEngineType.SqlAzure, "Unexpected database engine type detected, expecting SQL Azure.");
+                        Debug.Assert(this.engineType == ScriptDatabaseEngineType.SqlAzure, "Unexpected database engine type detected, expecting SQL Azure.");
                         this.TargetDatabaseEngineEdition = ScriptDatabaseEngineEdition.SqlAzureDatabaseEdition;
                     }
 

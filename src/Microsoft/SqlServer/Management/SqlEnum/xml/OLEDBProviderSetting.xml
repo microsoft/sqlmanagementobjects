@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="OLEDBProvider" impl_type="SqlObject" min_major='7' >
+<?xml version="1.0" ?>
+<EnumObject type="OLEDBProvider" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table="#OLEDBProv" alias="op" />
 		<property_link fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'
@@ -8,12 +8,7 @@
 create table #OLEDBProv (id int identity(1,1), Name sysname NOT NULL, ParseName sysname NOT NULL,Description sysname NOT NULL )
 			</prefix>
 			
-		<version min_major='7' max_major='7'>
-			<prefix>
-insert #OLEDBProv (Name, ParseName,Description) EXECUTE master.dbo.xp_enum_oledb_providers
-			</prefix>
-		</version>
-		<version min_major='8' >
+		<version min_major='10' >
 			<prefix>
 insert #OLEDBProv (Name, ParseName,Description) EXECUTE master.dbo.sp_enum_oledb_providers
 			</prefix>
@@ -21,74 +16,7 @@ insert #OLEDBProv (Name, ParseName,Description) EXECUTE master.dbo.sp_enum_oledb
 		<prefix>
 			delete from #OLEDBProv where exists ( select 1 from #OLEDBProv oprov where oprov.Name = #OLEDBProv.Name and oprov.id &lt; #OLEDBProv.id )
 		</prefix>
-		<version min_major='7' max_major='8'>
-			<prefix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
-create table #oledbprop (allow_in_process bit, disallow_adhoc_access bit, dynamic_parameters bit, index_as_access_path bit,
-				level_zero_only bit, nested_queries bit, non_transacted_updates bit, sql_server_like bit, provider_name sysname null) 
-		
-declare name_cursor cursor local fast_forward
-	FOR (select Name from  #OLEDBProv)
-open name_cursor 
-DECLARE @providername sysname 
-FETCH NEXT FROM name_cursor INTO @providername 
-WHILE (@@FETCH_STATUS &lt;&gt; -1) 
-BEGIN 
-	IF (@@FETCH_STATUS &lt;&gt; -2) 
-	BEGIN 
-		SELECT @providername = RTRIM(@providername) 
-
-		declare @regpath nvarchar(255)
-		set @regpath = N'SOFTWARE\Microsoft\MSSQLServer\Providers\' + @providername
-		
-		declare @allow_in_process int
-		declare @disallow_adhoc_access int
-		declare @dynamic_parameters int
-		declare @index_as_access_path int
-		declare @level_zero_only int
-		declare @nested_queries int
-		declare @non_transacted_updates int
-		declare @sql_server_like int
-
-			</prefix>
-		</version>
-		<version min_major='7' max_major='7'>
-			<prefix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'AllowInProcess', @allow_in_process OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'DisallowAdHocAccess', @disallow_adhoc_access OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'DynamicParameters', @dynamic_parameters OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'IndexAsAccessPath', @index_as_access_path OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'LevelZeroOnly', @level_zero_only OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'NestedQueries', @nested_queries OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'NonTransactedUpdates', @non_transacted_updates OUTPUT
-		exec master.dbo.xp_regread N'HKEY_LOCAL_MACHINE', @regpath, 'SqlServerLIKE', @sql_server_like OUTPUT
-			</prefix>
-		</version>
-		<version min_major='8' max_major='8'>
-			<prefix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'AllowInProcess', @allow_in_process OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'DisallowAdHocAccess', @disallow_adhoc_access OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'DynamicParameters', @dynamic_parameters OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'IndexAsAccessPath', @index_as_access_path OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'LevelZeroOnly', @level_zero_only OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'NestedQueries', @nested_queries OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'NonTransactedUpdates', @non_transacted_updates OUTPUT
-		exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @regpath, 'SqlServerLIKE', @sql_server_like OUTPUT
-			</prefix>
-		</version>
-		<version min_major='7' max_major='8'>
-			<prefix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
-		insert #oledbprop (allow_in_process, disallow_adhoc_access, dynamic_parameters, index_as_access_path, level_zero_only, 
-			nested_queries, non_transacted_updates, sql_server_like, provider_name) 
-		select IsNull(@allow_in_process, 0), IsNull(@disallow_adhoc_access, 0), IsNull(@dynamic_parameters, 0), IsNull(@index_as_access_path, 0), IsNull(@level_zero_only, 0), 
-			IsNull(@nested_queries, 0), IsNull(@non_transacted_updates, 0), IsNull(@sql_server_like, 0), @providername
-	END 
-	FETCH NEXT FROM name_cursor INTO @providername 
-END 
-CLOSE name_cursor 
-DEALLOCATE name_cursor
-			</prefix>
-		</version>
-		<version min_major='9' >
+		<version min_major='10' >
 			<prefix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
 create table #oledbprop (allow_in_process bit, disallow_adhoc_access bit, dynamic_parameters bit, index_as_access_path bit,
 				level_zero_only bit, nested_queries bit, non_transacted_updates bit, sql_server_like bit, provider_name sysname null) 

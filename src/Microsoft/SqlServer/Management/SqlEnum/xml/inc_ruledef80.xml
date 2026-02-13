@@ -1,14 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="RuleDefault" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="RuleDefault" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link table="dbo.sysobjects obj">
-				<link_multiple no = '1' expression="obj.xtype={0} and obj.name not like N'#%%' and 0=(obj.category &amp; 0x0800)">
-					<link_field type='local' field="XType" />
-				</link_multiple>
-			</property_link>
-		</version>
-	</settings>
+		</settings>
 	<properties>
 		<include file='inc_urn_schema.xml' />
 		<include alias='obj' file='inc_object.xml' />

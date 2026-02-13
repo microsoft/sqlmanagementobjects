@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="SqlAssembly" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+<EnumObject type="SqlAssembly" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='sys.assemblies AS asmbl' />
 		<property_link fields='#Owner#' join='sys.database_principals AS princip'>princip.principal_id = asmbl.principal_id</property_link>

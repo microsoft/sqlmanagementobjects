@@ -1,21 +1,15 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='7'>
+<EnumObject min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="DefaultID" />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table='dbo.systypes AS t' />
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<property_link join='sys.types AS t'/>
 		</version>
 	</settings>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<property name="DefaultID" type="int" hidden='true'>t.tdefault</property>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<property name="DefaultID" type="int" hidden='true'>t.default_object_id</property>
 		</version>
 		<include file='inc_type_reference.xml' alias='t' />

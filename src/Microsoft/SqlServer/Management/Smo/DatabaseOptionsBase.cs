@@ -94,11 +94,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     throw new InvalidSmoOperationException("SetSnapshotIsolation", State);
                 }
 
-                if (ServerVersion.Major < 9)
-                {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-                }
-
                 this.ExecutionManager.ExecuteNonQuery(
                     string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] SET ALLOW_SNAPSHOT_ISOLATION {1}",
                     SqlBraket(this.Parent.Name), enabled ? "ON" : "OFF"));

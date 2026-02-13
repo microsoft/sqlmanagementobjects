@@ -1,35 +1,19 @@
 <?xml version="1.0" ?>
-<EnumObject type="IndexedColumn" impl_type="SqlObject" min_major='7' cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="IndexedColumn" impl_type="SqlObject" min_major='10' cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings >
     <parent_link>
       <link parent="ID" local="IndexID" />
       <link parent="ParentID" local="TableID" />
     </parent_link>
-    <version min_major='7' max_major='8'>
-      <property_link table="dbo.sysindexkeys AS ic" />
-      <property_link filed = '#Name#IsComputed#' join="dbo.syscolumns AS clmns">clmns.id = ic.id and clmns.colid = ic.colid and clmns.number = 0</property_link>
-    </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <!-- accept key, include and xml column, reject RID and partition columns -->
       <property_link table = "sys.index_columns AS ic">ic.column_id > 0 and (ic.key_ordinal > 0 or ic.partition_ordinal = 0 or ic.is_included_column != 0)</property_link>
-      <property_link filed = '#Name#IsComputed#' join="sys.columns AS clmns">clmns.object_id = ic.object_id and clmns.column_id = ic.column_id</property_link>
+      <property_link fields = '#Name#IsComputed#' join="sys.columns AS clmns">clmns.object_id = ic.object_id and clmns.column_id = ic.column_id</property_link>
     </version>		
   </settings>
   <properties>
     <include file='inc_urn.xml' />
-    <version min_major='7' max_major='8'>
-      <property name="Name" type="nvarchar" size="256" mode="design#deploy">clmns.name</property>
-      <property name="ID" type="int" access="Read" cast='true'>ic.keyno</property>
-      <property name="TableID" type="int" hidden='true'>ic.id</property>
-      <property name="IndexID" type="int" hidden='true' cast='true'>ic.indid</property>
-      <property name="IsComputed" type="bit" access="Read"
-                cast = 'true'>COLUMNPROPERTY(ic.id, clmns.name, N'IsComputed')</property>
-    </version>
-    <version min_major = '8' max_major='8'>
-      <property name="Descending" type="bit"
-                cast = 'true' mode="design#deploy">INDEXKEY_PROPERTY(ic.id, ic.indid, ic.keyno, N'IsDescending')</property>
-    </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="Name" type="sysname" mode="design#deploy">clmns.name</property>
       <property name="ID" type="int" access="Read">(case ic.key_ordinal when 0 then ic.index_column_id else ic.key_ordinal end)</property>
       <property name="TableID" type="int" hidden='true'>ic.object_id</property>
@@ -40,7 +24,7 @@
     <version min_major='15' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="ColumnStoreOrderOrdinal" type="int" cast = 'true'>ISNULL(ic.column_store_order_ordinal,0)</property>
     </version>
-    <version min_major='9' cloud_min_major='10'>
+    <version min_major='10' cloud_min_major='10'>
       <property name="IsComputed" type="bit" access="Read"
                 cast = 'true'>COLUMNPROPERTY(ic.object_id, clmns.name, N'IsComputed')</property>
     </version>

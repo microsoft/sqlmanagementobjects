@@ -1,30 +1,17 @@
 <?xml version="1.0" ?>
-<EnumObject type="StatisticColumn" impl_type="SqlObject" min_major='7' cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="StatisticColumn" impl_type="SqlObject" min_major='10' cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings >
     <parent_link>
       <link parent="ID" local="IndexID" />
       <link parent="ParentID" local="TableID" />
     </parent_link>
-    <version min_major='7' max_major='8'>
-      <property_link table="dbo.sysindexkeys c" />
-      <property_link filed = '#Name#' table="dbo.syscolumns clmns">
-        clmns.id = c.id and clmns.colid = c.colid
-      </property_link>
-    </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <property_link table = "sys.stats_columns sic"/>
     </version>
   </settings>
   <properties>
     <include file='inc_urn.xml' />
-    <version min_major='7' max_major='8'>
-      <property name="Name" type="nvarchar" size="256">clmns.name</property>
-      <property name="ID" type="int" cast='true'>c.keyno</property>
-      <property name="TableID" type="int" hidden='true'>c.id</property>
-      <property name="IndexID" type="int" hidden='true'>c.indid</property>
-      <property name="ColumnID" type="int" hidden='true'>c.colid</property>
-    </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="Name" type="sysname">COL_NAME(sic.object_id, sic.column_id)</property>
       <property name="ID" type="int">sic.stats_column_id</property>
       <property name="TableID" type="int" hidden='true'>sic.object_id</property>

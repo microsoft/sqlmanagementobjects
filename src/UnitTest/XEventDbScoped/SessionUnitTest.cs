@@ -36,6 +36,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
             Assert.IsFalse(session.TrackCausality);
             Assert.IsFalse(session.AutoStart);
             Assert.AreEqual(Session.NotStarted, session.StartTime);
+            Assert.AreEqual(Session.DefaultMaxDuration, session.MaxDuration);
 
             session = new Session(null, "ut1");
             Assert.AreEqual(-1, session.ID);
@@ -50,8 +51,26 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
             Assert.IsFalse(session.TrackCausality);
             Assert.IsFalse(session.AutoStart);
             Assert.AreEqual(Session.NotStarted, session.StartTime);
+            Assert.AreEqual(Session.DefaultMaxDuration, session.MaxDuration);
         }
 
+        /// <summary>
+        /// Tests the MaxDuration property.
+        /// </summary>
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void TestMaxDuration()
+        {
+            Session session = new Session();
+            
+            // Test default value when no parent (version checking unavailable)
+            Assert.AreEqual(Session.DefaultMaxDuration, session.MaxDuration);
+            Assert.AreEqual(Session.UnlimitedDuration, session.MaxDuration);
+
+            session.MaxDuration = 3600;
+            session.MaxDuration = 86400;
+            session.MaxDuration = Session.UnlimitedDuration;
+        }
 
         [TestMethod]
         [TestCategory("Unit")]

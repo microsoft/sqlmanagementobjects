@@ -39,7 +39,8 @@ SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineTyp
 SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
 SERVERPROPERTY('ProductVersion') AS ProductVersion,
 @@MICROSOFTVERSION AS MicrosoftVersion,
-case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer;
+case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,
+convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
 select host_platform from sys.dm_os_host_info
 if @edition = N'SQL Azure' 
   select 'TCP' as ConnectionProtocol
@@ -56,7 +57,7 @@ else
                 // Note use of a dataset that would never occur in real life
                 (DataSet ds) =>
                 {
-                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x320104d2, HostPlatformNames.Linux, "TCP", false);
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x320104d2, HostPlatformNames.Linux, "TCP", false, "SQL_Latin1_General_CP1_CI_AS");
                 });
 
             var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
@@ -66,6 +67,7 @@ else
             Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Unexpected DatabaseEngineType");
             Assert.That(si.ServerVersion.Major, Is.EqualTo(50), "Unexpected ServerVersion");
             Assert.That(si.ConnectionProtocol, Is.EqualTo(NetworkProtocol.TcpIp), "Unexpected ConnectionProtocol");
+            Assert.That(si.Collation, Is.EqualTo("SQL_Latin1_General_CP1_CI_AS"), "Unexpected Collation");
             connectMock.VerifyAll();
             commandMock.VerifyAll();
             dataAdapterMock.VerifyAll();
@@ -89,7 +91,8 @@ SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineTyp
 SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
 SERVERPROPERTY('ProductVersion') AS ProductVersion,
 @@MICROSOFTVERSION AS MicrosoftVersion,
-case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer;
+case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,
+convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
 select N'Windows' as host_platform
 if @edition = N'SQL Azure' 
   select 'TCP' as ConnectionProtocol
@@ -106,7 +109,7 @@ else
             dataAdapterMock.Setup(d => d.Fill(It.IsAny<DataSet>())).Callback(
                 (DataSet ds) =>
                 {
-                    FillTestDataSet(ds, "12.0.2000.8", DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x0A0104d2, HostPlatformNames.Windows, null, false);
+                    FillTestDataSet(ds, "12.0.2000.8", DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase, 0x0A0104d2, HostPlatformNames.Windows, null, false, "SQL_Latin1_General_CP1_CI_AS");
                 });
 
             var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, "10.01.1234");
@@ -142,7 +145,7 @@ else
                 (DataSet ds) =>
                 {
                     // Simulate Azure SQL Database returning various editions
-                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, engineEdition, 0x10000FA0, HostPlatformNames.Windows, "TCP", false);
+                    FillTestDataSet(ds, versionString, DatabaseEngineType.SqlAzureDatabase, engineEdition, 0x10000FA0, HostPlatformNames.Windows, "TCP", false, "SQL_Latin1_General_CP1_CI_AS");
                 });
 
             var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
@@ -154,7 +157,7 @@ else
         }
 
         private void FillTestDataSet(DataSet ds, string productVersion, DatabaseEngineType databaseEngineType, DatabaseEngineEdition databaseEngineEdition,
-            int microsoftVersion, string hostPlatform, string protocol, bool isFabricServer)
+            int microsoftVersion, string hostPlatform, string protocol, bool isFabricServer, string collation)
         {
             Trace.TraceInformation("Creating test DataSet");
             ds.Tables.Add("Table");
@@ -163,7 +166,8 @@ else
             ds.Tables["Table"].Columns.Add(new DataColumn("DatabaseEngineEdition", typeof(int)));
             ds.Tables["Table"].Columns.Add(new DataColumn("MicrosoftVersion", typeof(int)));
             ds.Tables["Table"].Columns.Add(new DataColumn("IsFabricServer", typeof(bool)));
-            ds.Tables["Table"].Rows.Add(productVersion, (int)databaseEngineType, (int)databaseEngineEdition, microsoftVersion, isFabricServer);
+            ds.Tables["Table"].Columns.Add(new DataColumn("Collation", typeof(string)));
+            ds.Tables["Table"].Rows.Add(productVersion, (int)databaseEngineType, (int)databaseEngineEdition, microsoftVersion, isFabricServer, collation);
             ds.Tables.Add("Table2");
             ds.Tables["Table2"].Columns.Add(new DataColumn("host_platform", typeof(string)));
             ds.Tables["Table2"].Rows.Add(hostPlatform);

@@ -230,6 +230,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(ExternalLibrary):
                         prefix = "EXTERNAL LIBRARY"; break;
 
+                    case nameof(ExternalModel):
+                        prefix = "EXTERNAL MODEL"; break;
+
                     case nameof(SqlAssembly):
                         prefix = "ASSEMBLY"; break;
 
@@ -1277,7 +1280,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // limit the request to fields composing the key if we have any
                         // if there are no fields in the key this is a singleton and
                         // it does not make sense to check for its existance
-                        Diagnostics.TraceHelper.Assert(null != key, "null == key");
+                        Debug.Assert(null != key, "null == key");
                         StringCollection keyFields = key.GetFieldNames();
                         if (keyFields.Count > 0)
                         {
@@ -1418,9 +1421,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                Trace("DesignMode Missing " +
-                        ((Properties.Get(propname).Expensive) ? "expensive" : "regular") +
-                        " property " + propname + " for type " + this.GetType().Name);
+                SmoEventSource.Log.PropertyMissing(
+                    Properties.Get(propname).Expensive,
+                    true,
+                    propname,
+                    GetType().Name,
+                    "DesignMode");
             }
 
             return base.GetPropertyDefaultValue(propname);
@@ -1453,20 +1459,26 @@ namespace Microsoft.SqlServer.Management.Smo
                 switch (this.State)
                 {
                     case SqlSmoState.Pending:
-                        Diagnostics.TraceHelper.Assert(false); // can't happen through user code, intercepted earlier
+                        Debug.Assert(false); // can't happen through user code, intercepted earlier
                         break;
                     case SqlSmoState.Creating:
                         throw new PropertyNotSetException(propname);
                 }
             }
 
-            System.Diagnostics.Trace.TraceWarning("Missing " +
-                ((Properties.Get(propname).Expensive) ? "expensive" : "regular") +
-                " property " + propname + " property bag state " + propertyBagState +
-                " for type " + this.GetType().Name);
             var missingPropertyArgs = new PropertyMissingEventArgs(propname, this.GetType().Name);
             //treat first the expensive properties
             Property prop = Properties.Get(propname);
+
+            if (SmoEventSource.Log.IsEnabled())
+            {
+                SmoEventSource.Log.PropertyMissing(
+                    prop.Expensive,
+                    false,
+                    propname,
+                    GetType().Name,
+                    propertyBagState.ToString());
+            }
             if (prop.Expensive)
             {
                 String[] fields = new String[1];
@@ -1667,14 +1679,12 @@ namespace Microsoft.SqlServer.Management.Smo
             // retrieve the data into the property collection
             // This query should return just one row !
             System.Data.IDataReader reader = this.ExecutionManager.GetEnumeratorDataReader(req);
-            Diagnostics.TraceHelper.Assert(null != reader, "reader == null");
+            Debug.Assert(null != reader, "reader == null");
 
             // if the table has no rows this means that initialization of the object has failed
             if (!reader.Read())
             {
                 reader.Close();
-                System.Diagnostics.Trace.TraceWarning("Failed to Initialize urn " + urn);
-                //throw new FailedOperationException(ExceptionTemplates.FailedtoInitialize(urn));
                 return null; // this seems to be "normal", so why throw?
             }
 
@@ -1763,16 +1773,16 @@ namespace Microsoft.SqlServer.Management.Smo
             int startColIdx, int endColIdx)
         {
             var schemaTable = reader.GetSchemaTable();
-            Diagnostics.TraceHelper.Assert(null != schemaTable, "reader.GetSchemaTable()==null");
-            Diagnostics.TraceHelper.Assert(schemaTable.Rows.Count == reader.FieldCount, "schemaTable.Rows.Count != reader.FieldCount");
+            Debug.Assert(null != schemaTable, "reader.GetSchemaTable()==null");
+            Debug.Assert(schemaTable.Rows.Count == reader.FieldCount, "schemaTable.Rows.Count != reader.FieldCount");
 
             int colNameIdx = schemaTable.Columns.IndexOf("ColumnName");
-            Diagnostics.TraceHelper.Assert(colNameIdx > -1, "IndexOf(\"ColumnName\")==-1");
+            Debug.Assert(colNameIdx > -1, "IndexOf(\"ColumnName\")==-1");
 
             for (int i = startColIdx; i < (endColIdx >= 0 ? endColIdx : schemaTable.Rows.Count); i++)
             {
                 string columnName = schemaTable.Rows[i][colNameIdx] as string;
-                Diagnostics.TraceHelper.Assert(null != columnName, "schemaTable.Rows[i][\"ColumnName\"]==null");
+                Debug.Assert(null != columnName, "schemaTable.Rows[i][\"ColumnName\"]==null");
 
                 object colValue = reader.GetValue(i);
 
@@ -2176,13 +2186,6 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             return null;
-        }
-
-
-        // tracing stuff
-        internal protected static void Trace(string traceText)
-        {
-            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "{0}", traceText);
         }
 
 
@@ -2684,13 +2687,13 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (null == objIdent)
                 {
-                    Diagnostics.TraceHelper.Assert(null == columnName, "null == columnName");
+                    Debug.Assert(null == columnName, "null == columnName");
                     objIdent = new PermissionInfo.ObjIdent(perm.ObjectClass);
                     if (kind == PermissionWorker.PermissionEnumKind.Column)
                     {
                         // in the case of columns we need to set the info
                         // of the parent
-                        Diagnostics.TraceHelper.Assert(this is Column, "this is Column");
+                        Debug.Assert(this is Column, "this is Column");
                         objIdent.SetData(((Column)this).Parent);
                         columnName = ((Column)this).Name;
                     }
@@ -3024,7 +3027,7 @@ namespace Microsoft.SqlServer.Management.Smo
             get
             {
                 InitializeStringComparer();
-                Diagnostics.TraceHelper.Assert(m_comparer != null);
+                Debug.Assert(m_comparer != null);
                 return m_comparer;
             }
         }
@@ -3106,8 +3109,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
         // The collation value used for in-database comparisons depends on a combination of 3 properties:
         // ContainmentType, CatalogCollation, and Collation. This method fetches the subset of those 3 properties
-        // that is valid for the current database in one fetch at most, avoiding a full Database object fetch
-        // Only valid if this object is of type Database
+        // that is valid for the current database in one fetch at most, avoiding a full Database object fetch.
+        // If the current object is the Database, we can write those fetched properties to it to avoid another fetch.
+        // This code could handle some further refactoring, as only Database objects support CatalogCollation and ContainmentType properties, and a Server's
+        // Collation property comes from a ServerProperty query not from the master database Collation, but that level of rewrite is risky.
         private string GetCollationRelatedProperties(string dbName, out ContainmentType containmentType, out CatalogCollationType catalogCollation)
         {
             var propertiesToFetch = new List<string>();
@@ -3115,34 +3120,46 @@ namespace Microsoft.SqlServer.Management.Smo
             CatalogCollationType localCatalogCollationType = CatalogCollationType.DatabaseDefault;
             string collation = null;
 
-            if (!TryGetProperty("ContainmentType", ref localContainmentType))
+            Debug.Assert(!(this is Database database) || string.Compare(dbName, database.Name, StringComparison.OrdinalIgnoreCase) == 0,
+                "dbName parameter should match Database.Name property when called from Database object");
+            if (!(this is Database) || State != SqlSmoState.Creating)
             {
-                if (dbName != "master" && dbName != "msdb" && IsSupportedProperty("ContainmentType"))
+                if (!TryGetProperty("ContainmentType", ref localContainmentType))
                 {
-                    propertiesToFetch.Add("ContainmentType");
+                    if (dbName != "master" && dbName != "msdb" && IsSupportedProperty("ContainmentType"))
+                    {
+                        propertiesToFetch.Add("ContainmentType");
+                    }
+                }
+
+                if (!TryGetProperty("CatalogCollation", ref localCatalogCollationType) && IsSupportedProperty(nameof(Database.CatalogCollation)))
+                {
+                    if (DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
+                        string.Compare(dbName, "master", StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        localCatalogCollationType = CatalogCollationType.SQLLatin1GeneralCP1CIAS;
+                    }
+                    else
+                    {
+                        propertiesToFetch.Add("CatalogCollation");
+                    }
+                }
+
+                if (!TryGetProperty("Collation", ref collation))
+                {
+                    // Azure SQL database masters are fixed around the world to the same collation
+                    if (DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
+                        string.Compare(dbName, "master", StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        collation = "SQL_Latin1_General_CP1_CI_AS";
+                    }
+                    else
+                    {
+                        propertiesToFetch.Add("Collation");
+                    }
                 }
             }
-
-            if (!TryGetProperty("CatalogCollation", ref localCatalogCollationType) && IsSupportedProperty("CatalogCollation"))
-            {
-                propertiesToFetch.Add("CatalogCollation");
-            }
-
-            if (!TryGetProperty("Collation", ref collation))
-            {
-                // Azure SQL database masters are fixed around the world to the same collation
-                if (this.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
-                    string.Compare(dbName, "master", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    collation = "SQL_Latin1_General_CP1_CI_AS";
-                }
-                else
-                {
-                    propertiesToFetch.Add("Collation");
-                }
-            }
-
-            if (propertiesToFetch.Any())
+            if (propertiesToFetch.Count > 0)
             {
                 // Use an SFC request to fetch needed properties
                 var request = new Request(string.Format(SmoApplication.DefaultCulture,
@@ -3150,33 +3167,50 @@ namespace Microsoft.SqlServer.Management.Smo
                         Urn.EscapeString(dbName)),
                     propertiesToFetch.ToArray());
 
-                // handles the cloud DB case too (using Server's Execution Manager)
-                var dataTable = this.GetServerObject().ExecutionManager.GetEnumeratorData(request);
+                var dataTable = ExecutionManager.GetEnumeratorData(request);
 
                 if (dataTable.Rows.Count > 0)
                 {
-                    if (dataTable.Columns.Contains("Collation") && dataTable.Rows[0]["Collation"] != DBNull.Value)
+                    if (dataTable.Columns.Contains(nameof(Database.Collation)) && dataTable.Rows[0][nameof(Database.Collation)] != DBNull.Value)
                     {
-                        collation = (string) dataTable.Rows[0]["Collation"];
+                        collation = (string)dataTable.Rows[0][nameof(Database.Collation)];
+                        if (this is Database)
+                        {
+                            var pid = Properties.LookupID(nameof(Database.Collation), PropertyAccessPurpose.Read);
+                            Properties.SetValue(pid, collation);
+                            Properties.SetRetrieved(pid, true);
+                        }
                     }
 
-                    if (dataTable.Columns.Contains("CatalogCollation") &&
-                        dataTable.Rows[0]["CatalogCollation"] != DBNull.Value)
+                    if (dataTable.Columns.Contains(nameof(Database.CatalogCollation)) &&
+                        dataTable.Rows[0][nameof(Database.CatalogCollation)] != DBNull.Value)
                     {
-                        localCatalogCollationType = (CatalogCollationType) dataTable.Rows[0]["CatalogCollation"];
+                        localCatalogCollationType = (CatalogCollationType)dataTable.Rows[0][nameof(Database.CatalogCollation)];
+                        if (this is Database)
+                        {
+                            var pid = Properties.LookupID(nameof(Database.CatalogCollation), PropertyAccessPurpose.Read);
+                            Properties.SetValue(pid, localCatalogCollationType);
+                            Properties.SetRetrieved(pid, true);
+                        }
                     }
 
-                    if (dataTable.Columns.Contains("ContainmentType") &&
-                        dataTable.Rows[0]["ContainmentType"] != DBNull.Value)
+                    if (dataTable.Columns.Contains(nameof(Database.ContainmentType)) &&
+                        dataTable.Rows[0][nameof(Database.ContainmentType)] != DBNull.Value)
                     {
-                        localContainmentType = (ContainmentType) dataTable.Rows[0]["ContainmentType"];
+                        localContainmentType = (ContainmentType)dataTable.Rows[0][nameof(Database.ContainmentType)];
+                        if (this is Database)
+                        {
+                            var pid = Properties.LookupID(nameof(Database.ContainmentType), PropertyAccessPurpose.Read);
+                            Properties.SetValue(pid, localContainmentType);
+                            Properties.SetRetrieved(pid, true);
+                        }
                     }
                 }
             }
 
             catalogCollation = localCatalogCollationType;
             containmentType = localContainmentType;
-            return collation ?? String.Empty;
+            return collation ?? string.Empty;
         }
 
         internal protected virtual string CollationDatabaseInServer => "master";
@@ -3214,7 +3248,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //Couldn't get the collation from the database
                 //so fall back to the server's
                 dbcoll = this.GetServerObject().Collation;
-                Trace(string.Format(
+                SmoEventSource.Log.GeneralMessage(string.Format(
                     "Got null/empty DB Collation for DB {0}, falling back to using server collation {1}", dbName,
                     dbcoll));
             }
@@ -3405,7 +3439,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     ExecutionManager.GetDatabaseEngineEdition(),
                     hostPlatform: server == null ? HostPlatformNames.Windows : server.HostPlatform,
                     connectionProtocol: ExecutionManager.GetConnectionProtocol(),
-                    isFabricServer: ExecutionManager.IsFabricConnection);
+                    isFabricServer: ExecutionManager.IsFabricConnection,
+                    collation: ExecutionManager.ConnectionContext.Collation);
             }
         }
 
@@ -3468,7 +3503,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         internal static String MakeSqlStringForInsert(String s)
         {
-            Diagnostics.TraceHelper.Assert(s != null);
+            Debug.Assert(s != null);
             return MakeSqlString(s).Replace("\\" + System.Environment.NewLine,
                 "\\\' + N'" + System.Environment.NewLine);
         }
@@ -4014,7 +4049,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     currType = GetChildType(parsedUrn[reverseIdx].Name,
                         (reverseIdx > 0) ? parsedUrn[reverseIdx - 1].Name : this.GetType().Name);
-                    Diagnostics.TraceHelper.Assert(null != currType, "currType == null");
+                    Debug.Assert(null != currType, "currType == null");
 
                     if (null == parentType)
                     {
@@ -4574,7 +4609,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     currType = GetChildType(parsedUrn[reverseIdx].Name,
                         (reverseIdx > 0) ? parsedUrn[reverseIdx - 1].Name : this.GetType().Name);
-                    Diagnostics.TraceHelper.Assert(null != currType, "currType == null");
+                    Debug.Assert(null != currType, "currType == null");
 
                     if (null == parentType)
                     {
@@ -5579,8 +5614,8 @@ namespace Microsoft.SqlServer.Management.Smo
             int startLeafIdx)
         {
             // verify that we have received a valid parent row
-            Diagnostics.TraceHelper.Assert(null != parentRow, "parentRow == null");
-            Diagnostics.TraceHelper.Assert(parentRow.Length == reader.FieldCount,
+            Debug.Assert(null != parentRow, "parentRow == null");
+            Debug.Assert(parentRow.Length == reader.FieldCount,
                             "parentRow.Length != reader.FieldCount");
 
             // if we are on the last level of the Urn, the eat the current row
@@ -5723,7 +5758,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    Diagnostics.TraceHelper.Assert(false, "currentRow.GetOrdinal(" + idRowName + ") failed");
+                    Debug.Assert(false, "currentRow.GetOrdinal(" + idRowName + ") failed");
                 }
                 Int32 rowObjectID = Convert.ToInt32(currentRow.GetValue(idRowIdx), SmoApplication.DefaultCulture);
                 return (objectID - rowObjectID);
@@ -5744,15 +5779,15 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private bool CompareRows(System.Data.IDataReader reader, object[] parentRow, int columnStartIdx, int columnStopIdx)
         {
-            Diagnostics.TraceHelper.Assert(null != reader, "reader == null");
+            Debug.Assert(null != reader, "reader == null");
             if (reader.IsClosed)
             {
                 return false;
             }
 
-            Diagnostics.TraceHelper.Assert(null != parentRow, "parentRow == null");
-            Diagnostics.TraceHelper.Assert(columnStartIdx >= 0, "columnStartIdx < 0");
-            Diagnostics.TraceHelper.Assert(columnStopIdx < reader.FieldCount, "columnStopIdx >= reader.FieldCount");
+            Debug.Assert(null != parentRow, "parentRow == null");
+            Debug.Assert(columnStartIdx >= 0, "columnStartIdx < 0");
+            Debug.Assert(columnStopIdx < reader.FieldCount, "columnStopIdx >= reader.FieldCount");
 
 
             for (int i = columnStartIdx; i < columnStopIdx; i++)
@@ -6162,7 +6197,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 //if it is not the Server it must have a parent
                 // And Server should override this method to return proper ExecutionManager
-                Diagnostics.TraceHelper.Assert(null != parent, "parent == null");
+                Debug.Assert(null != parent, "parent == null");
 
                 return parent.ExecutionManager;
             }
@@ -6194,14 +6229,13 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Throws an exception if the ServerVersion major version for this object is below 9.0 (SQL 2005)
+        /// This method previously threw an exception if the ServerVersion major version was below 9.0 (SQL 2005).
+        /// Since the minimum supported version is now SQL Server 2008 (version 10), this check is no longer needed.
+        /// The method is retained for API compatibility but no longer throws exceptions.
         /// </summary>
         protected void ThrowIfBelowVersion90(string exceptionMessage = null)
         {
-            if (ServerVersion.Major < 9)
-            {
-                throw new UnsupportedVersionException(string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.SupportedOnlyOn90 : exceptionMessage).SetHelpContext("SupportedOnlyOn90");
-            }
+            // No-op: Minimum supported version is SQL Server 2008 (version 10), which is >= 9.0
         }
 
         /// <summary>
@@ -6234,10 +6268,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         protected void ThrowIfBelowVersion100(string exceptionMessage = null)
         {
-            if (ServerVersion.Major < 10)
-            {
-                throw new UnsupportedVersionException(string.IsNullOrEmpty(exceptionMessage) ? ExceptionTemplates.SupportedOnlyOn100 : exceptionMessage).SetHelpContext("SupportedOnlyOn100");
-            }
+            // Minimum supported version is now SQL Server 2008 (10.0), so this check is no longer needed
         }
 
         /// <summary>
@@ -6461,8 +6492,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return false;
             }
             Server svr = this.GetServerObject();
-            return (svr.Information.ServerVersion.Major >= 9 &&
-                    svr.Information.Edition.StartsWith("Express Edition", StringComparison.OrdinalIgnoreCase));
+            return svr.Information.Edition.StartsWith("Express Edition", StringComparison.OrdinalIgnoreCase);
         }
 
        /// <summary>
@@ -6696,10 +6726,10 @@ namespace Microsoft.SqlServer.Management.Smo
         internal CompatibilityLevel GetCompatibilityLevel()
         {
             Server srv = GetServerObject();
-            Diagnostics.TraceHelper.Assert(null != srv, "srv == null");
+            Debug.Assert(null != srv, "srv == null");
 
             string dbName = GetDBName();
-            Diagnostics.TraceHelper.Assert(null != dbName, "dbName == null");
+            Debug.Assert(null != dbName, "dbName == null");
 
             if (dbName.Length != 0)
             {
@@ -6729,10 +6759,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             switch (ver.Major)
             {
-                case 8:
-                    return CompatibilityLevel.Version80;
-                case 9:
-                    return CompatibilityLevel.Version90;
                 case 10:
                     return CompatibilityLevel.Version100;
                 case 11:
@@ -6839,12 +6865,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             switch (srv.ServerVersion.Major)
             {
-                case 7:
-                    return LocalizableResources.ServerSphinx;
-                case 8:
-                    return LocalizableResources.ServerShiloh;
-                case 9:
-                    return LocalizableResources.ServerYukon;
                 case 10:
                     if (srv.ServerVersion.Minor == 0)
                     {
@@ -6931,11 +6951,6 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
 
                 case FragmentationOption.Sampled:
-                    if (ServerVersion.Major < 9)
-                    {
-                        throw new UnsupportedVersionException(ExceptionTemplates.InvalidOptionForVersion("EnumFragmentation", fragmentationOption.ToString(), GetSqlServerVersionName()));
-                    }
-
                     optStr = "FragmentationSampled";
                     break;
 
@@ -7418,7 +7433,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         protected bool IsVersion90AndAbove()
         {
-            return (ServerVersion.Major >= 9);
+            return true;
         }
 
 
@@ -8577,8 +8592,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private bool IsSpeciallyLoaded(Type t, string propertyName)
         {
-            Diagnostics.TraceHelper.Assert(t != null, "Expect non-null type");
-            Diagnostics.TraceHelper.Assert(propertyName != null, "Expect non-null property name");
+            Debug.Assert(t != null, "Expect non-null type");
+            Debug.Assert(propertyName != null, "Expect non-null property name");
 
             switch (t.Name)
             {

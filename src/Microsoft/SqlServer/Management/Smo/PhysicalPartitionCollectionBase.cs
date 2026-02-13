@@ -115,13 +115,13 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="partitionNumber"></param>
         internal void Reset(int partitionNumber)
         {
-            Diagnostics.TraceHelper.Assert(partitionNumber > 0);
+            Debug.Assert(partitionNumber > 0);
             this[partitionNumber - 1].Refresh();
         }
 
         internal bool IsDataCompressionStateDirty(int partitionNumber)
         {
-            Diagnostics.TraceHelper.Assert(partitionNumber > 0);
+            Debug.Assert(partitionNumber > 0);
             if (!IsAppropriateForCompression())
             {
                 return false;
@@ -131,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal string GetCompressionCode(int partitionNumber)
         {
-            Diagnostics.TraceHelper.Assert(partitionNumber > 0);
+            Debug.Assert(partitionNumber > 0);
             switch (this[partitionNumber - 1].DataCompression)
             {
                 case DataCompressionType.None: return string.Format(SmoApplication.DefaultCulture, "DATA_COMPRESSION = NONE ");
@@ -183,13 +183,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal bool IsXmlCompressionStateDirty(int partitionNumber)
          {
-            Diagnostics.TraceHelper.Assert(partitionNumber > 0);
+            Debug.Assert(partitionNumber > 0);
             return this[partitionNumber - 1].IsDirty("XmlCompression");
         }
 
         internal string GetXmlCompressionCode(int partitionNumber)
         {
-            Diagnostics.TraceHelper.Assert(partitionNumber > 0);
+            Debug.Assert(partitionNumber > 0);
             switch (this[partitionNumber - 1].XmlCompression)
             {
                 case XmlCompressionType.Invalid: return string.Empty;
@@ -335,7 +335,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //So, let count should decide the game
                 return true;
             }
-            Diagnostics.TraceHelper.Assert(Parent.State == SqlSmoState.Creating);
+            Debug.Assert(Parent.State == SqlSmoState.Creating);
 
             //We don't know whether Table or index is parent.
             Table tbl = this.Parent as Table;
@@ -411,7 +411,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             //If you are getting this assert failure that implies you are not checking at very early stage whether
             //caller has supressed the option to generate the DataCompression related script.
-            Diagnostics.TraceHelper.Assert(sp.Storage.DataCompression);
+            Debug.Assert(sp.Storage.DataCompression);
 
             int rowCompressionCount = 0;
             int pageCompressionCount = 0;
@@ -540,7 +540,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     return string.Format(SmoApplication.DefaultCulture, "DATA_COMPRESSION = ROW");
                 }
-                Diagnostics.TraceHelper.Assert(string.IsNullOrEmpty(retString));
+                Debug.Assert(string.IsNullOrEmpty(retString));
                 retString = string.Format(SmoApplication.DefaultCulture, "DATA_COMPRESSION = ROW ON PARTITIONS ({0})", rowCompressedList);
             }
 
@@ -583,7 +583,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             // If you are getting this assert failure that implies you are not checking at very early stage whether
             // caller has suppressed the option to generate the XmlCompression related script.
-            Diagnostics.TraceHelper.Assert(sp.Storage.XmlCompression);
+            Debug.Assert(sp.Storage.XmlCompression);
 
             int offXmlCompressionCount = 0;
             int onXmlCompressionCount = 0;
