@@ -1,0 +1,5 @@
+name: "CodeQL config"
+
+# Ignore the unused C/C++ headers so CodeQL doesn't try to run the cpp extractor.
+paths-ignore:
+  - "**/*.h"
