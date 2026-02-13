@@ -77,7 +77,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             }
             if (string.IsNullOrEmpty(secret))
             {
-                TraceHelper.TraceInformation("Looking for secret {0} using name {1}. Starting with environment variables.", secretName, lookupName);
                 secret = Environment.GetEnvironmentVariable(lookupName);
             }
             if (string.IsNullOrEmpty(secret))
@@ -89,7 +88,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                     secretClient = new SecretClient(new Uri($"https://{KeyVaultName}.vault.azure.net"), credential);
                 }
                 var secretIdentifier = $"https://{KeyVaultName}.vault.azure.net/secrets/{lookupName}";
-                TraceHelper.TraceInformation("Secret {0} not set as environment variable. Looking in AKV for {1}.", secretName, secretIdentifier);
                 try
                 {
                     secret = secretClient.GetSecret(lookupName).Value.Value;
@@ -193,7 +191,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <returns></returns>
         public string GetStorageAccountAccessKey(string storageAccountResourceId)
         {
-            TraceHelper.TraceInformation($"Fetching storage access key for {storageAccountResourceId}");
             return new AzureStorageHelper(storageAccountResourceId, this).GetStorageAccountAccessKey(storageAccountResourceId);
         }
     }
