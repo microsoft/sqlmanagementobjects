@@ -10,7 +10,6 @@
     <NoWarn>$(NoWarn);NU1603;NU1202</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />

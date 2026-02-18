@@ -3,12 +3,24 @@
   <settings>
     <property_link table='sys.server_event_sessions' alias='session'/>
     <property_link fields='#IsRunning#StartTime#' left_join='#rs' alias='running'>running.name = session.name</property_link>
+    <property_link fields='#MaxDuration#' left_join='#md' alias='maxdur'>maxdur.event_session_id = session.event_session_id</property_link>
     <prefix fields='#IsRunning#StartTime#'>
       create table #rs (name sysname not null, create_time datetimeoffset not null)
       insert into #rs select name, create_time from sys.dm_xe_sessions
     </prefix>
+    <prefix fields='#MaxDuration#'>
+      create table #md (event_session_id int not null, max_duration bigint null)
+      if exists (select 1 from sys.all_columns where object_id = object_id('sys.server_event_sessions') and name = 'max_duration')
+      begin
+        declare @sql nvarchar(max) = 'insert into #md select event_session_id, max_duration from sys.server_event_sessions'
+        exec sp_executesql @sql
+      end
+    </prefix>
     <postfix fields='#IsRunning#StartTime#'>
       drop table #rs
+    </postfix>
+    <postfix fields='#MaxDuration#'>
+      drop table #md
     </postfix>
   </settings>
   <properties>
@@ -24,5 +36,6 @@
     <property name='TrackCausality' type='bit'>session.track_causality</property>
     <property name='AutoStart' type='bit'>session.startup_state</property>
     <property name='StartTime' type='datetime'>running.create_time</property>
+    <property name='MaxDuration' type='bigint'>ISNULL(maxdur.max_duration, 0)</property>
   </properties>
 </EnumObject>

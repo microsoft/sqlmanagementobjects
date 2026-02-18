@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
-<EnumObject type="SensitivityClassification" impl_type="SqlObject" min_major='10'  cloud_min_major='12'>
-  <settings distinct='True'>
+<EnumObject type="SensitivityClassification" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings distinct='true'>
 
     <!--Sensitivity CLassifications are a part of the Extended properties.-->
     <version min_major='10' max_major='14'>

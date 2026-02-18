@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -98,7 +99,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void InsertAt(int position, T o) =>
             // this should never be called
-            Diagnostics.TraceHelper.Assert(false);
+            Debug.Assert(false);
 
         internal override void RemoveAt(int position) => innerCollection.RemoveAt(position);
 

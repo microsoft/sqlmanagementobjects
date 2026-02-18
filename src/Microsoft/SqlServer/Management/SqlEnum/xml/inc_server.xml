@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject type="Server" impl_type="Server" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Server" impl_type="Server" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major='8'>
+    <version min_major='10'>
       <prefix fields='#MasterDBPath#MasterDBLogPath#ErrorLogPath#RootDirectory#InstallDataDirectory#PerfMonMode#MailProfile#BackupDirectory#AuditLevel#LoginMode#DefaultLog#DefaultFile#NumberOfLogFiles#BrowserStartMode#BrowserServiceAccount#InstallSharedDirectory#TcpEnabled#NamedPipesEnabled#ServiceStartMode#ServiceAccount#ServiceInstanceId#SqlDomainGroup#FilestreamShareName#FilestreamLevel#ErrorLogSizeKb#'>
         declare @HkeyLocal nvarchar(18)
         declare @ServicesRegPath nvarchar(34)
@@ -38,13 +38,6 @@
         select @TcpRegPath=@InstanceRegPath + N'\SuperSocketNetLib\Tcp'
       </prefix>
     </version>
-    <version min_major='8' max_major='9'>
-      <prefix fields='#TapeLoadWaitTime#'>
-        declare @SmoTapeLoadWaitTime int
-        exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'Tapeloadwaittime', @SmoTapeLoadWaitTime OUTPUT
-      </prefix>
-    </version>
-
     <version min_major="10">
       <prefix fields="#SqlDomainGroup#">
         declare @SqlGroup nvarchar(512)
@@ -106,7 +99,7 @@
     </version>
 
     <!--imported from settings.xml-->
-    <version min_major='8'>
+    <version min_major='10'>
       <prefix fields="#NumberOfLogFiles#">
         declare @NumErrorLogs int
         exec master.dbo.xp_instance_regread @HkeyLocal, @InstanceRegPath, N'NumErrorLogs', @NumErrorLogs OUTPUT
@@ -444,22 +437,18 @@
     <property name="IsCaseSensitive" type="bit" access="Read" cast='true'>case when 'a' &lt;&gt; 'A' then 1 else 0 end</property>
     <property name="MaxPrecision" type="tinyint" access="Read">@@MAX_PRECISION</property>
 
-    <version min_major='7' max_major='8'>
-      <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>case when (select password from master.dbo.syslogins where sid = 0x01) is null then 1 else 0 end</property>
-    </version>
-    <version min_major='7' cloud_min_major='12' >
+    <version min_major='10' cloud_min_major='12' >
       <property name="IsFullTextInstalled" type="bit" cast='true' access="Read">FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')</property>
     </version>
-    <version min_major='8'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="VersionString" type="sysname" access="Read">SERVERPROPERTY(N'ProductVersion')</property>
       <property name="Edition" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'Edition')</property>
       <property name="ProductLevel" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'ProductLevel')</property>
       <property name="ProductUpdateLevel" type="sysname" access="Read" cast='true'>ISNULL(SERVERPROPERTY(N'ProductUpdateLevel'), N'')</property>
       <property name="IsSingleUser" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsSingleUser')</property>
       <property name="EngineEdition" type="int" access='Read' cast='true' report_type='Edition'>SERVERPROPERTY('EngineEdition')</property>
-      <property name="Collation" type="sysname" access="Read">convert(sysname, serverproperty(N'collation'))</property>
     </version>
-    <version min_major='8' max_major='13'>
+    <version min_major='10' max_major='13'>
       <property name="IsClustered" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsClustered')</property>
       <property name="NetName" type="sysname" access="Read" cast = 'true'>SERVERPROPERTY(N'MachineName')</property>
     </version>
@@ -471,12 +460,12 @@
       <property name="ServiceStartMode" type="int" report_type="ServiceStartMode" access="Read">ISNULL(@ServiceStartMode,2)</property>
       <property name="BrowserStartMode" type="int" report_type="ServiceStartMode" access="Read" expensive="true">ISNULL(@BrowserStartMode,4)</property>
     </version>
-    <version min_major='7'>
+    <version min_major='10'>
       <property name="MasterDBLogPath" type="nvarchar" size="512" access="Read">@LogPath</property>
       <property name="MasterDBPath" type="nvarchar" size="512" access="Read">@MasterPath</property>
     </version>
 
-    <version min_major='7' max_major='10'>
+    <version min_major='10' max_major='10'>
       <property name="DefaultFile" type="nvarchar" size="512">ISNULL(@SmoDefaultFile,N'')</property>
       <property name="DefaultLog" type="nvarchar" size="512">ISNULL(@SmoDefaultLog,N'')</property>
     </version>
@@ -485,10 +474,7 @@
       <property name="DefaultLog" type="nvarchar" size="512">SERVERPROPERTY('instancedefaultlogpath')</property>
       <property name="ErrorLogSizeKb" type="int" expensive="true">ISNULL(@ErrorLogSizeKb, 0)</property>
     </version>
-    <version min_major='8' max_major='9'>
-      <property name="TapeLoadWaitTime" type="int">@SmoTapeLoadWaitTime</property>
-    </version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="ResourceVersionString" type="sysname" access="Read">SERVERPROPERTY(N'ResourceVersion')</property>
       <property name="ResourceLastUpdateDateTime" type="datetime" access="Read">SERVERPROPERTY(N'ResourceLastUpdateDateTime')</property>
       <property name="CollationID" type="int" access="Read">SERVERPROPERTY(N'CollationID')</property>
@@ -498,7 +484,7 @@
       <property name="SqlSortOrder" type="int" report_type2="System.Int16" access="Read">SERVERPROPERTY(N'SqlSortOrder')</property>
       <property name="SqlSortOrderName" type="sysname" access="Read">SERVERPROPERTY(N'SqlSortOrderName')</property>
     </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="BuildClrVersionString" type="sysname" access="Read">SERVERPROPERTY(N'BuildClrVersion')</property>
       <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>null</property>
       <!-- Setup Properties -->
@@ -509,22 +495,14 @@
       <property name="InstallSharedDirectory" type="nvarchar" size="512" access="Read">ISNULL(@InstallSharedDirectory,N'')</property>
       <property name="BrowserServiceAccount" type="nvarchar" size="512" access="Read" expensive="true">ISNULL(@BrowserServiceAccount,N'')</property>
     </version>
-    <version min_major='9' max_major='13'>
+    <version min_major='10' max_major='13'>
       <property name="ComputerNamePhysicalNetBIOS" type="sysname" access="Read">SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS')</property>
       <property name="ServiceStartMode" type="int" report_type="ServiceStartMode" access="Read">@ServiceStartMode</property>
       <property name="BrowserStartMode" type="int" report_type="ServiceStartMode" access="Read" expensive="true">ISNULL(@BrowserStartMode,4)</property>
     </version>
 
-    <version min_major = '7' max_major = '7'>
-      <property name="Name" type="sysname" access="Read" cast="true">@@SERVERNAME</property>
-    </version>
     <version min_major = "10" min_minor="50">
       <property name="ProcessorUsage" type="int" access="Read" expensive="true">case when OBJECT_ID(N'msdb.sys.sp_getProcessorUsage',  N'P') is not null then (select top 1 value from #tempproc)/(select Internal_Value from #SVer where Name = N'ProcessorCount') else -1 end</property>
-    </version>
-    <version min_major='8' max_major='9'>
-      <property name="Name" type="sysname" cast='true'>serverproperty(N'Servername')</property>
-      <property name="InstanceName" type="sysname" access="Read" cast='true'>ISNULL(serverproperty(N'instancename'),N'')</property>
-      <property name="Status" type="int" report_type="ServerStatus" access="Read" cast='true'>0x0010</property>
     </version>
     <version min_major = '10'>
       <property name="SqlDomainGroup" type="nvarchar" size="128" access="Read">ISNULL(suser_sname(sid_binary(ISNULL(@SqlGroup,N''))),N'')</property>
@@ -538,7 +516,7 @@
     <version min_major = '10'>
       <property name="FilestreamLevel" type="int" access="Read" report_type="FileStreamEffectiveLevel">@FilestreamLevel</property>
       <property name="FilestreamShareName" type="nvarchar" size="512" access="Read">ISNULL(@FilestreamShareName,N'')</property>
-      <property name="TapeLoadWaitTime" type="int" access="Read">-1</property>
+      <property name="TapeLoadWaitTime" type="int">-1</property>
     </version>
 
     <version min_major = '10'  cloud_min_major='10' datawarehouse_enabled='true'>
@@ -586,7 +564,7 @@
      <property name="UsedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'UsedStorageSizeMB' )</property>
     </version>
 
-    <version min_major='7' max_major='15' datawarehouse_enabled='true'>
+    <version min_major='10' max_major='15' datawarehouse_enabled='true'>
       <property name="IsJsonDataTypeEnabled" type="bit" cast="true" access="Read" expensive='true'>0</property>
     </version>
     <version min_major='16' cloud_min_major='12'>

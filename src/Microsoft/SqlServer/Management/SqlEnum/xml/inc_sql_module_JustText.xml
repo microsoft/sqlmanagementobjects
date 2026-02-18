@@ -1,16 +1,8 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='7'>
+<EnumObject min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings/>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<!-- on 7-8 Definition is just a pointer to the text-->
-			<property name="Definition" type="nvarchar" size='50' hidden='true'>
-				<link_multiple no='1' expression="cast({0} as nvarchar(20)) + '_' + cast(db_id() as nvarchar(20))">
-					<link_field type='local' field="ID" />
-				</link_multiple>
-			</property>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<!-- here we just offer support for text, every object will do whatever it sees fit
 			take the whole text, parse it, etc -->
 			<property name="Definition" type="nvarchar" size='max'  hidden='true'>

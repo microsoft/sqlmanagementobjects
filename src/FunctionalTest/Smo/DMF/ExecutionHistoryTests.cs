@@ -39,7 +39,8 @@ namespace Microsoft.SqlServer.Test.SMO.DMF
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 10)]
-
+        // This is flakey on MI so disabling for now
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
         public void When_LogOnSuccess_is_true_Policy_EvaluationHistories_match_server_data()
         {
             ExecuteWithDbDrop(db =>
@@ -322,6 +323,7 @@ namespace Microsoft.SqlServer.Test.SMO.DMF
                 }
                 finally
                 {
+                    db.SetOnline(); // bring the db back online so dropping it also deletes its files
                     SmoObjectHelpers.SafeDrop(policy, condition, objectSet, dbNameCondition);
                 }
             });

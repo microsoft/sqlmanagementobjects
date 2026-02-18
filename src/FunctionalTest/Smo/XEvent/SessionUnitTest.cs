@@ -40,6 +40,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
             Assert.IsFalse(session.TrackCausality);
             Assert.IsFalse(session.AutoStart);
             Assert.AreEqual(Session.NotStarted, session.StartTime);
+            Assert.That(Session.DefaultMaxDuration, Is.EqualTo(session.MaxDuration));
 
             session = new Session(store, "ut1");
             Assert.AreEqual(-1, session.ID);
@@ -54,6 +55,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
             Assert.IsFalse(session.TrackCausality);
             Assert.IsFalse(session.AutoStart);
             Assert.AreEqual(Session.NotStarted, session.StartTime);
+            Assert.That(Session.DefaultMaxDuration,Is.EqualTo(session.MaxDuration));
         }
 
         [TestMethod]
@@ -71,6 +73,8 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
                 TestRemoveActionFromExistingSession();
                 TestSQLInjection();
                 TestScriptCreateDrop();
+                // TODO: Bug:4806316 Re-enable after its enabled in Azure SQL DB. As of now only enabled on SQL Server 2025
+                // TestMaxDurationScripting();
                 TestStartStopExistingSession();
                 TestValidateByWrongMethodName();
                 TestValidateEvent();
@@ -245,6 +249,41 @@ ADD TARGET package0.ring_buffer(SET max_memory=(8192))
             sql = session.ScriptDrop().ToString();
             sql = sql.Remove(sql.LastIndexOf("\r\n", StringComparison.Ordinal)).TrimEnd();
             Assert.AreEqual("DROP EVENT SESSION [" + name + "] ON DATABASE", sql);
+        }
+
+        /// <summary>
+        /// Tests MaxDuration property scripting.
+        /// </summary>
+        public void TestMaxDurationScripting()
+        {
+            string name = "TestMaxDurationScripting-" + Guid.NewGuid();
+            if (store.Sessions[name] != null)
+            {
+                store.Sessions[name].Drop();
+            }
+
+            Session session = store.CreateSession(name);
+            Event evt = session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.rpc_starting"));
+            Target target = session.AddTarget(store.RingBufferTargetInfo);
+
+            // Test default behavior - MAX_DURATION should NOT be in script when not explicitly set
+            string sql = session.ScriptCreate().ToString();
+            Assert.That(sql, Does.Not.Contain("MAX_DURATION"), "MAX_DURATION should not appear in script when using default value");
+
+            // Test unlimited duration (explicitly set to 0)
+            session.MaxDuration = Session.UnlimitedDuration;
+            sql = session.ScriptCreate().ToString();
+            Assert.That(sql, Does.Contain("MAX_DURATION=UNLIMITED"), "Expected MAX_DURATION=UNLIMITED in create script when explicitly set");
+
+            // Test specific duration in seconds
+            session.MaxDuration = 3600; // 1 hour
+            sql = session.ScriptCreate().ToString();
+            Assert.That(sql, Does.Contain("MAX_DURATION=3600 SECONDS"), "Expected MAX_DURATION=3600 SECONDS in create script");
+
+            // Test very long duration
+            session.MaxDuration = 86400; // 1 day
+            sql = session.ScriptCreate().ToString();
+            Assert.That(sql, Does.Contain("MAX_DURATION=86400 SECONDS"), "Expected MAX_DURATION=86400 SECONDS in create script");
         }
 
         public void When_session_has_multiple_targets_ScriptCreate_properly_delimits_the_list()

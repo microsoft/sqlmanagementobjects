@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="ExternalResourcePoolAffinityInfo" impl_type="SqlObject" min_major='13'>
+<?xml version="1.0" ?>
+<EnumObject type="ExternalResourcePoolAffinityInfo" impl_type="SqlObject" min_major='13' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <property_link table="sys.resource_governor_external_resource_pools" alias= "[pls]"/>
         <property_link join="[sys].[dm_os_memory_nodes] AS [mn]">

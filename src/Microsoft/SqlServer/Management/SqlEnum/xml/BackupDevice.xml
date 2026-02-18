@@ -1,10 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="BackupDevice" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="BackupDevice" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major='7' max_major='8'>
-      <property_link table = 'master.dbo.sysdevices o'>(o.status &amp; 0x10) &lt;&gt; 0</property_link>
-    </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property_link table="sys.backup_devices o"></property_link>
     </version>
 
@@ -14,12 +11,7 @@
   <properties>
     <include file='inc_urn.xml' />
     <property name="Name" type="sysname">o.name</property>
-    <version min_major='7' max_major='8'>
-      <property name="PhysicalLocation" type="sysname" read_only_after_creation="true">o.phyname</property>
-      <property name="BackupDeviceType" type="int" report_type='BackupDeviceType' read_only_after_creation="true">o.cntrltype</property>
-      <property name="SkipTapeLabel" type="bit" cast='true' read_only_after_creation="true">o.status &amp; 0x08</property>
-    </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="PhysicalLocation" type="sysname" read_only_after_creation="true">o.physical_name</property>
       <property name="BackupDeviceType" type="int" report_type='BackupDeviceType' read_only_after_creation="true">o.type</property>
       <!-- This property is not supported on 9.0 but we return 0 in case someone is relying on it to have a value-->

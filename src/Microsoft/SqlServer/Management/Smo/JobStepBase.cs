@@ -125,7 +125,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             GetStringParameter( sb, sp, "OutputFileName", "@output_file_name=N'{0}'" , ref count);
             GetEnumParameter(sb, sp, "JobStepFlags", "@flags={0}", typeof(JobStepFlags), ref count);
 
-            if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 GetStringParameter(sb, sp, "ProxyName", "@proxy_name=N'{0}'", ref count);
             }

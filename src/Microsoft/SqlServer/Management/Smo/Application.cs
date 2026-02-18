@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Server;
+using SmoEventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
@@ -723,7 +724,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if( toLogFile )
                 {
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "{0}", s);
+                    SmoEventSource.Log.GeneralMessage(s);
                 }
                 else
                 {

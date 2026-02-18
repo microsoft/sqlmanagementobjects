@@ -1,5 +1,5 @@
-﻿<?xml version='1.0' ?>
-<EnumObject type='SPHelpJobstep' impl_type='SqlObject' min_major='7' >
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpJobstep' impl_type='SqlObject' min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="JobID" local="JobID" />
@@ -10,35 +10,11 @@
 	
 	
 		<property_link table='#tmp_sp_help_jobstep' alias='tshj'/>
-        <version min_major='9' > 
+        <version min_major='10' > 
             <property_link fields='#ProxyName#' left_join='#tmp_sp_help_proxy' alias = 'sp'>sp.proxy_id = tshj.proxy_id</property_link>
         </version>
 		
-		<version min_major='7' max_major='8'>
-			<prefix>
-				<link_multiple no='1' expression="
-create table #tmp_sp_help_jobstep
-(step_id int null, step_name nvarchar(128) null, subsystem nvarchar(128) collate Latin1_General_CI_AS null, command nvarchar(3200) null, flags int null, cmdexec_success_code int null, on_success_action tinyint null, on_success_step_id int null, on_fail_action tinyint null, on_fail_step_id int null, server nvarchar(128) null, database_name sysname null, database_user_name sysname null, retry_attempts int null, retry_interval int null, os_run_priority int null, output_file_name nvarchar(300) null, last_run_outcome int null, last_run_duration int null, last_run_retries int null, last_run_date int null, last_run_time int null, job_id uniqueidentifier null)
-
-declare @job_id uniqueidentifier
-declare crs cursor local fast_forward
-for ( {0} ) 
-open crs 
-fetch crs into @job_id
-while @@fetch_status &gt;= 0 
-begin 
-	insert into #tmp_sp_help_jobstep(step_id, step_name, subsystem, command, flags, cmdexec_success_code, on_success_action, on_success_step_id, on_fail_action, on_fail_step_id, server, database_name, database_user_name, retry_attempts, retry_interval, os_run_priority, output_file_name, last_run_outcome, last_run_duration, last_run_retries, last_run_date, last_run_time) 
-		exec msdb.dbo.sp_help_jobstep @job_id = @job_id
-	update #tmp_sp_help_jobstep set job_id = @job_id where job_id is null
-	fetch crs into @job_id
-end 
-close crs
-deallocate crs">
-					<link_field field="ParentSelect" />
-				</link_multiple>
-			</prefix>
-		</version>
-		<version min_major='9' >
+		<version min_major='10' >
 			<prefix>
 				<link_multiple no='1' expression="
 create table #tmp_sp_help_jobstep
@@ -86,10 +62,7 @@ drop table #tmp_sp_help_jobstep
 WHEN 'snapshot' THEN 4 WHEN 'logreader' THEN 5 WHEN 'distribution' THEN 6 
 WHEN 'merge' THEN 7 WHEN 'queuereader' THEN 8 WHEN 'analysisquery' THEN 9 
 WHEN 'analysiscommand' THEN 10 WHEN 'dts' THEN 11 WHEN 'ssis' THEN 11 WHEN 'powershell' THEN 12 ELSE 0 END</property>
-         <version min_major='7' max_major='8'>
-		    <property name='Command' type='nvarchar' size = '3200'>ISNULL(tshj.command,N'')</property>
-		</version> 
- 		<version min_major='9' >
+         <version min_major='10' >
 			<property name='Command' type='nvarchar' size = 'max'>ISNULL(tshj.command,N'')</property>		
 		</version>       
 		<property name='CommandExecutionSuccessCode' type='int'>tshj.cmdexec_success_code</property>
@@ -112,7 +85,7 @@ WHEN 'analysiscommand' THEN 10 WHEN 'dts' THEN 11 WHEN 'ssis' THEN 11 WHEN 'powe
 		<property name='LastRunTimeInt' type='int' hidden='true'>tshj.last_run_time</property>
 		<property name="JobStepFlags" type="int" report_type="Agent.JobStepFlags">tshj.flags</property>		
 
-		<version min_major='9' >
+		<version min_major='10' >
 			<property name="ProxyName" type="nvarchar" size="300">ISNULL(sp.name,N'')</property>		
 		</version>
 		

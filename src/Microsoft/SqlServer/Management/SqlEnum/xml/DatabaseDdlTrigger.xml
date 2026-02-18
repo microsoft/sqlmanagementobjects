@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<EnumObject type="Trigger" impl_type="SqlObject" min_major='9'  cloud_min_major='10'>
+<EnumObject type="Trigger" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='sys.triggers AS tr'>tr.parent_class = 0</property_link>
-    <version min_major='9'>
+    <version min_major='10'>
       <property_link fields='#ExecutionContext#'
               left_join='sys.assembly_modules' alias='am2tr'>am2tr.object_id = tr.object_id</property_link>
     </version>
-    <version min_major='9'  cloud_min_major='10'>
+    <version min_major='10'  cloud_min_major='10'>
       <property_link fields='#AnsiNullsStatus#QuotedIdentifierStatus#'
               left_join='sys.sql_modules' alias='sqlmod'>sqlmod.object_id = tr.object_id</property_link>
     </version>
@@ -18,7 +18,7 @@
 		<include file='mixed_module_link.xml' alias='tr' 
 			for='#ExecutionContextUser#MethodName#ClassName#AssemblyName#Text#TextBody#BodyStartIndex#IsEncrypted#' />
 		<include file='inc_ddl_trigger_event.xml' alias='tr' for='#DdlTriggerEvents#' ></include>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="ExecutionContext" type="int" report_type="DatabaseDdlTriggerExecutionContext">
         <link_multiple no='1' expression="case when am2tr.object_id is null then {0} else case isnull(am2tr.execute_as_principal_id, -1) when -1 then 1 else 2 end end">
           <link_field type='local' field="SqlExecutionContextDdl" />
@@ -32,7 +32,7 @@
         </link_multiple>
       </property>
     </version>
-    <version min_major='9' cloud_min_major='10'>
+    <version min_major='10' cloud_min_major='10'>
 		<property name="NotForReplication" type="bit" >tr.is_not_for_replication</property>
 		</version>
 		<property name="IsEnabled" type="bit">~tr.is_disabled</property>

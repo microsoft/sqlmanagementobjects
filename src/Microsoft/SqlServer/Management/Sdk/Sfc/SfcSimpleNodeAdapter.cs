@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Reflection;
+using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
@@ -107,7 +108,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
+                SmoEventSource.Log.SfcExceptionCaught(e);
                 return null;
             }
         }
@@ -120,7 +121,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
+                SmoEventSource.Log.SfcExceptionCaught(e);
                 return null;
             }
         }
@@ -133,7 +134,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
+                SmoEventSource.Log.SfcExceptionCaught(e);
                 return null;
             }
         }
@@ -146,7 +147,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
+                SmoEventSource.Log.SfcExceptionCaught(e);
                 return null;
             }
         }
@@ -159,7 +160,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
+                SmoEventSource.Log.SfcExceptionCaught(e);
                 return false;
             }
         }
@@ -172,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e) when (!IsSystemGeneratedException(e))
             {
-                TraceHelper.LogExCatch(e);
+                SmoEventSource.Log.SfcExceptionCaught(e);
                 return false;
             }
         }
@@ -237,7 +238,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (TargetInvocationException tie)
             {
-                TraceHelper.LogExCatch(tie);
+                SmoEventSource.Log.SfcExceptionCaught(tie);
                 propertyVal = null;
             }
             return propertyVal;

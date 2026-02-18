@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.SqlServer.Management.Smo.Internal;
@@ -400,7 +401,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder("DROP ASYMMETRIC KEY ");
             sb.Append(FormatFullNameForScripting(sp));
 
-            if (removeProviderKey && ServerVersion.Major >= 10)
+            if (removeProviderKey)
             {
                 sb.Append(" REMOVE PROVIDER KEY");
             }
@@ -423,7 +424,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             this.ThrowIfNotSupported(typeof(AsymmetricKey));
 
-            Diagnostics.TraceHelper.Assert(null != createInfo, "caller should initialize createInfo it before calling");
+            Debug.Assert(null != createInfo, "caller should initialize createInfo it before calling");
 
             //build script
             StringBuilder sb = new StringBuilder("CREATE ASYMMETRIC KEY ");
@@ -446,26 +447,26 @@ namespace Microsoft.SqlServer.Management.Smo
                 switch (createInfo.sourceType)
                 {
                     case AsymmetricKeySourceType.File:
-                        Diagnostics.TraceHelper.Assert(null != createInfo.keySource, "keySource cannot be null");
+                        Debug.Assert(null != createInfo.keySource, "keySource cannot be null");
                         sb.Append("FILE = ");
                         sb.Append(MakeSqlString(createInfo.keySource));
                         break;
 
                     case AsymmetricKeySourceType.Executable:
-                        Diagnostics.TraceHelper.Assert(null != createInfo.keySource, "keySource cannot be null");
+                        Debug.Assert(null != createInfo.keySource, "keySource cannot be null");
                         sb.Append("EXECUTABLE FILE = ");
                         sb.Append(MakeSqlString(createInfo.keySource));
                         break;
 
                     case AsymmetricKeySourceType.SqlAssembly:
-                        Diagnostics.TraceHelper.Assert(null != createInfo.keySource, "keySource cannot be null");
+                        Debug.Assert(null != createInfo.keySource, "keySource cannot be null");
                         sb.Append("ASSEMBLY ");
                         sb.Append(MakeSqlString(createInfo.keySource));
                         break;
 
                     case AsymmetricKeySourceType.Provider:
-                        Diagnostics.TraceHelper.Assert(null != createInfo.providerKeyName, "providerKeyName cannot be null");
-                        Diagnostics.TraceHelper.Assert(null != createInfo.providerAlgorithm, "providerAlgorithm cannot be null");
+                        Debug.Assert(null != createInfo.providerKeyName, "providerKeyName cannot be null");
+                        Debug.Assert(null != createInfo.providerAlgorithm, "providerAlgorithm cannot be null");
                         sb.Append("PROVIDER ");
                         string providerName = (string)this.GetPropValue("ProviderName");
                         if (string.IsNullOrEmpty(providerName))

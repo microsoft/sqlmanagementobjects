@@ -352,12 +352,13 @@ namespace Microsoft.SqlServer.Management.Smo
         ExternalLanguage                     = 0x0000800000000000,
         ExternalStream                       = 0x0001000000000000,
         ExternalStreamingJob                 = 0x0002000000000000,
+        ExternalModel                        = 0x0004000000000000,
         // If any of the above is changed, please change the "All" line as well.  The "All" value is a minimal mask.
         // For example, if the last value is 0x10000000, then the mask is 0x1fffffff.
         // If the last value is 0x20000000, then the mask is 0x3fffffff.
         // If the last value is 0x40000000, then the mask is 0x7fffffff.
         // If the last value is 0x80000000, then the mask is 0xffffffff.
-        All                                  = 0x0003ffffffffffff // all above combined 
+        All                                  = 0x0007ffffffffffff // all above combined 
     }
 
     [Flags]

@@ -4,7 +4,6 @@
 namespace Microsoft.SqlServer.Management.Smo
 {
     using System;
-    using System.Data;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -12,50 +11,13 @@ namespace Microsoft.SqlServer.Management.Smo
     {
         protected object m_text;
         bool m_btextSet;
-        DataTable m_dtText;
 
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public PostProcessText()
         {
             CleanRowData();
-            m_dtText = null;
         }
 
-        protected DataTable GetTextForAllRows()
-        {
-            Request reqtext = new Request();
-            reqtext.Urn = this.Request.Urn.Value + "/Text";
-
-            reqtext.ResultType = ResultType.DataTable;
-            reqtext.RequestFieldsTypes = RequestFieldsTypes.Request;
-            reqtext.Fields = new String[] { "ObjectIdentifier", "ID", "Text" };
-
-            reqtext.OrderByList = new OrderBy [] 
-            {
-                new OrderBy("ObjectIdentifier", OrderBy.Direction.Asc),
-                new OrderBy("ID", OrderBy.Direction.Asc)
-            };
-
-            return new Enumerator().Process(this.ConnectionInfo, reqtext);
-        }
-
-        protected String GetTextForObject(string sObjectIdentifier)
-        {
-            int i = BinarySearchSetOnFirst(m_dtText.Rows, sObjectIdentifier, "ObjectIdentifier");
-
-            if( 0 > i )
-            {
-                return string.Empty; // this can't be
-            }
-
-            String s = String.Empty;
-            do
-            {
-                s += (String)m_dtText.Rows[i++]["Text"];
-            }
-            while( i < m_dtText.Rows.Count && "1" != m_dtText.Rows[i]["ID"].ToString() );
-            return s;
-        }
 
         protected bool IsTextSet
         {
@@ -71,18 +33,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return;
             }
 
-            if( ExecuteSql.GetServerVersion(this.ConnectionInfo).Major < 9 )
-            {
-                if( null == m_dtText )
-                {
-                    m_dtText = GetTextForAllRows();
-                }
-                m_text = GetTextForObject((string)data);
-            }
-            else
-            {
-                m_text = GetTextFor90(data, dp);
-            }
+            m_text = GetTextFor90(data, dp);
 
             if( null == m_text )
             {
@@ -99,10 +50,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get 
             { 
-                if( ExecuteSql.GetServerVersion(this.ConnectionInfo).Major < 9 )
-                {
-                    return false;
-                }
                 return true;
             }
         }
@@ -122,7 +69,6 @@ namespace Microsoft.SqlServer.Management.Smo
             m_text = null;
         }
     }
-
 
 
     internal class PostProcessBodyText : PostProcessText

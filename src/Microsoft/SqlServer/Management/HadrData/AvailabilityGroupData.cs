@@ -375,6 +375,16 @@ namespace Microsoft.SqlServer.Management.HadrData
             get { return this.Secondaries.Any(replica => replica.GetServer().HostPlatform != this.PrimaryServer.HostPlatform); }
         }
 
+        /// <summary>
+        /// Specifies the cluster connection options used by WSFC to connect to SQL Server via ODBC. 
+        /// This enables TDS 8.0 and is only applicable when the cluster type is set to "WSFC" 
+        /// and the SQL Server version is 2025 or later.
+        /// </summary>
+        public string ClusterConnectionOptions
+        {
+            get;
+            set;
+        }
         #endregion
 
         #region Methods

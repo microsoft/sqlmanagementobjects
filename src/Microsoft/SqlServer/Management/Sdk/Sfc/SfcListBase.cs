@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
@@ -100,7 +101,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 K loopKey = loopObj.AbstractIdentityKey as K;
                 if (loopKey.Equals(key))
                 {
-                    TraceHelper.Assert(loopObj.State != SfcObjectState.Dropped); // drop should remove objects from collections, so this should never happen
+                    Debug.Assert(loopObj.State != SfcObjectState.Dropped); // drop should remove objects from collections, so this should never happen
                     return true;
                 }
             }
@@ -158,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 m_shadow.Add(obj);
                 // The object must already be parented correctly
-                TraceHelper.Assert(obj.Parent == this.Parent);
+                Debug.Assert(obj.Parent == this.Parent);
                 return true;
             }
             return false;

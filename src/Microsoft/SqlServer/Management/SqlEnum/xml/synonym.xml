@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Collation" impl_type="SqlObject" min_major='9'  cloud_min_major='10'>
+<?xml version="1.0" ?>
+<EnumObject type="Collation" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='sys.synonyms' alias='s' />
 		<post_process fields='#BaseServer#BaseDatabase#BaseSchema#BaseObject#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessSplitFourPartName'
@@ -8,7 +8,7 @@
 	<properties>
 		<include file='inc_object.xml' alias='s' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#' />
 
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="BaseServer" type="nvarchar" usage='request' read_only_after_creation="true" mode="deploy">N''</property>
     </version>
 		<property name="BaseDatabase" type="nvarchar" usage='request' read_only_after_creation="true" mode="design">N''</property>

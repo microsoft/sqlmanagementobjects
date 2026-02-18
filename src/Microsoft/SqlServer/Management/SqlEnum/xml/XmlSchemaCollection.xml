@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="XmlSchemaCollection" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+<EnumObject type="XmlSchemaCollection" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table="sys.xml_schema_collections AS xsc">
 				xsc.schema_id   &lt;&gt; 4</property_link>
@@ -25,4 +25,3 @@
 		</version>
   </properties>
 </EnumObject>
-

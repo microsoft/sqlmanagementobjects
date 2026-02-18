@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="WorkloadManagementWorkloadGroup" impl_type="SqlObject" datawarehouse_enabled='true'>
+<?xml version="1.0" ?>
+<EnumObject type="WorkloadManagementWorkloadGroup" impl_type="SqlObject" datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table="sys.workload_management_workload_groups AS wkg"/>
     <property_link fields="#HasClassifier" left_join="sys.workload_management_workload_classifiers AS wkc">wkg.name = wkc.group_name</property_link>

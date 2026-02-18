@@ -92,16 +92,9 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             try
             {
-                if (ServerVersion.Major >= 9)
-                {
-                    StringCollection statements = new StringCollection();
-                    statements.Add("EXEC master.dbo.sp_fulltext_service @action=N'update_languages'");
-                    this.ExecutionManager.ExecuteNonQuery(statements);
-                }
-                else
-                {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-                }
+                StringCollection statements = new StringCollection();
+                statements.Add("EXEC master.dbo.sp_fulltext_service @action=N'update_languages'");
+                this.ExecutionManager.ExecuteNonQuery(statements);
             }
             catch (Exception e)
             {
@@ -151,37 +144,34 @@ namespace Microsoft.SqlServer.Management.Smo
             Property property;
 
             // AllowUnsignedBinaries
-            if (ServerVersion.Major >= 9)
+            if (null != (property = this.Properties.Get("AllowUnsignedBinaries")).Value)
             {
-                if (null != (property = this.Properties.Get("AllowUnsignedBinaries")).Value)
+                // Script Alter if dirty or Create if target version 9 or above
+                if ((sp.ScriptForAlter && property.Dirty) ||
+                    (!sp.ScriptForAlter && sp.TargetServerVersion >= SqlServerVersion.Version90))
                 {
-                    // Script Alter if dirty or Create if target version 9 or above
-                    if ((sp.ScriptForAlter && property.Dirty) ||
-                        (!sp.ScriptForAlter && sp.TargetServerVersion >= SqlServerVersion.Version90))
-                    {
-                        statement.AppendFormat(SmoApplication.DefaultCulture,
-                            "EXEC master.dbo.sp_fulltext_service @action=N'verify_signature', @value={0}", (bool)property.Value ? 0 : 1);
-                        statement.Append(sp.NewLine);
+                    statement.AppendFormat(SmoApplication.DefaultCulture,
+                        "EXEC master.dbo.sp_fulltext_service @action=N'verify_signature', @value={0}", (bool)property.Value ? 0 : 1);
+                    statement.Append(sp.NewLine);
 
-                        queries.Add(statement.ToString());
-                        statement.Length = 0;
-                    }
+                    queries.Add(statement.ToString());
+                    statement.Length = 0;
                 }
+            }
 
-                // LoadOSResourcesEnabled
-                if (null != (property = this.Properties.Get("LoadOSResourcesEnabled")).Value)
+            // LoadOSResourcesEnabled
+            if (null != (property = this.Properties.Get("LoadOSResourcesEnabled")).Value)
+            {
+                // Script Alter if dirty or Create if target version 9 or above
+                if ((sp.ScriptForAlter && property.Dirty) ||
+                    (!sp.ScriptForAlter && sp.TargetServerVersion >= SqlServerVersion.Version90))
                 {
-                    // Script Alter if dirty or Create if target version 9 or above
-                    if ((sp.ScriptForAlter && property.Dirty) ||
-                        (!sp.ScriptForAlter && sp.TargetServerVersion >= SqlServerVersion.Version90))
-                    {
-                        statement.AppendFormat(SmoApplication.DefaultCulture,
-                            "EXEC master.dbo.sp_fulltext_service @action=N'load_os_resources', @value={0}", (bool)property.Value ? 1 : 0);
-                        statement.Append(sp.NewLine);
+                    statement.AppendFormat(SmoApplication.DefaultCulture,
+                        "EXEC master.dbo.sp_fulltext_service @action=N'load_os_resources', @value={0}", (bool)property.Value ? 1 : 0);
+                    statement.Append(sp.NewLine);
 
-                        queries.Add(statement.ToString());
-                        statement.Length = 0;
-                    }
+                    queries.Add(statement.ToString());
+                    statement.Length = 0;
                 }
             }
 
@@ -269,7 +259,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             //Catalog Upgrade Option
-            if (ServerVersion.Major >= 10 && sp.TargetServerVersion >= SqlServerVersion.Version100)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 property = this.Properties.Get("CatalogUpgradeOption");
 

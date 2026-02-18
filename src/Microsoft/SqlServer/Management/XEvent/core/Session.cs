@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 
@@ -56,6 +57,10 @@ namespace Microsoft.SqlServer.Management.XEvent
         /// AutoStart
         /// </summary>
         public const string AutoStartProperty = "AutoStart";
+        /// <summary>
+        /// MaxDuration
+        /// </summary>
+        public const string MaxDurationProperty = nameof(MaxDuration);
         /// <summary>
         /// Type name
         /// </summary>
@@ -1072,6 +1077,40 @@ namespace Microsoft.SqlServer.Management.XEvent
                     return Session.NotStarted;
                 }
                 return (DateTime)v;
+            }
+        }
+
+        /// <summary>
+        /// 0 indicates that duration is unlimited.
+        /// </summary>
+        public const long UnlimitedDuration = 0;
+
+        /// <summary>
+        /// Default duration is unlimited (0).
+        /// </summary>
+        public const long DefaultMaxDuration = 0;
+
+        /// <summary>
+        /// Gets or sets the max duration (in seconds).
+        /// MaxDuration is only supported on SQL Server 2025 (version 17) and later.
+        /// A value of 0 indicates unlimited duration.
+        /// </summary>
+        /// <value>The max duration in seconds.</value>
+        [SfcProperty(Data = true)]
+        public long MaxDuration
+        {
+            get
+            {
+                object v = this.Properties[Session.MaxDurationProperty].Value;
+                if (v == null)
+                {
+                    return Session.DefaultMaxDuration;
+                }
+                return Convert.ToInt64(v, CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                this.Properties[Session.MaxDurationProperty].Value = value;
             }
         }
 

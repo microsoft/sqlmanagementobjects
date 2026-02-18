@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Server" impl_type="Server" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Server" impl_type="Server" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <post_process fields = '#ServerType#IsContainedAuthentication#'
        class_name='Microsoft.SqlServer.Management.Smo.PostProcessServerProperties'/>

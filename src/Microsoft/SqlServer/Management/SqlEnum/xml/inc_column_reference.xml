@@ -1,11 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Column" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link fields='#TableName#TableSchema#' 
-				join = 'dbo.sysobjects AS tbl'>tbl.id = {0}.id</property_link>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<property_link fields='#TableName#TableSchema#' 
 				join = 'sys.tables AS tbl'>tbl.object_id = {0}.object_id</property_link>
 		</version>
@@ -13,10 +9,7 @@
 	<properties>
 		<property name="Name" type="sysname">{0}.name</property>
 		<property name="TableName" type="sysname">tbl.name</property>
-		<version min_major='7' max_major='8'>
-			<property name="TableSchema" type="sysname">user_name(tbl.uid)</property>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<property name="TableSchema" type="sysname">schema_name(tbl.schema_id)</property>
 		</version>
 	</properties>

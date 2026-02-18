@@ -2179,7 +2179,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.PrimaryObject = value;
                     break;
                 default:
-                    Diagnostics.TraceHelper.Assert(false, "incorrect index specified");
+                    Debug.Assert(false, "incorrect index specified");
                     break;
             }
         }
@@ -2281,7 +2281,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case EnumScriptOptions.PrimaryObject:
                     return this.PrimaryObject;
                 default:
-                    Diagnostics.TraceHelper.Assert(false, "incorrect index specified");
+                    Debug.Assert(false, "incorrect index specified");
                     return false;
             }
         }
@@ -2325,14 +2325,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             SqlServerVersion sqlSvrVersion;
             switch (majorVersion)
-            {
-                case 8:
-                    sqlSvrVersion = SqlServerVersion.Version80;
-                    break;
-                case 9:
-                    sqlSvrVersion = SqlServerVersion.Version90;
-                    break;
-                case 10:
+            {case 10:
                     if (minorVersion == 0)
                     {
                         sqlSvrVersion = SqlServerVersion.Version100;

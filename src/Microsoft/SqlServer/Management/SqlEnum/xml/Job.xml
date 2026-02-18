@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='SysjobsView' impl_type='SqlObject' min_major='7'>
+<EnumObject type='SysjobsView' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='msdb.dbo.sysjobs_view' alias='sv'/>
 
@@ -14,30 +14,7 @@
 			(category_id int null, category_type tinyint null, name nvarchar(128) null)
 			insert into #tmp_sp_help_category exec msdb.dbo.sp_help_category
 		</prefix>
-		<version min_major='7' max_major='8'>
-			<!-- Yukon SP2 bug 401299: In SQL 2000, aka major version 8, sp_help_operator 
-is available only to sysadmin, the db_owner or anyone explicitly 
-granted. Otherwise it raises an error which throws back into SMO. SQL 
-2000 doesn't have TRY..CATCH so we explicitly check for permission 
-before trying to call it.-->
-
-			<!--action = 224(EXECUTE) and protecttype != 206 (not DENY) and (uid = 0 or uid = USER_ID())(public or to me)-->
-			<prefix fields = '#OperatorToEmail#OperatorToNetSend#OperatorToPage#'>
-				create table #tmp_sp_help_operator
-				(id int null, name nvarchar(128) null, enabled tinyint null, email_address nvarchar(100) null, last_email_date int null, last_email_time int null, pager_address nvarchar(100) null, last_pager_date int null, last_pager_time int null, weekday_pager_start_time int null, weekday_pager_end_time int null, saturday_pager_start_time int null, saturday_pager_end_time int null, sunday_pager_start_time int null, sunday_pager_end_time int null, pager_days tinyint null, netsend_address nvarchar(100) null, last_netsend_date int null, last_netsend_time int null, category_name nvarchar(128) null)
-
-				if ((ISNULL(IS_SRVROLEMEMBER('sysadmin'), 0) != 0) or
-				exists (select * from sysprotects
-				where OBJECT_NAME(id) = 'sp_help_operator'
-				and action = 224
-				and protecttype != 206
-				and (uid = 0 or uid = USER_ID())
-				)
-				)
-				insert into #tmp_sp_help_operator exec msdb.dbo.sp_help_operator
-			</prefix>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<prefix fields = '#OperatorToEmail#OperatorToNetSend#OperatorToPage#'>
 				create table #tmp_sp_help_operator
 				(id int null, name nvarchar(128) null, enabled tinyint null, email_address nvarchar(100) null, last_email_date int null, last_email_time int null, pager_address nvarchar(100) null, last_pager_date int null, last_pager_time int null, weekday_pager_start_time int null, weekday_pager_end_time int null, saturday_pager_start_time int null, saturday_pager_end_time int null, sunday_pager_start_time int null, sunday_pager_end_time int null, pager_days tinyint null, netsend_address nvarchar(100) null, last_netsend_date int null, last_netsend_time int null, category_name nvarchar(128) null)

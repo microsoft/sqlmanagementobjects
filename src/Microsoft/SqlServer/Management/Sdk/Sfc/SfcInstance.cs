@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using Microsoft.SqlServer.Management.Common;
@@ -400,7 +401,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     }
 
                     // there is no real check here other than to try and get a hashcode. Every key must hash.
-                    // Note: Removed TraceHelper.Assert(m_key.GetHashCode() != 0), since 0 is a perfectly valid hash value!
+                    // Note: Removed Debug.Assert(m_key.GetHashCode() != 0), since 0 is a perfectly valid hash value!
                 }
                 return m_key;
             }
@@ -436,7 +437,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     if (this is ISfcDomain)
                     {
                         // Better not have a parent if we are the root
-                        TraceHelper.Assert(m_parent == null);
+                        Debug.Assert(m_parent == null);
 
                         // This would be an InvalidCast exception but we don't want to throw, just return null.
                         // The key from a ISfcDomain root object should always be a DomainRootKey.
@@ -460,7 +461,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             internal set // setting a keychain is now done in very few places and should be avoided altogether
             {
-                TraceHelper.Assert(value != null); // don't try setting a null keychain
+                Debug.Assert(value != null); // don't try setting a null keychain
 
                 // When we set the keychain we have to make sure that we aren't stepping on a 
                 // preset parent 
@@ -742,7 +743,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             object[] parentRow)
         {
             // have we finished the table already?
-            TraceHelper.Assert(!reader.IsClosed);
+            Debug.Assert(!reader.IsClosed);
 
             // Check for merging via key only if collection is not empty,
             // otherwise assume we can just add new items in via the reader.
@@ -859,7 +860,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <returns></returns>
         private static bool CompareRows(IDataReader reader, object[] parentRow, int columnStartIdx, int columnStopIdx)
         {
-            TraceHelper.Assert(!reader.IsClosed);
+            Debug.Assert(!reader.IsClosed);
 
             for (int i = columnStartIdx; i < columnStopIdx; i++)
             {
@@ -918,7 +919,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 return;
             }
 
-            TraceHelper.Assert(this is ISfcDomain);  // not supposed to be used for other things
+            Debug.Assert(this is ISfcDomain);  // not supposed to be used for other things
             this.State = SfcObjectState.Existing;
             this.Initialize();
         }
@@ -939,7 +940,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
 
             //This check is needed for Deserialization: Root of the deserialized tree might not be able to access parent
-            TraceHelper.Assert(this.KeyChain != null);
+            Debug.Assert(this.KeyChain != null);
 
             if (this.State == SfcObjectState.Dropped)
             {
@@ -1023,7 +1024,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         if (collection.GetExisting(this.AbstractIdentityKey, out existingObj))
                         {
                             // This is temporary solution to support DMF's deep creation. The object already exists, don't add it to the collection
-                            TraceHelper.Assert(Object.ReferenceEquals(existingObj, this));
+                            Debug.Assert(Object.ReferenceEquals(existingObj, this));
                         }
                         else
                         {
@@ -1041,7 +1042,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     {
                         // Before housekeeping event
                         // pass New keychain, New key
-                        TraceHelper.Assert(extraParam is SfcKey);
+                        Debug.Assert(extraParam is SfcKey);
                         SfcKey newKey = (extraParam as SfcKey);
                         SfcKeyChain newKeyChain = new SfcKeyChain(newKey, this.KeyChain.Parent);
                         SfcApplication.Events.OnBeforeObjectRenamed(this, new SfcBeforeObjectRenamedEventArgs(this.KeyChain.Urn, this, newKeyChain.Urn, newKey));
@@ -1050,12 +1051,12 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         SfcKey oldKey = this.KeyChain.LeafKey;
                         ISfcCollection collection = GetParentCollection();
                         SfcInstance existingObj;
-                        TraceHelper.Assert(collection.GetExisting(this.AbstractIdentityKey, out existingObj)); // can't remove if it doesn't exist
-                        TraceHelper.Assert(object.ReferenceEquals(this, existingObj)); // must refer to us
+                        Debug.Assert(collection.GetExisting(this.AbstractIdentityKey, out existingObj)); // can't remove if it doesn't exist
+                        Debug.Assert(object.ReferenceEquals(this, existingObj)); // must refer to us
                         collection.Rename(this, newKey);
-                        TraceHelper.Assert(!collection.GetExisting(oldKey, out existingObj)); // old key must not exist after removal
-                        TraceHelper.Assert(collection.GetExisting(this.AbstractIdentityKey, out existingObj)); // new key must now exist
-                        TraceHelper.Assert(object.ReferenceEquals(this, existingObj)); // must still refer to us
+                        Debug.Assert(!collection.GetExisting(oldKey, out existingObj)); // old key must not exist after removal
+                        Debug.Assert(collection.GetExisting(this.AbstractIdentityKey, out existingObj)); // new key must now exist
+                        Debug.Assert(object.ReferenceEquals(this, existingObj)); // must still refer to us
 
                         // User housekeeping
                         PostRename(executionResult);
@@ -1087,7 +1088,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
                         // Before housekeeping event
                         // pass New keychain, New parent
-                        TraceHelper.Assert(extraParam is SfcInstance);
+                        Debug.Assert(extraParam is SfcInstance);
                         SfcInstance newParent = (extraParam as SfcInstance);
                         SfcKeyChain newKeyChain = new SfcKeyChain(this.AbstractIdentityKey, newParent.KeyChain);
                         SfcApplication.Events.OnBeforeObjectMoved(this, new SfcBeforeObjectMovedEventArgs(this.KeyChain.Urn, this, newKeyChain.Urn, newParent));
@@ -1114,9 +1115,9 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         ISfcCollection collection = GetParentCollection();
                         SfcInstance existingObj;
                         collection.Add(this);
-                        TraceHelper.Assert(!oldCollection.GetExisting(this.AbstractIdentityKey, out existingObj)); // old collection entry for us must not exist
-                        TraceHelper.Assert(collection.GetExisting(this.AbstractIdentityKey, out existingObj)); // new collection entry must now exist
-                        TraceHelper.Assert(object.ReferenceEquals(this, existingObj)); // must still refer to us
+                        Debug.Assert(!oldCollection.GetExisting(this.AbstractIdentityKey, out existingObj)); // old collection entry for us must not exist
+                        Debug.Assert(collection.GetExisting(this.AbstractIdentityKey, out existingObj)); // new collection entry must now exist
+                        Debug.Assert(object.ReferenceEquals(this, existingObj)); // must still refer to us
 
                         // User housekeeping
                         PostMove(executionResult);
@@ -1152,7 +1153,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     break;
 
                 default:
-                    TraceHelper.Assert(false); // Unknown action
+                    Debug.Assert(false); // Unknown action
                     break;
             }
         }
@@ -1232,7 +1233,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             CheckObjectStateAndParent(requiredState);
 
             List<SfcInstance> depObjects = GetDependentObjects(depAction);
-            TraceHelper.Assert(depObjects.Count > 0); // could not get any objects to script
+            Debug.Assert(depObjects.Count > 0); // could not get any objects to script
 
             // Save a copy of the original Keychain in case this is a rename or move.
             // Eitehr operation will mutate the original, so make a COPY.
@@ -1259,7 +1260,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         ResetKey();
 
                         // Better be equal now...
-                        TraceHelper.Assert(mostCurrentKey.Equals(this.AbstractIdentityKey));
+                        Debug.Assert(mostCurrentKey.Equals(this.AbstractIdentityKey));
                     }
 
                     SfcInstance existingObj;

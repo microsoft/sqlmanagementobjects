@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Smo
@@ -981,14 +982,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             {
                                 parent.Properties.Get("Length").Value = -1;
                             }
-                            if (parent.ServerVersion.Major >= 9)
-                            {
-                                schema = "sys";
-                            }
-                            else
-                            {
-                                schema = "dbo";
-                            }
+                            schema = "sys";
                         }
                         else
                         {
@@ -1261,7 +1255,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string dt = sqlObject.GetPropValueOptional("DataType", string.Empty) as string;
             string st = sqlObject.GetPropValueOptional("SystemType", string.Empty) as string;
 
-            if (sqlObject is Parameter && !(sqlObject is NumberedStoredProcedureParameter) && parent.ServerVersion.Major >= 10)
+            if (sqlObject is Parameter && !(sqlObject is NumberedStoredProcedureParameter))
             {
                 bool isReadOnly = (bool)(sqlObject.GetPropValueOptional("IsReadOnly", false));
                 if (isReadOnly) // IsReadOnly is true only for Parameters of UserDefinedTableType type
@@ -1454,7 +1448,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else if (sqlDataType == SqlDataType.UserDefinedDataType)
             {
-                Diagnostics.TraceHelper.Assert(false, "UDDT cannot have another UDDT as the system type");
+                Debug.Assert(false, "UDDT cannot have another UDDT as the system type");
             }
 
 

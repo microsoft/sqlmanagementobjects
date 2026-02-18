@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="OrderColumn" impl_type="SqlObject" min_major='10'>
+<EnumObject type="OrderColumn" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings >
 		<parent_link>
 			<link parent="ID" local="UdfID" />
@@ -15,4 +15,3 @@
 		<property name="UdfID" type="int" hidden='true'>oc.object_id</property>
 	</properties>
 </EnumObject>
-

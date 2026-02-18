@@ -39,10 +39,7 @@ namespace Microsoft.SqlServer.Management.Smo
             SetParentImpl(parent);
             Init();
             PartitionNumber = partitionNumber;
-            if (this.ServerVersion.Major >= 10)
-            {
-                DataCompression = dataCompressionType;
-            }
+            DataCompression = dataCompressionType;
             this.key = new PartitionNumberedObjectKey((short)PartitionNumber);
         }
 
@@ -59,10 +56,7 @@ namespace Microsoft.SqlServer.Management.Smo
             SetParentImpl(parent);
             Init();
             PartitionNumber = partitionNumber;
-            if (this.ServerVersion.Major >= 10)
-            {
-                DataCompression = dataCompressionType;
-            }
+            DataCompression = dataCompressionType;
 
             if (this.IsSupportedProperty(nameof(XmlCompression)))
             {
@@ -186,12 +180,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get
             {
                 this.ThrowIfNotSupported(typeof(PhysicalPartition));
-                //Even if somebody checking the data compression state for the partition on
-                //yukon server then returing compression state none is OK
-                if (this.ServerVersion.Major < 10)
-                {
-                    return DataCompressionType.None;
-                }
                 return (Microsoft.SqlServer.Management.Smo.DataCompressionType)this.Properties.GetValueWithNullReplacement("DataCompression");
             }
             set

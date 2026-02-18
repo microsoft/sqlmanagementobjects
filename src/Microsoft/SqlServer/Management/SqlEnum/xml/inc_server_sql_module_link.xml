@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='9'>
+		<version min_major='10'>
             <!-- 
             here we have to fetch from both sys.server_sql_modules and sys.system_sql_modules
             because user objects are stored in the former, and system objects are 
@@ -16,10 +16,7 @@
 		</version>
 	</settings>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<include file='inc_sql_module.xml' alias='{0}'/>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<property name="AnsiNullsStatus" type="bit" cast='true'>ISNULL(sm{0}.uses_ansi_nulls, ssm{0}.uses_ansi_nulls)</property>
 			<property name="QuotedIdentifierStatus" type="bit" cast='true'>ISNULL(sm{0}.uses_quoted_identifier, ssm{0}.uses_quoted_identifier)</property>
 			<property name="IsSchemaBound" type="bit" cast='true'>OBJECTPROPERTYEX({0}.object_id, N'IsSchemaBound')</property>

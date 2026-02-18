@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="ExternalFileFormat" impl_type="SqlObject" min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+<?xml version="1.0" ?>
+<EnumObject type="ExternalFileFormat" impl_type="SqlObject" min_major='13' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table="sys.external_file_formats" alias="eff"/>
   </settings>

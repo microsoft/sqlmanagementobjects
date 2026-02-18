@@ -378,8 +378,7 @@ END
                     // throw an exception if the target server is less than 9.0
                     SqlSmoObject.ThrowIfBelowVersion90(sp.TargetServerVersion);
 
-                    if (true == sp.DataType.XmlNamespaces && sp.TargetServerVersion >= SqlServerVersion.Version90 &&
-                        oObj.ServerVersion.Major >= 9)
+                    if (true == sp.DataType.XmlNamespaces && sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         // set the xml collection name if supplied
                         string xmlNamespaceName = oObj.Properties.Get("XmlSchemaNamespace").Value as string;
@@ -573,7 +572,6 @@ END
             // script only the name of the type if we don't have the schema
             // or we're on 8.0
             if (SqlServerVersion.Version80 == sp.TargetServerVersion ||
-                oObj.ServerVersion.Major < 9 ||
                 null == sTypeSchema)
             {
                 sb.AppendFormat("[{0}]", SqlBraket(sType));

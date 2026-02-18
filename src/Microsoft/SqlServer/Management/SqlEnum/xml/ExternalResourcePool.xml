@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="ExternalResourcePool" impl_type="SqlObject" min_major='13' >
+<?xml version="1.0" ?>
+<EnumObject type="ExternalResourcePool" impl_type="SqlObject" min_major='13'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <property_link table="sys.resource_governor_external_resource_pools AS p"/>
     </settings>
@@ -14,4 +14,3 @@
         <include file='inc_policy_health_state.xml'/>
     </properties>
 </EnumObject>
-

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Microsoft.SqlServer.Management.Smo
@@ -102,7 +103,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="obj"></param>
         protected override void ImplAddExisting(SqlSmoObject obj)
         {
-            Diagnostics.TraceHelper.Assert(obj.Properties.Contains("ID"));
+            Debug.Assert(obj.Properties.Contains("ID"));
 
             // use the most generic version of the GetPropValueOptional because 
             // ID is int in most cases, but it's byte for some objects (IndexedColumn)
@@ -112,7 +113,7 @@ namespace Microsoft.SqlServer.Management.Smo
             for (var i = 0; i < InternalStorage.Count; i++)
             {
                 var currObj = InternalStorage.GetByIndex(i);
-                Diagnostics.TraceHelper.Assert(currObj.Properties.Contains("ID"));
+                Debug.Assert(currObj.Properties.Contains("ID"));
 
                 var currObjId = Convert.ToInt32(currObj.GetPropValueOptional<object>("ID", -1),
                                                 SmoApplication.DefaultCulture);

@@ -1,22 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Import this props file to take dependencies on the proper version of Microsoft.Data.SqlClient and its upstream dependencies -->
-  <!-- The dependencies using PrivateAssets=all are needed at runtime but are excluded from the dependencies list in the nupkg.
-    The PackageReference items are required in order to have deterministic builds with no double writes.  -->
   <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj' and '$(UseMicrosoftData)' != 'false'">
-    <PackageReference Include="Azure.Core" PrivateAssets="all" />
-    <PackageReference Include="Azure.Identity" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
-    <PackageReference Include="Microsoft.Identity.Client" PrivateAssets="all" />
-    <PackageReference Include="System.Buffers" PrivateAssets="all" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" PrivateAssets="all" />
-    <PackageReference Include="System.Memory" PrivateAssets="all" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" PrivateAssets="all" />
-    <PackageReference Include="System.Text.Encodings.Web" PrivateAssets="All" />
-    <PackageReference Include="System.Text.Json" PrivateAssets="All" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(MSBuildProjectFile)' != 'dirs.proj'  and '$(GacVersion)' != 'true'" >
-    <PackageReference Include="System.ValueTuple" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup>
      <SqlClientReferenceImported>true</SqlClientReferenceImported>

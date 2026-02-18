@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="ResumableIndex" impl_type="SqlObject" min_major='14' cloud_min_major='12' datawarehouse_enabled='false'>
+<EnumObject type="ResumableIndex" impl_type="SqlObject" min_major='14' cloud_min_major='12' datawarehouse_enabled='false' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent="ID" local="ParentID" />

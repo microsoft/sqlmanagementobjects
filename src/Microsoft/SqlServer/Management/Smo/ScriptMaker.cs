@@ -1,17 +1,18 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using SmoEventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
 using Microsoft.SqlServer.Server;
 using Environment = System.Environment;
-using TraceHelper = Microsoft.SqlServer.Management.Diagnostics.TraceHelper;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -356,12 +357,13 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="writer"></param>
         void ScriptWorker(List<Urn> urns, ISmoScriptWriter writer)
         {
-            TraceHelper.Trace("ScriptMaker", "ScriptWorker invoked for {0} Urns: {1}", urns.Count, string.Join(Environment.NewLine + "\t", urns.Select(urn => urn.Value).ToArray()));
-            if (null == writer)
+            // Only perform expensive string join operation if scripting logging is enabled
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Scripting))
             {
-                throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("writer"));
+                SmoEventSource.Log.ScriptWorkerInvoked(urns.Count, string.Join(Environment.NewLine + "\t", urns.Select(urn => urn.Value).ToArray()));
             }
-            this.writer = writer;
+
+            this.writer = writer ?? throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("writer"));
             this.currentRetryArgs = null;
 
             this.scriptContainerFactory = null;
@@ -733,7 +735,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void OnScriptingProgress(ScriptingProgressStages scriptingProgressStages, IEnumerable<Urn> urns)
         {
-            TraceHelper.Trace("ScriptMaker", "OnScriptingProgress {0}", scriptingProgressStages);
+            SmoEventSource.Log.ScriptingProgress(scriptingProgressStages.ToString());
             if (this.scriptingProgress != null)
             {
                 this.scriptingProgress(this, new ScriptingProgressEventArgs(scriptingProgressStages, new List<Urn>(urns)));
@@ -903,7 +905,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 discoveredUrns = this.discoverer.Discover(urns);
             }
-            TraceHelper.Trace("ScriptMaker", "Discovered {0} Urns: {1}", discoveredUrns.Count(), string.Join(Environment.NewLine + "\t", discoveredUrns.Select(urn => urn.Value).ToArray()));
+            // Only perform expensive string join operation if scripting logging is enabled
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Scripting))
+            {
+                SmoEventSource.Log.UrnsDiscovered(discoveredUrns.Count(), string.Join(Environment.NewLine + "\t", discoveredUrns.Select(urn => urn.Value).ToArray()));
+            }
             return discoveredUrns;
         }
 
@@ -961,7 +967,11 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             int count = 0;
             HashSet<Urn> urnHashSet = new HashSet<Urn>();
-            TraceHelper.Trace("ScriptMaker", "ScriptCreateObjects for {0} Urns: {1}", urns.Count(), string.Join(Environment.NewLine + "\t", urns.Select(u => u.Value).ToArray()));
+            // Only perform expensive string join operation if scripting logging is enabled
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Scripting))
+            {
+                SmoEventSource.Log.ScriptCreateObjects(urns.Count(), string.Join(Environment.NewLine + "\t", urns.Select(u => u.Value).ToArray()));
+            }
 
             foreach (Urn urn in urns)
             {
@@ -1009,9 +1019,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     this.objectScripting(this, new ObjectScriptingEventArgs(objecturn, urn, count, this.totalObjectsToScript, scriptType));
                 }
-#if DEBUG
-                TraceHelper.Trace("ScriptMaker", "ScriptCreate complete for {0}", urn);
-#endif
+                SmoEventSource.Log.ScriptCreateComplete(urn.ToString());
             }
         }
 
@@ -1777,7 +1785,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 ExternalStream.UrnSuffix,
 
                 // External Streaming Job
-                ExternalStreamingJob.UrnSuffix
+                ExternalStreamingJob.UrnSuffix,
+
+                //External Model
+                ExternalModel.UrnSuffix
+
             };
 
         /// <summary>

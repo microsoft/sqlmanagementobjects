@@ -95,7 +95,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (this.serverConnection == null)
             {
-                Diagnostics.TraceHelper.Assert(m_ExecutionManager != null, "m_ExecutionManager == null");
+                Debug.Assert(m_ExecutionManager != null, "m_ExecutionManager == null");
                 this.serverConnection = m_ExecutionManager.ConnectionContext;
             }
 
@@ -170,7 +170,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    Diagnostics.TraceHelper.Assert(false, "Version property of Server can only be set in design mode");
+                    Debug.Assert(false, "Version property of Server can only be set in design mode");
                 }
             }
         }
@@ -209,6 +209,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 return new Version(this.BuildClrVersionString.Substring(1));
             }
         }
+
+
+        [SfcProperty(SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
+        public string Collation => ExecutionManager.ConnectionContext.Collation;
 
         /// <summary>
         /// Overrides the standard behavior of scripting object permissions.
@@ -860,44 +864,37 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 statement.Append(Globals.newline);
 
-                if (this.ServerVersion.Major >= 9)
+                if (attachOptions == AttachOptions.RebuildLog)
                 {
-                    if (attachOptions == AttachOptions.RebuildLog)
-                    {
-                        statement.Append(" FOR ATTACH_REBUILD_LOG");
-                    }
-                    else
-                    {
-                        statement.Append(" FOR ATTACH");
-
-                        switch (attachOptions)
-                        {
-                            case AttachOptions.EnableBroker:
-                                statement.Append(" WITH ENABLE_BROKER");
-                                break;
-
-                            case AttachOptions.NewBroker:
-                                statement.Append(" WITH NEW_BROKER");
-                                break;
-
-                            case AttachOptions.ErrorBrokerConversations:
-                                statement.Append(" WITH ERROR_BROKER_CONVERSATIONS");
-                                break;
-
-                            case AttachOptions.None:
-                                //
-                                // do nothing.
-                                //
-                                break;
-
-                            default:
-                                throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("AttachOptions"));
-                        }
-                    }
+                    statement.Append(" FOR ATTACH_REBUILD_LOG");
                 }
                 else
                 {
                     statement.Append(" FOR ATTACH");
+
+                    switch (attachOptions)
+                    {
+                        case AttachOptions.EnableBroker:
+                            statement.Append(" WITH ENABLE_BROKER");
+                            break;
+
+                        case AttachOptions.NewBroker:
+                            statement.Append(" WITH NEW_BROKER");
+                            break;
+
+                        case AttachOptions.ErrorBrokerConversations:
+                            statement.Append(" WITH ERROR_BROKER_CONVERSATIONS");
+                            break;
+
+                        case AttachOptions.None:
+                            //
+                            // do nothing.
+                            //
+                            break;
+
+                        default:
+                            throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("AttachOptions"));
+                    }
                 }
 
 
@@ -1753,14 +1750,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     version value  0 means shiloh supported collation
                     version value  1 means yukon  supported collation
                     version value  2 means katmai supported collation   */
-                if (this.ServerVersion.Major < 9)
-                {
-                    collations = this.ExecutionManager.ExecuteWithResults("SELECT CollationVersion = CASE WHEN COLLATIONPROPERTY('" + collationName + "', 'lcid') IS NOT NULL THEN '0' END").Tables[0];
-                }
-                else
-                {
-                    collations = this.ExecutionManager.ExecuteWithResults("SELECT COLLATIONPROPERTY('" + collationName + "', 'Version') as CollationVersion").Tables[0];
-                }
+                collations = this.ExecutionManager.ExecuteWithResults("SELECT COLLATIONPROPERTY('" + collationName + "', 'Version') as CollationVersion").Tables[0];
             }
             finally
             {
@@ -2134,8 +2124,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     spidColumn = "request_session_id";
                 }
 
-                Diagnostics.TraceHelper.Assert(null != spids, "null == spids");
-                Diagnostics.TraceHelper.Assert(null != spidColumn, "null == spidColumn");
+                Debug.Assert(null != spids, "null == spids");
+                Debug.Assert(null != spidColumn, "null == spidColumn");
 
                 var col = new StringCollection();
                 if (DatabaseEngineType == DatabaseEngineType.Standalone)
@@ -2780,7 +2770,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         /// <param name="typeObject">Type of the object</param>
         /// <param name="fields">List of the fields</param>
-        /// <param name="databaseEngineEdition">This value is ignored by the method. Field names not relevant for the active Database will be filtered from the query.</param>
+        /// <param name="databaseEngineEdition">This value is only used when the type of the object is Database. For child objects of Database, properties not supported for the edition can be passed here and will be ignored.</param>
         public void SetDefaultInitFields(Type typeObject, StringCollection fields, DatabaseEngineEdition databaseEngineEdition)
         {
             // validate input parameters
@@ -2800,7 +2790,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new FailedOperationException(ExceptionTemplates.CannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
             }
 
-            var initFields = CreateInitFieldsColl(typeObject).ToList();
+            var initFields = CreateInitFieldsColl(typeObject, databaseEngineEdition).ToList();
             initFields.AddRange(fields.Cast<string>().Where(f => !initFields.Contains(f)));
             TypeInitFields[typeObject] = initFields;
         }
@@ -2952,11 +2942,11 @@ namespace Microsoft.SqlServer.Management.Smo
         internal string[] GetDefaultInitFieldsInternal(Type typeObject, DatabaseEngineEdition databaseEngineEdition)
         {
             // Has the existing fields already been inited
-            var requiredFields = CreateInitFieldsColl(typeObject);
+            var requiredFields = CreateInitFieldsColl(typeObject, databaseEngineEdition);
             IList<string> existingFields;
             if (!(TypeInitFields.TryGetValue(typeObject, out existingFields)))
             {
-                var fields = CreateInitFieldsColl(typeObject).ToList();
+                var fields = CreateInitFieldsColl(typeObject, databaseEngineEdition).ToList();
                 // Should we init with all fields
                 if (useAllFieldsForInit)
                 {
@@ -2982,7 +2972,7 @@ namespace Microsoft.SqlServer.Management.Smo
             return existingFields.Where(f => requiredFields.Contains(f) || IsSupportedProperty(typeObject, f, databaseEngineEdition)).ToArray();
         }
 
-        private IEnumerable<string> CreateInitFieldsColl(Type typeObject)
+        private IEnumerable<string> CreateInitFieldsColl(Type typeObject, DatabaseEngineEdition databaseEngineEdition)
         {
             // add fields that are mandatory
             // we will strip those fields when the user is requesting them
@@ -3046,6 +3036,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase) {
                     yield return "RealEngineEdition";
                 }
+                // Fetch collation properties because they are used frequently to compare collection members
+                if (IsSupportedProperty(typeof(Database), nameof(Database.CatalogCollation), databaseEngineEdition))
+                {
+                    yield return nameof(Database.CatalogCollation);
+                }
+                yield return nameof(Database.Collation);
             }
             else if (typeObject.IsSubclassOf(typeof(NamedSmoObject)))
             {
@@ -3153,7 +3149,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return mi.Invoke(null, new object[] { parentType, this.ServerVersion, this.DatabaseEngineType, databaseEngineEdition, this.DefaultTextMode && (!sp.OldOptions.EnforceScriptingPreferences) }) as string[];
             }
-            Diagnostics.TraceHelper.Assert(null != mi, childType.Name + " is missing GetScriptFields method!");
+            Debug.Assert(null != mi, childType.Name + " is missing GetScriptFields method!");
 
             return new string[] { };
         }

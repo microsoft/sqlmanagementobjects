@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='Transactions' impl_type='SqlObject' min_major='9' cloud_min_major='12'>
+<EnumObject type='Transactions' impl_type='SqlObject' min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 <!--
 1. we want all transactions normal and snapshot 
 2. if it is in dm_tran_active_snapshot_database_transactions we call a transaction versioned 

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- File name extension must be .runsettings -->
 <RunSettings>
+  <RunConfiguration>
+    <DisableParallelization>true</DisableParallelization>
+  </RunConfiguration>
   <TestRunParameters>
-    <Parameter name="SqlTestTargetServersFilter" value="AzureSterlingV12_SqlDWGen3" />
+    <Parameter name="SqlTestTargetServersFilter" value="FabricDatabase;FabricWarehouse" />
   </TestRunParameters>
   <DataCollectionRunSettings>
     <DataCollectors>
@@ -37,9 +40,6 @@ Included items must then not match any entries in the exclude list to remain inc
                 <ModulePath>.*Microsoft\.SqlServer\.Test\..*</ModulePath>
                 <!-- sqlparser code coverage is measured in its own branch tests -->
                 <ModulePath>.*Microsoft\.SqlServer\.Management\.SqlParser\.dll</ModulePath>
-                <ModulePath>.*Microsoft\.SqlServer\.RegSvrEnum\.dll</ModulePath>
-                <!-- Utility doesn't ship in the nuget package -->
-                <ModulePath>.*Microsoft\.SqlServer\.Management\.Utility\.dll</ModulePath>
                 <ModulePath>.*NUnit.*</ModulePath>
                 <ModulePath>.*moq.*</ModulePath>
               </Exclude>
@@ -69,38 +69,6 @@ Included items must then not match any entries in the exclude list to remain inc
               </Exclude>
             </Sources>
 
-            <Functions>
-            <!-- We are expressly ignoring hard-to-reach special cases and code specific to Design Mode -->
-              <Exclude>
-                <Function>.*DesignMode.*</Function>
-                <Function>.*DoDatabaseSpecialCase\(.*</Function>
-                <Function>.*GenerateStretchHeapWithClause.*</Function>
-                <Function>.*GetPropertyDefaultValue\(.*</Function>
-                <Function>.*InitFromSqlServer2005Store.*</Function>
-                <Function>.*InvalidSqlServer2005StoreFormatException.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.RegisteredServers.\RegisteredServersStore\.AddGroupMember.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Sdk\.Sfc\.SfcSerializer.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Smo\.AvailableSQLServers.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Smo\.DatabaseDdlTriggerEventSet.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Smo\.PostProcessServerDdlTriggerEvents.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Smo\.ServerDdlTriggerEvent.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Smo\.SqlSmoObject\.GetChildSingleton.*</Function>
-                <Function>Microsoft\.SqlServer\.Management\.Smo\.SqlSmoObject\.SetAccessToken.*</Function>                <Function>.*PopulateV7.*</Function>
-                <Function>.*PopulateV7.*</Function>
-                <Function>.*PopulateV9.*</Function>
-                <Function>.*ScriptAlterLess9.*</Function>
-                <Function>.*ScriptDbProps70Comp.*</Function>
-                <Function>.*ScriptCreateLess9.*</Function>
-                <Function>.*TestNetSend</Function>
-                <Function>.*ThrowIfBelowVersion80SP3.*</Function>
-                <Function>.*ThrowIfAboveVersion80.*</Function>
-                <Function>.*ThrowIfAboveVersion100.*</Function>                
-                <Function>.*ThrowIfSourceOrDestBelowVersion80.*</Function>
-                <Function>.*ThrowIfSourceOrDestBelowVersion90.*</Function>
-                <Function>.*ThrowIfSourceOrDestBelowVersion100.*</Function>
-                <Function>.*UpgradeFromSqlServer2005.*</Function>
-              </Exclude>
-            </Functions>
             <!-- Match the public key token of a signed assembly: -->
             <PublicKeyTokens>
               <!-- Exclude Visual Studio extensions: -->

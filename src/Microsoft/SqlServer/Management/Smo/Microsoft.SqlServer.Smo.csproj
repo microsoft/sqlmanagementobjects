@@ -84,6 +84,7 @@
     <CodeGen Include="ExternalResourcePool.cs" />
     <CodeGen Include="ExternalStream.cs" />
     <CodeGen Include="ExternalStreamingJob.cs" />
+    <CodeGen Include="ExternalModel.cs" />
     <CodeGen Include="FileGroup.cs" />
     <CodeGen Include="ForeignKey.cs" />
     <CodeGen Include="ForeignKeyColumn.cs" />
@@ -233,6 +234,7 @@
     <Compile Include="$(SmoSourceDir)\Collections\ExternalLanguageFileCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\ExternalLibraryCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\ExternalStreamCollection.cs" />
+    <Compile Include="$(SmoSourceDir)\Collections\ExternalModelCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\ExternalStreamingJobCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\ExternalResourcePoolCollection.cs" />
     <Compile Include="$(SmoSourceDir)\Collections\FileGroupCollection.cs" />
@@ -415,6 +417,7 @@
     <Compile Include="$(SmoSourceDir)\ExternalResourcePoolBase.cs" />
     <Compile Include="$(SmoSourceDir)\ExternalStreamBase.cs" />
     <Compile Include="$(SmoSourceDir)\ExternalStreamingJobBase.cs" />
+    <Compile Include="$(SmoSourceDir)\ExternalModelBase.cs" />
     <Compile Include="$(SmoSourceDir)\ExtensionClass.cs" />
     <Compile Include="$(SmoSourceDir)\Facets\AvailabilityGroupState.cs" />
     <Compile Include="$(SmoSourceDir)\Facets\DatabaseAdapter.cs" />

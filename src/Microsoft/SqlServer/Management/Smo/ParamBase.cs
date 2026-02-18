@@ -195,7 +195,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (bIsReadOnly && !(this is NumberedStoredProcedureParameter) && ServerVersion.Major >= 10)
+            if (bIsReadOnly && !(this is NumberedStoredProcedureParameter))
             {
                 if (null != Properties.Get("IsReadOnly").Value && true == (bool)Properties.Get("IsReadOnly").Value)
                 {

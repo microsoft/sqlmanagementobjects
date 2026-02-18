@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="PartitionFunctionParameter" impl_type="SqlObject" min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+<EnumObject type="PartitionFunctionParameter" impl_type="SqlObject" min_major='10' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="ParentID" />

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Specialized;
 using System.Data;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 using Cmn = Microsoft.SqlServer.Management.Common;
@@ -82,7 +83,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 foreach (DataRow dr in dt.Rows)
                 {
                     createQuery.Length = 0;
-                    Diagnostics.TraceHelper.Assert(!(string.IsNullOrEmpty(dr["Name"].ToString())), "Invalid login name");
+                    Debug.Assert(!(string.IsNullOrEmpty(dr["Name"].ToString())), "Invalid login name");
                     createQuery.AppendFormat(SmoApplication.DefaultCulture,
                             "EXEC msdb.dbo.sp_grant_login_to_proxy @proxy_name={0}, @login_name={1}",
                             MakeSqlString(this.Name), MakeSqlString(dr["Name"].ToString()));

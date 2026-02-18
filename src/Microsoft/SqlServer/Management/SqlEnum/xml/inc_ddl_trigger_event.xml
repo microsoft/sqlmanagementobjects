@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="inc_ddl_trigger_event" impl_type="SqlObject" min_major='9'  cloud_min_major='10'>
+<EnumObject type="inc_ddl_trigger_event" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<post_process fields='#DdlTriggerEvents#' triggered_fields = "#DdlTriggerEventsInternal#" class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseDdlTriggerEvents'/>
 	</settings>

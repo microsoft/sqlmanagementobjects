@@ -1,10 +1,7 @@
 <?xml version='1.0' ?>
-<EnumObject type='PerfInfo' impl_type='SqlObject' min_major='7'>
+<EnumObject type='PerfInfo' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link table='master.dbo.sysperfinfo AS spi'>spi.cntr_type != 1073939459</property_link>
-		</version>
-		<version min_major='9' max_major='10'>
+		<version min_major='10' max_major='10'>
       <property_link table='sys.dm_os_performance_counters AS spi'>spi.cntr_type != 1073939712</property_link>
     </version>
     <version min_major='11' >

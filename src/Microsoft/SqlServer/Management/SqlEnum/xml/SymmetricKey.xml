@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='SymmetricKey' impl_type='SqlObject' min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
+<EnumObject type='SymmetricKey' impl_type='SqlObject' min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='sys.symmetric_keys' alias='c'>c.symmetric_key_id &lt;&gt; 101</property_link>
 		<property_link fields = '#IsOpen#' left_join='sys.openkeys AS ok'>ok.key_id=c.symmetric_key_id and ok.database_id=db_id()</property_link>

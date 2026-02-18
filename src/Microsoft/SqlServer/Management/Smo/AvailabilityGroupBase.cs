@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Microsoft.SqlServer.Diagnostics.STrace;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -495,7 +494,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             // sanity checks
-            tc.Assert(null != query, "String collection should not be null");
+            System.Diagnostics.Debug.Assert(null != query, "String collection should not be null");
 
             // Ensure target server version is >= 11, and database engine is not azure
             ThrowIfBelowVersion110(sp.TargetServerVersion);
@@ -665,7 +664,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
             var createScript = script.ToString();
             query.Add(createScript);
-            tc.TraceInformation("Generated Create Script: {0}", createScript);
+            if (SmoEventSource.Log.IsEnabled())
+            {
+                SmoEventSource.Log.ScriptingProgress($"Generated Create Script: {createScript}");
+            }
         }
 
         /// <summary>
@@ -701,7 +703,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             //sanity checks
-            tc.Assert(null != alterQuery, "String collection should not be null");
+            System.Diagnostics.Debug.Assert(null != alterQuery, "String collection should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
             ThrowIfBelowVersion110(sp.TargetServerVersion);
@@ -735,7 +737,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //DROP AVAILABILITY GROUP 'group_name'
 
             //sanity checks
-            tc.Assert(null != dropQuery, "String collection for the drop query should not be null");
+            System.Diagnostics.Debug.Assert(null != dropQuery, "String collection for the drop query should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
             ThrowIfBelowVersion110(sp.TargetServerVersion);
@@ -766,7 +768,10 @@ namespace Microsoft.SqlServer.Management.Smo
 
             string dropScript = script.ToString(); 
             dropQuery.Add(dropScript);
-            tc.TraceInformation("Generated drop script: " + dropScript);
+            if (SmoEventSource.Log.IsEnabled())
+            {
+                SmoEventSource.Log.ScriptingProgress($"Generated drop script: {dropScript}");
+            }
         }
 
         /// <summary>
@@ -949,8 +954,6 @@ namespace Microsoft.SqlServer.Management.Smo
         #endregion
 
         #region Private members
-
-        private static readonly TraceContext tc = TraceContext.GetTraceContext(SmoApplication.ModuleName, "AvailabilityGroup");
 
         private bool IsDirty(string property)
         {

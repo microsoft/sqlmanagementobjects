@@ -5,9 +5,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using Microsoft.SqlServer.Management.Common;
 
 // !!!! IMPORTANT !!!!
 //
@@ -84,8 +86,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 throw new ArgumentNullException("resourcesName");
             }
 
-            TraceHelper.Assert(resourcesName != null, "unexpected null resourcesName parameter");
-            TraceHelper.Assert(0 < resourcesName.Length, "unexpected empty resourcesName");
+            Debug.Assert(resourcesName != null, "unexpected null resourcesName parameter");
+            Debug.Assert(0 < resourcesName.Length, "unexpected empty resourcesName");
 
             this.resourcesName = resourcesName;
             this.useDefaultKeys = false;
@@ -98,8 +100,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="useDefaultKeys"></param>
         public LocalizedPropertyResourcesAttribute(string resourcesName, bool useDefaultKeys)
         {
-            TraceHelper.Assert(resourcesName != null, "unexpected null resourcesName parameter");
-            TraceHelper.Assert(0 < resourcesName.Length, "unexpected empty resourcesName");
+            Debug.Assert(resourcesName != null, "unexpected null resourcesName parameter");
+            Debug.Assert(0 < resourcesName.Length, "unexpected empty resourcesName");
             this.resourcesName = resourcesName;
             this.useDefaultKeys = useDefaultKeys;
         }
@@ -114,7 +116,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 throw new ArgumentNullException("resourceType");
             }
 
-            TraceHelper.Assert(resourceType != null, "unexpected null resourceType parameter");
+            Debug.Assert(resourceType != null, "unexpected null resourceType parameter");
             this.resourcesName = resourceType.FullName;
         }
     }
@@ -158,7 +160,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             else
             {
-                TraceHelper.Assert(false, "keyAttribute " + keyAttribute.Name + " is of unknown type");
+                Debug.Assert(false, "keyAttribute " + keyAttribute.Name + " is of unknown type");
             }
 
             return key;
@@ -382,8 +384,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="key">The key used to look up the localized property category</param>
         public DisplayCategoryKeyAttribute(string key)
         {
-            TraceHelper.Assert(key != null, "unexpected null key parameter");
-            TraceHelper.Assert(0 < key.Length, "unexpected empty key");
+            Debug.Assert(key != null, "unexpected null key parameter");
+            Debug.Assert(0 < key.Length, "unexpected empty key");
 
             this.key = key;
         }
@@ -452,8 +454,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="key">The key used to look up the localized property name</param>
         public DisplayNameKeyAttribute(string key)
         {
-            TraceHelper.Assert(key != null, "unexpected null key parameter");
-            TraceHelper.Assert(0 < key.Length, "unexpected empty key");
+            Debug.Assert(key != null, "unexpected null key parameter");
+            Debug.Assert(0 < key.Length, "unexpected empty key");
 
             this.key = key;
         }
@@ -518,8 +520,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="key">The key used to look up the localized property description</param>
         public DisplayDescriptionKeyAttribute(string key)
         {
-            TraceHelper.Assert(key != null, "unexpected null key parameter");
-            TraceHelper.Assert(0 < key.Length, "unexpected empty key");
+            Debug.Assert(key != null, "unexpected null key parameter");
+            Debug.Assert(0 < key.Length, "unexpected empty key");
 
             this.key = key;
         }
@@ -709,8 +711,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         public LocalizablePropertyDescriptor(PropertyInfo property, ResourceManager resourceManager, bool isDefaultResourceManager)
             : base(property.Name, null)
         {
-            TraceHelper.Assert(property != null, "unexpected null property object");
-            TraceHelper.Assert(resourceManager != null, "resourceManager is null, is the resource string name correct?");
+            Debug.Assert(property != null, "unexpected null property object");
+            Debug.Assert(resourceManager != null, "resourceManager is null, is the resource string name correct?");
 
             // throw exceptions for null parameters
             if (property == null)
@@ -1153,8 +1155,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         public LocalizableMemberDescriptor(Type type, ResourceManager resourceManager, bool isDefaultResourceManager)
             : base(type.Name, null)
         {
-            TraceHelper.Assert(type != null, "unexpected null type object");
-            TraceHelper.Assert(resourceManager != null, "resourceManager is null, is the resource string name correct?");
+            Debug.Assert(type != null, "unexpected null type object");
+            Debug.Assert(resourceManager != null, "resourceManager is null, is the resource string name correct?");
 
             // throw exceptions for null parameters
             if (type == null)
@@ -1377,7 +1379,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         private PropertyDescriptorCollection GetPropertiesFromType(Type valueType)
         {
-            TraceHelper.Assert(valueType != null, "unexpected null value");
+            Debug.Assert(valueType != null, "unexpected null value");
 
             if (valueType == null)
             {
@@ -1500,7 +1502,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <returns></returns>
         public LocalizableMemberDescriptor GetTypeMemberDescriptor(Type type)
         {
-            TraceHelper.Assert(type != null, "unexpected null value");
+            Debug.Assert(type != null, "unexpected null value");
             if (type == null)
             {
                 throw new ArgumentNullException("value");
@@ -1563,8 +1565,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="manager">The resource manager used to load localized field names</param>
         private void LoadLocalizedFieldNames(Type type, ResourceManager manager)
         {
-            TraceHelper.Assert(type.IsEnum(), "type is not an Enum");
-            TraceHelper.Assert(manager != null, "manager is null");
+            Debug.Assert(type.IsEnum(), "type is not an Enum");
+            Debug.Assert(manager != null, "manager is null");
 
             // we get the FieldInfo for each field and then pull off the DisplayNameKey if it has one
             // and then use that to get the localized value
@@ -1606,7 +1608,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="type">The .NET Type for the enum</param>
         private void LoadUnlocalizedFieldNames(Type type)
         {
-            TraceHelper.Assert(type.IsEnum(), "type is not an Enum");
+            Debug.Assert(type.IsEnum(), "type is not an Enum");
 
             foreach (string fieldName in Enum.GetNames(type))
             {

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
@@ -137,7 +138,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
 
         internal void DoScript(ScriptOutputOptions outputOptions)
         {
-            SqlScriptPublishModelTraceHelper.Assert(outputOptions != null, "outputOptions is null");
+            Debug.Assert(outputOptions != null, "outputOptions is null");
             if (outputOptions == null)
             {
                 throw new ArgumentNullException("outputOptions");
@@ -432,7 +433,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             {
                 //If you are getting this assertion fail it means you are working for higher
                 //version of SQL Server. You need to update this part of code.
-                SqlScriptPublishModelTraceHelper.Assert(false, "This part of the code is not updated corresponding to latest version change");
+                Debug.Assert(false, "This part of the code is not updated corresponding to latest version change");
             }
 
             // for cloud scripting to work we also have to have Script Compat set to 105.
@@ -477,7 +478,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     scriptingOptions.TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlOnDemand;
                     break;
                 default:
-                    SqlScriptPublishModelTraceHelper.Assert(scriptingOptions.TargetDatabaseEngineEdition == DatabaseEngineEdition.Standard, "The default database engine edition is Standard.");
+                    Debug.Assert(scriptingOptions.TargetDatabaseEngineEdition == DatabaseEngineEdition.Standard, "The default database engine edition is Standard.");
                     scriptingOptions.TargetDatabaseEngineEdition = DatabaseEngineEdition.Standard;
                     break;
             }

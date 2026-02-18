@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="WorkloadManagementWorkloadClassifier" impl_type="SqlObject" datawarehouse_enabled='true'>
+<?xml version="1.0" ?>
+<EnumObject type="WorkloadManagementWorkloadClassifier" impl_type="SqlObject" datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table="#tmp_pivot_classifier_details_table" alias="wc"/>
     <prefix>

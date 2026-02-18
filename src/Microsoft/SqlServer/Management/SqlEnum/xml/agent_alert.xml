@@ -1,15 +1,8 @@
 <?xml version='1.0' ?>
-<EnumObject type='SPHelpAlert' impl_type='SqlObject' min_major='7'>
+<EnumObject type='SPHelpAlert' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='#tmp_sp_help_alert' alias='tsha' />
-		<version min_major='7' max_major='8'>
-			<prefix>
-				create table #tmp_sp_help_alert
-				(id int null, name nvarchar(128) null, event_source nvarchar(100) null, event_category_id int null, event_id int null, message_id int null, severity int null, enabled tinyint null, delay_between_responses int null, last_occurrence_date int null, last_occurrence_time int null, last_response_date int null, last_response_time int null, notification_message nvarchar(512) null, include_event_description tinyint null, database_name nvarchar(128) null, event_description_keyword nvarchar(100) null, occurrence_count int null, count_reset_date int null, count_reset_time int null, job_id uniqueidentifier null, job_name nvarchar(128) null, has_notification int null, flags int null, performance_condition nvarchar(512) null, category_name nvarchar(128) null, type int null)
-				insert into #tmp_sp_help_alert exec msdb.dbo.sp_help_alert
-			</prefix>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<prefix>
 create table #tmp_sp_help_alert
 (id int null, name nvarchar(128) null, event_source nvarchar(100) null, event_category_id int null, event_id int null, message_id int null, severity int null, enabled tinyint null, delay_between_responses int null, last_occurrence_date int null, last_occurrence_time int null, last_response_date int null, last_response_time int null, notification_message nvarchar(512) null, include_event_description tinyint null, database_name nvarchar(128) null, event_description_keyword nvarchar(100) null, occurrence_count int null, count_reset_date int null, count_reset_time int null, job_id uniqueidentifier null, job_name nvarchar(128) null, has_notification int null, flags int null, performance_condition nvarchar(512) null, category_name nvarchar(128) null, wmi_namespace nvarchar(max) null, wmi_query nvarchar(max) null, type int null)
@@ -57,7 +50,7 @@ drop table #tmp_sp_help_alert
 		<property name='PerformanceCondition' type='nvarchar' size='512'>ISNULL(tsha.performance_condition,N'')</property>
 		<property name='CategoryName' type='nvarchar' size='128'>ISNULL(tsha.category_name,N'')</property>
 		
-		<version min_major='9'>
+		<version min_major='10'>
 			<property name='WmiEventNamespace' type='nvarchar' size='max'>ISNULL(tsha.wmi_namespace,N'')</property>
 			<property name='WmiEventQuery' type='nvarchar' size='max'>ISNULL(tsha.wmi_query,N'')</property>
 		</version>

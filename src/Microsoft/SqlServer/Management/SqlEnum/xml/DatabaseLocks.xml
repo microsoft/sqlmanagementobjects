@@ -1,20 +1,12 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Lock" impl_type="SqlObject" min_major='7' cloud_min_major='12' >
+<?xml version="1.0" ?>
+<EnumObject type="Lock" impl_type="SqlObject" min_major='10' cloud_min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <property_link table='#t AS l' />
-        <version min_major='7'>
+        <version min_major='10'>
           <property_link fields='#LockType#' join='master.dbo.spt_values AS v'>v.number = l.mode AND v.type = N'L'</property_link>
         </version>
         <version cloud_min_major='12'>
           <property_link fields='#LockType#' join='#v AS v'>v.number = l.mode</property_link>
-        </version>
-        <version min_major='7' max_major='8'>
-            <prefix>
-                CREATE TABLE #t(spid int, mode int, dbid int NULL, objid int, objid2 int, indid int, status tinyint, ltype tinyint, objname sysname NULL, indname sysname NULL, dbname sysname NULL, sch sysname NULL)
-
-                INSERT #t SELECT spid = req_spid, mode = req_mode + 1, dbid=rsc_dbid, objid=l.rsc_objid, objid2=l.rsc_objid, indid=l.rsc_indid, status = l.req_status, ltype = l.rsc_type, objname=NULL, indname=NULL, dbname = NULL, sch = NULL
-                FROM master.dbo.syslockinfo l WHERE rsc_dbid != db_id('tempdb') OR rsc_objid != object_id('#t')
-            </prefix>
         </version>
         <!-- For azure we hard code the equivalent of select name, number from master.dbo.spt_values where type = N'L' -->
         <version cloud_min_major='12'>
@@ -45,7 +37,7 @@
                             (N'RangeX-X', 22);
           </prefix>
         </version>
-        <version min_major='9' cloud_min_major='12'>
+        <version min_major='10' cloud_min_major='12'>
             <prefix>
                 CREATE TABLE #t(spid int, mode int, dbid int NULL, objid bigint, objid2 bigint, indid int, status tinyint, ltype nvarchar(120), objname sysname NULL, indname sysname NULL, dbname sysname NULL, sch sysname NULL)
 
@@ -83,12 +75,7 @@
                 FROM sys.dm_tran_locks l WHERE resource_database_id = db_id() and resource_associated_entity_id != object_id('#t')
             </prefix>
               </version>
-        <version min_major='7' max_major='8'>
-            <prefix fields='#Database#Schema#Table#Index#'>
-update #t set dbname = d.name FROM #t t LEFT OUTER JOIN master.dbo.sysdatabases d ON d.dbid = t.dbid
-            </prefix>
-        </version>
-        <version min_major='9' cloud_min_major='12'>
+        <version min_major='10' cloud_min_major='12'>
             <prefix fields='#Database#Schema#Table#Index#'>
                 update #t set dbname = d.name FROM #t t LEFT OUTER JOIN sys.databases d ON d.database_id = t.dbid
                 update #t set objid2 = -objid2 where dbname is null
@@ -107,14 +94,7 @@ update #t set dbname = d.name FROM #t t LEFT OUTER JOIN master.dbo.sysdatabases 
             IF (@@FETCH_STATUS &lt;&gt; -2)
             BEGIN
         </prefix>
-        <version min_major='7' max_major='8'>
-            <prefix fields='#Database#Schema#Table#Index#'>
-                SELECT @sql = 'use ' + quotename(@dbname) + ' update #t set objname = o.name, indname = i.name, sch=user_name(o.uid) FROM #t AS t ' +
-                'LEFT JOIN dbo.sysobjects AS o ON o.id = t.objid LEFT OUTER JOIN dbo.sysindexes AS i ON i.id = t.objid AND i.indid = t.indid ' +
-                'WHERE t.ltype in (4,5) AND t.dbid = ' + CAST(@dbid AS NVARCHAR(20))
-            </prefix>
-        </version>
-        <version min_major='9' cloud_min_major='12'>
+        <version min_major='10' cloud_min_major='12'>
             <prefix fields='#Database#Schema#Table#Index#'>
                 IF( NOT @dbname	IS NULL )--resource database
                 SELECT @sql = 'use ' + quotename(@dbname)

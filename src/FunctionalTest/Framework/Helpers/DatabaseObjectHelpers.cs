@@ -389,6 +389,52 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         }
 
         /// <summary>
+        /// Create an external model.
+        /// </summary>
+        /// <param name="db">The target database</param>
+        /// <param name="modelName">The external model name</param>
+        /// <returns>The newly created external model</returns>
+        public static ExternalModel CreateExternalModelDefinition(this SMO.Database db, string modelName)
+        {
+            TraceHelper.TraceInformation("Creating external model [{0}] for database [{1}]", modelName, db.Name);
+            SMO.ExternalModel model = new SMO.ExternalModel(db, modelName);
+            return model;
+        }
+
+        /// <summary>
+        /// Creates an external model on the server.
+        /// </summary>
+        /// <param name="db">The target database</param>
+        /// <param name="modelName">The name of the external model</param>
+        /// <param name="location">The location of the model</param>
+        /// <param name="apiFormat">The API format (e.g., "ONNX")</param>
+        /// <param name="modelType">The model type (e.g., "EMBEDDINGS")</param>
+        /// <param name="model">The model content or identifier</param>
+        /// <param name="parameters">Any model parameters</param>
+        /// <param name="credential">Credential name used for access</param>
+        /// <returns>The newly created ExternalModel object</returns>
+        public static ExternalModel CreateExternalModel(
+            this SMO.Database db,
+            string modelName,
+            string location,
+            string apiFormat,
+            string modelType,
+            string model,
+            string parameters,
+            string credential)
+        {
+            var externalModel = CreateExternalModelDefinition(db, modelName);
+            externalModel.Location = location;
+            externalModel.ApiFormat = apiFormat;
+            externalModel.ModelType = ExternalModelType.Embeddings;
+            externalModel.Model = model;
+            externalModel.Parameters = parameters;
+            externalModel.Credential = credential;
+            externalModel.Create();
+            return externalModel;
+        }
+
+        /// <summary>
         /// Creates a user defined function definition with a uniquely generated name prefixed by the specified prefix and defined with the specified
         /// body and header. Optionally allows specifying the schema and whether the view is Schema Bound.
         /// </summary>

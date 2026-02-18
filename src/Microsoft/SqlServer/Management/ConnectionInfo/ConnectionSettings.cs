@@ -1243,7 +1243,7 @@ namespace Microsoft.SqlServer.Management.Common
             }
             else
             {
-                Trace.TraceWarning("Unable to set ApplicationIntent property because it is not supported");
+                SmoEventSource.Log.ConnectionConfigurationWarning("Unable to set ApplicationIntent property because it is not supported");
             }
         }
 

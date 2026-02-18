@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Database" impl_type="Database" min_major='7'  cloud_min_major='10'>
+<?xml version="1.0" ?>
+<EnumObject type="Database" impl_type="Database" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <version min_major='10'>
 	  <prefix fields='#HasDatabaseEncryptionKey#'>

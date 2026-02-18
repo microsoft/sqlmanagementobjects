@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="PlanGuide" impl_type="SqlObject" min_major='9'  cloud_min_major='12'>
+<?xml version="1.0" ?>
+<EnumObject type="PlanGuide" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <property_link table='sys.plan_guides AS pg' />
         <property_link fields = '#ScopeObjectName#ScopeSchemaName#' 
@@ -21,13 +21,6 @@
         <property name="ExtPropClass" type="int" hidden='true'>27</property>
         <property name="ExtPropMajorID" type="int" hidden='true'>pg.plan_guide_id</property>
         <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
-
-        <version min_major='9' max_major='9'>
-            <property name="ScopeBatch" type="nvarchar" size='max' read_only_after_creation="true">
-                ISNULL((case when ((pg.scope_type = 2 and pg.scope_batch is null) or pg.scope_type = 3) then pg.query_text else pg.scope_batch
-                end), N'')
-            </property>
-        </version>
 
         <version min_major='10'  cloud_min_major='12'>
             <property name="ScopeBatch" type="nvarchar" size='max' read_only_after_creation="true">ISNULL(pg.scope_batch, N'')</property>

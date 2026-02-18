@@ -7,7 +7,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-using Microsoft.SqlServer.Diagnostics.STrace;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -353,7 +352,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             //sanity checks
-            tc.Assert(null != query, "String collection should not be null");
+            System.Diagnostics.Debug.Assert(null != query, "String collection should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
             ThrowIfBelowVersion110(sp.TargetServerVersion);
@@ -454,7 +453,7 @@ namespace Microsoft.SqlServer.Management.Smo
              */
 
             //sanity checks
-            tc.Assert(null != query, "String collection should not be null");
+            System.Diagnostics.Debug.Assert(null != query, "String collection should not be null");
 
             //Ensure target server version is >= 11, and database engine is not azure
             ThrowIfBelowVersion110(sp.TargetServerVersion);
@@ -566,7 +565,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptDrop(System.Collections.Specialized.StringCollection dropQuery, ScriptingPreferences sp)
         {
             //sanity checks
-            tc.Assert(null != dropQuery, "String collection should not be null");
+            System.Diagnostics.Debug.Assert(null != dropQuery, "String collection should not be null");
 
             //ALTER AVAILABILITY GROUP  group_name 
             //REMOVE REPLICA ON  server_name  
@@ -949,8 +948,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get { return (String)this.Properties.GetValueWithNullReplacement("ReadonlyRoutingListDelimited"); }
         }
 
-        private static readonly TraceContext tc = TraceContext.GetTraceContext(SmoApplication.ModuleName, "AvailabilityReplica");
-
         private bool IsDirty(string property)
         {
             return this.Properties.IsDirty(this.Properties.LookupID(property, PropertyAccessPurpose.Read));
@@ -974,7 +971,7 @@ namespace Microsoft.SqlServer.Management.Smo
             PropertyType propertyType;
             bool found = AlterableReplicaProperties.TryGetValue(propertyName, out propertyType);
 
-            tc.Assert(found, "Invalid property name: " + propertyName);
+            System.Diagnostics.Debug.Assert(found, "Invalid property name: " + propertyName);
 
             return (propertyType & PropertyType.Alterable) == PropertyType.Alterable;
         }
@@ -984,7 +981,7 @@ namespace Microsoft.SqlServer.Management.Smo
             PropertyType propertyType;
             bool found = AlterableReplicaProperties.TryGetValue(propertyName, out propertyType);
 
-            tc.Assert(found, "Invalid property name: " + propertyName);
+            System.Diagnostics.Debug.Assert(found, "Invalid property name: " + propertyName);
 
             return (propertyType & PropertyType.PrimaryRoleProperty) == PropertyType.PrimaryRoleProperty;
         }
@@ -994,7 +991,7 @@ namespace Microsoft.SqlServer.Management.Smo
             PropertyType propertyType;
             bool found = AlterableReplicaProperties.TryGetValue(propertyName, out propertyType);
 
-            tc.Assert(found, "Invalid property name: " + propertyName);
+            System.Diagnostics.Debug.Assert(found, "Invalid property name: " + propertyName);
 
             return (propertyType & PropertyType.SecondaryRoleProperty) == PropertyType.SecondaryRoleProperty;
         }

@@ -136,7 +136,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override PropagateInfo[] GetPropagateInfo(PropagateAction action)
         {
             return new PropagateInfo[] { 
-											new PropagateInfo(ServerVersion.Major < 9 ? null : ExtendedProperties, true, ExtendedProperty.UrnSuffix )
+											new PropagateInfo(ExtendedProperties, true, ExtendedProperty.UrnSuffix )
 											};
         }
 

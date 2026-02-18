@@ -1,14 +1,10 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Column" impl_type="SqlObject" min_major='7'  cloud_min_major='12'>
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="DefaultRuleID" />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table = 'dbo.syscolumns AS c'/>
-			<property_link fields='#TableName#TableSchema#' join = 'dbo.sysobjects AS tbl'>tbl.id = c.id and OBJECTPROPERTY(tbl.id, N'IsUserTable') = 1</property_link>
-		</version>
-		<version min_major='9'  cloud_min_major='12'>
+		<version min_major='10'  cloud_min_major='12'>
 			<property_link join = 'sys.columns AS c'>dc.column_id = c.column_id and dc.object_id = c.object_id</property_link>
 			<property_link fields='#TableName#TableSchema#' join = 'sys.tables AS tbl'>tbl.object_id = c.object_id</property_link>
 		</version>
@@ -16,10 +12,7 @@
 	<properties>
 		<property name="Name" type="sysname">c.name</property>
 		<property name="TableName" type="sysname">tbl.name</property>
-		<version min_major='7' max_major='8'>
-			<property name="TableSchema" type="sysname">user_name(tbl.uid)</property>
-		</version>
-		<version min_major='9'  cloud_min_major='12'>
+		<version min_major='10'  cloud_min_major='12'>
 			<property name="TableSchema" type="sysname">schema_name(tbl.schema_id)</property>
 		</version>
 	</properties>

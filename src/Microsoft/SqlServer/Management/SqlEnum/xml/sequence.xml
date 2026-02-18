@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Sequence" impl_type="SqlObject" min_major='11' cloud_min_major='12'>
+<?xml version="1.0" ?>
+<EnumObject type="Sequence" impl_type="SqlObject" min_major='11' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='sys.sequences' alias='seq' />
 	</settings>
@@ -22,6 +22,3 @@
     </version>
   </properties>
 </EnumObject>
-
-
-

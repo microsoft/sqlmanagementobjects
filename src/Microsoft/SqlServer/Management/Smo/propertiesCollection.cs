@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
@@ -52,7 +53,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         protected void SetBit(int itemIndex, BitStorage.BitIndex bitIndex, bool value)
         {
-            Diagnostics.TraceHelper.Assert(itemIndex >= 0 && itemIndex < this.count);
+            Debug.Assert(itemIndex >= 0 && itemIndex < this.count);
             
             int index = itemIndex * BitsPerItem + (int)bitIndex;
 
@@ -68,7 +69,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         protected bool GetBit(int itemIndex, BitStorage.BitIndex bitIndex)
         {
-            Diagnostics.TraceHelper.Assert(itemIndex >= 0 && itemIndex < this.count);
+            Debug.Assert(itemIndex >= 0 && itemIndex < this.count);
 
             int index = itemIndex * BitsPerItem + (int)bitIndex;
             return (this.bitArray[index / 32] & (1 << (index % 32))) != 0;

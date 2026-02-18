@@ -117,7 +117,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 created = true;
                 Trace.TraceInformation($"Fabric {resourceTypeString.ToLowerInvariant()} created: {output}");
                 // Get the connection string for the newly created resource
-                string connectionString = ExecuteFabricCliCommand($"get {resourcePath} -q properties.connectionString")+DefaultAuthMethod;
+                string connectionString = ExecuteFabricCliCommand($"get {resourcePath} -q properties.connectionString -f")+DefaultAuthMethod;
                 return connectionString;
             }
             catch (Exception ex)
@@ -232,15 +232,15 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 Arguments = arguments,
                 RedirectStandardOutput = !interactiveInputNeeded,
                 RedirectStandardError = !interactiveInputNeeded,
-                UseShellExecute = interactiveInputNeeded,
+                UseShellExecute = false,
                 CreateNoWindow = !interactiveInputNeeded,
+                EnvironmentVariables =
+                {
+                    ["FAB_API_ENDPOINT_FABRIC"] = string.Equals(Environment, "daily", StringComparison.OrdinalIgnoreCase) ? "dailyapi.fabric.microsoft.com" : "api.fabric.microsoft.com",
+                    // Ensure UTF-8 encoding for Python subprocesses because the error messages may contain non-ASCII characters
+                    ["PYTHONIOENCODING"] = "utf-8"
+                }
             };
-            // Set FAB_API_ENDPOINT_FABRIC if Environment == "daily"
-            if (string.Equals(Environment, "daily", StringComparison.OrdinalIgnoreCase))
-            {
-                processStartInfo.FileName = "cmd.exe";
-                processStartInfo.Arguments = $"/c set FAB_API_ENDPOINT_FABRIC=dailyapi.fabric.microsoft.com&{FabricCliPath} {arguments}";
-            }
             Trace.WriteLine($"Executing Fabric CLI command: {processStartInfo.FileName} {processStartInfo.Arguments}");
             using (var process = Process.Start(processStartInfo))
             {

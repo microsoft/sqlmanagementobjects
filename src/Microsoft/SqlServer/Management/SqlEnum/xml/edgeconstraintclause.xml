@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="EdgeConstraintClause" impl_type="SqlObject" min_major='15'  cloud_min_major='12' datawarehouse_enabled='false'>
+<EnumObject type="EdgeConstraintClause" impl_type="SqlObject" min_major='15'  cloud_min_major='12' datawarehouse_enabled='false' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <version min_major='15'  cloud_min_major='12' datawarehouse_enabled='false'>
       <property_link join="sys.edge_constraint_clauses AS ec">

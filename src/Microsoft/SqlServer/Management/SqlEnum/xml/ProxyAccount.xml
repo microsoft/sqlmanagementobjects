@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="ProxyAccount" impl_type="SqlObject" min_major='9'>
+<EnumObject type="ProxyAccount" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
             <property_link table='#tmp_sp_help_proxy' alias='tshp'/>
             <property_link fields='#CredentialName#' join='sys.credentials' alias='sc'>sc.credential_id = tshp.credential_id</property_link>

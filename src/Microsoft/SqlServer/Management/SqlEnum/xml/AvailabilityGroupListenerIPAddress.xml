@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="AvailabilityGroupListenerIPAddress" impl_type="SqlObject" min_major='11' >
+<EnumObject type="AvailabilityGroupListenerIPAddress" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent='UniqueId' local='ListenerID'/>
@@ -45,4 +45,3 @@
     </properties>
 
 </EnumObject>
-

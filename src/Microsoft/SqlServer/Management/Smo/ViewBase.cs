@@ -332,7 +332,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         AppendWithOption(sbForSpExec, "IsEncrypted", "ENCRYPTION", ref bNeedsComma);
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         AppendWithOption(sbForSpExec, "ReturnsViewMetadata", "VIEW_METADATA", ref bNeedsComma);
                     }
@@ -486,7 +486,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 propInfo.Add(new PropagateInfo(ExtendedProperties, true, ExtendedProperty.UrnSuffix));
             }
 
-            if (this.DatabaseEngineType == DatabaseEngineType.Standalone && ServerVersion.Major >= 9)
+            if (this.DatabaseEngineType == DatabaseEngineType.Standalone)
             {
                 propInfo.Add(new PropagateInfo(FullTextIndex, true, FullTextIndex.UrnSuffix));
             }
@@ -607,38 +607,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
-            switch (this.ServerVersion.Major)
-            {
-                case 7:
-                    switch (prop.Name)
-                    {
-                        case "IsEncrypted":
-                            Validate_set_TextObjectDDLProperty(prop, value);
-                            break;
-                        case "HasColumnSpecification": goto case "IsEncrypted";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
-                    break;
-                case 8:
-                    switch (prop.Name)
-                    {
-                        case "IsSchemaBound":
-                            Validate_set_TextObjectDDLProperty(prop, value);
-                            break;
-                        case "IsEncrypted": goto case "IsSchemaBound";
-                        case "HasColumnSpecification": goto case "IsSchemaBound";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
-                    break;
-                case 9: goto case 8;
-                default: goto case 9;
-            }
+            // No version-specific validation needed for SQL Server 2008+
         }
 
 

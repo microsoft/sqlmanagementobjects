@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="FixedDrive" impl_type="SqlObject" min_major='7'>
+<EnumObject type="FixedDrive" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings main_table="#fixdrv">
     <version min_major="7" max_major="13">
       <prefix>
@@ -13,7 +13,7 @@
         update #fixdrv set Type = 'Removable' where Type IS NULL
       </prefix>
     </version>
-    <version min_major='9' max_major='13'>
+    <version min_major='10' max_major='13'>
         <prefix>
             insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 3
             update #fixdrv set Type = 'CD-ROM' where Type IS NULL

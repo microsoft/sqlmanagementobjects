@@ -1,22 +1,15 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Column" impl_type="SqlObject" min_major='7'>
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="DefaultID" />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table = 'dbo.syscolumns AS c'/>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<property_link join = 'sys.columns AS c'/>
 		</version>
 	</settings>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<!--needed for children inc_DefaultRule_column-->
-			<property name="DefaultID" type="int" hidden='true'>c.cdefault</property>
-		</version>
-		<version min_major='9'>
+		<version min_major='10'>
 			<!--needed for children inc_DefaultRule_column-->
 			<property name="DefaultID" type="int" hidden='true'>c.default_object_id</property>
 		</version>

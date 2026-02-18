@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Server;
@@ -239,11 +240,10 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!op.GetScriptingPreferences().TargetVersionAndDatabaseEngineTypeDirty)
             {
                 // default target server version should be set equal to the server we are scripting
-                if (GetServerObject().ServerVersion == null)
+                if (GetServerObject().ServerVersion == null) // would only be null if ServerConnection.IsForceDisconnected is true
                 {
                     // going to the server for the version should populate ServerVersion structure
                     string sVersion = GetServerObject().Information.VersionString;
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, sVersion);
                 }
 
                 op.SetTargetServerInfo(GetServerObject(), false);
@@ -445,7 +445,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                Diagnostics.TraceHelper.Assert(null != mainObj, "null == mainObj");
+                Debug.Assert(null != mainObj, "null == mainObj");
                 throw new FailedOperationException(ExceptionTemplates.Script, mainObj, e);
             }
         }       

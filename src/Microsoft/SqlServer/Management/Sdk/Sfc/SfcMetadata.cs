@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.SqlServer.Server;
 
@@ -233,8 +234,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
 
             internal TypeHandlePropertyNameKey(string propertyName, RuntimeTypeHandle typeHandle)
             {
-                TraceHelper.Assert(propertyName != null, "PropertyName can't be null in TypeHandlePropertyNameKey");
-                TraceHelper.Assert(typeHandle != null, "TypeHandle can't be null in TypeHandlePropertyNameKey");
+                Debug.Assert(propertyName != null, "PropertyName can't be null in TypeHandlePropertyNameKey");
+                Debug.Assert(typeHandle != null, "TypeHandle can't be null in TypeHandlePropertyNameKey");
 
                 this.propertyName = propertyName;
                 this.typeHandle = typeHandle;
@@ -504,7 +505,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                 }
             }
 
-            TraceHelper.Assert(typeRelations != null, "TypeRelations list can't be null");
+            Debug.Assert(typeRelations != null, "TypeRelations list can't be null");
             return typeRelations;
         }
 
@@ -525,7 +526,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                 }
             }
 
-            TraceHelper.Assert(typeKeys != null, "TypeKeys list can't be null");
+            Debug.Assert(typeKeys != null, "TypeKeys list can't be null");
             return typeKeys;
         }
 
@@ -668,7 +669,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                 object[] attributes = type.GetCustomAttributes(typeof(SfcElementTypeAttribute), false);
                 if (attributes != null && attributes.Length > 0)
                 {
-                    TraceHelper.Assert(attributes.Length == 1, "SfcElementType attribute should exist only once");
+                    Debug.Assert(attributes.Length == 1, "SfcElementType attribute should exist only once");
                     SfcElementTypeAttribute elementType = (SfcElementTypeAttribute)attributes[0];
                     urnSuffix = elementType.ElementTypeName;
                 }
@@ -1193,7 +1194,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                     }
                 }
 
-                TraceHelper.Assert(list != null, "ReadOnlyProperties return list can't be null");
+                Debug.Assert(list != null, "ReadOnlyProperties return list can't be null");
                 return list.AsReadOnly();
             }
         }
@@ -1484,7 +1485,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             }
 
             PropertyInfo property = instance.GetType().GetProperty(this.PropertyName);
-            TraceHelper.Assert(property != null);
+            Debug.Assert(property != null);
             // Just return the property value directly for non-reference properties
             return property.GetValue(instance, null);
         }
@@ -1509,7 +1510,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             }
 
             PropertyInfo property = instance.GetType().GetProperty(this.PropertyName);
-            TraceHelper.Assert(property != null);
+            Debug.Assert(property != null);
             // Just return the property value directly for non-reference properties
             return (T)property.GetValue(instance, null);
         }
@@ -1534,7 +1535,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
 
             // Yield normal property values if we didn't find any reference collection attributes
             PropertyInfo property = instance.GetType().GetProperty(this.PropertyName);
-            TraceHelper.Assert(property != null);
+            Debug.Assert(property != null);
             // Just yield the property values directly for non-reference collection properties
             return (IEnumerable)property.GetValue(instance, null);
         }
@@ -1561,7 +1562,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
 
             // Yield normal property values if we didn't find any reference collection attributes
             PropertyInfo property = instance.GetType().GetProperty(this.PropertyName);
-            TraceHelper.Assert(property != null);
+            Debug.Assert(property != null);
             // Just yield the property values directly for non-reference collection properties
             return (IEnumerable<T>)property.GetValue(instance, null);
         }

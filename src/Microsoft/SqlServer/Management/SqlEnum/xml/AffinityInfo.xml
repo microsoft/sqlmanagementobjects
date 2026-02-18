@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="AffinityInfo" impl_type="SqlObject" min_major='10' min_minor ='50'>
+<EnumObject type="AffinityInfo" impl_type="SqlObject" min_major='10' min_minor ='50' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
 	<version min_major='10' min_minor ='50'>
 		<property_link table="sys.dm_os_memory_nodes" alias= "mnd"/>

@@ -96,7 +96,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal void AddPermissionFilter(StringBuilder sb, ServerVersion ver)
         {
-            string attribute = ver.Major < 9 ? "@SqlInt = " : "@StringCode = ";
+            string attribute = "@StringCode = ";
 
             bool bFirst = true;
             for (int i = 0; i < m_storage.Length; i++)
@@ -113,19 +113,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     sb.Append(attribute);
                     string s = PermissionCodeToPermissionType(i);
-                    if (ver.Major < 9)
-                    {
-                        int code = YukonToShilohPermission(s);
-                        if (code < 0)
-                        {
-                            throw new SmoException(ExceptionTemplates.UnsupportedPermission(code.ToString()));
-                        }
-                        sb.Append(code);
-                    }
-                    else
-                    {
-                        sb.Append("'" + s + "'");
-                    }
+                    sb.Append("'" + s + "'");
                 }
             }
         }
@@ -431,14 +419,6 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="obj"></param>
         internal static void CheckPermissionsAllowed(SqlSmoObject obj)
         {
-            if (obj.ServerVersion.Major < 9)
-            {
-                string typeName = obj.GetType().Name;
-                if (typeName == "Login" || typeName == "User")
-                {
-                    throw new UnsupportedVersionException(ExceptionTemplates.SupportedOnlyOn90);
-                }
-            }
         }
 
         internal static string ScriptPermissionInfo(SqlSmoObject obj, PermissionInfo pi, ScriptingPreferences sp, bool grantGrant, bool cascade)

@@ -44,8 +44,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 database =>
                 {
                     var result = new SqlTestResult();
-                    _SMO.Table table = database.CreateTable("tbl_" + this.TestContext.TestName);
-                    _SMO.Index index = table.CreateIndex("idx_" + this.TestContext.TestName);
+                    var table = database.CreateTable("tbl_" + this.TestContext.TestName);
+                    var index = table.CreateIndex("idx_" + this.TestContext.TestName);
 
                     //Read-Only properties
                     result &= SqlTestHelpers.TestReadProperty(index, "HasCompressedPartitions", false);
@@ -77,8 +77,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     var result = new SqlTestResult();
 
-                    _SMO.Table table = database.CreateTable("tbl_" + this.TestContext.TestName);
-                    _SMO.Index index = table.CreateIndex("idx_" + this.TestContext.TestName);
+                    var table = database.CreateTable("tbl_" + this.TestContext.TestName);
+                    var index = table.CreateIndex("idx_" + this.TestContext.TestName);
 
                     //Read-Only properties
                     result &= SqlTestHelpers.TestReadProperty(index, "HasCompressedPartitions", false);
@@ -110,8 +110,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 {
                     var result = new SqlTestResult();
 
-                    _SMO.Table table = database.CreateTable("tbl_" + this.TestContext.TestName);
-                    _SMO.Index index = table.CreateIndex("idx_" + this.TestContext.TestName);
+                    var table = database.CreateTable("tbl_" + this.TestContext.TestName);
+                    var index = table.CreateIndex("idx_" + this.TestContext.TestName);
 
                     //Read-Only properties
                     result &= SqlTestHelpers.TestReadProperty(index, "HasCompressedPartitions", false);
@@ -152,32 +152,47 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                                       ('20200320', 'Partition1March', '<data><elem>3</elem></data>'),
                                       ('20200402', 'Partition1April', '<data><elem>4</elem></data>')");
 
-                _SMO.Index index = CreatePartitionedIndex(db, tb);
-
-                index.PhysicalPartitions[1].XmlCompression = _SMO.XmlCompressionType.On;
-                Assert.That(index.Rebuild, Throws.Nothing, "rebuild index should succeed");
-
-                db.Parent.SetDefaultInitFields(typeof(_SMO.PhysicalPartition), true);
-                index.PhysicalPartitions.ClearAndInitialize(string.Empty, new string[0]);
-                var physicalPartition = index.PhysicalPartitions[1];
-                Assert.Multiple(() =>
-                {
-                    Assert.That(physicalPartition.XmlCompression, Is.EqualTo(_SMO.XmlCompressionType.On), "Xml Compression should be on");
-                    Assert.That(physicalPartition.DataCompression, Is.EqualTo(_SMO.DataCompressionType.None), "Data Compression should be off");
-                });
-
-                // script the index and make sure creation succeeds
-                //
-                string script = ScriptSmoObject(index);
-                index.Drop();
+                var index = CreatePartitionedIndex(db, tb);
+                var schemeName = index.PartitionScheme;
                 try
                 {
-                    db.ExecuteNonQuery(script);
-                    db.Tables.Refresh();
+                    index.PhysicalPartitions[1].XmlCompression = _SMO.XmlCompressionType.On;
+                    Assert.That(index.Rebuild, Throws.Nothing, "rebuild index should succeed");
+
+                    db.Parent.SetDefaultInitFields(typeof(_SMO.PhysicalPartition), true);
+                    index.PhysicalPartitions.ClearAndInitialize(string.Empty, new string[0]);
+                    var physicalPartition = index.PhysicalPartitions[1];
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(physicalPartition.XmlCompression, Is.EqualTo(_SMO.XmlCompressionType.On), "Xml Compression should be on");
+                        Assert.That(physicalPartition.DataCompression, Is.EqualTo(_SMO.DataCompressionType.None), "Data Compression should be off");
+                    });
+
+                    // script the index and make sure creation succeeds
+                    //
+                    string script = ScriptSmoObject(index);
+                    index.Drop();
+                    try
+                    {
+                        db.ExecuteNonQuery(script);
+                        db.Tables.Refresh();
+                    }
+                    catch (Exception e)
+                    {
+                        Assert.Fail($"Index creation failed. {e}\r\n{script}");
+                    }
                 }
-                catch(Exception e)
+                finally
                 {
-                    Assert.Fail($"Index creation failed. {e}\r\n{script}");
+                    tb.Drop();
+                    foreach (var fileGroup in db.PartitionSchemes[schemeName].FileGroups)
+                    {
+                        foreach (var file in db.FileGroups[fileGroup].Files.ToList())
+                        {
+                            file.Shrink(0, ShrinkMethod.EmptyFile);
+                            file.Drop();
+                        }
+                    }
                 }
             });
         }
@@ -225,7 +240,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteFromDbPool(
                 database =>
                 {
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName);
+                    var table = database.CreateTable(this.TestContext.TestName);
                     _SMO.Index index = new _SMO.Index(table, GenerateSmoObjectName("idx"));
 
                     index.IndexedColumns.Add(new _SMO.IndexedColumn(index, table.Columns[0].Name));
@@ -248,10 +263,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             this.ExecuteFromDbPool(
                 database =>
                 {
-                    _SMO.Table table = database.CreateTable(this.TestContext.TestName);
+                    var table = database.CreateTable(this.TestContext.TestName);
                     _SMO.Index pk = new _SMO.Index(table, GenerateSmoObjectName("pk"));
 
-                    _SMO.Column column = table.Columns[0];
+                    var column = table.Columns[0];
                     column.Nullable = false;
                     column.Alter();
 
@@ -299,7 +314,8 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
                     memoryOptimizedFg.Create();
 
-                    _SMO.DataFile dataFile = new _SMO.DataFile(memoryOptimizedFg, String.Format("{0}_hkfg", database.Name))
+                    // Memory optimized data files don't have to be manually deleted
+                    var dataFile = new DataFile(memoryOptimizedFg, string.Format("{0}_hkfg", database.Name))
                     {
                         FileName =
                             _SMO.PathWrapper.Combine(_SMO.PathWrapper.GetDirectoryName(database.FileGroups["PRIMARY"].Files[0].FileName),
@@ -327,7 +343,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 table.Create();
 
                 string script = ScriptSmoObject(table);
-
                 var expectedScriptFragment =
 $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine}({Environment.NewLine}\t[c1] [int] NOT NULL,{Environment.NewLine}{Environment.NewLine} CONSTRAINT [c1_pk]  PRIMARY KEY NONCLUSTERED {Environment.NewLine}({Environment.NewLine}\t[c1] ASC{Environment.NewLine}),{Environment.NewLine}INDEX [cci] CLUSTERED COLUMNSTORE WITH (COMPRESSION_DELAY = 0){Environment.NewLine})WITH ( MEMORY_OPTIMIZED = ON , DURABILITY = SCHEMA_AND_DATA )";
 
@@ -852,14 +867,14 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         private void TestResumableRebuildOnPrem(_SMO.Database database, bool useResumableIndex)
         {
             // Prepare: Create a table with the specified rows and columns data
-            _SMO.Table table = CreateBasicTable(database, 2, 50);
+            var table = CreateBasicTable(database, 2, 50);
 
             // Prepare: Create a clustered index for test.
-            _SMO.Index index = table.CreateIndex("idx_" + this.TestContext.TestName, new IndexProperties() {IsClustered = true});
-            _SMO.Server server = database.Parent;
+            var index = table.CreateIndex("idx_" + this.TestContext.TestName, new IndexProperties() {IsClustered = true});
+            var server = database.Parent;
             server.SetDefaultInitFields(typeof(_SMO.ResumableIndex), "ResumableOperationState", "MaxDOP", "PercentComplete");
 
-            var initialExcutionModes = server.ConnectionContext.SqlExecutionModes;
+            var initialExecutionModes = server.ConnectionContext.SqlExecutionModes;
             server.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
             _SMO.ResumableIndex resumableIndex = null;
 
@@ -1082,7 +1097,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             }
             finally
             {
-                server.ConnectionContext.SqlExecutionModes = initialExcutionModes;
+                server.ConnectionContext.SqlExecutionModes = initialExecutionModes;
                 try
                 {
                     table.Drop();
@@ -1121,11 +1136,11 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         private void TestResumableRebuildOnAzure(_SMO.Database database, bool useResumableIndex)
         {
             // Prepare: Create a table with the specified rows and columns data
-            _SMO.Table table = CreateBasicTable(database, 2, 50);
+            var table = CreateBasicTable(database, 2, 50);
 
             // Prepare: Create a clustered index for test.
-            _SMO.Index index = table.CreateIndex("idx_" + this.TestContext.TestName, new IndexProperties() { IsClustered = true });
-            _SMO.Server server = database.Parent;
+            var index = table.CreateIndex("idx_" + this.TestContext.TestName, new IndexProperties() { IsClustered = true });
+            var server = database.Parent;
             server.SetDefaultInitFields(typeof(_SMO.ResumableIndex), "ResumableOperationState", "MaxDOP", "PercentComplete");
             _SMO.ResumableIndex resumableIndex = null;
 
@@ -1266,8 +1281,8 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             database =>
             {
                 // Prepare: Create a table with the specified rows and columns data
-                _SMO.Table table = CreateBasicTable(database, 2, 50);
-                _SMO.Server server = database.Parent;
+                var table = CreateBasicTable(database, 2, 50);
+                var server = database.Parent;
 
                 // Enable the TF that allows us to run the index creation with the resumable setting enabled.
                 // Only do this for on-prem DBs, as treaceflags are not support in Azure.
@@ -1281,7 +1296,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 // Create a clustered index on the table.
                 //
-                _SMO.Index clIdx = table.CreateIndex("clIdx_" + this.TestContext.TestName, new IndexProperties() { IsClustered = true});
+                var clIdx = table.CreateIndex("clIdx_" + this.TestContext.TestName, new IndexProperties() { IsClustered = true});
 
                 try
                 {
@@ -1294,7 +1309,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                     ncIdx.ResumableIndexOperation = true;
                     ncIdx.ResumableMaxDuration = 5;
 
-                    StringCollection stringColl = ncIdx.Script();
+                    var stringColl = ncIdx.Script();
                     StringBuilder sb = new StringBuilder();
                     foreach (string statement in stringColl)
                     {
@@ -1350,7 +1365,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                     columns[columnId] = new ColumnProperties($"C{columnId.ToString()}") { Nullable = false };
                 }
 
-                _SMO.Table table = DatabaseObjectHelpers.CreateTable(
+                var table = DatabaseObjectHelpers.CreateTable(
                     database: database,
                     tableNamePrefix: "tbl",
                     columnProperties: columns);
@@ -1396,9 +1411,9 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
             // Create trigger that will delay for 10 minutes after the rebuild of an index. This will leave the index in the
             // "running" state for those 10 minutes, during which we can cancel the rebuild and then get the paused index.
-            _SMO.Server server = database.Parent;
+            var server = database.Parent;
             TraceHelper.TraceInformation("Creating the trigger on database.");
-            _SMO.DatabaseDdlTrigger triggerDb = DatabaseObjectHelpers.CreateDatabaseDdlTrigger(database,
+            var triggerDb = DatabaseObjectHelpers.CreateDatabaseDdlTrigger(database,
                 "trg", "AFTER ALTER_INDEX", "WAITFOR DELAY '00:10:00'"); // the delay time is set as 10 minutes.
 
             // Execute the index rebuild on a separate thread so that we can cancel the operation after starting the rebuild,
@@ -1471,7 +1486,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                 columns[columnId] = new ColumnProperties(String.Format("C{0}", columnId.ToString())) { Nullable = nullable };
             }
 
-            _SMO.Table table = DatabaseObjectHelpers.CreateTable(
+            var table = DatabaseObjectHelpers.CreateTable(
                 database: database,
                 tableNamePrefix: "tbl",
                 columnProperties: columns);
@@ -1495,11 +1510,11 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             database =>
             {
                 // Prepare: Create a table with the specified rows and columns data
-                _SMO.Table table = CreateBasicTable(database, 2, 50);
-                _SMO.Server server = database.Parent;
+                var table = CreateBasicTable(database, 2, 50);
+                var server = database.Parent;
                 int maxDuration = 2;
                 _SMO.AbortAfterWait[] abortTypeValues = (_SMO.AbortAfterWait[])Enum.GetValues(typeof(_SMO.AbortAfterWait));
-                foreach (_SMO.AbortAfterWait abortType in abortTypeValues)
+                foreach (var abortType in abortTypeValues)
                 {
                     database.Parent.ConnectionContext.CapturedSql.Clear();
                     // Create a simple non-clustered index on the first column of the table.
@@ -1512,7 +1527,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                     ncIdx.LowPriorityAbortAfterWait = abortType;
                     ncIdx.DropExistingIndex = false;
 
-                    StringCollection stringColl = ncIdx.Script();
+                    var stringColl = ncIdx.Script();
                     StringBuilder sb = new StringBuilder();
                     foreach (string statement in stringColl)
                     {
@@ -1549,11 +1564,11 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                 database =>
                 {
                     // Prepare: Create table and insert some data;
-                    _SMO.Table table = CreateBasicTable(database, 1, 10, false);
+                    var table = CreateBasicTable(database, 1, 10, false);
 
                     // Prepare: Set the execution mode to ExecuteAndCaptureSql for the connection.
-                    _SMO.Server server = database.Parent;
-                    var initialExcutionModes = server.ConnectionContext.SqlExecutionModes;
+                    var server = database.Parent;
+                    var initialExecutionModes = server.ConnectionContext.SqlExecutionModes;
                     server.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
 
                     // Test the index drop and constraint drop with low priority option with considering all possible properties of the tested index.
@@ -1597,7 +1612,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
                     }
                     finally
                     {
-                        server.ConnectionContext.SqlExecutionModes = initialExcutionModes;
+                        server.ConnectionContext.SqlExecutionModes = initialExecutionModes;
                     }
               });
         }
@@ -1617,14 +1632,14 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             int maxDuration = 2;
             _SMO.AbortAfterWait[] abortTypeValues = (_SMO.AbortAfterWait[])Enum.GetValues(typeof(_SMO.AbortAfterWait));
 
-            foreach (_SMO.AbortAfterWait abortType in abortTypeValues)
+            foreach (var abortType in abortTypeValues)
             {
                 // Create an index whose properties are specified by the IndexProperties.
-                _SMO.Index index = table.CreateIndex(namePrefix, indexProperties);
+                var index = table.CreateIndex(namePrefix, indexProperties);
 
                 // Save the default values of the sub-options related with the low priority option.
                 int defaultMaxDuration = index.LowPriorityMaxDuration;
-                _SMO.AbortAfterWait defaultAbortType = index.LowPriorityAbortAfterWait;
+                var defaultAbortType = index.LowPriorityAbortAfterWait;
 
                 // Set the sub-options values of the low priority so that the index will be dropped by low priority.
                 index.LowPriorityMaxDuration = maxDuration;
@@ -1704,39 +1719,23 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
             this.ExecuteFromDbPool(
                 database =>
                 {
-                    // Prepare: Create table and insert some data;
-                    _SMO.Table table = CreateBasicTable(database, 1, 10, false);
-
-                    // Prepare: Set the execution mode to ExecuteAndCaptureSql for the connection.
-                    _SMO.Server server = database.Parent;
-                    var initialExcutionModes = server.ConnectionContext.SqlExecutionModes;
-                    server.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
-
                     // Test the index drop operation with the helper function, where the type of the tested indexes include
                     // the non_clustered regular index, the clustered regular index, the unique key constraint and the primary key constraint.
-                    try
-                    {
-                        // Check 1: Check the non_clustered regular index dropped with the different options
-                        DropIndexWithDifferentOptions(database, table, "non_cluster_index",
-                            new IndexProperties() { IndexType = _SMO.IndexType.NonClusteredIndex, IsClustered = false });
+                    // Check 1: Check the non_clustered regular index dropped with the different options
+                    DropIndexWithDifferentOptions(database, "non_cluster_index",
+                        new IndexProperties() { IndexType = _SMO.IndexType.NonClusteredIndex, IsClustered = false });
 
-                        // Check 2: Check the clustered regular index dropped with the different options.
-                        DropIndexWithDifferentOptions(database, table, "cluster_index",
-                            new IndexProperties() { IndexType = _SMO.IndexType.ClusteredIndex, IsClustered = true });
+                    // Check 2: Check the clustered regular index dropped with the different options.
+                    DropIndexWithDifferentOptions(database, "cluster_index",
+                        new IndexProperties() { IndexType = _SMO.IndexType.ClusteredIndex, IsClustered = true });
 
-                        // Check 3: Check the unique key constraint dropped with the different options.
-                        DropIndexWithDifferentOptions(database, table, "unique_cluster_index",
-                            new IndexProperties() { IndexType = _SMO.IndexType.ClusteredIndex, IsClustered = true, KeyType = _SMO.IndexKeyType.DriUniqueKey });
+                    // Check 3: Check the unique key constraint dropped with the different options.
+                    DropIndexWithDifferentOptions(database, "unique_cluster_index",
+                        new IndexProperties() { IndexType = _SMO.IndexType.ClusteredIndex, IsClustered = true, KeyType = _SMO.IndexKeyType.DriUniqueKey });
 
-                        // Check 4: Check the primary key constraint dropped with thedifferent options.
-                        DropIndexWithDifferentOptions(database, table, "primary_cluster_index",
-                            new IndexProperties() { IndexType = _SMO.IndexType.ClusteredIndex, IsClustered = true, KeyType = _SMO.IndexKeyType.DriPrimaryKey });
-                    }
-                    finally
-                    {
-                        server.ConnectionContext.SqlExecutionModes = initialExcutionModes;
-                    }
-
+                    // Check 4: Check the primary key constraint dropped with thedifferent options.
+                    DropIndexWithDifferentOptions(database, "primary_cluster_index",
+                        new IndexProperties() { IndexType = _SMO.IndexType.ClusteredIndex, IsClustered = true, KeyType = _SMO.IndexKeyType.DriPrimaryKey });
 
                 });
         }
@@ -1746,77 +1745,107 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         /// The tested index properties are specified by the indexProperties that includes the IndexType, IsClustered, OnlineIndexOperation and IndexkeyType properties.
         /// Specifically, if the index is regular and clustered, it could also support the DropAndMove operation. </summary>
         /// <param name="database"></param>
-        /// <param name="table"></param>
         /// <param name="namePrefix">The prefix name of the index that will be created.</param>
         /// <param name="indexProperties">The specified properties of the index.</param>
-        private void DropIndexWithDifferentOptions(_SMO.Database database, _SMO.Table table, string namePrefix, IndexProperties indexProperties)
+        private void DropIndexWithDifferentOptions(_SMO.Database database, string namePrefix, IndexProperties indexProperties)
         {
             // The enumerated values for the online/maxdop/move-to options are set as the remainders of the iterator divided by 2, 5, 3 respectively.
             // These three numbers are relatively prime, so if the iteratorCount is setted as the lowest common multiple of them (30),
             // all combinations values of three dimensions ([0,1]*[0,4]*[0,2]) would be enumerated in the following loop.
             const int iteratorCount = 30;
-            for (int iterator = 0; iterator < iteratorCount; iterator++)
+            var initialExecutionModes = database.Parent.ConnectionContext.SqlExecutionModes;
+            try
             {
-                // Create an index whose properties are specified by the IndexProperties.
-                _SMO.Index index = table.CreateIndex(namePrefix, indexProperties);
-
-                // Generate the option values based on the iterator.
-                // For the value of the dropType here, 0 represents the Drop operation, 1 represents the DropAndMove operation with
-                // the file group parameter, 2 represents the DropAndMove operation with the partition scheme parameter.
-                bool isOnline = index.IsOnlineRebuildSupported ? (iterator % 2 == 0) : false;
-                int maxDegreeOfParallelism = iterator % 5;
-                int dropType = iterator % 3;
-
-                index.OnlineIndexOperation = isOnline;
-                index.MaximumDegreeOfParallelism = maxDegreeOfParallelism;
-
-                string dropScript;
-                bool isClusteredRegularIndex = (indexProperties.IsClustered == true && indexProperties.KeyType == _SMO.IndexKeyType.None);
-
-                // Only the regular and clustered index supports the DropAndMove operation for now.
-                if (isClusteredRegularIndex && dropType == 1)
+                for (int iterator = 0; iterator < iteratorCount; iterator++)
                 {
-                    // drop index and move data to a new fileGroup.
-                    _SMO.FileGroup fileGroup = DatabaseObjectHelpers.CreateFileGroupWithDataFile(database, index.Name);
-                    database.Parent.ConnectionContext.CapturedSql.Clear();
-                    index.DropAndMove(fileGroup.Name);
-                    dropScript = database.Parent.ConnectionContext.CapturedSql.Text.ToSingleString();
+                    // Prepare: Create table and insert some data;
+                    var table = CreateBasicTable(database, 1, 10, false);
 
-                    // verify the "MOVE TO" option of the index drop.
-                    Assert.That(dropScript, Does.Contain(String.Format("MOVE TO {0}", fileGroup.FullQualifiedName)));
-                }
-                else if (isClusteredRegularIndex && dropType == 2)
-                {
-                    // drop index and move data to a new partition scheme.
-                    object[] val = new object[] { "3", "5"};
-                    _SMO.PartitionScheme partitionScheme = DatabaseObjectHelpers.CreatePartitionSchemeWithFileGroups(database, index.Name, val, _SMO.DataType.Int);
-                    database.Parent.ConnectionContext.CapturedSql.Clear();
-                    index.DropAndMove(partitionScheme.Name, new StringCollection { table.Columns[0].Name });
-                    dropScript = database.Parent.ConnectionContext.CapturedSql.Text.ToSingleString();
+                    // Prepare: Set the execution mode to ExecuteAndCaptureSql for the connection.
+                    var server = database.Parent;
+                    server.ConnectionContext.SqlExecutionModes = SqlExecutionModes.ExecuteAndCaptureSql;
+                    // Create an index whose properties are specified by the IndexProperties.
+                    var index = table.CreateIndex(namePrefix, indexProperties);
 
-                    // verify the "MOVE TO" option of the index drop.
-                    Assert.That(dropScript, Does.Contain(String.Format("MOVE TO {0}", partitionScheme.FullQualifiedName)));
-                }
-                else{
-                    // drop index
-                    database.Parent.ConnectionContext.CapturedSql.Clear();
-                    index.Drop();
-                    dropScript = database.Parent.ConnectionContext.CapturedSql.Text.ToSingleString();
-                }
+                    // Generate the option values based on the iterator.
+                    // For the value of the dropType here, 0 represents the Drop operation, 1 represents the DropAndMove operation with
+                    // the file group parameter, 2 represents the DropAndMove operation with the partition scheme parameter.
+                    bool isOnline = index.IsOnlineRebuildSupported ? (iterator % 2 == 0) : false;
+                    int maxDegreeOfParallelism = iterator % 5;
+                    int dropType = iterator % 3;
 
-                // Verify the tsql script of the index drop.
-                AssertDropOperationScript(dropScript, table, index, indexProperties);
+                    index.OnlineIndexOperation = isOnline;
+                    index.MaximumDegreeOfParallelism = maxDegreeOfParallelism;
 
-                // Verify the ONLINE and MAXDOP options of the index drop.
-                if (indexProperties.IsClustered == true)
-                {
-                    Assert.That(dropScript, Does.Contain(String.Format("ONLINE = {0}", isOnline? "ON":"OFF")));
+                    string dropScript;
+                    bool isClusteredRegularIndex = (indexProperties.IsClustered == true && indexProperties.KeyType == _SMO.IndexKeyType.None);
 
-                    if (maxDegreeOfParallelism != 0)
+                    // Only the regular and clustered index supports the DropAndMove operation for now.
+                    if (isClusteredRegularIndex && dropType == 1)
                     {
-                        Assert.That(dropScript, Does.Contain(String.Format("MAXDOP = {0}", maxDegreeOfParallelism)));
+                        // drop index and move data to a new fileGroup.
+                        var fileGroup = DatabaseObjectHelpers.CreateFileGroupWithDataFile(database, index.Name);
+                        database.Parent.ConnectionContext.CapturedSql.Clear();
+                        index.DropAndMove(fileGroup.Name);
+                        dropScript = database.Parent.ConnectionContext.CapturedSql.Text.ToSingleString();
+                        table.Drop();
+                        foreach (var file in fileGroup.Files.ToList())
+                        {
+                            // Clean up the created data files.
+                            file.Shrink(0, ShrinkMethod.EmptyFile);
+                            file.Drop();
+                        }
+                        // verify the "MOVE TO" option of the index drop.
+                        Assert.That(dropScript, Does.Contain(string.Format("MOVE TO {0}", fileGroup.FullQualifiedName)));
+
+                    }
+                    else if (isClusteredRegularIndex && dropType == 2)
+                    {
+                        // drop index and move data to a new partition scheme.
+                        object[] val = new object[] { "3", "5" };
+                        var partitionScheme = DatabaseObjectHelpers.CreatePartitionSchemeWithFileGroups(database, index.Name, val, _SMO.DataType.Int);
+                        database.Parent.ConnectionContext.CapturedSql.Clear();
+                        index.DropAndMove(partitionScheme.Name, new StringCollection { table.Columns[0].Name });
+                        dropScript = database.Parent.ConnectionContext.CapturedSql.Text.ToSingleString();
+                        table.Drop();
+                        foreach (var fg in partitionScheme.FileGroups)
+                        {
+                            foreach (var df in database.FileGroups[fg].Files.ToList())
+                            {
+                                df.Shrink(0, ShrinkMethod.EmptyFile);
+                                df.Drop();
+                            }
+                        }
+                        // verify the "MOVE TO" option of the index drop.
+                        Assert.That(dropScript, Does.Contain(string.Format("MOVE TO {0}", partitionScheme.FullQualifiedName)));
+                    }
+                    else
+                    {
+                        // drop index
+                        database.Parent.ConnectionContext.CapturedSql.Clear();
+                        index.Drop();
+                        dropScript = database.Parent.ConnectionContext.CapturedSql.Text.ToSingleString();
+                        table.Drop();
+                    }
+
+                    // Verify the tsql script of the index drop.
+                    AssertDropOperationScript(dropScript, table, index, indexProperties);
+
+                    // Verify the ONLINE and MAXDOP options of the index drop.
+                    if (indexProperties.IsClustered == true)
+                    {
+                        Assert.That(dropScript, Does.Contain(String.Format("ONLINE = {0}", isOnline ? "ON" : "OFF")));
+
+                        if (maxDegreeOfParallelism != 0)
+                        {
+                            Assert.That(dropScript, Does.Contain(String.Format("MAXDOP = {0}", maxDegreeOfParallelism)));
+                        }
                     }
                 }
+            }
+            finally
+            {
+                database.Parent.ConnectionContext.SqlExecutionModes = initialExecutionModes;
             }
         }
 

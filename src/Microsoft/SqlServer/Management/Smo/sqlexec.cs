@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Diagnostics = Microsoft.SqlServer.Management.Diagnostics;
+using SmoEventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
@@ -96,10 +97,7 @@ namespace Microsoft.SqlServer.Management.Smo
 					m_connection.ConnectionString = connectionString + ";pooling=false";
 					
 					oldConnectionString = connectionString;
-#if DEBUG
-				Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, 
-							"Getting a new connection with connection string =\"" + m_connection.ConnectionString + "\"");
-#endif
+				SmoEventSource.Log.ExecutionMessage("Getting a new connection with connection string =\"" + m_connection.ConnectionString + "\"");
 				}
 
 				// open the connection if necessary
@@ -112,10 +110,7 @@ namespace Microsoft.SqlServer.Management.Smo
 			{
 				m_connection = new SqlConnection(connectionString);
 				m_connection.Open();
-#if DEBUG
-				Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, 
-							"Getting a new connection with connection string =\"" + m_connection.ConnectionString + "\"");
-#endif
+				SmoEventSource.Log.ExecutionMessage("Getting a new connection with connection string =\"" + m_connection.ConnectionString + "\"");
 			}
 
 			return m_connection;

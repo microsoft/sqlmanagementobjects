@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true'>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
 	<settings>
 		<version min_major = '7' max_major = '8'>
 			<property_link>prmssn.id = 0</property_link>

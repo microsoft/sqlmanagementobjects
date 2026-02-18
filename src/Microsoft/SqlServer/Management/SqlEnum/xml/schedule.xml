@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='SPHelpSchedule' impl_type='SqlObject' min_major='9'>
+<EnumObject type='SPHelpSchedule' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table='#tmp_sp_help_schedule' alias='tshs'/>
     <property_link fields='#OwnerLoginName#' left_join='msdb.dbo.sysschedules_localserver_view' alias='sslv' >tshs.schedule_id = sslv.schedule_id</property_link>

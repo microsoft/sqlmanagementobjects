@@ -142,3 +142,9 @@ Post Processing is for doing additional calculations on the returned data. This 
 
 This tag has 2 specialized uses and one standard behavior. Originally it was a special case for [table.xml](table.xml), to add a filter to hide temp tables when enumerating tables in tempdb, and to enable adding a query hint for optimizing the overall tables query. 
 Now it also acts as similarly to `post_process` by being a general purpose conditioned sql tag with a `fields` attribute and a body which is added to the `WHERE` clause of the query with an `AND` condition.
+
+## Notes and Best Practices
+
+- SQL DW doesn't support primary keys in temp tables
+- For non-DW use primary keys in temp tables where possible for better performance
+- When adding new properties, consider the performance impact of adding additional joins to the main query. If the join is expensive, consider using a temp table populated in a prefix tag and dropped in a postfix tag.

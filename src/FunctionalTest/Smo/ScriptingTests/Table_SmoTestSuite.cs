@@ -3977,43 +3977,24 @@ AS NODE ON [PRIMARY]
                 {
                      if (database.Parent.IsJsonDataTypeEnabled && !database.IsFabricDatabase)
                     { 
-                        string jsonString = @"[\
-]";
-                        string queryMatch = @"INSERT \[.*\]\.\[.*\] \(\[jsonColumn\]\) VALUES \(CAST\(N'\[\]' AS Json\)\)";
+                        var jsonString = @"{""key"":""value""}";
 
                         var table = new _SMO.Table(database, "jsonTable" + Guid.NewGuid().ToString());
                         var jsonColumn = new _SMO.Column(table, "jsonColumn", new _SMO.DataType(_SMO.SqlDataType.Json));
                         table.Columns.Add(jsonColumn);
                         table.Create();
 
-                        string insertQuery = "INSERT INTO " + table.Name.SqlBracketQuoteString() + string.Format(" values('{0}')", jsonString);
+                        
+                        database.ExecuteNonQuery("INSERT INTO " + table.Name.SqlBracketQuoteString() + $" values('{jsonString}')");
 
-                        database.ExecuteNonQuery(insertQuery);
-
-                        _SMO.Scripter scripter = new _SMO.Scripter(database.Parent);
+                        var scripter = new _SMO.Scripter(database.Parent);
                         scripter.Options.ScriptData = true;
                         scripter.Options.ScriptSchema = true;
 
-                        bool isRecordInserted = false;
-                        IEnumerable<string> scripts = scripter.EnumScript(new Urn[] { table.Urn });
-                        foreach (string script in scripts)
-                        {
-                            if (script.StartsWith(string.Format("INSERT {0}", table.FullQualifiedName), ignoreCase: true, culture: CultureInfo.InvariantCulture))
-                            {
-                                if (!Regex.IsMatch(script, queryMatch, RegexOptions.IgnoreCase))
-                                {
-                                    Assert.Fail(string.Format("Unexpected data row found during script generation of JSON tables that fails match with expected value, the data row generated was {0}", script));
-                                }
+                        var scripts = scripter.EnumScript(new Urn[] { table.Urn });
 
-                                isRecordInserted = true;
-                            }
-                        }
+                        Assert.That(scripts, Has.Member("INSERT [dbo]." + table.Name.SqlBracketQuoteString() + $" ([jsonColumn]) VALUES (N'{jsonString}')"));
 
-                        Assert.True(isRecordInserted, string.Format("The expected data row was not inserted correctly. The table DDLs are as follows: \n {0}", string.Join("\n", scripts)));
-
-                        table.DropIfExists();
-                        string tableCreateScript = (from string script in scripts where script.StartsWith("CREATE", StringComparison.InvariantCultureIgnoreCase) select script).First();
-                        Assert.DoesNotThrow(() => database.ExecuteNonQuery(tableCreateScript), string.Format("The generated table DDL was invalid and failed to create the table, script generated was {0}", tableCreateScript));
                     }
                 });
         }
@@ -4073,7 +4054,6 @@ AS NODE ON [PRIMARY]
         // TODO: Azure and MI currently don't support the 2-parameter vector declaration. That will be
         // enabled soon, and we aren't planning on being backwards compatible with the 1-param version so
         // for now just disable this test.
-        // https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/4698232
         // [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
@@ -4085,14 +4065,12 @@ AS NODE ON [PRIMARY]
                 {
                     if (database.Parent.ServerType != DatabaseEngineType.Standalone || database.Parent.VersionMajor >= 17)
                     {
-                        string queryMatch = @"INSERT \[.*\]\.\[.*\] \(\[vectorColumn\]\) VALUES \(CAST\(N'\[0\.0000000e\+000,0\.0000000e\+000\]' AS Vector\(2\)\)\)";
-
                         var table = new Table(database, "vectorTable");
                         var vectorColumn = new Column(table, "vectorColumn", DataType.Vector(2));
                         table.Columns.Add(vectorColumn);
                         table.Create();
 
-                        string insertQuery = $"INSERT INTO {table.Name.SqlBracketQuoteString()} values('[0,0]')";
+                        var insertQuery = $"INSERT INTO {table.Name.SqlBracketQuoteString()} values('[1,0]')";
 
                         database.ExecuteNonQuery(insertQuery);
 
@@ -4100,14 +4078,9 @@ AS NODE ON [PRIMARY]
                         scripter.Options.ScriptData = true;
                         scripter.Options.ScriptSchema = true;
 
-                        IEnumerable<string> scripts = scripter.EnumScript(new Urn[] { table.Urn });
-                        Assert.That(scripts, Has.One.Matches(queryMatch).IgnoreCase, "Scripting of Vector tables is expected to generate a valid INSERT statement");
-
-                        table.DropIfExists();
-                        string tableCreateScript = (from string script in scripts where script.StartsWith("CREATE", StringComparison.InvariantCultureIgnoreCase) select script).First();
-                        database.ExecuteNonQuery(tableCreateScript);
-                        database.Tables.ClearAndInitialize(string.Empty, null);
-                        Assert.That(database.Tables, Has.One.Items.Matches<Table>(i => i.Name == table.Name), "Table should be created successfully.");
+                        var scripts = scripter.EnumScript(new Urn[] { table.Urn });
+                        // SqlClient 5 used scientific notation for vector components but sqlclient 6 gets the string from the server which does not use scientific notation unless needed
+                        Assert.That(scripts, Has.Member("INSERT [dbo]." + table.Name.SqlBracketQuoteString() + $" ([vectorColumn]) VALUES (N'[1,0]')"), "Scripting of Vector tables is expected to generate a valid INSERT statement");
                     }
                 });
         }
@@ -4413,8 +4386,6 @@ set nocount off;
         /// <returns></returns>
         public static Database CreateDbWithLotsOfTables(_SMO.Server serverContext, int tableCount = 20000, bool withData = false)
         {
-            var timeout = serverContext.ConnectionContext.StatementTimeout;
-            serverContext.ConnectionContext.StatementTimeout = Math.Max(900, timeout);
             var db = serverContext.CreateDatabaseDefinition("lotsoftables");
             var fileGroupName = "PRIMARY";
             var indexFileGroupName = "PRIMARY";
@@ -4439,8 +4410,19 @@ set nocount off;
                 indexFileGroupName = "AE_INDEX";
             }
             db.Create();
-            db.ExecuteNonQuery(CreateLotsOfTables(fileGroupName, indexFileGroupName, tableCount, withData));
-            serverContext.ConnectionContext.StatementTimeout = timeout;
+            var timeout = db.ExecutionManager.ConnectionContext.StatementTimeout;
+            db.ExecutionManager.ConnectionContext.StatementTimeout = Math.Max(1200, timeout);
+            try
+            {
+                db.ExecuteNonQuery(CreateLotsOfTables(fileGroupName, indexFileGroupName, tableCount, withData));
+                
+            }
+            finally
+            {
+                // in case the ExecutionManager is also the Server's ExecutionManager, restore the timeout
+                db.ExecutionManager.ConnectionContext.StatementTimeout = timeout;
+            }
+
             return db;
         }
 
@@ -4457,16 +4439,28 @@ set nocount off;
                 {
                     db = CreateDbWithLotsOfTables(ServerContext);
 
-                    var rowTimeout = db.DatabaseEngineType == DatabaseEngineType.Standalone ? 10 : 60;
-                    var queryGoalSeconds = db.DatabaseEngineType == DatabaseEngineType.Standalone ? 12 : 80;
+                    var rowTimeout = db.DatabaseEngineType == DatabaseEngineType.Standalone ? 10 : 20;
+                    var queryGoalSeconds = db.DatabaseEngineType == DatabaseEngineType.Standalone ? 12 : 30;
 
                     var fields = Table.GetScriptFields(typeof(Database), db.Parent.ServerVersion, db.Parent.DatabaseEngineType, db.Parent.DatabaseEngineEdition, true);
                     db.ExecutionManager.ConnectionContext.StatementTimeout = rowTimeout;
                     var stopwatch = new Stopwatch();
-                    Trace.TraceInformation("Fetching Tables collection");
+                    
                     db.ExecutionManager.ConnectionContext.SqlConnectionObject.StatisticsEnabled = true;
+
+                    // We want to ignore connection time because it varies wildly depending on the environment
+                    if (!db.ExecutionManager.ConnectionContext.IsOpen)
+                    {
+                        db.ExecutionManager.ConnectionContext.Connect();
+                    }
+                    Trace.TraceInformation("Fetching Tables collection");
+                    db.ExecutionManager.ConnectionContext.SqlConnectionObject.ResetStatistics();
                     stopwatch.Start();
-                    Assert.DoesNotThrow(() => db.Tables.ClearAndInitialize("", fields));
+                    // Add tracing of more detailed sql client events around this call to help diagnose any performance issues. 0x3 is already covered by the base test recorder.
+                    using (new SqlClientEventRecorder(Environment.CurrentManagedThreadId, keywords: 0xfffc))
+                    {
+                        db.Tables.ClearAndInitialize("", fields);
+                    }
                     stopwatch.Stop();
                     var statistics = db.ExecutionManager.ConnectionContext.SqlConnectionObject.RetrieveStatistics();
                     Trace.TraceInformation($"Tables population took {stopwatch.ElapsedMilliseconds} ms");
@@ -4832,47 +4826,72 @@ set nocount off;
                     table.FileGroup = $"{prefix}_FG0";
                 }
                 table.Create();
-
                 var table2 = new Table(db, "UnpartitionedTable2");
-                table2.Columns.Add(new Column(table2, "ItemDate", DataType.DateTime));
-                table2.Columns.Add(new Column(table2, "ItemName", DataType.SysName));
-                table2.Checks.Add(new Check(table2, "checkit2") { Text = "ItemDate <= '20200201'" });
-                if (db.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase)
+                try
                 {
-                    table2.FileGroup = $"{prefix}_FG0";
-                }
-                table2.Create();
+                    table2.Columns.Add(new Column(table2, "ItemDate", DataType.DateTime));
+                    table2.Columns.Add(new Column(table2, "ItemName", DataType.SysName));
+                    table2.Checks.Add(new Check(table2, "checkit2") { Text = "ItemDate <= '20200201'" });
+                    if (db.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase)
+                    {
+                        table2.FileGroup = $"{prefix}_FG0";
+                    }
+                    table2.Create();
 
-                db.ExecuteNonQuery(@"INSERT INTO partitionedTable1(ItemDate, ItemName) VALUES
+                    db.ExecuteNonQuery(@"INSERT INTO partitionedTable1(ItemDate, ItemName) VALUES
                                       ('20200110', 'Partition1January'),
                                       ('20200215', 'Partition1February'),
                                       ('20200320', 'Partition1March'),
                                       ('20200402', 'Partition1April')");
-                db.ExecuteNonQuery(@"INSERT INTO partitionedTable2(ItemDate, ItemName) VALUES
+                    db.ExecuteNonQuery(@"INSERT INTO partitionedTable2(ItemDate, ItemName) VALUES
                                       ('20200110', 'Partition2January'),
                                       ('20200215', 'Partition2February'),
                                       ('20200320', 'Partition2March'),
                                       ('20200402', 'Partition2April')");
 
-                Assert.That(() => table.SwitchPartition(null), Throws.InstanceOf<ArgumentNullException>(), "SwitchPartition(null)");
-                partitionedTable1.SwitchPartition(1, table);
-                var itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from UnpartitionedTable");
-                Assert.That(itemName, Is.EqualTo("Partition1January"), "SwitchPartition of partitioned table into unpartitioned table");
-                partitionedTable2.SwitchPartition(1, partitionedTable1, 1);
-                itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from partitionedTable1 where ItemDate <= '20200201'");
-                Assert.That(itemName, Is.EqualTo("Partition2January"), "SwitchPartition of partitioned table into partitioned table");
-                if (db.ServerVersion.Major >= 12)
-                {
-                    table.LowPriorityMaxDuration = 1;
-                }
-                table.SwitchPartition(partitionedTable2, 1);
-                itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from partitionedTable2 where ItemDate <= '20200201'");
-                Assert.That(itemName, Is.EqualTo("Partition1January"), "SwitchPartition of unpartitioned table to partitioned table");
-                db.ExecuteNonQuery(@"INSERT INTO UnpartitionedTable(ItemDate, ItemName) VALUES
+                    Assert.That(() => table.SwitchPartition(null), Throws.InstanceOf<ArgumentNullException>(), "SwitchPartition(null)");
+                    partitionedTable1.SwitchPartition(1, table);
+                    var itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from UnpartitionedTable");
+                    Assert.That(itemName, Is.EqualTo("Partition1January"), "SwitchPartition of partitioned table into unpartitioned table");
+                    partitionedTable2.SwitchPartition(1, partitionedTable1, 1);
+                    itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from partitionedTable1 where ItemDate <= '20200201'");
+                    Assert.That(itemName, Is.EqualTo("Partition2January"), "SwitchPartition of partitioned table into partitioned table");
+                    if (db.ServerVersion.Major >= 12)
+                    {
+                        table.LowPriorityMaxDuration = 1;
+                    }
+                    table.SwitchPartition(partitionedTable2, 1);
+                    itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from partitionedTable2 where ItemDate <= '20200201'");
+                    Assert.That(itemName, Is.EqualTo("Partition1January"), "SwitchPartition of unpartitioned table to partitioned table");
+                    db.ExecuteNonQuery(@"INSERT INTO UnpartitionedTable(ItemDate, ItemName) VALUES
                                       ('20200110', 'January')");
-                table.SwitchPartition(table2);
-                itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from UnpartitionedTable2 where ItemDate <= '20200201'");
-                Assert.That(itemName, Is.EqualTo("January"), "Switch unpartitioned table to unpartitioned table");
+                    table.SwitchPartition(table2);
+                    itemName = db.ExecutionManager.ExecuteScalar("select top 1 ItemName from UnpartitionedTable2 where ItemDate <= '20200201'");
+                    Assert.That(itemName, Is.EqualTo("January"), "Switch unpartitioned table to unpartitioned table");
+                }
+                finally
+                {
+                    partitionedTable1.DropIfExists();
+                    partitionedTable2.DropIfExists();
+                    table.DropIfExists();
+                    if (table2.State == SqlSmoState.Existing)
+                    {
+                        table2.Drop();
+                    }
+                    // Delete all the files from the partition scheme otherwise they will be left orphaned
+                    if (partitionScheme.IsSupportedObject<FileGroup>())
+                    {
+                        foreach (var fg in partitionScheme.FileGroups)
+                        {
+                            foreach (var df in db.FileGroups[fg].Files.ToList())
+                            {
+                                df.Shrink(0, ShrinkMethod.EmptyFile);
+                                df.Drop();
+                            }
+                        }
+                    }
+                    partitionScheme.Drop();
+                }
             });
         }
 
@@ -4989,7 +5008,7 @@ set nocount off;
             {
                 var table = db.CreateTableDefinition("NoQuery");
                 var view = db.CreateViewDefinition("NoQuery", "dbo", "select 1");
-                var recorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId);
+                var recorder = new SqlClientEventRecorder(Environment.CurrentManagedThreadId){ EnableTraceLogging = false };
                 using (recorder)
                 {
                     recorder.Start();

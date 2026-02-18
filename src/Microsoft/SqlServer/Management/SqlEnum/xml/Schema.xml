@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="Schema" impl_type="SqlObject" min_major='9'  cloud_min_major='10'  datawarehouse_enabled='true'>
+<EnumObject type="Schema" impl_type="SqlObject" min_major='10'  cloud_min_major='10'  datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table="sys.schemas AS s" />
 		<property_link fields = '#Owner#' left_join="sys.database_principals AS dp1">dp1.principal_id = s.principal_id</property_link>

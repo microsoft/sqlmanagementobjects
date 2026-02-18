@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<EnumObject type="ClusterMemberState" impl_type="SqlObject" min_major='11'>
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="ClusterMemberState" impl_type="SqlObject" min_major='11' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
       <property_link table="sys.dm_hadr_cluster_members cm"></property_link>
   </settings>

@@ -231,7 +231,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // the following work only for 10.0 and beyond
-            if ((this.ServerVersion.Major >= 10) && ((int)SqlServerVersion.Version100 <= (int)sp.TargetServerVersion))
+            if ((int)SqlServerVersion.Version100 <= (int)sp.TargetServerVersion)
             {
                 GetStringOption(query, sp, "IsPromotionofDistributedTransactionsForRPCEnabled", "remote proc transaction promotion");
             }

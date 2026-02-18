@@ -437,5 +437,336 @@ ADD EVENT sqlserver.sp_statement_starting
 
             session.Drop();
         }
+
+        #region MaxDuration Tests (Server-Scoped Only)
+        // TODO: Bug:4816977 Re-enable MaxDuration tests on Managed Instance
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_CreateSession_WithUnlimitedValue_IncludesInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    var session = store.CreateSession(sessionName);
+                    session.MaxDuration = Session.UnlimitedDuration; // Explicitly set to UNLIMITED (0)
+                    session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.rpc_starting"));
+                    
+                    var expectedCreateString = $@"CREATE EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.rpc_starting
+WITH (MAX_DURATION=UNLIMITED)
+".FixNewLines();
+                    
+                    var createScript = session.ScriptCreate().ToString();
+                    Assert.That(createScript, Is.EqualTo(expectedCreateString), 
+                        "CREATE script should match expected T-SQL when MAX_DURATION is explicitly set to UNLIMITED");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_CreateSession_WithValidValue_IncludesInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    var session = store.CreateSession(sessionName);
+                    session.MaxDuration = 3600; // 1 hour
+                    session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.rpc_starting"));
+                    
+                    var expectedCreateString = $@"CREATE EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.rpc_starting
+WITH (MAX_DURATION=3600 SECONDS)
+".FixNewLines();
+                    var createScript = session.ScriptCreate().ToString();
+                    Assert.That(createScript, Is.EqualTo(expectedCreateString), 
+                        "CREATE script should match expected T-SQL when MAX_DURATION is explicitly set to 3600 seconds");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        public void MaxDuration_CreateSession_WithoutSettingValue_DoesNotIncludeInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    var session = store.CreateSession(sessionName);
+                    // Do NOT set MaxDuration - should use default and not include in script
+                    session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.rpc_starting"));
+                    
+                    var expectedCreateString = $@"CREATE EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.rpc_starting
+WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF)
+".FixNewLines();
+                    
+                    session.Create();
+                    
+                    var createScript = session.ScriptCreate().ToString();
+                    Assert.That(createScript, Is.EqualTo(expectedCreateString), 
+                        "CREATE script should match expected T-SQL without MAX_DURATION when not explicitly set");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_ScriptExistingSession_WithDefaultValue_DoesNotIncludeInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    // Create session via T-SQL with default MAX_DURATION (UNLIMITED)
+                    ServerContext.ConnectionContext.ExecuteNonQuery($@"
+                        CREATE EVENT SESSION [{sessionName}] ON SERVER 
+                        ADD EVENT sqlserver.rpc_starting
+                        WITH (MAX_MEMORY=4096 KB,MAX_DURATION=UNLIMITED)");
+                    
+                    store.Refresh();
+                    var session = store.Sessions[sessionName];
+                    
+                    Assert.That(session.MaxDuration, Is.EqualTo(Session.UnlimitedDuration), 
+                        "MaxDuration should be UnlimitedDuration (0) for existing session");
+                    
+                    var expectedCreateString = $@"CREATE EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.rpc_starting
+WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF)
+".FixNewLines();
+                    
+                    var createScript = session.ScriptCreate().ToString();
+                    Assert.That(createScript, Is.EqualTo(expectedCreateString), 
+                        "ScriptCreate for existing session should match expected T-SQL without MAX_DURATION when value is default UNLIMITED");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_ScriptExistingSession_WithNonDefaultValue_IncludesInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    // Create session via T-SQL with non-default MAX_DURATION
+                    ServerContext.ConnectionContext.ExecuteNonQuery($@"
+                        CREATE EVENT SESSION [{sessionName}] ON SERVER 
+                        ADD EVENT sqlserver.rpc_starting
+                        WITH (MAX_MEMORY=4096 KB, MAX_DURATION=7200 SECONDS)");
+                    
+                    store.Refresh();
+                    var session = store.Sessions[sessionName];
+                    
+                    Assert.That(session.MaxDuration, Is.EqualTo(7200), 
+                        "MaxDuration should be 7200 for existing session");
+                    
+                    var expectedCreateString = $@"CREATE EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.rpc_starting
+WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=30 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF,MAX_DURATION=7200 SECONDS)
+".FixNewLines();
+                    
+                    var createScript = session.ScriptCreate().ToString();
+                    Assert.That(createScript, Is.EqualTo(expectedCreateString), 
+                        "ScriptCreate for existing session should match expected T-SQL with MAX_DURATION when value is non-default");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_AlterSession_FromValidValueToUnlimited_IncludesInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    // Create session via T-SQL with non-default MAX_DURATION
+                    ServerContext.ConnectionContext.ExecuteNonQuery($@"
+                        CREATE EVENT SESSION [{sessionName}] ON SERVER 
+                        ADD EVENT sqlserver.rpc_starting
+                        WITH (MAX_MEMORY=4096 KB, MAX_DURATION=3600 SECONDS)");
+                    
+                    store.Refresh();
+                    var session = store.Sessions[sessionName];
+                    
+                    // Alter to set MaxDuration to UNLIMITED
+                    session.MaxDuration = Session.UnlimitedDuration;
+                    
+                    var expectedAlterString = $@"ALTER EVENT SESSION [{sessionName}] ON SERVER 
+ WITH (MAX_DURATION=UNLIMITED)
+".FixNewLines();
+                    
+                    var alterScript = session.ScriptAlter().ToString();
+                    Assert.That(alterScript, Is.EqualTo(expectedAlterString), 
+                        "ALTER script should match expected T-SQL when MAX_DURATION is explicitly changed to UNLIMITED");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, Edition = DatabaseEngineEdition.Enterprise, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_AlterSession_FromUnlimitedToValidValue_IncludesInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    // Create session via T-SQL with UNLIMITED MAX_DURATION
+                    ServerContext.ConnectionContext.ExecuteNonQuery($@"
+                        CREATE EVENT SESSION [{sessionName}] ON SERVER 
+                        ADD EVENT sqlserver.rpc_starting
+                        WITH (MAX_MEMORY=4096 KB, MAX_DURATION=UNLIMITED)");
+                    
+                    store.Refresh();
+                    var session = store.Sessions[sessionName];
+                    
+                    // Alter to set MaxDuration to a specific value
+                    session.MaxDuration = 1800; // 30 minutes
+                    //session.Alter();
+
+                    var expectedAlterString = $@"ALTER EVENT SESSION [{sessionName}] ON SERVER 
+ WITH (MAX_DURATION=1800 SECONDS)
+".FixNewLines();
+
+                    var alterScript = session.ScriptAlter().ToString();
+                    Assert.That(alterScript, Is.EqualTo(expectedAlterString), 
+                        "ALTER script should match expected T-SQL when MAX_DURATION is changed from unlimited");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        [TestMethod]
+        [SqlTestArea(SqlTestArea.ExtendedEvents)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
+        public void MaxDuration_AlterSession_WithoutChangingMaxDuration_DoesNotIncludeInScript()
+        {
+            ExecuteTest(() =>
+            {
+                var store = new XEStore(new SqlStoreConnection(ServerContext.ConnectionContext.SqlConnectionObject));
+                var sessionName = "TestMaxDuration_" + Guid.NewGuid().ToString();
+                
+                try
+                {
+                    // Create session via T-SQL
+                    ServerContext.ConnectionContext.ExecuteNonQuery($@"
+                        CREATE EVENT SESSION [{sessionName}] ON SERVER 
+                        ADD EVENT sqlserver.rpc_starting
+                        WITH (MAX_MEMORY=4096 KB, MAX_DURATION=3600 SECONDS)");
+                    
+                    store.Refresh();
+                    var session = store.Sessions[sessionName];
+                    
+                    // Alter session but don't change MaxDuration - just add an event
+                    session.AddEvent(store.ObjectInfoSet.Get<EventInfo>("sqlserver.rpc_completed"));
+                    
+                    var expectedAlterString = $@"ALTER EVENT SESSION [{sessionName}] ON SERVER 
+ADD EVENT sqlserver.rpc_completed
+".FixNewLines();
+                    
+                    var alterScript = session.ScriptAlter().ToString();
+                    Assert.That(alterScript, Is.EqualTo(expectedAlterString), 
+                        "ALTER script should match expected T-SQL without MAX_DURATION when MaxDuration property is not dirty");
+                }
+                finally
+                {
+                    if (store.Sessions[sessionName] != null)
+                    {
+                        store.Sessions[sessionName].Drop();
+                    }
+                }
+            });
+        }
+
+        #endregion MaxDuration Tests
     }
 }

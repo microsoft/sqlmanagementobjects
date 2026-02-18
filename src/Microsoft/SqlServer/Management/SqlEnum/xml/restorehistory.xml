@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<EnumObject type='restorehistory' impl_type='SqlObject' min_major='7'>
+<EnumObject type='restorehistory' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='msdb.dbo.restorehistory rthist' />
 	</settings>
@@ -15,7 +15,7 @@
 		<property name='IsRestartSpecified' type='bit'>rthist.restart</property>
 		<property name='StopAt' type='datetime'>rthist.stop_at</property>
 		<property name='DeviceCount' type='tinyint'>rthist.device_count</property>
-		<version min_major='8'>		
+		<version min_major='10'>		
 			<property name='StopAtMarkName' type='nvarchar' size='128'>rthist.stop_at_mark_name</property>
 			<property name='IncludesMarkedTransaction' type='bit'>rthist.stop_before</property>			
 		</version>

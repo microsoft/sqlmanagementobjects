@@ -6,6 +6,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     using System;
     using System.Collections.Specialized;
     using System.Data;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Reflection;
     using System.Text;
@@ -120,7 +121,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             else
             {
-                TraceHelper.Assert( ResultType.DataTable == res );
+                Debug.Assert( ResultType.DataTable == res );
                 return new EnumResult(ds.Tables[0], res);
             }
         }
@@ -294,7 +295,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 }
 
                 // if we are going to escape this character, then sb should not be null
-                TraceHelper.Assert(!escape || sb != null);
+                Debug.Assert(!escape || sb != null);
 
 
                 if (escape)

@@ -1,14 +1,10 @@
 <?xml version="1.0" ?>
-<EnumObject type="Table" impl_type="SqlObject" min_major='7' cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Table" impl_type="SqlObject" min_major='10' cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major='7' max_major='8'>
-      <property_link table="dbo.sysobjects AS tbl">(tbl.type='U' or tbl.type='S')</property_link>
-      <property_link fields='#HasClusteredIndex#HasPrimaryClusteredIndex#IndexID#RowCount#' join="dbo.sysindexes AS idx">idx.id = tbl.id and idx.indid &lt; 2</property_link>
-    </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <property_link table="sys.tables AS tbl" />
     </version>
-    <version min_major='9' max_major='11' cloud_min_major='10' cloud_max_major='11'>
+    <version min_major='10' max_major='11' cloud_min_major='10' cloud_max_major='11'>
       <property_link fields='#DataSpaceID#HasClusteredIndex#HasPrimaryClusteredIndex#IndexID#IndexIDForPartition#FileStreamFileGroup#FileStreamPartitionScheme#DistributionPolicy#' join="sys.indexes AS idx">
         idx.object_id = tbl.object_id and (idx.index_id &lt; &lt;msparam&gt;2&lt;/msparam&gt;)
       </property_link>
@@ -28,6 +24,10 @@
           fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#'
           left_join='#external_data AS edt'>edt.object_id = tbl.object_id</property_link>
     </version>
+    <!-- ShardingColumnName has to join on sys.columns AFTER #external_data because this join references edt -->
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+      <property_link fields='#ShardingColumnName#' left_join='sys.columns AS sc'>sc.object_id = tbl.object_id AND sc.column_id = edt.sharding_col_id</property_link>
+    </version>
     <version datawarehouse_enabled='true'>
       <property_link fields='#RejectedRowLocation#' left_join="sys.external_tables as et">et.object_id = tbl.object_id</property_link>
       <property_link fields='#DwTableDistribution#' left_join="sys.pdw_table_distribution_properties as tdp">tdp.object_id = tbl.object_id</property_link>
@@ -37,7 +37,7 @@
       <property_link fields='#HasSystemTimePeriod#SystemTimePeriodStartColumn#SystemTimePeriodEndColumn# ' left_join='sys.periods as periods'>periods.object_id = tbl.object_id</property_link>
       <property_link fields='#HistoryTableName#HistoryTableSchema#HistoryTableID#' left_join='sys.tables as historyTable'>historyTable.object_id = tbl.history_table_id</property_link>
     </version>
-    <version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
       <property_link fields='#TextFileGroup#' left_join='sys.data_spaces AS dstext '>tbl.lob_data_space_id = dstext.data_space_id</property_link>
     </version>
     <!-- Change Tracking Properties for Table info is available in sys.change_tracking_tables-->
@@ -62,7 +62,7 @@
     <version min_major='10' cloud_min_major='12'>
         <prefix fields = '#ChangeTrackingEnabled#TrackColumnsUpdatedEnabled#'>
             create table #change_tracking_tables
-            (object_id int null, is_track_columns_updated_on bit null)
+            (object_id int not null primary key, is_track_columns_updated_on bit null)
             insert into #change_tracking_tables
             select t.object_id, c.is_track_columns_updated_on
             from sys.tables t
@@ -72,7 +72,7 @@
     <version min_major="11">
         <prefix fields='FileTableDirectoryName#FileTableNameColumnCollation#FileTableNamespaceEnabled#'>
             CREATE TABLE #file_tables
-            (object_id int not null, is_enabled bit null, directory_name nvarchar(256) null, filename_collation_name nvarchar(129) null)
+            (object_id int not null primary key, is_enabled bit null, directory_name nvarchar(256) null, filename_collation_name nvarchar(129) null)
             insert into #file_tables
             select t.object_id, f.is_enabled, f.directory_name, f.filename_collation_name
             from sys.tables as t
@@ -82,7 +82,7 @@
     <version min_major='16' cloud_min_major='12'>
       <prefix fields="#LedgerViewName#LedgerViewSchema#">
         CREATE TABLE #tmp_ledger_details
-        (table_object_id int not null, ledger_view_name sysname null, ledger_view_schema_name sysname null)
+        (table_object_id int not null primary key, ledger_view_name sysname null, ledger_view_schema_name sysname null)
         INSERT INTO #tmp_ledger_details
         SELECT t.object_id, v.name, s.name
         from sys.tables as t
@@ -91,40 +91,50 @@
       </prefix>
       <prefix fields='#LedgerViewTransactionIdColumnName#LedgerViewSequenceNumberColumnName#LedgerViewOperationTypeColumnName#LedgerViewOperationTypeDescColumnName#'>
         CREATE TABLE #tmp_ledger_view_column_names
-        (table_object_id int not null, ledger_transaction_id_column_name sysname null, ledger_sequence_number_column_name sysname null, ledger_operation_type_column_name sysname null, ledger_operation_type_desc_column_name sysname null)
+        (table_object_id int not null primary key, ledger_transaction_id_column_name sysname null, ledger_sequence_number_column_name sysname null, ledger_operation_type_column_name sysname null, ledger_operation_type_desc_column_name sysname null)
         INSERT INTO #tmp_ledger_view_column_names
         SELECT
-          t_obj_id,
-          [ledger_transaction_id_column_name] = MAX(CASE WHEN ledger_view_column_type = 1 THEN c_name ELSE NULL END),
-          [ledger_sequence_number_column_name] =MAX(CASE WHEN ledger_view_column_type = 2 THEN c_name ELSE NULL END),
-          [ledger_operation_type_column_name] = MAX(CASE WHEN ledger_view_column_type = 3 THEN c_name ELSE NULL END),
-          [ledger_operation_type_desc_column_name] = MAX(CASE WHEN ledger_view_column_type = 4 THEN c_name ELSE NULL END)
+        t_obj_id,
+        [ledger_transaction_id_column_name] = MAX(CASE WHEN ledger_view_column_type = 1 THEN c_name ELSE NULL END),
+        [ledger_sequence_number_column_name] =MAX(CASE WHEN ledger_view_column_type = 2 THEN c_name ELSE NULL END),
+        [ledger_operation_type_column_name] = MAX(CASE WHEN ledger_view_column_type = 3 THEN c_name ELSE NULL END),
+        [ledger_operation_type_desc_column_name] = MAX(CASE WHEN ledger_view_column_type = 4 THEN c_name ELSE NULL END)
         FROM
         (
-          SELECT t.object_id as t_obj_id, a.name as c_name, a.ledger_view_column_type FROM sys.tables as t
-          CROSS APPLY
-          (
-            SELECT name, ledger_view_column_type  FROM sys.columns as c
-            WHERE c.object_id = t.ledger_view_id and t.ledger_view_id!=0 and c.ledger_view_column_type!=0 and t.is_dropped_ledger_table=0
-          ) a
+        SELECT t.object_id as t_obj_id, c.name as c_name, c.ledger_view_column_type FROM sys.tables as t
+        INNER JOIN sys.columns AS c ON c.object_id = t.ledger_view_id
+        WHERE t.ledger_view_id != 0 AND c.ledger_view_column_type != 0 AND t.is_dropped_ledger_table=0
         ) as x
         GROUP BY x.t_obj_id
       </prefix>
     </version>
-    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='13' cloud_min_major='12'>
       <prefix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
-        create table #external_data (object_id int not null, data_source_id int , file_format_id int , [location] nvarchar(4000), reject_type nvarchar(20), reject_value float, reject_sample_value float, datasource_name nvarchar(128), fileformat_name nvarchar(128), sharding_col_id int, distribution_type tinyint, remote_schema_name nvarchar(128), remote_object_name nvarchar(128))
+        create table #external_data (object_id int not null primary key, data_source_id int , file_format_id int , [location] nvarchar(4000), reject_type nvarchar(20), reject_value float, reject_sample_value float, datasource_name nvarchar(128), fileformat_name nvarchar(128), sharding_col_id int, distribution_type tinyint, remote_schema_name nvarchar(128), remote_object_name nvarchar(128))
         insert into #external_data
         select tbl.object_id, eds.data_source_id, eff.file_format_id, et.location, et.reject_type, et.reject_value, et.reject_sample_value, eds.name, eff.name, et.sharding_col_id, et.distribution_type, et.remote_schema_name, et.remote_object_name
         from sys.tables tbl
-        LEFT OUTER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
+        INNER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
         LEFT OUTER JOIN sys.external_data_sources AS eds ON eds.data_source_id = et.data_source_id
         LEFT OUTER JOIN sys.external_file_formats AS eff ON eff.file_format_id = et.file_format_id
         WHERE
         (tbl.is_external = 1)
       </prefix>
     </version>
-    <version min_major='7'>
+    <version datawarehouse_enabled='true'>
+      <prefix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
+        create table #external_data (object_id int not null, data_source_id int , file_format_id int , [location] nvarchar(4000), reject_type nvarchar(20), reject_value float, reject_sample_value float, datasource_name nvarchar(128), fileformat_name nvarchar(128), sharding_col_id int, distribution_type tinyint, remote_schema_name nvarchar(128), remote_object_name nvarchar(128))
+        insert into #external_data
+        select tbl.object_id, eds.data_source_id, eff.file_format_id, et.location, et.reject_type, et.reject_value, et.reject_sample_value, eds.name, eff.name, et.sharding_col_id, et.distribution_type, et.remote_schema_name, et.remote_object_name
+        from sys.tables tbl
+        INNER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
+        LEFT OUTER JOIN sys.external_data_sources AS eds ON eds.data_source_id = et.data_source_id
+        LEFT OUTER JOIN sys.external_file_formats AS eff ON eff.file_format_id = et.file_format_id
+        WHERE
+        (tbl.is_external = 1)
+      </prefix>
+    </version>
+    <version min_major='10'>
       <prefix fields='#IndexSpaceUsed#DataSpaceUsed#'>
         declare @PageSize float
         select @PageSize=v.low/1024.0 from master.dbo.spt_values v where v.number=&lt;msparam&gt;1&lt;/msparam&gt; and v.type=&lt;msparam&gt;E&lt;/msparam&gt;
@@ -175,7 +185,7 @@
                     class_name='Microsoft.SqlServer.Management.Smo.PostProcessTable'
                     triggered_fields='#DatabaseName#SchemaName#TableName#'/>
     </version>
-    <version cloud_min_major='12' datawarehouse_enabled='true' min_major='7'>
+    <version cloud_min_major='12' datawarehouse_enabled='true' min_major='10'>
       <special_query database = 'tempdb' hint="">tbl.name not like '#%'</special_query>
     </version>
   </settings>
@@ -210,44 +220,7 @@
         END
       </property>
     </version>
-    <version min_major='7' max_major='8'>
-      <property name="FakeSystemTable" type="bit" access='Read' cast='true'>CASE WHEN (OBJECTPROPERTY(tbl.id, N'tableisfake')=1) THEN 1 ELSE 0 END</property>
-      <property name="DataSpaceUsed" type="float" access='Read' expensive='true'>
-        @PageSize*((SELECT sum(sidx.dpages)
-        FROM dbo.sysindexes sidx
-        WHERE sidx.indid &lt; &lt;msparam&gt;2&lt;/msparam&gt; and sidx.id = tbl.id)
-        +
-        (SELECT isnull(sum(sidx.used), 0)
-        FROM dbo.sysindexes sidx
-        WHERE sidx.indid = &lt;msparam&gt;255&lt;/msparam&gt; and sidx.id = tbl.id))
-      </property>
-      <property name="IndexSpaceUsed" type="float" access='Read' expensive='true'>
-        @PageSize*(SELECT sum(isnull(sidx.used,0)-isnull(sidx.dpages,0))
-        FROM dbo.sysindexes sidx
-        WHERE sidx.indid &lt; &lt;msparam&gt;2&lt;/msparam&gt; and sidx.id = tbl.id)
-      </property>
-      <property name="HasClusteredIndex" type="bit" access='Read' cast='true'>CASE idx.indid WHEN  1 THEN 1 ELSE 0 END</property>
-      <property name="HasNonClusteredIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from dbo.sysindexes ind where ind.id = tbl.id and ind.indid &gt; 1 and 1 != INDEXPROPERTY(ind.id,ind.name,N'IsStatistics') and 1 != INDEXPROPERTY(ind.id,ind.name,N'IsHypothetical')), 0)</property>
-      <property name="HasPrimaryClusteredIndex" type="bit" access='Read' cast='true'>case idx.indid WHEN 1 THEN case when (0 != idx.status&amp;0x800) then 1 else 0 end else 0 end</property>
-      <property name="TextFileGroup" type="sysname" read_only_after_creation="true">ISNULL((SELECT top 1 s.groupname FROM dbo.sysfilegroups s, dbo.sysindexes i WHERE i.id = tbl.id and i.indid in (0,1)AND i.groupid = s.groupid), N'')</property>
-      <property name="Replicated" type="bit" access='Read' cast='true'>tbl.replinfo</property>
-      <property name="HasFullTextCatalog" type="bit" hidden='true' cast='true'>OBJECTPROPERTY(tbl.id, 'TableFullTextCatalogId')</property>
-      <!-- used for link with PartitionSchemeParameter, inc_storage -->
-      <property name="IndexID" type="int" hidden='true'>idx.indid</property>
-      <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true">0</property>
-      <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
-    </version>
-    <version min_major='7' max_major='7'>
-      <property name="RowCount" type="int" report_type2 = 'System.Int64' access='Read' cast='true'>idx.rows</property>
-    </version>
-    <version min_major='8' max_major='8'>
-      <property name="AnsiNullsStatus" type="bit" cast='true' read_only_after_creation="true" mode="design">OBJECTPROPERTY(tbl.id,N'IsAnsiNullsOn')</property>
-      <property name="QuotedIdentifierStatus" type="bit" cast='true' read_only_after_creation="true" mode="design">OBJECTPROPERTY(tbl.id,N'IsQuotedIdentOn')</property>
-      <property name="RowCount" type="bigint" access='Read' cast='true'>idx.rowcnt</property>
-      <!-- extended properties support -->
-      <property name="ObjectTypeName" type="sysname" hidden="true">N'TABLE'</property>
-    </version>
-    <version min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="HasClusteredIndex" type="bit" access='Read' cast='true'>CASE idx.index_id WHEN 1 THEN 1 ELSE 0 END</property>
       <property name="HasNonClusteredIndex" type="bit" access='Read' cast='true'>ISNULL((select top 1 1 from sys.indexes ind where ind.object_id = tbl.object_id and ind.type &gt; 1 and ind.is_hypothetical = 0 ), 0)</property>
       <property name="HasPrimaryClusteredIndex" type="bit" access='Read' cast='true'>case idx.index_id when 1 then case when (idx.is_primary_key + 2*idx.is_unique_constraint = 1) then 1 else 0 end else 0 end</property>
@@ -265,12 +238,12 @@
       <property name="TableID" type="int" hidden='true' cast='true'>tbl.object_id</property>
     </version>
 
-    <version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="TextFileGroup" type="sysname" read_only_after_creation="true">ISNULL(dstext.name,N'')</property>
       <property name="DataSpaceID" type="int" hidden='true'>idx.data_space_id</property>
     </version>
 
-    <version min_major='9' >
+    <version min_major='10' >
       <property name='IsVarDecimalStorageFormatEnabled' type='bit' cast='true' expensive ='true' mode="deploy">
         case
         when databasepropertyex(DB_NAME(), 'version') &lt; 612 then 0
@@ -278,12 +251,12 @@
         end
       </property>
     </version>
-    <version min_major='9' max_major='15'>
+    <version min_major='10' max_major='15'>
       <property name="IsLedger" type="bit" cast="true" read_only_after_creation="true" >0</property>
       <property name="IsDroppedLedgerTable" type="bit" access="Read" cast="true">0</property>
     </version>
 
-    <version min_major='9' max_major='11'>
+    <version min_major='10' max_major='11'>
       <property name="RowCount" type="bigint" access='Read'>ISNULL( ( select sum (spart.rows) from sys.partitions spart where spart.object_id = tbl.object_id and spart.index_id &lt; &lt;msparam&gt;2&lt;/msparam&gt;), 0)</property>
       <!--when modify check datatabase.xml DataSpaceUsed for consistency -->
       <property name="DataSpaceUsed" type="float" access='Read' expensive='true'>
@@ -376,7 +349,7 @@
       </property>
     </version>
 
-    <version min_major='9' cloud_min_major='10'>
+    <version min_major='10' cloud_min_major='10'>
       <property name="Replicated" type="bit" access='Read'>tbl.is_replicated</property>
     </version>
     <!-- Properties for Change Tracking and Lock Escalation improvements-->
@@ -397,10 +370,6 @@
     <version min_major='10' cloud_min_major='12'>
       <property name="ChangeTrackingEnabled" type="bit" cast='true' mode="deploy">case when ctt.object_id is null then 0 else 1  end</property>
       <property name="TrackColumnsUpdatedEnabled" type="bit" cast='true' mode="deploy">ISNULL(ctt.is_track_columns_updated_on,0)</property>
-    </version>
-
-    <version min_major="7" cloud_min_major='10' max_major='9' cloud_max_major='11'>
-      <property name="HasSparseColumn" type="bit" cast='true' access='Read'>0</property>
     </version>
 
     <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
@@ -455,7 +424,7 @@
       <property name="FileTableNamespaceEnabled" type="bit" cast="true">0</property>
     </version>
 
-    <version min_major='7' cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
       <include alias='idx' file='inc_storage.xml'/>
     </version>
 
@@ -547,11 +516,7 @@
         ELSE 255
         END
       </property>
-      <property name="ShardingColumnName" type="sysname" expensive="true">
-        CASE WHEN edt.sharding_col_id IS NULL THEN N''
-        ELSE (select name from sys.columns sc where sc.object_id = tbl.object_id AND sc.column_id = edt.sharding_col_id)
-        END
-      </property>
+      <property name="ShardingColumnName" type="sysname" expensive="true">ISNULL(sc.name, N'')</property>
       <property name="RemoteSchemaName" type="sysname" expensive="true">ISNULL(edt.remote_schema_name,'')</property>
       <property name="RemoteObjectName" type="sysname" expensive="true">ISNULL(edt.remote_object_name,'')</property>
     </version>

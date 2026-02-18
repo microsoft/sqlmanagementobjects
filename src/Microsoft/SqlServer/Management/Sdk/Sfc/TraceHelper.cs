@@ -89,30 +89,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <summary>
         /// This API supports the product infrastructure and is not intended to be used directly from your code.
         /// </summary>
-        public static void Assert(bool condition)
-        {
-#if STRACE
-            STrace.Assert(condition);
-#else
-            System.Diagnostics.Debug.Assert(condition);
-#endif
-        }
-
-        /// <summary>
-        /// This API supports the product infrastructure and is not intended to be used directly from your code.
-        /// </summary>
-        public static void Assert(bool condition, string strFormat)
-        {
-#if STRACE
-            STrace.Assert(condition, strFormat);
-#else
-            System.Diagnostics.Debug.Assert(condition, strFormat);
-#endif
-        }
-
-        /// <summary>
-        /// This API supports the product infrastructure and is not intended to be used directly from your code.
-        /// </summary>
         public static void LogExCatch(System.Exception ex)
         {
 #if STRACE

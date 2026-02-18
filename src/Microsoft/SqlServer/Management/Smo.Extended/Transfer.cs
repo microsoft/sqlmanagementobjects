@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -277,9 +278,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     nodeForWhichToBreakLink = 0;
 
-                    Sdk.Sfc.TraceHelper.Assert(false, "We could not find a node to break for the cycle");
+                    Debug.Assert(false, "We could not find a node to break for the cycle");
 
-                    SqlSmoObject.Trace("We could not find a node to break for the cycle");
+                    SmoEventSource.Log.TransferMarkingNodeForBreaking("Could not find a node to break for the cycle");
                 }
             }
 

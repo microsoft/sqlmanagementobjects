@@ -318,6 +318,18 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
     /// <summary>
+    /// Types of an External Model.
+    /// </summary>
+    public enum ExternalModelType
+    {
+        /// <summary>
+        /// EMBEDDINGS Model Type.
+        /// </summary>
+        [TsqlSyntaxString("EMBEDDINGS")]
+        Embeddings = 1,
+    }
+
+    /// <summary>
     /// The enumeration specifies the external file format types
     /// </summary>
     [TypeConverter(typeof(Microsoft.SqlServer.Management.Smo.ExternalFileFormatTypeConverter))]

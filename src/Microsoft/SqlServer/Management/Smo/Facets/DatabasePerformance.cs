@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Facets;
 using Sfc = Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -119,9 +120,9 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                Diagnostics.TraceHelper.Assert(null != this.Database.Parent, "Database Performance facet Database Parent object is null");
-                Diagnostics.TraceHelper.Assert(null != this.Database.Parent.Databases["master"], "Database Performance facet master database is null");
-                Diagnostics.TraceHelper.Assert(null != this.Database.Parent.Databases["model"], "Database Performance facet model database is null");
+                Debug.Assert(null != this.Database.Parent, "Database Performance facet Database Parent object is null");
+                Debug.Assert(null != this.Database.Parent.Databases["master"], "Database Performance facet master database is null");
+                Debug.Assert(null != this.Database.Parent.Databases["model"], "Database Performance facet model database is null");
 
                 return ((this.Database.Collation == this.Database.Parent.Databases["master"].Collation) || (this.Database.Collation == this.Database.Parent.Databases["model"].Collation));
             }
@@ -138,9 +139,9 @@ namespace Microsoft.SqlServer.Management.Smo
             this.Database.LogFiles.Refresh();
             this.Database.FileGroups.Refresh();
 
-            Diagnostics.TraceHelper.Assert(null != this.Database.Parent, "Database Performance facet Database Parent object is null");
-            Diagnostics.TraceHelper.Assert(null != this.Database.Parent.Databases["master"], "Database Performance facet master database is null");
-            Diagnostics.TraceHelper.Assert(null != this.Database.Parent.Databases["model"], "Database Performance facet master database is null");
+            Debug.Assert(null != this.Database.Parent, "Database Performance facet Database Parent object is null");
+            Debug.Assert(null != this.Database.Parent.Databases["master"], "Database Performance facet master database is null");
+            Debug.Assert(null != this.Database.Parent.Databases["model"], "Database Performance facet model database is null");
 
             this.Database.Parent.Databases["master"].Refresh();
             this.Database.Parent.Databases["model"].Refresh();

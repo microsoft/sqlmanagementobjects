@@ -13,6 +13,7 @@ using System.Data.SqlTypes;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using SmoEventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
@@ -364,7 +365,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     moveNext = false;
                     break;
                 default:
-                    Diagnostics.TraceHelper.Assert(false, "Bug in dev code");
+                    Debug.Assert(false, "Bug in dev code");
                     throw new Exception("Unknown state");
             }
 
@@ -375,7 +376,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (moveNext == null)
             {
-                Diagnostics.TraceHelper.Assert(false, "MoveNext not initialized. Bug in code");
+                Debug.Assert(false, "MoveNext not initialized. Bug in code");
                 throw new Exception("MoveNext not initialized. Bug in code");
             }
             return moveNext.Value;
@@ -964,22 +965,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     formattedValue = this.FormatSqlVariantValue(columnIndex);
                     break;
 
-                case SqlDataType.Json:
-                    formattedValue = String.Format(
-                        CultureInfo.InvariantCulture,
-                        "CAST({0} AS Json)", SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString()));
-                    break;
-
                 case SqlDataType.Vector:
-                    string sqlStringValue = SqlSmoObject.MakeSqlString(this.reader.GetProviderSpecificValue(columnIndex).ToString());
-                    if (!string.IsNullOrEmpty(columnData.VectorBaseType))
-                    {
-                        formattedValue = $"CAST({sqlStringValue} AS Vector({columnData.VectorDimensions}, {columnData.VectorBaseType}))";
-                    }
-                    else
-                    {
-                        formattedValue = $"CAST({sqlStringValue} AS Vector({columnData.VectorDimensions}))";
-                    }
+                    // GetString returns JSON-encoded Vector data
+                case SqlDataType.Json:
+                    formattedValue =  SqlSmoObject.MakeSqlString(reader.GetString(columnIndex));
                     break;
 
                 default:
@@ -987,7 +976,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // to support types that we don't understand.
 
                     //
-                    Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, $"ERROR: Attempting to script data for type {columnData.DataType}");
+                    SmoEventSource.Log.DataTypeScriptingError(columnData.DataType.ToString());
 
                     throw new InvalidSmoOperationException(
                         ExceptionTemplates.DataScriptingUnsupportedDataTypeException(

@@ -758,12 +758,9 @@ namespace Microsoft.SqlServer.Management.Smo
                         continue;
                     }
 #if !SMOCODEGEN
-                    else if ((postProcess.Value is PostProcessBodyText) &&
-                        ((ServerConnection)this.ConnectionInfo).ServerVersion.Major >= 9)
+                    else if (postProcess.Value is PostProcessBodyText)
                     {
-                        // PostProcessBodyText can be done directly only on 9.0
-                        // on 8.0 we need to execute additional queries and paste 
-                        // the syscomments fields
+                        // PostProcessBodyText can be done directly on supported server versions
                         continue;
                     }
 #endif

@@ -123,6 +123,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     switch (type.Name)
                     {
                         case nameof(IndexedJsonPath):
+                        case nameof(ExternalModel):
                             return false;
                     }
                 }
@@ -182,7 +183,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     switch (type.Name)
                     {
                         case "AffinityInfo":
-                            if ((serverVersion.Major >= 10 && serverVersion.Minor < 50) || (serverVersion.Major < 10))
+                            if (serverVersion.Minor < 50)
                             {
                                 return false;
                             }
@@ -207,70 +208,6 @@ namespace Microsoft.SqlServer.Management.Smo
                         // After version bump changes are in DS_Main, we need to check this condition
                         //         only on server versions less than 12.0
                         case "SmartAdmin":
-                            return false;
-                    }
-                }
-                if (serverVersion.Major < 10)
-                {
-                    switch (type.Name)
-                    {
-                        case "Audit" :
-                        case "AuditSpecification" :
-                        case "CryptographicProvider":
-                        case "DatabaseAuditSpecification" :
-                        case "DatabaseEncryptionKey":
-                        case "FullTextStopList":
-                        case "OrderColumn":
-                        case "ResourceGovernor":
-                        case "ResourcePool":
-                        case nameof(SensitivityClassification) :
-                        case "ServerAuditSpecification":
-                        case "UserDefinedTableType" :
-                        case "WorkLoadGroup":
-                            return false;
-                    }
-                }
-                if (serverVersion.Major < 9)
-                {
-                    switch (type.Name)
-                    {
-                        case "BrokerPriority" :
-                        case "BrokerService" :
-                        case "Certificate" :
-                        case "Credential" :
-                        case "DatabaseDdlTrigger" :
-                        case "DatabaseMirroringPayload":
-                        case "Endpoint" :
-                        case "EndpointPayload" :
-                        case "EndpointProtocol" :
-                        case "FullTextCatalog":
-                        case "MailAccount" :
-                        case "MailProfile":
-                        case "MailServer" :
-                        case "MessageType" :
-                        case "MessageTypeMapping" :
-                        case "PartitionFunction" :
-                        case "PartitionFunctionParameter" :
-                        case "PartitionScheme" :
-                        case "PartitionSchemeParameter" :
-                        case "PhysicalPartition" :
-                        case "PlanGuide" :
-                        case "RemoteServiceBinding":
-                        case "Schema" :
-                        case "ServerDdlTrigger" :
-                        case "ServiceBroker":
-                        case "ServiceContract":
-                        case "ServiceMasterKey" :
-                        case "ServiceContractMapping":
-                        case "ServiceQueue":
-                        case "ServiceRoute":
-                        case "SqlAssembly" :
-                        case "Synonym" :
-                        case "SymmetricKey" :
-                        case "UserDefinedAggregate":
-                        case "UserDefinedAggregateParameter":
-                        case "UserDefinedType" :
-                        case "XmlSchemaCollection" :
                             return false;
                     }
                 }
@@ -329,6 +266,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(DatabaseScopedConfiguration):
                     case nameof(DatabaseScopedCredential) :
                     case nameof(Default) :
+                    case nameof(ExternalModel):
                     case nameof(ExtendedProperty):
                     case nameof(ExternalDataSource):
                     case nameof(FullTextCatalog) :
@@ -359,7 +297,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case nameof(UserDefinedAggregateParameter) :
                     case nameof(UserDefinedType) :
                     case nameof(UserOptions) :
-                    case nameof(XmlSchemaCollection):
+                    case nameof(XmlSchemaCollection) :
                         return true;
                     case nameof(ExternalFileFormat):
                     case nameof(WorkloadManagementWorkloadGroup):
@@ -466,6 +404,7 @@ namespace Microsoft.SqlServer.Management.Smo
             smoObject.ThrowIfNotSupported(type, message: null, sp: sp);
         }
 
+        //VBUMP
         /// <summary>
         /// Checks if the specified type is supported by the <see cref="ServerVersion"/>, <see cref="DatabaseEngineType"/>
         /// and <see cref="DatabaseEngineEdition"/> of the root server for this object. If ScriptingPreferences are non-null
@@ -621,7 +560,9 @@ namespace Microsoft.SqlServer.Management.Smo
             (new ServerVersion(12, 0)),  //2014
             (new ServerVersion(13, 0)),  //2016
             (new ServerVersion(14, 0)),  //2017
-            (new ServerVersion(15, 0))   //2019
+            (new ServerVersion(15, 0)),  //2019
+            (new ServerVersion(16, 0)),  //2022
+            (new ServerVersion(17, 0))   //2025 (VBUMP)
         };
 
         /// <summary>

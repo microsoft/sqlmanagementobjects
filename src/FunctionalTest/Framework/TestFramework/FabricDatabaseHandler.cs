@@ -18,12 +18,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
     {
         public FabricDatabaseHandler(TestDescriptor descriptor)
         {
-            if (descriptor == null || !(descriptor is FabricWorkspaceDescriptor))
-            {
+            TestDescriptor = (descriptor as FabricWorkspaceDescriptor) ?? 
                 throw new ArgumentException($"The descriptor must be of type {nameof(FabricWorkspaceDescriptor)}.", nameof(descriptor));
-            }
-
-            TestDescriptor = descriptor;
         }
         public override Database HandleDatabaseCreation(DatabaseParameters dbParameters)
         {
@@ -31,18 +27,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             string fabricDbName;
             var currentUtcTime = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
             var dbNamePrefix = $"{fabricWorkspaceDescriptor.DbNamePrefix}{currentUtcTime}-";
-            if (dbParameters == null)
-            {
-                fabricDbName = SmoObjectHelpers.GenerateUniqueObjectName(dbNamePrefix);
-            }
-            else
-            {
-                fabricDbName = SmoObjectHelpers.GenerateUniqueObjectName(dbNamePrefix,
-                    includeClosingBracket: dbParameters.UseEscapedCharacters,
-                    includeDoubleClosingBracket: dbParameters.UseEscapedCharacters,
-                    includeSingleQuote: dbParameters.UseEscapedCharacters,
-                    includeDoubleSingleQuote: dbParameters.UseEscapedCharacters);
-            }
+            // Fabric does not allow some special characters in database names
+            fabricDbName = SmoObjectHelpers.GenerateUniqueObjectName(dbNamePrefix, 
+                    includeClosingBracket: false, 
+                    includeDoubleClosingBracket: false, 
+                    includeSingleQuote: false, 
+                    includeDoubleSingleQuote: false);
             //create fabric database using fabric-cli
             var connectionString = fabricWorkspaceDescriptor.CreateDatabase(fabricDbName);
             Trace.TraceInformation($"Created fabric database {fabricDbName}");

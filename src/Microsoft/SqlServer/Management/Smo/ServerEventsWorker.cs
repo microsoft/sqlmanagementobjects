@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Tracing;
 using System.Globalization;
+using SmoEventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
 using System.Management;
 using System.Text;
 using Microsoft.SqlServer.Management.Smo.Broker;
@@ -90,11 +92,6 @@ namespace Microsoft.SqlServer.Management.Smo
             // This may throw an exception if target is in Pending state
             Server server = target.GetServerObject();
 
-            // Check for correct server version
-            if (server.ServerVersion.Major < 9)
-            {
-                throw new InvalidVersionSmoOperationException(server.ServerVersion);
-            }
 
             this.eventEnumType = eventEnumType;
             this.events = (EventSetBase)Activator.CreateInstance(eventSetType);
@@ -152,8 +149,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         EventSubscription subscription = (EventSubscription)eventSubscriptions[eventClass];
                         if (null != subscription)
                         {
-                            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                                "Updating event handler for event " + eventClass + " on class " + this.Target.GetType().Name);
+                            SmoEventSource.Log.ServerEventSubscriptionUpdated(eventClass, this.Target.GetType().Name);
 
                             // We do not subscribe the second time,
                             // just update the handler
@@ -161,8 +157,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                                "Adding subscription for event " + eventClass + " on class " + this.Target.GetType().Name);
+                            SmoEventSource.Log.ServerEventSubscriptionAdded(eventClass, this.Target.GetType().Name);
 
                             // Create a new subscription
                             CreateSubscription(eventID, eventClass, eventHandlerKey);
@@ -190,8 +185,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     EventSubscription subscription = (EventSubscription)eventSubscriptions[eventClass];
                     if (null != subscription)
                     {
-                        Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                            "Removing subscription for event " + eventClass + " on class " + this.Target.GetType().Name);
+                        SmoEventSource.Log.ServerEventSubscriptionRemoved(eventClass, this.Target.GetType().Name);
 
                         // Remove subscription
                         this.eventSubscriptions.Remove(eventClass);
@@ -213,8 +207,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     foreach (EventSubscription subscription in this.eventSubscriptions.Values)
                     {
-                        Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                            "Starting event subscription on: {0}, query: {1}", subscription.EventWatcher.Scope.Path, subscription.EventWatcher.Query.QueryString);
+                        SmoEventSource.Log.ServerEventSubscriptionStarted(subscription.EventWatcher.Scope.Path.Path, subscription.EventWatcher.Query.QueryString);
 
                         subscription.EventWatcher.Start();
                     }
@@ -243,7 +236,7 @@ namespace Microsoft.SqlServer.Management.Smo
         public void Dispose()
         {
 
-            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways, "Removing all subscriptions");
+            SmoEventSource.Log.RemoveAllSubscriptions();
 
             // Stop all subscriptions and release all resources
             foreach (EventSubscription subscription in this.eventSubscriptions.Values)
@@ -354,8 +347,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             EventQuery query = CreateWqlQuery(eventClass);
 
-            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                "Subscription query {0}", query.QueryString);
+            SmoEventSource.Log.ServerEventSubscriptionQueryCreated(query.QueryString);
 
             // 
             // Connect to WMI service and create a watcher object for 
@@ -399,8 +391,7 @@ namespace Microsoft.SqlServer.Management.Smo
             EventType eventType = ConvertFromEventClass(args.NewEvent.ClassPath.ClassName);
             EventSubscription subscription = null;
 
-            Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                "Received event {0} on class {1}", args.NewEvent.ClassPath.ClassName, this.Target.GetType().Name);
+            SmoEventSource.Log.ServerEventReceived(args.NewEvent.ClassPath.ClassName, this.Target.GetType().Name);
 
             while (subscriptionKey != null && subscriptionKey.Length > 0)
             {
@@ -411,8 +402,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     ServerEventHandler eventHandler = (ServerEventHandler)this.eventHandlers[subscription.EventHandlerKey];
                     if (null != eventHandler)
                     {
-                        Diagnostics.TraceHelper.Trace(SmoApplication.ModuleName, SmoApplication.trAlways,
-                            "Raising event {0} on subscription: {1}", args.NewEvent.ClassPath.ClassName, subscriptionKey);
+                        SmoEventSource.Log.ServerEventRaised(args.NewEvent.ClassPath.ClassName, subscriptionKey);
 
                         eventHandler(this.Target, new ServerEventArgs(eventType, args.NewEvent.Properties));
                     }

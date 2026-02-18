@@ -1,9 +1,9 @@
 <?xml version='1.0' ?>
-<EnumObject type='DatabaseMasterKey' impl_type='SqlObject' min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+<EnumObject type='DatabaseMasterKey' impl_type='SqlObject' min_major='10' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table='sys.symmetric_keys' alias='c'>c.symmetric_key_id = 101</property_link>
     <property_link fields = '#IsOpen#' left_join='sys.openkeys AS ok'>ok.key_id=c.symmetric_key_id and ok.database_id=db_id()</property_link>
-    <version min_major='9'>
+    <version min_major='10'>
       <property_link fields = '#IsEncryptedByServer#' join='sys.databases AS mkdb'>mkdb.database_id=db_id()</property_link>
     </version>
     <!--It's preferable to use db_id() but on Azure SQL DB and Azure SQL DW the ID in sys.databases and the one from db_id() may
@@ -23,7 +23,7 @@
     <property name='DateLastModified' type='datetime' access='Read'>c.modify_date</property>
     <!--Though we have DML to open/close master key for Azure SQL DW, currently no catalog view(sys.openkeys not supported)
         was provided for getting its "open" status, so we don't support retrieving this property here-->
-    <version min_major='9' cloud_min_major='12'>
+    <version min_major='10' cloud_min_major='12'>
       <property name='IsOpen' type='bit' access='Read' cast='true'>ISNULL(ok.status, 0)</property>
     </version>
     <property name='IsEncryptedByServer' type='bit' access='Read' convert='true'>ISNULL(mkdb.is_master_key_encrypted_by_server, 0)</property>

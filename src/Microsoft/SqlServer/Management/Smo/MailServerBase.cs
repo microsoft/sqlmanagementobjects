@@ -167,17 +167,9 @@ namespace Microsoft.SqlServer.Management.Smo.Mail
             {
                 bool bIncludeCredentialChangeFlag = true;
 
-                // This is the build of the first SQL 2005 hotfix that contains the fix.
-                Version sql2005Sp3Cu5 = new Version(9,0,4230);
-
                 Version connectedServerVersion = (Version)this.ServerVersion;
 
-                if ((this.ServerVersion.Major == 9) &&
-                    (connectedServerVersion < sql2005Sp3Cu5))
-                {
-                    bIncludeCredentialChangeFlag = false;
-                }
-                else if (this.ServerVersion.Major == 10)
+                if (this.ServerVersion.Major == 10)
                 {
                     // This is the last SQL 2008 RTM CU build before the fix in CU 7.
                     Version sql2008RtmCu6 = new Version(10,0,1815);

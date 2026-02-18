@@ -1,14 +1,11 @@
 <?xml version="1.0" ?>
-<EnumObject type="Param" impl_type="SqlObject" min_major='7'  cloud_min_major='12'>
+<EnumObject type="Param" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="ParentID" />
 			<link parent="ParentNumber" local="Number" />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table='syscolumns' alias='param'/>
-		</version>
-		<version min_major='9'  cloud_min_major='12'>
+		<version min_major='10'  cloud_min_major='12'>
 			<property_link table='mycte' alias='param'/>
 		</version>
 		<prefix>
@@ -31,12 +28,7 @@
 	</settings>
 	<properties>
 		<include file='parameter.xml' for = '#Urn#Name#ID#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#DefaultValue#'/>
-		<version min_major='7' max_major='8'>
-			<property name="IsOutputParameter" type="bit" 
-			cast='true'>CASE param.isoutparam WHEN 1 THEN param.isoutparam WHEN 0 THEN CASE param.name WHEN '' THEN 1 ELSE 0 END END</property>
-			<property name="Number" type="smallint" hidden='true'>param.number</property>
-		</version>
-		<version min_major='9'  cloud_min_major='12'>
+		<version min_major='10'  cloud_min_major='12'>
 			<property name="IsOutputParameter" type="bit">param.is_output</property>
 			<property name="Number" type="int" hidden='true' cast='true'>param.procedure_number</property>
 		</version>

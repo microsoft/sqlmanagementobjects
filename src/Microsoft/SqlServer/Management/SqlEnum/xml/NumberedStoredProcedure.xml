@@ -1,14 +1,11 @@
 <?xml version="1.0" ?>
-<EnumObject type="StoredProcedure" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+<EnumObject type="StoredProcedure" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent="ID" local="ID" />
     </parent_link>
 
-    <version min_major='7' max_major='8'>
-      <property_link table='syscomments' alias = 'nsp'>nsp.colid = &lt;msparam&gt;1&lt;/msparam&gt; and nsp.number &gt; &lt;msparam&gt;1&lt;/msparam&gt;</property_link>
-    </version>
-    <version min_major='9' cloud_min_major='12'>
+    <version min_major='10' cloud_min_major='12'>
       <property_link table='sys.numbered_procedures' alias = 'nsp'/>
     </version>
   </settings>
@@ -20,19 +17,7 @@
         <link_field field="NType" />
       </link_multiple>
     </property>
-    <version min_major='7' max_major='8'>
-      <property name="Number" type="smallint" access='Read'>nsp.number</property>
-      <property name="Name" type="sysname" read_only_after_creation="true">object_name(nsp.id) + ';' + cast(nsp.number as nvarchar(20))</property>
-      <property name="IsEncrypted" type="bit" cast='true'>nsp.encrypted</property>
-
-      <!-- on 7-8 Definition is just a pointer to the text-->
-      <property name="Definition" type="nvarchar" size='80'
-        hidden='true'>cast(nsp.id as nvarchar(20)) + N'_' + cast(db_id() as nvarchar(20)) + N'_' + cast(nsp.number as nvarchar(20))</property>
-      <property name="ParentNumber" type='smallint' hidden='true'>nsp.number</property>
-      <property name="ID" type='int' hidden='true'>nsp.id</property>
-    </version>
-
-    <version min_major='9'  cloud_min_major='12'>
+    <version min_major='10'  cloud_min_major='12'>
       <property name="Number" type="smallint" access='Read'>nsp.procedure_number</property>
       <property name="Name" type="sysname" read_only_after_creation="true">object_name(nsp.object_id) + ';' + cast(nsp.procedure_number as nvarchar(20))</property>
       <property name="IsEncrypted" type="bit" cast='true'>CASE WHEN nsp.definition IS NULL THEN 1 ELSE 0 END</property>

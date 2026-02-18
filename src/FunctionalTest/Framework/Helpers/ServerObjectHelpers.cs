@@ -31,7 +31,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
     /// </summary>
     public static class ServerObjectHelpers
     {
-        private static readonly Semaphore azureDbCreateLock = new Semaphore(2, 2);
+        private static readonly Semaphore azureDbCreateLock = new Semaphore(3, 3);
 
         /// <summary>
         /// Restores a database from the specified backup file. It's the callers responsibility to ensure the server
@@ -396,10 +396,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             RetryHelper.RetryWhenExceptionThrown(
             () =>
             {
-                var databaseName = SmoObjectHelpers.GenerateUniqueObjectName(dbParameters.NamePrefix, 
-                    includeClosingBracket: dbParameters.UseEscapedCharacters, 
-                    includeDoubleClosingBracket: dbParameters.UseEscapedCharacters, 
-                    includeSingleQuote: dbParameters.UseEscapedCharacters, 
+                var databaseName = SmoObjectHelpers.GenerateUniqueObjectName(dbParameters.NamePrefix,
+                    includeClosingBracket: dbParameters.UseEscapedCharacters,
+                    includeDoubleClosingBracket: dbParameters.UseEscapedCharacters,
+                    includeSingleQuote: dbParameters.UseEscapedCharacters,
                     includeDoubleSingleQuote: dbParameters.UseEscapedCharacters);
                 try
                 {
@@ -424,7 +424,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                                         // VBUMP
                                         db = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand
                                             ? new Database(server, databaseName)
-                                            : new Database(server, databaseName) { ReadOnly = false, CompatibilityLevel = CompatibilityLevel.Version170 };
+                                            : new Database(server, databaseName) { ReadOnly = false, CompatibilityLevel = CompatibilityLevel.Version170,  AzureEdition = "GeneralPurpose"};
                                         break;
                                     }
                                 case SqlTestBase.AzureDatabaseEdition.DataWarehouse:
@@ -651,6 +651,9 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                         }
                     }
                     dbDropped = true;
+                } else
+                {
+                    TraceHelper.TraceInformation($"Database '{dbName}' does not exist on server {server.Name}, no need to drop");
                 }
             }
             catch (Exception e)

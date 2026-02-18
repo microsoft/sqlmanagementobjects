@@ -1,19 +1,10 @@
 <?xml version="1.0" ?>
-<EnumObject type="ForeignKey" impl_type="SqlObject" min_major='7'  cloud_min_major='10'>
+<EnumObject type="ForeignKey" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<parent_link>
 			<link parent="ID" local="ParentID" />
 		</parent_link>
-		<version min_major='7' max_major='8'>
-			<property_link table="dbo.sysobjects AS cstr">cstr.type=N'F'</property_link>
-			<property_link fields="#ReferencedKey#ReferencedTable#ReferencedTableSchema#" 
-					join="dbo.sysreferences AS rfr">rfr.constid = cstr.id</property_link>
-			<property_link fields="#ReferencedKey#" 
-					left_join="dbo.sysindexes AS ki">ki.indid = rfr.rkeyindid AND ki.id = rfr.rkeyid</property_link>
-			<property_link fields="#ReferencedTable#ReferencedTableSchema#" 
-					join="dbo.sysobjects AS rtbl">rfr.rkeyid = rtbl.id</property_link>
-		</version>
-		<version min_major='9' max_major='11' cloud_min_major='10' cloud_max_major='11'>
+		<version min_major='10' max_major='11' cloud_min_major='10' cloud_max_major='11'>
 			<property_link table="sys.foreign_keys AS cstr" />
 			<property_link fields="#ReferencedKey#"
 					left_join="sys.indexes AS ki">ki.index_id = cstr.key_index_id and ki.object_id = cstr.referenced_object_id</property_link>
@@ -34,20 +25,8 @@
 	<properties>
     
 		<include file='inc_constraint.xml' />
-		<version min_major='7' max_major='8'>
-			<property name="ReferencedKey" type="sysname" access='Read'>ki.name</property>
-			<property name="ReferencedTable" type="sysname" mode="design">rtbl.name</property>
-			<property name="ReferencedTableSchema" type="sysname" mode="design">user_name(rtbl.uid)</property>
-			<property name="DeleteAction" type="tinyint" report_type='ForeignKeyAction' read_only_after_creation="true" mode="design">OBJECTPROPERTY(cstr.id, N'CnstIsDeleteCascade')</property>
-			<property name="UpdateAction" type="tinyint" report_type='ForeignKeyAction' read_only_after_creation="true" mode="design">OBJECTPROPERTY(cstr.id, N'CnstIsUpdateCascade')</property>
-		</version>
-		
 		<!-- extended properties support-->		
-		<version min_major='8' max_major='8'>
-			<include file ="inc_level2SupportProperties.xml"/>
-		</version>
-		
-		<version min_major='9'  cloud_min_major='10'>
+		<version min_major='10'  cloud_min_major='10'>
 			<property name="ReferencedKey" type="sysname" access='Read'>ki.name</property>
 			<property name="ReferencedTable" type="sysname" mode="design">rtbl.name</property>
 			<property name="ReferencedTableSchema" type="sysname" mode="design">schema_name(rtbl.schema_id)</property>

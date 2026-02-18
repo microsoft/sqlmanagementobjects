@@ -167,8 +167,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90
-                && this.ServerVersion.Major >= 9)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
                 {
@@ -339,8 +338,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90
-                && this.ServerVersion.Major >= 9)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 StringBuilder sbOption = new StringBuilder();
                 bool optionAdded = false;
@@ -1160,8 +1158,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             ValidateVersionAndEngineTypeForScripting(sp);
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90
-                && this.Parent.Parent.ConnectionContext.ServerVersion.Major >= 9)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 ValidateAlterInputs();
 
@@ -1312,14 +1309,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    if (this.ServerVersion.Major >= 9)
-                    {
-                        prefix = "sys";
-                    }
-                    else
-                    {
-                        prefix = "dbo";
-                    }
+                    prefix = "sys";
                 }
                 string username;
                 if (sp != null)
@@ -1367,10 +1357,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptRename(StringCollection renameQuery, ScriptingPreferences sp, string newName)
         {
-            if (this.ServerVersion.Major < 9)
-            {
-                throw new InvalidVersionSmoOperationException(this.ServerVersion);
-            }
 
             // the user is responsible to put the database in single user mode on 7.0 server
             renameQuery.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(Parent.Name)));

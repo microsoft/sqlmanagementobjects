@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
@@ -79,7 +80,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.AddImpl(obj);
 
             // The object must already be parented correctly
-            TraceHelper.Assert(obj.Parent == this.Parent);
+            Debug.Assert(obj.Parent == this.Parent);
         }
         
         public abstract void Clear();
@@ -351,7 +352,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 try
                 {
                     keyProp = obj.Properties[keyPropName];
-                    TraceHelper.Assert(keyProp != null);
+                    Debug.Assert(keyProp != null);
                 }
                 catch
                 {
@@ -517,7 +518,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 //to the fact that KJ assemblies carry the same version as Katmai ones, removes this will be changing the public
                 //interface, and will be breaking applications that use Katmai assemblies because due to the same version, they 
                 //will be using KJ without any knowledge of that.
-                TraceHelper.Assert(false, "Setting IsSynchronized property is not supported");
+                Debug.Assert(false, "Setting IsSynchronized property is not supported");
             }
             get
             {
@@ -533,7 +534,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 //to the fact that KJ assemblies carry the same version as Katmai ones, removes this will be changing the public
                 //interface, and will be breaking applications that use Katmai assemblies because due to the same version, they 
                 //will be using KJ without any knowledge of that.
-                TraceHelper.Assert(false, "Setting SyncRoot property is not supported");
+                Debug.Assert(false, "Setting SyncRoot property is not supported");
             }
             get
             {

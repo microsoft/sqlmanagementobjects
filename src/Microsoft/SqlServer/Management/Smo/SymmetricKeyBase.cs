@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo.Internal;
 using Cmn = Microsoft.SqlServer.Management.Common;
@@ -428,7 +429,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 CheckNullArgument(keyEncryptions, "keyEncryptions");
 
-                Diagnostics.TraceHelper.Assert(keyEncryptions.Length > 0);
+                Debug.Assert(keyEncryptions.Length > 0);
 
                 if (keyEncryptions.Length > 0)
                 {
@@ -438,7 +439,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.Append(" ADD ");
 
                     string keyEncryptionsScript = ScriptSymmetricKeyEncryptions(keyEncryptions);
-                    Diagnostics.TraceHelper.Assert(keyEncryptionsScript.Length > 0);
+                    Debug.Assert(keyEncryptionsScript.Length > 0);
 
                     sb.Append(keyEncryptionsScript);
 
@@ -480,7 +481,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 CheckNullArgument(keyEncryptions, "keyEncryptions");
 
-                Diagnostics.TraceHelper.Assert(keyEncryptions.Length > 0);
+                Debug.Assert(keyEncryptions.Length > 0);
 
                 if (keyEncryptions.Length > 0)
                 {
@@ -490,7 +491,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.Append(" DROP ");
 
                     string keyEncryptionsScript = ScriptSymmetricKeyEncryptions(keyEncryptions);
-                    Diagnostics.TraceHelper.Assert(keyEncryptionsScript.Length > 0);
+                    Debug.Assert(keyEncryptionsScript.Length > 0);
 
                     sb.Append(keyEncryptionsScript);
 
@@ -762,7 +763,7 @@ namespace Microsoft.SqlServer.Management.Smo
             CreateInfo createInfo = this.createInfo;
             this.createInfo = null;
 
-            Diagnostics.TraceHelper.Assert(null != createInfo, "caller should initialize createInfo it before calling");
+            Debug.Assert(null != createInfo, "caller should initialize createInfo it before calling");
 
             StringBuilder sb = new StringBuilder("CREATE SYMMETRIC KEY ");
             sb.Append(FormatFullNameForScripting(sp));
@@ -779,13 +780,13 @@ namespace Microsoft.SqlServer.Management.Smo
             if (createInfo.keyEncryptionAlgorithm == SymmetricKeyEncryptionAlgorithm.CryptographicProviderDefined)
             {
                 ThrowIfBelowVersion100();
-                Diagnostics.TraceHelper.Assert(createInfo.keyEncryptions.Length == 1, "There should be only one keyEncryptionType which is the provider");
+                Debug.Assert(createInfo.keyEncryptions.Length == 1, "There should be only one keyEncryptionType which is the provider");
                 SymmetricKeyEncryption keyEncryption = createInfo.keyEncryptions[0];
                 CheckNullArgument(keyEncryption, "keyEncryption");
                 CheckNullArgument(keyEncryption.ObjectNameOrPassword, "keyEncryption.ObjectNameOrPassword");
 
                 // sanity check
-                Diagnostics.TraceHelper.Assert(keyEncryption.KeyEncryptionType == KeyEncryptionType.Provider);
+                Debug.Assert(keyEncryption.KeyEncryptionType == KeyEncryptionType.Provider);
 
                 sb.Append(string.Format(SmoApplication.DefaultCulture, "FROM PROVIDER {0}", MakeSqlBraket(keyEncryption.ObjectNameOrPassword)));
                 sb.Append(Globals.newline);
@@ -861,7 +862,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private string ScriptSymmetricKeyEncryptions(SymmetricKeyEncryption[] keyEncryptions)
         {
             //condition also verified by the caller
-            Diagnostics.TraceHelper.Assert(null != keyEncryptions);
+            Debug.Assert(null != keyEncryptions);
 
             //if we have key encriptions, prepare to script them
             if (keyEncryptions.Length <= 0)

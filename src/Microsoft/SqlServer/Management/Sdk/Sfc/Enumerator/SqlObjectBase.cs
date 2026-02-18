@@ -15,6 +15,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     using System.Collections.Specialized;
     using Microsoft.SqlServer.Management.Common;
     using System.Runtime.InteropServices;
+    using System.Diagnostics;
 
     ///	<summary>
     ///	main work horse for the sql enumerator. it generates the tsql for a level and 
@@ -723,12 +724,9 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         // PostProcessCreateSqlSecureString can be done directly
                         continue;
                     }
-                    else if ((postProcess.Value is PostProcessBodyText) &&
-                        ((ServerConnection)this.ConnectionInfo).ServerVersion.Major >= 9)
+                    else if (postProcess.Value is PostProcessBodyText)
                     {
-                        // PostProcessBodyText can be done directly only on 9.0
-                        // on 8.0 we need to execute additional queries and paste 
-                        // the syscomments fields
+                        // PostProcessBodyText can be done directly
                         continue;
                     }
                     else
@@ -743,8 +741,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 {
                     if (resultType == ResultType.IDataReader)
                     {
-                        TraceHelper.Trace("w", SQLToolsCommonTraceLvl.Always,
-                            "IDataReader will be returned from a DataTable because post processing is needed");
+                        SmoEventSource.Log.SfcTrace("SqlObjectBase", "IDataReader will be returned from a DataTable because post processing is needed");
                     }
 
                     resultType = ResultType.DataTable;
@@ -792,7 +789,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             else
             {
-                TraceHelper.Assert( resultType == ResultType.DataTable || resultType == ResultType.DataSet );
+                Debug.Assert( resultType == ResultType.DataTable || resultType == ResultType.DataSet );
                 DataTable dt = ExecuteSql.ExecuteWithResults(sql, connectionInfo, sb);
                 if( resultType == ResultType.DataTable )
                 {

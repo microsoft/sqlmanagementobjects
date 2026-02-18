@@ -242,18 +242,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 else
                 {
                     DataTable dataTable;
-                    if (ServerVersion.Major < 10)
-                    {
-                        string loginUrn = String.Format(SmoApplication.DefaultCulture,
-                            this.Parent.Urn.Value + "/Login[@Credential = '{0}']", Urn.EscapeString(this.Name));
-                        Request req = new Request(loginUrn, new string[] { "Name" });
-                        dataTable = this.ExecutionManager.GetEnumeratorData(req);
-                    }
-                    else
-                    {
-                        string query = string.Format(SmoApplication.DefaultCulture, "select name from sys.server_principal_credentials as c join sys.server_principals as p on p.principal_id = c.principal_id where c.credential_id = {0}", this.ID.ToString());
-                        dataTable = this.ExecutionManager.ExecuteWithResults(query).Tables[0];
-                    }
+                    string query = string.Format(SmoApplication.DefaultCulture, "select name from sys.server_principal_credentials as c join sys.server_principals as p on p.principal_id = c.principal_id where c.credential_id = {0}", this.ID.ToString());
+                    dataTable = this.ExecutionManager.ExecuteWithResults(query).Tables[0];
 
                     foreach (DataRow row in dataTable.Rows)
                     {
@@ -329,7 +319,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.secret = null;
             }
 
-            if (create && ServerVersion.Major >= 10)
+            if (create)
             {
                 Property mappedClassType = Properties.Get("MappedClassType");
                 if (mappedClassType.Dirty && (MappedClassType)mappedClassType.Value == MappedClassType.CryptographicProvider)

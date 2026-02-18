@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="DatabaseReplicaState" impl_type="SqlObject" min_major='11' >
+<?xml version="1.0" ?>
+<EnumObject type="DatabaseReplicaState" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent='UniqueId' local='AvailabilityGroupId'/>
@@ -72,7 +72,7 @@
       <property name="IsSuspended" type="bit" access="Read">ISNULL(dbr.is_suspended, 0)</property>
       <property name="SuspendReason" type="tinyint" report_type="DatabaseReplicaSuspendReason" access="Read">ISNULL(dbr.suspend_reason, 7)</property>
       <property name="RecoveryLSN" type="numeric" size="25" access="Read">ISNULL(dbr.recovery_lsn, 0)</property>
-      <property name="TruncationLSN" type="numeric" siz="25" access="Read">ISNULL(dbr.truncation_lsn, 0)</property>
+      <property name="TruncationLSN" type="numeric" size="25" access="Read">ISNULL(dbr.truncation_lsn, 0)</property>
       <property name="LastSentLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_sent_lsn, 0)</property>
       <property name="LastSentTime" type="datetime" access="Read">ISNULL(dbr.last_sent_time, 0)</property>
       <property name="LastReceivedLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_received_lsn, 0)</property>

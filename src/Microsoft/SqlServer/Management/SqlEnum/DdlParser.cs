@@ -4,6 +4,7 @@
 namespace Microsoft.SqlServer.Management.Smo
 {
     using System;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
@@ -277,7 +278,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             //check some basic rules
-            TraceHelper.Assert(headerInfo.name.Length > 0 && headerInfo.indexNameStart > 0 && 
+            Debug.Assert(headerInfo.name.Length > 0 && headerInfo.indexNameStart > 0 && 
                         headerInfo.indexNameEnd > headerInfo.indexNameStart);
             return true;
         }
@@ -426,7 +427,7 @@ namespace Microsoft.SqlServer.Management.Smo
             
             if( !retVal || 0 != String.Compare("TRIGGER", headerInfo.objectType, StringComparison.OrdinalIgnoreCase) )
             {
-                TraceHelper.Assert(headerInfo.objectType.Length > 0 && headerInfo.name.Length > 0 &&
+                Debug.Assert(headerInfo.objectType.Length > 0 && headerInfo.name.Length > 0 &&
                     headerInfo.indexCreate >= 0 && headerInfo.indexNameStart > 0 && 
                     headerInfo.indexNameEnd > headerInfo.indexNameStart && headerInfo.indexNameStartSecondary == -1);
 
@@ -468,7 +469,7 @@ namespace Microsoft.SqlServer.Management.Smo
             headerInfo.nameSecondary= headerInfoTmp.name;
             headerInfo.databaseSecondary = headerInfoTmp.database;
 
-            TraceHelper.Assert(headerInfo.objectType.Length > 0 && headerInfo.name.Length > 0 &&
+            Debug.Assert(headerInfo.objectType.Length > 0 && headerInfo.name.Length > 0 &&
                 headerInfo.indexCreate >= 0 && headerInfo.indexNameStart > 0 && 
                 headerInfo.indexNameEnd > headerInfo.indexNameStart &&
                 headerInfo.nameSecondary.Length > 0 && headerInfo.indexNameStartSecondary > 0 && 

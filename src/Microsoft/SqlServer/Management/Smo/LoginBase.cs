@@ -542,26 +542,14 @@ namespace Microsoft.SqlServer.Management.Smo
 
             StringCollection sc = new StringCollection();
 
-            if (this.ServerVersion.Major < 9)
-            {
-                // for standard logins, we can try to change their password
-                sc.Add(string.Format(SmoApplication.DefaultCulture,
-                                      "EXEC master.dbo.sp_password @old={0}, @new={1}, @loginame={2}",
-                                      oldPassword == null ? "NULL" : MakeSqlString((string)oldPassword),
-                                      MakeSqlString((string)password),
-                                      FormatFullNameForScripting(new ScriptingPreferences())));
-            }
-            else
-            {
-                sc.Add("USE [master]");
-                StringBuilder sb = new StringBuilder();
-                sb.Append("ALTER LOGIN ");
-                sb.Append(FormatFullNameForScripting(new ScriptingPreferences()));
-                sb.Append(" WITH ");
+            sc.Add("USE [master]");
+            StringBuilder sb = new StringBuilder();
+            sb.Append("ALTER LOGIN ");
+            sb.Append(FormatFullNameForScripting(new ScriptingPreferences()));
+            sb.Append(" WITH ");
 
-                AddPasswordOptions(null, sb, password, oldPassword, false, bMustChange, bUnlock);
-                sc.Add(sb.ToString());
-            }
+            AddPasswordOptions(null, sb, password, oldPassword, false, bMustChange, bUnlock);
+            sc.Add(sb.ToString());
 
             this.ExecutionManager.ExecuteNonQuery(sc);
         }
@@ -798,50 +786,47 @@ namespace Microsoft.SqlServer.Management.Smo
                         sbOption.Append(MakeSqlBraket(s));
                     }
 
-                    if (this.ServerVersion.Major >= 9)
+                    Object o = GetPropValueOptional("PasswordExpirationEnabled");
+
+                    if (null != o)
                     {
-                        Object o = GetPropValueOptional("PasswordExpirationEnabled");
+                        AddComma(sbOption, ref bStuffAdded);
+                        sbOption.Append("CHECK_EXPIRATION=");
+                        sbOption.Append(BoolToOnOff(o));
+                    }
 
-                        if (null != o)
-                        {
-                            AddComma(sbOption, ref bStuffAdded);
-                            sbOption.Append("CHECK_EXPIRATION=");
-                            sbOption.Append(BoolToOnOff(o));
-                        }
+                    o = GetPropValueOptional("PasswordPolicyEnforced");
+                    if (null != o)
+                    {
+                        AddComma(sbOption, ref bStuffAdded);
+                        sbOption.Append("CHECK_POLICY=");
+                        sbOption.Append(BoolToOnOff(o));
+                    }
 
-                        o = GetPropValueOptional("PasswordPolicyEnforced");
-                        if (null != o)
+                    //Here control will only reach if targetenginetype is not cloud.
+                    if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
+                    {
+                        Property credential = this.Properties.Get("Credential");
+                        if (null != credential.Value && (credential.Dirty || bForCreate))
                         {
-                            AddComma(sbOption, ref bStuffAdded);
-                            sbOption.Append("CHECK_POLICY=");
-                            sbOption.Append(BoolToOnOff(o));
-                        }
+                            string credentialStr = (string)credential.Value;
 
-                        //Here control will only reach if targetenginetype is not cloud.
-                        if (Cmn.DatabaseEngineType.SqlAzureDatabase != this.DatabaseEngineType)
-                        {
-                            Property credential = this.Properties.Get("Credential");
-                            if (null != credential.Value && (credential.Dirty || bForCreate))
+                            if (credentialStr.Length == 0)
                             {
-                                string credentialStr = (string)credential.Value;
-
-                                if (credentialStr.Length == 0)
-                                {
-                                    if (!bForCreate)
-                                    {
-                                        AddComma(sbOption, ref bStuffAdded);
-                                        // if we are altering the login and the credential is
-                                        // an empty string then we remove the mapping of the login to
-                                        // the existing credential
-                                        sbOption.Append("NO CREDENTIAL");
-                                    }
-                                }
-                                else
+                                if (!bForCreate)
                                 {
                                     AddComma(sbOption, ref bStuffAdded);
-                                    sbOption.Append("CREDENTIAL = ");
-                                    sbOption.Append(MakeSqlBraket(credentialStr));
+                                    // if we are altering the login and the credential is
+                                    // an empty string then we remove the mapping of the login to
+                                    // the existing credential
+                                    sbOption.Append("NO CREDENTIAL");
                                 }
+                            }
+                            else
+                            {
+                                AddComma(sbOption, ref bStuffAdded);
+                                sbOption.Append("CREDENTIAL = ");
+                                sbOption.Append(MakeSqlBraket(credentialStr));
                             }
                         }
                     }
@@ -1608,11 +1593,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal override void ScriptRename(StringCollection renameQuery, ScriptingPreferences sp, string newName)
         {
-            if (this.ServerVersion.Major < 9)
-            {
-                throw new InvalidVersionSmoOperationException(this.ServerVersion);
-            }
-
             // the user is responsible to put the database in single user mode on 7.0 server
             AddDatabaseContext(renameQuery, sp);
             renameQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER LOGIN {0} WITH NAME={1}",

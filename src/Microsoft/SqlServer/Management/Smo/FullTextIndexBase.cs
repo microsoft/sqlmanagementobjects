@@ -354,17 +354,14 @@ namespace Microsoft.SqlServer.Management.Smo
                         onClause.AppendFormat(SmoApplication.DefaultCulture, "{0}", MakeSqlBraket(strCatalog));
                     }
 
-                    if (this.ServerVersion.Major >= 10)
+                    String sFilegroup = this.Properties.Get("FilegroupName").Value as String;
+                    if (null != sFilegroup && sFilegroup.Length > 0)
                     {
-                        String sFilegroup = this.Properties.Get("FilegroupName").Value as String;
-                        if (null != sFilegroup && sFilegroup.Length > 0)
+                        if (onClause.Length > 0)
                         {
-                            if (onClause.Length > 0)
-                            {
-                                onClause.Append(Globals.commaspace);
-                            }
-                            onClause.AppendFormat(SmoApplication.DefaultCulture, "FILEGROUP {0}", MakeSqlBraket(sFilegroup));
+                            onClause.Append(Globals.commaspace);
                         }
+                        onClause.AppendFormat(SmoApplication.DefaultCulture, "FILEGROUP {0}", MakeSqlBraket(sFilegroup));
                     }
 
                     if (onClause.Length > 0)
@@ -404,58 +401,55 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                     }
 
-                    if (this.ServerVersion.Major >= 10)
-                    {
-                        Property propertyStopListOption = this.Properties.Get("StopListOption");
-                        String strStopListName = this.Properties.Get("StopListName").Value as String;
+                    Property propertyStopListOption = this.Properties.Get("StopListOption");
+                    String strStopListName = this.Properties.Get("StopListName").Value as String;
 
-                        if (null != propertyStopListOption.Value)
+                    if (null != propertyStopListOption.Value)
+                    {
+                        if (withClause.Length > 0)
                         {
-                            if (withClause.Length > 0)
-                            {
-                                withClause.Append(Globals.commaspace);
-                            }
-                            withClause.Append("STOPLIST = ");
-                            StopListOption slOption = (StopListOption)propertyStopListOption.Value;
-                            switch (slOption)
-                            {
-                                case StopListOption.Off:
-                                    withClause.Append("OFF");
-                                    if ((null != strStopListName) && (strStopListName.Length > 0))
-                                    {
-                                        throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "OFF"));
-                                    }
-                                    break;
-                                case StopListOption.System:
-                                    withClause.Append("SYSTEM");
-                                    if ((null != strStopListName) && (strStopListName.Length > 0))
-                                    {
-                                        throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
-                                    }
-                                    break;
-                                case StopListOption.Name:
-                                    if ((null != strStopListName) && (strStopListName.Length > 0))
-                                    {
-                                        withClause.AppendFormat(SmoApplication.DefaultCulture, "{0}", MakeSqlBraket(strStopListName));
-                                    }
-                                    else
-                                    {
-                                        throw new PropertyNotSetException("StopListName");
-                                    }
-                                    break;
-                                default:
-                                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("StopList Name"));
-                            }
+                            withClause.Append(Globals.commaspace);
                         }
-                        else if ((null != strStopListName) && (strStopListName.Length > 0))
+                        withClause.Append("STOPLIST = ");
+                        StopListOption slOption = (StopListOption)propertyStopListOption.Value;
+                        switch (slOption)
                         {
-                            if (withClause.Length > 0)
-                            {
-                                withClause.Append(Globals.commaspace);
-                            }
-                            withClause.Append("STOPLIST = ");
-                            withClause.AppendFormat(SmoApplication.DefaultCulture, "{0}", MakeSqlBraket(strStopListName));
+                            case StopListOption.Off:
+                                withClause.Append("OFF");
+                                if ((null != strStopListName) && (strStopListName.Length > 0))
+                                {
+                                    throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "OFF"));
+                                }
+                                break;
+                            case StopListOption.System:
+                                withClause.Append("SYSTEM");
+                                if ((null != strStopListName) && (strStopListName.Length > 0))
+                                {
+                                    throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
+                                }
+                                break;
+                            case StopListOption.Name:
+                                if ((null != strStopListName) && (strStopListName.Length > 0))
+                                {
+                                    withClause.AppendFormat(SmoApplication.DefaultCulture, "{0}", MakeSqlBraket(strStopListName));
+                                }
+                                else
+                                {
+                                    throw new PropertyNotSetException("StopListName");
+                                }
+                                break;
+                            default:
+                                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("StopList Name"));
                         }
+                    }
+                    else if ((null != strStopListName) && (strStopListName.Length > 0))
+                    {
+                        if (withClause.Length > 0)
+                        {
+                            withClause.Append(Globals.commaspace);
+                        }
+                        withClause.Append("STOPLIST = ");
+                        withClause.AppendFormat(SmoApplication.DefaultCulture, "{0}", MakeSqlBraket(strStopListName));
                     }
 
                     // including SEARCH PROPERTY LIST [ = ] property_list_name in WITH clause
@@ -645,7 +639,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (sp.TargetServerVersion >= SqlServerVersion.Version100 && ServerVersion.Major >= 10)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version100)
             {
                 StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
@@ -942,19 +936,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 TableViewBase table = this.Parent;
                 Database db = (Database)table.ParentColl.ParentInstance;
 
-                if (ServerVersion.Major >= 9)
-                {
-                    statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
-                    statements.Add(string.Format(SmoApplication.DefaultCulture,
-                        "ALTER FULLTEXT INDEX ON {0} ENABLE", table.FullQualifiedName));
-                }
-                else
-                {
-                    statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
-                    statements.Add(string.Format(SmoApplication.DefaultCulture,
-                        "EXEC dbo.sp_fulltext_table @tabname=N'{0}', @action=N'activate'",
-                        SqlString(table.FullQualifiedName)));
-                }
+                statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
+                statements.Add(string.Format(SmoApplication.DefaultCulture,
+                    "ALTER FULLTEXT INDEX ON {0} ENABLE", table.FullQualifiedName));
                 this.ExecutionManager.ExecuteNonQuery(statements);
             }
             catch (Exception e)
@@ -969,48 +953,24 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             try
             {
-                if (ServerVersion.Major >= 8)
+                StringCollection statements = new StringCollection();
+
+                TableViewBase table = this.Parent;
+                Database db = (Database)table.ParentColl.ParentInstance;
+
+                statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
+                string actionString = string.Empty;
+                switch (action)
                 {
-                    StringCollection statements = new StringCollection();
-
-                    TableViewBase table = this.Parent;
-                    Database db = (Database)table.ParentColl.ParentInstance;
-
-                    if (ServerVersion.Major >= 9)
-                    {
-                        statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
-                        string actionString = string.Empty;
-                        switch (action)
-                        {
-                            case IndexPopulationAction.Full: actionString = "FULL"; break;
-                            case IndexPopulationAction.Incremental: actionString = "INCREMENTAL"; break;
-                            default: actionString = "UPDATE"; break;
-                        }
-                        statements.Add(string.Format(SmoApplication.DefaultCulture,
-                            "ALTER FULLTEXT INDEX ON {0} START {1} POPULATION",
-                            table.FullQualifiedName, actionString));
-                    }
-                    else
-                    {
-                        statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
-                        string actionString = string.Empty;
-                        switch (action)
-                        {
-                            case IndexPopulationAction.Full: actionString = "start_full"; break;
-                            case IndexPopulationAction.Incremental: actionString = "start_incremental"; break;
-                            default: actionString = "update_index"; break;
-                        }
-                        statements.Add(string.Format(SmoApplication.DefaultCulture,
-                            "EXEC dbo.sp_fulltext_table @tabname=N'{0}', @action=N'{1}'",
-                            SqlString(table.FullQualifiedName), actionString));
-                    }
-
-                    this.ExecutionManager.ExecuteNonQuery(statements);
+                    case IndexPopulationAction.Full: actionString = "FULL"; break;
+                    case IndexPopulationAction.Incremental: actionString = "INCREMENTAL"; break;
+                    default: actionString = "UPDATE"; break;
                 }
-                else
-                {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-                }
+                statements.Add(string.Format(SmoApplication.DefaultCulture,
+                    "ALTER FULLTEXT INDEX ON {0} START {1} POPULATION",
+                    table.FullQualifiedName, actionString));
+
+                this.ExecutionManager.ExecuteNonQuery(statements);
             }
             catch (Exception e)
             {
@@ -1024,33 +984,16 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             try
             {
-                if (ServerVersion.Major >= 8)
-                {
-                    StringCollection statements = new StringCollection();
+                StringCollection statements = new StringCollection();
 
-                    TableViewBase table = this.Parent;
-                    Database db = (Database)table.ParentColl.ParentInstance;
+                TableViewBase table = this.Parent;
+                Database db = (Database)table.ParentColl.ParentInstance;
 
-                    if (ServerVersion.Major >= 9)
-                    {
-                        statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
-                        statements.Add(string.Format(SmoApplication.DefaultCulture,
-                            "ALTER FULLTEXT INDEX ON {0} STOP POPULATION", table.FullQualifiedName));
-                    }
-                    else
-                    {
-                        statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
-                        statements.Add(string.Format(SmoApplication.DefaultCulture,
-                            "EXEC dbo.sp_fulltext_table @tabname=N'{0}', @action=N'stop'",
-                            SqlString(table.FullQualifiedName)));
-                    }
+                statements.Add(string.Format(SmoApplication.DefaultCulture, "USE [{0}]", SqlBraket(db.Name)));
+                statements.Add(string.Format(SmoApplication.DefaultCulture,
+                    "ALTER FULLTEXT INDEX ON {0} STOP POPULATION", table.FullQualifiedName));
 
-                    this.ExecutionManager.ExecuteNonQuery(statements);
-                }
-                else
-                {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-                }
+                this.ExecutionManager.ExecuteNonQuery(statements);
             }
             catch (Exception e)
             {

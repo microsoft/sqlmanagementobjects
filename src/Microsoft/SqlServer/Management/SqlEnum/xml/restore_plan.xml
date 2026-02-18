@@ -1,199 +1,16 @@
 <?xml version='1.0' ?>
-<EnumObject type='backupset' impl_type='SqlObject' min_major='7'>
+<EnumObject type='backupset' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table='#backupset AS btmp' />
     <property_link join='msdb.dbo.backupset AS bkps'>bkps.backup_set_id = btmp.backup_set_id</property_link>
-    <version min_major='7' max_major='7'>
-      <prefix>
-        declare @server_name nvarchar(512)
-        set @server_name = @@SERVERNAME
-      </prefix>
-    </version>
-    <version min_major='8'>
+    <version min_major='10'>
       <prefix>
         declare @server_name nvarchar(512)
         set @server_name = cast(serverproperty(N'Servername') as nvarchar(512))
       </prefix>
     </version>
 
-    <version min_major='7' max_major='8'>
-      <prefix>
-        DECLARE
-        @first_full_backupset_id      INTEGER,
-        @first_full_backup_startdate  DATETIME,
-        @count_entries					INTEGER,
-        @in_restore_plan				BIT,
-        @last_backupset_type			CHAR(1),
-        @last_backupset_id				INTEGER,
-        @last_backupset_family_guid		UNIQUEIDENTIFIER,
-        @last_backupset_diff_base_guid	UNIQUEIDENTIFIER,
-        @last_backupset_recovery_fork_guid	UNIQUEIDENTIFIER,
-        @full_backupset_id				INTEGER,
-        @full_backupset_start_date		DATETIME,
-        @full_backupset_recovery_fork_guid	UNIQUEIDENTIFIER,
-
-
-        @loop_var						BIT,
-        @loop_backup_set_id				INTEGER,
-        @loop_start_date				DATETIME,
-        @count_unique_fork_guid INTEGER,
-
-        @t1_backup_set_id				INTEGER,
-        @t1_type						CHAR(1),
-        @t1_backup_start_date			DATETIME,
-        @t1_first_recovery_fork_guid	UNIQUEIDENTIFIER,
-        @t1_last_recovery_fork_guid		UNIQUEIDENTIFIER,
-        @t1_first_lsn					NUMERIC(25, 0),
-        @t1_last_lsn					NUMERIC(25, 0),
-        @t1_checkpoint_lsn				NUMERIC(25, 0),
-        @t1_database_backup_lsn			NUMERIC(25, 0),
-        @t1_fork_point_lsn				NUMERIC(25, 0),
-        @t1_backup_set_uuid				UNIQUEIDENTIFIER,
-        @t1_database_guid				UNIQUEIDENTIFIER,
-        @t1_diff_base_guid				UNIQUEIDENTIFIER,
-
-        @t2_backup_set_id				INTEGER,
-        @t2_type						CHAR(1),
-        @t2_backup_start_date			DATETIME,
-        @t2_first_recovery_fork_guid	UNIQUEIDENTIFIER,
-        @t2_last_recovery_fork_guid		UNIQUEIDENTIFIER,
-        @t2_first_lsn					NUMERIC(25, 0),
-        @t2_last_lsn					NUMERIC(25, 0),
-        @t2_checkpoint_lsn				NUMERIC(25, 0),
-        @t2_database_backup_lsn			NUMERIC(25, 0),
-        @t2_fork_point_lsn				NUMERIC(25, 0),
-        @t2_backup_set_uuid				UNIQUEIDENTIFIER,
-        @t2_database_guid				UNIQUEIDENTIFIER,
-        @t2_diff_base_guid				UNIQUEIDENTIFIER
-
-
-        CREATE TABLE #backupset(
-        backup_set_id					INTEGER				NOT NULL,
-        is_in_restore_plan				BIT					NOT NULL,
-        backup_start_date				DATETIME			NOT NULL,
-        type						    CHAR(1)				NOT NULL,
-        database_name				    NVARCHAR(256)		NOT NULL,
-        database_guid				    UNIQUEIDENTIFIER	,
-        family_guid						UNIQUEIDENTIFIER	,
-        first_recovery_fork_guid		UNIQUEIDENTIFIER	,
-        last_recovery_fork_guid			UNIQUEIDENTIFIER	,
-        first_lsn					    NUMERIC(25, 0)		,
-        last_lsn					    NUMERIC(25, 0)		,
-        checkpoint_lsn					NUMERIC(25, 0)		,
-        database_backup_lsn				NUMERIC(25, 0)		,
-        fork_point_lsn					NUMERIC(25, 0)		,
-        restore_till_lsn				NUMERIC(25, 0)		,
-        backup_set_uuid					UNIQUEIDENTIFIER	,
-        differential_base_guid			UNIQUEIDENTIFIER
-        )
-        /**********************************************************************/
-        /* Identify the first                                                 */
-        /**********************************************************************/
-        SELECT @first_full_backupset_id = backupset_outer.backup_set_id
-        ,@first_full_backup_startdate = backupset_outer.backup_start_date
-        FROM msdb.dbo.backupset backupset_outer
-        WHERE backupset_outer.database_name = @db_name
-        AND backupset_outer.server_name = @server_name
-        AND backupset_outer.type = 'D' -- Full Database Backup
-        AND backupset_outer.backup_start_date = (  SELECT MAX(backupset_inner.backup_start_date)
-        FROM msdb.dbo.backupset backupset_inner
-        WHERE backupset_inner.database_name = backupset_outer.database_name
-        AND backupset_inner.server_name = @server_name
-        AND backupset_inner.type = backupset_outer.type AND
-        backupset_inner.backup_start_date &lt;= @restore_to_datetime)
-        /*******************************************************************************************/
-        /* Find the first full database backup needed in the restore plan and store its attributes */
-        /* in #backupset work table                                                                */
-        /*******************************************************************************************/
-        INSERT #backupset(
-        backup_set_id
-        ,is_in_restore_plan
-        ,backup_start_date
-        ,type
-        ,database_name
-        )
-        SELECT backup_set_id
-        ,1                   --  The full database backup is always needed for the restore plan
-        ,backup_start_date
-        ,type
-        ,database_name
-        FROM msdb.dbo.backupset
-        WHERE msdb.dbo.backupset.backup_set_id = @first_full_backupset_id
-        AND msdb.dbo.backupset.server_name = @server_name
-
-        /***************************************************************/
-        /* Find the log and differential backups that occurred after   */
-        /* the full backup and store them in #backupset work table     */
-        /***************************************************************/
-        INSERT #backupset(
-        backup_set_id
-        ,is_in_restore_plan
-        ,backup_start_date
-        ,type
-        ,database_name
-        )
-        SELECT backup_set_id
-        ,0
-        ,backup_start_date
-        ,type
-        ,database_name
-        FROM msdb.dbo.backupset
-        WHERE msdb.dbo.backupset.database_name = @db_name
-        AND msdb.dbo.backupset.server_name = @server_name
-        AND msdb.dbo.backupset.type IN ('I', 'L')  -- Differential, Log backups
-        AND msdb.dbo.backupset.backup_start_date &gt;= @first_full_backup_startdate
-
-        /**********************************************************************************/
-        /* identify and mark the backup logs that need to be included in the restore plan */
-        /**********************************************************************************/
-        UPDATE #backupset
-        SET is_in_restore_plan = 1
-        WHERE #backupset.type = 'I'
-        AND #backupset.backup_start_date = (SELECT MAX(backupset_inner.backup_start_date)
-        FROM #backupset backupset_inner
-        WHERE backupset_inner.type = #backupset.type
-        AND backupset_inner.backup_start_date &lt;= @restore_to_datetime)
-
-        /**************************************************************************************/
-        /* Log backups that occurred after the different are always part of the restore plan. */
-        /**************************************************************************************/
-        UPDATE #backupset
-        SET is_in_restore_plan = 1
-        WHERE #backupset.type = 'L'
-        AND #backupset.backup_start_date &lt;= @restore_to_datetime
-        AND #backupset.backup_start_date &gt;= (SELECT backupset_inner.backup_start_date
-        FROM #backupset backupset_inner
-        WHERE backupset_inner.type = 'I'
-        AND backupset_inner.is_in_restore_plan = 1)
-
-        /**************************************************************************************/
-        /* If @restore_to_datetime is greater than the last startdate of the last log backup, */
-        /* include the next log backup in the restore plan                                    */
-        /**************************************************************************************/
-        UPDATE #backupset
-        SET is_in_restore_plan = 1
-        WHERE #backupset.type = 'L'
-        AND #backupset.backup_start_date = (SELECT MIN(backupset_inner.backup_start_date)
-        FROM #backupset backupset_inner
-        WHERE backupset_inner.type = 'L'
-        AND backupset_inner.backup_start_date > @restore_to_datetime
-        AND backupset_inner.is_in_restore_plan = 0)
-
-        /**************************************************************************************/
-        /* If there are no differential backups, all log backups that occurred after the full */
-        /* backup are needed in the restore plan.                                             */
-        /**************************************************************************************/
-        UPDATE #backupset
-        SET is_in_restore_plan = 1
-        WHERE #backupset.type = 'L'
-        AND #backupset.backup_start_date &lt;= @restore_to_datetime
-        AND NOT EXISTS(SELECT *
-        FROM #backupset backupset_inner
-        WHERE backupset_inner.type = 'I')
-      </prefix>
-    </version>
-
-    <version min_major='9' >
+    <version min_major='10' >
       <prefix>
         DECLARE
         @first_full_backupset_id      INTEGER,
@@ -377,7 +194,7 @@
       </prefix>
     </version>
 
-    <version min_major='9' >
+    <version min_major='10' >
       <prefix>
 
         /**************************************************************************************/
@@ -964,13 +781,13 @@
     <property name='DatabaseName' type='nvarchar' size='128'>bkps.database_name</property>
     <property name='ServerName' type='nvarchar' size='128'>bkps.server_name</property>
     <property name='MachineName' type='nvarchar' size='128'>bkps.machine_name</property>
-    <version min_major='8'>
+    <version min_major='10'>
       <property name='Flags' type='int'>bkps.flags</property>
       <property name='UnicodeLocale' type='int'>bkps.unicode_locale</property>
       <property name='UnicodeCompareStyle' type='int'>bkps.unicode_compare_style</property>
       <property name='CollationName' type='nvarchar' size='128'>bkps.collation_name</property>
     </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name='IsCopyOnly' type='bit'>bkps.is_copy_only</property>
     </version>
   </properties>

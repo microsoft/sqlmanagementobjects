@@ -1,27 +1,12 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<?xml version="1.0" ?>
+<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property_link fields = '#Owner#' left_join='sys.database_principals AS s{0}'>s{0}.principal_id = ISNULL({0}.principal_id, (OBJECTPROPERTY({0}.object_id, 'OwnerId')))</property_link>
     </version>
  	</settings>
 	<properties>
-		<version min_major='7' max_major='8'>
-			<property name="Name" type="sysname" mode="design">{0}.name</property>
-			<property name="ID" type="int" access='Read'>{0}.id</property>
-			<property name="CreateDate" type="datetime" access='Read'>{0}.crdate</property>
-			<property name="ParentID" type="int" hidden='true'>{0}.parent_obj</property>
-			<!-- extended properties support : commented out: sysproperties is not accessible to regular users
-			<property name="ExtPropClass" type="int" hidden='true'>3</property>
-			-->
-			<!-- extended properties support -->
-			<property name="ObjectNameFromFilter" type="sysname" hidden='true'>
-				<link_multiple no='1' expression="{{0}}">
-					<link_field type='filter' field="Name" default_value="null"/>
-				</link_multiple>
-			</property>
-		</version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="Name" type="sysname" mode="design">{0}.name</property>
 			<property name="ID" type="int" access='Read'>{0}.object_id</property>
 			<property name="CreateDate" type="datetime" access='Read'>{0}.create_date</property>
@@ -38,7 +23,7 @@
         </link_multiple>
       </property>
       <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
-    <version min_major='9'  cloud_min_major='10'  datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10'  datawarehouse_enabled='true'>
       <property name="Owner" type="sysname" mode="design">ISNULL(s{0}.name, N'')</property>
       <property name="IsSchemaOwned" type="bit" access="Read" cast="true" mode="design">case when {0}.principal_id is null then 1 else 0 end</property>
      </version>

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Cmn = Microsoft.SqlServer.Management.Common;
@@ -156,11 +157,8 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (ImplementationType.SqlClr == (ImplementationType)property.Value)
                 {
-                    // CLR procedures are not supported on versions prior to 9.0 
-                    if (ServerVersion.Major < 9)
-                    {
-                        throw new WrongPropertyValueException(ExceptionTemplates.ClrNotSupported("ImplementationType", ServerVersion.ToString()));
-                    }
+                    // CLR procedures were introduced in SQL Server 2005 (version 9.0).
+                    // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
 
                     //CLR UDF is not supported if target server is Azure below v12.0
                     if (sp.TargetDatabaseEngineType != Cmn.DatabaseEngineType.SqlAzureDatabase)
@@ -182,7 +180,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     string sExists;
                     sExists = (sp.ScriptForAlter) ? string.Empty : "NOT";
-                    if (sp.TargetServerVersion >= SqlServerVersion.Version90 && this.ServerVersion.Major >= 9)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         sb.AppendFormat(Scripts.INCLUDE_EXISTS_FUNCTION90, sExists, SqlString(sFullScriptingName));
                     }
@@ -277,7 +275,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                     }
 
-                    if (ServerVersion.Major >= 9 && sp.TargetServerVersion >= SqlServerVersion.Version90)
+                    if (sp.TargetServerVersion >= SqlServerVersion.Version90)
                     {
                         // we can't specify execution context for inline table-valued functions
                         if (type != UserDefinedFunctionType.Inline)
@@ -887,49 +885,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
-            switch (this.ServerVersion.Major)
-            {
-                case 7:
-                    // we should not have UDFs on 7.0
-                    Diagnostics.TraceHelper.Assert(false, "ServerVersion.Major == 7");
-                    break;
-                case 8:
-                    switch (prop.Name)
-                    {
-                        case "FunctionType":
-                            Validate_set_TextObjectDDLProperty(prop, value);
-                            break;
-                        case "IsSchemaBound": goto case "FunctionType";
-                        case "IsEncrypted": goto case "FunctionType";
-                        case "TableVariableName": goto case "FunctionType";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
-                    break;
-                case 9:
-                    switch (prop.Name)
-                    {
-                        case "FunctionType":
-                            Validate_set_TextObjectDDLProperty(prop, value);
-                            break;
-                        case "IsSchemaBound": goto case "FunctionType";
-                        case "IsEncrypted": goto case "FunctionType";
-                        case "ExecutionContext": goto case "FunctionType";
-                        case "TableVariableName": goto case "FunctionType";
-                        case "ExecutionContextPrincipal": goto case "FunctionType";
-                        case "AssemblyName": goto case "FunctionType";
-                        case "ClassName": goto case "FunctionType";
-                        case "MethodName": goto case "FunctionType";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
-                    break;
-                default: goto case 9;
-            }
+            // No version-specific validation needed for SQL Server 2008+
         }
 
 

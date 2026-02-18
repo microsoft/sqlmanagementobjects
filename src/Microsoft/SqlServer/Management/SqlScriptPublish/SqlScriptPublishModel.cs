@@ -14,6 +14,7 @@ using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
 using Microsoft.SqlServer.Management.Common;
+using System.Diagnostics;
 
 namespace Microsoft.SqlServer.Management.SqlScriptPublish
 {
@@ -79,7 +80,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
         public SqlScriptPublishModel(string connectionString)
             : this()
         {
-            SqlScriptPublishModelTraceHelper.Assert(!string.IsNullOrEmpty(connectionString), "connectionString is empty");
+            Debug.Assert(!string.IsNullOrEmpty(connectionString), "connectionString is empty");
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new ArgumentNullException("connectionString");
@@ -276,7 +277,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
         {
             get
             {
-                SqlScriptPublishModelTraceHelper.Assert(this.smoServer != null);
+                Debug.Assert(this.smoServer != null);
                 return this.smoServer;
             }
         }
@@ -419,7 +420,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                 // this is really dangerous that we just toss out all existing changes to the scriptAdvancedOptions
                 // ideally we would just throw here or change the design but not sure of the impact on existing systems
                 // so we'll assert for now
-                SqlScriptPublishModelTraceHelper.Assert(false, "WARNING: all changes to AdvancedOptions have been lost due to changes in ScriptAllObjects.");
+                Debug.Assert(false, "WARNING: all changes to AdvancedOptions have been lost due to changes in ScriptAllObjects.");
                 this.scriptAdvancedOptions = null;
                 return GetAdvancedScriptingOptions();
             }

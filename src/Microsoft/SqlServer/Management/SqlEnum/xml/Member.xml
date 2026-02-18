@@ -1,27 +1,7 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type="Member" impl_type="SqlObject" min_major='7' cloud_min_major='12'>
+<?xml version="1.0" ?>
+<EnumObject type="Member" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
-        <version min_major='7' max_major='8'>
-            <parent_link>
-                <link_multiple no="1" expression="{0} = lgnmb.role_col">
-                    <link_field type="parent" field="Name" />
-                </link_multiple>
-            </parent_link>
-            <property_link table='#SmoMemberTemp lgnmb' />
-            <prefix>
-create table #SmoMemberTemp
-(
-	role_col sysname NOT NULL,
-	mem_col sysname NOT NULL,
-	id_col varbinary(85)
-)
-insert into #SmoMemberTemp (role_col, mem_col, id_col) exec master.dbo.sp_helpsrvrolemember
-            </prefix>
-            <postfix>
-drop table #SmoMemberTemp
-            </postfix>
-        </version>
-        <version min_major='9'>
+        <version min_major='10'>
             <parent_link>
                 <link_multiple no="1" expression="{0} = m.role_principal_id">
                     <link_field type="parent" field="ID" />
@@ -63,10 +43,7 @@ drop table #SmoMemberTemp
         </version>
     </settings>
 <properties>
-    <version min_major='7' max_major='8'>
-      <property name="Name" type="sysname">lgnmb.mem_col</property>
-    </version>
-    <version min_major='9'>
+    <version min_major='10'>
       <property name="Name" type="sysname">p.name</property>
       <property name="LoginType" type="int" report_type="LoginType" access='read'>CASE p.type WHEN N'U' THEN 0 WHEN N'G' THEN 1 WHEN N'S' THEN 2 WHEN N'C' THEN 3 WHEN N'K' THEN 4 END</property>
     </version>

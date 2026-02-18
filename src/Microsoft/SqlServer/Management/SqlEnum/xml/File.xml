@@ -1,17 +1,14 @@
 <?xml version="1.0" ?>
-<EnumObject type="File" impl_type="SqlObject" min_major='7'>
+<EnumObject type="File" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
     <settings>
         <parent_link>
             <link parent="ID" local="GroupID" />
         </parent_link>
 
-        <version min_major='9' max_major='9'>
-            <property_link table="sys.database_files AS s">s.type = 0 and (s.drop_lsn IS NULL)</property_link>
-        </version>
         <version min_major='10'>
             <property_link table='s'/>              
         </version>        
-    <version min_major='9' >
+    <version min_major='10' >
        <property_link fields='#NumberOfDiskReads#NumberOfDiskWrites#BytesReadFromDisk#BytesWrittenToDisk#' left_join='sys.dm_io_virtual_file_stats(default, default) AS fs'>fs.database_id = db_id() AND fs.file_id = s.file_id</property_link>
     </version>
       <!-- snapshots do not have .ss files listed in sys.database_files, only in sys.master_files. 
@@ -73,21 +70,11 @@ mf.size as size
         <include file='inc_DbFile.xml'/>
 
         <!-- undocumented: using file id == 1 in place of slow FILEPROPERTY(s.name, N'IsPrimaryFile') see #441694 -->
-        <version min_major='7' max_major='8'>
-            <property name="IsPrimaryFile" type="bit" cast='true' read_only_after_creation="true">CASE s.fileid WHEN 1 THEN 1 ELSE 0 END</property>
-      <property name="UsedSpace" type="float" access='Read' cast='true'>CAST(FILEPROPERTY(s.name, 'SpaceUsed') AS float)* CONVERT(float,8) </property>
-      <property name="AvailableSpace" type="float" access='Read'>
-        <link_multiple no='2' expression=" {0} - {1} ">
-          <link_field type='local' field="Size" />
-          <link_field type='local' field="UsedSpace" />
-        </link_multiple>
-      </property>
-    </version>
-        <version min_major='9'>
+        <version min_major='10'>
             <property name="IsPrimaryFile" type="bit" cast='true' read_only_after_creation="true">CASE s.file_id WHEN 1 THEN 1 ELSE 0 END</property>
         </version>
 
-        <version min_major='9' max_major='10' max_minor='50'>
+        <version min_major='10' max_major='10' max_minor='50'>
             <property name="UsedSpace" type="float" access='Read' cast='true'>CASE s.type WHEN 2 THEN 0 ELSE CAST(FILEPROPERTY(s.name, 'SpaceUsed') AS float)* CONVERT(float,8) END</property>
       </version>
     <version min_major='10'>
@@ -97,7 +84,7 @@ mf.size as size
       <property name="UsedSpace" type="float" access='Read' cast='true' expensive='true'>0.0</property>
       <property name="AvailableSpace" type="float" access='Read' cast='true' expensive='true'>0.0</property>
     </version>
-    <version min_major='9' max_major='10' max_minor='50'>
+    <version min_major='10' max_major='10' max_minor='50'>
       <property name="AvailableSpace" type="float" access='Read'>
         <link_multiple no='2' expression=" CASE s.type WHEN 2 THEN 0 ELSE ({0} - {1})  END ">
           <link_field type='local' field="Size" />

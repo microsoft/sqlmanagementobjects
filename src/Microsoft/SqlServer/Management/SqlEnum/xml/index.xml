@@ -1,15 +1,10 @@
 <?xml version="1.0" ?>
-<EnumObject type="Index" impl_type="SqlObject" min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject type="Index" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <parent_link>
       <link parent="ID" local="ParentID" />
     </parent_link>
-    <version min_major='7' max_major='8'>
-      <!-- ignore heap( > 0 ), and we need only indexes (<255) -->
-      <property_link table="dbo.sysindexes AS i">i.indid &gt; &lt;msparam&gt;0&lt;/msparam&gt; and i.indid &lt; &lt;msparam&gt;255&lt;/msparam&gt; and &lt;msparam&gt;1&lt;/msparam&gt; != INDEXPROPERTY(i.id,i.name,N'IsStatistics') and &lt;msparam&gt;1&lt;/msparam&gt; != INDEXPROPERTY(i.id,i.name,N'IsHypothetical')</property_link>
-      <property_link fields = '#KeyID#IsSystemNamed#' left_join="dbo.sysobjects AS k">k.parent_obj = i.id AND k.name = i.name AND k.xtype IN (N'PK', N'UQ')</property_link>
-    </version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <!-- ignore heap( > 0 )-->
       <property_link table="sys.indexes AS i">i.index_id &gt; &lt;msparam&gt;0&lt;/msparam&gt; and i.is_hypothetical = &lt;msparam&gt;0&lt;/msparam&gt;</property_link>
       <property_link fields='#NoAutomaticRecomputation#' left_join="sys.stats AS s">s.stats_id = i.index_id AND s.object_id = i.object_id</property_link>
@@ -54,12 +49,12 @@
     </version>
 
     <!-- Vector Index support added in SQL Server 2025 (version 17) -->
-    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+    <version min_major='17' cloud_min_major='12'>
       <property_link fields='#VectorIndexMetric#VectorIndexType#' left_join="#vectorindexes AS vi">i.object_id = vi.object_id AND i.index_id = vi.index_id</property_link>
     </version>
 
     <!-- JSON Index support added in SQL Server 2025 (version 17) -->
-    <version min_major='17' min_build="950" cloud_min_major='12'>
+    <version min_major='17' cloud_min_major='12'>
       <property_link fields='#OptimizeForArraySearch#' left_join="#jsonindexes AS ji">i.object_id = ji.object_id AND i.index_id = ji.index_id</property_link>
     </version>
 
@@ -68,10 +63,10 @@
       <property_link fields='#IndexedXmlPathName#' left_join="sys.selective_xml_index_paths AS indexedpaths">xi.object_id = indexedpaths.object_id AND xi.using_xml_index_id = indexedpaths.index_id AND xi.path_id = indexedpaths.path_id</property_link>
     </version>
 
-    <version min_major='7'>
+    <version min_major='10'>
       <prefix fields="#SpaceUsed#">declare @PageSize float select @PageSize=v.low/1024.0 from master.dbo.spt_values v where v.number=&lt;msparam&gt;1&lt;/msparam&gt; and v.type=&lt;msparam&gt;E&lt;/msparam&gt;</prefix>
     </version>
-    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+    <version min_major='17' cloud_min_major='12'>
       <prefix fields='#VectorIndexMetric#VectorIndexType#'>
         create table #vectorindexes (object_id int, index_id int, distance_metric nvarchar(60), vector_index_type nvarchar(60));
         begin try
@@ -106,45 +101,7 @@
   </settings>
   <properties>
     <include file='inc_urn.xml' />
-    <version min_major='7' max_major='8'>
-      <property name="Name" type="sysname" mode="design#deploy">i.name</property>
-      <property name="ID" type="int" cast='true'>i.indid</property>
-      <property name="IsSystemObject" type="bit" access="Read" cast='true'>OBJECTPROPERTY(i.id,N'IsMSShipped')</property>
-      <property name="IsFullTextKey" type="bit" cast='true'>INDEXPROPERTY(i.id,i.name,N'IsFulltextKey')</property>
-      <property name="NoAutomaticRecomputation" type="bit" cast='true' mode="design#deploy">CASE WHEN (i.status &amp; 0x1000000) &lt;&gt; 0 THEN 1 ELSE 0 END</property>
-      <property name="FillFactor" type="tinyint" cast='true' read_only_after_creation="true" mode="design#deploy">INDEXPROPERTY(i.id,i.name,N'IndexFillFactor')</property>
-      <property name="SpaceUsed" type="float" expensive='true' access='Read'>CASE WHEN (i.indid = 1) THEN (i.used - i.dpages - ISNULL((SELECT
-                                SUM(j.used) FROM dbo.sysindexes AS j WHERE (j.indid &gt; 1) AND (j.indid &lt; 255) AND (j.id = i.id) AND (j.name = i.name)), 0)) * @PageSize ELSE i.used * @PageSize END</property>
-      <property name="IsClustered" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">CASE i.indid WHEN 1 THEN 1 ELSE 0 END</property>
-      <property name="IndexKeyType" type="int" report_type="IndexKeyType" read_only_after_creation="true" mode="design#deploy">CASE WHEN 0 != i.status&amp;0x800 THEN 1 WHEN 0 != i.status&amp;0x1000 THEN 2 ELSE 0 END</property>
-      <property name="IsUnique" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">i.status&amp;2</property>
-      <property name="IgnoreDuplicateKeys" type="bit" cast='true' mode="design#deploy">CASE WHEN 0 != (i.status&amp;0x01) THEN 1 ELSE 0 END</property>
-      <property name="DisallowRowLocks" type="bit" cast='true' mode="design#deploy">INDEXPROPERTY(i.id, i.name, N'IsRowLockDisallowed')</property>
-      <property name="DisallowPageLocks" type="bit" cast='true' mode="design#deploy">INDEXPROPERTY(i.id, i.name, N'IsPageLockDisallowed')</property>
-      <property name="PadIndex" type="bit" cast='true' read_only_after_creation="true" mode="design#deploy">INDEXPROPERTY(i.id, i.name, N'IsPadIndex')</property>
-      <property name="IsSystemNamed" type="bit" cast='true' access='Read'>ISNULL(k.status &amp; 4, 0)</property>
-      <property name="ParentID" type="int" hidden='true'>i.id</property>
-      <property name="KeyID" type="int" hidden='true'>k.id</property>
-      <!-- used for link with PartitionSchemeParameter, inc_storage -->
-      <property name="IndexID" type="int" hidden='true' cast='true'>i.indid</property>
-      <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>CASE i.indid WHEN 1 THEN 0 ELSE 1 END</property>
-    </version>
-    <version min_major='8' max_major='8'>
-      <!-- extended properties support : commented out: sysproperties is not accessible to regular users
-			<property name="ExtPropClass" type="int" hidden='true'>
-				<link_multiple no='1' expression="CASE ({0}) WHEN 0 THEN 6 ELSE 3 END">
-					<link_field type='local' field="IndexKeyType" />
-				</link_multiple>
-			</property>
-			-->
-      <property name="ObjectTypeName" type="int" hidden='true'>
-        <link_multiple no='1' expression="CASE ({0}) WHEN 0 THEN N'INDEX' ELSE N'CONSTRAINT' END ">
-          <link_field type='filter' field="IndexKeyType" default_value="0"/>
-        </link_multiple>
-      </property>
-      <include file ="inc_level2SupportProperties.xml"/>
-    </version>
-    <version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="Name" type="sysname" mode="design#deploy">i.name</property>
       <property name="ID" type="int" cast='true'>i.index_id</property>
       <property name="IsSystemObject" type="bit" access="Read" cast='true'>OBJECTPROPERTY(i.object_id,N'IsMSShipped')</property>
@@ -191,7 +148,7 @@
       </property>
     </version>
 
-    <version min_major='9'>
+    <version min_major='10'>
       <!-- will report 0 for hypothetical indexes -->
       <!--when modify check datatabase.xml and table.xml IndexSpaceUsed for consistency -->
       <property name="SpaceUsed" type="float" expensive='true' access='Read'>
@@ -200,16 +157,16 @@
         JOIN sys.allocation_units as a ON a.container_id = p.partition_id
         WHERE p.object_id = i.object_id AND p.index_id = i.index_id),0.0)</property>
     </version>
-    <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="IsFullTextKey" type="bit" cast='true'>INDEXPROPERTY(i.object_id,i.name,N'IsFulltextKey')</property>
       <property name="IsXmlIndex" type="bit" access="Read" cast='true'>case when i.type=3 then 1 else 0 end</property>
       <property name="DataSpaceID" type="int" hidden='true'>i.data_space_id</property>
     </version>
-    <version min_major='9' cloud_min_major='12'>
+    <version min_major='10' cloud_min_major='12'>
       <property name='SecondaryXmlIndexType' type="int" report_type="SecondaryXmlIndexType" read_only_after_creation="true">case UPPER(ISNULL(xi.secondary_type,'')) when 'P' then 1 when 'V' then 2 when 'R' then 3 else 0 end</property>
       <property name='ParentXmlIndex' type="sysname" read_only_after_creation="true">ISNULL(xi2.name, N'')</property>
     </version>
-    <version min_major='9' max_major='10'>
+    <version min_major='10' max_major='10'>
        <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>CASE i.type WHEN 1 THEN 0 WHEN 3 THEN CASE WHEN xi.using_xml_index_id IS NULL THEN 2 ELSE 3 END WHEN 4 THEN 4 WHEN 6 THEN 5 ELSE 1 END</property>
     </version>
     <version min_major='10' cloud_min_major='10'>
@@ -224,9 +181,6 @@
       <property name ="Level4Grid" type="smallint"  cast ="true" report_type="SpatialGeoLevelSize" read_only_after_creation="true">ISNULL(si.level_4_grid,0)</property>
       <property name ="CellsPerObject" type="int" cast ="true" read_only_after_creation="true">ISNULL(si.cells_per_object,0)</property>
       <property name ="IsSpatialIndex" type="bit" access ="read" cast ='true'>case when i.type=4 then 1 else 0 end</property>
-    </version>
-    <version min_major="7" cloud_min_major='10' max_major='9' cloud_max_major='11'>
-        <property name="HasSparseColumn" type="bit" cast='true' access='Read'>0</property>
     </version>
     <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
       <!-- used for link with PhysicalPartition-->
@@ -248,7 +202,7 @@
       <property name="IndexType" type="tinyint" report_type="IndexType" read_only_after_creation="true" cast='true'>CASE i.type WHEN 1 THEN 0 WHEN 4 THEN 4 ELSE 1 END</property>
     </version>
 
-    <version min_major='7'  cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
       <include alias='i' file='inc_storage.xml' ro_after_creation='#FileStreamFileGroup#FileStreamPartitionScheme#'/>
     </version>
 
@@ -433,20 +387,13 @@
     </version>
 
     <!-- Vector Index properties added in SQL Server 2025 -->
-    <version min_major='17' max_major='17' min_minor='0' max_minor='0' max_build="949">
-      <property name="VectorIndexMetric" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">N''</property>
-      <property name="VectorIndexType" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">N''</property>
-    </version>
-    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+    <version min_major='17' cloud_min_major='12'>
       <property name="VectorIndexMetric" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">ISNULL(vi.distance_metric, N'')</property>
       <property name="VectorIndexType" type="nvarchar" size="60" read_only_after_creation="true" expensive="true">ISNULL(vi.vector_index_type, N'')</property>
     </version>
 
     <!-- JSON Index properties added in SQL Server 2025 -->
-    <version min_major='17' max_major='17' min_minor='0' max_minor='0' max_build="949">
-      <property name="OptimizeForArraySearch" type="bit" cast='true' read_only_after_creation="true">0</property>
-    </version>
-    <version min_major='17' max_major='17' min_minor='0' max_minor='0' min_build="950" cloud_min_major='12'>
+    <version min_major='17' cloud_min_major='12'>
       <property name="OptimizeForArraySearch" type="bit" cast='true' read_only_after_creation="true">ISNULL(ji.optimize_for_array_search, 0)</property>
     </version>
   </properties>

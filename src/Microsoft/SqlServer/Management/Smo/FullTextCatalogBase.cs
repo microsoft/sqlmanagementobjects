@@ -142,8 +142,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // ON FILEGROUP <filegroup>
                 if (sp.TargetServerVersion == SqlServerVersion.Version90)
                 {
-                    if (ServerVersion.Major >= 9 &&
-                    sp.Storage.FileGroup)
+                    if (sp.Storage.FileGroup)
                     {
                         if ((null != (property = this.GetPropertyOptional("FileGroup")).Value) && (property.Value.ToString().Length > 0))
                         {
@@ -171,28 +170,25 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                if (ServerVersion.Major >= 9)
+                // WITH ACCENT_SENSITIVITY {ON | OFF}
+                if (null != (property = this.Properties.Get("IsAccentSensitive")).Value)
                 {
-                    // WITH ACCENT_SENSITIVITY {ON | OFF}
-                    if (null != (property = this.Properties.Get("IsAccentSensitive")).Value)
-                    {
-                        sb.AppendFormat(SmoApplication.DefaultCulture, "WITH ACCENT_SENSITIVITY = {0}", ((bool)property.Value) ? "ON" : "OFF");
-                        sb.Append(sp.NewLine);
-                    }
+                    sb.AppendFormat(SmoApplication.DefaultCulture, "WITH ACCENT_SENSITIVITY = {0}", ((bool)property.Value) ? "ON" : "OFF");
+                    sb.Append(sp.NewLine);
+                }
 
-                    // AS DEFAULT
-                    if ((null != (property = this.Properties.Get("IsDefault")).Value) && (true == (bool)property.Value))
-                    {
-                        sb.Append("AS DEFAULT");
-                        sb.Append(sp.NewLine);
-                    }
+                // AS DEFAULT
+                if ((null != (property = this.Properties.Get("IsDefault")).Value) && (true == (bool)property.Value))
+                {
+                    sb.Append("AS DEFAULT");
+                    sb.Append(sp.NewLine);
+                }
 
-                    // AUTHORIZATION <owner_name>
-                    if (sp.IncludeScripts.Owner && (null != (property = this.Properties.Get("Owner")).Value) && (property.Value.ToString().Length > 0))
-                    {
-                        sb.AppendFormat("AUTHORIZATION [{0}]", SqlBraket(property.Value.ToString()));
-                        sb.Append(sp.NewLine);
-                    }
+                // AUTHORIZATION <owner_name>
+                if (sp.IncludeScripts.Owner && (null != (property = this.Properties.Get("Owner")).Value) && (property.Value.ToString().Length > 0))
+                {
+                    sb.AppendFormat("AUTHORIZATION [{0}]", SqlBraket(property.Value.ToString()));
+                    sb.Append(sp.NewLine);
                 }
             }
 
@@ -224,7 +220,7 @@ namespace Microsoft.SqlServer.Management.Smo
             bool altered = false;
 
             // Target version >= 9
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90 && ServerVersion.Major >= 9)
+            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
             {
                 // For now, only one property, Owner, is supported by this method.
                 // If adding more properties, put them in front of Owner and
@@ -271,13 +267,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="so"></param>
         internal override void AddScriptPermission(StringCollection query, ScriptingPreferences sp)
         {
-            // return if source version is less than 9 because permissions on ApplicationRoles were
-            // not supported prior to that
-            if (Parent.Parent.Information.Version.Major < 9)
-            {
-                return;
-            }
-
+            // Permissions on FullText Catalogs were introduced in SQL Server 2005 (version 9).
+            // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
             base.AddScriptPermission(query, sp);
         }
 
@@ -360,53 +351,30 @@ namespace Microsoft.SqlServer.Management.Smo
             Database db = (Database)ParentColl.ParentInstance;
             statements.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(db.Name)));
 
-            if (ServerVersion.Major >= 9)
-            {
-                statements.Add(string.Format(SmoApplication.DefaultCulture,
-                    "ALTER FULLTEXT CATALOG [{0}] REBUILD", SqlBraket(this.Name)));
-            }
-            else
-            {
-                statements.Add(string.Format(SmoApplication.DefaultCulture,
-                            "EXEC dbo.sp_fulltext_catalog @ftcat=N'{0}', @action=N'rebuild'",
-                            SqlString(this.Name)));
-            }
+            statements.Add(string.Format(SmoApplication.DefaultCulture,
+                "ALTER FULLTEXT CATALOG [{0}] REBUILD", SqlBraket(this.Name)));
             this.ExecutionManager.ExecuteNonQuery(statements);
         }
 
         public void Rebuild(bool accentSensitive)
         {
-            if (ServerVersion.Major >= 9)
-            {
-                StringCollection statements = new StringCollection();
-                Database db = (Database)ParentColl.ParentInstance;
-                statements.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(db.Name)));
-                statements.Add(string.Format(SmoApplication.DefaultCulture,
-                    "ALTER FULLTEXT CATALOG [{0}] REBUILD WITH ACCENT_SENSITIVITY = {1}",
-                    SqlBraket(this.Name), accentSensitive ? "ON" : "OFF"));
-                this.ExecutionManager.ExecuteNonQuery(statements);
-            }
-            else
-            {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-            }
+            StringCollection statements = new StringCollection();
+            Database db = (Database)ParentColl.ParentInstance;
+            statements.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(db.Name)));
+            statements.Add(string.Format(SmoApplication.DefaultCulture,
+                "ALTER FULLTEXT CATALOG [{0}] REBUILD WITH ACCENT_SENSITIVITY = {1}",
+                SqlBraket(this.Name), accentSensitive ? "ON" : "OFF"));
+            this.ExecutionManager.ExecuteNonQuery(statements);
         }
 
         public void Reorganize()
         {
-            if (ServerVersion.Major >= 9)
-            {
-                StringCollection statements = new StringCollection();
-                Database db = (Database)ParentColl.ParentInstance;
-                statements.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(db.Name)));
-                statements.Add(string.Format(SmoApplication.DefaultCulture,
-                    "ALTER FULLTEXT CATALOG [{0}] REORGANIZE", SqlBraket(this.Name)));
-                this.ExecutionManager.ExecuteNonQuery(statements);
-            }
-            else
-            {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
-            }
+            StringCollection statements = new StringCollection();
+            Database db = (Database)ParentColl.ParentInstance;
+            statements.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(db.Name)));
+            statements.Add(string.Format(SmoApplication.DefaultCulture,
+                "ALTER FULLTEXT CATALOG [{0}] REORGANIZE", SqlBraket(this.Name)));
+            this.ExecutionManager.ExecuteNonQuery(statements);
         }
 
         private enum CatalogPopulationActionEx
@@ -422,45 +390,23 @@ namespace Microsoft.SqlServer.Management.Smo
 
             // sp_fulltext_catalog has been deprecated in Yukon, so we need to iterate over FT indexes
             // in the catalog and generate ALTER FULLTEXT INDEX
-            if (ServerVersion.Major >= 9) // Yukon or later server
+            DataTable dt = EnumTables();
+            foreach (DataRow dr in dt.Rows)
             {
-                DataTable dt = EnumTables();
-                foreach (DataRow dr in dt.Rows)
-                {
-                    Table table = db.Tables[(string)dr["Table_Name"], (string)dr["Table_Schema"]];
+                Table table = db.Tables[(string)dr["Table_Name"], (string)dr["Table_Schema"]];
 
-                    Debug.Assert(table != null);
-                    Debug.Assert(table.FullTextIndex != null);
+                Debug.Assert(table != null);
+                Debug.Assert(table.FullTextIndex != null);
 
-                    if (action == CatalogPopulationActionEx.Stop)
-                    {
-                        table.FullTextIndex.StopPopulation();
-                    }
-                    else
-                    {
-                        IndexPopulationAction indexAction = (action == CatalogPopulationActionEx.Incremental ? IndexPopulationAction.Incremental : IndexPopulationAction.Full);
-                        table.FullTextIndex.StartPopulation(indexAction);
-                    }
-                }
-            }
-            else
-            {
-                StringCollection statements = new StringCollection();
-                string action_stmt;
                 if (action == CatalogPopulationActionEx.Stop)
                 {
-                    action_stmt = "stop";
+                    table.FullTextIndex.StopPopulation();
                 }
                 else
                 {
-                    action_stmt = (action == CatalogPopulationActionEx.Incremental ? "start_incremental" : "start_full");
+                    IndexPopulationAction indexAction = (action == CatalogPopulationActionEx.Incremental ? IndexPopulationAction.Incremental : IndexPopulationAction.Full);
+                    table.FullTextIndex.StartPopulation(indexAction);
                 }
-                statements.Add(string.Format(SmoApplication.DefaultCulture, Scripts.USEDB, SqlBraket(db.Name)));
-                statements.Add(string.Format(SmoApplication.DefaultCulture,
-                    "EXEC dbo.sp_fulltext_catalog @ftcat=N'{0}', @action=N'{1}'",
-                    SqlString(this.Name),
-                    action_stmt));
-                db.ExecutionManager.ExecuteNonQuery(statements);
             }
         }
 
@@ -522,7 +468,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
-            if (this.ServerVersion.Major >= 9 && prop.Name == "IsDefault")
+            if (prop.Name == "IsDefault")
             {
                 Validate_set_IsDefault(prop, value);
             }
@@ -530,16 +476,13 @@ namespace Microsoft.SqlServer.Management.Smo
 
         protected override void PostCreate()
         {
-            if (this.ServerVersion.Major >= 9)
-            {
-                Property pDef = this.Properties.Get("IsDefault");
+            Property pDef = this.Properties.Get("IsDefault");
 
-                if (null != pDef.Value && (bool)pDef.Value)
-                {
-                    Property parentDef = this.Parent.Properties.Get("DefaultFullTextCatalog");
-                    parentDef.SetValue(this.Name);
-                    parentDef.SetRetrieved(true);
-                }
+            if (null != pDef.Value && (bool)pDef.Value)
+            {
+                Property parentDef = this.Parent.Properties.Get("DefaultFullTextCatalog");
+                parentDef.SetValue(this.Name);
+                parentDef.SetRetrieved(true);
             }
         }
 

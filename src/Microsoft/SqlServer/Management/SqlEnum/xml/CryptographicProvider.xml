@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" ?>
-<EnumObject type='CryptographicProvider' impl_type='SqlObject' min_major='10'>
+<?xml version="1.0" ?>
+<EnumObject type='CryptographicProvider' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
 		<property_link table='sys.cryptographic_providers' alias='c' />
 		<property_link fields='#VersionString#SqlCryptographicVersionString#SymmetricKeySupported#SymmetricKeyExportable#SymmetricKeyImportable#SymmetricKeyPersistable#AsymmetricKeySupported#AsymmetricKeyExportable#AsymmetricKeyImportable#AsymmetricKeyPersistable#' join="sys.dm_cryptographic_provider_properties AS cp">cp.provider_id = c.provider_id</property_link>

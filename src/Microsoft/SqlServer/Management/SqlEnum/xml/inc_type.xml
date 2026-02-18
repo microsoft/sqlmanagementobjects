@@ -1,32 +1,20 @@
 <?xml version="1.0" ?>
-<EnumObject min_major='7'  cloud_min_major='10' datawarehouse_enabled='true'>
+<EnumObject min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
 	<settings>
-		<version min_major='7' max_major='8'>
-			<property_link fields='#DataType#DataTypeSchema#' 
-					left_join='systypes AS usrt'>usrt.xusertype = {0}.xusertype</property_link>
-			<property_link fields='#SystemType#Length#BaseTypeHidden#'
-					left_join='systypes AS baset'>baset.xusertype = {0}.xtype and baset.xusertype = baset.xtype</property_link>
-			<property_link fields='#DataTypeSchema#' 
-					left_join='sysusers AS s1{0}'>s1{0}.uid = usrt.uid</property_link>
-		</version>
-        <!-- 
+		<!-- 
           For clr system types the system_type_id and user_type_id will be different in sys.types.		 	 
         -->
-        <version min_major='9' max_major='9'>
-            <property_link fields='#SystemType#Length#BaseTypeHidden#VariableLength#' 
-                    left_join='sys.types AS baset'>(baset.user_type_id = {0}.system_type_id and baset.user_type_id = baset.system_type_id) </property_link>
-        </version>
         <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
             <property_link fields='#SystemType#Length#BaseTypeHidden#VariableLength#' 
                     left_join='sys.types AS baset'>(baset.user_type_id = {0}.system_type_id and baset.user_type_id = baset.system_type_id) or ((baset.system_type_id = {0}.system_type_id) and (baset.user_type_id = {0}.user_type_id) and (baset.is_user_defined = 0) and (baset.is_assembly_type = 1)) </property_link>
         </version>
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property_link fields='#DataType#DataTypeSchema#UserType#' 
 					left_join='sys.types AS usrt'>usrt.user_type_id = {0}.user_type_id</property_link>
 			<property_link fields = '#DataTypeSchema#' 
 					left_join='sys.schemas AS s1{0}'>s1{0}.schema_id = usrt.schema_id</property_link>
     </version>
-    <version min_major='9'  cloud_min_major='10'>
+    <version min_major='10'  cloud_min_major='10'>
 			<property_link fields='#XmlSchemaNamespace#XmlSchemaNamespaceSchema#' 
 					left_join='sys.xml_schema_collections AS xsc{0}'>xsc{0}.xml_collection_id = {0}.xml_collection_id</property_link>
 			<property_link fields = '#XmlSchemaNamespaceSchema#' 
@@ -38,20 +26,14 @@
     <property name="DataTypeSchema" type="sysname">s1{0}.name</property>
     <property name="BaseTypeHidden" type="sysname" hidden='true'>baset.name</property>
     <property name="SystemType" type="sysname" access='Read'>ISNULL(baset.name, N'')</property>
-    <version min_major='7' max_major='8'>
-			<property name="Length" type="int" 
-			 cast='true' mode="design">CASE WHEN baset.name IN (N'char', N'varchar', N'binary', N'varbinary', N'nchar', N'nvarchar') THEN {0}.prec ELSE {0}.length END</property>
-			<property name="NumericPrecision" type="int" cast='true' mode="design">{0}.xprec</property>
-			<property name="NumericScale" type="int" cast='true' mode="design">{0}.xscale</property>
-		</version>        
-		<version min_major='9'  cloud_min_major='10' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
 			<property name="Length" type="int"
 				cast='true' mode="design">CASE WHEN baset.name IN (N'nchar', N'nvarchar') AND {0}.max_length &lt;&gt; -1 THEN {0}.max_length/2 ELSE {0}.max_length END</property>
 			<property name="NumericPrecision" type="int" cast='true' mode="design">{0}.precision</property>
 			<property name="NumericScale" type="int" cast='true' mode="design">{0}.scale</property>
 		</version>
 
-    <version min_major='9'  cloud_min_major='10'>
+    <version min_major='10'  cloud_min_major='10'>
       <property name='XmlSchemaNamespace' type='sysname'>ISNULL(xsc{0}.name, N'')</property>
       <property name='XmlSchemaNamespaceSchema' type='sysname'>ISNULL(s2{0}.name, N'')</property>
       <property name='XmlDocumentConstraint' type='int' report_type='XmlDocumentConstraint'>ISNULL( (case {0}.is_xml_document when 1 then 2 else 1 end), 0)</property>

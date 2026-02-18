@@ -357,18 +357,22 @@ namespace Microsoft.SqlServer.Management.Smo
             if (IsSupportedProperty(nameof(GroupMaximumTempdbDataMB), sp))
             {
                 // For ALTER operations: convert -1 to null to explicitly reset the value in the script only if the property is dirty
-                // For CREATE operations: exclude -1 values entirely
+                // For CREATE operations: always include as null when -1
                 var tempdbMBProperty = Properties.Get(nameof(GroupMaximumTempdbDataMB));
                 var originalValue = tempdbMBProperty.Value;
                 
                 if (originalValue is double doubleValue && doubleValue == -1.0)
                 {
-                    if (isAlterOperation && tempdbMBProperty.Dirty)
+                    if ((isAlterOperation && tempdbMBProperty.Dirty) || !isAlterOperation)
                     {
-                        // For ALTER: include as null to reset the value on the server
+                        // For ALTER: include as null to reset the value on the server when dirty
+                        // For CREATE: always include as null when -1
                         if (count++ > 0)
                         {
-                            _ = parameters.Append(", ");
+                            _ = parameters.Append(Globals.commaspace);
+                            _ = parameters.Append(Globals.newline);
+                            _ = parameters.Append(Globals.tab);
+                            _ = parameters.Append(Globals.tab);
                         }
                         _ = parameters.Append("group_max_tempdb_data_mb=null");
                     }
@@ -381,17 +385,21 @@ namespace Microsoft.SqlServer.Management.Smo
             if (IsSupportedProperty(nameof(GroupMaximumTempdbDataPercent), sp))
             {
                 // For ALTER operations: convert -1 to null to explicitly reset the value in the script only if the property is dirty
-                // For CREATE operations: exclude -1 values entirely
+                // For CREATE operations: always include as null when -1
                 var tempdbPercentProperty = Properties.Get(nameof(GroupMaximumTempdbDataPercent));
                 var originalValue = tempdbPercentProperty.Value;
                 if (originalValue is double doubleValue && doubleValue == -1.0)
                 {
-                    if (isAlterOperation && tempdbPercentProperty.Dirty)
+                    if ((isAlterOperation && tempdbPercentProperty.Dirty) || !isAlterOperation)
                     {
-                        // For ALTER: include as null to reset the value on the server
+                        // For ALTER: include as null to reset the value on the server when dirty
+                        // For CREATE: always include as null when -1
                         if (count++ > 0)
                         {
-                            _ = parameters.Append(", ");
+                            _ = parameters.Append(Globals.commaspace);
+                            _ = parameters.Append(Globals.newline);
+                            _ = parameters.Append(Globals.tab);
+                            _ = parameters.Append(Globals.tab);
                         }
                         _ = parameters.Append("group_max_tempdb_data_percent=null");
                     }

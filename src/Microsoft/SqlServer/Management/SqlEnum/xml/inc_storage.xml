@@ -1,16 +1,7 @@
 <?xml version="1.0" ?>
-<EnumObject type="Table" impl_type="SqlObject" min_major='7'  cloud_min_major='12' datawarehouse_enabled='true'>
+<EnumObject type="Table" impl_type="SqlObject" min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
-    <version min_major='7' max_major='8'>
-      <!-- left join because sysfiles have groupid = 0 on their index -->
-      <property_link fields='#FileGroup#' left_join='dbo.sysfilegroups AS fg{0}'>
-        <link_multiple no='1' expression="fg{0}.groupid = {0}.groupid">
-          <!--used just to trigger the parent property link -->
-          <link_field type='local' field="IndexID" />
-        </link_multiple>
-      </property_link>
-    </version>
-    <version min_major='9'  cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
       <property_link fields='#FileGroup#PartitionScheme#IsPartitioned#' left_join='sys.data_spaces AS ds{0}'>
         <link_multiple no='1' expression="ds{0}.data_space_id = {0}.data_space_id">
           <!--used just to trigger the parent property link -->
@@ -40,10 +31,7 @@
     </version>
   </settings>
   <properties>
-    <version min_major='7' max_major='8'>
-      <property name="FileGroup" type="sysname" read_only_after_creation="true">fg{0}.groupname</property>
-    </version>
-    <version min_major='9'  max_major='11'>
+    <version min_major='10'  max_major='11'>
       <property name="FileGroup" type="sysname" read_only_after_creation="true">CASE WHEN 'FG'=ds{0}.type THEN ds{0}.name ELSE N'' END</property>
     </version>
     <version min_major='12' cloud_min_major='12'>
@@ -62,7 +50,7 @@
         END
       </property>
     </version>
-    <version min_major='9' cloud_min_major='12' datawarehouse_enabled='true'>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="PartitionScheme" type="sysname" read_only_after_creation="true">CASE WHEN 'PS'=ds{0}.type THEN ds{0}.name ELSE N'' END</property>
       <property name="IsPartitioned" type="bit" cast='true' access="Read">CASE WHEN 'PS'=ds{0}.type THEN 1 ELSE 0 END</property>
     </version>

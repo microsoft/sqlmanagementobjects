@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="AvailabilityGroup" impl_type="SqlObject" min_major='11' >
+<EnumObject type="AvailabilityGroup" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <property_link table="#tmpag_availability_groups" alias="AG"/>
     <property_link fields='#PrimaryReplicaServerName#ID#LocalReplicaRole#'

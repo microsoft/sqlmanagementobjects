@@ -38,7 +38,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 
         public string GetStorageAccountAccessKey(string storageAccountResourceId)
         {
-            TraceHelper.TraceInformation($"Fetching storage access key for {storageAccountResourceId}");
             var storageAccount = ArmClient.GetStorageAccountResource(new Azure.Core.ResourceIdentifier(storageAccountResourceId));
             return storageAccount.GetKeys().First().Value;
         }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using Microsoft.SqlServer.Management.Common;
@@ -66,7 +67,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // of the query. When the type factory gets cleaner we will likely be able to cache
             // the actual type factory here and not just the name
             _type = _root.GetType(_urn.Type);
-            TraceHelper.Assert(_type != null);
+            Debug.Assert(_type != null);
 
             // Determine the actual connection to use now. Only do this once in this object instance (not on Reset).
             GetConnection();
@@ -107,7 +108,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // Get the type and create the object
             Type type = _root.GetType(urn.Type);
             object obj = SfcRegistration.CreateObject(type.FullName);
-            TraceHelper.Assert(obj != null);
+            Debug.Assert(obj != null);
 
             // Set the object root to disconnected (design) mode 
             if (obj is IAlienRoot)
@@ -183,13 +184,13 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     SfcKeyChain kc = new SfcKeyChain(_ResultsDataReader.GetString(_urnColIndex), _root);
                     if( kc.Parent == null )
                     {
-                        TraceHelper.Assert( kc.LeafKey is DomainRootKey );
+                        Debug.Assert( kc.LeafKey is DomainRootKey );
                         _currentInstance = kc.GetObject();
                     }
                     else
                     {
                         SfcInstance parent = kc.Parent.GetObject();
-                        TraceHelper.Assert(parent != null);
+                        Debug.Assert(parent != null);
 
                         string elementTypeName = kc.LeafKey.InstanceType.Name;
                         ISfcCollection collection = parent.GetChildCollection(elementTypeName);

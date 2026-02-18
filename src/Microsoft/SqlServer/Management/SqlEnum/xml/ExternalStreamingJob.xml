@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<EnumObject type="ExternalStreamingJob" impl_type="SqlObject" min_major='15'>
+<EnumObject type="ExternalStreamingJob" impl_type="SqlObject" min_major='15' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
   <settings>
     <version min_major='15'>
         <property_link table="sys.external_streaming_jobs" alias="ext_streaming_job"/>

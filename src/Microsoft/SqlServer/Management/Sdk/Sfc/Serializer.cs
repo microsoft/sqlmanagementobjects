@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -1167,7 +1168,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <returns>adapter object or null if no adapter type was specified</returns>
         private static IXmlSerializationAdapter GetSerializationAdapter(SfcMetadataRelation propertyRelation)
         {
-            TraceHelper.Assert(propertyRelation != null);
+            Debug.Assert(propertyRelation != null);
 
             //create the serialization adapter for this property if it is specified
             IXmlSerializationAdapter serializationAdapter = null;
@@ -1177,7 +1178,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
             if (attribute != null)
             {
-                TraceHelper.Assert(attribute is SfcSerializationAdapterAttribute);
+                Debug.Assert(attribute is SfcSerializationAdapterAttribute);
 
                 SfcSerializationAdapterAttribute adapterAttribute = attribute as SfcSerializationAdapterAttribute;
                 try
@@ -1186,13 +1187,13 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     serializationAdapter = adapter as IXmlSerializationAdapter;
 
                     //the given adapter should implement IXmlSerializationAdapter
-                    TraceHelper.Assert(serializationAdapter != null, "Specified serialization adapter of type " + adapterAttribute.SfcSerializationAdapterType.Name
+                    Debug.Assert(serializationAdapter != null, "Specified serialization adapter of type " + adapterAttribute.SfcSerializationAdapterType.Name
                                                                 + " does not implement IXmlSerializationAdapter");
                 }
                 catch (System.MissingMethodException mme)
                 {
                     //adapter should allow construction using default constructor, but here it doesn't.
-                    TraceHelper.Assert(false, "Serialization adapter is specified but cannot be constructed using default constructor. Caught exception: " + mme.Message);
+                    Debug.Assert(false, "Serialization adapter is specified but cannot be constructed using default constructor. Caught exception: " + mme.Message);
                 }
             }
             

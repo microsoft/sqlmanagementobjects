@@ -9,6 +9,7 @@ using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Diagnostics;
 
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -508,32 +509,30 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         throw new WrongPropertyValueException(ExceptionTemplates.NoDataMaskingOnComputedColumns);
                     }
-                    if (sp.TargetServerVersion >= SqlServerVersion.Version90 &&
-                        this.ServerVersion.Major >= 9)
+                    // PERSISTED keyword for computed columns is supported since SQL Server 2005 (Version90)
+                    // Since minimum supported version is now SQL Server 2008 (Version100), this is always available
+                    if (GetPropValueOptional("IsPersisted", false))
                     {
-                        if (GetPropValueOptional("IsPersisted", false))
+                        sb.Append(" PERSISTED");
+                        //you can set a computed column to be not null if it is persisted
+                        if (!GetPropValueOptional("Nullable", false))
                         {
-                            sb.Append(" PERSISTED");
-                            //you can set a computed column to be not null if it is persisted
-                            if (!GetPropValueOptional("Nullable", false))
-                            {
-                                sb.Append(" NOT NULL");
-                            }
+                            sb.Append(" NOT NULL");
                         }
+                    }
 
-                        if (Cmn.DatabaseEngineType.SqlAzureDatabase != sp.TargetDatabaseEngineType)
+                    if (Cmn.DatabaseEngineType.SqlAzureDatabase != sp.TargetDatabaseEngineType)
+                    {
+                        // we need to force the collation of the computed columns
+                        // when we script optimizer data because it is dependent on the
+                        // collation of the database and it might not match the stats blob
+                        if (sp.Data.OptimizerData && RequiresCollate(sp))
                         {
-                            // we need to force the collation of the computed columns
-                            // when we script optimizer data because it is dependent on the
-                            // collation of the database and it might not match the stats blob
-                            if (sp.Data.OptimizerData && RequiresCollate(sp))
+                            string sCollation = Properties.Get("Collation").Value as string;
+                            if (null != sCollation && 0 < sCollation.Length)
                             {
-                                string sCollation = Properties.Get("Collation").Value as string;
-                                if (null != sCollation && 0 < sCollation.Length)
-                                {
-                                    CheckCollation(sCollation, sp);
-                                    sb.AppendFormat(SmoApplication.DefaultCulture, " COLLATE {0}", sCollation);
-                                }
+                                CheckCollation(sCollation, sp);
+                                sb.AppendFormat(SmoApplication.DefaultCulture, " COLLATE {0}", sCollation);
                             }
                         }
                     }
@@ -692,7 +691,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case GeneratedAlwaysType.None:
                     break;
                 default:
-                    Diagnostics.TraceHelper.Assert(false, "Unknown 'GeneratedAlwaysType' property value encountered.");
+                    Debug.Assert(false, "Unknown 'GeneratedAlwaysType' property value encountered.");
                     break;
             }
 
@@ -906,7 +905,7 @@ namespace Microsoft.SqlServer.Management.Smo
         ///
         private void CheckSupportedType(ScriptingPreferences options)
         {
-            Diagnostics.TraceHelper.Assert(options != null);
+            Debug.Assert(options != null);
 
             // Get the SqlDataType for the column, in the event
             // that it's a UDDT and we need to infer it's underlying type
@@ -1162,17 +1161,17 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // mark the column as persisted if needed
-            if (sp.TargetServerVersion >= SqlServerVersion.Version90)
+            // PERSISTED keyword for computed columns is supported since SQL Server 2005 (Version90)
+            // Since minimum supported version is now SQL Server 2008 (Version100), this is always available
+            Property propPersisted = Properties.Get("IsPersisted");
+            if (propPersisted.Dirty)
             {
-                Property propPersisted = Properties.Get("IsPersisted");
-                if (propPersisted.Dirty)
-                {
-                    alterQuery.Add(string.Format(SmoApplication.DefaultCulture,
-                        "ALTER TABLE {0} ALTER COLUMN {1} {2} PERSISTED",
-                        ParentColl.ParentInstance.FullQualifiedName, FullQualifiedName,
-                        (bool)propPersisted.Value ? "ADD" : "DROP"));
-                }
+                alterQuery.Add(string.Format(SmoApplication.DefaultCulture,
+                    "ALTER TABLE {0} ALTER COLUMN {1} {2} PERSISTED",
+                    ParentColl.ParentInstance.FullQualifiedName, FullQualifiedName,
+                    (bool)propPersisted.Value ? "ADD" : "DROP"));
             }
+
 
             bool isColumnSet = false;
             bool isGeneratedAlwaysColumn = false;
@@ -1558,8 +1557,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// that is we have to init all properties</param>
         internal void InitializeDefault(System.Data.IDataReader reader, int colIdx, bool forScripting)
         {
-            Diagnostics.TraceHelper.Assert(null != reader, "reader == null");
-            Diagnostics.TraceHelper.Assert(colIdx < reader.FieldCount, "colIdx >= reader.FieldCount");
+            Debug.Assert(null != reader, "reader == null");
+            Debug.Assert(colIdx < reader.FieldCount, "colIdx >= reader.FieldCount");
 
             //
             // initalize the default
@@ -1585,16 +1584,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    Diagnostics.TraceHelper.Assert(false,
+                    Debug.Assert(false,
                         "Text column should be present when initializing for scripting" +
                         " or if it is an init field");
                 }
 
                 Object oText = reader.GetValue(textColumnIdx);
 
-                Diagnostics.TraceHelper.Assert(propText.Type.Equals(typeof (string)),
+                Debug.Assert(propText.Type.Equals(typeof (string)),
                     "text for the default should be of type string");
-                Diagnostics.TraceHelper.Assert(null != oText, "enumerator is expected to return DBNull instead of null");
+                Debug.Assert(null != oText, "enumerator is expected to return DBNull instead of null");
 
                 if (DBNull.Value.Equals(oText))
                 {
@@ -1622,16 +1621,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    Diagnostics.TraceHelper.Assert(false,
+                    Debug.Assert(false,
                         "IsSystemNamed column should be present when initializing for scripting" +
                         " or if it is an init field");
                 }
 
                 Object oSysName = reader.GetValue(isSystemNamedColumnIdx);
 
-                Diagnostics.TraceHelper.Assert(propSysName.Type.Equals(typeof (bool)),
+                Debug.Assert(propSysName.Type.Equals(typeof (bool)),
                     "IsSystemNamed should be of type bool");
-                Diagnostics.TraceHelper.Assert(null != oSysName,
+                Debug.Assert(null != oSysName,
                     "enumerator is expected to return DBNull instead of null");
 
                 if (DBNull.Value.Equals(oSysName))
@@ -1656,16 +1655,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    Diagnostics.TraceHelper.Assert(false,
+                    Debug.Assert(false,
                         "IsFileTableDefined column should be present when initializing for scripting" +
                         " or if it is an init field");
                 }
 
                 Object oSysName = reader.GetValue(isFileTableDefinedIdx);
 
-                Diagnostics.TraceHelper.Assert(propIsFileTableDefined.Type.Equals(typeof(bool)),
+                Debug.Assert(propIsFileTableDefined.Type.Equals(typeof(bool)),
                     "IsFileTableDefined should be of type bool");
-                Diagnostics.TraceHelper.Assert(null != oSysName,
+                Debug.Assert(null != oSysName,
                     "enumerator is expected to return DBNull instead of null");
 
                 if (DBNull.Value.Equals(oSysName))
@@ -1776,8 +1775,9 @@ namespace Microsoft.SqlServer.Management.Smo
             ArrayList propInfo = new ArrayList();
             if (this.IsSupportedObject<ExtendedProperty>())
             {
-                propInfo.Add(new PropagateInfo(ServerVersion.Major < 8 ? null : ExtendedProperties, true,
-                    ExtendedProperty.UrnSuffix));
+                // Extended Properties are supported since SQL Server 2000 (version 8)
+                // Since minimum supported version is now SQL Server 2008 (version 10), they are always available
+                propInfo.Add(new PropagateInfo(ExtendedProperties, true, ExtendedProperty.UrnSuffix));
             }
             if (this.Parent is Table)
             {
@@ -1974,70 +1974,33 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="value"></param>
         internal override void ValidateProperty(Property prop, object value)
         {
-            switch (this.ServerVersion.Major)
+            switch (prop.Name)
             {
-                case 7:
-                    switch (prop.Name)
-                    {
-                        case "Computed":
-                            ValidatePropertyChangeForText(prop, value);
-                            break;
-                        case "ComputedText": goto case "Computed";
-                        case "Default": goto case "Computed";
-                        case "DefaultSchema": goto case "Computed";
-                        case "Identity": goto case "Computed";
-                        case "IdentityIncrement": goto case "Computed";
-                        case "IdentityIncrementAsDecimal": goto case "Computed";
-                        case "IdentitySeed": goto case "Computed";
-                        case "IdentitySeedAsDecimal": goto case "Computed";
-                        case "NotForReplication": goto case "Computed";
-                        case "Nullable": goto case "Computed";
-                        case "RowGuidCol":
-                            if (!prop.Dirty)
-                            {
-                                oldRowGuidColValue = prop.Value;
-                            }
-                            goto case "Computed";
-                        case "Rule": goto case "Computed";
-                        case "RuleSchema": goto case "Computed";
-
-                        default:
-                            // other properties are not validated
-                            break;
-                    }
+                case "Collation":
+                    ValidatePropertyChangeForText(prop, value);
                     break;
-                case 8:
-                    switch (prop.Name)
+                case "Computed": goto case "Collation";
+                case "ComputedText": goto case "Collation";
+                case "Default": goto case "Collation";
+                case "DefaultSchema": goto case "Collation";
+                case "Identity": goto case "Collation";
+                case "IdentityIncrement": goto case "Collation";
+                case "IdentitySeed": goto case "Collation";
+                case "IdentityIncrementAsDecimal": goto case "Collation";
+                case "IdentitySeedAsDecimal": goto case "Collation";
+                case "NotForReplication": goto case "Collation";
+                case "Nullable": goto case "Collation";
+                case "RowGuidCol":
+                    if (!prop.Dirty)
                     {
-                        case "Collation":
-                            ValidatePropertyChangeForText(prop, value);
-                            break;
-                        case "Computed": goto case "Collation";
-                        case "ComputedText": goto case "Collation";
-                        case "Default": goto case "Collation";
-                        case "DefaultSchema": goto case "Collation";
-                        case "Identity": goto case "Collation";
-                        case "IdentityIncrement": goto case "Collation";
-                        case "IdentitySeed": goto case "Collation";
-                        case "IdentityIncrementAsDecimal": goto case "Collation";
-                        case "IdentitySeedAsDecimal": goto case "Collation";
-                        case "NotForReplication": goto case "Collation";
-                        case "Nullable": goto case "Collation";
-                        case "RowGuidCol":
-                            if (!prop.Dirty)
-                            {
-                                oldRowGuidColValue = prop.Value;
-                            }
-                            goto case "Collation";
-                        case "Rule": goto case "Collation";
-                        case "RuleSchema": goto case "Collation";
-                        default:
-                            // other properties are not validated
-                            break;
+                        oldRowGuidColValue = prop.Value;
                     }
+                    goto case "Collation";
+                case "Rule": goto case "Collation";
+                case "RuleSchema": goto case "Collation";
+                default:
+                    // other properties are not validated
                     break;
-                case 9: goto case 8;
-                default: goto case 9;
             }
         }
 
@@ -2067,7 +2030,7 @@ namespace Microsoft.SqlServer.Management.Smo
             bool defaultTextMode)
         {
             // Column should always have a parent,.
-            Diagnostics.TraceHelper.Assert(null != parentType, "null == parentType");
+            Debug.Assert(null != parentType, "null == parentType");
             // in the case of views we don't need to prefetch all those
             // properties for scripting
             if (!parentType.Equals(typeof(View)) || !defaultTextMode)

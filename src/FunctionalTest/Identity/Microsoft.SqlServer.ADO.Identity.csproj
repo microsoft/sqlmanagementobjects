@@ -16,6 +16,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="System.Text.Json" PrivateAssets="None" />
+    <!-- Add privateassets packagereferences for some pinned indirect dependencies so they are not exposed to consumers -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all" IncludeAssets="None"/>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" PrivateAssets="all" IncludeAssets="None" />
+    <PackageReference Include="System.Security.AccessControl" PrivateAssets="all" IncludeAssets="None"/>
+    <PackageReference Include="System.Text.Encodings.Web" PrivateAssets="all" IncludeAssets="None"/>
   </ItemGroup>
   <ItemGroup Condition="'$(GacVersion)' == 'true'">
     <PackageReference Include="Microsoft.Data.SqlClient" />

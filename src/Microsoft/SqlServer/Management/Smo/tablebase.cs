@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Sdk.Sfc.Metadata;
@@ -858,7 +859,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (sp.IncludeScripts.AnsiPadding && HasMultiplePaddings())
                     {
                         // at this point the table-level ansi_padding should have a valid value
-                        Diagnostics.TraceHelper.Assert(tablePaddingSetting.HasValue);
+                        Debug.Assert(tablePaddingSetting.HasValue);
                         GetTableCreationScriptWithAnsiPadding(sp, sb, tablePaddingSetting.Value);
                     }
                     else
@@ -922,7 +923,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 // page and row count on the heap index that represents the storage
                 // for that table.
                 if (sp.Data.OptimizerData &&
-                    this.ServerVersion.Major >= 9 &&
                     sp.TargetServerVersion >= SqlServerVersion.Version90 &&
                     !isMemoryOptimized &&
                     !isSqlDw &&
@@ -972,8 +972,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sb"> The string builder to hold scripts </param>
         private void GetMemoryOptimizedTableCreationScript(ScriptingPreferences sp, StringBuilder sb)
         {
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             // first make sure both current object and target scripting environment
             // support memory optimized table
@@ -1045,8 +1045,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             const string DataSourceNamePropertyName = "DataSourceName";
 
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             // first make sure both current object and target scripting environment
             // support external table
@@ -1101,8 +1101,8 @@ namespace Microsoft.SqlServer.Management.Smo
              *   FOR VALUES ( [ boundary_value [,...n] ] )
              */
 
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             // first make sure both current object and target scripting environment
             // support SQL DW table
@@ -1218,8 +1218,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <returns></returns>
         private bool IsCompressionCodeRequired(bool bAlter)
         {
-            Diagnostics.TraceHelper.Assert(this.ServerVersion.Major >= 10);
-            Diagnostics.TraceHelper.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
+            Debug.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
             if (this.State == SqlSmoState.Creating)
             {
                 if (m_PhysicalPartitions != null)
@@ -1252,8 +1251,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 return false;
             }
 
-            Diagnostics.TraceHelper.Assert(this.IsSupportedProperty(nameof(HasXmlCompressedPartitions)));
-            Diagnostics.TraceHelper.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
+            Debug.Assert(this.IsSupportedProperty(nameof(HasXmlCompressedPartitions)));
+            Debug.Assert((this.State == SqlSmoState.Existing) || (this.State == SqlSmoState.Creating));
             if (this.State == SqlSmoState.Creating)
             {
                 if (m_PhysicalPartitions != null)
@@ -1284,8 +1283,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sb"></param>
         private void GetTableCreationScript(ScriptingPreferences sp, StringBuilder sb)
         {
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             bool isEdgeTable = GetPropValueIfSupportedWithThrowOnTarget("IsEdge", false, sp);
 
@@ -1351,7 +1350,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sb"></param>
         private void ScriptPeriodForSystemTime(StringBuilder sb)
         {
-            Diagnostics.TraceHelper.Assert(IsSupportedProperty("HasSystemTimePeriod"));
+            Debug.Assert(IsSupportedProperty("HasSystemTimePeriod"));
 
             string startCol = string.Empty;
             string endCol = string.Empty;
@@ -1393,8 +1392,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="sb"></param>
         private void GetFileTableCreationScript(ScriptingPreferences sp, StringBuilder sb)
         {
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             //Code that follows from here is not supported on Cloud.
             GenerateDataSpaceScript(sb, sp);
@@ -1486,8 +1485,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <param name="initialPadding">use initial padding</param>
         private void GetTableCreationScriptWithAnsiPadding(ScriptingPreferences sp, StringBuilder sb, bool initialPadding)
         {
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             StringCollection col_strings = new StringCollection();
             bool fFirstColumn = true;
@@ -1511,7 +1510,7 @@ namespace Microsoft.SqlServer.Management.Smo
             while (enumColls.MoveNext())
             {
                 Column column = enumColls.Current as Column;
-                Diagnostics.TraceHelper.Assert(null != column);
+                Debug.Assert(null != column);
 
                 // prepare to script column only if in direct execution mode or not explicitly directed to ignore it
                 if (sp.ScriptForCreateDrop || !column.IgnoreForScripting)
@@ -1539,7 +1538,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     sb.Append(Globals.tab);
                     // there needs to be just one string in this collection
-                    Diagnostics.TraceHelper.Assert(col_strings.Count == 1);
+                    Debug.Assert(col_strings.Count == 1);
                     sb.Append(col_strings[0]);
 
                     col_strings.Clear();
@@ -1562,7 +1561,7 @@ namespace Microsoft.SqlServer.Management.Smo
             GenerateGraphScript(sb, sp);
 
             // we should exit the loop before we finish the collection
-            Diagnostics.TraceHelper.Assert(paddingHasFlipped);
+            Debug.Assert(paddingHasFlipped);
 
             // generate script for the location of the table
             GenerateDataSpaceScript(sb, sp);
@@ -1598,7 +1597,7 @@ namespace Microsoft.SqlServer.Management.Smo
             do
             {
                 Column col = enumColls.Current as Column;
-                Diagnostics.TraceHelper.Assert(null != col);
+                Debug.Assert(null != col);
 
                 Nullable<bool> thisPadding = GetColumnPadding(col);
                 // check if we need to change the ANSI_PADDING
@@ -1634,8 +1633,8 @@ namespace Microsoft.SqlServer.Management.Smo
         /// </summary>
         private void GenerateWithOptionScript(StringBuilder sb, ScriptingPreferences sp)
         {
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
 
             StringBuilder withOptions = new StringBuilder();
 
@@ -1646,7 +1645,6 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             bool fDataCompression = ((sp.TargetDatabaseEngineEdition != Cmn.DatabaseEngineEdition.SqlDataWarehouse)
                 && (sp.TargetServerVersion >= SqlServerVersion.Version100)
-                && (this.ServerVersion.Major >= 10)
                 && !sp.TargetEngineIsAzureStretchDb()
                 && sp.Storage.DataCompression
                 && (!this.HasClusteredPrimaryOrUniqueKey(sp))
@@ -2193,7 +2191,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         case ExternalTableDistributionType.Sharded:
                             Property shardingColNameProperty = this.GetPropertyOptional(ShardingColumnPropertyName);
-                            Diagnostics.TraceHelper.Assert(!shardingColNameProperty.IsNull);
+                            Debug.Assert(!shardingColNameProperty.IsNull);
                             string distributionWithShardingColName = string.Format("{0}({1})",
                                 typeConverter.ConvertToInvariantString(distribution),
                                 MakeSqlBraket(Convert.ToString(shardingColNameProperty.Value, SmoApplication.DefaultCulture)));
@@ -2204,7 +2202,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             this.AddPropertyToScript(typeConverter.ConvertToInvariantString(distribution), "DISTRIBUTION = {0}", script);
                             break;
                         default:
-                            Diagnostics.TraceHelper.Assert(distribution == ExternalTableDistributionType.None);
+                            Debug.Assert(distribution == ExternalTableDistributionType.None);
                             break;
                     }
                 }
@@ -2302,7 +2300,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             this.AddPropertyToScript(typeConverter.ConvertToInvariantString(distribution), "DISTRIBUTION = {0}", script);
                             break;
                         default:
-                            Diagnostics.TraceHelper.Assert(distribution == DwTableDistributionType.None);
+                            Debug.Assert(distribution == DwTableDistributionType.None);
                             break;
                     }
                 }
@@ -2623,7 +2621,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 return c.GetPropValueOptional<bool>("AnsiPaddingStatus");
             }
             else if (c.GetPropValueOptional("Computed", false) &&
-                            this.ServerVersion.Major >= 9 &&
                             c.GetPropValueOptional("IsPersisted", false))
             {
                 // persisted columns always need ansi_padding set to true
@@ -2744,9 +2741,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal static void ScriptTableInternal(ScriptingPreferences sp, StringBuilder sb, IEnumerable<Column> columns, ICollection indexes, bool isEdgeTable = false)
         {
-            Diagnostics.TraceHelper.Assert(null != sp);
-            Diagnostics.TraceHelper.Assert(null != sb);
-            Diagnostics.TraceHelper.Assert(null != columns);
+            Debug.Assert(null != sp);
+            Debug.Assert(null != sb);
+            Debug.Assert(null != columns);
 
             ScriptColumns(sp, sb, columns, isEdgeTable: isEdgeTable);
 
@@ -2855,7 +2852,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // script all non-primary indexes
             foreach (Index idx in indexes)
             {
-                Diagnostics.TraceHelper.Assert(idx.IsMemoryOptimizedIndex);
+                Debug.Assert(idx.IsMemoryOptimizedIndex);
 
                 if (firstIndex)
                 {
@@ -2870,7 +2867,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (sp.ScriptForCreateDrop || !idx.IgnoreForScripting)
                 {
                     idx.ScriptDdl(col_strings, sp, true, true);
-                    Diagnostics.TraceHelper.Assert(col_strings.Count != 0);
+                    Debug.Assert(col_strings.Count != 0);
 
                     sb.Append(sp.NewLine);
                     sb.Append(col_strings[0]);
@@ -2900,7 +2897,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // script all clustered indexes
             foreach (Index idx in indexes)
             {
-                Diagnostics.TraceHelper.Assert(idx.IndexType == IndexType.ClusteredIndex);
+                Debug.Assert(idx.IndexType == IndexType.ClusteredIndex);
 
                 if (firstIndex)
                 {
@@ -2915,7 +2912,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (sp.ScriptForCreateDrop || !idx.IgnoreForScripting)
                 {
                     idx.ScriptDdl(scripts, sp, true, true);
-                    Diagnostics.TraceHelper.Assert(scripts.Count == 1);
+                    Debug.Assert(scripts.Count == 1);
                     sb.Append(sp.NewLine);
                     sb.Append(scripts[0]);
                     scripts.Clear();
@@ -2983,7 +2980,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // as the second parameter has been abused to generate partial DDL
                         // to inject into the CREATE TABLE
                         idx.ScriptDdl(col_strings, sp, !embedded, true);
-                        Diagnostics.TraceHelper.Assert(col_strings.Count != 0);
+                        Debug.Assert(col_strings.Count != 0);
 
                         if (embedded)
                         {
@@ -3025,7 +3022,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // as the second parameter has been abused to generate partial DDL
                         // to inject into the CREATE TABLE
                         idx.ScriptDdl(col_strings, sp, !embedded, true);
-                        Diagnostics.TraceHelper.Assert(col_strings.Count != 0);
+                        Debug.Assert(col_strings.Count != 0);
 
                         if (embedded)
                         {
@@ -3832,10 +3829,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (action == IndexEnableAction.Rebuild)
                 {
                     StringBuilder rebuildOptions = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-                    if (this.ServerVersion.Major >= 10)
-                    {
-                        ScriptRebuildOptions(rebuildOptions, new ScriptingPreferences(this));
-                    }
+                    ScriptRebuildOptions(rebuildOptions, new ScriptingPreferences(this));
                     if (rebuildOptions.Length > 0)
                     {
                         queries.Add(string.Format(SmoApplication.DefaultCulture, "ALTER INDEX ALL ON {0} REBUILD WITH ({1})",
@@ -3965,7 +3959,7 @@ namespace Microsoft.SqlServer.Management.Smo
             bool bWithScript = action != PropagateAction.Create;
             ArrayList propInfo = new ArrayList();
 
-            propInfo.Add(new PropagateInfo(ServerVersion.Major < 10 ? null : m_PhysicalPartitions, false, false));
+            propInfo.Add(new PropagateInfo(m_PhysicalPartitions, false, false));
             propInfo.Add(new PropagateInfo(Columns, bWithScript, true));
             propInfo.Add(new PropagateInfo(Statistics, true, Statistic.UrnSuffix));
 
@@ -4300,7 +4294,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (this.IsSupportedProperty(DistributionPropertyName))
                 {
-                    Diagnostics.TraceHelper.Assert(this.IsSupportedProperty(ShardingColumnPropertyName));
+                    Debug.Assert(this.IsSupportedProperty(ShardingColumnPropertyName));
                     Property distributionProperty = this.GetPropertyOptional(DistributionPropertyName);
                     Property shardingColProperty = this.GetPropertyOptional(ShardingColumnPropertyName);
 
@@ -4345,7 +4339,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // Either both remote schema and remote object proerties be used, or none.
                     if (this.IsSupportedProperty(RemoteSchemaPropertyName))
                     {
-                        Diagnostics.TraceHelper.Assert(this.IsSupportedProperty(RemoteObjectPropertyName));
+                        Debug.Assert(this.IsSupportedProperty(RemoteObjectPropertyName));
                         Property remoteSchemaProperty = this.GetPropertyOptional(RemoteSchemaPropertyName);
                         Property remoteObjectProperty = this.GetPropertyOptional(RemoteObjectPropertyName);
 
@@ -4511,8 +4505,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new string[] { nameof(HasCompressedPartitions), nameof(HasXmlCompressedPartitions) };
             }
-            else if ((version.Major > 9)
-                && (sp.TargetServerVersion > SqlServerVersion.Version90)
+            else if ((sp.TargetServerVersion > SqlServerVersion.Version90)
                 && (sp.Storage.DataCompression))
             {
                 return new string[] { nameof(HasCompressedPartitions) };
