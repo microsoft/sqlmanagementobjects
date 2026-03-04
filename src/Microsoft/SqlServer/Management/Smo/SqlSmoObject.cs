@@ -4282,6 +4282,11 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             yield return nameof(Database.DataRetentionEnabled);
                         }
+                        if (databaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance
+                            && databaseEngineEdition != DatabaseEngineEdition.SqlDatabase)
+                        {
+                            yield return nameof(Database.AutomaticIndexCompactionEnabled);
+                        }
                         if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
                         {
                             yield return nameof(Database.AutoClose);
@@ -6771,12 +6776,16 @@ namespace Microsoft.SqlServer.Management.Smo
                     return CompatibilityLevel.Version140;
                 case 15:
                     return CompatibilityLevel.Version150;
+                case 16:
+                    return CompatibilityLevel.Version160;
+                case 17:
+                    return CompatibilityLevel.Version170;
                 // VBUMP
                 //Forward Compatibility: An older version SSMS/Smo connecting to a future version sql server database engine.
                 //That is why if the ver(ServerVersion) is unknown, we need to set it according to the latest database engine available,
                 //so that all Latest-Version-Supported-Features in the Tools work seamlessly for the unknown future version database engines too.
                 default:
-                    return CompatibilityLevel.Version160;
+                    return CompatibilityLevel.Version180;
             }
         }
 
@@ -6892,6 +6901,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     return LocalizableResources.ServerSQLv160;
                 case 17:
                     return LocalizableResources.ServerSQLv170;
+                case 18:
+                    return LocalizableResources.ServerSQLv180;
                     // VBUMP
                 default:
                     return string.Empty;

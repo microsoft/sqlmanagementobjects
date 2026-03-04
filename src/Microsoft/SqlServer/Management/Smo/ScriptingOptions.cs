@@ -128,9 +128,11 @@ namespace Microsoft.SqlServer.Management.Smo
         Version160 = 10,
         [DisplayNameKey("ServerSQLv170")]
         Version170 = 11,
+        [DisplayNameKey("ServerSQLv180")]
+        Version180 = 12,
         // VBUMP
-        [DisplayNameKey("ServerSQLv170")]
-        VersionLatest = Version170,
+        [DisplayNameKey("ServerSQLv180")]
+        VersionLatest = Version180,
         // Set this to the oldest SQL Server version still under extended security support
         // https://learn.microsoft.com/lifecycle/faq/extended-security-updates#esu-availability-and-end-dates
         [DisplayNameKey("ServerSQL14")]
@@ -896,10 +898,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     return new ServerVersion(16, 0, 0);
                 case SqlServerVersion.Version170:
                     return new ServerVersion(17, 0, 0);
+                case SqlServerVersion.Version180:
+                    return new ServerVersion(18, 0, 0);
                     //VBUMP
                 default:
                     Debug.Fail("unexpected server version");
-                    return new ServerVersion(17, 0, 0);
+                    return new ServerVersion(18, 0, 0);
             }
         }
         /// <summary>
@@ -2353,8 +2357,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 case 16:
                     sqlSvrVersion = SqlServerVersion.Version160;
                     break;
-                case int n when n >= 17:
+                case 17:
                     sqlSvrVersion = SqlServerVersion.Version170;
+                    break;
+                case int n when n >= 18:
+                    sqlSvrVersion = SqlServerVersion.Version180;
                     break;
                 default:
                     // VBUMP

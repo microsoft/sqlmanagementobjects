@@ -3,6 +3,10 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 181.15.0
+
+- Fix bug when scripting ALTER USER for Windows Group users
+
 ## 181.12.0
 
 - Remove SQL Server 2005 and prior version support:

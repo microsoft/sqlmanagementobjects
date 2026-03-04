@@ -1020,6 +1020,10 @@ namespace Microsoft.SqlServer.Management.Smo
             if (null != propCompat.Value && (propCompat.Dirty || !sp.ScriptForAlter))
             {
                 // VBUMP
+                var isVersion180WithCompatLevelLessThan180 =
+                    (sp.TargetServerVersion == SqlServerVersion.Version180) &&
+                    ((int)(CompatibilityLevel)propCompat.Value <= 180);
+
                 var isVersion170WithCompatLevelLessThan170 =
                     (sp.TargetServerVersion == SqlServerVersion.Version170) &&
                     ((int)(CompatibilityLevel)propCompat.Value <= 170);
@@ -1070,6 +1074,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     isVersion150WithCompatLevelLessThan150 ||
                     isVersion160WithCompatLevelLessThan160 ||
                     isVersion170WithCompatLevelLessThan170 ||
+                    isVersion180WithCompatLevelLessThan180 ||
                     isTargetSqlAzureOrMIOrMIAA;
                     // VBUMP
 
@@ -6262,10 +6267,10 @@ SortedList list = new SortedList();
             }
 
             /// If at any point we attempt to run an alter command that would result in AcceleratedDatabaseRecovery (ADR)
-            /// being disabled while OptimizedLocking (OL) is enabled, we will get an error, as OL cannot be enabled without ADR.
+            /// being disabled while OptimizedLocking (OL) or AutomaticIndexCompaction (AIC) is enabled, we will get an error, as OL/AIC cannot be enabled without ADR.
             /// This means that when both features get enabled, ADR must be enabled first, whereas when both features 
-            /// get disabled, OL must be disabled first.
-            /// So we check if ADR is being disabled and in that case we process OL first, otherwise we process ADR first.
+            /// get disabled, OL/AIC must be disabled first.
+            /// So we check if ADR is being disabled and in that case we process OL/AIC first, otherwise we process ADR first.
             /// Of course there are more scenarios than just enabling/disabling them both simoultaneously, but in those cases
             /// the order is not going to make a difference. For instance, if ADR gets disabled while OL gets enabled, that will
             /// still result in an error no matter the order, but that behavior would be expected.
@@ -6274,13 +6279,16 @@ SortedList list = new SortedList();
                 && ! (bool)Properties.Get(nameof(AcceleratedRecoveryEnabled)).Value)
             {
                 ScriptAlterOptimizedLocking(sp, query, isAzureDb, targetEditionIsManagedServer);
+                ScriptAlterAutomaticIndexCompaction(sp, query);
                 ScriptAlterAcceleratedDatabaseRecovery(sp, query, isAzureDb, targetEditionIsManagedServer);
             } 
             else
             {
                 ScriptAlterAcceleratedDatabaseRecovery(sp, query, isAzureDb, targetEditionIsManagedServer);
                 ScriptAlterOptimizedLocking(sp, query, isAzureDb, targetEditionIsManagedServer);
+                ScriptAlterAutomaticIndexCompaction(sp, query);
             }
+
 
             ScriptAlterPropBool(nameof(DataRetentionEnabled), "DATA_RETENTION", sp, query, false);
         }
@@ -6322,6 +6330,14 @@ SortedList list = new SortedList();
             if (IsSupportedProperty(nameof(OptimizedLockingOn), sp) && !isAzureDb && !targetEditionIsManagedServer)
             {
                 ScriptAlterPropBool(nameof(OptimizedLockingOn), "OPTIMIZED_LOCKING", sp, query, true);
+            }
+        }
+
+        private void ScriptAlterAutomaticIndexCompaction(ScriptingPreferences sp, StringCollection query)
+        {
+            if (IsSupportedProperty(nameof(AutomaticIndexCompactionEnabled), sp))
+            {
+                ScriptAlterPropBool(nameof(AutomaticIndexCompactionEnabled), "AUTOMATIC_INDEX_COMPACTION", sp, query, true);
             }
         }
 

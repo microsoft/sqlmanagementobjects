@@ -5,6 +5,8 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
     <EnableLocalization>false</EnableLocalization>
+    <!-- Allow net8.0 test host to run on .NET 10+ runtime when .NET 8 runtime is not installed -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NewtonSoft.Json" />

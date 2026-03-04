@@ -14,11 +14,11 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             try
             {
-                return  base.GetObjectByName(name);
+                return base.GetObjectByName(name);
             }
-            catch (Microsoft.SqlServer.Management.Common.ConnectionFailureException cfe) 
+            catch (Microsoft.SqlServer.Management.Common.ConnectionFailureException cfe)
                    when (cfe.InnerException is SqlException ex && ex.Number == 4060)
-            {                  
+            {
                 Microsoft.SqlServer.Management.Diagnostics.TraceHelper.LogExCatch(cfe);
                 // this exception occurs if the user doesn't have access to 
                 //  the database with the input name

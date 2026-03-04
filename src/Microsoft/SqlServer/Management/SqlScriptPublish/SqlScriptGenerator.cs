@@ -11,7 +11,6 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
-using Microsoft.SqlServer.Management.Smo.Notebook;
 
 namespace Microsoft.SqlServer.Management.SqlScriptPublish
 {
@@ -20,6 +19,13 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
     /// </summary>
     public class SqlScriptGenerator
     {
+        /// <summary>
+        /// Global factory delegate for creating an ISmoScriptWriter that generates Notebook output.
+        /// Set this before using ScriptDestination.ToNotebook.
+        /// The delegate receives the output file path and returns an ISmoScriptWriter implementation.
+        /// </summary>
+        public static Func<string, ISmoScriptWriter> NotebookWriterFactory { get; set; }
+
         private SqlScriptPublishModel model;
         private SqlScriptOptions scriptOptions;
         private ScriptMaker scriptMaker;
@@ -181,7 +187,10 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     break;
 
                 case ScriptDestination.ToNotebook:
-                    (writer as NotebookFileWriter).Close();
+                    if (writer is IDisposable disposableWriter)
+                    {
+                        disposableWriter.Dispose();
+                    }
                     break;
 
             }
@@ -221,12 +230,11 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     break;
 
                 case ScriptDestination.ToNotebook:
-                    writer = new NotebookFileWriter(outputOptions.SaveFileName)
+                    if (NotebookWriterFactory == null)
                     {
-                        BatchTerminator = BatchTerminator,
-                        ScriptBatchTerminator = ScriptBatchTerminator,
-                        Indented = outputOptions.Indented
-                    };
+                        throw new InvalidOperationException(SR.ERROR_NotebookWriterNotRegistered);
+                    }
+                    writer = NotebookWriterFactory(outputOptions.SaveFileName);
                     break;
 
                 case ScriptDestination.ToCustomWriter:
@@ -389,7 +397,11 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             scriptingOptions.ScriptXmlCompression = SqlScriptOptions.ConvertBooleanTypeOptionToBoolean(this.scriptOptions.ScriptXmlCompressionOptions);
 
             // VBUMP
-            if (scriptOptions.ScriptCompatibilityOption == SqlScriptOptions.ScriptCompatibilityOptions.Script170Compat)
+            if (scriptOptions.ScriptCompatibilityOption == SqlScriptOptions.ScriptCompatibilityOptions.Script180Compat)
+            {
+                scriptingOptions.TargetServerVersion = SqlServerVersion.Version180;
+            }
+            else if (scriptOptions.ScriptCompatibilityOption == SqlScriptOptions.ScriptCompatibilityOptions.Script170Compat)
             {
                 scriptingOptions.TargetServerVersion = SqlServerVersion.Version170;
             }

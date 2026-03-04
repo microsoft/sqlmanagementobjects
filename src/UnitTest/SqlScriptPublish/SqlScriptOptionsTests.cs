@@ -89,8 +89,13 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
         [TestCategory("Unit")]
         public void Compat_verify_enum_attribute_versions()
         {
+            // Version 18
+            var attr = CompatibilityLevelSupportedVersionAttribute.GetAttributeForOption(ScriptCompatibilityOptions.Script180Compat);
+            Assert.That(attr.MinimumMajorVersion, Is.EqualTo(18));
+            Assert.That(attr.MinimumMinorVersion, Is.EqualTo(0));
+
             // Version 17
-            var attr = CompatibilityLevelSupportedVersionAttribute.GetAttributeForOption(ScriptCompatibilityOptions.Script170Compat);
+            attr = CompatibilityLevelSupportedVersionAttribute.GetAttributeForOption(ScriptCompatibilityOptions.Script170Compat);
             Assert.That(attr.MinimumMajorVersion, Is.EqualTo(17));
             Assert.That(attr.MinimumMinorVersion, Is.EqualTo(0));
 
@@ -144,8 +149,17 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
         [TestCategory("Unit")]
         public void Compat_GetOptionForVersion_returns_correct_options()
         {
+            // VBUMP
+            // Version 18
+            var option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(18);
+            Assert.That(option.Value, Is.EqualTo(ScriptCompatibilityOptions.Script180Compat));
+
+            // Version 19 - Non-existent version (update when VBUMP)
+            option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(19);
+            Assert.That(option, Is.Null);
+
             // Version 17
-            var option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(17);
+            option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(17);
             Assert.That(option.Value, Is.EqualTo(ScriptCompatibilityOptions.Script170Compat));
 
             // Version 16
@@ -188,10 +202,6 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
             option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(8);
             Assert.That(option, Is.Null);
 
-            // Version 18 - Non-existent version
-            option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(18);
-            Assert.That(option, Is.Null);
-
             // Edge case for minor version-handling
             option = CompatibilityLevelSupportedVersionAttribute.GetOptionForVersion(1, 50);
             Assert.That(option, Is.Null);
@@ -206,9 +216,15 @@ namespace Microsoft.SqlServer.Test.SqlScriptPublishTests
 
             var initialCount = optionsList.Count;
 
+            // VBUMP
+            // Version 18
+            optionsList = CompatibilityLevelSupportedVersionAttribute.FilterUnsupportedOptions(optionsList, 18, 0);
+            Assert.That(optionsList.Count, Is.EqualTo(initialCount));
+
             // Version 17
             optionsList = CompatibilityLevelSupportedVersionAttribute.FilterUnsupportedOptions(optionsList, 17, 0);
-            Assert.That(optionsList.Count, Is.EqualTo(initialCount));
+            Assert.That(optionsList.Count, Is.EqualTo(--initialCount));
+            Assert.That(optionsList, Does.Not.Contain(ScriptCompatibilityOptions.Script180Compat));
 
             // Version 16
             optionsList = CompatibilityLevelSupportedVersionAttribute.FilterUnsupportedOptions(optionsList, 16, 0);

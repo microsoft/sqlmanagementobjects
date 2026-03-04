@@ -113,7 +113,7 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         // VBUMP - use latest in-market
-        private SqlServerVersion m_eTargetServerVersion = SqlServerVersion.Version160;
+        private SqlServerVersion m_eTargetServerVersion = SqlServerVersion.Version170;
 
         /// <summary>
         /// The server version on which the scripts will run.
@@ -208,10 +208,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 case 17:
                     m_eTargetServerVersion = SqlServerVersion.Version170;
                     break;
+
+                case 18:
+                    m_eTargetServerVersion = SqlServerVersion.Version180;
+                    break;
                 // VBUMP
                 default:
-                    Debug.Fail($"Unknown server version {ver.Major}. Treating it as 17.");
-                    m_eTargetServerVersion = SqlServerVersion.Version170;
+                    Debug.Fail($"Unknown server version {ver.Major}. Treating it as 18.");
+                    m_eTargetServerVersion = SqlServerVersion.Version180;
                     break;
             }
         }

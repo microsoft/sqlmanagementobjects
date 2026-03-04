@@ -24,6 +24,7 @@ ServerSQL2017 = SQL Server 2017
 ServerSQLv150 = SQL Server 2019
 ServerSQLv160 = SQL Server 2022
 ServerSQLv170 = SQL Server 2025
+ServerSQLv180 = SQL Server vNext
 #VBUMP
 EngineCloud = Microsoft Azure SQL Database
 EngineCloudMI = Microsoft Azure SQL Managed Instance
@@ -224,6 +225,9 @@ Database_AutoCreateStatisticsEnabledDesc=Specifies whether statistics are automa
 Database_AutoCreateIncrementalStatisticsEnabledName=Auto Create Incremental Statistics Enabled
 Database_AutoCreateIncrementalStatisticsEnabledDesc=Specifies whether automatically created statistics for the database are incremental by default.
 
+Database_AutomaticIndexCompactionEnabledName=Automatic Index Compaction Enabled
+Database_AutomaticIndexCompactionEnabledDesc=Indicates whether Automatic Index Compaction is enabled.
+
 Database_AutoUpdateStatisticsEnabledName=Auto Update Statistics Enabled
 Database_AutoUpdateStatisticsEnabledDesc=Specifies whether statistics are automatically updated for the database.
 
@@ -404,7 +408,7 @@ Database_MirroringWitnessStatusDesc=The status of the mirroring witness server.
 Database_NameName=Name
 Database_NameDesc=The name of the database.
 
-Database_OptimizedLockingOn=Optimized Locking On
+Database_OptimizedLockingOnName=Optimized Locking On
 Database_OptimizedLockingOnDesc=Indicates whether Optimized Locking (OL) is on.
 
 Database_OwnerName=Owner
@@ -554,6 +558,7 @@ Database_RemoteDataArchiveLinkedServerDesc=Name of the linked server associated 
 Database_RemoteDatabaseNameName=Remote Database Name
 Database_RemoteDatabaseNameDesc=Name of the Remote Database.
 
+
 Database_RemoteDataArchiveCredentialName=Remote Data Archive Credential
 Database_RemoteDataArchiveCredentialDesc=Credential associated with the stretched database.
 
@@ -578,7 +583,7 @@ Database_UserAccessDesc=The database user access.
 Database_UserDataName=User Data
 Database_UserDataDesc=User-defined data associated with the referenced object.
 
-Datababase_DefaultFileStreamFileGroupName=DefaultFILESTREAMFileGroup
+Database_DefaultFileStreamFileGroupName=DefaultFILESTREAMFileGroup
 Database_DefaultFileStreamFileGroupDesc=Gets the filegroup name for the default FILESTREAM filegroup.
 
 Database_ChangeTrackingAutoCleanUpName=ChangeTrackingAutoCleanUp
@@ -980,9 +985,6 @@ Table_DurabilityName=Durability
 Table_DurabilityDesc=Gets or sets the value that specifies whether the data stored in the table is recoverable.
 
 ######  Begin Server Settings
-ISettings_Name=Server Settings
-ISettings_Desc=Exposes properties of the Server regarding settings for the server.
-
 Settings_AuditLevelName=Audit Level
 Settings_AuditLevelDesc=Gets or sets the audit level for the instance of Microsoft SQL Server.
 
@@ -994,9 +996,6 @@ Settings_DefaultFileDesc=Gets or sets the default data file directory for the in
 
 Settings_DefaultLogName=Default Log
 Settings_DefaultLogDesc=Gets or sets the default log file directory for the instance of Microsoft SQL Server.
-
-Settings_ImpersonateClientName=Impersonate Client
-Settings_ImpersonateClientDesc=Gets or sets the Boolean property value that specifies whether xp_cmdshell runs in the security context of the client connection or SQL Server Agent.
 
 Settings_LoginModeName=Login Mode
 Settings_LoginModeDesc=Gets or sets the logon mode for Microsoft SQL Server.
@@ -1011,190 +1010,6 @@ Settings_ParentName=Parent
 Settings_ParentDesc=Gets the Server object that is the parent of the Settings object.
 
 ########## End Server Settings
-
-########## Begin Server Configuration
-ServerConfiguration_Name=Server Configuration
-ServerConfiguration_Desc=Exposes properties of the Server regarding the configuration settings of the server.
-
-ServerConfiguration_ContainmentEnabledName=Containment Enabled
-ServerConfiguration_ContainmentEnabledDesc=Gets or sets whether contained databases and authentication is enabled on this instance of SQL Server.
-
-ServerConfiguration_AdHocDistributedQueriesEnabledName=AdHoc Distributed Queries Enabled
-ServerConfiguration_AdHocDistributedQueriesEnabledDesc=Gets the ConfigProperty object that is used to set the ad hoc distributed queries configuration option.
-
-ServerConfiguration_Affinity64MaskName=Affinity 64 Mask
-ServerConfiguration_Affinity64MaskDesc=Gets the ConfigProperty object that is used to set the affinity 64 mask configuration option.
-
-ServerConfiguration_AffinityIOMaskName=Affinity IO Mask
-ServerConfiguration_AffinityIOMaskDesc=Gets the ConfigProperty object that is used to set the affinity IO mask configuration option.
-
-ServerConfiguration_AffinityMaskName=Affinity Mask
-ServerConfiguration_AffinityMaskDesc=Gets the ConfigProperty object that is used to set the affinity mask configuration option.
-
-ServerConfiguration_AgentXPsEnabledName=Agent XPs Enabled
-ServerConfiguration_AgentXPsEnabledDesc=Gets the ConfigProperty object that is used to set the agent XPs enabled configuration option.
-
-ServerConfiguration_AllowedHttpSessionsName=Allowed Http Sessions
-ServerConfiguration_AllowedHttpSessionsDesc=Gets the ConfigProperty object that is used to set the allowed HTTP sessions configuration option.
-
-ServerConfiguration_AllowUpdatesName=Allow Updates
-ServerConfiguration_AllowUpdatesDesc=Gets the ConfigProperty object that is used to set the allow updates configuration option.
-
-ServerConfiguration_AweEnabledName=Awe Enabled
-ServerConfiguration_AweEnabledDesc=Gets the ConfigProperty object that is used to set the AWE enabled configuration option.
-
-ServerConfiguration_C2AuditModeName=C2 Audit Mode
-ServerConfiguration_C2AuditModeDesc=Gets the ConfigProperty object that is used to set the C2 audit mode configuration option.
-
-ServerConfiguration_CostThresholdForParallelismName=Cost Threshold For Parallelism
-ServerConfiguration_CostThresholdForParallelismDesc=Gets the ConfigProperty object that is used to set the cost threshold for parallelism configuration option.
-
-ServerConfiguration_CrossDBOwnershipChainingName=Cross DB Ownership Chaining
-ServerConfiguration_CrossDBOwnershipChainingDesc=Gets the ConfigProperty object that is used to set the cross DB ownership chaining configuration option.
-
-ServerConfiguration_CursorThresholdName=Cursor Threshold
-ServerConfiguration_CursorThresholdDesc=Gets the ConfigProperty object that is used to set the cursor threshold configuration option.
-
-ServerConfiguration_DatabaseMailEnabledName=DatabaseMail Enabled
-ServerConfiguration_DatabaseMailEnabledDesc=Gets the ConfigProperty object that is used to set the database mail enabled configuration option.
-
-ServerConfiguration_DefaultFullTextLanguageName=Default FullText Language
-ServerConfiguration_DefaultFullTextLanguageDesc=Gets the ConfigProperty object that is used to set default full text language configuration option.
-
-ServerConfiguration_DefaultLanguageName=Default Language
-ServerConfiguration_DefaultLanguageDesc=Gets the ConfigProperty object that is used to set the default language configuration option.
-
-ServerConfiguration_FilestreamAccessLevelName= FILESTREAM Access Level
-ServerConfiguration_FilestreamAccessLevelDesc=Gets the FILESTREAM access level.
-
-ServerConfiguration_FillFactorName=Fill Factor
-ServerConfiguration_FillFactorDesc=Gets the ConfigProperty object that is used to set the fill factor configuration option.
-
-ServerConfiguration_HttpConnectionIdleMaximumTimeName=Http Connection Idle Maximum Time
-ServerConfiguration_HttpConnectionIdleMaximumTimeDesc=Gets the ConfigProperty object that is used to set the HTTP connection idle maximum time configuration option.
-
-ServerConfiguration_HttpSessionIdleMaximumTimeName=Http Session Idle Maximum Time
-ServerConfiguration_HttpSessionIdleMaximumTimeDesc=Gets the ConfigProperty object that is used to set the HTTP session idle maximum time configuration option.
-
-ServerConfiguration_IndexCreateMemoryName=Index Create Memory
-ServerConfiguration_IndexCreateMemoryDesc=Gets the ConfigProperty object that is used to set the index create memory configuration option.
-
-ServerConfiguration_IsSqlClrEnabledName=Is SqlClr Enabled
-ServerConfiguration_IsSqlClrEnabledDesc=Gets the ConfigProperty object that is used to set the is SQL CLR enabled configuration option.
-
-ServerConfiguration_LightweightPoolingName=Light weight Pooling
-ServerConfiguration_LightweightPoolingDesc=Gets the ConfigProperty object that is used to set the lightweight pooling configuration option.
-
-ServerConfiguration_LocksName=Locks
-ServerConfiguration_LocksDesc=Gets the ConfigProperty object that is used to set the locks configuration option.
-
-ServerConfiguration_MaxDegreeOfParallelismName=Max Degree Of Parallelism
-ServerConfiguration_MaxDegreeOfParallelismDesc=Gets the ConfigProperty object that is used to set the max degree of parallelism configuration option.
-
-ServerConfiguration_MaxServerMemoryName=Max Server Memory
-ServerConfiguration_MaxServerMemoryDesc=Gets the ConfigProperty object that is used to set the max server memory configuration option.
-
-ServerConfiguration_MaxWorkerThreadsName=Max Worker Threads
-ServerConfiguration_MaxWorkerThreadsDesc=Gets the ConfigProperty object that is used to set the max worker threads configuration option.
-
-ServerConfiguration_MediaRetentionName=Media Retention
-ServerConfiguration_MediaRetentionDesc=Gets the ConfigProperty object that is used to set the media retention configuration option.
-
-ServerConfiguration_MinMemoryPerQueryName=Min Memory Per Query
-ServerConfiguration_MinMemoryPerQueryDesc=Gets the ConfigProperty object that is used to set the min memory per query configuration option.
-
-ServerConfiguration_OptimizeAdhocWorkloadsName= Optimize for Ad hoc Workloads
-ServerConfiguration_OptimizeAdhocWorkloadsDesc=When this option is set, plan cache size is further reduced for single-use adhoc OLTP workload.
-
-ServerConfiguration_MinServerMemoryName=Min Server Memory
-ServerConfiguration_MinServerMemoryDesc=Gets the ConfigProperty object that is used to set the min server memory configuration option.
-
-ServerConfiguration_NestedTriggersName=Nested Triggers
-ServerConfiguration_NestedTriggersDesc=Gets the ConfigProperty object that is used to set the nested triggers configuration option.
-
-ServerConfiguration_NetworkPacketSizeName=Network Packet Size
-ServerConfiguration_NetworkPacketSizeDesc=Gets the ConfigProperty object that is used to set the network packet size configuration option.
-
-ServerConfiguration_OleAutomationProceduresEnabledName=Ole Automation Procedures Enabled
-ServerConfiguration_OleAutomationProceduresEnabledDesc=Gets the ConfigProperty object that is used to set the OLE automation procedures enabled configuration option.
-
-ServerConfiguration_OpenObjectsName=Open Objects
-ServerConfiguration_OpenObjectsDesc=Gets the ConfigProperty object that is used to set the open objects configuration option.
-
-ServerConfiguration_PrecomputeRankName=Precompute Rank
-ServerConfiguration_PrecomputeRankDesc=Gets the ConfigProperty object that is used to set the precompute rank configuration option.
-
-ServerConfiguration_PriorityBoostName=Priority Boost
-ServerConfiguration_PriorityBoostDesc=Gets the ConfigProperty object that is used to set the priority boost configuration option.
-
-ServerConfiguration_ProtocolHandlerTimeoutName=Protocol Handler Timeout
-ServerConfiguration_ProtocolHandlerTimeoutDesc=Gets the ConfigProperty object that is used to set the protocol handler timeoutconfiguration option.
-
-ServerConfiguration_QueryGovernorCostLimitName=Query Governor Cost Limit
-ServerConfiguration_QueryGovernorCostLimitDesc=Gets the ConfigProperty object that is used to set the query governor cost limit option.
-
-ServerConfiguration_QueryWaitName=Query Wait
-ServerConfiguration_QueryWaitDesc=Gets the ConfigProperty object that is used to set the query wait configuration option.
-
-ServerConfiguration_RecoveryIntervalName=Recovery Interval
-ServerConfiguration_RecoveryIntervalDesc=Gets the ConfigProperty object that is used to set the recovery interval configuration option.
-
-ServerConfiguration_RemoteAccessName=Remote Access
-ServerConfiguration_RemoteAccessDesc=Gets the ConfigProperty object that is used to set the remote access configuration option.
-
-ServerConfiguration_RemoteDacConnectionsEnabledName=Remote Dac Connections Enabled
-ServerConfiguration_RemoteDacConnectionsEnabledDesc=Gets the ConfigProperty object that is used to set the remote DAC connections enabled configuration option.
-
-ServerConfiguration_RemoteLoginTimeoutName=Remote Login Timeout
-ServerConfiguration_RemoteLoginTimeoutDesc=Gets the ConfigProperty object that is used to set the remote login timeout configuration option.
-
-ServerConfiguration_RemoteProcTransName=Remote Proc Trans
-ServerConfiguration_RemoteProcTransDesc=Gets the ConfigProperty object that is used to set the remote proc trans configuration option.
-
-ServerConfiguration_RemoteQueryTimeoutName=Remote Query Timeout
-ServerConfiguration_RemoteQueryTimeoutDesc=Gets the ConfigProperty object that is used to set the remote query timeout configuration option.
-
-ServerConfiguration_ReplicationMaxTextSizeName=Replication Max Text Size
-ServerConfiguration_ReplicationMaxTextSizeDesc=Gets the ConfigProperty object that is used to set the replication max text size configuration option.
-
-ServerConfiguration_ReplicationXPsEnabledName=Replication XPs Enabled
-ServerConfiguration_ReplicationXPsEnabledDesc=Gets the ConfigProperty object that is used to set the replication XPs enabled configuration option.
-
-ServerConfiguration_ScanForStartupProceduresName=Scan For Startup Procedures
-ServerConfiguration_ScanForStartupProceduresDesc=Gets the ConfigProperty object that is used to set the scan for startup procedures configuration option.
-
-ServerConfiguration_SetWorkingSetSizeName=Set Working Set Size
-ServerConfiguration_SetWorkingSetSizeDesc=Gets the ConfigProperty object that is used to set the set working set size configuration option.
-
-ServerConfiguration_ShowAdvancedOptionsName=Show Advanced Options
-ServerConfiguration_ShowAdvancedOptionsDesc=Gets the ConfigProperty object that is used to set the show advanced options configuration option.
-
-ServerConfiguration_SmoAndDmoXPsEnabledName=Smo And Dmo XPs Enabled
-ServerConfiguration_SmoAndDmoXPsEnabledDesc=Gets the ConfigProperty object that is used to set the SMO and DMO XPs enabled configuration option.
-
-ServerConfiguration_SqlMailXPsEnabledName=SqlMail XP sEnabled
-ServerConfiguration_SqlMailXPsEnabledDesc=Gets the ConfigProperty object that is used to set the SQL mail XPs enabled configuration option.
-
-ServerConfiguration_TransformNoiseWordsName=Transform Noise Words
-ServerConfiguration_TransformNoiseWordsDesc=Gets the ConfigProperty object that is used to set the transform noise words configuration option.
-
-ServerConfiguration_TwoDigitYearCutoffName=Two Digit Year Cut off
-ServerConfiguration_TwoDigitYearCutoffDesc=Gets the ConfigProperty object that is used to set the two digit year cutoff configuration option.
-
-ServerConfiguration_UserConnectionsName=User Connections
-ServerConfiguration_UserConnectionsDesc=Gets the ConfigProperty object that is used to set the user connections configuration option.
-
-ServerConfiguration_UserOptionsName=User Options
-ServerConfiguration_UserOptionsDesc=Gets the ConfigProperty object that is used to set the user options configuration option.
-
-ServerConfiguration_WebXPsEnabledName=Web XPs Enabled
-ServerConfiguration_WebXPsEnabledDesc=Gets the ConfigProperty object that is used to set the web XPs enabled configuration option.
-
-ServerConfiguration_XPCmdShellEnabledName=XPCmdShell Enabled
-ServerConfiguration_XPCmdShellEnabledDesc=Gets the ConfigProperty object that is used to set the XP cmd shell enabled configuration option.
-
-
-###### End ServerConfiguration
 
 
 ###### Begin Login
@@ -1454,12 +1269,6 @@ Index_OptimizeForArraySearchDesc=Gets or sets whether the JSON index is optimize
 ####### Begin IndexedJsonPath
 IndexedJsonPath_PathName=Path
 IndexedJsonPath_PathDesc=Gets or sets the JSON path expression for the indexed path.
-
-IndexedJsonPath_TableIDName=Table ID
-IndexedJsonPath_TableIDDesc=Gets the ID of the table that contains the index.
-
-IndexedJsonPath_IndexIDName=Index ID
-IndexedJsonPath_IndexIDDesc=Gets the ID of the index that contains this path.
 
 ####### End IndexedJsonPath
 
@@ -2135,7 +1944,7 @@ Table_HasXmlCompressedPartitionsDesc=Gets the Boolean value that indicates wheth
 Table_IsVarDecimalStorageFormatEnabledName=Is Var Decimal Storage Format Enabled
 Table_IsVarDecimalStorageFormatEnabledDesc=Gets the Boolean value that indicates whether var decimal storage is enabled.
 
-Table_AnsiNulAnsiNullsStatusName=Ansi Nulls Status
+Table_AnsiNullsStatusName=ANSI Nulls Status
 Table_AnsiNullsStatusDesc=Gets the Boolean property value that specifies whether SQL-92 NULL handling is enabled on the table.
 
 Table_ChangeTrackingEnabledName=ChangeTrackingEnabled
@@ -2156,7 +1965,7 @@ Table_DataRetentionPeriodDesc =The length of time to retain data in the table.
 Table_DataRetentionPeriodUnitName =Data Retention Period Unit
 Table_DataRetentionPeriodUnitDesc =The unit of time to retain data in the table (DAY, WEEK, MONTH, YEAR, INFINITE).
 
-Table_DataRetentionFilterColumnName =Data Retention Filter Column Name
+Table_DataRetentionFilterColumnNameName =Data Retention Filter Column Name
 Table_DataRetentionFilterColumnNameDesc =The name of the column used to filter rows for data retention.
 
 Table_DateLastModifiedName=Date Last Modified
@@ -2273,9 +2082,6 @@ Table_QuotedIdentifierStatusDesc=Gets or sets a Boolean property value that spec
 Table_RemoteDataArchiveEnabledName=Remote Data Archive Enabled
 Table_RemoteDataArchiveEnabledDesc=Whether Remote Data Archive is enabled for the table.
 
-Table_RemoteDataArchiveMigrationEnabledName=Remote Data Archive Migration Enabled
-Table_RemoteDataArchiveMigrationEnabledDesc=Whether Remote Data Archive Migration is enabled for the table.
-
 Table_RemoteDataArchiveDataMigrationStateName=Remote Data Archive Migration State
 Table_RemoteDataArchiveDataMigrationStateDesc=Migration state of Remote Data Archive for the table.
 
@@ -2288,14 +2094,8 @@ Table_RemoteObjectNameDesc=For external tables over a SHARD_MAP_MANAGER external
 Table_RemoteTableNameName=Remote Table Name
 Table_RemoteTableNameDesc=Remote table name for the stretched table.
 
-Table_RemoteDataArchiveMigratedRowCountName=Remote Data Archive Migrated Row Count
-Table_RemoteDataArchiveMigratedRowCountDesc=Number of rows of the table migrated to remote table.
-
 Table_RemoteSchemaNameName=Remote Schema Name
 Table_RemoteSchemaNameDesc=For external tables over a SHARD_MAP_MANAGER external data source, this is the schema where the base table is located on the remote databases (if different from the schema where the external table is defined).
-
-Table_RemoteTableSizeName=Remote Table Size
-Table_RemoteTableSizeDesc=Size of the stretched table.
 
 Table_RemoteTableProvisionedName=Remote Table Provisioned
 Table_RemoteTableProvisionedDesc=Whether Remote Table provisioning is complete for the table.
@@ -2458,6 +2258,7 @@ Server_BrowserServiceAccountDesc=Gets the service account name for the SQL Serve
 Server_NamedPipesEnabledName=Named Pipes Enabled
 Server_NamedPipesEnabledDesc=Boolean value that specifies whether the Named Pipes protocol is enabled.
 
+Server_TcpEnabledName=TCP/IP Protocol Enabled
 Server_TcpIpProtocolEnabledName=TCP/IP Protocol Enabled
 Server_TcpEnabledDesc=Boolean value that specifies whether the TCP/IP protocol is enabled.
 
@@ -2473,7 +2274,7 @@ Server_ServiceStartModeDesc=Get the SQL Server service startup type.
 Server_InstanceIdName=Instance Identifier
 Server_InstanceIdDesc=Get the Instance ID that specifies the installation location for the server components.
 
-SServer_FilestreamLevelName=FILESTREAM Level
+Server_FilestreamLevelName=FILESTREAM Level
 Server_FilestreamLevelDesc=Gets the enabled level of FILESTREAM.
 
 Server_FilestreamShareNameName=FILESTREAM Share Name
@@ -2590,9 +2391,6 @@ Server_DefaultFileDesc=Gets or sets the default data file directory for the inst
 
 Server_DefaultLogName=Default Log
 Server_DefaultLogDesc=Gets or sets the default log file directory for the instance of Microsoft SQL Server.
-
-Server_ImpersonateClientName=Impersonate Client
-Server_ImpersonateClientDesc=Gets or sets the Boolean property value that specifies whether xp_cmdshell runs in the security context of the client connection or SQL Server Agent.
 
 Server_LoginModeName=Login Mode
 Server_LoginModeDesc=Gets or sets the logon mode for Microsoft SQL Server.

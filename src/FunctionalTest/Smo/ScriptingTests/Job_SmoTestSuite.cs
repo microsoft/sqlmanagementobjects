@@ -7,11 +7,14 @@ using System.Data.SqlClient;
 #endif
 
 using System;
+using System.Collections.Generic;
 using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo.Agent;
 using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using _SMO = Microsoft.SqlServer.Management.Smo;
+using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
 namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
@@ -66,6 +69,79 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                             job.Drop();
                         }
                         throw;
+                    }
+                });
+        }
+
+        /// <summary>
+        /// Tests that scripting multiple jobs with AgentJobId=false uses @job_name in sp_delete_job
+        /// and @job_id in sp_add_jobstep.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.Express, DatabaseEngineEdition.SqlOnDemand)]
+        public void SmoScripter_AgentJobIdFalse_EmitsJobNameInDeleteJob()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    var server = database.Parent;
+                    var jobs = new System.Collections.Generic.List<_SMO.Agent.Job>();
+
+                    try
+                    {
+                        // Create two test jobs, each with one step
+                        for (int i = 0; i < 2; i++)
+                        {
+                            var job = new _SMO.Agent.Job(server.JobServer,
+                                GenerateUniqueSmoObjectName("job"));
+                            job.Create();
+
+                            var step = new _SMO.Agent.JobStep(job, "Step1");
+                            step.Command = "SELECT 1";
+                            step.SubSystem = _SMO.Agent.AgentSubSystem.TransactSql;
+                            step.Create();
+
+                            jobs.Add(job);
+                        }
+
+                        // Configure the scripter
+                        var scripter = new _SMO.Scripter(server);
+                        scripter.Options.ScriptDrops = false;
+                        scripter.Options.WithDependencies = false;
+                        scripter.Options.IncludeHeaders = true;
+                        scripter.Options.AppendToFile = true;
+                        scripter.Options.AgentJobId = false;
+
+                        // Test each job
+                        foreach (var job in jobs)
+                        {
+                            // Script with ScriptDrops = true and verify sp_delete_job uses @job_name
+                            scripter.Options.ScriptDrops = true;
+                            var deleteScripts = scripter.Script(new Urn[] { job.Urn });
+
+                            Assert.That(deleteScripts, Has.Some.Matches<string>(line =>
+                                line.Contains("msdb.dbo.sp_delete_job") && line.Contains($"@job_name=N'{job.Name}'")),
+                                $"Expected sp_delete_job with @job_name=N'{job.Name}' in delete scripts");
+
+                            // Script with ScriptDrops = false and verify sp_add_jobstep uses @job_id
+                            scripter.Options.ScriptDrops = false;
+                            var createScripts = scripter.Script(new Urn[] { job.Urn });
+
+                            Assert.That(createScripts, Has.Some.Matches<string>(line =>
+                                line.Contains("msdb.dbo.sp_add_jobstep") && line.Contains("@job_id=@jobId")),
+                                "Expected sp_add_jobstep with @job_id=@jobId in create scripts");
+                        }
+                    }
+                    finally
+                    {
+                        // Cleanup: drop all test jobs
+                        foreach (var job in jobs)
+                        {
+                            if (job.State == _SMO.SqlSmoState.Existing)
+                            {
+                                job.Drop();
+                            }
+                        }
                     }
                 });
         }

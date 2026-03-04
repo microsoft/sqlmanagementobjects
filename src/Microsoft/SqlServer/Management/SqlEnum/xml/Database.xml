@@ -61,7 +61,11 @@
       <property_link fields="#PersistentVersionStoreFileGroup#PersistentVersionStoreSizeKB#" 
              left_join="#pvsfilegroups as pfg">pfg.database_id = dtb.database_id</property_link>
     </version>
-    <!-- Prefix and post fix fields will be defined after all the table and field links are defined-->
+    <version  min_major='17' cloud_min_major='12'>
+      <property_link fields="#AutomaticIndexCompactionEnabled#"
+             left_join="#aictemp as aic">aic.database_id = dtb.database_id</property_link>
+    </version>
+          <!-- Prefix and post fix fields will be defined after all the table and field links are defined-->
     <version cloud_min_major='12'>
       <!-- sys.database_service_objectives may fail sometimes and raise an exception. We only return master in that case.
       When the query is run in a user database, sys.database_service_objectives doesn't return a row for master.
@@ -124,6 +128,17 @@
         </prefix>
     </version>
 
+    <version min_major="17" cloud_min_major="12">
+        <!-- AutomaticIndexCompaction is only supported on Azure SQL Database and Azure SQL Managed Instance-->
+        <prefix fields='#AutomaticIndexCompactionEnabled#'>
+              create table #aictemp (database_id int primary key, is_automatic_index_compaction_on bit)
+              if (((SERVERPROPERTY('EngineEdition') = 8 AND SERVERPROPERTY('ProductUpdateType') = 'Continuous')) OR SERVERPROPERTY('EngineEdition') = 5)
+              BEGIN
+              exec sp_executesql N'insert into #aictemp (database_id, is_automatic_index_compaction_on) select d.database_id, d.is_automatic_index_compaction_on from sys.databases d'
+              END
+        </prefix>
+    </version>
+
     <version min_major='10'>
 
       <prefix fields="#IsVarDecimalStorageFormatEnabled#">
@@ -142,6 +157,12 @@
       </postfix>
       <postfix fields="#LastBackupDate#LastDifferentialBackupDate#LastLogBackupDate#">
         drop table #tempbackup
+      </postfix>
+    </version>
+
+    <version min_major="17" cloud_min_major="12">
+      <postfix fields='#AutomaticIndexCompactionEnabled#'>
+              drop table #aictemp
       </postfix>
     </version>
 
@@ -614,6 +635,12 @@
     </version>
     <version min_major="7" datawarehouse_enabled='true'>
       <property name="IsFabricDatabase" type="bit" cast="true" access="read" expensive="true">0</property>
+    </version>
+
+    <version min_major="17" cloud_min_major="12">
+      <property name="AutomaticIndexCompactionEnabled" type="bit" cast="true">
+              ISNULL(aic.is_automatic_index_compaction_on, 0)
+      </property>
     </version>
   </properties>
 

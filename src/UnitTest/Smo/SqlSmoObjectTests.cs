@@ -121,6 +121,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     "AutoClose",
                     "AutoCreateIncrementalStatisticsEnabled",
                     "AutoCreateStatisticsEnabled",
+                    nameof(Database.AutomaticIndexCompactionEnabled),
                     "AutoUpdateStatisticsAsync",
                     "AutoUpdateStatisticsEnabled",
                     "BrokerEnabled",

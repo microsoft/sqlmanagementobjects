@@ -315,6 +315,83 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 }
             }
         }
+
+        /// <summary>
+        /// Tests that scripting a stored procedure with CR newline in comment preserves the TextBody after round-trip.
+        /// Regression test for DDL text parser handling different newline characters.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        public void SmoStoredProcedure_ScriptWithCRNewlineInComment()
+        {
+            VerifyScriptStoredProcedureWithNewline("\r");
+        }
+
+        /// <summary>
+        /// Tests that scripting a stored procedure with LF newline in comment preserves the TextBody after round-trip.
+        /// Regression test for DDL text parser handling different newline characters.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        public void SmoStoredProcedure_ScriptWithLFNewlineInComment()
+        {
+            VerifyScriptStoredProcedureWithNewline("\n");
+        }
+
+        /// <summary>
+        /// Tests that scripting a stored procedure with CRLF newline in comment preserves the TextBody after round-trip.
+        /// Regression test for DDL text parser handling different newline characters.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        public void SmoStoredProcedure_ScriptWithCRLFNewlineInComment()
+        {
+            VerifyScriptStoredProcedureWithNewline("\r\n");
+        }
+
+        /// <summary>
+        /// Helper method to verify that scripting a stored procedure with a specific newline character
+        /// in a comment header preserves the TextBody after script round-trip.
+        /// </summary>
+        /// <param name="newline">The newline character(s) to test (e.g., "\r", "\n", "\r\n")</param>
+        private void VerifyScriptStoredProcedureWithNewline(string newline)
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+            {
+                string procName = GenerateUniqueSmoObjectName("proc");
+                string textBody = "BEGIN SELECT 1 END";
+                string createSql = string.Format("--Comment{0}CREATE PROCEDURE {1} AS\n{2}", newline, _SMO.SqlSmoObject.MakeSqlBraket(procName), textBody);
+
+                // Create the proc via T-SQL (not SMO) to preserve exact newlines
+                database.ExecuteNonQuery(createSql);
+
+                // Retrieve via SMO
+                database.StoredProcedures.Refresh();
+                var proc = database.StoredProcedures[procName];
+                Assert.IsNotNull(proc, "Stored procedure should exist");
+
+                // Script it with options to avoid database context
+                StringCollection scripts = proc.Script(new _SMO.ScriptingOptions { IncludeDatabaseContext = false });
+
+                // Drop and re-create from script
+                proc.Drop();
+                foreach (string script in scripts)
+                {
+                    database.ExecuteNonQuery(script);
+                }
+
+                // Verify round-trip
+                database.StoredProcedures.Refresh();
+                proc = database.StoredProcedures[procName];
+                Assert.IsNotNull(proc, "Stored procedure should be re-created from script");
+                proc.Refresh();
+                Assert.That(proc.TextBody.Trim(), Is.EqualTo(textBody),
+                    "TextBody should be preserved after script round-trip");
+
+                // Cleanup
+                proc.Drop();
+            });
+        }
     }
  #endregion
 }

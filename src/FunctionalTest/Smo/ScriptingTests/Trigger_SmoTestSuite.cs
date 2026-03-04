@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+using System.Collections.Specialized;
+using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo.Agent;
 using Microsoft.SqlServer.Test.Manageability.Utils;
@@ -144,6 +146,151 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     Assert.That(e.Message, Does.Contain(string.Format("CreateOrAlter failed for Trigger '{0}'.", trigger.Name)), "Unexpected error message.");
                 });
         }
+
+        /// <summary>
+        /// Tests that creating a DML trigger via SMO results in an enabled trigger.
+        /// Verifies the IsEnabled property reflects the correct state.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        public void SmoTrigger_CreateDmlTrigger_IsEnabled()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Create a table
+                    var table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1"));
+
+                    // Create a trigger using SMO
+                    var trigger = new _SMO.Trigger(table, GenerateSmoObjectName("trg"));
+                    trigger.TextMode = false;
+                    trigger.Insert = true;
+                    trigger.Update = true;
+                    trigger.TextBody = "RAISERROR('Trigger fired', 1, 1)";
+                    trigger.ImplementationType = _SMO.ImplementationType.TransactSql;
+                    trigger.Create();
+
+                    // Refresh and verify
+                    table.Triggers.Refresh();
+                    var createdTrigger = table.Triggers[trigger.Name];
+                    Assert.IsNotNull(createdTrigger, "Trigger should exist");
+                    Assert.That(createdTrigger.IsEnabled, Is.True, "Trigger should be enabled after creation");
+                });
+        }
+
+        /// <summary>
+        /// Tests that scripting a disabled DML trigger at the trigger level produces a script with DISABLE TRIGGER.
+        /// Verifies that dropping and re-creating the trigger from the script preserves the disabled state.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        public void SmoTrigger_ScriptDisabledTrigger_RoundTrip()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Create a table with a column
+                    var tableName = GenerateSmoObjectName("tbl");
+                    var table = database.CreateTable(tableName, new ColumnProperties("c1"));
+
+                    // Create a DML trigger via T-SQL
+                    var triggerName = GenerateSmoObjectName("trg");
+                    database.ExecuteNonQuery(
+                        $"CREATE TRIGGER {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(triggerName)} ON {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(table.Name)} AFTER INSERT AS BEGIN SET NOCOUNT ON; END");
+
+                    // Disable the trigger via T-SQL
+                    database.ExecuteNonQuery($"DISABLE TRIGGER {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(triggerName)} ON {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(table.Name)}");
+
+                    // Retrieve via SMO and script at the trigger level
+                    table.Triggers.Refresh();
+                    var smoTrigger = table.Triggers[triggerName];
+                    Assert.IsNotNull(smoTrigger, "Trigger should exist");
+                    Assert.That(smoTrigger.IsEnabled, Is.False, "Trigger should be disabled");
+
+                    var scripts = smoTrigger.Script(new _SMO.ScriptingOptions { IncludeDatabaseContext = false });
+
+                    // Verify script contains DISABLE TRIGGER
+                    var scriptText = string.Join("\n", scripts.Cast<string>());
+                    Assert.That(scriptText, Does.Contain("DISABLE TRIGGER"),
+                        "Script should contain DISABLE TRIGGER statement");
+
+                    // Drop the trigger
+                    smoTrigger.Drop();
+                    table.Triggers.Refresh();
+                    Assert.IsNull(table.Triggers[triggerName], "Trigger should be dropped");
+
+                    // Re-create from scripts
+                    foreach (string script in scripts)
+                    {
+                        database.ExecuteNonQuery(script);
+                    }
+
+                    // Verify the re-created trigger is disabled
+                    table.Triggers.Refresh();
+                    var recreated = table.Triggers[triggerName];
+                    Assert.IsNotNull(recreated, "Trigger should be re-created from script");
+                    Assert.That(recreated.IsEnabled, Is.False,
+                        "Trigger should be disabled after round-trip from script");
+                });
+        }
+
+        /// <summary>
+        /// Tests that scripting a table with a disabled DML trigger (at the table level with Triggers=true)
+        /// produces a script with DISABLE TRIGGER. Verifies that dropping and re-creating the table from
+        /// the script preserves the disabled trigger state.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        public void SmoTrigger_ScriptTableWithDisabledTrigger_RoundTrip()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Create a table with a column
+                    var tableName = GenerateSmoObjectName("tbl");
+                    var table = database.CreateTable(tableName, new ColumnProperties("c1"));
+
+                    // Create a DML trigger via T-SQL
+                    var triggerName = GenerateSmoObjectName("trg");
+                    database.ExecuteNonQuery(
+                        $"CREATE TRIGGER {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(triggerName)} ON {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(table.Name)} AFTER INSERT AS BEGIN SET NOCOUNT ON; END");
+
+                    // Disable the trigger via T-SQL
+                    database.ExecuteNonQuery($"DISABLE TRIGGER {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(triggerName)} ON {_SMO.SqlSmoObject.MakeSqlBraket("dbo")}.{_SMO.SqlSmoObject.MakeSqlBraket(table.Name)}");
+
+                    // Retrieve via SMO and script at the table level with Triggers=true
+                    database.Tables.Refresh();
+                    var smoTable = database.Tables[table.Name];
+                    Assert.IsNotNull(smoTable, "Table should exist");
+
+                    var scripts = smoTable.Script(new _SMO.ScriptingOptions { Triggers = true, IncludeDatabaseContext = false });
+
+                    // Verify script contains DISABLE TRIGGER
+                    var scriptText = string.Join("\n", scripts.Cast<string>());
+                    Assert.That(scriptText, Does.Contain("DISABLE TRIGGER"),
+                        "Script should contain DISABLE TRIGGER statement when scripting table with disabled trigger");
+
+                    // Drop the entire table
+                    smoTable.Drop();
+                    database.Tables.Refresh();
+                    Assert.IsNull(database.Tables[table.Name], "Table should be dropped");
+
+                    // Re-execute all scripts
+                    foreach (string script in scripts)
+                    {
+                        database.ExecuteNonQuery(script);
+                    }
+
+                    // Verify the re-created table and trigger
+                    database.Tables.Refresh();
+                    var recreatedTable = database.Tables[table.Name];
+                    Assert.IsNotNull(recreatedTable, "Table should be re-created");
+
+                    recreatedTable.Triggers.Refresh();
+                    var recreatedTrigger = recreatedTable.Triggers[triggerName];
+                    Assert.IsNotNull(recreatedTrigger, "Trigger should be re-created");
+                    Assert.That(recreatedTrigger.IsEnabled, Is.False,
+                        "Trigger should be disabled when scripted at table level");
+                });
+        }
+
         #endregion
     }
 }

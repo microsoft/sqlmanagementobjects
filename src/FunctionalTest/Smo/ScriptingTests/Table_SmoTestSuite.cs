@@ -282,6 +282,206 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         }
 
         /// <summary>
+        /// Tests disabling change tracking on a table through SMO on SQL2016 and after onprem.
+        /// Regression test ensuring that change tracking can be disabled after being enabled.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void SmoTableAlter_DisableChangeTracking()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Enable database-level change tracking (only if not already enabled)
+                    if (!database.ChangeTrackingEnabled)
+                    {
+                        database.ChangeTrackingEnabled = true;
+                        database.ChangeTrackingRetentionPeriod = 1;
+                        database.ChangeTrackingRetentionPeriodUnits = _SMO.RetentionPeriodUnits.Hours;
+                        database.ChangeTrackingAutoCleanUp = true;
+                        database.Alter();
+                    }
+
+                    // Create a table with a primary key
+                    var table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                    table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
+
+                    // Enable change tracking on the table
+                    table.ChangeTrackingEnabled = true;
+                    table.Alter();
+                    table.Refresh();
+                    Assert.That(table.ChangeTrackingEnabled, Is.True, "Change tracking should be enabled after Alter()");
+
+                    // Disable change tracking
+                    table.ChangeTrackingEnabled = false;
+                    table.Alter();
+                    table.Refresh();
+                    Assert.That(table.ChangeTrackingEnabled, Is.False, "Change tracking should be disabled after setting to false and calling Alter()");
+
+                    // Verify via T-SQL that change tracking is disabled
+                    var query = $"SELECT COUNT(*) FROM sys.change_tracking_tables WHERE object_id = OBJECT_ID({SqlSmoObject.MakeSqlString(table.FullQualifiedName)})";
+                    var result = database.ExecutionManager.ExecuteScalar(query);
+                    Assert.That(result, Is.EqualTo(0), "sys.change_tracking_tables should not contain the table after disabling change tracking");
+                });
+        }
+
+        /// <summary>
+        /// Tests that enabling change tracking on a table that already has it enabled throws FailedOperationException.
+        /// Regression test for ensuring proper error handling when re-enabling change tracking.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void SmoTableAlter_EnableChangeTrackingOnAlreadyEnabledTable_Throws()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Enable database-level change tracking (only if not already enabled)
+                    if (!database.ChangeTrackingEnabled)
+                    {
+                        database.ChangeTrackingEnabled = true;
+                        database.ChangeTrackingRetentionPeriod = 1;
+                        database.ChangeTrackingRetentionPeriodUnits = _SMO.RetentionPeriodUnits.Hours;
+                        database.ChangeTrackingAutoCleanUp = true;
+                        database.Alter();
+                    }
+
+                    // Create a table with a primary key
+                    var table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                    table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
+
+                    // Enable change tracking on the table
+                    table.ChangeTrackingEnabled = true;
+                    table.Alter();
+                    table.Refresh();
+
+                    // Attempt to enable change tracking again (should throw)
+                    table.ChangeTrackingEnabled = true;
+                    Assert.Throws<_SMO.FailedOperationException>(() => table.Alter(),
+                        "Expected FailedOperationException when re-enabling change tracking on an already-enabled table");
+                });
+        }
+
+        /// <summary>
+        /// Tests that scripting a table with change tracking enabled produces a script that can be used to recreate the table
+        /// with change tracking still enabled (round-trip test).
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void SmoTableScript_ChangeTrackingRoundTrip()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Enable database-level change tracking (only if not already enabled)
+                    if (!database.ChangeTrackingEnabled)
+                    {
+                        database.ChangeTrackingEnabled = true;
+                        database.ChangeTrackingRetentionPeriod = 1;
+                        database.ChangeTrackingRetentionPeriodUnits = _SMO.RetentionPeriodUnits.Hours;
+                        database.ChangeTrackingAutoCleanUp = true;
+                        database.Alter();
+                    }
+
+                    // Create a table with a primary key
+                    var table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                    table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
+
+                    // Enable change tracking on the table
+                    table.ChangeTrackingEnabled = true;
+                    table.Alter();
+                    table.Refresh();
+
+                    // Script the table with change tracking
+                    var options = new _SMO.ScriptingOptions
+                    {
+                        ChangeTracking = true,
+                        Indexes = true,
+                        DriPrimaryKey = true,
+                        IncludeDatabaseContext = false,
+                        ScriptSchema = true
+                    };
+                    StringCollection scripts = table.Script(options);
+
+                    // Verify the script contains CHANGE_TRACKING = ON
+                    var scriptText = string.Join("\n", scripts.Cast<string>());
+                    bool hasChangeTracking = scriptText.Contains("CHANGE_TRACKING = ON") || 
+                                            scriptText.Contains("ENABLE CHANGE_TRACKING");
+                    Assert.IsTrue(hasChangeTracking, "Script should contain CHANGE_TRACKING = ON or ENABLE CHANGE_TRACKING");
+
+                    // Capture table name before dropping (can't access properties after Drop)
+                    var tableName = table.Name;
+
+                    // Drop the table
+                    table.Drop();
+                    database.Tables.Refresh();
+                    Assert.IsNull(database.Tables[tableName, "dbo"], "Table should be dropped");
+
+                    // Re-execute the scripts to recreate the table
+                    foreach (string script in scripts)
+                    {
+                        try
+                        {
+                            database.ExecuteNonQuery(script);
+                        }
+                        catch (Exception ex)
+                        {
+                            Assert.Fail($"Failed to execute script on {database.Parent.Name}: {ex.Message}\nScript:\n{script}");
+                        }
+                    }
+
+                    // Verify the re-created table has change tracking enabled
+                    database.Tables.Refresh();
+                    var recreatedTable = database.Tables[tableName, "dbo"];
+                    Assert.IsNotNull(recreatedTable, "Table should be re-created from script");
+                    recreatedTable.Refresh();
+
+                    // Verify via sys.change_tracking_tables
+                    var query = $"SELECT COUNT(*) FROM sys.change_tracking_tables WHERE object_id = OBJECT_ID({SqlSmoObject.MakeSqlString(recreatedTable.FullQualifiedName)})";
+                    var result = database.ExecutionManager.ExecuteScalar(query);
+                    Assert.That(result, Is.EqualTo(1), "sys.change_tracking_tables should contain the re-created table with change tracking enabled");
+                });
+        }
+
+        /// <summary>
+        /// Tests that setting TrackColumnsUpdatedEnabled = true after table creation (when change tracking is already enabled)
+        /// throws FailedOperationException, because column tracking can only be set at table creation time.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void SmoTableAlter_TrackColumnsUpdatedEnabled_ThrowsAfterCreation()
+        {
+            ExecuteFromDbPool(this.TestContext.FullyQualifiedTestClassName, database =>
+                {
+                    // Enable database-level change tracking (only if not already enabled)
+                    if (!database.ChangeTrackingEnabled)
+                    {
+                        database.ChangeTrackingEnabled = true;
+                        database.ChangeTrackingRetentionPeriod = 1;
+                        database.ChangeTrackingRetentionPeriodUnits = _SMO.RetentionPeriodUnits.Hours;
+                        database.ChangeTrackingAutoCleanUp = true;
+                        database.Alter();
+                    }
+
+                    // Create a table with a primary key
+                    var table = database.CreateTable(this.TestContext.TestName, new ColumnProperties("c1") { Nullable = false });
+                    table.CreateIndex(this.TestContext.TestName, new IndexProperties() { KeyType = _SMO.IndexKeyType.DriPrimaryKey });
+
+                    // Enable change tracking without column tracking
+                    table.ChangeTrackingEnabled = true;
+                    table.TrackColumnsUpdatedEnabled = false;
+                    table.Alter();
+                    table.Refresh();
+
+                    // Attempt to toggle column tracking on (should throw)
+                    table.TrackColumnsUpdatedEnabled = true;
+                    Assert.Throws<_SMO.FailedOperationException>(() => table.Alter(),
+                        "Expected FailedOperationException when toggling TrackColumnsUpdatedEnabled after creation");
+                });
+        }
+
+        /// <summary>
         /// Verify that SMO object is dropped.
         /// <param name="obj">Smo object.</param>
         /// <param name="objVerify">Smo object used for verification of drop.</param>

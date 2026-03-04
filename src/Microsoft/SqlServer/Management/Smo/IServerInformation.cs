@@ -161,7 +161,7 @@ namespace Microsoft.SqlServer.Management.Smo
         [DisplayDescriptionKey("Server_IsHadrEnabledDesc")]
         Boolean IsHadrEnabled { get; }
 
-		[DisplayNameKey("Server_IsXTPSupported")]
+        [DisplayNameKey("Server_IsXTPSupportedName")]
         [DisplayDescriptionKey("Server_IsXTPSupportedDesc")]
         Boolean IsXTPSupported { get; }
 

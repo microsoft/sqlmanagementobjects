@@ -74,6 +74,7 @@ Rules:
 - Long, descriptive test method names: Start with the SMO object type being tested, then scenario, then expected outcome.
 - Always include assertion messages clarifying intent & expected result.
 - Logs should make failures diagnosable without rerunning with a debugger.
+- For data-driven/parameterized tests, use MSTest attributes (`[DataRow]` or `[DynamicData]`) instead of NUnit attributes (`[TestCase]`, `[TestCaseSource]`, etc.).
 
 Pattern example (pseudo):
 ```
@@ -122,6 +123,7 @@ Avoid:
 - Placing secret values or tokens in source or tests.
 - Publishing internal-only folder content to public mirrors.
 - Exposing raw JSON strings in public SMO APIs; wrap them in typed classes.
+- Referencing internal work items (e.g., "VSTS #12345", "work item 12345") in code comments, assertions, or documentation. This is externally shipping code; use descriptive text instead.
 
 ## 9. Security & Compliance
 - Never commit credentials, connection strings with auth info, or access tokens.
@@ -165,6 +167,18 @@ Many subdirectories include a focused `README.md` describing domain specifics (e
 4. Do not duplicate content: link (relative path) to the authoritative README section instead of copying.
 
 Agent Hint: Before adding or altering code in an unfamiliar area, read the local README to pick up naming, nullability, threading, and performance patterns to mirror.
+
+## 16. Design Specifications
+
+Design specifications for significant features and architectural changes live in the [`/specs`](../specs/) folder. See the [specs README](../specs/README.md) for an index of all specifications.
+
+### Workflow for New Design Work
+1. **Before starting any new feature or significant change**, check `/specs` for existing relevant specifications. Read any related specs to understand prior decisions and constraints.
+2. **If a spec exists for the work you are doing**, follow its design decisions. If implementation reveals issues with the spec, note discrepancies and propose spec updates.
+3. **If no spec exists and the work is significant** (new public API surface, cross-cutting architectural changes, new async patterns, etc.), initiate creation of a new spec before implementation. Use the next available sequence number (`NNNN-short-title.md`) and add it to the index in `/specs/README.md`.
+4. **Modification of existing specs** requires updating the status field and preserving the change history in the document.
+
+Agent Hint: When asked to implement a feature, first check `/specs` for a relevant design specification. If one exists, use it as the authoritative source for design decisions. If the work warrants a spec and none exists, propose creating one before proceeding with implementation.
 
 ---
 Concise Canonical Rules (TL;DR):

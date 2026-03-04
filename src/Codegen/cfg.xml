@@ -304,6 +304,7 @@
       <property name="MirroringTimeout" generate="true" is_intrinsic="false" />
       <property name="LastDifferentialBackupDate" generate="true" is_intrinsic="true" />
       <property name="OptimizedLockingOn" generate="true" is_intrinsic="false" />
+      <property name="AutomaticIndexCompactionEnabled" generate="true" is_intrinsic="false" />
 
       <!-- HADR Properties-->
       <property name="AvailabilityGroupName" generate="true" is_intrinsic="true" />

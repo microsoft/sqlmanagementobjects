@@ -1179,7 +1179,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (lType == LoginType.WindowsGroup && this.ServerVersion.Major >= 11)
                     {
                         AddComma(sbOption, ref optionAdded);
-                        sbOption.Append("DEFAULT_SCHEMA==NULL");
+                        sbOption.Append("DEFAULT_SCHEMA=NULL");
                     }
                 }
 

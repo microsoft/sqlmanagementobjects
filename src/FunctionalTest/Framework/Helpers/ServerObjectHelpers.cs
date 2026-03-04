@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Test.Manageability.Utils.Helpers;
@@ -125,7 +126,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             // Construct the sqlpackage.exe command
             var action = dbBackupFile.EndsWith(".bacpac", StringComparison.OrdinalIgnoreCase) ? "Import" : "Publish";
             var connStr = new SqlConnectionStringBuilder(server.ConnectionContext.ConnectionString) { InitialCatalog = dbName };
-            var sqlPackagePath = "sqlpackage.exe"; // Ensure sqlpackage.exe is in the PATH
+            var sqlPackagePath = "sqlpackage";
             var isUrl = dbBackupFile.StartsWith("http", StringComparison.OrdinalIgnoreCase);
             if (isUrl)
             {
@@ -143,30 +144,73 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     $"/TargetConnectionString:\"{connStr.ConnectionString}\""
                 });
 
-                // Execute the command with the response file
+                // The sqlpackage native apphost shim (installed as a dotnet global tool)
+                // requires hostfxr.dll at the exact major version it was built for.
+                // On build agents that only have .NET 10 runtime, the shim fails with
+                // 0xC0000135 (STATUS_DLL_NOT_FOUND) because hostfxr 8.x isn't present.
+                // To work around this, resolve the actual sqlpackage.dll from the tool
+                // store (preferring the TFM matching the installed runtime) and launch
+                // it via "dotnet exec --roll-forward Major".
+                string fileName;
+                string arguments;
+                var toolDll = ResolveDotnetToolDll("microsoft.sqlpackage", "sqlpackage.dll");
+                if (toolDll != null)
+                {
+                    TraceHelper.TraceInformation($"Launching sqlpackage via dotnet exec: {toolDll}");
+                    fileName = GetDotnetPath();
+                    arguments = $"exec --roll-forward Major \"{toolDll}\" @\"{responseFilePath}\"";
+                }
+                else
+                {
+                    TraceHelper.TraceInformation("Could not resolve sqlpackage.dll from tool store; falling back to shim.");
+                    fileName = sqlPackagePath;
+                    arguments = $"@\"{responseFilePath}\"";
+                }
+
                 var processStartInfo = new ProcessStartInfo
                 {
-                    FileName = sqlPackagePath,
-                    Arguments = $"@\"{responseFilePath}\"",
-                    RedirectStandardOutput = false,
+                    FileName = fileName,
+                    Arguments = arguments,
+                    RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
 
+                // Diagnostic logging to help investigate launch failures.
+                var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+                LogSqlPackageDiagnostics(sqlPackagePath, dotnetRoot);
+
                 using (var process = Process.Start(processStartInfo))
                 {
                     if (process == null)
                     {
-                        throw new InvalidOperationException("Failed to start sqlpackage.exe process.");
+                        throw new InvalidOperationException("Failed to start sqlpackage process.");
                     }
-                    // For some reason, trying to read StandardOut from sqlpackage causes it to hang when there's an error.
+                    // Collect stdout asynchronously via the event-based API while
+                    // reading stderr synchronously.  Reading both streams with
+                    // ReadToEnd() sequentially can deadlock when one pipe buffer
+                    // fills and the child process blocks waiting for it to drain.
+                    var stdout = new StringBuilder();
+                    process.OutputDataReceived += (sender, e) =>
+                    {
+                        if (e.Data != null)
+                        {
+                            stdout.AppendLine(e.Data);
+                        }
+                    };
+                    process.BeginOutputReadLine();
                     var error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
+                    if (stdout.Length > 0)
+                    {
+                        TraceHelper.TraceInformation($"sqlpackage stdout:{Environment.NewLine}{stdout}");
+                    }
+
                     if (process.ExitCode != 0)
                     {
-                        Trace.TraceError($"*** sqlpackage.exe failed with exit code {process.ExitCode}.{Environment.NewLine}\t{error}");
+                        Trace.TraceError($"*** sqlpackage failed with exit code {process.ExitCode}.{Environment.NewLine}\t{error}");
                         throw new InvalidOperationException($"Failed to restore database from package file '{dbBackupFile}': {error}");
                     }
                 }
@@ -182,6 +226,192 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
 
             server.Databases.Refresh();
             return server.Databases[dbName];
+        }
+
+        /// <summary>
+        /// Finds the full path to the dotnet executable by searching PATH.
+        /// </summary>
+        private static string GetDotnetPath()
+        {
+            var dotnetExe = Environment.OSVersion.Platform == PlatformID.Win32NT ? "dotnet.exe" : "dotnet";
+            var pathVar = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+            foreach (var dir in pathVar.Split(Path.PathSeparator))
+            {
+                var candidate = Path.Combine(dir, dotnetExe);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+            return dotnetExe;
+        }
+
+        /// <summary>
+        /// Resolves the managed entry-point DLL for a dotnet global tool by
+        /// searching the <c>~/.dotnet/tools/.store</c> directory. This allows
+        /// launching the tool via <c>dotnet exec</c> instead of the native apphost
+        /// shim, avoiding 0xC0000135 failures when the required hostfxr major
+        /// version is not installed.
+        /// </summary>
+        /// <param name="toolPackageId">Lowercase NuGet package ID (e.g. "microsoft.sqlpackage").</param>
+        /// <param name="dllName">Entry-point DLL filename (e.g. "sqlpackage.dll").</param>
+        /// <returns>Full path to the DLL, or null if it cannot be found.</returns>
+        private static string ResolveDotnetToolDll(string toolPackageId, string dllName)
+        {
+            try
+            {
+                var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var storeRoot = Path.Combine(userProfile, ".dotnet", "tools", ".store", toolPackageId);
+                if (!Directory.Exists(storeRoot))
+                {
+                    TraceHelper.TraceInformation($"Tool store not found: {storeRoot}");
+                    return null;
+                }
+
+                // Prefer the highest installed version of the tool.
+                var versionDirs = Directory.GetDirectories(storeRoot);
+                Array.Sort(versionDirs);
+                Array.Reverse(versionDirs);
+
+                // Prefer TFMs in descending order so the runtime that's actually
+                // installed gets matched first (e.g. net10.0 before net8.0).
+                var preferredTfms = new[] { "net10.0", "net9.0", "net8.0", "net6.0" };
+
+                foreach (var versionDir in versionDirs)
+                {
+                    // Layout: .store/<id>/<ver>/<id>/<ver>/tools/<tfm>/any/<dll>
+                    var innerRoot = Path.Combine(versionDir, toolPackageId);
+                    if (!Directory.Exists(innerRoot))
+                    {
+                        continue;
+                    }
+                    foreach (var innerVerDir in Directory.GetDirectories(innerRoot))
+                    {
+                        var toolsDir = Path.Combine(innerVerDir, "tools");
+                        if (!Directory.Exists(toolsDir))
+                        {
+                            continue;
+                        }
+
+                        // First pass: check preferred TFMs in order.
+                        foreach (var tfm in preferredTfms)
+                        {
+                            var candidate = Path.Combine(toolsDir, tfm, "any", dllName);
+                            if (File.Exists(candidate))
+                            {
+                                return candidate;
+                            }
+                        }
+
+                        // Second pass: any TFM directory that contains the DLL.
+                        foreach (var tfmDir in Directory.GetDirectories(toolsDir))
+                        {
+                            var candidate = Path.Combine(tfmDir, "any", dllName);
+                            if (File.Exists(candidate))
+                            {
+                                return candidate;
+                            }
+                            candidate = Path.Combine(tfmDir, dllName);
+                            if (File.Exists(candidate))
+                            {
+                                return candidate;
+                            }
+                        }
+                    }
+                }
+
+                TraceHelper.TraceInformation($"Could not find {dllName} in tool store: {storeRoot}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceWarning($"Error searching for dotnet tool DLL: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Logs diagnostic information about sqlpackage and its .NET runtime
+        /// environment to help investigate 0xC0000135 (STATUS_DLL_NOT_FOUND) failures.
+        /// </summary>
+        private static void LogSqlPackageDiagnostics(string sqlPackagePath, string dotnetRoot)
+        {
+            try
+            {
+                // Resolve the full path that the OS will use to launch the process.
+                var resolvedPath = ResolveExecutablePath(sqlPackagePath);
+                TraceHelper.TraceInformation($"sqlpackage resolved path: {resolvedPath ?? "(not found)"}");
+
+                if (resolvedPath != null)
+                {
+                    var sqlPackageDir = Path.GetDirectoryName(resolvedPath);
+                    // Check for runtimeconfig.json — it tells the apphost which framework to load.
+                    var runtimeConfig = Path.Combine(sqlPackageDir, "sqlpackage.runtimeconfig.json");
+                    if (File.Exists(runtimeConfig))
+                    {
+                        TraceHelper.TraceInformation($"sqlpackage.runtimeconfig.json:{Environment.NewLine}{File.ReadAllText(runtimeConfig)}");
+                    }
+                    else
+                    {
+                        TraceHelper.TraceInformation("sqlpackage.runtimeconfig.json not found next to executable.");
+                    }
+
+                    // List DLLs beside sqlpackage to check if it's self-contained vs framework-dependent.
+                    var dllCount = Directory.GetFiles(sqlPackageDir, "*.dll").Length;
+                    TraceHelper.TraceInformation($"sqlpackage directory contains {dllCount} DLL(s): {sqlPackageDir}");
+                }
+
+                // Log DOTNET_ROOT and check for hostfxr.dll in expected locations.
+                TraceHelper.TraceInformation($"DOTNET_ROOT={dotnetRoot ?? "(not set)"}");
+                if (!string.IsNullOrEmpty(dotnetRoot))
+                {
+                    var hostFxrDir = Path.Combine(dotnetRoot, "host", "fxr");
+                    if (Directory.Exists(hostFxrDir))
+                    {
+                        var versions = Directory.GetDirectories(hostFxrDir);
+                        TraceHelper.TraceInformation($"hostfxr versions at {hostFxrDir}: {string.Join(", ", versions.Select(Path.GetFileName))}");
+                    }
+                    else
+                    {
+                        TraceHelper.TraceInformation($"hostfxr directory not found: {hostFxrDir}");
+                    }
+                }
+
+                // Log the dotnet executable location and PATH for completeness.
+                var dotnetPath = GetDotnetPath();
+                TraceHelper.TraceInformation($"dotnet executable: {dotnetPath}");
+                TraceHelper.TraceInformation($"PATH={Environment.GetEnvironmentVariable("PATH")}");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceWarning($"Failed to collect sqlpackage diagnostics: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Resolves the full path to an executable by checking if it exists as-is,
+        /// then searching PATH with common Windows extensions.
+        /// </summary>
+        private static string ResolveExecutablePath(string fileName)
+        {
+            if (Path.IsPathRooted(fileName) && File.Exists(fileName))
+            {
+                return Path.GetFullPath(fileName);
+            }
+            var extensions = new[] { "", ".exe", ".cmd", ".bat" };
+            var pathVar = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+            foreach (var dir in pathVar.Split(Path.PathSeparator))
+            {
+                foreach (var ext in extensions)
+                {
+                    var candidate = Path.Combine(dir, fileName + ext);
+                    if (File.Exists(candidate))
+                    {
+                        return Path.GetFullPath(candidate);
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>

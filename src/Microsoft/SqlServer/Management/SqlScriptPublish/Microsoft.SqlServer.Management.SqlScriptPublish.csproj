@@ -13,7 +13,6 @@
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />
     <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
-    <ProjectReference Include="$(NotebookSrc)\Microsoft.SqlServer.Smo.Notebook.csproj" />
   </ItemGroup>
     <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SqlScriptPublishTests" Key="$(RealPublicKey)"/>

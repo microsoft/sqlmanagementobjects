@@ -158,6 +158,7 @@ namespace Microsoft.SqlServer.Management.Smo
             v150 = 9,
             v160 = 10,
             v170 = 11,
+            v180 = 12,
             // VBUMP
         }
 
@@ -315,12 +316,17 @@ namespace Microsoft.SqlServer.Management.Smo
                             versionIndex = (int)StandaloneVersionIndex.v170;
                             break;
                         }
+                    case 18:
+                        {
+                            versionIndex = (int)StandaloneVersionIndex.v180;
+                            break;
+                        }
                     // VBUMP
                     //Forward Compatibility: An older version SSMS/Smo connecting to a future version sql server database engine.
                     //That is why if the server version is unknown, we need to set it according to the latest database engine available,
                     //so that all Latest-Version-Supported-Features in the Tools work seamlessly for the unknown future version database engines too.
                     default:
-                        versionIndex = (int)StandaloneVersionIndex.v170;
+                        versionIndex = (int)StandaloneVersionIndex.v180;
                         break;
                 }
             }
@@ -585,6 +591,11 @@ namespace Microsoft.SqlServer.Management.Smo
                     case (int)StandaloneVersionIndex.v170:
                         {
                             versionName = LocalizableResources.ServerSQLv170;
+                            break;
+                        }
+                    case (int)StandaloneVersionIndex.v180:
+                        {
+                            versionName = LocalizableResources.ServerSQLv180;
                             break;
                         }
                     default:

@@ -961,7 +961,11 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         /// Compatibility level for SQL v170
         /// </summary>
-        Version170 = 170
+        Version170 = 170,
+        /// <summary>
+        /// Compatibility level for SQL v180
+        /// </summary>
+        Version180 = 180,
         // VBUMP
     }
 

@@ -1146,6 +1146,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     return LocalizableResources.ServerSQLv160;
                 case 17:
                     return LocalizableResources.ServerSQLv170;
+                case 18:
+                    return LocalizableResources.ServerSQLv180;
                 default:
                     // VBUMP
                     return version.ToString();

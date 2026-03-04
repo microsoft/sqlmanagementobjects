@@ -68,38 +68,12 @@ EncryptedViewsFunctionsDownlevel(string view, string targetVersion) = {0} is an 
 ; message for Schemas not supported in prior versions
 SchemaDownlevel(string objectName, string targetVersion) = Error with Schema {0}.  Schemas are not supported in {1}.
 
-; message for User Defined Aggregates not supported in prior versions
-UserDefinedAggregatesDownlevel(string objectName, string targetVersion) = Error with User Defined Aggregate {0}.  User Defined Aggregates are not supported in {1}.
-
-; message for XmlSchemaCollections not supported in prior versions
-XmlSchemaCollectionDownlevel(string objectName, string targetVersion) = Error with Xml Schema Collection {0}.  Xml Schema Collections are not supported in {1}.
-
-; message for Synonyms not supported in prior versions
-SynonymDownlevel(string objectName, string targetVersion) = Error with Synonym {0}.  Synonyms are not supported in {1}.
-
-; message for Sequences not supported in prior versions
-SequenceDownlevel(string objectName, string targetVersion) = Error with Sequence {0}.  Sequences are not supported in {1}.
-
-; message for Security Policies not supported in prior versions
-SecurityPolicyDownlevel(string objectName, string targetVersion) = Error with Security Policy {0}.  Security Policies are not supported in {1}.
-
-; message for External Data Sources not supported in prior versions
-ExternalDataSourceDownlevel(string objectName, string targetVersion) = Error with External Data Source {0}.  External Data Sources are not supported in {1}.
 
 ; message for column encryption keys not supported in prior versions
 ColumnEncryptionKeyDownlevel(string objectName, string targetVersion) = Error with Column Encryption Key {0}.  Column Encryption Keys are not supported in {1}.
 
-; message for External File Formats not supported in prior versions
-ExternalFileFormatDownlevel(string objectName, string targetVersion) = Error with External File Format {0}.  External File Formats are not supported in {1}.
-
 ; message for column master keys not supported in prior versions
 ColumnMasterKeyDownlevel(string objectName, string targetVersion) = Error with Column Master Key {0}.  Column Master Keys are not supported in {1}.
-
-; message for column master keys not supported in prior versions
-DatabaseScopedCredentialDownlevel(string objectName, string targetVersion) = Error with Database Scoped Credential {0}.  Database Scoped Credentials are not supported in {1}.
-
-; message for User Defined Table Type not supported in prior versions
-UserDefinedTableDownlevel(string objectName, string targetVersion) = Error with User Defined Table Type {0}.  User Defined Table Types are not supported in {1}.
 
 ; message for DDL triggers not supported in prior versions
 DdlTriggerDownlevel(string objectName, string targetVersion) = Error with DDL Trigger {0}.  DDL Triggers are not supported in {1}.
@@ -109,9 +83,6 @@ ClrUserDefinedFunctionDownlevel(string objectName, string targetVersion) = Error
 
 ; message for CLR sprocs not supported in prior versions
 ClrStoredProcedureDownlevel(string objectName, string targetVersion) = Error with CLR Stored Procedure {0}.  CLR Stored Procedure are not supported in {1}.
-
-; message for Assemblies not supported in Shiloh
-AssemblyDownlevel(string objectName, string targetVersion) = Error with Assembly {0}.  Assemblies are not supported in {1}.
 
 ; message for no values in the ColumnEncryptionKey
 ColumnEncryptionKeyNoValues(string objectName) = Error creating Column Encryption Key {0}.  Must specify at least one Column Encryption Key value before creation.
@@ -1181,9 +1152,6 @@ UserOptions=UserOptions
 BackupDevice=BackupDevice
 FullTextService=FullTextService
 ServerActiveDirectory=ServerActiveDirectory
-HttpEndpoint=HttpEndpoint
-SoapConfiguration=SoapConfiguration
-SoapMethod=SoapMethod
 ServerAlias=ServerAlias
 PhysicalPartition=PhysicalPartition
 Audit=Audit

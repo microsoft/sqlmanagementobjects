@@ -52,10 +52,13 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             [DisplayNameKey("OnlyScript160CompatibleFeatures")]
             [CompatibilityLevelSupportedVersion(16)]
             Script160Compat,
-            // VBUMP
             [DisplayNameKey("OnlyScript170CompatibleFeatures")]
             [CompatibilityLevelSupportedVersion(17)]
             Script170Compat,
+            // VBUMP
+            [DisplayNameKey("OnlyScript180CompatibleFeatures")]
+            [CompatibilityLevelSupportedVersion(18)]
+            Script180Compat,
         }
 
         /// <summary>
@@ -225,8 +228,8 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             // VBUMP
             else
             {
-                Debug.Assert(false, "Unexpected server version. Setting Compatibility Mode to 17.0!");
-                compatMode = ScriptCompatibilityOptions.Script170Compat;
+                Debug.Assert(false, "Unexpected server version. Setting Compatibility Mode to 18.0!");
+                compatMode = ScriptCompatibilityOptions.Script180Compat;
             }
 
             // setup the SqlAzure read/only properites and their default values
@@ -352,8 +355,8 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                 }
                 else
                 {
-                    // Remove 170 since it's currently only for standalone instances
-                    values.Remove(ScriptCompatibilityOptions.Script170Compat);
+                    // VBUMP: Remove 180 since Azure SQL Database doesn't support compatibility level 180 yet
+                    values.Remove(ScriptCompatibilityOptions.Script180Compat);
                 }
             }
             return values;

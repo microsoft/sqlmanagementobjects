@@ -8,6 +8,8 @@
   <PropertyGroup>
     <TargetFrameworks Condition="'$(GacVersion)' != 'true'">$(NetfxVersion);net8.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(GacVersion)' == 'true'">$(NetfxVersion)</TargetFrameworks>
+    <!-- Allow net8.0 test host to run on .NET 10+ runtime when .NET 8 runtime is not installed -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
   <PropertyGroup>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

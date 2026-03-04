@@ -173,7 +173,7 @@ else
                 }
                 var isFabricServer = Convert.ToBoolean(dataSet.Tables[0].Rows[0]["IsFabricServer"]);
                 var connectionProtocol = dataSet.Tables[2].Rows[0]["ConnectionProtocol"];
-                var collation = (string)dataSet.Tables[0].Rows[0]["Collation"];
+                var collation = Convert.ToString(dataSet.Tables[0].Rows[0]["Collation"]);
 
                 return new ServerInformation(serverVersion,
                     new Version((string)dataSet.Tables[0].Rows[0]["ProductVersion"]),

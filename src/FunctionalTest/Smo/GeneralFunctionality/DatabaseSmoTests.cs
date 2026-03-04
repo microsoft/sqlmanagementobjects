@@ -1082,6 +1082,43 @@ END");
             });
         }
 
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, MinMajor = 17)]
+        public void Database_Alter_toggles_automatic_index_compaction_not_supported()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                db.AutomaticIndexCompactionEnabled = true;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AutomaticIndexCompactionEnabled) });
+                db = db.Parent.Databases[db.Name];
+                db.Refresh();
+                Assert.That(db.AutomaticIndexCompactionEnabled, Is.False, "AutomaticIndexCompactionEnabled not set to true by Alter since we do not generate script for AIC");
+            });
+        }
+
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlManagedInstance)]
+        public void Database_Alter_toggles_automatic_index_compaction()
+        {
+            ExecuteFromDbPool(db =>
+            {
+                db.AutomaticIndexCompactionEnabled = true;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AutomaticIndexCompactionEnabled) });
+                db = db.Parent.Databases[db.Name];
+                db.Refresh();
+                Assert.That(db.AutomaticIndexCompactionEnabled, Is.True, "AutomaticIndexCompactionEnabled set to true by Alter");
+                db.AutomaticIndexCompactionEnabled = false;
+                db.Alter();
+                db.Parent.Databases.ClearAndInitialize(string.Format("[@Name='{0}']", Urn.EscapeString(db.Name)), new string[] { nameof(Database.AutomaticIndexCompactionEnabled) });
+                db = db.Parent.Databases[db.Name];
+                db.Refresh();
+                Assert.That(db.AutomaticIndexCompactionEnabled, Is.False, "AutomaticIndexCompactionEnabled set to false by Alter");
+            });
+        }
+
         /// <summary>
         /// If at any point we attempt to run an alter command that would result in AcceleratedDatabaseRecovery (ADR)
         /// being disabled while OptimizedLocking (OL) is enabled, we will get an error, as OL cannot be enabled without ADR.

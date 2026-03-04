@@ -70,6 +70,7 @@ ValueIsNullOrEmpty(string str) = '{0}' is null or empty.
 InvalidObjectType(string typeName) = Invalid object type '{0}'.
 InvalidObjectTypeForVersion(string name, string type) = Object '{0}' of type '{1}' is not valid for the selected database engine type.
 ERROR_ScriptingFailed = An error occurred while scripting the objects.
+ERROR_NotebookWriterNotRegistered = No Notebook writer factory has been registered. Call SqlScriptGenerator.NotebookWriterFactory to register an ISmoScriptWriter implementation for Notebook output before using ScriptDestination.ToNotebook.
 
 # Unsupported Options
 InvalidScriptPreText = /* * * *\nThe following script is not valid for the specified SQL Server database engine type and must be updated.\n* * * */\n

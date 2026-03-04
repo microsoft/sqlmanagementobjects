@@ -219,7 +219,7 @@ namespace Microsoft.SqlServer.Management.Smo
         [DisplayDescriptionKey("Database_RemoteDatabaseNameDesc")]
         String RemoteDatabaseName { get; }
 
-        [DisplayNameKey("Database_RemoteDataArchiveUseFederatedServiceAccount")]
+        [DisplayNameKey("Database_RemoteDataArchiveUseFederatedServiceAccountName")]
         [DisplayDescriptionKey("Database_RemoteDataArchiveUseFederatedServiceAccountDesc")]
         Boolean RemoteDataArchiveUseFederatedServiceAccount { get; }
 
@@ -242,6 +242,10 @@ namespace Microsoft.SqlServer.Management.Smo
         [DisplayNameKey("Database_DelayedDurabilityName")]
         [DisplayDescriptionKey("Database_DelayedDurabilityDesc")]
         DelayedDurability DelayedDurability { get; set; }
+
+        [DisplayNameKey("Database_AutomaticIndexCompactionEnabledName")]
+        [DisplayDescriptionKey("Database_AutomaticIndexCompactionEnabledDesc")]
+        Boolean AutomaticIndexCompactionEnabled { get; set; }
 
     }
 }

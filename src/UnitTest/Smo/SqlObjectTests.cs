@@ -154,7 +154,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
         public void SqlPropertMetadataProvider_implementations_have_correct_number_of_versions()
         {
             // VBUMP
-            int standaloneVersionCount = new[] { 7.0, 8.0, 9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0 }.Length;
+            int standaloneVersionCount = new[] { 7.0, 8.0, 9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 }.Length;
             int cloudVersionCount = new[] { 10.0, 11.0, 12.0 }.Length;
             var metadataType = typeof(SqlPropertyMetadataProvider);
             var providers = metadataType.Assembly.GetTypes().Where(t => t != metadataType && metadataType.IsAssignableFrom(t)).ToArray();

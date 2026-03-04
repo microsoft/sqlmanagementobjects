@@ -562,7 +562,8 @@ namespace Microsoft.SqlServer.Management.Smo
             (new ServerVersion(14, 0)),  //2017
             (new ServerVersion(15, 0)),  //2019
             (new ServerVersion(16, 0)),  //2022
-            (new ServerVersion(17, 0))   //2025 (VBUMP)
+            (new ServerVersion(17, 0)),  //2025
+            (new ServerVersion(18, 0))   //vNext (VBUMP)
         };
 
         /// <summary>

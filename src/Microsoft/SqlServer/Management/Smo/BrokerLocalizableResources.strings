@@ -27,6 +27,12 @@ MessageType_ValidationXmlSchemaCollectionSchemaDesc=Name of the database schema 
 
 MessageType_IsSystemObjectName=Is System Object  
 MessageType_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+
+MessageType_ExtendedPropertiesName=Extended Properties
+MessageType_ExtendedPropertiesDesc=Gets the collection of extended properties for the message type.
+
+MessageType_ParentName=Parent
+MessageType_ParentDesc=Gets the parent ServiceBroker object.
 #######End MessageType
 
 ######Begin ServiceContract
@@ -42,11 +48,20 @@ ServiceContract_IDDesc=Gets the ID value that uniquely identifies the service co
 ServiceContract_IsSystemObjectName=Is System Object  
 ServiceContract_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
 
+ServiceContract_MessageTypeMappingsName=Message Type Mappings
+ServiceContract_MessageTypeMappingsDesc=Gets the collection of message type mappings for this service contract.
+
+ServiceContract_ExtendedPropertiesName=Extended Properties
+ServiceContract_ExtendedPropertiesDesc=Gets the collection of extended properties for the service contract.
+
 ######End ServiceContract
 
 ######Begin ServiceQueue
 ServiceQueue_Name = Service Queue
 ServiceQueue_Desc = Name of the queue, which receives Service Broker messages.
+
+ServiceQueue_NameName=Name
+ServiceQueue_NameDesc=Gets or sets the name of the service queue.
 
 ServiceQueue_IDName=ID
 ServiceQueue_IDDesc=Gets the ID value that uniquely identifies the service queue.
@@ -93,8 +108,14 @@ ServiceQueue_ProcedureSchemaDesc= Name of the schema that contains the stored pr
 ServiceQueue_RowCountName= Message count
 ServiceQueue_RowCountDesc= The number of messages in the queue.
 
+ServiceQueue_RowCountAsDoubleName=Row Count (Double)
+ServiceQueue_RowCountAsDoubleDesc=Gets the number of messages in the queue as a double-precision floating point number.
+
 ServiceQueue_IsSystemObjectName=Is System Object  
 ServiceQueue_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+
+ServiceQueue_ExtendedPropertiesName=Extended Properties
+ServiceQueue_ExtendedPropertiesDesc=Gets the collection of extended properties for the service queue.
 
 ServiceQueue_SchemaName = Schema
 ServiceQueue_SchemaDesc = Gets or sets the schema.(inherited from ScriptSchemaObjectBase) 
@@ -118,6 +139,12 @@ BrokerService_QueueSchemaDesc = Name of the schema to which the queue belongs
 
 BrokerService_IsSystemObjectName=Is System Object  
 BrokerService_IsSystemObjectDesc=Gets the Boolean property that specifies whether the message type is a system object. 
+
+BrokerService_ServiceContractMappingsName=Service Contract Mappings
+BrokerService_ServiceContractMappingsDesc=Gets the collection of service contract mappings for this broker service.
+
+BrokerService_ExtendedPropertiesName=Extended Properties
+BrokerService_ExtendedPropertiesDesc=Gets the collection of extended properties for the broker service.
 
 ######End BrokerService
 

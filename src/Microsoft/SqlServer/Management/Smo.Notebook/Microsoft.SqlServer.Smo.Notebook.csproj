@@ -6,8 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SqlScriptPublishSrc)\Microsoft.SqlServer.Management.SqlScriptPublish.csproj" />
     <PackageReference Include="NewtonSoft.Json" />
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.SqlScriptPublish" Key="$(RealPublicKey)" />
+
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SMO" Key="$(RealPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoNotebookUnitTests" Key="$(RealPublicKey)" />
   </ItemGroup>

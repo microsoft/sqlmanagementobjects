@@ -117,6 +117,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         OptimizerData = true,
                         Permissions = true
                     });
+                yield return new Tuple<string, ScriptingOptions>(
+                    "Sqlv180",
+                    new ScriptingOptions()
+                    {
+                        ExtendedProperties = true,
+                        TargetDatabaseEngineType = DatabaseEngineType.Standalone,
+                        TargetServerVersion = SqlServerVersion.Version180,
+                        IncludeScriptingParametersHeader = true,
+                        OptimizerData = true,
+                        Permissions = true
+                    });
                 // VBUMP : Add new server versions here
                 yield return new Tuple<string, ScriptingOptions>(
                     "AzureSterlingV12",
