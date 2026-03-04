@@ -1,0 +1,9 @@
+<?xml version='1.0' ?>
+<EnumObject type='RemoteMaintenancePlan' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings distinct='true'>
+    <property_link table='msdb.dbo.sysmaintplan_log' alias='s'>s.logged_remotely = 1</property_link>
+  </settings>
+  <properties>
+    <property name='Name' type='sysname'>s.plan_name</property>
+  </properties>
+</EnumObject>

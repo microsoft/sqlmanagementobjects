@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<EnumObject type="FullTextLanguage" impl_type="SqlObject" min_major='10' cloud_min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table="sys.fulltext_languages AS ftl" />
+	</settings>
+	<properties>
+		<property name="Name" type="sysname" access="Read">ftl.name</property>
+		<property name="Lcid" type="int" access="Read">ftl.lcid</property>
+	</properties>
+</EnumObject>

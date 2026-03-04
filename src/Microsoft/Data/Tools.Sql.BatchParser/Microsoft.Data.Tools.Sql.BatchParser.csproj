@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <RootNamespace>Microsoft.Data.Tools.Sql.BatchParser</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.ConnectionInfo" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="SmoCodeGen" Key="$(RealPublicKey)"/>
+  </ItemGroup>
+  <ItemGroup>
+    <SqlStringResource Include="SR.strings" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major = '9'>
+			<property_link>prmssn.class = 100</property_link>
+		</version>		
+	</settings>
+	<properties>
+		<include file='inc_perm.xml' alias='server'/>
+		<property name="Code" type="int" report_type = 'ServerPermissionSetValue'>null</property>
+		
+	</properties>
+</EnumObject>

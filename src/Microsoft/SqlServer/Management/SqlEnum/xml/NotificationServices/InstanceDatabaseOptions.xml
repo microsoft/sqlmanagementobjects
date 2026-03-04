@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+<EnumObject type='InstanceDatabaseOptions' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<property_link table='#tmp_InstDatabaseOptions' alias='ido'/>
+		<prefix>
+CREATE TABLE #tmp_InstDatabaseOptions (
+    SystemName nvarchar(255),
+    DefaultFileGroup nvarchar(128),
+    CollationName nvarchar(255)
+)
+INSERT INTO #tmp_InstDatabaseOptions EXEC [SchemaPrefix].NSGetDatabaseOptions
+		</prefix>
+		<postfix>
+DROP TABLE #tmp_InstDatabaseOptions
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name='Name' type='nvarchar' size = '255'>ido.SystemName</property>
+		<property name='DefaultFileGroup' type='nvarchar' size = '128'>ido.DefaultFileGroup</property>
+		<property name='CollationName' type='nvarchar' size = '255'>ido.CollationName</property>
+	</properties>
+</EnumObject>

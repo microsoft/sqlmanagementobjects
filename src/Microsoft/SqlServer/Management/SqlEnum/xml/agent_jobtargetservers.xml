@@ -1,0 +1,56 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpJobserver' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="JobID" local="JobID" />
+		</parent_link>
+		<request_parent_select>
+			<field name='JobID' />
+		</request_parent_select>
+
+		<property_link table='#tmp_sp_help_jobserver' alias='tshj'/>
+		<prefix>
+			<link_multiple no='1' expression="
+create table #tmp_sp_help_jobserver
+(server_id int null, server_name sysname null, enlist_date datetime null, last_poll_date datetime null, last_run_date int null, last_run_time int null, last_run_duration int null, last_run_outcome tinyint null, last_outcome_message nvarchar(4000) null, job_id uniqueidentifier null)
+
+declare @job_id uniqueidentifier
+declare crs cursor local fast_forward
+for ( {0} )
+open crs
+fetch crs into @job_id
+while @@fetch_status &gt;= 0
+begin
+insert into #tmp_sp_help_jobserver(server_id, server_name, enlist_date, last_poll_date, last_run_date, last_run_time, last_run_duration, last_run_outcome, last_outcome_message)
+		exec msdb.dbo.sp_help_jobserver @job_id = @job_id, @show_last_run_details = 1
+	update #tmp_sp_help_jobserver set job_id = @job_id where job_id is null
+	fetch crs into @job_id
+end
+close crs
+deallocate crs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+drop table #tmp_sp_help_jobserver
+		</postfix>
+		<post_process fields = '#LastRunDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDateTime'
+					triggered_fields='#LastRunDateInt#LastRunTimeInt#'/>
+	</settings>
+	<properties>
+		<property name='ServerName' type='sysname'>tshj.server_name</property>
+		<property name='ID' type='int'>tshj.server_id</property>
+		<property name='EnlistDate' type='datetime'>tshj.enlist_date</property>
+		<property name='LastPollDate' type='datetime'>tshj.last_poll_date</property>
+
+		<property name='LastRunDate' type='datetime'>null</property>
+		<property name='LastRunDateInt' type='int' hidden='true'>tshj.last_run_date</property>
+		<property name='LastRunTimeInt' type='int' hidden='true'>tshj.last_run_time</property>
+
+		<property name='LastRunDuration' type='int'>tshj.last_run_duration</property>
+		<property name='LastRunOutcome' type='tinyint' report_type = 'Agent.JobOutcome'>tshj.last_run_outcome</property>
+		<property name='LastOutcomeMessage' type='nvarchar' size = '4000'>tshj.last_outcome_message</property>
+
+		<property name='JobID' type='uniqueidentifier' hidden='true'>tshj.job_id</property>
+	</properties>
+</EnumObject>

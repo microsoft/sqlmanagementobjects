@@ -1,0 +1,142 @@
+<?xml version="1.0" ?>
+<EnumObject type="DatabaseReplicaState" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent='UniqueId' local='AvailabilityGroupId'/>
+    </parent_link>
+    <property_link fields="#AvailabilityReplicaServerName#AvailabilityGroupId#ReplicaAvailabilityMode#AvailabilityReplicaId#" table="#tmpdbr_availability_replicas" alias="AR" />
+    <property_link fields="#ReplicaRole#IsLocal#" join="#tmpdbr_availability_replica_states AS arstates">arstates.replica_id = AR.replica_id</property_link>
+    <property_link join="#tmpdbr_database_replica_cluster_states AS dbcs">dbcs.replica_id = AR.replica_id</property_link>
+    <property_link fields="#DatabaseId#SynchronizationState#IsSuspended#SuspendReason#RecoveryLSN#TruncationLSN#LastSentLSN#LastSentTime#LastReceivedLSN#LastReceivedTime#LastHardenedLSN#LastHardenedTime#LastRedoneLSN#LastRedoneTime#LogSendQueueSize#LogSendRate#RedoQueueSize#FileStreamSendRate#EndOfLogLSN#LastCommitLSN#LastCommitTime#EstimatedRecoveryTime#SynchronizationPerformance#RedoRate#EstimatedDataLoss#" left_join="#tmpdbr_database_replica_states AS dbr">dbcs.replica_id = dbr.replica_id AND dbcs.group_database_id = dbr.group_database_id</property_link>
+    <property_link fields="#EstimatedDataLoss#" left_join="#tmpdbr_database_replica_states_primary_LCT AS dbrp">dbr.database_id = dbrp.database_id</property_link>
+
+    <prefix fields="#PolicyHealthState#">
+      DECLARE @is_policy_automation_enabled bit
+      SET @is_policy_automation_enabled  = (SELECT CONVERT(bit, current_value)
+      FROM msdb.dbo.syspolicy_configuration
+      WHERE name = 'Enabled')
+    </prefix>
+    <prefix fields="#AvailabilityReplicaServerName#AvailabilityGroupId#ReplicaAvailabilityMode#AvailabilityReplicaId#">
+      select group_id, replica_id,replica_server_name,availability_mode into #tmpdbr_availability_replicas from master.sys.availability_replicas where availability_mode &lt;&gt; 4
+    </prefix>
+    <prefix fields="#ReplicaRole#IsLocal#EstimatedDataLoss#">
+      select replica_id,role,is_local into #tmpdbr_availability_replica_states from master.sys.dm_hadr_availability_replica_states
+    </prefix>
+    <prefix>
+      select replica_id,group_database_id,database_name,is_database_joined,is_failover_ready into #tmpdbr_database_replica_cluster_states from master.sys.dm_hadr_database_replica_cluster_states
+    </prefix>
+    <prefix fields="#DatabaseId#SynchronizationState#IsSuspended#SuspendReason#RecoveryLSN#TruncationLSN#LastSentLSN#LastSentTime#LastReceivedLSN#LastReceivedTime#LastHardenedLSN#LastHardenedTime#LastRedoneLSN#LastRedoneTime#LogSendQueueSize#LogSendRate#RedoQueueSize#FileStreamSendRate#EndOfLogLSN#LastCommitLSN#LastCommitTime#EstimatedRecoveryTime#SynchronizationPerformance#RedoRate#EstimatedDataLoss#">
+      select * into #tmpdbr_database_replica_states from master.sys.dm_hadr_database_replica_states
+    </prefix>
+    <prefix fields="#EstimatedDataLoss#">
+      select ars.role, drs.database_id, drs.replica_id, drs.last_commit_time into #tmpdbr_database_replica_states_primary_LCT from  #tmpdbr_database_replica_states as drs left join #tmpdbr_availability_replica_states ars on drs.replica_id = ars.replica_id where ars.role = 1
+    </prefix>
+
+    <postfix fields="#AvailabilityReplicaServerName#AvailabilityGroupId#ReplicaAvailabilityMode#AvailabilityReplicaId#">
+      DROP TABLE #tmpdbr_availability_replicas
+    </postfix>
+    <postfix fields="#ReplicaRole#IsLocal#">
+      DROP TABLE #tmpdbr_availability_replica_states
+    </postfix>
+    <postfix>
+      DROP TABLE #tmpdbr_database_replica_cluster_states
+    </postfix>
+    <postfix fields="#DatabaseId#SynchronizationState#IsSuspended#SuspendReason#RecoveryLSN#TruncationLSN#LastSentLSN#LastSentTime#LastReceivedLSN#LastReceivedTime#LastHardenedLSN#LastHardenedTime#LastRedoneLSN#LastRedoneTime#LogSendQueueSize#LogSendRate#RedoQueueSize#FileStreamSendRate#EndOfLogLSN#LastCommitLSN#LastCommitTime#EstimatedRecoveryTime#SynchronizationPerformance#RedoRate#EstimatedDataLoss#">
+      DROP TABLE #tmpdbr_database_replica_states
+    </postfix>
+    <postfix fields="#EstimatedDataLoss#">
+      DROP TABLE #tmpdbr_database_replica_states_primary_LCT
+    </postfix>
+
+  </settings>
+  <properties>
+    <version min_major='11'>
+      <!--Key fields for the collection go first -->
+      <property name="AvailabilityReplicaServerName" type="nvarchar" access="Read">AR.replica_server_name</property>
+      <property name="AvailabilityDatabaseName" type="nvarchar" access="Read">dbcs.database_name</property>
+
+      <!--Then the rest of the data fields -->
+      <property name="DatabaseId" type="int" access="Read">ISNULL(dbr.database_id, 0)</property>
+      <property name="AvailabilityGroupId" type="uniqueidentifier" access="Read">AR.group_id</property>
+      <property name="AvailabilityReplicaId" type="uniqueidentifier" access="Read">AR.replica_id</property>
+      <property name="AvailabilityDateabaseId" type="uniqueidentifier" access="Read">dbcs.group_database_id</property>
+      <property name="AvailabilityGroupName" type="nvarchar" access="Read">AG.name</property>
+      <property name="ReplicaAvailabilityMode" type="int" report_type="AvailabilityReplicaAvailabilityMode">ISNULL(AR.availability_mode, 2)</property>
+      <property name="ReplicaRole" type="int" report_type="AvailabilityReplicaRole" access="Read">ISNULL(arstates.role, 3)</property>
+      <property name="IsJoined" type="bit" access="Read">ISNULL(dbcs.is_database_joined, 0)</property>
+      <!--we need to get locality by AR since there is a possibility that the datbase will not be joined yet, in which case the row is infered to be related to a local database
+            replica only if we are talking about a local availability replica.-->
+      <property name="IsLocal" type="bit" access="Read">arstates.is_local</property>
+      <property name="IsFailoverReady" type="bit" access="Read">ISNULL(dbcs.is_failover_ready, 0)</property>
+      <property name="SynchronizationState" type="tinyint" report_type="AvailabilityDatabaseSynchronizationState" access="Read">ISNULL(dbr.synchronization_state, 0)</property>
+      <property name="IsSuspended" type="bit" access="Read">ISNULL(dbr.is_suspended, 0)</property>
+      <property name="SuspendReason" type="tinyint" report_type="DatabaseReplicaSuspendReason" access="Read">ISNULL(dbr.suspend_reason, 7)</property>
+      <property name="RecoveryLSN" type="numeric" size="25" access="Read">ISNULL(dbr.recovery_lsn, 0)</property>
+      <property name="TruncationLSN" type="numeric" size="25" access="Read">ISNULL(dbr.truncation_lsn, 0)</property>
+      <property name="LastSentLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_sent_lsn, 0)</property>
+      <property name="LastSentTime" type="datetime" access="Read">ISNULL(dbr.last_sent_time, 0)</property>
+      <property name="LastReceivedLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_received_lsn, 0)</property>
+      <property name="LastReceivedTime" type="datetime" access="Read">ISNULL(dbr.last_received_time, 0)</property>
+      <property name="LastHardenedLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_hardened_lsn, 0)</property>
+      <property name="LastHardenedTime" type="datetime" access="Read">ISNULL(dbr.last_hardened_time, 0)</property>
+      <property name="LastRedoneLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_redone_lsn, 0)</property>
+      <property name="LastRedoneTime" type="datetime" access="Read">ISNULL(dbr.last_redone_time, 0)</property>
+      <property name="LogSendQueueSize" type="bigint" access="Read">ISNULL(dbr.log_send_queue_size, -1)</property>
+      <property name="LogSendRate" type="bigint" access="Read">ISNULL(dbr.log_send_rate, -1)</property>
+      <property name="RedoQueueSize" type="bigint" access="Read">ISNULL(dbr.redo_queue_size, -1)</property>
+      <property name="RedoRate" type="bigint" access="Read">ISNULL(dbr.redo_rate, -1)</property>
+      <property name="FileStreamSendRate" type="bigint" access="Read">ISNULL(dbr.filestream_send_rate, -1)</property>
+      <property name="EndOfLogLSN" type="numeric" size="25" access="Read">ISNULL(dbr.end_of_log_lsn, 0)</property>
+      <property name="LastCommitLSN" type="numeric" size="25" access="Read">ISNULL(dbr.last_commit_lsn, 0)</property>
+      <property name="LastCommitTime" type="datetime" access="Read">ISNULL(dbr.last_commit_time, 0)</property>
+      <property name="SynchronizationPerformance" type="float" access="Read">ISNULL(CASE dbr.log_send_rate WHEN 0 THEN -1 ELSE CAST(dbr.log_send_queue_size AS float) / dbr.log_send_rate END, -1)</property>
+      
+      <property name="Urn" type="nvarchar" size="600">
+        <link_multiple no='4' expression="{0} + '/{3}[@AvailabilityReplicaServerName=' + quotename({1},'''') + ' and @AvailabilityDatabaseName=' + quotename({2},'''') + ']'">
+          <link_field type='parent' field="Urn" />
+          <link_field type='local' field="AvailabilityReplicaServerName" />
+          <link_field type='local' field="AvailabilityDatabaseName" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='4' expression="{0} + '/{3}[@AvailabilityReplicaServerName=' + quotename({1},'''') + ' and @AvailabilityDatabaseName=' + quotename({2},'''') + ']'">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field type='local' field="AvailabilityReplicaServerName" />
+          <link_field type='local' field="AvailabilityDatabaseName" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      <property name="PolicyHealthState" type="int" expensive ="true" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+        <link_multiple no='4' expression="case when 1=@is_policy_automation_enabled and exists (select * from msdb.dbo.syspolicy_system_health_state where target_query_expression_with_id like {0}+ '/{3}\[@AvailabilityReplicaServerName=' + QUOTENAME({1},'''') + ' and @AvailabilityDatabaseName=' + QUOTENAME({2},'''') + '\]%' ESCAPE '\') then 1 else 0 end">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field type='local' field="AvailabilityReplicaServerName" />
+          <link_field type='local' field="AvailabilityDatabaseName" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+
+    </version>
+    <version min_major='11' max_major='11'>
+      <property name="EstimatedRecoveryTime" type="float" access="Read">ISNULL(CASE dbr.redo_rate WHEN 0 THEN -2 ELSE CAST(dbr.redo_queue_size AS float) / dbr.redo_rate END, -2)</property>
+      <property name="EstimatedDataLoss" type="int" access="Read">CASE dbcs.is_failover_ready WHEN 1 THEN 0 ELSE ISNULL(DATEDIFF(ss, dbr.last_commit_time, dbrp.last_commit_time), 0) END </property>
+    </version>
+    <version min_major='12'>
+      <!--Estimated Recovery Time(RTO) calculation: 
+            1) if db is in primary replica, dont calculate its RTO, return -1 and display empty value in frontend 
+            2) else if redo_queue_size is null, return -2 and display Not Available in frontend 
+            3) else if redo_queue_size is 0, then RTO is 0 
+            4) else if redo_rate is null or 0, return -2 and display Not Available in frontend
+            5) else if redo_queue_size/redo_rate is 0, return -2 and display Not Available in frontend
+            6  else return redo_queue_size/redo_rate as float value -->
+      <property name="EstimatedRecoveryTime" type="float" access="Read">ISNULL(CASE WHEN dbr.is_primary_replica = 1 THEN -1 WHEN dbr.redo_queue_size is null THEN -2 WHEN dbr.redo_queue_size = 0 THEN 0 WHEN dbr.redo_rate is null or dbr.redo_rate = 0 THEN -2 ELSE CAST(dbr.redo_queue_size AS float) / dbr.redo_rate END, -2)</property>
+      <!--Estimated Data Loss(RPO) calculation: 
+            1) if db is in primary replica, dont calculate its RPO, return -1 and display empty value in frontend
+            2) else if db is failover ready, then RPO is 0
+            3) else if datediff between db's last commmit time and its correlated primary db's last commit time is null, then return -2 and display Not Available in frontend
+            4) else return datediff(in seconds) between db's last commmit time and its correlated primary db's last commit time as int value-->
+      <property name="EstimatedDataLoss" type="int" access="Read">CASE WHEN dbr.is_primary_replica = 1 THEN -1 WHEN dbcs.is_failover_ready = 1 THEN 0 ELSE ISNULL(DATEDIFF(ss, dbr.last_commit_time, dbrp.last_commit_time), -2) END </property>
+    </version>
+  </properties>
+</EnumObject>

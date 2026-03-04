@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="Audit" impl_type="SqlObject" min_major="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table='sys.server_audits AS au'></property_link>
+    <property_link fields='#FileName#MaximumFileSize#ReserveDiskSpace#MaximumRolloverFiles#MaximumFiles#' left_join='sys.server_file_audits AS fileau'>fileau.audit_id = au.audit_id AND fileau.audit_guid = au.audit_guid</property_link>
+    <property_link fields='#Owner#' left_join='sys.server_principals as p'>au.principal_id = p.principal_id</property_link>
+    
+    <version min_major='12'>
+      <prefix fields='#IsOperator#'>
+        create table #temp_server_audits (audit_id int not null, is_operator_audit bit)
+
+        if serverproperty('engineedition') = 8
+        exec sp_executesql N'insert into #temp_server_audits
+        select sa.audit_id, sa.is_operator_audit
+        from sys.server_audits sa'
+      </prefix>
+
+      <postfix fields='#IsOperator#'>
+        drop table #temp_server_audits
+      </postfix>
+    </version>
+    
+    <post_process fields = '#MaximumFileSize#MaximumFileSizeUnit#'
+        class_name='Microsoft.SqlServer.Management.Smo.PostProcessAuditProperties'
+        triggered_fields='#MaximumFileSizeInMegaBytes#'/>
+  </settings>  
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='Name' type='sysname'>au.name</property>
+    <property name='ID' type='int' access='Read'>au.audit_id</property>
+    <property name='DestinationType' type='tinyint' report_type='AuditDestinationType'>case when au.type='FL' then 0 when au.type='SL' then 1 when au.type='AL' then 2 when au.type='UL' then 3 when au.type='EM' then 4 else 100 end</property>
+    <property name='QueueDelay' type='int'>au.queue_delay</property>
+    <property name='OnFailure' type='tinyint' report_type='OnFailureAction'>au.on_failure</property>
+    <property name='Enabled' type='bit' access='Read'>au.is_state_enabled</property>
+    <property name='Guid' type='uniqueidentifier' report_type2='System.Guid' read_only_after_creation='true'>au.audit_guid</property>
+    <property name='CreateDate' type='datetime' access='Read'>au.create_date</property>
+    <property name='DateLastModified' type='datetime' access='Read'>au.modify_date</property>
+    <property name='FilePath' type='sysname'>ISNULL(log_file_path,'')</property>
+    <property name='FileName' type='sysname' access='Read'>ISNULL(log_file_name,'')</property>
+    <property name='MaximumFileSizeInMegaBytes' type='bigint' hidden='true'>ISNULL(fileau.max_file_size,0)</property>
+    <property name='MaximumFileSize' type='int'>0</property>
+    <property name='MaximumFileSizeUnit' type='tinyint' report_type='AuditFileSizeUnit'>0</property>
+    <property name='ReserveDiskSpace' type='bit'>ISNULL(fileau.reserve_disk_space, 0)</property>
+    <property name='MaximumRolloverFiles' type='bigint'>ISNULL(fileau.max_rollover_files, 0)</property>
+    <version min_major='11'>
+      <property name='MaximumFiles' type='int'>ISNULL(fileau.max_files, 0)</property>
+      <property name='Filter' type="nvarchar" size='3000'>ISNULL(au.predicate, '')</property>
+    </version>
+
+    <version min_major='12'>
+      <property name='IsOperator' type="bit" cast="true">ISNULL((select is_operator_audit from #temp_server_audits as tsa where tsa.audit_id = au.audit_id),0)</property>
+    </version>
+
+    <version min_major='15'>
+      <property name='RetentionDays' type='int'>ISNULL(fileau.retention_days,0)</property>
+    </version>
+
+    <include file='inc_policy_health_state.xml'/>
+  </properties>
+</EnumObject>

@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<EnumObject type="DatabaseMapping" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="Name" local="LoginName" />
+		</parent_link>
+		<property_link table = '#loginmappings AS logmap'/>
+		<prefix>
+create table #loginmappings( LoginName sysname NULL, DBName sysname NULL, UserName sysname NULL, AliasName sysname NULL )
+declare @db_name nvarchar(512)
+declare crs cursor local fast_forward
+	</prefix>
+		<version min_major = '10'>
+			<prefix> 
+	for ( select name from sys.databases where 1 = has_dbaccess(name)) 
+			</prefix>
+		</version>
+	<prefix>
+open crs 
+fetch crs into @db_name
+while @@fetch_status &gt;= 0 
+begin 
+	set @db_name = quotename(@db_name)
+		</prefix>
+		<version min_major = '10' >
+			<prefix> 
+	exec('use ' + @db_name + ' INSERT #loginmappings select suser_sname(u.sid), db_name(), u.name, null from sys.database_principals AS u where suser_sname(u.sid) is not null')
+			</prefix>
+		</version>
+		<prefix> 
+	fetch crs into @db_name
+end 
+close crs
+deallocate crs
+		</prefix>
+		<postfix>
+drop table #loginmappings
+		</postfix>
+	</settings>
+	<properties>
+		<property name="LoginName" type="sysname" access="Read">logmap.LoginName</property>
+		<property name="DBName" type="sysname" access="Read">logmap.DBName</property>
+		<property name="UserName" type="sysname" access="Read">logmap.UserName</property>
+	</properties>
+</EnumObject>

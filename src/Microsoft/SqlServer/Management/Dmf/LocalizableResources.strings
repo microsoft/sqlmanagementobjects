@@ -1,0 +1,15 @@
+######### Begin PolicyStore
+
+PolicyStore_Name=PolicyStore
+PolicyStore_Desc=Exposes properties of the PolicyStore object.
+
+PolicyStore_EnabledName=Enabled
+PolicyStore_EnabledDesc=Specifies whether Policy Management is enabled. 
+
+PolicyStore_HistoryRetentionInDaysName=HistoryRetentionInDays
+PolicyStore_HistoryRetentionInDaysDesc=Specifies the number of days that policy evaluation history should be retained. If this value is 0, the history will not be automatically removed.
+
+PolicyStore_LogOnSuccessName=LogOnSuccess
+PolicyStore_LogOnSuccessDesc=Specifies whether Policy Management logs successful policy evaluations. When this value is false, only failed policy evaluations are logged.
+
+####### End PolicyStore

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings distinct='true'>
+		<parent_link>
+			<link parent="Name" local="Grantee" />
+		</parent_link>
+		<property_link table='dbo.sysusers usr, master.dbo.spt_values spv'>
+			usr.uid &gt;= 16384 and
+			usr.uid &lt;= 16393 and
+			spv.type = 'DBR' and
+			((usr.uid = 16384 and spv.number &gt;= 16384 and spv.number &lt; 16392) or (usr.uid &lt;&gt; 16384 and usr.uid = spv.number)) and
+			spv.low &gt; 0		
+		</property_link>
+	</settings>
+	<properties>
+		<property name="Grantee" type="sysname">usr.name</property>
+		<property name="Description" type="sysname">spv.name</property>		
+	</properties>
+</EnumObject>

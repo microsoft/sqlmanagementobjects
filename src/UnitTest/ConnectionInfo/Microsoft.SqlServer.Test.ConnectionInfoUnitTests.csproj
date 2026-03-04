@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Globals">
+    <RootNamespace>Microsoft.SqlServer.ConnectionInfoUnitTests</RootNamespace>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <NoWarn>0436;$(NoWarn)</NoWarn>
+  </PropertyGroup>
+  <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
+  <ItemGroup>
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <Compile Include="..\Common\UnitTestBase.cs" />
+  </ItemGroup>
+</Project>

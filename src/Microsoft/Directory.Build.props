@@ -1,0 +1,33 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Label="GAC build settings" Condition="'$(GacVersion)' == 'true' and '$(TargetGroup)' == 'netfx'">
+      <DefineConstants>$(DefineConstants);NATIVEBATCHPARSER</DefineConstants> 
+  </PropertyGroup>
+  <!--
+    Used for projects under this directory which have strings to localize.
+    Enabling localization is done centrally in 'src\Directory.Build.targets' for projects which have strings as .strings file.
+    Some projects have strings as .resx file (without using .strings file), in such a case, localization should be enabled in the project file itself.
+    Refer to the SMO loc wiki or generic MSBuild+Retail loc wiki https://aka.ms/retailloc to understand the meaning of each element.
+  -->
+  <PropertyGroup>
+    <NeutralLanguage Condition="'$(NeutralLanguage)'==''">en-US</NeutralLanguage>
+    <PostBuildLocalization>true</PostBuildLocalization>
+    <!-- This metadata resolves to de;es;fr;it;ja;ko;pt-BR;ru;zh-Hans;zh-Hant;cz;pl;tr. -->
+    <LanguageSet>VS_Main_Languages</LanguageSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <LocalizeFile Include="$(TargetPath)">
+      <LclFile>$(EnlistmentRoot)\intl\lcl\{Lang}\%(Filename)%(Extension).lcl</LclFile>
+      <LciFile Condition="Exists('$(EnlistmentRoot)\intl\lci\%(Filename)%(Extension).lci')">$(EnlistmentRoot)\intl\lci\%(Filename)%(Extension).lci</LciFile>
+      <LssFiles>$(EnlistmentRoot)\intl\lss\P211SubparserExclusion.lss</LssFiles>
+      <CopyOption>LangIDOnPath</CopyOption>
+      <OutputPath>$(TargetDir)</OutputPath>
+    </LocalizeFile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

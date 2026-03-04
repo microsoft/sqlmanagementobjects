@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<EnumObject type="DatabaseScopedConfiguration" impl_type="SqlObject" min_major='13' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table='sys.database_scoped_configurations AS sp' />
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='2' expression="{0} + '/DatabaseScopedConfiguration[@Name=' + quotename({1},'''') + ']'">
+        <link_field type='parent' field="Urn" />
+        <link_field type='local' field="Name" />
+      </link_multiple>
+    </property>
+    <property name="Name" type="sysname">sp.name</property>
+    <property name="Id" type="int" access='Read'>sp.configuration_id</property>
+    <property name="Value" type="nvarchar" size="200" cast = "true" access='ReadWrite'>
+      CASE
+        WHEN SQL_VARIANT_PROPERTY(value,'BaseType') = 'bit' THEN 
+          CASE value
+            WHEN 1 THEN 'ON'
+            WHEN 0 THEN 'OFF'
+          END
+        ELSE ISNULL(value, 'NULL')
+      END
+    </property>
+    <property name="ValueForSecondary" type="nvarchar" size="200" cast = "true" access='ReadWrite'>
+      CASE
+        WHEN SQL_VARIANT_PROPERTY(value_for_secondary,'BaseType') = 'bit' THEN
+          CASE value_for_secondary
+            WHEN 1 THEN 'ON'
+            WHEN 0 THEN 'OFF'
+          END
+        ELSE ISNULL(value_for_secondary, 'PRIMARY')
+      END
+    </property>
+    <version min_major='14' cloud_min_major='12'>
+      <property name="IsValueDefault" type="bit" access="read">sp.is_value_default</property>
+    </version>
+  </properties>
+</EnumObject>

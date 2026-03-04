@@ -1,0 +1,39 @@
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in parameters,
+# which are identified with the .NET {x} format (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+
+#
+# LocStudio comments description:
+#
+
+; For localizers and UE (These comments will be seen in LocStudio)
+# For internal use (These comments will not be seen in LocStudio)
+
+# Comments should be added before the string. 
+
+# When the string resource file is complied the tool will read these comments 
+# and push the comment using the <comment> tag into the resx file.  
+# LocStudio parser looks in the resx file for the comment tag to load comments 
+# into the instruction field of the database. 
+# 
+# For LocStudio to parse the comments the resx name must match the .resources 
+# name in the manifest, so if you rename the namespace you need to change the 
+# name of the project as well.  After you have done this you will need to make a 
+# single character change to the string file and save, so that the SR.String cs 
+# file has the correct namespace embedded in it. 
+#
+
+[strings]
+MismatchType(type, provider)= The type of nodes, '{0}' and '{1}', do not match.
+NotRecognizedGraph= The type of the input graph is not recognized.
+CannotFindMetadataProvider= Cannot find the Metadata corresponds to the input type.
+FailedProviderLookup(provider, node)= Lookup operation on Provider '{0}' failed on object '{1}'.
+FailedProviderOperation(provider, node)= Operation on Provider '{0}' failed on object '{1}'.
+NotRecognizedProvider= The type of the specified provider is not recognized.

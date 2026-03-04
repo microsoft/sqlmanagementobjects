@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="MailProfile" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+	<property_link table='#tmp_sysmail_help_profile' alias='tshp'/>
+	<prefix>
+create table #tmp_sysmail_help_profile(profile_id int, name nvarchar(128), description nvarchar(256) null)
+
+insert into #tmp_sysmail_help_profile(profile_id, name, description) exec msdb.dbo.sysmail_help_profile_sp
+	</prefix>
+	<postfix>
+drop table #tmp_sysmail_help_profile
+	</postfix>
+    </settings>
+    <properties>
+	<include file='inc_urn.xml' />
+	<property name='Name' type='sysname'>tshp.name</property>
+	<property name='ID' type='int'>tshp.profile_id</property>
+	<property name='Description' type='nvarchar' size = '256'>ISNULL(tshp.description,N'')</property>
+    </properties>
+</EnumObject>

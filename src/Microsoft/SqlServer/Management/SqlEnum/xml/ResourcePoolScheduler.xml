@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<EnumObject type="ResourcePoolScheduler" impl_type="SqlObject" min_major='11' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+	<version min_major='11'>
+      <property_link table="[sys].[dm_os_memory_nodes]" alias= "[mn]"/>
+      <property_link join="
+                         (SELECT [osn].[memory_node_id] AS [numa_node_id], [sc].[cpu_id], [sc].[scheduler_id]
+                          FROM [sys].[dm_os_nodes] AS [osn]
+                          LEFT JOIN [sys].[dm_os_schedulers] AS [sc] 
+                              ON [osn].[node_id] = [sc].[parent_node_id] 
+                              AND [sc].[scheduler_id] &lt; 1048576
+                          WHERE [osn].[memory_node_id] &lt; (CASE WHEN @@version like '%(X64)%' THEN 64 ELSE 32 END)) AS [smap]"> [mn].[memory_node_id] = [smap].[numa_node_id]
+      </property_link>
+      <property_link join="[sys].[dm_resource_governor_resource_pools] AS [pls]"> 1 = 1 </property_link>
+      <property_link left_join="[sys].[dm_resource_governor_resource_pool_affinity] AS [aff]">
+        [pls].[pool_id] = [aff].[pool_id] 
+        AND ([smap].[scheduler_id] / (CASE WHEN @@version like '%(X64)%' THEN 64 ELSE 32 END)) = [aff].[processor_group]
+      </property_link>
+      <postfix>ORDER BY [smap].[numa_node_id], [smap].[scheduler_id] ASC</postfix>
+    </version>
+  </settings>
+  <properties>
+	<version min_major='11'>
+        <property name="NumaNodeId" type="int" access="Read">[mn].[memory_node_id]</property>
+		<property name="CpuId" type="int" access="Read">[smap].[cpu_id]</property>
+		<property name="SchedulerId" type="int" access="Read">[smap].[scheduler_id]</property>
+		<property name="PoolId" type="int" access="Read">[pls].[pool_id]</property>
+		<property name="SchedulerMask" type="bigint" access="Read">ISNULL([aff].[scheduler_mask], 0)</property>
+    </version>
+  </properties>
+</EnumObject>

@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_text" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		</settings>
+	<properties>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="Text" type="nvarchar" size='max' expensive='true' mode="design">{0}.definition</property>
+		</version>
+	</properties>
+</EnumObject>

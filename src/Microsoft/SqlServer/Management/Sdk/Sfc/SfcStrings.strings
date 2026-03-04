@@ -1,0 +1,168 @@
+
+# ------------------------------------------------------------
+# Copyright (c) Microsoft Corporation.  All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+# ------------------------------------------------------------
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in 
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+
+[strings]
+PropertyReadOnly(String propertyName) = Property '{0}' is read-only.
+PropertyNotSet(String propertyName) = Property '{0}' is not set.
+OperationValidOnlyInPendingState = This operation is only valid when the object is in the Pending state.
+SfcObjectInitFailed(String objName) = The initialize operation on object {0} failed.
+SfcInvalidConnectionContextModeChange(String fromMode, String toMode) = The connection context mode cannot be changed from {0} to {1}.
+InvalidKey(String keyName) = The {0} key is not a valid key. This can be because member variables are not yet set.
+InvalidKeyChain = The parent or key of the KeyChain is not the same as the previously set parent or key.
+InvalidRename = The rename failed.
+InvalidMove = The move failed.
+KeyExists(String key) = The {0} key already exists in the collection.
+KeyNotFound(String key) = The {0} key is not found in the collection.
+KeyAlreadySet = The key to this object is already set. Setting the keychain is not allowed.
+KeyChainAlreadySet = The key chain to this object already exists and the parents do not match.
+SfcInvalidArgument(String argumentName) = The '{0}' argument is either null or invalid.
+SfcInvalidReaderStream(String argumentName) = The '{0}' input stream is closed, at end-of-file or in an error state.
+SfcInvalidWriterStream(String argumentName) = The '{0}' output stream is closed or in an error state.
+SfcInvalidSerialization = Serialization output is invalid.
+SfcInvalidDeserialization = Deserialization input in corrupt.
+SfcInvalidDeserializationMissingParent(String instanceUri, String parentUri) = Deserialization input is invalid. The parent entry of '{0}' is missing. The parent entry '{1}' is expected to occurs before its children.
+SfcInvalidSerializationInstance(String instanceName) = Serialization operation on {0} has failed.
+SfcInvalidDeserializationInstance(String instanceName) = Deserialization operation on {0} has failed.
+SfcNullArgumentToSerialize = The instance passed in to serialize is a null instance.
+SfcNullArgumentToResolve = The instance passed in to resolve is a null instance.
+SfcNullArgumentToResolveCollection = The instance passed in to resolve collection is a null instance.
+SfcNullArgumentToSfcReferenceAttribute(string attribute) = The resolver type passed in to the '{0}' attribute is null.
+SfcNullInvalidSfcReferenceResolver(string resolverType, string resolverInterface) = The resolver type '{0}' does not implement interface '{1}' needed to perform resolving.
+SfcNullArgumentToViewAttribute = The view name passed in to the relation view attribute is null.
+SfcNullArgumentToProxyInstance = The instance passed in to the proxy as the referenced instance is null.
+SfcNullWriterToSerialize = The writer passed in to serialize is a null instance.
+SfcNullReaderToSerialize = The reader passed in to serialize is a null instance.
+SfcNonSerializableType(String typeName) = Type {0} is not supported for serialization. 
+SfcInvalidWriteWithoutDiscovery = Write method invoked without setting instances to serialize.
+SfcNonSerializableProperty(String property) = Serializer cannot handle the property {0}. The property is not in the property bag of the instance type.
+UnregisteredXmlSfcDomain(String sfcDomainName) = The Xml contains an unregistered Sfc Domain '{0}'
+UnregisteredSfcXmlType(String sfcDomain, String sfcType) = The Xml contains an unregistered Sfc Domain '{0}' with Type '{1}'
+CannotDeserializeNonSerializableProperty(String propertyName, String sfcTypeName) = The Xml contains property '{0}' within Sfc Type '{1}' that is attributed as non-serializable.
+SfcUnsupportedVersion = The serialized content's version is higher than the domain's current version. Deserialization cannot proceed.
+SfcUnsupportedDomainUpgrade = The domain does not support Serialization upgrade. Deserialization cannot proceed with older version content.
+EmptySfcXml = The Xml passed in is either empty or does not contain any Xml elements that could be deserialized.
+InvalidSfcXmlParentType(string sfcExpectedParentDomain, string sfcExpectedParentType, string sfcGivenParentType) = The Xml expects a parent object in Sfc Domain '{0}' with Type '{1}', but the parent object Type is '{2}'.
+InvalidSMOQuery(string query) = '{0}' is an invalid query expression for a SMO ObjectQuery. The query is expected to start with 'Server'.
+ParentHasNoConnecton = Cannot set a parent that is a root but does not have a connection.
+SfcQueryConnectionUnavailable = A query connection is unavailable or not supported for the requested query execution environment. This is usually due to a request for Multiple Active Queries on a single user mode server or other condition preventing a valid connection.
+BadCreateIdentityKey = CreateIdentityKey returned null. The domain implementation is incorrect.
+InvalidState(SfcObjectState current_state, SfcObjectState required_state) = Unable to perform this operation on an object in state '{0}'. The object must be in state '{1}'.
+CRUDOperationFailed(string opname, string objname) = Operation '{0}' on object '{1}' failed during execution.
+ObjectNotScriptabe(string objname, string className) = Domain error: object '{0}' is in the dependency graph but CRUD operation cannot be scripted. Consider changing IsCrudActionHandledByParent in TypeMetadata for class '{1}'.
+UnsupportedAction(string action, string className) = The action '{0}' is unsupported for type '{1}'.
+MissingParent = Must set the Parent to perform this operation.
+opCreate=Create
+opRename=Rename
+opMove=Move
+opAlter=Alter
+opDrop=Drop
+CannotMoveNoDestination(SfcInstance obj) = Cannot move object '{0}', no destination parent object given.
+CannotMoveDestinationIsDescendant(SfcInstance obj, SfcInstance destObj) = Cannot move object '{0}', the destination parent object '{1}' may not be our descendant.
+CannotMoveDestinationHasDuplicate(SfcInstance obj, SfcInstance destObj) = Cannot move object '{0}', the destination parent object '{1}' has a duplicate child.
+CannotRenameNoProperties(SfcInstance obj) = Cannot rename object '{0}', key has no properties.
+CannotRenameMissingProperty(SfcInstance obj, String missingProperty) = Cannot rename object '{0}', must have property '{1}'.
+CannotRenameNoKey(SfcInstance obj) = Cannot rename object '{0}', no key given.
+CannotRenameDestinationHasDuplicate(SfcInstance obj, SfcKey key) = Cannot rename object '{0}', the key '{1}' already exists.
+PermissionDenied = Don't have rights to execute requested operation.
+IncompatibleWithSfcListAdapterCollection(type) = Provided Collection is not compatible with SfcListAdapter. It should implement IList, IListSource or IEnumerable<{0}>.
+BadQueryForConnection(string query, string rootName) = '{0}': invalid query expression root when connected to '{1}'
+CannotCreateDestinationHasDuplicate(SfcInstance obj) = Object '{0}' already exists
+MissingSqlCeTools = Unable to Load Microsoft SQL Server Compact. Install Microsoft SQL Server Compact MSIs from the folder - Servers\\Setup on the SQL Server installation media. For more details, please refer to KB Article 952218.
+
+#Metadata
+AttributeConflict(string firstAttribute,secondAttribute,typeName,propertyName)=The {0} and {1} attributes on {2}.{3} are conflicting.
+DomainNotFound(string name) = Domain '{0}' was not found on the list of registered domain.
+
+#Strings from Enumerator
+PropertyUsageError(name, usage) = Property {0} cannot be used for {1}
+UsageRequest = request
+UsageFilter = filter
+UsageOrderBy = order by
+PropertyCannotHaveAlias(name) = Property {0} cannot have an alias. It is not requested.
+InvalidPrefixAlias(name) = Cannot find alias for property {0}. The Prefix property is null.
+AliasNotSpecified(name) = Cannot find alias for property {0}. Alias was not specified.
+InvalidAlias = Invalid alias kind.
+ResultNotSupported=result type not supported
+UnknownProperty(property)=unknown property {0}
+UnknownType(type)=unknown type {0}
+
+XPathUnclosedString = unclosed string
+XPathSyntaxError = syntax error
+FailedToLoadAssembly(string assembly) = failed to load assembly {0}.
+CouldNotInstantiateObj(string objType) = could not instantiate object {0}.
+UnknowNodeType = unknown node type
+UnknownOperator = unknown operator
+UnknownFunction = unknown function
+VariablesNotSupported = variables not supported
+UnknownElemType = unknown element type
+ChildrenNotSupported = child expressions are not supported.
+UnsupportedExpresion = unsupported expression
+NotDerivedFrom(string objType, string objName) = {0} is not derived from {1}.
+ISupportInitDataNotImplement(string objType) = {0} doesn't implement ISupportInitData, but it has a configuration file.
+UrnCouldNotBeResolvedAtLevel(string level) = urn could not be resolved at level {0}.
+InvalidNode = invalid node.
+NoPropertiesRequested = The query must have at least one property to return.
+FailedRequest=Failed to retrieve data for this request.
+
+# Strings from SqlEnumerator
+IncorrectVersionTag(string elemContent) = Incorrect version tag. You must specify either a min_major, cloud_min_major or datawarehouse_enabled attribute. \n\n{0}
+InvalidAttributeValue = Value '{0}' on attribute '{1}' was unable to be parsed correctly.
+NullVersionOnLoadingCfgFile = Version was not specified on loading configuration file.
+EnumObjectTagNotFound = Enumeration object tag was not found.
+InvalidConnectionType = Connection type is not valid.
+OnlyPathOrFullName = Only Path or only FullName must be specified.
+DatabaseNameMustBeSpecified = Database name must be specified.
+FailedToLoadResFile(fileName) = File {0} was not found.\nThe file might be missing in sources or misspelled in config.xml (note: file name in config.xml is case sensitive)
+UnsupportedTypeDepDiscovery(string objType, string suppList) = {0} is not supported in dependency discovery. Only objects of the following types are supported: {1}.
+QueryNotSupportedPostProcess(string propList) = Cannot provide DataReader because of the properties: {0}
+
+FailedToCreateUrn(string objCode) = failed to create Urn for object code: {0}
+
+PropMustBeSpecified(string prop, string obj) = {0} must be specified on {1}.
+InvalidUrnForDepends(string urn) = Urn is not valid for dependency discovery: {0}
+TooManyDbLevels = too many database levels.
+InvalidConfigurationFile = Configuration file is not valid.
+MissingSection(string section) = invalid configuration file: missing section {0}.
+NotDbObject = object is not under database.
+NotSingleDb = objects are not in a single database.
+NoClassNamePostProcess = <post_process> tag missing class_name.
+InvalidVersion(string version) = Operation not supported on version {0}.
+InvalidSqlServer(string productName) = Operation not supported on {0}.
+DatabaseNameMustBeSpecifiedinTheUrn(string urn) = The database name must be specified in the urn: {0}
+CouldNotGetInfoFromDependencyRow(string rowInformation) = Failed to retrieve dependency information ({0}).
+SqlServer90Name = SQL Server 2005
+SqlServer80Name = SQL Server 2000
+InvalidTypeForProperty(string propertyName,string typeName) = The property '{0}' is not valid from the type '{1}' context
+
+InvalidUrn = Invalid URN.
+UnknownDomain(string root) = URN starts with an unknown root element '{0}'.
+NoProvider(string urn) = No provider is available for URN '{0}'.
+LevelNotFound(string level, string urn) = Unknown level '{0}' in URN '{1}'.
+InvalidKeyValue(string key, string urn) = Empty key '{0}' in URN '{1}'.
+MissingKeys(string urn, string level) = URN '{0}' has one or more missing keys at level '{1}'.
+ServerNameMissing(string urn) = Server name is missing from URN '{0}'.
+
+#strings added during design mode changes
+DomainRootUnknown(string fullTypeName) = Domain root for type '{0}' is unknown. Cannot retrieve logical version.
+
+#SfcUnsupportedVersionException
+PropertyNotsupported = Property not supported for current server version.
+ObjectNotSupportedOnSqlDw = This object is not supported on Azure Synapse Analytics databases.

@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<EnumObject type="AgentSubSystem" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+        <settings>
+				<parent_link>
+					<link parent="ID" local="ProxyID" />
+				</parent_link>
+        
+                <property_link table='#tmp_sp_help_proxy_subsystem' alias='tsepfs'/>
+				<prefix>
+create table #tmp_sp_enum_sqlagent_subsystems
+(subsystem nvarchar(max) null, description nvarchar(max) null, subsystem_dll nvarchar(max) null, agent_exe nvarchar(max) null, start_entry_point nvarchar(max) null, event_entry_point nvarchar(max) null, stop_entry_point nvarchar(max) null, max_worker_threads int null, subsystem_id int null)
+create table #tmp_sp_help_proxy_subsystem(subsystem nvarchar(max) null, proxy_id int null, name nvarchar(128) null, credential_identity nvarchar(128) null, enabled tinyint null, description nvarchar(1024) null, user_sid varbinary(40) null,  credential_id int null, credential_identity_exists int null)
+
+insert into #tmp_sp_enum_sqlagent_subsystems(subsystem, description, subsystem_dll, agent_exe, start_entry_point, event_entry_point, stop_entry_point, max_worker_threads, subsystem_id)
+		exec msdb.dbo.sp_enum_sqlagent_subsystems
+		
+declare @subsystem nvarchar(max)
+declare @login sysname
+set @login = suser_sname()
+		
+declare crs insensitive cursor 
+	for ( select subsystem from #tmp_sp_enum_sqlagent_subsystems ) 
+for read only 
+open crs 
+fetch crs into @subsystem
+while @@fetch_status &gt;= 0 
+begin 
+	if 'TSQL' != @subsystem
+	begin
+		insert into #tmp_sp_help_proxy_subsystem(proxy_id, name, credential_identity, enabled, description, user_sid, credential_id, credential_identity_exists) 
+			exec msdb.dbo.sp_help_proxy @subsystem_name = @subsystem, @name = @login
+		
+		update #tmp_sp_help_proxy_subsystem set subsystem = @subsystem where subsystem is null
+	end		
+	fetch crs into @subsystem
+end 
+close crs
+deallocate crs
+               </prefix>
+                <postfix>
+drop table #tmp_sp_help_proxy_subsystem
+                </postfix>
+ 				<postfix>
+drop table #tmp_sp_enum_sqlagent_subsystems
+				</postfix>
+        </settings>
+        <properties>
+			<include file='inc_urn.xml' />
+            <property name='Name' type='sysname'>tsepfs.subsystem</property>
+            <property name='ProxyID' type='int' hidden='true'>tsepfs.proxy_id</property>
+        </properties>	
+</EnumObject>

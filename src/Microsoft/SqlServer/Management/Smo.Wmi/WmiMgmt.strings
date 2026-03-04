@@ -1,0 +1,706 @@
+# String resource file 
+#
+# When processed by the String Resource Tool, this file generates
+# both a .CS and a .RESX file with the same name as the file.
+# The .CS file contains a class which can be used to access these 
+# string resources, including the ability to format in 
+# parameters, which are identified with the .NET {x} format
+# (see String.Format help).    
+#
+# Comments below assume the file name is SR.strings.
+#
+# Lines starting with a semicolon ";" are also treated as comments, but
+# in a future version they will be extracted and made available in LocStudio
+# Put your comments to localizers _before_ the string they apply to.
+#
+
+# SMO build specific comment
+# after generating the .resx file, run resgen on it and get the .resources file
+# please remember to also check that .resources in, along with the 
+# .strings and .cs file
+[strings]
+
+LoginPropertyNotSet = You must set the Login property before creating an user.
+LoginEnable = Enable Login.
+LoginDisable = Disable Login.
+
+CannotSetPrivilege(privName) = The privilege {0} cannot be set for this type of object.
+
+
+; this exception gets thrown when the user is requesting a collection that is not availabel on this version of server.
+CollectionNotAvailable(string objectname, string serverversion) = {0} collection is not accessible on server version {1}.
+
+TriggerNotSupported(string serverversion) = INSTEAD OF triggers are not supported on server version {0}.
+CannotEnableViewTrigger = You cannot set Enabled property while creating a view trigger.
+
+UnknownRecoveryModel(string modelname) = Recovery model {0} is unknown.
+UnknownUserAccess(string modelname) = Unknown user access {0}.
+
+CannotRenameObject(string objectname, string serverversion) = You cannot rename object {0} on server version {1}.
+
+; if the property is missing the script cannot be generated
+PropertyNotSet(string propname, string objtype) = Set property {0} for {1} object to accomplish this action.
+
+ColumnAlreadyHasDefault(string name) = Column {0} already has a default.
+ColumnHasNoDefault(string colname, string defname ) = Column '{0}' does not have a default named '{1}'.
+
+MismatchingServerName(string srvname, string urnsrvname) = The input Urn belongs to server {1}, instead of server {0}. 
+
+MissingBackupDevices = No backup devices are set.
+
+MissingBackupDeviceType = You must specify the type of the backup devices.
+
+MismatchingNumberOfMirrors(int i1, int i2) = There is a mismatch in the number of mirrored devices. Expected {0}, received {1}.
+
+BackupToPipesNotSupported(string serverversion) = Backup to pipe device is not supported on server version {0}.
+
+LoginHasUser( string name, string dbname) = The proposed new database owner {0} is mapped as user {1} in this database.
+LoginHasAlias( string name) = The proposed new database owner {0} already has an alias in this database.
+InvalidLogin(string loginname) = The login '{0}' does not exist on this server.
+
+UnknownShrinkType = Unknown Shrink type.
+InvalidShrinkMethod(string name) = Shrink method {0} is not supported here.
+CannotChangePrimary = The primary file must reside in the PRIMARY filegroup.
+OnlyOnePrimaryFile = The PRIMARY filegroup already has a primary file.
+MustSpecifyGrowth = You must specify Growth if you want to change GrowthType for this object.
+WrongPercentageGrowth = Percentage growth must be a positive integer.
+WrongSize = The size specified represents a value that is out of bounds.
+
+; thrown when a foreign key or an index references a nonexistent column.
+ObjectRefsNonexCol( string objname, string key, string col )= The {0} '{1}' references nonexistent column '{2}'.
+
+; Exception thrown when an object already exists in the collection where we tried to add it.
+CannotAddObject(string typename, string objectName) = {0} '{1}' could not be added to the collection, because it already exists.
+UnknownObjectType(string name) = Unknown object type {0}.
+TooFewFiles = At least one file is needed for Database Attach.
+; thrown when we get a property from the enumerator that we do not have in the property bag.
+UnknownProperty(string name, string typename) = Property {0} does not belong to {1}.
+ObjectNotUnderServer(string name) = object {0} does not live under Server.
+UnknownChild = Child object does not fit with the type of the child collection.
+UnknownChildCollection(string objtypename, string childname) = {0} object does not contain a collection of {1}.
+CantCreateType(string name) = Type {0} could not be created.
+ObjectAlreadyExists(string type, string name) = The {0} '{1}' already exists.
+NoSqlGen(string objname) = No Transact-SQL was generated to create the object '{0}'.
+InvalidType(string typename) = Type {0} is invalid.
+WrongUrn(string objectType, string urn ) = The {0} object cannot be created with Urn='{1}'.
+NoDepForSysObjects(string objUrn) = Scripting system objects with dependencies is not supported when AllowSystemObjects is set to false. Error at Urn ='{0}'.
+UrnMissing(string urn) = Urn '{0}' is missing from the dependencies list.
+InvalidGranteeList = The grantee list is not valid.
+DatabaseAlreadyExists = Cannot attach a database with the same name as an existing database.
+ObjectWithNoChildren(string objectName, string childName) = Cannot create {0} that does not contain at least one {1}.
+ColumnBeforeNotExisting(string colname) = Failed to insert column, because column '{0}' does not exist.
+PropNotModifiable( string propName, string objectType ) = Modifying the {0} property of the {1} object is not allowed. You must drop and recreate the object with the desired property.
+UnsupportedLoginMode(string loginmode) = The login mode {0} is not supported.
+CannotSetDefInitFlds(string typename) = The type {0} cannot have default init fields.
+ReasonTextIsEncrypted = The text is encrypted.
+ReasonPropertyIsNotSupportedOnCurrentServerVersion = Property is not supported on current server version
+
+; Exception thrown when a child collection is not found
+InvalidPathChildCollectionNotFound(string child, string parent) = Invalid path: There is no collection of {0} objects that is a child of {1}.
+
+SqlInnerException = An exception occurred while executing a Transact-SQL statement.
+InnerException = An exception occurred in SMO.
+InnerWmiException = An exception occurred in SMO while trying to manage a service.
+UnknownError = Unknown error.
+WMIException(string errorCode) = The call failed with WMI error {0}. Please consult the WMI documentation.
+CallingInitChildLevelWithWrongUrn(string urn) = InitChildLevel has been called with {0}.
+UnsupportedBackupDeviceType(string name) = Cannot create device with type {0}.
+UnsupportedVersion(string version) = This method cannot be called on the server version {0}.
+ObjectDoesNotExist(string type, string name) = The {0} '{1}' does not exist on the server.
+UnsupportedFeature(string type) = {0} is not supported on this edition of SQL Server.
+OneFilePageSupported = You can specify pages for only one file in this operation.
+NoObjectWithoutColumns(string objName) = Cannot create {0} without specifying one or more columns.
+ConflictingScriptingOptions(string opt1, string opt2) = Cannot specify both {0} and {1} as scripting options.
+SupportedOnlyBelow90 = This method or property is accessible only while working against a version earlier than SQL Server 2005.
+SupportedOnlyOn90 = This method or property is accessible only while working against SQL Server 2005 or later.
+SupportedOnlyOn80 = This method or property is accessible only while working against SQL Server 2000 or later.
+EmptyInputParam(string paramName, string paramKind) = The input parameter {0} must be a non-empty {1} for this operation to succeed.
+MustSpecifyOneParameter = You must specify a parameter with a non-empty name for this aggregate function.
+MutuallyExclusiveProperties(string prop1, string prop2) = {0} and {1} cannot both be set at the same time.
+NeedPSParams = PartitionSchemeParameters need to be non-empty when PartitionScheme has been set.
+IndexMustBeClustered(string tableName, string indexName) = {0}.{1} is not a clustered index.
+ParentMustExist(string objectType, string objectName) = Cannot create {0} '{1}' if parent is not yet created.
+ViewCannotHaveKeys = You cannot create a PRIMARY KEY or an UNIQUE KEY on a view.
+InvalidAcctName = The account name is not valid.
+OperationOnlyInPendingState = Cannot perform the operation on this object, because the object is a member of a collection.
+OperationNotInPendingState = Cannot execute this operation for an object that is in Pending state.
+OperationNotInPendingState1(string prop1) = Before executing this operation you need to set {0} for this object.
+OperationNotInPendingState2(string prop1, string prop2) = Before executing this operation you need to set {0} and {1} for this object.
+OperationNotInPendingState3(string prop1, string prop2, string prop3) = Before executing this operation you need to set {0} and {1} and {2} for this object.
+
+NotXmlIndexOnView = An XML index cannot be created on a view.
+OneColumnInXmlIndex = An XML index can have only one column.
+NoXmlIndexUnique = An XML index cannot be unique.
+NoXmlIndexClustered = An XML index cannot be clustered.
+Version80SP3Only = This property or method requires Microsoft SQL Server 2000 Service Pack 3 or later.
+CantSetDefaultFalse = The IsDefault property cannot be set to false. Please select another file group and try to make it default.
+TimeoutMustBePositive = A positive value must be supplied for the transaction termination time.
+NoPropertyChangeForDotNet(string propertyName) = The {0} property cannot be changed for .NET run-time routines.
+ClrNotSupported(string propName, string version) = Invalid value for property {0}. .NET run-time routines are not supported on server version {1}.
+InvalidPropertyNumberRange(string propName, string numberMin, string numberMax) = Invalid value for {0} property: the value must be a number between {1} and {2}.
+WrongPropertyValueException(string PropName, string PropValue) = The {0} property cannot have a value of {1} for this version of SQL Server.
+InvalidCollation(string name) = Collation '{0}' is not valid.
+ViewColumnsCannotBeModified = View columns cannot be modified or created.
+NeedToPassObject(string objtype) = Transfer cannot process {0}. You need to pass an instance class object.
+InexistentDir(string dir) = The directory '{0}' does not exist.
+CantCreateTempFile(string dir) =Cannot create temporary file in directory '{0}'.
+UnknownFilter(string filter) = Internal error: the filter '{0}' cannot be processed by the prefetch operation.
+SystemMessageReadOnly = The SystemMessage object is read only.
+MessageIDTooSmall(int id) = The user defined messages need to have id's bigger than 50000.
+DataTypeUnsupported(string dt) = DataType instantiation failed: {0} type not supported by the constructor.
+CantSetTypeName(string type) = Cannot set Name property for the {0} type.
+CantSetTypeSchema(string type) = Cannot set Schema property for the {0} type.
+UnknownSqlDataType(string type) = The value does not belong to SqlDataType enumeration.
+NeedExistingObjForDataType(string objName) = DataType instantiation failed: the object {0} does not exist on the server.
+NoPendingObjForDataType(string state) = An object in {0} state cannot be used to create a DataType.
+
+ViewFragInfoNotInV7 = Fragmentation information is not available for views on SQL Server 7.0.
+InvalidOptionForVersion(string method, string optionName, string SqlVersionName) = {0} failed: the {1} option is not available for {2}.
+InvalidParamForVersion(string method, string paramName, string SqlVersionName) = {0} failed: the {1} parameter cannot be specified on {2}.
+InvalidPropertyValueForVersion(string typeName, string propertyName, string value, string sqlVersionName) = {0}.{1}: {2} is not a valid option for {3}.
+UnknownLanguageId(string langid) = {0} is not a valid language id on the server.
+UnknownEnumeration(string type) = Unexpected value for enumeration type {0}.
+MissingConfigVariable(string fnName, string varName) = The function {0} was called without supplying variable {1}.
+DtsNotInstalled = The Integration Services component is not installed or you do not have permission to use it.
+NSNotInstalled = The Notification Services component is not installed or you do not have permissions to use it.
+InvalidNSOperation = The Notification Services operation performed is invalid.
+NSNotConnectedToServer = Unable to perform this operation as the object is not connected to a server.
+;InvalidNSInstanceName = The instance name is not valid. Instance names cannot contain the following characters: open bracket ([), close bracket (]), quotation mark ("), single quote ('), baskslash (\\), forward slash (/).
+;RequiredElementMissing(string elementName) = A required element: {0} is missing.
+InvalidThreadPoolSize = The ThreadPoolSize entry is not valid. It must be a non-negative integer.
+InvalidQuantumLimit = The specified quantum limit is not valid. The quantum limit value must be a non-negative integer.
+InvalidQuantumDuration = The quantum duration specified is not valid. The value must be at least 1 second.
+InvalidThrottle = The specified throttle value is not valid. The value must be a non-negative integer.
+InvalidFailuresBeforeLoggingEvent = The FailuresBeforeLoggingEvent entry is not valid. It must be a non-negative integer.
+InvalidFailuresBeforeAbort = The FailuresBeforeAbort entry is not valid. It must be a non-negative integer.
+InvalidMulticastRecipientLimit = The MulticastRecipientLimit entry is not valid. It must be a non-negative integer.
+InvalidNotificationClassBatchSize = The NotificationBatchSize value is not valid. It must be an non-negative integer.
+ThreadPoolSizeNotValidForEdition (string componentName, int threadPoolSize) = The {0} ThreadPoolSize value must be {1} for the Standard Edition of Notification Services.
+StartTimeGreaterThanADay = The start time for a vacuumer is the time within a day and cannot be greater than 24 hours.
+InvalidPropertySetForExistingObject (string propertyName) = Cannot set property {0} for an existing Notification Service Instance or Application.
+InvalidEncryptArgumentsAndArgumentKey (string EncryptArguments, string ArgumentKey) = Invalid values for properties Instance.{0} and Instance.{1}. If you set Instance.{0} then you must provide a valid Instance.{1}. If you provide an Instance.{1} then you must set Instance.{0}. You must set these properties correctly to encrypt or decrypt argument values.
+
+RequiredChildMissingFromParent(string requiredChildType, string parentName, string parentType) = A required object of type: {0} is missing from parent object: '{1}' (Type: {2}).
+
+
+NoPermissions=No permissions have been specified.
+WrongParent(string objectName)=Parent property of object {0} does not match the collection's parent to which it is added.
+VerifyFailed(string database, string backupType)=Verify failed. Backup information for database '{0}' (type {1}) not found.
+VerifyFailed0(string database)=Verify failed. Backup information for database '{0}' not found.
+PrimaryFgMustHaveFiles=The PRIMARY filegroup must have at least one file.
+NeedToSetParent=You must set Parent property.
+InvalidVersion(string version)=Invalid version: {0}.
+ErrorInCreatingState=You cannot execute this operation since the object has not been created.
+ConflictingSwitches(string prop1, string prop2) = The {0} and {1} properties have conflicting settings.
+BackupFailed=Backup operation failed.
+RestoreFailed=Restore operation failed.
+BadCompatLevel(string level) = {0} database compatibility level is not supported.
+SetPasswordError = SetPassword cannot be used on existing objects. Use ChangePassword to change the password for an existing object.
+PassPhraseAndIdentityNotSpecified=Both pass phrase and identity phrase are not specified.
+PassPhraseNotSpecified=Pass phrase is not specified.
+NotEnoughRights=Could not read metadata, possibly due to insufficient access rights.
+
+###############################################################################
+# Header printed before scripted objects
+# {0} - object type (e.g. Table, View etc.)
+# {1} - object name (e.g. [dbo].[authors]
+# {2} - timestamp 
+IncludeHeader(string objectType, string name, string dateString)=/****** Object:  {0} {1}    Script Date: {2} ******/
+
+
+
+
+
+###############################################################################
+# Internal erorrs 
+NoUrnSuffix=Internal SMO error. This object does not have UrnSuffix or it is empty string.
+FullPropertyBag(string propName)=Internal SMO error. OnPropertyMissing(\"{0}\") was called for a full property bag.
+MultipleRowsForUrn(string urnName)=Internal SMO error. SqlSmoObject.ImplInitialize() got multiple rows for urn '{0}'.
+GetParentFailed=Internal SMO error. Trying to get the Parent property through reflection failed.
+ParentNull=Internal SMO error. Parent property is null.
+CouldNotFindKey(string keyName)=Internal SMO error. Could not find key {0}.
+UnsupportedUrnFilter(string attrib, string functionType) = Internal SMO error. During prefetch the filter attribute {0} does not support function type {1}.
+UnsupportedUrnAttrib(string attrib) = Internal SMO error. During prefetch the filter attribute {0} is not supported.
+###############################################################################
+
+
+
+###############################################################################
+# ServiceBroker exceptions
+MappingObjectIdMissing(string typename, int id ) = The {0} with ID={1} does not exist. You cannot create a {0}Mapping.
+EmptyMapping(string parent, string mappingname) = Cannot create a {0} object if the {1}Collection is empty.
+ExecutionContextPrincipalIsNotSpecified = ExecutionContextPrincipal property needs to be set for this activation execution context 
+###############################################################################
+
+
+###############################################################################
+; the following error messages are Service call error codes
+; More references on those error messages can be found in WMI documentation
+
+ServiceError0=The request was accepted.
+ServiceError1=The request is not supported.
+ServiceError2=The user did not have the necessary access.
+ServiceError3=The service cannot be stopped because other running services depend on it.
+ServiceError4=The requested control code is not valid, or it is unacceptable to the service.
+ServiceError5=The requested control code cannot be sent to the service because the state of the service (Win32_BaseService:State) is equal to 0, 1, or 2.
+ServiceError6=The service has not been started.
+ServiceError7=The service did not respond to the start request in a timely fashion.
+ServiceError8=Unknown failure when starting the service.
+ServiceError9=The directory path to the service executable was not found.
+ServiceError10=The service is already running.
+ServiceError11=The database to add a new service is locked.
+ServiceError12=A dependency for which this service relies on has been removed from the system.
+ServiceError13=The service failed to find the service needed from a dependent service.
+ServiceError14=The service has been disabled from the system.
+ServiceError15=The service does not have the correct authentication to run on the system.
+ServiceError16=This service is being removed from the system.
+ServiceError17=There is no execution thread for the service.
+ServiceError18=There are circular dependencies when starting the service.
+ServiceError19=There is a service running under the same name.
+ServiceError20=There are invalid characters in the name of the service.
+ServiceError21=Invalid parameters have been passed to the service.
+ServiceError22=The account that this service is to run under, is either invalid or lacks the permissions to run the service.
+ServiceError23=The service exists in the database of services available from the system.
+ServiceError24=The service is currently paused in the system.
+###############################################################################
+
+############################################################
+# Agent specific exceptions
+UnknownCategoryName(string name) = Unknown Category Name {0}.
+UnknownCategoryType(string typename) = Unknown Category Type {0}.
+UnknownOperator(string name) = The operator {0} does not exist.
+############################################################
+
+############################################################
+# UnsupportedFeatureAreas
+UnsupportedFeatureSqlAgent=SQL Server Agent
+UnsupportedFeatureSqlMail=Database Mail
+UnsupportedFeatureServiceBroker=SQL Server Service Broker
+UnsupportedFeatureFullText=Full-text
+
+############################################################
+# WMI Specific exceptions
+InvalidServerUrn(string serverName) = The input Urn refers to server {0}.
+InvalidUrn(string type) = Urn that starts with {0} is currently not supported.
+WMIProviderNotInstalled(string machineName) = SQL Server WMI provider is not available on {0}.
+PropertyCannotBeChangedAfterConnection(string propertyName) = Property {0} cannot be changed after connection is established.
+CouldNotFindManagementObject(string type, string name) = Could not find management object for {0} {1}.
+############################################################
+
+############################################################
+# Server Events exceptions
+CannotSubscribe = Cannot create an event subscription.
+CannotStartSubscription = Cannot start an event subscription.
+NotSupportedNotification(string className, string eventType) = Property could not be set. The {0} object does not support {1} event notification.
+
+############################################################
+# Registered Server exceptions
+InnerRegSvrException = An exception occurred in the RegisteredServer store while updating it.
+
+# Registered Server Type Name
+SqlServerTypeName = Microsoft SQL Servers
+
+############################################################
+# From this point on, only messages used by the exception classes
+############################################################
+
+MissingObjectExceptionText( string parentName, string objectName, string serverVersion) = The object {0} is missing from parent {1}. Server version is {2}.
+PropertyNotSetExceptionText(string propertyName) = Set property {0} to accomplish this action.
+WrongPropertyValueExceptionText(string propName, string propValue) = Cannot execute this operation while the property {0} is set to '{1}'.
+PropertyTypeMismatchExceptionText(string propname, string received, string expected) = Type mismatch when trying to assign value to property {0}. Received {1} instead of {2}.
+MissingPropertyExceptionText( string propertyName, string serverVersion ) = The property {0} does not exist on server version {1}, or you do not have access to it.
+UnknownPropertyExceptionText( string propertyName) = {0}: unknown property.
+PropertyReadOnlyExceptionText(string name) = Cannot change property {0}. It is read-only.
+InvalidSmoOperationExceptionText(string opName, string state) = You cannot perform operation {0} on an object in state {1}.
+PropertyCannotBeRetrievedExceptionText(string objType, string propname, string objName) = Property {0} is not available for {1} '{2}'. This property may not exist for this object, or may not be retrievable due to insufficient access rights. 
+ObjectDroppedExceptionText(string type, string name) = Cannot access properties or methods for the {0} '{1}', because it has been dropped.
+UnsupportedObjectNameExceptionText(string objectType) = Cannot use empty object names for {0}.
+FailedtoInitialize(string urn) = Failed to initialize Urn {0}.
+PropertyMustBeSpecifiedInUrn(string propName, string nodeType)=The input Urn must specify {0} at level {1}.
+InvalidScanType(string scanType) = Error creating Statistic object; {0} is not a valid statistic scan type.
+ColumnsMustBeSpecified = Error creating Statistic object, columns must be specified.
+PasswdModiOnlyForStandardLogin = Password can be modified only for a Standard login.
+DenyLoginModiNotForStandardLogin = DenyWindowsLogin cannot be modified for a Standard login.
+CannotCreateExtendedPropertyWithoutSchema = Cannot create ExtendedProperty, because schema is not specified on the parent object.
+InvalidSchema = Schema is not valid.
+FailedToChangeSchema = Schema can only be changed for an existing object. 
+InvalidUrnServerLevel = Invalid Urn filter on server level: filter must be empty, or server attribute must be equal with the true server name.
+ServerLevelMustBePresent = Server level must be present.
+TempTablesNotSupported(string tableName) = Invalid table name: '{0}'. Temporary tables are not supported.
+TypeSchemaMustBeDbo(string prop, string value) = UserDefinedDataType {0} must be dbo. It is {1}.
+OperationInProgress = An operation is already in progress. 
+UnssuportedPermission(string permName) = Unsupported permission {0}.
+InvalidVersionSmoOperation(string version) = Operation is not supported on {0}.
+CannotChangePassword = Cannot change password for Windows login.
+OperationNotSupportedWhenPartOfAUDF = Operation is not supported when part of a UserDefinedFunction.
+FailedToWriteProperty(propName, objectType, objectName, reason) = Writing property {0} of {1} '{2}' is not allowed when {3}.
+ReasonIntextMode = TextMode has been set
+ReasonNotIntextMode = TextMode has not been set
+SyntaxErrorInTextHeader(objectType, objectName) = Syntax error in TextHeader of {0} '{1}'.
+IncorrectTextHeader(objectType, objectName, propNameSmall, propName) = The {2} specified in the TextHeader property of {0} '{1}' must match {3} property.
+CollectionCannotBeModified = Collection cannot be modified when 
+KeyOptionsIncorrect = Symmetric key options are incorrect
+PropertyIsInvalidInUrn(string propName, string nodeType)=The input Urn property {0} at level {1} has invalid value.
+TableOrViewParentForUpdateStatistics = Parent of Column must be Table or View in order to call UpdateStatistics
+ReasonObjectAlreadyCreated(string objName)={0} is already created.
+ServerSphinx = SQL Server 7.0
+ServerShiloh = SQL Server 2000
+ServerYukon = SQL Server 2005
+PropertyAvailable = This property is not available on 
+ServerPropertyMustBeSetForOlap = Server property needs to be set for the OLAP subsystem
+InvalidInstanceName = Server name cannot be split into machine and instance names.
+TransferCtorErr=You must supply an existing Database object.
+UnsupportedVersionException=Either the object or one of its properties is not supported on the target server version.
+CantScriptObject(string urn)=Cannot script the object with Urn='{0}'.
+
+####################################################################
+; This is how to interprest this exception string
+; {0} is an operation name, see below a list of names
+; {1} is an object type, see below object types
+; {2} is an object name
+; E.G.: Create failed for Table 't1'
+FailedOperationExceptionText(string opName, string objType, string objName) = {0} failed for {1} '{2}'.
+FailedOperationExceptionText2(string opName) = {0} failed.
+FailedOperationExceptionText3(string opName, string objType, string objName, string Reason) = {0} failed for {1} '{2}'. Reason: {3}.
+
+; the message below is thrown for collections
+; e.g. Collection lookup failed for LoginCollection of Server '[sf_sql70]'.
+FailedOperationExceptionTextColl(string opName, string coll, string objType, string parent) = {0} failed for {1}  of {2} '{3}'.
+; customized message for script failure
+FailedOperationExceptionTextScript(string objType, string objName) = The {0} '{1}' cannot be scripted as its data is not accessible.
+; failed operation not supported in database temp db
+FailedOperationMessageNotSupportedTempdb=this object does not support this operation for database tempdb
+####################################################################
+
+####################################################################
+#       Operation names
+####################################################################
+SetAccount=Set account
+Create=Create
+Alter=Alter
+Drop=Drop
+Rename=Rename
+Script=Script
+Grant=Grant
+Revoke=Revoke
+Deny=Deny
+GrantWithGrant=GrantWithGrant
+Bind=Bind
+Unbind=Unbind
+AddDefaultConstraint=Add default constraint
+TestMailProfile=Test mail profile
+TestNetSend=Test net send
+SetState=Set state
+DropAndMove=Drop and move
+GetSmoObject=Attempt to retrieve data for object
+AdvancedProperties=Advanced properties
+AddCollection=Add object to collection
+RemoveCollection=Remove object from collection
+This=Indexer
+Abort=Abort
+AddMember=Add member
+DropMember=Drop member
+EnumMembers=Enumerate members
+EnumPermissions=Enumerate permissions
+AddMemberServer=Add member server
+EnumMemberServers=Enumerate member servers
+RemoveMemberServer=Remove member server
+ResetOccurrenceCount=Reset occurrence count
+AddNotification=Add notification
+RemoveNotification=Remove notification
+UpdateNotification=Update notification
+EnumNotifications=Enumerate notifications
+ApplyToTargetServer=Apply to target server
+ApplyToTargetServerGroup=Apply to target server group
+EnumAlerts=Enumerate alerts
+EnumHistory=Enumerate history
+EnumJobStepOutputLogs=Enumerate job step output logs
+EnumTargetServers=Enumerate target servers
+EnumJobSteps=Enumerate job steps
+Invoke=Invoke
+PurgeHistory=Purge history
+AddSharedSchedule=Add shared schedule
+RemoveSharedSchedule=Remove shared schedule
+RemoveAllJobSchedules=Remove all job schedules
+RemoveAllJobSteps=Remove all job steps
+RemoveFromTargetServer=Remove from target server
+RemoveFromTargetServerGroup=Remove from target server group
+Start=Start
+Stop=Stop
+SetPassword=Set password
+ChangePassword=Change password
+EnumDatabaseMappings=Enumerate database mappings
+GetDatabaseUser=Get database user
+AddToRole=Add to role
+AttachDatabase=Attach database
+DetachDatabase=Detach database
+EnumCollations=Enumerate collations
+EnumPerformanceCounters=Enumerate performance counters
+EnumErrorLogs=Enumerate error logs
+EnumDatabaseMirrorWitnessRoles=Enumerate database mirror witness roles
+ReadErrorLog=Read error log
+KillDatabase=Kill database
+KillProcess=Kill process
+GetActiveDBConnectionCount=Get active connection count
+DropAllActiveDBConnections=Drop all active database connections
+EnumDirectories=Enumerate directories
+EnumLocks=Enumerate locks
+AddPrivateKey=Add private key
+ExportCertificate=Export
+ChangePrivateKeyPassword=Change private key password
+RemovePrivateKey=Remove private key
+AddKeyEncryption=Add key encryption
+DropKeyEncryption=Drop key encryption
+SymmetricKeyOpen=Open symmetric key
+SymmetricKeyClose=Close symmetric key
+EnumLogins=Enumerate logins
+EnumWindowsDomainGroups=Enumerate domain groups
+EnumProcesses=Enumerate processes
+EnumStartupProcedures=Enumerate startup procedures
+EnumWindowsUserInfo=Enumerate user information
+EnumWindowsGroupInfo=Enumerate group information
+EnumAvailableMedia=Enumerate available media
+EnumServerAttributes=Enumerate server attributes
+DeleteBackupHistory=Delete backup history
+Refresh=Refresh
+EnumBoundColumns=Enumerate bound columns
+EnumBoundDataTypes=Enumerate bound data types
+CheckAllocations=Check allocations
+CheckCatalog=Check catalog
+CheckIdentityValues=Check identity values
+CheckTables=Check tables
+CheckTable=Check table
+Shrink=Shrink
+RecalculateSpaceUsage=Recalculate space usage
+PrefetchObjects=Prefetch objects
+EnumTransactions=Enumerate transactions
+GetTransactionCount=Get transaction count
+ImportXmlSchema=Import XML schema
+ExtendXmlSchema=Extend XML schema
+RemoveFullTextCatalogs=Remove full-text catalogs
+SetDefaultFullTextCatalog=Set default full-text catalog
+SetDefaultFileGroup=Set default file group
+CheckFileGroup=Check file group
+CheckIndex=Check index
+Checkpoint=Checkpoint
+Cleanup=Cleanup
+UpdateLanguageResources=Update language resources
+EnumLanguages=Enumerate languages
+ClearHostLoginAccount=Clear host login account
+SetProxyAccount=Set proxy account
+ClearProxyAccount=Clear proxy account
+SetMsxAccount=Set master server account
+ClearMsxAccount=Clear master server account
+CycleErrorLog=Cycle agent error log
+EnumJobHistory=Enumerate job history
+EnumJobs=Enumerate jobs
+MoreThanOneProxyAccountIsNotSupported=Only one proxy account is supported on this platform
+AddSubSystems=Add subsystems
+DeleteJobStepLogs=Delete job step output logs
+RemoveSubSystems=Remove subsystems
+EnumSubSystems=Enumerate subsystems
+AddMailAccountToProfile=Add MailAccount to MailProfile
+RemoveMailAccountFromProfile=Remove MailAccount from MailProfile
+EnumMailAccountsForProfile=Enumerate MailAccounts associated with MailProfile
+AddPrincipalToMailProfile=Add Principal to MailProfile
+RemovePrincipalFromMailProfile=Remove Principal from MailProfile
+EnumPrincipalsForMailProfile=Enumerate Principals associated with MailProfile
+AddLoginToProxyAccount=Add login to proxy account
+RemoveLoginFromProxyAccount=Remove login from proxy account
+EnumLoginsOfProxyAccount=Enumerate login of proxy account
+AddServerRoleToProxyAccount=Add server role to proxy account
+RemoveServerRoleFromProxyAccount=Remove server role from proxy account
+EnumServerRolesOfProxyAccount=Enumerate server role of proxy account
+AddMSDBRoleToProxyAccount=Add msdb role to proxy account
+RemoveMSDBRoleFromProxyAccount=Remove msdb role from proxy account
+EnumMSDBRolesOfProxyAccount=Enumerate msdb role of proxy account
+MsxDefect=MSX defect
+MsxEnlist=MSX enlist
+PurgeJobHistory=Purge job history
+ReassignJobsByLogin=Reassign jobs by login
+DropJobsByLogin=Drop jobs by login
+StartMonitor=Start monitor
+StopMonitor=Stop monitor
+EnumProxies=Enumerate proxies
+DropJobsByServer=Drop jobs by server
+CompareUrn=Compare Urn objects
+Disable=Disable
+DisableAllIndexes=Disable all indexes
+EnableAllIndexes=Enable all indexes
+DiscoverDependencies=Discover dependencies
+DropBackupHistory=Drop backup history
+ChangeMirroringState=Change mirroring state
+IsMember=Is Member
+Recreate=Recreate
+Enable=Enable
+EnumColumns=Enumerate columns
+EnumForeignKeys=Enumerate foreign keys
+EnumIndexes=Enumerate indexes
+EnumFragmentation=Enumerate fragmentation information
+EnumReferences=Enumerate references
+SetOffline=Set offline
+SetOwner=Set owner
+StartPopulation=Start population
+StopPopulation=Stop population
+Rebuild=Rebuild
+Reorganize=Reorganize
+UpdateStatistics=Update statistics
+SetHostLoginAccount=Set host login account
+SetMailServerAccount=Set mail server login account
+SetMailServerPassword=Set mail server login password
+EnumLastStatisticsUpdates=Enumerate last statistics update
+RebuildIndexes=Rebuild indexes
+ReCompileReferences=Recompile references
+TruncateData=Truncate data
+TruncateLog=Truncate Log
+SwitchPartition=Switch partition
+MergeHashPartition=Merge hash partition
+MergeRangePartition=Merge range partition
+SplitHashPartition=Split hash partition
+SplitRangePartition=Split range partition
+GetRangeValues=Get range values
+ResetNextUsed=Reset next used filegroup
+GetFileGroups=Get FileGroups
+GetDefaultInitFields=Get default init fields
+SetDefaultInitFields=Set default init fields
+GetPropertyNames=Get property names
+SetParent=SetParent
+SetName=SetName
+SetNamespace=SetNamespace
+SetSchema=SetSchema
+ExecuteNonQuery=ExecuteNonQuery
+SetSnapshotIsolation=Set snapshot isolation
+EnumNamespaces=Enumerate namespaces
+EnumTypes=Enumerate types
+AddSchemaDocument=Add schema document
+ScriptTransfer=Script transfer
+SetIdentityPhrase = Set Identity Phrase
+SetEncryptionOptions = Set Encryption Options
+EnumStatistics = Enum statistics
+GetJobByID=Get job by ID
+RemoveJobByID=Remove job by ID
+RemoveJobsByLogin=Remove jobs by login
+EnumCandidateKeys=Enum candidate keys
+ExecuteWithResults=Execute with results
+UpdateIndexStatistics=Update index statistics
+EnumMatchingSPs=Enum matching SPs
+EnumObjects=Enum objects
+ReadBackupHeader=Read backup header
+ReadMediaHeader=Read media header
+DetachedDatabaseInfo=Detached database info
+IsDetachedPrimaryFile=Is detached primaryFile
+IsWindowsGroupMember=Is windows group member
+EnumDetachedDatabaseFiles=Enum detached database files
+EnumDetachedLogFiles=Enum detached log files
+ServerEnumMembers=Enum members
+Contains=Collection lookup
+PingSqlServerVersion = Ping Sql Server version
+SetServiceAccount=Set service account
+ChangeServicePassword=Change service account password
+ServerActiveDirectoryRegister=Register server with Active Directory Services
+ServerActiveDirectoryUpdateRegistration=Update server registration with Active Directory Services
+ServerActiveDirectoryUnregister=Unregister server with Active Directory Services
+DatabaseActiveDirectoryRegister=Register database with Active Directory Services
+DatabaseActiveDirectoryUpdateRegistration=Update database registration with Active Directory Services
+DatabaseActiveDirectoryUnregister=Unregister database with Active Directory Services
+RecoverMasterKey=Recover
+RegenerateMasterKey=Regenerate
+ImportMasterKey=Import
+ExportMasterKey=Export
+ChangeAcctMasterKey=Change account
+AddEncryptionMasterKey=Add encryption
+DropEncryptionMasterKey=Drop encryption
+Close=Close
+Open=Open
+EnumKeyEncryptions=Enumerate key encryptions
+Compare=Compare
+Insert=Insert
+AddRange=Add range
+SetRange=Set range
+AddDevice=Add device
+SetMirrors= Set Mirrors
+SetDatabase=Set Database
+SqlManagement=SQL Management
+
+####################################################################
+#       Object types
+####################################################################
+Table=Table
+View=View
+Server=Server
+Database=Database
+ExtendedProperty=ExtendedProperty
+DatabaseOptions=DatabaseOptions
+Synonym=Synonym
+FullTextIndex=FullTextIndex
+FullTextIndexColumn=FullTextIndexColumn
+Check=Check
+ForeignKey=ForeignKey
+ForeignKeyColumn=ForeignKeyColumn
+PartitionSchemeParameter=PartitionSchemeParameter
+Trigger=Trigger
+Index=Index
+IndexedColumn=Index
+Statistic=Statistic
+StatisticColumn=
+Column=Column
+DefaultConstraint=DefaultConstraint
+StoredProcedure=StoredProcedure
+StoredProcedureParameter=StoredProcedureParameter
+SqlAssembly=SqlAssembly
+SqlAssemblyFile=SqlAssemblyFile
+UserDefinedType=UserDefinedType
+UserDefinedAggregate=UserDefinedAggregate
+UserDefinedAggregateParameter=UserDefinedAggregateParameter
+FullTextCatalog=FullTextCatalog
+ExtendedStoredProcedure=ExtendedStoredProcedure
+UserDefinedFunction=UserDefinedFunction
+UserDefinedFunctionParameter=UserDefinedFunctionParameter
+User=User
+Schema=Schema
+DatabaseRole=DatabaseRole
+ApplicationRole=ApplicationRole
+LogFile=LogFile
+FileGroup=FileGroup
+DataFile=DataFile
+Default=Default
+Rule=Rule
+UserDefinedDataType=UserDefinedDataType
+PartitionFunction=PartitionFunction
+PartitionScheme=PartitionScheme
+DatabaseActiveDirectory=DatabaseActiveDirectory
+Language=Language
+Login=Login
+ServerRole=ServerRole
+LinkedServer=LinkedServer
+LinkedServerLogin=LinkedServerLogin
+SystemDataType=SystemDataType
+JobServer=JobServer
+Category=Category
+AlertSystem=AlertSystem
+Alert=Alert
+Operator=Operator
+TargetServer=TargetServer
+TargetServerGroup=TargetServerGroup
+Job=Job
+JobStep=JobStep
+JobSchedule=JobSchedule
+Settings=Settings
+Information=Information
+UserOptions=UserOptions
+BackupDevice=BackupDevice
+FullTextService=FullTextService
+ServerActiveDirectory=ServerActiveDirectory
+HttpEndpoint=HttpEndpoint
+SoapConfiguration=SoapConfiguration
+SoapMethod=SoapMethod
+ServerAlias=ServerAlias
+ManagedComputer=ManagedComputer
+Service=Service
+XmlSchemaCollection=XmlSchemaCollection
+Restore=Restore
+RestoreAsync=Asynchronous restore
+EnumAvailableSqlServers=EnumAvailableSQLServers
+GetDataType=Get DataType
+SetDataType=Set DataType
+Backup=Backup

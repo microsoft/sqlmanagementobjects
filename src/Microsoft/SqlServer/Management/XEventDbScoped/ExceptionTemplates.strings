@@ -1,0 +1,37 @@
+#General
+NoSuchCollection(string name) = The collection '{0}' does not exist.
+UnsupportedKey(string key) = Cannot create key for object of type '{0}'.
+UnsupportedConnectionType(string type) = The connection type '{0}' is not supported. Use a SqlStoreConnection or ServerConnection object instead.
+SqlExecutionFailure(string sql) = Failed to execute Transact-SQL statement '{0}'.
+FileAlreadyExists = The file already exists. You must specify a different name.
+FileNotExist = The file does not exist.
+ChangeNameForExistingSession = To change the name of an existing session, you must drop and re-create the session.
+ChangePropertyForExistingEvent(string propertyName) = To change the property '{0}' for an existing event, drop the event, and then add the event by using the ALTER EVENT SESSION DDL statement.
+
+#Validation
+NewSessionMustContainEvent = Cannot create a session without any events.
+InvalidParameter(string param) = The parameter '{0}' is invalid.
+ParentNull = The parent XEStore cannot be null.
+NameNullEmpty = The Name property cannot be null or an empty string.
+CannotSetNameForExistingObject = You cannot change the Name property for an existing object.
+Expression2NotNull = The second expression must be null for a NOT logical expression.
+InvalidProperty = The property setting is invalid.
+PackageNotExist(string name) = The package '{0}' does not exist.
+ObjectNotExist(string name) = The object '{0}' does not exist.
+CannotAddActionToExistingEvent = You cannot add the action to an existing event. You must drop the event, and then add the event with the action.
+CannotChangeFieldForExistingEvent = You cannot change the field values for an existing event. You must drop the event, and then add the event with the field.
+CannotChangeFieldForExistingTarget = You cannot change the field values for an existing target. You must drop the target, and then add the target with the field.
+CannotSetEventInfoForExistingEvent = You cannot change the EventInfo object for an existing event.
+CannotSetTargetInfoForExistingTarget = You cannot change the TargetInfo object for an existing target.
+CannotSetActionInfoForExistingAction = You cannot change the ActionInfo object for an existing action.
+SaveTemplateForExistingSession = You can only invoke the SaveSessionToTemplate method on an existing session. Call the Session.Create method to validate the session.
+PackageNameNotUnique(string name) = The package name '{0}' is not unique. You must use a fully-qualified name, in the format '[module_guid].package_name'.
+ObjectNameNotUnique(string name) = The object name '{0}' is not unique. You must use a fully-qualified name, in the format '[module_guid].package_name.object_name'.
+UnknownType = Unknown type.
+NoBlockingEventNotAllowedInNoEventLossSession(string sessionName, string eventName)= Events with "NO_BLOCK" capability cannot be added to a session with a "NO_EVENT_LOSS" event retention mode. Therefore, event '{1}' cannot be added to session {0}.
+InvalidState(Microsoft.SqlServer.Management.Sdk.Sfc.SfcObjectState current_state, Microsoft.SqlServer.Management.Sdk.Sfc.SfcObjectState required_state) = You cannot perform this operation on an object in state '{0}'. The object must be in state '{1}'.
+AlterValidationFailure = Session validation for the alter operation failed.
+CannotReadTargetData = Cannot read target data. Please check session and target status.
+ActionNameNotUnique(string name) = Action {0} already exists in the session and cannot be added again.
+InvalidConnectionType = Connection type is not valid.
+InvalidVersion(string version) = Operation not supported on version {0}.

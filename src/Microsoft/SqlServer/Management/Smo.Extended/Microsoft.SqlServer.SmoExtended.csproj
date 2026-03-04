@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.SmoExtended</RootNamespace>
+    <ClsCompliant>true</ClsCompliant>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.MaintenancePlanTasks" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.MaintenancePlanTasksUI" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.DTEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.WmiEnum" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(RealPublicKey)"/>
+  </ItemGroup>
+  <ItemGroup>
+    <SqlStringResource Include="DatabaseRestorePlannerSR.strings" >
+        <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
+        <LogicalName>Microsoft.SqlServer.Management.Smo.DatabaseRestorePlannerSR.resources</LogicalName>
+    </SqlStringResource>
+  </ItemGroup>  
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SqlEnumSrc)\Microsoft.SqlServer.SqlEnum.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+</Project>

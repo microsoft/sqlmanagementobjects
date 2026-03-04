@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<EnumObject type="Process" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10'>
+			<property_link table = 'sys.dm_exec_sessions p'/>
+			<property_link fields ="#Status#Command#Database#BlockingSpid#" left_join = 'sys.dm_exec_requests r'>r.session_id = p.session_id</property_link>
+			<property_link fields ="#ExecutionContextID#Database#" join = 'sys.sysprocesses pr'>pr.spid = p.session_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='3' expression="{0} + '/{2}[@Spid=''' + CAST({1} AS sysname) + ''']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="Spid" />
+				<link_field field="NType" />
+			</link_multiple>
+		</property>
+
+		<version min_major='10'>
+			<property name="Name" type="sysname" cast='true'>p.session_id</property>
+			<property name="Spid" type="smallint">p.session_id</property>
+			<property name="Login" type="sysname">p.login_name</property>
+			<property name="Host" type="nchar" size='129'>p.host_name</property>
+			<property name="Status" type="nchar" size='31'>ISNULL(r.status, N'')</property>
+			<property name="Command" type="nchar" size='31'>ISNULL(r.command, N'')</property>
+			<property name="Database" type="sysname">ISNULL(db_name(r.database_id), ISNULL(db_name(pr.dbid), N''))</property>
+			<property name="Cpu" type="int">p.cpu_time</property>
+			<property name="MemUsage" type="int">p.memory_usage</property>
+			<property name="BlockingSpid" type="smallint">ISNULL(r.blocking_session_id, 0)</property>
+			<property name="IsSystem" type="bit" cast='true'>~p.is_user_process</property>
+		</version>
+		
+		<property name="Program" type="nchar" size='129'>p.program_name</property>
+		
+		<!-- kept for compatibility with dmo -->
+		<version min_major='10'>
+			<property name="ExecutionContextID" type="smallint">pr.ecid</property>
+		</version>
+
+	</properties>
+</EnumObject>
+ 

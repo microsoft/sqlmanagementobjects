@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <RootNamespace>Microsoft.SqlServer.Management.Dmf.Common</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetGroup)' == 'netfx'">
+    <DefineConstants>$(DefineConstants);APTCA_ENABLED</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <SqlStringResource Include="ExceptionTemplates.strings" outclassname="ExceptionTemplatesSR" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+</Project>

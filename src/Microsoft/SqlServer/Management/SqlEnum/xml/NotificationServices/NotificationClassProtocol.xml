@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NotificationClassProtocol' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="NotificationClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="NotificationClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_protocols" alias="p" />
+		<prefix>
+CREATE TABLE #tmp_protocols(
+    NotificationClassProtocolId int,
+    NotificationClassProtocolName nvarchar(255),
+    NotificationClassId int,
+    FailureEventLogInterval int,
+    FailuresBeforeEventLog int,
+    FailuresBeforeAbort int,
+    MulticastRecipientLimit int,
+    WorkItemTimeout int
+)
+INSERT #tmp_protocols EXEC [SchemaPrefix].NSGetNotificationClassProtocols
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_protocols
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">p.NotificationClassProtocolName</property>
+        <property name="Id" type="int">p.NotificationClassProtocolId</property>
+        <property name="NotificationClassId" type="int" hidden="true">p.NotificationClassId</property>
+		<property name="FailureEventLogInterval" type="int">p.FailureEventLogInterval</property>
+		<property name="FailuresBeforeEventLog" type="int">p.FailuresBeforeEventLog</property>
+		<property name="FailuresBeforeAbort" type="int">p.FailuresBeforeAbort</property>
+		<property name="MulticastRecipientLimit" type="int">p.MulticastRecipientLimit</property>
+		<property name="WorkItemTimeout" type="int">p.WorkItemTimeout</property>
+	</properties>
+</EnumObject>

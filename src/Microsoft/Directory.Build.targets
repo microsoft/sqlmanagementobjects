@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project >
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <DocumentationFile>$(BaseOutputPath)\Documentation\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+     <!-- Ignore XML Doc warnings temporarily until they can be fixed - see TFS#10083927
+    1591 - Missing XML comment for publicly visible type or member -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <!-- Enable QTest after it supports multi targeting -->
+  <PropertyGroup>
+    <EnableQTest>false</EnableQTest>
+  </PropertyGroup>
+  <ItemGroup>
+    
+  </ItemGroup>
+</Project>

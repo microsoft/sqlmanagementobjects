@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServiceContractMapping" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+		<parent_link>
+			<link parent='ID' local = 'ServiceID'/>
+		</parent_link>
+		<property_link table = 'sys.service_contract_usages scu'/>
+        <property_link fields='#Name#' join="sys.service_contracts AS sc">sc.service_contract_id = scu.service_contract_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="NType" type="sysname" access='Read' hidden='true'>ServiceContractMapping</property>
+		<property name="ServiceID" type="int" hidden='true'>scu.service_id</property>		
+        <property name="Name" type="sysname">sc.name</property>
+	</properties>
+</EnumObject>

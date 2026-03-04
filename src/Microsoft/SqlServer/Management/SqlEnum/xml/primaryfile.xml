@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="PrimaryFile" impl_type="PrimaryFile" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table="#smoPrimaryFileProp p" fields="#Property#Value#" />
+		<prefix fields="#Property#Value#"> 
+			declare @command nvarchar(300)
+			select @command = 'dbcc checkprimaryfile (N'''+ @fileName + ''' , 2)'
+			create table #smoPrimaryFileProp(property sql_variant NULL, value sql_variant NULL) 
+			insert #smoPrimaryFileProp exec (@command)
+		</prefix>
+		<postfix fields="#Property#Value#"> drop table #smoPrimaryFileProp</postfix>
+	</settings>
+	<properties>
+		<property name="Name" type="nvarchar" size='255'>rtrim(@fileName)</property>
+		<property name="Property" type="sysname" access="Read">p.property</property>
+		<property name="Value" type="sysname" access="Read">p.value</property>
+	</properties>
+</EnumObject>

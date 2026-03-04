@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServiceContract" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+		<property_link table = 'sys.service_contracts sc'/>
+        <property_link fields='#Owner#' join="sys.database_principals AS dp">dp.principal_id = sc.principal_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+        <!-- extended properties support -->
+        <include file='inc_ext_prop.xml' />
+        <property name="ExtPropClass" type="int" hidden='true'>16</property>
+        <property name="NType" type="sysname" access='Read' hidden='true'>ServiceContract</property>
+		<property name="Name" type="sysname">sc.name</property>
+		<property name="ID" type="int" access='Read'>sc.service_contract_id</property>		
+		<property name="Owner" type="sysname">dp.name</property>
+        <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+        <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when sc.service_contract_id &lt; 65536 then 1 else 0 end</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

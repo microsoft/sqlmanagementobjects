@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="inc_ext_prop" impl_type="SqlObject" min_major='9'>
+	<settings>
+	</settings>
+    <properties>
+        <property name="ExtPropMajorID" type="int" hidden='true'>
+            <link_multiple no='1' expression="{0}">
+                <link_field type='local' field="ID" />
+            </link_multiple>
+        </property>
+        <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+	</properties>
+</EnumObject>
