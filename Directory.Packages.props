@@ -53,5 +53,6 @@
   <ItemGroup>
     <!-- GlobalPackageReference packages are installed and processed by msbuild but are not referenced by the C# compiler -->
     <GlobalPackageReference Include="Microsoft.TestPlatform" Version="17.6.0" GeneratePathProperty="true" />
+    <GlobalPackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="5.0.0-1.25277.114" />
   </ItemGroup>
 </Project>

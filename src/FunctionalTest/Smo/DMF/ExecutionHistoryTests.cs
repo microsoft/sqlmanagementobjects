@@ -39,7 +39,6 @@ namespace Microsoft.SqlServer.Test.SMO.DMF
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 10, Edition = DatabaseEngineEdition.Enterprise)]
-        // This is flakey on MI so disabling for now : https://msdata.visualstudio.com/SQLToolsAndLibraries/_workitems/edit/4776713
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
         public void When_LogOnSuccess_is_true_Policy_EvaluationHistories_match_server_data()
         {
