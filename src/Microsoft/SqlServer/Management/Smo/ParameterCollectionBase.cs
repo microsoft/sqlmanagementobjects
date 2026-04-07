@@ -90,7 +90,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var name = urn.GetAttribute("Name");
             if (string.IsNullOrEmpty(name))
             {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("Name", urn.Type));
+                throw new SmoException(ExceptionTemplates.FormatPropertyMustBeSpecifiedInUrn("Name", urn.Type));
             }
 
             return new SimpleObjectKey(name);

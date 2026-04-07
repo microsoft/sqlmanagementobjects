@@ -355,7 +355,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             {
                 if (assembly != null)
                 {
-                    return ExceptionTemplatesSR.AssemblyAlreadyRegistered(assembly);
+                    return ExceptionTemplatesSR.FormatAssemblyAlreadyRegistered(assembly);
                 }
                 else
                 {
@@ -463,7 +463,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.ExpressionTypeMistmatch(typeLeft, typeRight);
+                return ExceptionTemplatesSR.FormatExpressionTypeMistmatch(typeLeft, typeRight);
 
             }
         }
@@ -586,7 +586,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.OperatorNotApplicable(operatorName, type);
+                return ExceptionTemplatesSR.FormatOperatorNotApplicable(operatorName, type);
             }
         }
 
@@ -714,7 +714,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.FunctionWrongArgumentType(functionName, receivedType, expectedType);
+                return ExceptionTemplatesSR.FormatFunctionWrongArgumentType(functionName, receivedType, expectedType);
             }
         }
 
@@ -850,7 +850,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.FunctionWrongArgumentsNumber(functionName, receivedCount, expectedCount);
+                return ExceptionTemplatesSR.FormatFunctionWrongArgumentsNumber(functionName, receivedCount, expectedCount);
             }
         }
 
@@ -973,7 +973,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.AdapterAlreadyExists(interfaceName, objectTypeName);
+                return ExceptionTemplatesSR.FormatAdapterAlreadyExists(interfaceName, objectTypeName);
             }
         }
 
@@ -1096,7 +1096,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             {
                 if (adapter != null)
                 {
-                    return ExceptionTemplatesSR.AdapterHasTooManyArguments(adapter);
+                    return ExceptionTemplatesSR.FormatAdapterHasTooManyArguments(adapter);
 
                 }
                 else
@@ -1202,7 +1202,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.NullFacet(facet);
+                return ExceptionTemplatesSR.FormatNullFacet(facet);
             }
         }
 
@@ -1370,16 +1370,16 @@ namespace Microsoft.SqlServer.Management.Dmf
                         }
                         else
                         {
-                            return ExceptionTemplatesSR.UnexpectedElement(nameRead, nameExpected);
+                            return ExceptionTemplatesSR.FormatUnexpectedElement(nameRead, nameExpected);
                         }
                     case (ReaderActionType.Read):
                         if (String.IsNullOrEmpty(nameExpected))
                         {
-                            return ExceptionTemplatesSR.UnexpectedType(typeRead, nameRead, typeExpected);
+                            return ExceptionTemplatesSR.FormatUnexpectedType(typeRead, nameRead, typeExpected);
                         }
                         else
                         {
-                            return ExceptionTemplatesSR.UnexpectedName(typeRead, nameRead, typeExpected, nameExpected);
+                            return ExceptionTemplatesSR.FormatUnexpectedName(typeRead, nameRead, typeExpected, nameExpected);
                         }
                     default:
                         return base.Message;
@@ -1522,7 +1522,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.CannotConvertToType(inputString, typeName);
+                return ExceptionTemplatesSR.FormatCannotConvertToType(inputString, typeName);
 
             }
         }
@@ -1642,7 +1642,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.UnsupportedConstantType(node, typeName);
+                return ExceptionTemplatesSR.FormatUnsupportedConstantType(node, typeName);
 
             }
         }
@@ -1742,7 +1742,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.BadExpressionTree(reason);
+                return ExceptionTemplatesSR.FormatBadExpressionTree(reason);
 
             }
         }
@@ -1856,7 +1856,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.UnsupportedObjectType(typeName, host);
+                return ExceptionTemplatesSR.FormatUnsupportedObjectType(typeName, host);
 
             }
         }
@@ -2059,7 +2059,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return (null == subtype) ? ExceptionTemplatesSR.ExpressionNodeNotConfigurableGeneric : ExceptionTemplatesSR.ExpressionNodeNotConfigurable(subtype);
+                return (null == subtype) ? ExceptionTemplatesSR.ExpressionNodeNotConfigurableGeneric : ExceptionTemplatesSR.FormatExpressionNodeNotConfigurable(subtype);
             }
         }
     }
@@ -2178,7 +2178,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.ExpressionNodeNotConfigurableOperators(propertyName, expression);
+                return ExceptionTemplatesSR.FormatExpressionNodeNotConfigurableOperators(propertyName, expression);
 
             }
         }
@@ -2302,7 +2302,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             get
             {
 
-                return ExceptionTemplatesSR.NonConfigurableReadOnlyProperty(propertyName);
+                return ExceptionTemplatesSR.FormatNonConfigurableReadOnlyProperty(propertyName);
             }
         }
     }
@@ -2407,7 +2407,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.ConversionNotSupported(host, typeName);
+                return ExceptionTemplatesSR.FormatConversionNotSupported(host, typeName);
             }
         }
 
@@ -2515,7 +2515,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.InvalidOperand(nodeType, operand);
+                return ExceptionTemplatesSR.FormatInvalidOperand(nodeType, operand);
             }
         }
 
@@ -2635,7 +2635,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.InvalidInOperator(opType);
+                return ExceptionTemplatesSR.FormatInvalidInOperator(opType);
 
             }
         }
@@ -2782,7 +2782,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return String.Format("{0}", ExceptionTemplatesSR.ValidationFailed(objectType, objectName));
+                return String.Format("{0}", ExceptionTemplatesSR.FormatValidationFailed(objectType, objectName));
 
             }
         }
@@ -2910,7 +2910,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return String.Format("{0}", ExceptionTemplatesSR.ObjectAlreadyExists(objectType, objectName));
+                return String.Format("{0}", ExceptionTemplatesSR.FormatObjectAlreadyExists(objectType, objectName));
             }
         }
 
@@ -3037,7 +3037,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return String.Format("{0}", ExceptionTemplatesSR.ObjectDoesntExist(objectType, objectName));
+                return String.Format("{0}", ExceptionTemplatesSR.FormatObjectDoesntExist(objectType, objectName));
             }
         }
 
@@ -3163,7 +3163,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return base.Message + "\n" + ExceptionTemplatesSR.NotSupported(type1, name1, type2, name2);
+                return base.Message + "\n" + ExceptionTemplatesSR.FormatNotSupported(type1, name1, type2, name2);
             }
         }
 
@@ -3569,7 +3569,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     operation.Length > 0 &&
                     failedObjectName.Length > 0)
                 {
-                    return ExceptionTemplatesSR.FailedOperation(
+                    return ExceptionTemplatesSR.FormatFailedOperation(
                         operation, failedObjectType, failedObjectName);
                 }
                 else
@@ -3694,7 +3694,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.MissingProperty(propertyName);
+                return ExceptionTemplatesSR.FormatMissingProperty(propertyName);
             }
         }
     }
@@ -3749,7 +3749,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// </summary>
 
         public NonRetrievablePropertyException(string propertyName, Exception innerException)
-            : base(ExceptionTemplatesSR.NonRetrievableProperty(propertyName), innerException)
+            : base(ExceptionTemplatesSR.FormatNonRetrievableProperty(propertyName), innerException)
         {
             this.PropertyName = propertyName;
         }
@@ -3807,7 +3807,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.NonRetrievableProperty(propertyName);
+                return ExceptionTemplatesSR.FormatNonRetrievableProperty(propertyName);
 
             }
         }
@@ -3914,7 +3914,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             get
             {
 
-                return ExceptionTemplatesSR.MissingTypeFacetAssociation(typeName, facet);
+                return ExceptionTemplatesSR.FormatMissingTypeFacetAssociation(typeName, facet);
 
             }
         }
@@ -4023,7 +4023,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.FunctionNotASmoObject(functionName, targetType);
+                return ExceptionTemplatesSR.FormatFunctionNotASmoObject(functionName, targetType);
             }
         }
 
@@ -4228,7 +4228,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.FunctionWrongReturnType(functionName, receivedType, expectedType);
+                return ExceptionTemplatesSR.FormatFunctionWrongReturnType(functionName, receivedType, expectedType);
 
             }
         }
@@ -4508,7 +4508,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.StringPropertyTooLong(propertyName, maxLength, currentLength);
+                return ExceptionTemplatesSR.FormatStringPropertyTooLong(propertyName, maxLength, currentLength);
             }
         }
 
@@ -4608,7 +4608,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.TargetSetCountMismatch(objectSetName, facetName);
+                return ExceptionTemplatesSR.FormatTargetSetCountMismatch(objectSetName, facetName);
             }
         }
 
@@ -4719,7 +4719,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.UnsupportedTargetSetForFacet(targetSetSkeleton, objectSetName, facetName);
+                return ExceptionTemplatesSR.FormatUnsupportedTargetSetForFacet(targetSetSkeleton, objectSetName, facetName);
             }
         }
 #if NETFRAMEWORK
@@ -4816,7 +4816,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.NoTargetSetEnabled(objectSetName);
+                return ExceptionTemplatesSR.FormatNoTargetSetEnabled(objectSetName);
             }
         }
 
@@ -5002,7 +5002,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             get
             {
-                return ExceptionTemplatesSR.ConfigValueMismatch(
+                return ExceptionTemplatesSR.FormatConfigValueMismatch(
                     propertyName, configValue.ToString(), runValue.ToString());
             }
         }

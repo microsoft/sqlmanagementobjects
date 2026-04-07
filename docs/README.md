@@ -80,9 +80,9 @@ If the object type you are adding corresponds to an entry in sys.securable_class
 
 - Enumerations.cs/DatabaseObjectBase.cs - If necessary update the DatabaseObjectTypes with your new object type and add it to the EnumObjects method of Database
   - Note this is only for actual objects in the Database. Options and other "virtual" objects shouldn't be added here
-- ExceptionTemplatesImpl.strings - Any new exception template messages go here
+- ExceptionTemplatesImpl.resx - Any new exception template messages go here
   - Such as a new "object unsupported in current version" message for your new type.
-- LocalizableResources.strings - Add descriptions for each publicly exposed property of the added type
+- LocalizableResources.resx - Add descriptions for each publicly exposed property of the added type
   - This is REQUIRED if the object is a DMF Facet (it will have the `[Microsoft.SqlServer.Management.Sdk.Sfc.PhysicalFacet]` attribute on the base class definition). If it is not a DMF facet you won't need it unless you added something that's using the text, but it's still recommended you add it anyways
   - Note that this applies to ALL public properties. So if you add a new object and it inherits from a base class with public properties you need to add descriptions for those as well. A suggestion is to view the object with something like ILSpy to see all the properties and make sure you aren't missing any.
 - script_patterns.cs - Add any common script additions here

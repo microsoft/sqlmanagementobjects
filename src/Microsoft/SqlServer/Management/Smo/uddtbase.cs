@@ -206,7 +206,7 @@ END
         {
             if (this.ServerVersion.Major > 8)
             {
-                throw new UnsupportedFeatureException(ExceptionTemplates.PropertyCannotBeSetForVersion("Owner", "User Defined Data Type", GetSqlServerName(sp) ));
+                throw new UnsupportedFeatureException(ExceptionTemplates.FormatPropertyCannotBeSetForVersion("Owner", "User Defined Data Type", GetSqlServerName(sp) ));
             }
         }
 
@@ -257,7 +257,7 @@ END
 
             if (0 != StringComparer.Compare("dbo", this.Schema))
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.TypeSchemaMustBeDbo("Schema", this.Schema));
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatTypeSchemaMustBeDbo("Schema", this.Schema));
             }
             sb.Append(sp.NewLine);
         }
@@ -358,7 +358,7 @@ END
                 // raise error if data type is not supported on target version.
                 if (!DataType.IsDataTypeSupportedOnTargetVersion(sqlDataType, sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition))
                 {
-                    throw new SmoException(ExceptionTemplates.UnsupportedDataTypeOnTarget(
+                    throw new SmoException(ExceptionTemplates.FormatUnsupportedDataTypeOnTarget(
                         sqlDataType.ToString(),
                         sp.TargetServerVersion.ToString(),
                         sp.TargetDatabaseEngineType.ToString(),
@@ -370,7 +370,7 @@ END
                 {
                     ThrowIfCloud(sp.TargetDatabaseEngineType,
                         string.Format(CultureInfo.CurrentCulture,
-                            ExceptionTemplates.PropertyNotSupportedOnCloud(sqlDataType.ToString())));
+                            ExceptionTemplates.FormatPropertyNotSupportedOnCloud(sqlDataType.ToString())));
                 }
 
                 if (0 == string.Compare(sType, "xml", StringComparison.OrdinalIgnoreCase))
@@ -396,7 +396,7 @@ END
                                 case XmlDocumentConstraint.Default:
                                     break;
                                 default:
-                                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("XmlDocumentConstraint"));
+                                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("XmlDocumentConstraint"));
                             }
 
                             string xmlSchemaName = oObj.Properties.Get("XmlSchemaNamespaceSchema").Value as string;
@@ -507,7 +507,7 @@ END
             {
                 ThrowIfCloud(sp.TargetDatabaseEngineType,
                     string.Format(CultureInfo.CurrentCulture,
-                        ExceptionTemplates.PropertyNotSupportedOnCloud(sqlDataType.ToString())));
+                        ExceptionTemplates.FormatPropertyNotSupportedOnCloud(sqlDataType.ToString())));
             }
 
             if (oObj.State == SqlSmoState.Creating && null == oObj.Properties.Get("DataType").Value)

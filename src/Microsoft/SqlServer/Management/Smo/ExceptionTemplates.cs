@@ -4,9 +4,9 @@
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
 namespace Microsoft.SqlServer.Management.Smo
 {
-    internal class ExceptionTemplates : ExceptionTemplatesImpl
+    internal partial class ExceptionTemplates
     {
-        new public static string IncludeHeader (string objectType, string name, string dateString)
+        public static string IncludeHeader (string objectType, string name, string dateString)
         {
             string safeName;
             if( name.Contains("*/") )
@@ -24,7 +24,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 safeName = name;
             }
 
-            return ExceptionTemplatesImpl.IncludeHeader( objectType, safeName, dateString );
+            return ExceptionTemplates.FormatIncludeHeaderTemplate(objectType, safeName, dateString);
         }
     }
 

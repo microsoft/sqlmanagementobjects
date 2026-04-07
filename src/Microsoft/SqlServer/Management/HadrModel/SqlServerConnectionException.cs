@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -15,7 +13,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="VMIPAddress"></param>
         public SqlServerConnectionException(string VMIPAddress)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AddDomainUserInAdminGroupTaskException, VMIPAddress))
+            : base(Resource.FormatAddDomainUserInAdminGroupTaskException(VMIPAddress))
         {
         }
 

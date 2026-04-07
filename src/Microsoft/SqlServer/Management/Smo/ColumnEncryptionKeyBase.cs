@@ -107,7 +107,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string fullyFormattedName = FormatFullNameForScripting(sp);
 
             this.ThrowIfNotSupported(this.GetType(),
-                ExceptionTemplates.ColumnEncryptionKeyDownlevel(
+                ExceptionTemplates.FormatColumnEncryptionKeyDownlevel(
                     fullyFormattedName,
                     GetSqlServerName(sp)),
                     sp: sp);
@@ -159,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (this.ColumnEncryptionKeyValues.Count == 0)
             {
-                throw new InvalidOperationException(ExceptionTemplates.ColumnEncryptionKeyNoValues(this.FullQualifiedName));
+                throw new InvalidOperationException(ExceptionTemplates.FormatColumnEncryptionKeyNoValues(this.FullQualifiedName));
             }
 
             base.CreateImpl();
@@ -186,7 +186,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string fullyFormattedName = FormatFullNameForScripting(sp);
 
             this.ThrowIfNotSupported(this.GetType(),
-                ExceptionTemplates.ColumnEncryptionKeyDownlevel(
+                ExceptionTemplates.FormatColumnEncryptionKeyDownlevel(
                     fullyFormattedName,
                     GetSqlServerName(sp)),
                     sp: sp);
@@ -294,7 +294,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string fullyFormattedName = FormatFullNameForScripting(sp);
 
             this.ThrowIfNotSupported(this.GetType(),
-                ExceptionTemplates.ColumnEncryptionKeyDownlevel(
+                ExceptionTemplates.FormatColumnEncryptionKeyDownlevel(
                     fullyFormattedName,
                     GetSqlServerName(sp)),
                     sp: sp);

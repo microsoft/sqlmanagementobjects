@@ -9,7 +9,7 @@
     <DefineConstants>$(DefineConstants);APTCA_ENABLED</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <SqlStringResource Include="ExceptionTemplates.strings" outclassname="ExceptionTemplatesSR" />
+    <EmbeddedResource Update="*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />

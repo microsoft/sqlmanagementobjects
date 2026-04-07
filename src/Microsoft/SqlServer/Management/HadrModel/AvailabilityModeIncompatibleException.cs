@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -16,7 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// Constructor
         /// </summary>
         public AvailabilityModeIncompatibleException()
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AvailabilityModeCompatibilityWarning))
+            : base(Resource.AvailabilityModeCompatibilityWarning)
         {
         }
     }

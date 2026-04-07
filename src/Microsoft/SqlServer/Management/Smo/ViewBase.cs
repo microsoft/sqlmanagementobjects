@@ -74,12 +74,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 this.IsEncrypted)
             {
                 ThrowIfBelowVersion90(sp.TargetServerVersion,
-                    ExceptionTemplates.EncryptedViewsFunctionsDownlevel(
+                    ExceptionTemplates.FormatEncryptedViewsFunctionsDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
 
                 ThrowIfCloud(sp.TargetDatabaseEngineType,
-                    ExceptionTemplates.EncryptedViewsFunctionsDownlevel(
+                    ExceptionTemplates.FormatEncryptedViewsFunctionsDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetDatabaseEngineName(sp)));
             }
@@ -281,14 +281,14 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
                             ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
-                                ExceptionTemplates.CreateOrAlterDownlevel(
+                                ExceptionTemplates.FormatCreateOrAlterDownlevel(
                                     "View",
                                     GetSqlServerName(sp)));
 
                             sbForSpExec.AppendFormat(SmoApplication.DefaultCulture, "{0} VIEW {1} ", Scripts.CREATE_OR_ALTER, sFullScriptingName);
                             break;
                         default:
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(scriptHeaderType.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(scriptHeaderType.ToString()));
                     }
 
                     // generate the list of columns - if they have been specified

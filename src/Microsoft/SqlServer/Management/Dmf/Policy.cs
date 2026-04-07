@@ -451,7 +451,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 methodTraceContext.TraceParameters(name);
                 if (String.IsNullOrEmpty(name))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("Name")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("Name")));
                 }
 
                 base.RenameImpl(new Policy.Key(name));
@@ -511,7 +511,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
                     if (types.Count > 1)
                     {
-                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.TooManyURNsReturned(this.RootCondition)));
+                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatTooManyURNsReturned(this.RootCondition)));
                     }
 
                     if (types[0] != typeof(Smo.Server))
@@ -519,7 +519,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         List<string> urns = SfcMetadataDiscovery.GetUrnSkeletonsFromType(types[0]);
                         if (urns.Count > 1)
                         {
-                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.TooManyURNsReturned(this.RootCondition)));
+                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatTooManyURNsReturned(this.RootCondition)));
                         }
 
                         // SFC doesn't handle singleton requests yet (like "Server/Information")
@@ -535,7 +535,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
                     if (target == null)
                     {
-                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.RootConditionFailed(this.RootCondition)));
+                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatRootConditionFailed(this.RootCondition)));
                     }
 
                     FacetEvaluationContext context = FacetEvaluationContext.GetFacetEvaluationContext(facet, target);
@@ -630,7 +630,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                             resultException = readOnlyException;
                         }
 
-                        PolicyEvaluationException evaluationException = new PolicyEvaluationException(ExceptionTemplatesSR.PolicyEvaluationFailed(this.Name), resultException);
+                        PolicyEvaluationException evaluationException = new PolicyEvaluationException(ExceptionTemplatesSR.FormatPolicyEvaluationFailed(this.Name), resultException);
 
                         // TODO: Figure out how to reliably get the server name. The server name is a policy logging thing only
                         // and perhaps shouldn't be in the condition evaluation args at all and could stay within the policy class.
@@ -934,7 +934,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         // TODO: Double check if the result needs to be specific to the connection or the overall progressing result
                         this.FireConnectionProcessingFinished(new ConnectionProcessingFinishedEventArgs(
                                                                             connectionEvaluationResult,
-                                                                            evaluationException == null ? null : new PolicyEvaluationException(ExceptionTemplatesSR.PolicyEvaluationFailed(this.Name), evaluationException),
+                                                                            evaluationException == null ? null : new PolicyEvaluationException(ExceptionTemplatesSR.FormatPolicyEvaluationFailed(this.Name), evaluationException),
                                                                             sfcConnection,
                                                                             connectionTargetsEvaluated));
                         if (logPolicyEvents != null)
@@ -992,7 +992,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 PolicyEvaluationException evaluationException = null;
                 if ((eventArgs.EvaluationResult == false) && (eventArgs.EvaluationException != null))
                 {
-                    evaluationException = new PolicyEvaluationException(ExceptionTemplatesSR.PolicyEvaluationFailed(this.Name), eventArgs.EvaluationException);
+                    evaluationException = new PolicyEvaluationException(ExceptionTemplatesSR.FormatPolicyEvaluationFailed(this.Name), eventArgs.EvaluationException);
                 }
 
                 this.FireTargetProcessed(new TargetProcessedEventArgs(eventArgs.Target,
@@ -1052,7 +1052,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 {
                     // we only support connections to SqlServer for the moment,
                     // due to limitations in SfcObjectQuery
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.UnsupportedObjectType(targetConnection.GetType().Name, "Policy.Execute")));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatUnsupportedObjectType(targetConnection.GetType().Name, "Policy.Execute")));
                 }
 
 
@@ -1067,7 +1067,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     }
                     else
                     {
-                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyOneTarget(targetQueryExpression.ToString())));
+                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyOneTarget(targetQueryExpression.ToString())));
                     }
                 }
 
@@ -1210,18 +1210,18 @@ namespace Microsoft.SqlServer.Management.Dmf
                         messageNumber = messageNumberCheckOnSchedule;
                         break;
                     default:
-                        throw traceContext.TraceThrow(new DmfException(ExceptionTemplates.UnknownEnumeration(
+                        throw traceContext.TraceThrow(new DmfException(ExceptionTemplates.FormatUnknownEnumeration(
                             typeof(AutomatedPolicyEvaluationMode).Name)));
                 }
 
                 // build the message text
                 if (null == targetUri || targetUri.Length == 0)
                 {
-                    messageText = ExceptionTemplatesSR.PolicyViolated(this.Name);
+                    messageText = ExceptionTemplatesSR.FormatPolicyViolated(this.Name);
                 }
                 else
                 {
-                    messageText = ExceptionTemplatesSR.PolicyViolatedTarget(
+                    messageText = ExceptionTemplatesSR.FormatPolicyViolatedTarget(
                         SfcTsqlProcFormatter.EscapeString(this.Name, '\''),
                         targetUri);
                 }
@@ -1974,7 +1974,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     case EvaluationHistory.typeName:
                         methodTraceContext.TraceParameterOut("returnVal", this.EvaluationHistories);
                         return this.EvaluationHistories;
-                    default: throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                    default: throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
                 }
             }
         }

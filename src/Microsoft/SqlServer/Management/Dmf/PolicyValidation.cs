@@ -190,7 +190,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                                     Smo.Server server = new Smo.Server(Parent.SqlStoreConnection.ServerConnection);
                                     if (null == server.JobServer.SharedSchedules[ScheduleUid])
                                     {
-                                        validationState.AddWarning(ExceptionTemplatesSR.ScheduleDoesntExist(ScheduleUid.ToString()), "ScheduleUid");
+                                        validationState.AddWarning(ExceptionTemplatesSR.FormatScheduleDoesntExist(ScheduleUid.ToString()), "ScheduleUid");
                                     }
                                 }
                             }
@@ -363,7 +363,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 if (!String.IsNullOrEmpty(Condition) && (Parent.Conditions[Condition].Facet != Parent.ObjectSets[ObjectSet].Facet))
                 {
                     Exception de = new DmfException(
-                        ExceptionTemplatesSR.ObjectSetAndConditionFacetMismatch(ObjectSet, Parent.ObjectSets[ObjectSet].Facet, Condition, Parent.Conditions[Condition].Facet));
+                        ExceptionTemplatesSR.FormatObjectSetAndConditionFacetMismatch(ObjectSet, Parent.ObjectSets[ObjectSet].Facet, Condition, Parent.Conditions[Condition].Facet));
                     if (throwOnFirst)
                     {
                         throw methodTraceContext.TraceThrow(new ObjectValidationException(ExceptionTemplatesSR.Policy, Name, de));
@@ -383,7 +383,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 ReadOnlyCollection<Policy> dependentPolicies = Parent.ObjectSets[ObjectSet].EnumDependentPolicies();
                 if (dependentPolicies.Count > 1 || (dependentPolicies.Count == 1 && !dependentPolicies.Contains(this)))
                 {
-                    Exception de = new DmfException(ExceptionTemplatesSR.ObjectSetAlreadyReferenced(ObjectSet, dependentPolicies[0].Name));
+                    Exception de = new DmfException(ExceptionTemplatesSR.FormatObjectSetAlreadyReferenced(ObjectSet, dependentPolicies[0].Name));
                     if (throwOnFirst)
                     {
                         throw methodTraceContext.TraceThrow(new ObjectValidationException(ExceptionTemplatesSR.Policy, Name, de));

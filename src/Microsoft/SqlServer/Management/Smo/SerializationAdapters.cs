@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -29,7 +29,7 @@ namespace Microsoft.SqlServer.Management.Smo
             Version version = objectToSerialize as Version;
             if (version == null)
             {
-                throw new ArgumentException(ExceptionTemplates.InvalidSerializerAdapterFound("VersionSerializationAdapter", 
+                throw new ArgumentException(ExceptionTemplates.FormatInvalidSerializerAdapterFound("VersionSerializationAdapter", 
                                     typeof(Version).FullName, objectToSerialize.GetType().FullName));
             }
 
@@ -55,12 +55,12 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             catch (ArgumentNullException)
             {
-                throw new FailedOperationException(ExceptionTemplates.InvalidConversionError("VersionSerializationAdapter",
+                throw new FailedOperationException(ExceptionTemplates.FormatInvalidConversionError("VersionSerializationAdapter",
                     "null", typeof(Version).FullName));
             }
             catch (ArgumentException)
             {
-                throw new FailedOperationException(ExceptionTemplates.InvalidConversionError("VersionSerializationAdapter",
+                throw new FailedOperationException(ExceptionTemplates.FormatInvalidConversionError("VersionSerializationAdapter",
                    versionString, typeof(Version).FullName));
             }
             

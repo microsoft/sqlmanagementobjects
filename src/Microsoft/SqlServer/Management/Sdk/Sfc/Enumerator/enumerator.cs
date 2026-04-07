@@ -5,7 +5,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
     using System;
     using System.Collections;
-    using System.Diagnostics;
     using System.Reflection;
     using System.Runtime.InteropServices;
     using Microsoft.SqlServer.Management.Common;

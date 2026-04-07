@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Data;
-using System.Globalization;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 #pragma warning disable 1590,1591,1592,1573,1571,1570,1572,1587
@@ -178,7 +177,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (this.Parent.EncryptionType == DatabaseEncryptionType.ServerCertificate 
                         && string.IsNullOrEmpty((string)certificateNameBackupDateHash[this.Parent.EncryptorName]))
                     {
-                        string certificateBackupError = string.Format(CultureInfo.InvariantCulture, ExceptionTemplates.CertificateNotBackedUp, this.Parent.EncryptorName);
+                        string certificateBackupError = ExceptionTemplates.FormatCertificateNotBackedUp(this.Parent.EncryptorName);
                         return new ValidationState(certificateBackupError, "EncryptorName", true);
                     }
                 }

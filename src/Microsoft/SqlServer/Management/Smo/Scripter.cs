@@ -419,7 +419,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // if we couldn't retrieve a property
                         // throw custom error message
                         FailedOperationException foe = new FailedOperationException(
-                                ExceptionTemplates.FailedOperationExceptionTextScript(
+                                ExceptionTemplates.FormatFailedOperationExceptionTextScript(
                                                         SqlSmoObject.GetTypeName(mainObj.GetType().Name),
                                                         mainObj.ToString()),
                                 e);
@@ -556,7 +556,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (options.DdlBodyOnly && options.DdlHeaderOnly)
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.ConflictingScriptingOptions(
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatConflictingScriptingOptions(
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.DdlBodyOnly),
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.DdlHeaderOnly)));
             }
@@ -567,7 +567,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!options.ScriptData &&
                 !options.ScriptSchema)
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.InvalidScriptingOutput(
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatInvalidScriptingOutput(
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.ScriptData),
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.ScriptSchema)));
             }
@@ -579,7 +579,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!options.ScriptSchema &&
                 options.ScriptForAlter)
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.ConflictingScriptingOptions(
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatConflictingScriptingOptions(
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.ScriptSchema),
                     "ScriptForAlter"));
             }

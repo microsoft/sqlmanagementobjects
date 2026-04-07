@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -66,7 +66,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             }
             catch (Exception ex)
             {
-                throw new SqlScriptPublishException(SR.UnableToConnect(sqlConnectionInfo.ServerName), ex);
+                throw new SqlScriptPublishException(SR.FormatUnableToConnect(sqlConnectionInfo.ServerName), ex);
             }
             InitServer();
             this.sqlQueryHandler = new SqlQueryHandler(this);
@@ -111,7 +111,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             }
             catch (Exception ex)
             {
-                throw new SqlScriptPublishException(SR.UnableToConnect(serverName), ex);
+                throw new SqlScriptPublishException(SR.FormatUnableToConnect(serverName), ex);
             }
 
             this.sqlQueryHandler = new SqlQueryHandler(this);
@@ -223,7 +223,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             if (string.IsNullOrEmpty(outputOptions.SaveFileName) &&
                 (outputOptions.ScriptDestination == ScriptDestination.ToSingleFile || outputOptions.ScriptDestination == ScriptDestination.ToFilePerObject || outputOptions.ScriptDestination == ScriptDestination.ToNotebook))
             {
-                throw new SqlScriptPublishException(SR.ValueIsNullOrEmpty("SaveFileName"));
+                throw new SqlScriptPublishException(SR.FormatValueIsNullOrEmpty("SaveFileName"));
             }
 
             SqlScriptGenerator scripter = new SqlScriptGenerator(this);
@@ -469,7 +469,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                         {
                             // we need to send a ScriptError event so the progress bar will be updated correctly
                             // but then we also need to throw an exception so that the scripting process will stop
-                            SqlScriptPublishException publishException = new SqlScriptPublishException(SR.InvalidObjectTypeForVersion(urn.GetAttribute("Name"), urn.Type));
+                            SqlScriptPublishException publishException = new SqlScriptPublishException(SR.FormatInvalidObjectTypeForVersion(urn.GetAttribute("Name"), urn.Type));
                             ScriptEventArgs errorArgs = new ScriptEventArgs(null, publishException);
                             ScriptError(this, errorArgs);
                             throw publishException;

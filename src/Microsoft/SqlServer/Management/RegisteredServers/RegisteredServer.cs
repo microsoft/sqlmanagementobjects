@@ -222,7 +222,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                         break;
                     default:
                         throw new RegisteredServerException(
-                            RegSvrStrings.UnknownEnumeration("CredentialPersistenceType"));
+                            RegSvrStrings.FormatUnknownEnumeration("CredentialPersistenceType"));
                 }
 
                 return builder.ConnectionString;
@@ -795,7 +795,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 if (String.IsNullOrEmpty(value))
                 {
-                    throw new ArgumentException(RegSvrStrings.ArgumentNullOrEmpty("ServerName"));
+                    throw new ArgumentException(RegSvrStrings.FormatArgumentNullOrEmpty("ServerName"));
                 }
                 
                 string svrName = this.GetServerNameFromConnectionString(this.ConnectionString);
@@ -1010,7 +1010,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             switch (elementType)
             {
                 default:
-                    throw new RegisteredServerException(RegSvrStrings.NoSuchCollection(elementType));
+                    throw new RegisteredServerException(RegSvrStrings.FormatNoSuchCollection(elementType));
             }
         }
         #endregion
@@ -1175,7 +1175,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentException(RegSvrStrings.ArgumentNullOrEmpty("Name"));
+                throw new ArgumentException(RegSvrStrings.FormatArgumentNullOrEmpty("Name"));
             }
 
             Rename(new Key(name));

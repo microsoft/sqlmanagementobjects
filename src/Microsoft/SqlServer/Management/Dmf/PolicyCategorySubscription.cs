@@ -120,7 +120,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     (String.IsNullOrEmpty(((SFC.FilterNodeConstant)op.Right).ValueAsString)))
                 {
                     throw new BadExpressionTreeException(
-                        ExceptionTemplatesSR.UnsupportedTargetFilter(target.ToString()));
+                        ExceptionTemplatesSR.FormatUnsupportedTargetFilter(target.ToString()));
                 }
 
                 this.Parent = parent;
@@ -414,7 +414,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 methodTraceContext.TraceParameters(elementType);
                 switch (elementType)
                 {
-                    default: throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                    default: throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
                 }
             }
         }

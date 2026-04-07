@@ -201,7 +201,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     SfcInstance instRoot = (SfcInstance)domain;
                     if( !thisLevelKey.Equals(instRoot.AbstractIdentityKey) )
                     {
-                        throw new SfcInvalidQueryExpressionException(SfcStrings.BadQueryForConnection(thisLevelKey.ToString(),instRoot.ToString()));
+                        throw new SfcInvalidQueryExpressionException(SfcStrings.FormatBadQueryForConnection(thisLevelKey.ToString(),instRoot.ToString()));
                     }
                     m_Parent = null;
                     m_ThisKey = thisLevelKey;

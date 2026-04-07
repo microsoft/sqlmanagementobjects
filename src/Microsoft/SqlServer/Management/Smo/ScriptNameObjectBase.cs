@@ -546,7 +546,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (idx <= 0 || idx > text.Length)
             {
                 throw new FailedOperationException(
-                    ExceptionTemplates.SyntaxErrorInTextHeader(this.GetType().Name, this.Name));
+                    ExceptionTemplates.FormatSyntaxErrorInTextHeader(this.GetType().Name, this.Name));
             }
             return idx;
         }
@@ -563,7 +563,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (m_isTextDirty)
             {
-                throw new SmoException(ExceptionTemplates.PropNotModifiable("Text", this.GetType().Name));
+                throw new SmoException(ExceptionTemplates.FormatPropNotModifiable("Text", this.GetType().Name));
             }
         }
 
@@ -703,7 +703,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             if (!(this is Cmn.ICreateOrAlterable))
                             {
                                 throw new FailedOperationException(
-                                    ExceptionTemplates.ScriptHeaderTypeNotSupported(
+                                    ExceptionTemplates.FormatScriptHeaderTypeNotSupported(
                                         scriptHeaderType.ToString(),
                                         this.GetType().Name,
                                         this.Name));
@@ -851,7 +851,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (indexCreate < 0 || indexCreate > text.Length - Scripts.CREATE.Length)
             {
                 throw new SmoException(
-                    ExceptionTemplates.InvalidIndexSpecifiedForModifyingTextToCreateOrAlter(indexCreate, 0, text.Length - Scripts.CREATE.Length));
+                    ExceptionTemplates.FormatInvalidIndexSpecifiedForModifyingTextToCreateOrAlter(indexCreate, 0, text.Length - Scripts.CREATE.Length));
             }
             // invalid text to modify to CREATE OR ALTER
             if (Scripts.CREATE != text.Substring(indexCreate, Scripts.CREATE.Length).ToUpper(SmoApplication.DefaultCulture))
@@ -904,7 +904,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (!DdlTextParser.CheckDdlHeader(ddlText, GetQuotedIdentifier(), IsOrAlterSupported(sp), out headerInfo))
                     {
                         throw new FailedOperationException(
-                            ExceptionTemplates.SyntaxErrorInTextHeader(this.GetType().Name, this.Name));
+                            ExceptionTemplates.FormatSyntaxErrorInTextHeader(this.GetType().Name, this.Name));
                     }
 
                     CheckObjectSupportability(headerInfo, sp);
@@ -955,7 +955,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // instead of returning back unsupported scripts to the user.
             if ((this is StoredProcedure && !string.IsNullOrEmpty(headerInfo.procedureNumber)) && sp.TargetEngineIsAzureSqlDw())
             {
-                throw new UnsupportedEngineEditionException(ExceptionTemplates.NotSupportedForSqlDw(typeof(NumberedStoredProcedure).Name))
+                throw new UnsupportedEngineEditionException(ExceptionTemplates.FormatNotSupportedForSqlDw(typeof(NumberedStoredProcedure).Name))
                            .SetHelpContext("NotSupportedForSqlDw");
             }
         }
@@ -971,7 +971,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //
                 if (base.IsObjectDirty() && CheckObjectDirty())
                 {
-                    throw new FailedOperationException(ExceptionTemplates.WrongPropertyValueExceptionText("TextMode", "true"));
+                    throw new FailedOperationException(ExceptionTemplates.FormatWrongPropertyValueExceptionText("TextMode", "true"));
                 }
                 return GetTextProperty("TextHeader", sp);
             }
@@ -1050,7 +1050,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (0 != this.StringComparer.Compare(expectedName, foundBraketName))
             {
                 throw new FailedOperationException(
-                    ExceptionTemplates.IncorrectTextHeader(this.GetType().Name, this.Name, "name", "Name"));
+                    ExceptionTemplates.FormatIncorrectTextHeader(this.GetType().Name, this.Name, "name", "Name"));
             }
 
             //
@@ -1065,7 +1065,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (0 != this.StringComparer.Compare(expectedSchema, foundSchema))
                     {
                         throw new FailedOperationException(
-                            ExceptionTemplates.IncorrectTextHeader(this.GetType().Name, this.Name, "schema", "Schema"));
+                            ExceptionTemplates.FormatIncorrectTextHeader(this.GetType().Name, this.Name, "schema", "Schema"));
                     }
                 }
                 else
@@ -1077,7 +1077,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (0 != this.StringComparer.Compare(expectedSchema, MakeSqlBraket(parentCollection.GetDefaultSchema())))
                     {
                         throw new FailedOperationException(
-                            ExceptionTemplates.IncorrectTextHeader(this.GetType().Name, this.Name, "schema", "Schema"));
+                            ExceptionTemplates.FormatIncorrectTextHeader(this.GetType().Name, this.Name, "schema", "Schema"));
                     }
                 }
             }
@@ -1116,14 +1116,14 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!DdlTextParser.CheckDdlHeader(ddlText, GetQuotedIdentifier(), isOrAlterSupported, out headerInfo))
             {
                 throw new FailedOperationException(
-                    ExceptionTemplates.SyntaxErrorInTextHeader(this.GetType().Name, this.Name));
+                    ExceptionTemplates.FormatSyntaxErrorInTextHeader(this.GetType().Name, this.Name));
             }
 
             //check if the script must be for CREATE
             if (true == enforceCreate && false == headerInfo.scriptForCreate)
             {
                 throw new FailedOperationException(
-                    ExceptionTemplates.SyntaxErrorInTextHeader(this.GetType().Name, this.Name));
+                    ExceptionTemplates.FormatSyntaxErrorInTextHeader(this.GetType().Name, this.Name));
             }
 
             //check that the text operates on the type of object that we want
@@ -1142,7 +1142,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (false == bObjectTypeFound)
                 {
                     throw new FailedOperationException(
-                        ExceptionTemplates.SyntaxErrorInTextHeader(this.GetType().Name, this.Name));
+                        ExceptionTemplates.FormatSyntaxErrorInTextHeader(this.GetType().Name, this.Name));
 
                 }
             }
@@ -1493,7 +1493,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                             if (ec != ExecutionContext.Caller)
                             {
-                                errorMessage = ExceptionTemplates.StoredProcedureDownlevelExecutionContext(
+                                errorMessage = ExceptionTemplates.FormatStoredProcedureDownlevelExecutionContext(
                                             fullObjectName,
                                             GetExecutionContextString(ec),
                                             sqlServerVersion);
@@ -1511,7 +1511,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                             if (udfec != ExecutionContext.Caller)
                             {
-                                errorMessage = ExceptionTemplates.UserDefinedFunctionDownlevelExecutionContext(
+                                errorMessage = ExceptionTemplates.FormatUserDefinedFunctionDownlevelExecutionContext(
                                                 fullObjectName,
                                                 GetExecutionContextString(udfec),
                                                 sqlServerVersion);
@@ -1527,7 +1527,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                             if (tec != ExecutionContext.Caller)
                             {
-                                errorMessage = ExceptionTemplates.TriggerDownlevelExecutionContext(
+                                errorMessage = ExceptionTemplates.FormatTriggerDownlevelExecutionContext(
                                                 fullObjectName,
                                                 GetExecutionContextString(tec),
                                                 sqlServerVersion);
@@ -1543,7 +1543,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                             if (ddtcc != DatabaseDdlTriggerExecutionContext.Caller)
                             {
-                                errorMessage = ExceptionTemplates.TriggerDownlevelExecutionContext(
+                                errorMessage = ExceptionTemplates.FormatTriggerDownlevelExecutionContext(
                                                 fullObjectName,
                                                 GetExecutionContextString(ddtcc),
                                                 sqlServerVersion);
@@ -1558,7 +1558,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                             if (sdtec != ServerDdlTriggerExecutionContext.Caller)
                             {
-                                errorMessage = ExceptionTemplates.TriggerDownlevelExecutionContext(
+                                errorMessage = ExceptionTemplates.FormatTriggerDownlevelExecutionContext(
                                                 fullObjectName,
                                                 GetExecutionContextString(sdtec),
                                                 sqlServerVersion);
@@ -1604,7 +1604,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 //We are currently not supporting text mode object for SQL Server 2000
                 //Need to fix this once we start supporting
-                string errorMessage = ExceptionTemplates.InvalidVersionSmoOperation(LocalizableResources.ServerShiloh);
+                string errorMessage = ExceptionTemplates.FormatInvalidVersionSmoOperation(LocalizableResources.ServerShiloh);
                 throw new UnsupportedVersionException(errorMessage);
             }
 

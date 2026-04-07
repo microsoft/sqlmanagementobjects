@@ -180,7 +180,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // $Issue - Exception "IncorectVersionTag" that was raised here does not provide enough
                     //          context for users to debug failures
-                    throw new InternalEnumeratorException(StringSqlEnumerator.IncorrectVersionTag(this.Reader.ReadOuterXml()));
+                    throw new InternalEnumeratorException(StringSqlEnumerator.FormatIncorrectVersionTag(this.Reader.ReadOuterXml()));
                 }
 
                 //Whether we should skip this version node (because of version
@@ -196,7 +196,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         !Boolean.TryParse(datawarehouseEnabled, out isDatawarehouseEnabled))
                     {
                         throw new InvalidConfigurationFileEnumeratorException(
-                            string.Format(StringSqlEnumerator.InvalidAttributeValue, datawarehouseEnabled,
+                            StringSqlEnumerator.FormatInvalidAttributeValue(datawarehouseEnabled,
                                 ATTR_DATAWAREHOUSE_ENABLED));
                     }
 
@@ -460,7 +460,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if( realFile.Length == 0 )
             {
                 // Despite all the temporary solutions, we were unable to find the right XML file. Die painful death.
-                throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FailedToLoadResFileFromPaths(strFile, string.Join(System.Environment.NewLine, subPaths.Select(p => "'" + Path.GetFullPath(Path.Combine(realPath, p)) + "'"))));
+                throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FormatFailedToLoadResFileFromPaths(strFile, string.Join(System.Environment.NewLine, subPaths.Select(p => "'" + Path.GetFullPath(Path.Combine(realPath, p)) + "'"))));
             }
 
             m_fs = new FileStream(realFile, FileMode.Open,FileAccess.Read, FileShare.Read);
@@ -472,7 +472,7 @@ namespace Microsoft.SqlServer.Management.Smo
 #endif
             if (null == m_fs)
             {
-                throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FailedToLoadResFileFromAssembly(strFile, a.Location));
+                throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FormatFailedToLoadResFileFromAssembly(strFile, a.Location));
             }
             LoadInternal();
         }
@@ -507,7 +507,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     String.IsNullOrEmpty(cloudMin) &&
                     String.IsNullOrEmpty(datawarehouseEnabled))
                 {
-                    throw new InternalEnumeratorException(StringSqlEnumerator.IncorrectVersionTag(this.Reader.ReadOuterXml()));
+                    throw new InternalEnumeratorException(StringSqlEnumerator.FormatIncorrectVersionTag(this.Reader.ReadOuterXml()));
                 }
 
                 if (this.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
@@ -518,8 +518,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         !Boolean.TryParse(datawarehouseEnabled, out isDatawarehouseEnabled))
                     {
                         throw new InvalidConfigurationFileEnumeratorException(
-                            string.Format(StringSqlEnumerator.InvalidAttributeValue, datawarehouseEnabled,
-                                ATTR_DATAWAREHOUSE_ENABLED));
+                            StringSqlEnumerator.FormatInvalidAttributeValue(datawarehouseEnabled, ATTR_DATAWAREHOUSE_ENABLED));
                     }
 
                     if (!isDatawarehouseEnabled)
@@ -565,12 +564,12 @@ namespace Microsoft.SqlServer.Management.Smo
                                 if (this.DatabaseEngineType == DatabaseEngineType.Standalone)
                                 {
                                     throw new InvalidVersionEnumeratorException(
-                                        StringSqlEnumerator.InvalidVersion(this.Version.ToString()));
+                                        StringSqlEnumerator.FormatInvalidVersion(this.Version.ToString()));
                                 }
                                 else
                                 {
                                     throw new InvalidVersionEnumeratorException(
-                                        StringSqlEnumerator.InvalidVersion(this.Version.ToString() + " " +
+                                        StringSqlEnumerator.FormatInvalidVersion(this.Version.ToString() + " " +
                                                                            this.DatabaseEngineType.ToString()));
                                 }
                         }
@@ -614,7 +613,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if( !IsElementWithCheckVersion("settings") )
                 {
-                    throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.MissingSection("settings"));
+                    throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FormatMissingSection("settings"));
                 }
                 return new XmlReadSettings(this);
             }
@@ -628,7 +627,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if( !IsElementWithCheckVersion("properties") && !XmlUtility.IsElement(this.Reader, "properties") )
                 {
-                    throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.MissingSection("properties"));
+                    throw new InvalidConfigurationFileEnumeratorException(StringSqlEnumerator.FormatMissingSection("properties"));
                 }
 
                 XmlUtility.SelectNextElement(this.Reader);

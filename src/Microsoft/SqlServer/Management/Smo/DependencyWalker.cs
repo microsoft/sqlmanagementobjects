@@ -230,7 +230,7 @@ public delegate bool ScriptingFilter( Urn urn );
 					if( 0 != NetCoreHelpers.StringCompare(sServerName, GetServerObject().ExecutionManager.TrueServerName, 
 											true, SmoApplication.DefaultCulture ) )
 					{
-						throw new ArgumentException(ExceptionTemplates.MismatchingServerName(GetServerObject().ExecutionManager.TrueServerName, sServerName));
+						throw new ArgumentException(ExceptionTemplates.FormatMismatchingServerName(GetServerObject().ExecutionManager.TrueServerName, sServerName));
 					}
 				}
 

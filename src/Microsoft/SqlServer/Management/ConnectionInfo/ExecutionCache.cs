@@ -35,7 +35,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
             if (capacity <= 1)
             {
-                throw new ArgumentOutOfRangeException(StringConnectionInfo.InvalidArgumentCacheCapacity(1));
+                throw new ArgumentOutOfRangeException(StringConnectionInfo.FormatInvalidArgumentCacheCapacity(1));
             }
             this.capacity = capacity;
         }
@@ -82,7 +82,7 @@ namespace Microsoft.SqlServer.Management.Common
 
             if (ContainsKey(item.Key))
             {
-                throw new ArgumentException(StringConnectionInfo.InvalidArgumentCacheDuplicateKey(item.Key));
+                throw new ArgumentException(StringConnectionInfo.FormatInvalidArgumentCacheDuplicateKey(item.Key));
             }
 
             if (items == null)

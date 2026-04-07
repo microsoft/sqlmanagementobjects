@@ -349,7 +349,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     //If the value is null or DBNull then we have an error of value is not set
                     if (value == null || value == DBNull.Value)
                     {
-                        message = SfcStrings.PropertyNotSet(property.Name);
+                        message = SfcStrings.FormatPropertyNotSet(property.Name);
                         state.AddError(message, exception, property.Name);
                     }
                 }
@@ -944,7 +944,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
             if (this.State == SfcObjectState.Dropped)
             {
-                    throw new SfcInvalidStateException(SfcStrings.InvalidState(this.State, SfcObjectState.Existing));
+                    throw new SfcInvalidStateException(SfcStrings.FormatInvalidState(this.State, SfcObjectState.Existing));
             }
         }
 
@@ -973,7 +973,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
             if( this.State != required_state )
             {
-                throw new SfcInvalidStateException(SfcStrings.InvalidState(this.State, required_state));
+                throw new SfcInvalidStateException(SfcStrings.FormatInvalidState(this.State, required_state));
             }
         }
 
@@ -1182,7 +1182,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch(InvalidCastException)
             {
-                throw new SfcObjectNotScriptableException(SfcStrings.ObjectNotScriptabe(this.ToString(),this.GetType().Name));
+                throw new SfcObjectNotScriptableException(SfcStrings.FormatObjectNotScriptabe(this.ToString(),this.GetType().Name));
             }
             return null;
         }
@@ -1266,7 +1266,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     SfcInstance existingObj;
                     if (this.GetParentCollection().GetExisting(mostCurrentKey, out existingObj))
                     {
-                        throw new SfcCRUDOperationFailedException(SfcStrings.CannotCreateDestinationHasDuplicate(this));
+                        throw new SfcCRUDOperationFailedException(SfcStrings.FormatCannotCreateDestinationHasDuplicate(this));
                     }
                 }
             }
@@ -1281,7 +1281,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 }
                 catch (Exception ex)
                 {
-                    throw new SfcCRUDOperationFailedException(SfcStrings.CRUDOperationFailed(operationName, this.ToString()), ex);
+                    throw new SfcCRUDOperationFailedException(SfcStrings.FormatCRUDOperationFailed(operationName, this.ToString()), ex);
                 }
             }
 
@@ -1350,7 +1350,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // The new key must not be null
             if (newKey == null)
             {
-                throw new SfcInvalidRenameException(SfcStrings.CannotRenameNoKey(this));
+                throw new SfcInvalidRenameException(SfcStrings.FormatCannotRenameNoKey(this));
             }
 
             // We MUST make sure the collection is initialized before we start talking to it. Since some of these
@@ -1373,7 +1373,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 SfcInstance existingObj;
                 if (this.GetParentCollection().GetExisting(newKey, out existingObj))
                 {
-                    throw new SfcInvalidRenameException(SfcStrings.CannotRenameDestinationHasDuplicate(this, newKey));
+                    throw new SfcInvalidRenameException(SfcStrings.FormatCannotRenameDestinationHasDuplicate(this, newKey));
                 }
 
                 CRUDImplWorker(SfcStrings.opRename, SfcObjectState.Existing, SfcDependencyAction.Rename, SfcObjectState.Existing, newKey);
@@ -1391,20 +1391,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // The new parent object must not be null
             if (newParent == null)
             {
-                throw new SfcInvalidMoveException(SfcStrings.CannotMoveNoDestination(this));
+                throw new SfcInvalidMoveException(SfcStrings.FormatCannotMoveNoDestination(this));
             }
 
             // The new parent object cannot be inside us
             if (this.KeyChain.IsClientAncestorOf(newParent.KeyChain))
             {
-                throw new SfcInvalidMoveException(SfcStrings.CannotMoveDestinationIsDescendant(this, newParent));
+                throw new SfcInvalidMoveException(SfcStrings.FormatCannotMoveDestinationIsDescendant(this, newParent));
             }
 
             // The new parent object must not have an existing child in the same collection with the same key as us
             SfcInstance existingObj;
             if (newParent.GetChildCollection(this.GetType().Name).GetExisting(this.AbstractIdentityKey, out existingObj))
             {
-                throw new SfcInvalidMoveException(SfcStrings.CannotMoveDestinationHasDuplicate(this, newParent));
+                throw new SfcInvalidMoveException(SfcStrings.FormatCannotMoveDestinationHasDuplicate(this, newParent));
             }
 
             // Any state is allowed, so use the object's current state as bothrequire state and final state
@@ -1426,7 +1426,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             CheckObjectState();
             if (this.State != SfcObjectState.Existing && this.State != SfcObjectState.ToBeDropped)
             {
-                throw new SfcInvalidStateException(SfcStrings.InvalidState(this.State, SfcObjectState.Existing));
+                throw new SfcInvalidStateException(SfcStrings.FormatInvalidState(this.State, SfcObjectState.Existing));
             }
 
             if (dropOnAlter)
@@ -1520,7 +1520,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     case SfcDependencyAction.Drop:
                         return true;
                     default:
-                        throw new InvalidOperationException(SfcStrings.UnsupportedAction(depAction.ToString(), this.typeName));
+                        throw new InvalidOperationException(SfcStrings.FormatUnsupportedAction(depAction.ToString(), this.typeName));
                 }
             }
         }

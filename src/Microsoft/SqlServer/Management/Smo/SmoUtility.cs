@@ -447,7 +447,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     ServerVersion minSupportedVersion = SmoUtility.GetMinimumSupportedVersion(type, DbEngineTypeToUse , DbEngineEditionToUse );
                     if (DbEngineEditionToUse == DatabaseEngineEdition.SqlDatabaseEdge)
                     {
-                        message = string.IsNullOrEmpty(message) ? ExceptionTemplates.NotSupportedOnSqlEdge(type.Name) : message;
+                        message = string.IsNullOrEmpty(message) ? ExceptionTemplates.FormatNotSupportedOnSqlEdge(type.Name) : message;
                         throw new UnsupportedVersionException(message).SetHelpContext("NotSupportedOnSqlEdge");
                     }
                     if (minSupportedVersion.Major == 17)
@@ -500,13 +500,13 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        throw new UnsupportedFeatureException(ExceptionTemplates.NotSupportedOnStandaloneWithDetails(type.Name))
+                        throw new UnsupportedFeatureException(ExceptionTemplates.FormatNotSupportedOnStandaloneWithDetails(type.Name))
                             .SetHelpContext("NotSupportedOnStandaloneWithDetails");
                     }
                 }
                 else if (DbEngineEditionToUse  == DatabaseEngineEdition.SqlOnDemand)
                 {
-                    throw new UnsupportedVersionException(ExceptionTemplates.NotSupportedForSqlOd(type.Name))
+                    throw new UnsupportedVersionException(ExceptionTemplates.FormatNotSupportedForSqlOd(type.Name))
                         .SetHelpContext("NotSupportedForSqlOd");
                 }
                 else if (DbEngineTypeToUse  == DatabaseEngineType.SqlAzureDatabase)
@@ -515,12 +515,12 @@ namespace Microsoft.SqlServer.Management.Smo
                         ((SmoUtility.IsSupportedObject(type, smoObject.ServerVersion, DbEngineTypeToUse ,
                             DbEngineEditionToUse ) == false)))
                     {
-                        throw new UnsupportedVersionException(ExceptionTemplates.NotSupportedForSqlDw(type.Name))
+                        throw new UnsupportedVersionException(ExceptionTemplates.FormatNotSupportedForSqlDw(type.Name))
                             .SetHelpContext("NotSupportedForSqlDw");
                     }
                     else
                     {
-                        throw new UnsupportedVersionException(ExceptionTemplates.NotSupportedOnCloudWithDetails(type.Name))
+                        throw new UnsupportedVersionException(ExceptionTemplates.FormatNotSupportedOnCloudWithDetails(type.Name))
                             .SetHelpContext("NotSupportedOnCloudWithDetails");
                     }
                 }

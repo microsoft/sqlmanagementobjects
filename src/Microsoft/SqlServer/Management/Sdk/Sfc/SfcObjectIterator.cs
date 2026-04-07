@@ -172,7 +172,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     else
                     {
                         // TODO: VSTS-252089 Need to handle other domains (if any)
-                        throw new SfcMetadataException(SfcStrings.DomainNotFound(urn.XPathExpression[0].ToString()));
+                        throw new SfcMetadataException(SfcStrings.FormatDomainNotFound(urn.XPathExpression[0].ToString()));
                     }
                 }
 

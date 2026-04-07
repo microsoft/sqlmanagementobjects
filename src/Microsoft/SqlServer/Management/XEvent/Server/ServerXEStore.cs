@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -190,7 +190,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                 case Target.TypeTypeName: return new Target.Key(urnFragment.FieldDictionary);
                 case TargetField.TypeTypeName: return new TargetField.Key(urnFragment.FieldDictionary);
             }
-            throw new XEventException(ExceptionTemplates.UnsupportedKey(urnFragment.Name));
+            throw new XEventException(ExceptionTemplates.FormatUnsupportedKey(urnFragment.Name));
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                     return null;
                 default:
                     TraceHelper.TraceContext.TraceError("Unknown typeName.");
-                    throw new XEventException(ExceptionTemplates.InvalidParameter("typeName"));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter("typeName"));
             }
         }
 

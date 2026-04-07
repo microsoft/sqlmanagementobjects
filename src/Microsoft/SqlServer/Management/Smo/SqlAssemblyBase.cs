@@ -117,7 +117,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (0 == assemblyLocalPaths.Length)
                 {
                     throw new FailedOperationException(ExceptionTemplates.Create, this, null,
-                                            ExceptionTemplates.EmptyInputParam("assemblyLocalPaths", "Collection"));
+                                            ExceptionTemplates.FormatEmptyInputParam("assemblyLocalPaths", "Collection"));
                 }
 
                 this.assemblyLocalPaths = assemblyLocalPaths;
@@ -147,7 +147,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (string.Empty == primaryAssemblyServerPath)
                 {
                     throw new FailedOperationException(ExceptionTemplates.Create, this, null,
-                                                    ExceptionTemplates.EmptyInputParam("primaryAssemblyServerPath", "string"));
+                                                    ExceptionTemplates.FormatEmptyInputParam("primaryAssemblyServerPath", "string"));
                 }
 
                 this.primaryAssemblyServerPath = primaryAssemblyServerPath;
@@ -393,7 +393,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (string.Empty == primaryAssemblyServerPath)
                 {
                     throw new FailedOperationException(ExceptionTemplates.Alter, this, null,
-                                                    ExceptionTemplates.EmptyInputParam("primaryAssemblyServerPath", "string"));
+                                                    ExceptionTemplates.FormatEmptyInputParam("primaryAssemblyServerPath", "string"));
                 }
 
                 this.assemblyAlterMethod = assemblyAlterMethod;
@@ -424,7 +424,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (0 == assemblyLocalPaths.Length)
                 {
                     throw new FailedOperationException(ExceptionTemplates.Alter, this, null,
-                                            ExceptionTemplates.EmptyInputParam("assemblyLocalPaths", "Collection"));
+                                            ExceptionTemplates.FormatEmptyInputParam("assemblyLocalPaths", "Collection"));
                 }
 
                 this.assemblyLocalPaths = assemblyLocalPaths;

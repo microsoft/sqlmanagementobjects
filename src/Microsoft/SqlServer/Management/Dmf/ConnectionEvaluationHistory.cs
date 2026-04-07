@@ -119,7 +119,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             {
                 case EvaluationDetail.typeName:
                     return this.EvaluationDetails;
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
 
@@ -497,7 +497,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     case SfcDependencyAction.Drop:
                         return true;
                     default:
-                        throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.UnsupportedCrudDependencyAction(depAction.ToString())));
+                        throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatUnsupportedCrudDependencyAction(depAction.ToString())));
                 }
             }
         }

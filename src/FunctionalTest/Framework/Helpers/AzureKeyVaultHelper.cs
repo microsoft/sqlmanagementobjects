@@ -134,9 +134,9 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         }
 
         /// <summary>
-        /// Detects whether the current environment is an Azure VM by checking for the Azure Instance Metadata Service (IMDS).
+        /// Detects whether the current environment is an Azure VM with a configured managed identity.
         /// </summary>
-        /// <returns>True if running on an Azure VM, false otherwise.</returns>
+        /// <returns>True if running on an Azure VM with managed identity, false otherwise.</returns>
         private static bool DetectAzureVM()
         {
             // Check for well-known environment variables that indicate Azure VM/App Service/Container Instances
@@ -158,8 +158,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 }
             }
 
-            // Try to reach the Azure Instance Metadata Service (IMDS)
-            // IMDS is available at a well-known, non-routable IP address (169.254.169.254)
+            // Try to reach the Azure Instance Metadata Service (IMDS) and verify managed identity is configured
             try
             {
                 using (var client = new System.Net.Http.HttpClient())
@@ -167,11 +166,38 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                     client.Timeout = TimeSpan.FromSeconds(2);
                     client.DefaultRequestHeaders.Add("Metadata", "true");
                     
-                    var response = client.GetAsync("http://169.254.169.254/metadata/instance?api-version=2021-02-01").Result;
-                    if (response.IsSuccessStatusCode)
+                    // First check if IMDS is available
+                    var instanceResponse = client.GetAsync("http://169.254.169.254/metadata/instance?api-version=2021-02-01").Result;
+                    if (instanceResponse.IsSuccessStatusCode)
                     {
-                        TraceHelper.TraceInformation("Azure VM detected via IMDS endpoint.");
-                        return true;
+                        TraceHelper.TraceInformation("Azure VM detected via IMDS endpoint. Checking for managed identity...");
+
+                        // Now verify that a managed identity is actually configured
+                        // Use a minimal token request to test if managed identity is available
+                        // DEVNOTE(chgagnon) This is a workaround for a known issue in the Azure SDK where it doesn't
+                        // silently continue to the next chained credential when this fails : https://github.com/Azure/azure-sdk-for-net/issues/47057
+                        try
+                        {
+                            using (var identityResponse = client.GetAsync("http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://vault.azure.net").Result)
+                            {
+                                // If we get a successful response, managed identity is configured
+                                if (identityResponse.IsSuccessStatusCode)
+                                {
+                                    TraceHelper.TraceInformation("Managed identity is configured and available.");
+                                    return true;
+                                }
+                                else
+                                {
+                                    TraceHelper.TraceInformation($"Managed identity not configured (HTTP {identityResponse.StatusCode}). Will not use ManagedIdentityCredential.");
+                                    return false;
+                                }
+                            }
+                        }
+                        catch (Exception identityEx)
+                        {
+                            TraceHelper.TraceInformation($"Managed identity check failed: {identityEx.Message}. Will not use ManagedIdentityCredential.");
+                            return false;
+                        }
                     }
                 }
             }

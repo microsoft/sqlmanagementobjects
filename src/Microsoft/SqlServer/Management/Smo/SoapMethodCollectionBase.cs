@@ -29,7 +29,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var name = urn.GetAttribute("Name");
             if( null == name || name.Length == 0)
             {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("Name", urn.Type));
+                throw new SmoException(ExceptionTemplates.FormatPropertyMustBeSpecifiedInUrn("Name", urn.Type));
             }
 
             var methodNamespace = urn.GetAttribute("Namespace");

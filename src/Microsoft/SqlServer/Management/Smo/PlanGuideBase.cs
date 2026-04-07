@@ -39,7 +39,7 @@ namespace Microsoft.SqlServer.Management.Smo
             base.ValidateName(name);
             if (0 == name.Length)
             {
-                throw new UnsupportedObjectNameException(ExceptionTemplates.UnsupportedObjectNameExceptionText(name));
+                throw new UnsupportedObjectNameException(ExceptionTemplates.FormatUnsupportedObjectNameExceptionText(name));
             }
             CheckPlanGuideName(name);
         }
@@ -139,7 +139,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 pgType = (PlanGuideType)pType;
                 if (!Enum.IsDefined(typeof(PlanGuideType), pgType))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("PlanGuideType"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("PlanGuideType"));
                 }
                 statement.AppendFormat(SmoApplication.DefaultCulture, "{0} @type = {1}",
                        Globals.comma, MakeSqlString(type));
@@ -174,7 +174,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case PlanGuideType.Object:
                     if (scopeBatch.Length > 0)
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.PropertyNotValidException("ScopeBatch", "ScopeType", type));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatPropertyNotValidException("ScopeBatch", "ScopeType", type));
                     }
 
                     if (scopeObjectName.Length > 0)
@@ -198,7 +198,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case PlanGuideType.Sql:
                     if (scopeObjectName.Length > 0 || scopeSchemaName.Length > 0)
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.PropertiesNotValidException("ScopeObjectName and ScopeSchemaName", "ScopeType", type));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatPropertiesNotValidException("ScopeObjectName and ScopeSchemaName", "ScopeType", type));
                     }
                     if (scopeBatch.Length > 0)
                     {
@@ -214,7 +214,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     //Template - Scope Batch has to be null when user sets it but engine saves the value after creation hence during scripting we ignore it.
                     if ((isScopeBatchDirty && scopeBatch.Length > 0) || scopeObjectName.Length > 0 || scopeSchemaName.Length > 0)
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.PropertiesNotValidException("ScopeBatch, ScopeObjectName and ScopeSchemaName", "ScopeType", type));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatPropertiesNotValidException("ScopeBatch, ScopeObjectName and ScopeSchemaName", "ScopeType", type));
                     }
                     else if (isScriptForYukon)
                     {
@@ -228,7 +228,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (pgType == PlanGuideType.Object)
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.PropertyNotValidException("Parameters", "ScopeType", type));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatPropertyNotValidException("Parameters", "ScopeType", type));
                 }
                 else
                 {
@@ -345,7 +345,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (planGuideName.StartsWith("#", StringComparison.Ordinal))
             {
                 // plan name cannot start with the number sign (#).
-                throw new WrongPropertyValueException(ExceptionTemplates.PlanGuideNameCannotStartWithHash(planGuideName));
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatPlanGuideNameCannotStartWithHash(planGuideName));
             }
         }
 

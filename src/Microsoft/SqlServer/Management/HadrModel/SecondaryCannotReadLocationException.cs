@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -18,7 +17,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="secondaryServerName">The name of the secondaryServer</param>
         /// <param name="backupLocation">The backup location</param>
         public SecondaryCannotReadLocationException(string secondaryServerName, string backupLocation)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.SecondaryCannotReadLocation, secondaryServerName, backupLocation))
+            : base(Resource.FormatSecondaryCannotReadLocation(secondaryServerName, backupLocation))
         {
         }
 
@@ -29,7 +28,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="backupLocation">The backup location</param>
         /// <param name="innerException">The inner exception</param>
         public SecondaryCannotReadLocationException(string secondaryServerName, string backupLocation, Exception innerException)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.SecondaryCannotReadLocation, secondaryServerName, backupLocation), innerException)
+            : base(Resource.FormatSecondaryCannotReadLocation(secondaryServerName, backupLocation), innerException)
         {
         }
     }

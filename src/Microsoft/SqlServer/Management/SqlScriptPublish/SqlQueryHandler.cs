@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -8,7 +8,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Diagnostics;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
 
@@ -88,7 +87,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                 Debug.Assert(info != null, "Unsupported object type:" + objectType);
                 if (info == null)
                 {
-                    throw new SqlScriptPublishException(SR.InvalidObjectType(objectType.ToString()));
+                    throw new SqlScriptPublishException(SR.FormatInvalidObjectType(objectType.ToString()));
                 }
 
                 // Check to see if the object type is supported from the SQL version.

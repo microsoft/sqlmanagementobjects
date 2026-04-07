@@ -230,7 +230,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // IsDHCP cannot be set to true, since no sensible script can be produced in this case.
             if (this.GetPropValueOptional(IsDHCPPropertyName) != null && this.IsDHCP == true)
             {
-                throw new InvalidOperationException(ExceptionTemplates.CannotAddDHCPIPAddress(UrnSuffix, IsDHCPPropertyName));
+                throw new InvalidOperationException(ExceptionTemplates.FormatCannotAddDHCPIPAddress(UrnSuffix, IsDHCPPropertyName));
             }
 
             // The IPAddress key must be set.
@@ -377,7 +377,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     else
                     {
                         // In this case, more than one result was returned, which should never happen.
-                        throw new SmoException(ExceptionTemplates.GetDHCPAddressFailed(this.Parent.Name, resultTable.Rows.Count));
+                        throw new SmoException(ExceptionTemplates.FormatGetDHCPAddressFailed(this.Parent.Name, resultTable.Rows.Count));
                     }
                 }
                 catch (Exception e)

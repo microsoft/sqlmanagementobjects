@@ -84,7 +84,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // is provided on Azure-side. So we need to disable scripting capability for this case.
             if (sp.TargetDatabaseEngineType == Cmn.DatabaseEngineType.SqlAzureDatabase)
             {
-                throw new UnsupportedEngineTypeException(ExceptionTemplates.ScriptingNotSupportedOnCloud(typeof(UserOptions).Name)).
+                throw new UnsupportedEngineTypeException(ExceptionTemplates.FormatScriptingNotSupportedOnCloud(typeof(UserOptions).Name)).
                     SetHelpContext("ScriptingNotSupportedOnCloud");
             }
 

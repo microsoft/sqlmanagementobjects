@@ -203,7 +203,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
             }
         }
 
@@ -261,7 +261,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
             }
         }
 

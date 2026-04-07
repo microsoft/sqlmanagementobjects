@@ -154,7 +154,7 @@ namespace Microsoft.SqlServer.Management.Common
         * NOTE: If you're adding new value here,
         * please update as well ScriptDatabaseEngineEdition enum
         * in src\Microsoft\SqlServer\Management\SqlScriptPublish\SqlScriptOptions.cs
-        * and src\Microsoft\SqlServer\Management\SqlScriptPublish\SqlScriptOptionsSR.strings
+        * and src\Microsoft\SqlServer\Management\SqlScriptPublish\SqlScriptOptionsSR.resx
         */
 
         /* !!IMPORTANT!! When updating this enum make sure to update GetSupportedDatabaseEngineEditions below as well */

@@ -135,7 +135,7 @@ namespace Microsoft.SqlServer.Management.Smo
 					//first character is always at sign(@) for parameter name
 					if (c != '@')
 					{
-						throw new WrongPropertyValueException(ExceptionTemplates.WrongPropertyValueException("Name", paramName));
+						throw new WrongPropertyValueException(ExceptionTemplates.FormatWrongPropertyValueException("Name", paramName));
 					}
 					bFirst = false;
 				}
@@ -144,7 +144,7 @@ namespace Microsoft.SqlServer.Management.Smo
 					//can be letter, digit, underscore, at sign, number sign, dollar sign or the unicode long underscore unless it's first char.
 					if (!(char.IsLetterOrDigit(c) || c == '_' || c == '@' || c == '#' || c == '$' || c == longUderscoreChar))
 					{
-						throw new WrongPropertyValueException(ExceptionTemplates.WrongPropertyValueException("Name", paramName));
+						throw new WrongPropertyValueException(ExceptionTemplates.FormatWrongPropertyValueException("Name", paramName));
 					}
 				}
 			}

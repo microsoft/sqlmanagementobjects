@@ -351,7 +351,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.PropertyNotSetExceptionText(propertyName));
+                return ExceptionTemplates.FormatPropertyNotSetExceptionText(propertyName);
             }
         }
 
@@ -459,8 +459,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 StringBuilder propertiesText = new StringBuilder();
                 if( property != null )
                 {
-                    return string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.WrongPropertyValueExceptionText(property.Name,
-                                    (null != property.Value)?property.Value.ToString():string.Empty));
+                    return ExceptionTemplates.FormatWrongPropertyValueExceptionText(property.Name,
+                                    (null != property.Value)?property.Value.ToString():string.Empty);
                 }
                 else
                 {
@@ -569,7 +569,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return ExceptionTemplates.PropertyTypeMismatchExceptionText(propertyName, receivedType, expectedType);
+                return ExceptionTemplates.FormatPropertyTypeMismatchExceptionText(propertyName, receivedType, expectedType);
             }
         }
 
@@ -678,7 +678,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //if we haven't been already set a message build one
                 if (base.Message.Length <= 0)
                 {
-                    return ExceptionTemplates.UnknownPropertyExceptionText(propertyName);
+                    return ExceptionTemplates.FormatUnknownPropertyExceptionText(propertyName);
                 }
                 return base.Message;
             }
@@ -788,7 +788,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return ExceptionTemplates.PropertyReadOnlyExceptionText(propertyName);
+                return ExceptionTemplates.FormatPropertyReadOnlyExceptionText(propertyName);
             }
         }
 
@@ -896,7 +896,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return ExceptionTemplates.FailedToWriteProperty(propertyName, objectKind, objectName, reason);
+                return ExceptionTemplates.FormatFailedToWriteProperty(propertyName, objectKind, objectName, reason);
             }
         }
 
@@ -1004,7 +1004,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    return ExceptionTemplates.InvalidSmoOperationExceptionText(opName, state.ToString() );
+                    return ExceptionTemplates.FormatInvalidSmoOperationExceptionText(opName, state.ToString() );
                 }
             }
         }
@@ -1112,7 +1112,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (null != version)
                 {
                     string versionName = GetVersionName(this.version);
-                    return ExceptionTemplates.InvalidVersionSmoOperation(versionName);
+                    return ExceptionTemplates.FormatInvalidVersionSmoOperation(versionName);
                 }
                 return string.Empty;
             }
@@ -1263,7 +1263,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             get
             {
-                return string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.CollectionNotAvailable(colname, serverVersion != null ? serverVersion.ToString() : string.Empty ) );
+                return ExceptionTemplates.FormatCollectionNotAvailable(colname, serverVersion != null ? serverVersion.ToString() : string.Empty);
             }
         }
 
@@ -1389,7 +1389,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 string message = null;
                 if (null != propertyName && propertyName.Length > 0 && null != failedObject)
                 {
-                    message = ExceptionTemplates.PropertyCannotBeRetrievedExceptionText(propertyName,
+                    message = ExceptionTemplates.FormatPropertyCannotBeRetrievedExceptionText(propertyName,
                                                 SqlSmoObject.GetTypeName(failedObject.GetType().Name),
                                                 failedObject.ToString());
                 }
@@ -1619,7 +1619,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (failedObject is SqlSmoObject)
                     {
                         // message for the objects that we know
-                        msg = ExceptionTemplates.FailedOperationExceptionText(operation,
+                        msg = ExceptionTemplates.FormatFailedOperationExceptionText(operation,
                                                 SqlSmoObject.GetTypeName(failedObject.GetType().Name),
                                                 ((SqlSmoObject)failedObject).key.GetExceptionName() );
                     }
@@ -1627,7 +1627,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         // this message is for collections
                         SqlSmoObject parentObj = ((AbstractCollectionBase)failedObject).ParentInstance;
-                        msg = ExceptionTemplates.FailedOperationExceptionTextColl(operation,
+                        msg = ExceptionTemplates.FormatFailedOperationExceptionTextColl(operation,
                                                 SqlSmoObject.GetTypeName(failedObject.GetType().Name),
                                                 SqlSmoObject.GetTypeName(parentObj.GetType().Name),
                                                 parentObj.key.GetExceptionName());
@@ -1637,7 +1637,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     else
                     {
                         // all other cases just report that the operation failed
-                        msg = ExceptionTemplates.FailedOperationExceptionText2(operation);
+                        msg = ExceptionTemplates.FormatFailedOperationExceptionText2(operation);
                     }
 
                     return msg  + (reason != null?(" " +reason):string.Empty);
@@ -1818,13 +1818,13 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         // we have a WMI error code, but we don't map it to a string
                         // because there is no way of doing this via API
-                        return ExceptionTemplates.WMIException(errorCode.ToString("X", SmoApplication.DefaultCulture));
+                        return ExceptionTemplates.FormatWMIException(errorCode.ToString("X", SmoApplication.DefaultCulture));
                     }
                     else
                     {
                         if (SqlContext.IsAvailable)
                         {
-                            return ExceptionTemplates.Win32Error(ErrorCode.ToString());
+                            return ExceptionTemplates.FormatWin32Error(ErrorCode.ToString());
                         }
                             return ExceptionTemplates.UnknownError;
                     }

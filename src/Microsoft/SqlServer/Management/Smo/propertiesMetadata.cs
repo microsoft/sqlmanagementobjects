@@ -491,13 +491,13 @@ namespace Microsoft.SqlServer.Management.Smo
             switch (pap)
             {
                 case PropertyAccessPurpose.Read:
-                    text = ExceptionTemplates.CannotReadProperty(propertyName);
+                    text = ExceptionTemplates.FormatCannotReadProperty(propertyName);
                     break;
                 case PropertyAccessPurpose.Write:
-                    text = ExceptionTemplates.CannotWriteProperty(propertyName);
+                    text = ExceptionTemplates.FormatCannotWriteProperty(propertyName);
                     break;
                 default:
-                    text = ExceptionTemplates.CannotAccessProperty(propertyName);
+                    text = ExceptionTemplates.FormatCannotAccessProperty(propertyName);
                     break;
             }
 
@@ -908,7 +908,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return providerLookup[t];
             }
-            throw new ArgumentException(ExceptionTemplates.InvalidTypeForMetadataProvider(t.Name));
+            throw new ArgumentException(ExceptionTemplates.FormatInvalidTypeForMetadataProvider(t.Name));
         }
 
     }

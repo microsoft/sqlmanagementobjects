@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -12,9 +11,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// Standard Exception with endpointName and authenticationType
         /// </summary>
         public EndpointAuthenticationValidationException(string endpointName, string authenticationType)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.EndpointAuthenticationValidatorException,
-                endpointName))
+            : base(Resource.FormatEndpointAuthenticationValidatorException(endpointName, authenticationType))
         {
 
         }
@@ -23,9 +20,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// Exception with endpointName and authenticationType and inner exception
         /// </summary>
         public EndpointAuthenticationValidationException(string endpointName, string authenticationType, Exception inner)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.EndpointAuthenticationValidatorException,
-                endpointName, authenticationType), inner)
+            : base(Resource.FormatEndpointAuthenticationValidatorException(endpointName, authenticationType), inner)
         {
 
         }  

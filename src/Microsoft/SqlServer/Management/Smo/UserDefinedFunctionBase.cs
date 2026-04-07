@@ -111,7 +111,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (functionType != UserDefinedFunctionType.Scalar && functionType != UserDefinedFunctionType.Inline && sp.TargetEngineIsAzureSqlDw())
             {
                 throw new UnsupportedEngineEditionException(
-                    ExceptionTemplates.PropertyValueNotSupportedForSqlDw(typeof(UserDefinedFunctionType).Name, functionType.ToString()))
+                    ExceptionTemplates.FormatPropertyValueNotSupportedForSqlDw(typeof(UserDefinedFunctionType).Name, functionType.ToString()))
                     .SetHelpContext("PropertyValueNotSupportedForSqlDw");
             }
             Property property;
@@ -165,7 +165,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                     // it insures we can't script a CLR UDF that targets a 8.0 server
                    ThrowIfBelowVersion90(sp.TargetServerVersion,
-                        ExceptionTemplates.ClrUserDefinedFunctionDownlevel(
+                        ExceptionTemplates.FormatClrUserDefinedFunctionDownlevel(
                             FormatFullNameForScripting(sp, true),
                             GetSqlServerName(sp)));
                     }
@@ -209,14 +209,14 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
                             ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
-                                ExceptionTemplates.CreateOrAlterDownlevel(
+                                ExceptionTemplates.FormatCreateOrAlterDownlevel(
                                     "Function",
                                     GetSqlServerName(sp)));
 
                             udfBody.AppendFormat(SmoApplication.DefaultCulture, "{0} FUNCTION {1}", Scripts.CREATE_OR_ALTER, sFullScriptingName);
                             break;
                         default:
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(scriptHeaderType.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(scriptHeaderType.ToString()));
                     }
                     udfBody.Append(Globals.LParen);
 
@@ -310,7 +310,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             Column basecol = m_Columns[orderCol.Name];
                             if (basecol == null)
                             {
-                                throw new SmoException(ExceptionTemplates.OrderHintRefsNonexCol(Name, "[" + SqlStringBraket(orderCol.Name) + "]"));
+                                throw new SmoException(ExceptionTemplates.FormatOrderHintRefsNonexCol(Name, "[" + SqlStringBraket(orderCol.Name) + "]"));
                             }
 
                             udfBody.Append(MakeSqlBraket(orderCol.GetName(sp)));
@@ -422,7 +422,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (this.State != SqlSmoState.Creating && this.IsEncrypted && this.ImplementationType == ImplementationType.TransactSql)
             {
                 ThrowIfBelowVersion90(sp.TargetServerVersion,
-                    ExceptionTemplates.EncryptedUserDefinedFunctionsDownlevel(
+                    ExceptionTemplates.FormatEncryptedUserDefinedFunctionsDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
             }

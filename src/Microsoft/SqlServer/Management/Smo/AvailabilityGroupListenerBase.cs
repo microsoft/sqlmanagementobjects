@@ -80,7 +80,7 @@ namespace Microsoft.SqlServer.Management.Smo
             catch (Exception e)
             {
                 FilterException(e);
-                throw new FailedOperationException(ExceptionTemplates.RestartListenerFailed(this.Name, this.Parent.Name), e);
+                throw new FailedOperationException(ExceptionTemplates.FormatRestartListenerFailed(this.Name, this.Parent.Name), e);
             }
         }
 
@@ -240,7 +240,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // can not create the listener if there is no ipaddress
             if (this.AvailabilityGroupListenerIPAddresses == null || this.AvailabilityGroupListenerIPAddresses.Count < 1)
             {
-                throw new SmoException(ExceptionTemplates.ObjectWithNoChildren(AvailabilityGroupListener.UrnSuffix, AvailabilityGroupListenerIPAddress.UrnSuffix));
+                throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren(AvailabilityGroupListener.UrnSuffix, AvailabilityGroupListenerIPAddress.UrnSuffix));
             }
 
             bool useDHCP = this.AvailabilityGroupListenerIPAddresses[0].IsDHCP;
@@ -250,7 +250,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (ip.IsDHCP != useDHCP)
                 {
-                    throw new SmoException(ExceptionTemplates.WrongHybridIPAddresses(AvailabilityGroupListener.UrnSuffix));
+                    throw new SmoException(ExceptionTemplates.FormatWrongHybridIPAddresses(AvailabilityGroupListener.UrnSuffix));
                 }
             }
 
@@ -259,13 +259,13 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (this.AvailabilityGroupListenerIPAddresses.Count > 1)
                 {
-                    throw new SmoException(ExceptionTemplates.WrongMultiDHCPIPAddresses(AvailabilityGroupListener.UrnSuffix));
+                    throw new SmoException(ExceptionTemplates.FormatWrongMultiDHCPIPAddresses(AvailabilityGroupListener.UrnSuffix));
                 }
 
                 // DHCP must be IPv4 or empty
                 if (!string.IsNullOrEmpty(this.AvailabilityGroupListenerIPAddresses[0].IPAddress) && this.AvailabilityGroupListenerIPAddresses[0].IsIPv6)
                 {
-                    throw new SmoException(ExceptionTemplates.WrongDHCPv6IPAddress(AvailabilityGroupListener.UrnSuffix));
+                    throw new SmoException(ExceptionTemplates.FormatWrongDHCPv6IPAddress(AvailabilityGroupListener.UrnSuffix));
                 }
             }
         }

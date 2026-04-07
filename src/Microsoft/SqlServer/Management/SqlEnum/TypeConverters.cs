@@ -24,18 +24,7 @@ namespace Microsoft.SqlServer.Management.Smo
             this.name = name;
         }
 
-        public override string DisplayName
-        {
-            get
-            {
-                string result = StringSqlEnumerator.Keys.GetString(name);
-                if (result == null)
-                {
-                    result = this.name;
-                }
-                return result;
-            }
-        }
+        public override string DisplayName => StringSqlEnumerator.GetResourceString(name, this.name) ?? this.name;
     }
 
     /// <summary>

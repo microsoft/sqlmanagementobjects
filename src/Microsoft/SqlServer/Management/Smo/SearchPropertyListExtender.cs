@@ -306,7 +306,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (string.IsNullOrEmpty(this.Parent.Name) || this.Parent.Name.Length > SearchPropertyListConstants.MaxSearchPropertyListNameLength)
             {
-                return new ValidationState(ExceptionTemplates.SearchPropertyListNameNotValid(SearchPropertyListConstants.MaxSearchPropertyListNameLength), "Name");
+                return new ValidationState(ExceptionTemplates.FormatSearchPropertyListNameNotValid(SearchPropertyListConstants.MaxSearchPropertyListNameLength), "Name");
             }
 
             if (string.IsNullOrEmpty(this.Parent.Name.Trim()))

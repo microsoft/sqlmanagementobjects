@@ -47,7 +47,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return new ConfigProperty(this, 16393);
             }
             //Containment is not supported for Version Earlier than Denali(SQL11)
-            throw new UnsupportedVersionException(ExceptionTemplates.ContainmentNotSupported(this.Parent.ServerVersion.ToString()));
+            throw new UnsupportedVersionException(ExceptionTemplates.FormatContainmentNotSupported(this.Parent.ServerVersion.ToString()));
         }
     }
 
@@ -355,7 +355,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new ConfigProperty(this, 1548);
             }
-            throw new UnsupportedVersionException(ExceptionTemplates.AweEnabledNotSupported(this.Parent.ServerVersion.Major.ToString(SmoApplication.DefaultCulture)));
+            throw new UnsupportedVersionException(ExceptionTemplates.FormatAweEnabledNotSupported(this.Parent.ServerVersion.Major.ToString(SmoApplication.DefaultCulture)));
         }
     }
 
@@ -584,7 +584,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             Version serverVersion = Parent.Version;
             //web assistant XPs have been removed since SQL Server 2008.
-            throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(serverVersion.Major.ToString()));
+            throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(serverVersion.Major.ToString()));
         }
     }
 
@@ -778,7 +778,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new ConfigProperty(this, 1573);
             }
-            throw new UnsupportedFeatureException(ExceptionTemplates.UnsupportedFeature("UserInstanceTimeout"));
+            throw new UnsupportedFeatureException(ExceptionTemplates.FormatUnsupportedFeature("UserInstanceTimeout"));
         }
     }
 
@@ -796,7 +796,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return new ConfigProperty(this, 1575);
             }
-            throw new UnsupportedFeatureException(ExceptionTemplates.UnsupportedFeature("UserInstancesEnabled"));
+            throw new UnsupportedFeatureException(ExceptionTemplates.FormatUnsupportedFeature("UserInstancesEnabled"));
         }
     }
 

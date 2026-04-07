@@ -185,7 +185,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             {
                 // we only support connections to SqlServer for the moment,
                 // due to limitations in SfcObjectQuery
-                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.UnsupportedObjectType(targetConnection.GetType().Name, methodName)));
+                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatUnsupportedObjectType(targetConnection.GetType().Name, methodName)));
             }
             return sqlStoreConnection;
         }

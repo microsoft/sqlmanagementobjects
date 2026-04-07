@@ -175,7 +175,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (this.IsDesignMode && this.Parent.DoesMasterKeyAlreadyExist())
             {
-                throw new FailedOperationException(ExceptionTemplates.ObjectAlreadyExists("Database's", "MasterKey")); ;
+                throw new FailedOperationException(ExceptionTemplates.FormatObjectAlreadyExists("Database's", "MasterKey")); ;
             }
         }
 

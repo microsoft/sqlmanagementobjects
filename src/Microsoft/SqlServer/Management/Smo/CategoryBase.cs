@@ -139,7 +139,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                     return "NONE";
             }
 
-            throw new InternalSmoErrorException( ExceptionTemplates.UnknownCategoryType(ct.ToString()));
+            throw new InternalSmoErrorException( ExceptionTemplates.FormatUnknownCategoryType(ct.ToString()));
         }
 
         /// <summary>

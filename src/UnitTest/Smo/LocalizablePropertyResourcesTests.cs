@@ -22,7 +22,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
     /// <summary>
     /// Tests to verify that all SMO and related objects with LocalizableTypeConverter have
     /// properly named localization strings for their properties.
-    /// This helps catch typos in .strings files like:
+    /// This helps catch typos in .resx files like:
     /// - "Datababase_" instead of "Database_"
     /// - "SServer_" instead of "Server_"
     /// - Missing "Name" suffix (e.g., "Table_DataRetentionFilterColumnName" instead of "Table_DataRetentionFilterColumnNameName")

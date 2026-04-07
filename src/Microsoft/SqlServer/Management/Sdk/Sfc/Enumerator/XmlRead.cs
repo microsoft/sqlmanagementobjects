@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 {
                     // $Issue - Exception "IncorectVersionTag" that was raised here does not provide enough
                     //          context for users to debug failures
-                    throw new InternalEnumeratorException(SfcStrings.IncorrectVersionTag(this.Reader.ReadOuterXml()));
+                    throw new InternalEnumeratorException(SfcStrings.FormatIncorrectVersionTag(this.Reader.ReadOuterXml()));
                 }
 
                 //Whether we should skip this version node (because of version
@@ -189,7 +189,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         !Boolean.TryParse(datawarehouseEnabled, out isDatawarehouseEnabled))
                     {
                         throw new InvalidConfigurationFileEnumeratorException(
-                            string.Format(SfcStrings.InvalidAttributeValue, datawarehouseEnabled,
+                            SfcStrings.FormatInvalidAttributeValue(datawarehouseEnabled,
                                 ATTR_DATAWAREHOUSE_ENABLED));
                     }
 
@@ -404,7 +404,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             m_fs = a.GetManifestResourceStream(strFile);
             if( null == m_fs )
             {
-                throw new InvalidConfigurationFileEnumeratorException(SfcStrings.FailedToLoadResFile(strFile));
+                throw new InvalidConfigurationFileEnumeratorException(SfcStrings.FormatFailedToLoadResFile(strFile));
             }
             this.Reader = new XmlTextReader(m_fs)
             {
@@ -427,7 +427,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     String.IsNullOrEmpty(cloudMin) &&
                     String.IsNullOrEmpty(datawarehouseEnabled))
                 {
-                    throw new InternalEnumeratorException(SfcStrings.IncorrectVersionTag(this.Reader.ReadOuterXml()));
+                    throw new InternalEnumeratorException(SfcStrings.FormatIncorrectVersionTag(this.Reader.ReadOuterXml()));
                 }
 
                 if (this.DatabaseEngineEdition == DatabaseEngineEdition.SqlDataWarehouse)
@@ -438,7 +438,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         !Boolean.TryParse(datawarehouseEnabled, out isDatawarehouseEnabled))
                     {
                         throw new InvalidConfigurationFileEnumeratorException(
-                            string.Format(SfcStrings.InvalidAttributeValue, datawarehouseEnabled,
+                            SfcStrings.FormatInvalidAttributeValue(datawarehouseEnabled,
                                 ATTR_DATAWAREHOUSE_ENABLED));
                     }
 
@@ -478,7 +478,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     if (minMajor > this.Version.Major || maxMajor < this.Version.Major)
                     {
                         throw new InvalidVersionEnumeratorException(
-                            SfcStrings.InvalidVersion(this.Version.ToString()));
+                            SfcStrings.FormatInvalidVersion(this.Version.ToString()));
                     }
                 }
 
@@ -519,7 +519,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 if( !IsElementWithCheckVersion("settings") )
                 {
-                    throw new InvalidConfigurationFileEnumeratorException(SfcStrings.MissingSection("settings"));
+                    throw new InvalidConfigurationFileEnumeratorException(SfcStrings.FormatMissingSection("settings"));
                 }
                 return new XmlReadSettings(this);
             }
@@ -533,7 +533,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 if( !IsElementWithCheckVersion("properties") && !XmlUtility.IsElement(this.Reader, "properties") )
                 {
-                    throw new InvalidConfigurationFileEnumeratorException(SfcStrings.MissingSection("properties"));
+                    throw new InvalidConfigurationFileEnumeratorException(SfcStrings.FormatMissingSection("properties"));
                 }
 
                 XmlUtility.SelectNextElement(this.Reader);

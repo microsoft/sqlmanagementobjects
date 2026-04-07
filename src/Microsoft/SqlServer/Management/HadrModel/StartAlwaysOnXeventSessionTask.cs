@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.XEvent;
@@ -35,7 +34,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="replica">The replica data</param>
         public StartAlwaysOnXeventSessionTask(AvailabilityGroupReplica replica)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.StartAlwaysOnXeventSessionText, AlwaysOnHealthSessionName, replica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatStartAlwaysOnXeventSessionText(AlwaysOnHealthSessionName, replica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (replica == null)
             {
@@ -59,9 +58,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         protected override void Perform(IExecutionPolicy policy)
         {
             this.UpdateStatus(new TaskEventArgs(this.Name,
-                string.Format(Resource.EnablingXeventOnReplica,
-                                AlwaysOnHealthSessionName,
-                                this.Replica.AvailabilityGroupReplicaData.ReplicaName),
+                Resource.FormatEnablingXeventOnReplica(AlwaysOnHealthSessionName, this.Replica.AvailabilityGroupReplicaData.ReplicaName),
                 TaskEventStatus.Running));
 
             // This task will only be tried once.

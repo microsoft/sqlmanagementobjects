@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -15,7 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// Exception with DatabaseName and inner exception
         /// </summary>
         public RestoreLogTaskException(string DatabaseName,Exception inner)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.RestoreLogTaskException, DatabaseName), inner)
+            : base(Resource.FormatRestoreLogTaskException(DatabaseName), inner)
         {
         }
     }

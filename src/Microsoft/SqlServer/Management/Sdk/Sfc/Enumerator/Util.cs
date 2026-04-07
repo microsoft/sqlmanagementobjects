@@ -97,7 +97,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     strType = "System.Object";
                     break;
                 default:
-                    throw new InvalidConfigurationFileEnumeratorException(SfcStrings.UnknownType(strDBType));
+                    throw new InvalidConfigurationFileEnumeratorException(SfcStrings.FormatUnknownType(strDBType));
             }
             return strType;
         }
@@ -169,11 +169,11 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch(Exception e)
             {
-                throw new InternalEnumeratorException(SfcStrings.FailedToLoadAssembly(assemblyName) + "\n\n" + e.ToString());
+                throw new InternalEnumeratorException(SfcStrings.FormatFailedToLoadAssembly(assemblyName) + "\n\n" + e.ToString());
             }
             if( null == a )
             {
-                throw new InternalEnumeratorException(SfcStrings.FailedToLoadAssembly(assemblyName));
+                throw new InternalEnumeratorException(SfcStrings.FormatFailedToLoadAssembly(assemblyName));
             }
             return a;
         }
@@ -185,7 +185,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 null, null, CultureInfo.InvariantCulture, null);
             if( null == o )
             {
-                throw new InternalEnumeratorException(SfcStrings.CouldNotInstantiateObj(objectType));
+                throw new InternalEnumeratorException(SfcStrings.FormatCouldNotInstantiateObj(objectType));
             }
             return o;
         }

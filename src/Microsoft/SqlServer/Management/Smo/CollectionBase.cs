@@ -56,7 +56,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var name = urn.GetAttribute("Name");
             if (null == name || (name.Length == 0 && !CanHaveEmptyName(urn)))
             {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("Name", urn.Type));
+                throw new SmoException(ExceptionTemplates.FormatPropertyMustBeSpecifiedInUrn("Name", urn.Type));
             }
 
             return KeyFromName(name);
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                     objectType.Equals(typeof(UserDefinedFunctionParameter));
             if( null == Name || (Name.Length == 0 && !acceptEmptyName))
             {
-                throw new UnsupportedObjectNameException(ExceptionTemplates.UnsupportedObjectNameExceptionText(objectType.ToString())).SetHelpContext("UnsupportedObjectNameExceptionText");
+                throw new UnsupportedObjectNameException(ExceptionTemplates.FormatUnsupportedObjectNameExceptionText(objectType.ToString())).SetHelpContext("UnsupportedObjectNameExceptionText");
             }
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -385,7 +385,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                     return this.Packages;
                 default:
                     TraceHelper.TraceContext.TraceError("No such collection for type {0}", elementType);
-                    throw new XEventException(ExceptionTemplates.NoSuchCollection(elementType));
+                    throw new XEventException(ExceptionTemplates.FormatNoSuchCollection(elementType));
             }
         }
 
@@ -433,7 +433,7 @@ namespace Microsoft.SqlServer.Management.XEvent
             }
             catch (InvalidVersionEnumeratorException e)
             {
-                throw new XEventException(ExceptionTemplates.InvalidVersion(this.connection.ServerVersion.ToString()), e);
+                throw new XEventException(ExceptionTemplates.FormatInvalidVersion(this.connection.ServerVersion.ToString()), e);
             }
         }
 

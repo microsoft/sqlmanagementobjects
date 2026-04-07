@@ -47,7 +47,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             if (foundDomain == null)
             {
-                throw new SfcPathConversionException(SfcStrings.UnknownDomain(levels[0]));
+                throw new SfcPathConversionException(SfcStrings.FormatUnknownDomain(levels[0]));
             }
 
             sb.Append(foundDomain.PSDriveName);
@@ -83,7 +83,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
                 if (currentRelation == null)
                 {
-                    throw new SfcPathConversionException(SfcStrings.LevelNotFound(levels[level], urn.ToString()));
+                    throw new SfcPathConversionException(SfcStrings.FormatLevelNotFound(levels[level], urn.ToString()));
                 }
 
                 // If it is a container, we need to print the container as well
@@ -123,7 +123,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                             if (level < levels.Length - 1)
                             {
                                 // The key can only be be undefined at the last level
-                                throw new SfcPathConversionException(SfcStrings.InvalidKeyValue(key.PropertyName, urn.ToString()));
+                                throw new SfcPathConversionException(SfcStrings.FormatInvalidKeyValue(key.PropertyName, urn.ToString()));
                             }
                         }
                         else
@@ -142,7 +142,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                             if (keysFound != currentRelation.ReadOnlyKeys.Count)
                             {
                                 // Keys are missing
-                                throw new SfcPathConversionException(SfcStrings.MissingKeys(urn.ToString(), levels[level]));
+                                throw new SfcPathConversionException(SfcStrings.FormatMissingKeys(urn.ToString(), levels[level]));
                             }
                             sb.Append(keyBuilder.ToString());
                         }

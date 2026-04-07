@@ -411,7 +411,7 @@ namespace Microsoft.SqlServer.Management.Smo
             int nodeCount = parsedUrn.Length;
             if (nodeCount < 1)
             {
-                throw new InternalSmoErrorException(ExceptionTemplates.CallingInitChildLevelWithWrongUrn(fullQueryUrn));
+                throw new InternalSmoErrorException(ExceptionTemplates.FormatCallingInitChildLevelWithWrongUrn(fullQueryUrn));
             }
 
             // Do a top-down query though each level of the Urn, to cause ancestors to be cached and present at each level.
@@ -432,7 +432,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             catch (ArgumentException e)
             {
-                throw new ArgumentException(ExceptionTemplates.UnsupportedObjectQueryUrn(queryString), e);
+                throw new ArgumentException(ExceptionTemplates.FormatUnsupportedObjectQueryUrn(queryString), e);
             }
 
             return urnList;
@@ -663,7 +663,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // get the child object from child collection
             var thisNode = ((ISmoInternalCollection)childCollection).GetObjectByKey(childKey);
             return null == thisNode
-                ? throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(GetTypeName(nodeType), childKey.ToString()))
+                ? throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist(GetTypeName(nodeType), childKey.ToString()))
                 : thisNode;
         }
 
@@ -766,7 +766,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!Databases.Contains(name))
             {
-                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(ExceptionTemplates.Database, name));
+                throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist(ExceptionTemplates.Database, name));
             }
 
             StringCollection query = new StringCollection();
@@ -836,12 +836,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (name.Length == 0)
                 {
-                    throw new ArgumentException(ExceptionTemplates.EmptyInputParam("name", "string"));
+                    throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("name", "string"));
                 }
 
                 if (owner != null && owner.Length == 0)
                 {
-                    throw new ArgumentException(ExceptionTemplates.EmptyInputParam("owner", "string"));
+                    throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("owner", "string"));
                 }
 
 
@@ -893,7 +893,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
 
                         default:
-                            throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("AttachOptions"));
+                            throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("AttachOptions"));
                     }
                 }
 
@@ -1767,7 +1767,7 @@ namespace Microsoft.SqlServer.Management.Smo
             else
             {
                 // if we did not find the collation then we need to throw
-                throw new WrongPropertyValueException(ExceptionTemplates.InvalidCollation(collationName));
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatInvalidCollation(collationName));
             }
         }
 
@@ -2733,7 +2733,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // validate the type
             if (!typeObject.IsSubclassOf(typeof(SqlSmoObject)) || !typeObject.GetIsSealed())
             {
-                throw new FailedOperationException(ExceptionTemplates.CannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
+                throw new FailedOperationException(ExceptionTemplates.FormatCannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
             }
 
             StringCollection fields = new StringCollection();
@@ -2787,7 +2787,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // make sure the type can have default init fields
             if (!typeObject.IsSubclassOf(typeof(SqlSmoObject)) || !typeObject.GetIsSealed())
             {
-                throw new FailedOperationException(ExceptionTemplates.CannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
+                throw new FailedOperationException(ExceptionTemplates.FormatCannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
             }
 
             var initFields = CreateInitFieldsColl(typeObject, databaseEngineEdition).ToList();
@@ -2840,7 +2840,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // make sure the type can have default init fields
             if (!typeObject.IsSubclassOf(typeof(SqlSmoObject)) || !typeObject.GetIsSealed())
             {
-                throw new FailedOperationException(ExceptionTemplates.CannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
+                throw new FailedOperationException(ExceptionTemplates.FormatCannotSetDefInitFlds(typeObject.Name)).SetHelpContext("CannotSetDefInitFlds");
             }
 
             Type typeProps = typeObject.GetNestedType("PropertyMetadataProvider", BindingFlags.NonPublic);
@@ -3801,7 +3801,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             loginMode != ServerLoginMode.Normal &&
                             loginMode != ServerLoginMode.Mixed)
                         {
-                            throw new SmoException(ExceptionTemplates.UnsupportedLoginMode(loginMode.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatUnsupportedLoginMode(loginMode.ToString()));
                         }
 
                         // LoginMode is enumeration, must be converted to its integer value
@@ -3814,7 +3814,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         AuditLevel auditLevel = (AuditLevel)o;
                         if (0 > auditLevel || AuditLevel.All < auditLevel)
                         {
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(AuditLevel).Name));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(AuditLevel).Name));
                         }
 
                         // auditLevel is enumeration, must be converted to its integer value
@@ -3848,7 +3848,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 }
 
                             default:
-                                throw new SmoException(ExceptionTemplates.UnknownEnumeration(perfMonMode.GetType().Name));
+                                throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(perfMonMode.GetType().Name));
                         }
 
                         continue;
@@ -3977,7 +3977,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return IsSupportedProperty(memberExpression.Member.DeclaringType, memberExpression.Member.Name);
                 }
             }
-            throw new ArgumentException(ExceptionTemplates.InvalidPropertyExpression(expression.ToString()));
+            throw new ArgumentException(ExceptionTemplates.FormatInvalidPropertyExpression(expression.ToString()));
         }
 
 #region ISfcHasConnection Members
@@ -4155,7 +4155,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 FilterException(e);
 
-                throw new FailedOperationException(ExceptionTemplates.JoinAvailabilityGroupFailed(this.Name, availabilityGroupName), e);
+                throw new FailedOperationException(ExceptionTemplates.FormatJoinAvailabilityGroupFailed(this.Name, availabilityGroupName), e);
             }
         }
 
@@ -4208,8 +4208,8 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 FilterException(e);
 
-                string exceptionMessage = grantPrivilege ? ExceptionTemplates.GrantAGCreateDatabasePrivilegeFailed(this.Name, availabilityGroupName)
-                    : ExceptionTemplates.RevokeAGCreateDatabasePrivilegeFailed(this.Name, availabilityGroupName);
+                string exceptionMessage = grantPrivilege ? ExceptionTemplates.FormatGrantAGCreateDatabasePrivilegeFailed(this.Name, availabilityGroupName)
+                    : ExceptionTemplates.FormatRevokeAGCreateDatabasePrivilegeFailed(this.Name, availabilityGroupName);
                 throw new FailedOperationException(exceptionMessage, e);
             }
         }
@@ -4232,7 +4232,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 FilterException(e);
 
-                throw new FailedOperationException(ExceptionTemplates.EnumClusterSubnets(this.Name), this, e);
+                throw new FailedOperationException(ExceptionTemplates.FormatEnumClusterSubnets(this.Name), this, e);
             }
         }
 
@@ -4254,7 +4254,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 FilterException(e);
 
-                throw new FailedOperationException(ExceptionTemplates.EnumClusterMemberState(this.Name), this, e);
+                throw new FailedOperationException(ExceptionTemplates.FormatEnumClusterMemberState(this.Name), this, e);
             }
         }
 

@@ -156,7 +156,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        throw new PropertyCannotBeRetrievedException(ExceptionTemplates.PropertyCannotBeRetrievedFromSecondary("IsAutoFailover"));
+                        throw new PropertyCannotBeRetrievedException(ExceptionTemplates.FormatPropertyCannotBeRetrievedFromSecondary("IsAutoFailover"));
                     }
                 }
 

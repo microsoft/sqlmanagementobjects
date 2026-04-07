@@ -77,7 +77,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (identity.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplates.EmptyInputParam("identity", "string"));
+                throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("identity", "string"));
             }
 
             this.Identity = identity;
@@ -134,7 +134,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (identity.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplates.EmptyInputParam("identity", "string"));
+                throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("identity", "string"));
             }
 
             this.Identity = identity;
@@ -157,7 +157,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (identity.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplates.EmptyInputParam("identity", "string"));
+                throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("identity", "string"));
             }
 
             this.Identity = identity;

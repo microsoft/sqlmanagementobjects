@@ -6,7 +6,7 @@
     <ClsCompliant>true</ClsCompliant>
   </PropertyGroup>
   <ItemGroup>
-    <SqlStringResource Include="SRError.strings" />
+    <EmbeddedResource Update="*.resx" EmitFormatMethods="true"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />

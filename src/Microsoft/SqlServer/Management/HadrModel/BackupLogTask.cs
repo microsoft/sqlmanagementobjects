@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Smo;
@@ -37,7 +36,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="databaseName">database name</param>
         /// <param name="availabilityGroupData">agData</param>
         public BackupLogTask(string databaseName, AvailabilityGroupData availabilityGroupData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.BackupLogText, databaseName))
+            : base(Resource.FormatBackupLogText(databaseName))
         {
             if (String.IsNullOrEmpty(databaseName))
             {

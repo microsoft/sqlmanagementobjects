@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -17,7 +16,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="hostedServiceName">Current Hosted Service Name</param>
         /// <param name="currentHostedService">Current Hosted Service Count</param>
         public MaxHostedServicesException(string hostedServiceName,string currentHostedService)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.MaxHostedServicesException, hostedServiceName, currentHostedService))
+            : base(Resource.FormatMaxHostedServicesException(hostedServiceName, currentHostedService))
         {
         }
 
@@ -28,7 +27,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="currentHostedService">Current Hosted Service Count</param>
         /// <param name="inner"></param>
         public MaxHostedServicesException(string hostedServiceName, string currentHostedService, Exception inner)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.MaxHostedServicesException, hostedServiceName, currentHostedService),inner)
+            : base(Resource.FormatMaxHostedServicesException(hostedServiceName, currentHostedService),inner)
         {
         }
     }

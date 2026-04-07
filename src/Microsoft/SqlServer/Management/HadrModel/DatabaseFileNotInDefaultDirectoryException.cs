@@ -18,8 +18,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="defaultLogFolder">Default log folder</param>
         /// <param name="filesNotInDefaultDirectory">List of files not in default directory</param>
         public DatabaseFileNotInDefaultDirectoryException(string defaultDataFolder, string defaultLogFolder, IEnumerable<string> filesNotInDefaultDirectory)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.DatabaseFileNotInDefaultDirectoryException, defaultDataFolder, defaultLogFolder, string.Join(CultureInfo.CurrentUICulture.TextInfo.ListSeparator, filesNotInDefaultDirectory)))
+            : base(Resource.FormatDatabaseFileNotInDefaultDirectoryException(defaultDataFolder, defaultLogFolder, string.Join(CultureInfo.CurrentUICulture.TextInfo.ListSeparator, filesNotInDefaultDirectory)))
         {
         }
     }

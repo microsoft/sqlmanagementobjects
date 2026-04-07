@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -70,7 +70,7 @@ namespace Microsoft.SqlServer.Management.XEvent
             catch(ArgumentException e)
             {
 
-                throw new XEventException(ExceptionTemplates.ActionNameNotUnique(obj.Name), e);
+                throw new XEventException(ExceptionTemplates.FormatActionNameNotUnique(obj.Name), e);
             }            
         }
     }

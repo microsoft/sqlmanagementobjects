@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -530,15 +530,15 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else if (this.TailLogBackupOperation != null && this.RestoreOperations[processCompleted].BackupSet == null)
                         {
-                            message = ExceptionTemplates.Restoring(ExceptionTemplates.TailLog);
+                            message = ExceptionTemplates.FormatRestoring(ExceptionTemplates.TailLog);
                         }
                         else if (this.TailLogBackupOperation != null)
                         {
-                            message = ExceptionTemplates.Restoring(this.RestoreOperations[processCompleted].BackupSet.Name);
+                            message = ExceptionTemplates.FormatRestoring(this.RestoreOperations[processCompleted].BackupSet.Name);
                         }
                         else
                         {
-                            message = ExceptionTemplates.Restoring(this.RestoreOperations[processCompleted + 1].BackupSet.Name);
+                            message = ExceptionTemplates.FormatRestoring(this.RestoreOperations[processCompleted + 1].BackupSet.Name);
                         }
                         
                         this.PercentComplete(this, new PercentCompleteEventArgs(e.Error, message));

@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 using System.Threading;
 
 namespace Microsoft.SqlServer.Management.HadrModel
@@ -130,13 +129,13 @@ namespace Microsoft.SqlServer.Management.HadrModel
                     {
                         if (policy.Expired)
                         {
-                            this.UpdateStatus(new TaskEventArgs(this.Name, string.Format(CultureInfo.InvariantCulture,Resource.TaskEventArgsTaskExecutionFailed, ex.Message)));
+                            this.UpdateStatus(new TaskEventArgs(this.Name, Resource.FormatTaskEventArgsTaskExecutionFailed(ex.Message)));
                             exception = ex;
                             break;
                         }
                         else
                         {
-                            this.UpdateStatus(new TaskEventArgs(this.Name, string.Format(CultureInfo.InvariantCulture,Resource.TaskEventArgsTaskExecutionFailedWithRetry, ex.Message)));
+                            this.UpdateStatus(new TaskEventArgs(this.Name, Resource.FormatTaskEventArgsTaskExecutionFailedWithRetry(ex.Message)));
                         }
 
                         Thread.Sleep(policy.BackoffInterval());
@@ -186,13 +185,13 @@ namespace Microsoft.SqlServer.Management.HadrModel
                     {
                         if (policy.Expired)
                         {
-                            this.UpdateStatus(new TaskEventArgs(this.Name, string.Format(CultureInfo.InvariantCulture, Resource.TaskEventArgsTaskExecutionFailed, ex.Message)));
+                            this.UpdateStatus(new TaskEventArgs(this.Name, Resource.FormatTaskEventArgsTaskExecutionFailed(ex.Message)));
                             exception = ex;
                             break;
                         }
                         else
                         {
-                            this.UpdateStatus(new TaskEventArgs(this.Name, string.Format(CultureInfo.InvariantCulture, Resource.TaskEventArgsTaskExecutionFailedWithRetry, ex.Message)));
+                            this.UpdateStatus(new TaskEventArgs(this.Name, Resource.FormatTaskEventArgsTaskExecutionFailedWithRetry(ex.Message)));
                         }
 
                         Thread.Sleep(policy.BackoffInterval());

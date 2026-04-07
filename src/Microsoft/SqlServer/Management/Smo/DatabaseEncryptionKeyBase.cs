@@ -84,7 +84,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!SmoUtility.IsSupportedObject(this.GetType(), this.ServerVersion, this.DatabaseEngineType, this.DatabaseEngineEdition))
             {
-                throw new UnsupportedFeatureException(ExceptionTemplates.UnsupportedFeature(ExceptionTemplates.DatabaseEncryptionKey));
+                throw new UnsupportedFeatureException(ExceptionTemplates.FormatUnsupportedFeature(ExceptionTemplates.DatabaseEncryptionKey));
             }
             
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -142,7 +142,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
             }
         }
 
@@ -205,7 +205,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
             }
         }
 
@@ -261,7 +261,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
             }
         }
 
@@ -329,7 +329,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case DatabaseEncryptionAlgorithm.TripleDes: strEncryptAlgo = "TRIPLE_DES_3KEY";
                     break;
                 default:
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("EncryptionAlgorithm"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("EncryptionAlgorithm"));
             }
             return strEncryptAlgo;
         }
@@ -349,7 +349,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case DatabaseEncryptionType.ServerAsymmetricKey: strEncryptionType = "SERVER ASYMMETRIC KEY ";
                     break;
                 default:
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("EncryptionType"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("EncryptionType"));
             }
             return strEncryptionType;
         }

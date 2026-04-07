@@ -8,7 +8,6 @@ using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;
 #endif
-using System.Globalization;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
@@ -41,7 +40,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="databaseName">backup database name</param>
         /// <param name="availabilityGroupData">AGdata</param>
         public BackupDatabaseTask(string databaseName, AvailabilityGroupData availabilityGroupData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.BackupDatabaseText, databaseName))
+            : base(Resource.FormatBackupDatabaseText(databaseName))
         {
             if (String.IsNullOrEmpty(databaseName))
             {

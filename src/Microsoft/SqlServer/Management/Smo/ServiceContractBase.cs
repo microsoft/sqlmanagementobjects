@@ -61,7 +61,7 @@ namespace Microsoft.SqlServer.Management.Smo.Broker
             // if the messagetype mappings list is empty, the contract cannot be created
             if (MessageTypeMappings.Count < 1)
             {
-                throw new SmoException(ExceptionTemplates.EmptyMapping("ServiceContract", "MessageTypeMapping"));
+                throw new SmoException(ExceptionTemplates.FormatEmptyMapping("ServiceContract", "MessageTypeMapping"));
             }
 
             sb.Append(Globals.LParen);

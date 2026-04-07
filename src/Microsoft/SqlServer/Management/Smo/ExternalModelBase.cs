@@ -200,7 +200,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Validate enum
             if (!Enum.IsDefined(typeof(ExternalModelType), externalModelType))
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(externalModelType.ToString()));
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration(externalModelType.ToString()));
             }
 
             string fullyFormattedName = FormatFullNameForScripting(sp);

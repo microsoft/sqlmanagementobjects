@@ -72,7 +72,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // if the index exists don't allow changes to its columns 
                     if ((this is UserDefinedTableType) && (this.State == SqlSmoState.Existing))
                     {
-                        m_Indexes.LockCollection(ExceptionTemplates.ReasonObjectAlreadyCreated(UserDefinedTableType.UrnSuffix));
+                        m_Indexes.LockCollection(ExceptionTemplates.FormatReasonObjectAlreadyCreated(UserDefinedTableType.UrnSuffix));
                     }
                 }
                 return m_Indexes;

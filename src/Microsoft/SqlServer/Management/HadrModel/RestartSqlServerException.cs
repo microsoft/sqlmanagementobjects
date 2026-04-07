@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -17,7 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="InstanceName"> target Sql Instance Name</param>
         public RestartSqlServerException(string InstanceName)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.RestartSqlServerException, InstanceName))
+            : base(Resource.FormatRestartSqlServerException(InstanceName))
         {
         }
     }

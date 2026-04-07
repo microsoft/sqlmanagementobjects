@@ -124,7 +124,7 @@ namespace Microsoft.SqlServer.Management.Smo
         internal override void ScriptCreate(StringCollection createQuery, ScriptingPreferences sp)
         {
             ThrowIfBelowVersion90(sp.TargetServerVersion,
-                ExceptionTemplates.SchemaDownlevel(
+                ExceptionTemplates.FormatSchemaDownlevel(
                     FormatFullNameForScripting(sp, true),
                     GetSqlServerName(sp)
                     ));

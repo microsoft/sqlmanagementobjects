@@ -8,7 +8,7 @@
     <Reference Include="System.Management" />
   </ItemGroup>
   <ItemGroup>
-    <SqlStringResource Include="StringWmiEnumerator.strings" />
+    <EmbeddedResource Update="**\*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(DmfCommonSrc)\Microsoft.SqlServer.Dmf.Common.csproj" />

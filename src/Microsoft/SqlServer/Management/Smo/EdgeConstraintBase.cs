@@ -234,7 +234,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case EdgeConstraintDeleteAction.Cascade:
                     return " ON DELETE CASCADE";
                 default:
-                    throw new InvalidSmoOperationException(ExceptionTemplates.InvalidEdgeConstraintReferentialAction(ecDeleteAction.ToString()));
+                    throw new InvalidSmoOperationException(ExceptionTemplates.FormatInvalidEdgeConstraintReferentialAction(ecDeleteAction.ToString()));
             }
         }
 

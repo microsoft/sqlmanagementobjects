@@ -223,7 +223,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if (startCpuId > endCpuId)
             {
-                throw new FailedOperationException(ExceptionTemplates.WrongIndexRangeProvidedCPU(startCpuId, endCpuId));
+                throw new FailedOperationException(ExceptionTemplates.FormatWrongIndexRangeProvidedCPU(startCpuId, endCpuId));
             }
             for (int i = startCpuId; i <= endCpuId; i++)
             {
@@ -237,7 +237,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (!ignoreMissingIds)
                     {
-                        throw new FailedOperationException(ExceptionTemplates.HoleInIndexRangeProvidedCPU(i));
+                        throw new FailedOperationException(ExceptionTemplates.FormatHoleInIndexRangeProvidedCPU(i));
                     }
                 }
             }
@@ -530,7 +530,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if (startNumaNodeId > endNumaNodeId)
             {
-                throw new FailedOperationException(ExceptionTemplates.WrongIndexRangeProvidedNuma(startNumaNodeId, endNumaNodeId));
+                throw new FailedOperationException(ExceptionTemplates.FormatWrongIndexRangeProvidedNuma(startNumaNodeId, endNumaNodeId));
             }
             for (int i = startNumaNodeId; i <= endNumaNodeId; i++)
             {
@@ -543,7 +543,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (!ignoreMissingIds)
                     {
-                        throw new FailedOperationException(ExceptionTemplates.HoleInIndexRangeProvidedNumaNode(i));
+                        throw new FailedOperationException(ExceptionTemplates.FormatHoleInIndexRangeProvidedNumaNode(i));
                     }
                 }
 
@@ -912,7 +912,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if (startIndex > endIndex)
             {
-                throw new FailedOperationException(ExceptionTemplates.WrongIndexRangeProvidedScheduler(startIndex, endIndex));
+                throw new FailedOperationException(ExceptionTemplates.FormatWrongIndexRangeProvidedScheduler(startIndex, endIndex));
             }
             for (int i = startIndex; i <= endIndex; i++)
             {

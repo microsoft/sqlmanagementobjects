@@ -382,7 +382,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     && sp.TargetDatabaseEngineEdition != Cmn.DatabaseEngineEdition.SqlManagedInstance)
                 {
                     throw new UnsupportedVersionException(
-                        ExceptionTemplates.InvalidPropertyValueForVersion(
+                        ExceptionTemplates.FormatInvalidPropertyValueForVersion(
                             this.GetType().Name, "UserType", this.UserType.ToString(), GetSqlServerName(sp)));
                 }
 
@@ -427,7 +427,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
 
                     default:
-                        throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("UserType"));
+                        throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("UserType"));
                 }
 
                 string s = null;
@@ -517,7 +517,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (type == UserType.Certificate || type == UserType.AsymmetricKey || type == UserType.External)
                 {
                     throw new UnsupportedVersionException(
-                        ExceptionTemplates.InvalidPropertyValueForVersion(
+                        ExceptionTemplates.FormatInvalidPropertyValueForVersion(
                             this.GetType().Name, "UserType", this.UserType.ToString(), GetSqlServerName(sp)));
                 }
 
@@ -539,7 +539,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if ((null == login.Value) || (login.Value.ToString() == string.Empty) || (!bSuppressDirtyCheck && !login.Dirty))
                     {
                         // throw new SmoException("You must set the Login property before creating an user");
-                        throw new SmoException(ExceptionTemplates.UsersWithoutLoginsDownLevel(GetSqlServerName(sp)));
+                        throw new SmoException(ExceptionTemplates.FormatUsersWithoutLoginsDownLevel(GetSqlServerName(sp)));
                     }
                     else
                     {

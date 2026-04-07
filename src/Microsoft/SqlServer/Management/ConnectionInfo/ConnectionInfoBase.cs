@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Management.Common
         // default constructor cannot be used
         protected ConnectionInfoBase()
         {
-            throw new InvalidOperationException(StringConnectionInfo.ClassDefaulConstructorCannotBeUsed("ConnectionInfoBase"));
+            throw new InvalidOperationException(StringConnectionInfo.FormatClassDefaulConstructorCannotBeUsed("ConnectionInfoBase"));
         }
 
         // need to know connection type

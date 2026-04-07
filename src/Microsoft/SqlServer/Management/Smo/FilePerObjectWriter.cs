@@ -361,7 +361,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (name == null)
             {
-                throw new ScriptWriterException(string.Format(SmoApplication.DefaultCulture,ExceptionTemplates.FilePerObjectUrnMissingName, urn));
+                throw new ScriptWriterException(ExceptionTemplates.FormatFilePerObjectUrnMissingName(urn));
             }
 
             fileName.AppendFormat("{0}.{1}", name, urn.Type);

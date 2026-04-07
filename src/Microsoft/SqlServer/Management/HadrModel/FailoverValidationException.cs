@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -15,9 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="replicaName"></param>
         /// <param name="replicaRole"></param>
         public FailoverValidationException(string replicaName,string replicaRole):
-            base(string.Format(CultureInfo.InvariantCulture,
-                Resource.FailoverValidationException,
-                replicaName, replicaRole))
+            base(Resource.FormatFailoverValidationException(replicaName, replicaRole))
         {
 
         }
@@ -30,9 +27,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="replicaRole"></param>
         /// <param name="inner"></param>
         public FailoverValidationException(string replicaName, string replicaRole,Exception inner) :
-            base(string.Format(CultureInfo.InvariantCulture,
-                  Resource.FailoverValidationException,
-                  replicaName, replicaRole),inner)
+            base(Resource.FormatFailoverValidationException(replicaName, replicaRole),inner)
         {
 
         }

@@ -508,7 +508,7 @@ END", SqlStatement.ToString());
                     case DeviceType.Pipe:
                         if (targetVersion.Major >= 9)
                         {
-                            throw new WrongPropertyValueException(ExceptionTemplates.BackupToPipesNotSupported(targetVersion.ToString()));
+                            throw new WrongPropertyValueException(ExceptionTemplates.FormatBackupToPipesNotSupported(targetVersion.ToString()));
                         }
                         format = " PIPE = N'{0}'";
                         isIdentifier = false;
@@ -518,7 +518,7 @@ END", SqlStatement.ToString());
                         // $ISSUE - VSTS# 1040958 -  Update SQL 11 PCU1 Version in SMO's VersionUtils.cs
                         if (!IsBackupUrlDeviceSupported(targetVersion))
                         {
-                            throw new WrongPropertyValueException(ExceptionTemplates.BackupToUrlNotSupported(targetVersion.ToString(),
+                            throw new WrongPropertyValueException(ExceptionTemplates.FormatBackupToUrlNotSupported(targetVersion.ToString(),
                                 BackupUrlDeviceSupportedServerVersion.ToString()));
                         }
                         format = " URL = N'{0}'";
@@ -528,7 +528,7 @@ END", SqlStatement.ToString());
 
                         break;
                     default:
-                        throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("DeviceType"));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("DeviceType"));
                 }
 
                 if (!first)
@@ -839,7 +839,7 @@ END", SqlStatement.ToString());
                 // throw if version is less than SQL 11 PCU1
                 if (!IsBackupUrlDeviceSupported(targetVersion))
                 {
-                    throw new UnsupportedFeatureException(ExceptionTemplates.CredentialNotSupportedError(CredentialName,
+                    throw new UnsupportedFeatureException(ExceptionTemplates.FormatCredentialNotSupportedError(CredentialName,
                         targetVersion.ToString(),
                         BackupUrlDeviceSupportedServerVersion.ToString()));
                 }
@@ -1305,7 +1305,7 @@ END", SqlStatement.ToString());
             if (!(obj is BackupDeviceItem))
             {
                 throw new FailedOperationException(operation, thisptr,
-                        new NotSupportedException(ExceptionTemplates.InvalidType(obj.GetType().ToString())));
+                        new NotSupportedException(ExceptionTemplates.FormatInvalidType(obj.GetType().ToString())));
             }
 
         }
@@ -1408,11 +1408,11 @@ END", SqlStatement.ToString());
             }
             if (this.PageID == 0)
             {
-                throw new SmoException(ExceptionTemplates.CannotRestoreFileBootPage(this.FileID, this.PageID));
+                throw new SmoException(ExceptionTemplates.FormatCannotRestoreFileBootPage(this.FileID, this.PageID));
             }
             if (this.FileID == 1 && this.PageID == 9)
             {
-                throw new SmoException(ExceptionTemplates.CannotRestoreDatabaseBootPage(this.FileID, this.PageID));
+                throw new SmoException(ExceptionTemplates.FormatCannotRestoreDatabaseBootPage(this.FileID, this.PageID));
             }
         }
 

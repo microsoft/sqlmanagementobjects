@@ -660,7 +660,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     if (!isFile)
                     {
-                        throw new SmoException(ExceptionTemplates.BackupFileNotFound(bkMedia.MediaName));
+                        throw new SmoException(ExceptionTemplates.FormatBackupFileNotFound(bkMedia.MediaName));
                     }
                 }
             }

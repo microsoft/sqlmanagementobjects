@@ -3,15 +3,9 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
     <RootNamespace>Microsoft.SqlServer.Management.XEventDbScoped</RootNamespace>
-    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
   <ItemGroup>
-    <SqlStringResource Include="ExceptionTemplates.strings" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="XsdResource.resx">
-      <LogicalName>Microsoft.SqlServer.Management.XEventDbScoped.XsdResource.resources</LogicalName>
-    </EmbeddedResource>
+    <EmbeddedResource Update="*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />

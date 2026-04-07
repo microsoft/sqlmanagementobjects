@@ -228,7 +228,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 externalDataSourceType = (ExternalDataSourceType)this.GetPropValue(DataSourceTypePropertyName);
                 if (!Enum.IsDefined(typeof(ExternalDataSourceType), externalDataSourceType))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(externalDataSourceType.ToString()));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration(externalDataSourceType.ToString()));
                 }
             }
 
@@ -373,7 +373,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 var pushdownOption = (ExternalDataSourcePushdownOption)GetPropValueOptional(PushdownOptionPropertyName);
                 if (!Enum.IsDefined(typeof(ExternalDataSourcePushdownOption), pushdownOption))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(pushdownOption.ToString()));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration(pushdownOption.ToString()));
                 }
                 // The default pushdown option is ON, so only script it out if it's different
                 // from the default
@@ -439,14 +439,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (dataSourceTypeProperty.Dirty)
                     {
-                        throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.UnsupportedPropertyForAlter, DataSourceTypePropertyName));
+                        throw new SmoException(ExceptionTemplates.FormatUnsupportedPropertyForAlter(DataSourceTypePropertyName));
                     }
 
                     ExternalDataSourceType externalDataSourceType = (ExternalDataSourceType)dataSourceTypeProperty.Value;
                     if (externalDataSourceType == ExternalDataSourceType.ShardMapManager ||
                         externalDataSourceType == ExternalDataSourceType.Rdbms)
                     {
-                        throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.AlterNotSupportedForRelationalTypes, externalDataSourceType));
+                        throw new SmoException(ExceptionTemplates.FormatAlterNotSupportedForRelationalTypes(externalDataSourceType));
                     }
                 }
             }
@@ -458,7 +458,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Property databaseNameProperty = this.GetPropertyOptional(DatabaseNamePropertyName);
                 if (!databaseNameProperty.IsNull && databaseNameProperty.Dirty)
                 {
-                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.UnsupportedPropertyForAlter, DatabaseNamePropertyName));
+                    throw new SmoException(ExceptionTemplates.FormatUnsupportedPropertyForAlter(DatabaseNamePropertyName));
                 }
             }
 
@@ -468,7 +468,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Property shardMapNameProperty = this.GetPropertyOptional(ShardMapNamePropertyName);
                 if (!shardMapNameProperty.IsNull && shardMapNameProperty.Dirty)
                 {
-                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.UnsupportedPropertyForAlter, ShardMapNamePropertyName));
+                    throw new SmoException(ExceptionTemplates.FormatUnsupportedPropertyForAlter(ShardMapNamePropertyName));
                 }
             }
 
@@ -522,7 +522,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 var pushdownOption = (ExternalDataSourcePushdownOption)GetPropValueOptional(PushdownOptionPropertyName);
                 if (!Enum.IsDefined(typeof(ExternalDataSourcePushdownOption), pushdownOption))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(pushdownOption.ToString()));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration(pushdownOption.ToString()));
                 }
                 // The default pushdown option is ON, so only script it out if it's different
                 // from the default
@@ -592,7 +592,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     !string.IsNullOrEmpty(this.GetPropValue(propertyName).ToString()))
                 {
                     throw new WrongPropertyValueException(
-                        string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.UnsupportedParamForDataSourceType, propertyName, dataSourceType));
+                        ExceptionTemplates.FormatUnsupportedParamForDataSourceType(propertyName, dataSourceType));
                 }
             }
         }
@@ -611,7 +611,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 externalDataSourceLocation.StartsWith(ExternalDataSourceLocationWasb, System.StringComparison.OrdinalIgnoreCase) ||
                 externalDataSourceLocation.StartsWith(ExternalDataSourceLocationAsv, System.StringComparison.OrdinalIgnoreCase))
             {
-                throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.UnsupportedResourceManagerLocationProperty, "ResourceManagerLocation"));
+                throw new SmoException(ExceptionTemplates.FormatUnsupportedResourceManagerLocationProperty("ResourceManagerLocation"));
             }
         }
 

@@ -20,3 +20,4 @@ Specifications document **what** and **why** — not implementation sequencing. 
 - Status values: **Placeholder** → **Draft** → **Review** → **Accepted** → **Implemented** → **Superseded**.
 - Each spec should be self-contained with enough context for a reader unfamiliar with the prior discussion.
 - Specs should clearly document dependencies between components to support implementation planning.
+- **DDL-related specs** can be generated and implemented using the `@ddl-changes` Copilot Chat agent (see [../.github/agents/ddl-changes.md](../.github/agents/ddl-changes.md)). The agent gathers requirements interactively, produces a spec in this folder, and after user approval, implements the full change.

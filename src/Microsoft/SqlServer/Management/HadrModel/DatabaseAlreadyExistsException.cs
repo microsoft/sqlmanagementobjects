@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -20,8 +19,6 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="replicaName">The replica name</param>
         /// <param name="existingDatabases">The names of databases that already exist</param>
         public DatabaseAlreadyExistsException(string replicaName, IEnumerable<string> existingDatabases)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.DatabasesExistingOnReplica,
-                replicaName, string.Join(",", existingDatabases))){}
+            : base(Resource.FormatDatabasesExistingOnReplica(replicaName, string.Join(",", existingDatabases))){}
     }
 }

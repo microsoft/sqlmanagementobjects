@@ -100,7 +100,7 @@ namespace Microsoft.Data.Tools.Sql.BatchParser
 
         static string GetCircularReferenceErrorMessage(string filename)
         {
-            return string.Format(CultureInfo.CurrentCulture, SR.BatchParser_CircularReference, filename);
+            return SR.FormatBatchParser_CircularReference(filename);
         }
 
         public void PushInput(TextReader reader, string name)

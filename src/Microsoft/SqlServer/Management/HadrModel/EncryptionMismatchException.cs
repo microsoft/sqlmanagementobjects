@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -15,7 +13,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="replicasString">The replicas</param>
         public EncryptionMismatchException(string replicasString)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.EncryptionMismatchException, replicasString))
+            : base(Resource.FormatEncryptionMismatchException(replicasString))
         {
         }
     }

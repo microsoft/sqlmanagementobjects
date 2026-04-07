@@ -952,7 +952,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     {
                         //To-do create new objects
                         throw new FailedOperationException(ExceptionTemplates.Script, this,
-                         new SmoException(ExceptionTemplates.CantScriptObject(item ?? string.Empty)));
+                         new SmoException(ExceptionTemplates.FormatCantScriptObject(item ?? string.Empty)));
                     }
                 }
             }
@@ -1810,7 +1810,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // To-do create conflictingScriptingPreferences template and put that here
             if (Preferences.OldOptions.DdlBodyOnly && Preferences.OldOptions.DdlHeaderOnly)
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.ConflictingScriptingOptions(
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatConflictingScriptingOptions(
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.DdlBodyOnly),
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.DdlHeaderOnly)));
             }
@@ -1821,7 +1821,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!Preferences.IncludeScripts.Data &&
                 !Preferences.IncludeScripts.Ddl)
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.InvalidScriptingOutput(
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatInvalidScriptingOutput(
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.ScriptData),
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.ScriptSchema)));
             }
@@ -1833,7 +1833,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (!Preferences.IncludeScripts.Ddl &&
                 Preferences.ScriptForAlter)
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.ConflictingScriptingOptions(
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatConflictingScriptingOptions(
                     Enum.GetName(typeof(EnumScriptOptions), EnumScriptOptions.ScriptSchema),
                     "ScriptForAlter"));
             }

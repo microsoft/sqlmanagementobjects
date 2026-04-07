@@ -111,7 +111,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     bBegin = false;
                     props += f;
                 }
-                throw new QueryNotSupportedEnumeratorException(StringSqlEnumerator.QueryNotSupportedPostProcess(props));
+                throw new QueryNotSupportedEnumeratorException(StringSqlEnumerator.FormatQueryNotSupportedPostProcess(props));
             }
         }
         

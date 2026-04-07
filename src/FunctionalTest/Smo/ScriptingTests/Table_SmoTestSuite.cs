@@ -4251,37 +4251,31 @@ AS NODE ON [PRIMARY]
         /// This test verifies that vector column is correctly scripted for insert statements.
         /// </summary>
         [TestMethod]
-        // TODO: Azure and MI currently don't support the 2-parameter vector declaration. That will be
-        // enabled soon, and we aren't planning on being backwards compatible with the 1-param version so
-        // for now just disable this test.
-        // [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 17)]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlManagedInstance)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse)]
         public void ScriptingInsertTableWithVectorColumnTest()
         {
             ExecuteFromDbPool(
                 this.TestContext.FullyQualifiedTestClassName,
                 (database) =>
                 {
-                    if (database.Parent.ServerType != DatabaseEngineType.Standalone || database.Parent.VersionMajor >= 17)
-                    {
-                        var table = new Table(database, "vectorTable");
-                        var vectorColumn = new Column(table, "vectorColumn", DataType.Vector(2));
-                        table.Columns.Add(vectorColumn);
-                        table.Create();
+                    var table = new Table(database, "vectorTable");
+                    var vectorColumn = new Column(table, "vectorColumn", DataType.Vector(2));
+                    table.Columns.Add(vectorColumn);
+                    table.Create();
 
-                        var insertQuery = $"INSERT INTO {table.Name.SqlBracketQuoteString()} values('[1,0]')";
+                    var insertQuery = $"INSERT INTO {table.Name.SqlBracketQuoteString()} values('[1,0]')";
 
-                        database.ExecuteNonQuery(insertQuery);
+                    database.ExecuteNonQuery(insertQuery);
 
-                        var scripter = new Scripter(database.Parent);
-                        scripter.Options.ScriptData = true;
-                        scripter.Options.ScriptSchema = true;
+                    var scripter = new Scripter(database.Parent);
+                    scripter.Options.ScriptData = true;
+                    scripter.Options.ScriptSchema = true;
 
-                        var scripts = scripter.EnumScript(new Urn[] { table.Urn });
-                        // SqlClient 5 used scientific notation for vector components but sqlclient 6 gets the string from the server which does not use scientific notation unless needed
-                        Assert.That(scripts, Has.Member("INSERT [dbo]." + table.Name.SqlBracketQuoteString() + $" ([vectorColumn]) VALUES (N'[1,0]')"), "Scripting of Vector tables is expected to generate a valid INSERT statement");
-                    }
+                    var scripts = scripter.EnumScript(new Urn[] { table.Urn });
+                    // SqlClient 5 used scientific notation for vector components but sqlclient 6 gets the string from the server which does not use scientific notation unless needed
+                    Assert.That(scripts, Has.Member("INSERT [dbo]." + table.Name.SqlBracketQuoteString() + $" ([vectorColumn]) VALUES (N'[1,0]')"), "Scripting of Vector tables is expected to generate a valid INSERT statement");
                 });
         }
         #endregion // Vector column tests
@@ -4586,7 +4580,10 @@ set nocount off;
         /// <returns></returns>
         public static Database CreateDbWithLotsOfTables(_SMO.Server serverContext, int tableCount = 20000, bool withData = false)
         {
-            var db = serverContext.CreateDatabaseDefinition("lotsoftables");
+            var db = serverContext.CreateDatabaseDefinition("lotsoftables",
+                serverContext.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase
+                    ? SqlTestBase.AzureDatabaseEdition.Hyperscale
+                    : SqlTestBase.AzureDatabaseEdition.NotApplicable);
             var fileGroupName = "PRIMARY";
             var indexFileGroupName = "PRIMARY";
             if (serverContext.DatabaseEngineType == DatabaseEngineType.Standalone)
@@ -4991,8 +4988,9 @@ set nocount off;
         /// Reassigns all data in one partition of a partitioned table to an existing non-partitioned table.
         /// </summary>
         [TestMethod]
-        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [SupportedServerVersionRange(MinMajor = 13, Edition = DatabaseEngineEdition.Enterprise)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         public void SmoTable_SwitchPartition_supports_all_variations()
         {
             ExecuteFromDbPool(db =>

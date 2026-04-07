@@ -436,7 +436,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 typelist.Append(s.Name);
             }
 
-            throw new InternalEnumeratorException(StringSqlEnumerator.UnsupportedTypeDepDiscovery(type, typelist.ToString()));
+            throw new InternalEnumeratorException(StringSqlEnumerator.FormatUnsupportedTypeDepDiscovery(type, typelist.ToString()));
         }
 
         /// <summary>
@@ -476,7 +476,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 TypeToNo(rd.Urns[0].Type);
                 //if the type is supported but the database has not been specified
                 //throw exception that database name must be present in the urn.
-                throw new InternalEnumeratorException(StringSqlEnumerator.DatabaseNameMustBeSpecifiedinTheUrn(rd.Urns[0]));
+                throw new InternalEnumeratorException(StringSqlEnumerator.FormatDatabaseNameMustBeSpecifiedinTheUrn(rd.Urns[0]));
             }
             //Will pass string comparer to ServerDbSchemaName so that we can compare two objects while adding them in dependency list
 
@@ -545,7 +545,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     catch (InternalEnumeratorException e)
                     {
-                        throw new InternalEnumeratorException(StringSqlEnumerator.InvalidUrnForDepends(urn), e);
+                        throw new InternalEnumeratorException(StringSqlEnumerator.FormatInvalidUrnForDepends(urn), e);
                     }
                 }
                 else
@@ -580,7 +580,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         catch (InternalEnumeratorException e)
                         {
-                            throw new InternalEnumeratorException(StringSqlEnumerator.InvalidUrnForDepends(urn), e);
+                            throw new InternalEnumeratorException(StringSqlEnumerator.FormatInvalidUrnForDepends(urn), e);
                         }
                     }
                 }
@@ -804,7 +804,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             catch (InvalidCastException e)
             {
-                throw new InternalEnumeratorException(StringSqlEnumerator.CouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
+                throw new InternalEnumeratorException(StringSqlEnumerator.FormatCouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
             }
         }
 
@@ -829,7 +829,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             catch (InvalidCastException e)
             {
-                throw new InternalEnumeratorException(StringSqlEnumerator.CouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
+                throw new InternalEnumeratorException(StringSqlEnumerator.FormatCouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
             }
         }
 
@@ -932,7 +932,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             catch (InvalidCastException e)
             {
-                throw new InternalEnumeratorException(StringSqlEnumerator.CouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
+                throw new InternalEnumeratorException(StringSqlEnumerator.FormatCouldNotGetInfoFromDependencyRow(DumpRow(row)), e);
             }
             return surn;
         }

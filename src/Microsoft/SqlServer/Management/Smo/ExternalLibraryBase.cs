@@ -120,7 +120,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (String.IsNullOrEmpty(libraryContent))
                 {
                     throw new FailedOperationException(ExceptionTemplates.Create, this, null,
-                                                    ExceptionTemplates.EmptyInputParam("libraryContent", "string"));
+                                                    ExceptionTemplates.FormatEmptyInputParam("libraryContent", "string"));
                 }
 
                 this.libraryContent = libraryContent;
@@ -279,7 +279,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (String.IsNullOrEmpty(libraryContent))
                 {
                     throw new FailedOperationException(ExceptionTemplates.Alter, this, null,
-                                                    ExceptionTemplates.EmptyInputParam("libraryContent", "string"));
+                                                    ExceptionTemplates.FormatEmptyInputParam("libraryContent", "string"));
                 }
 
                 this.libraryContent = libraryContent;

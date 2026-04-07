@@ -602,7 +602,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (ServerVersion.Major == 7)
             {
-                throw new SmoException(ExceptionTemplates.CannotRenameObject(this.GetType().Name, ServerVersion.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatCannotRenameObject(this.GetType().Name, ServerVersion.ToString()));
             }
 
             renameQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] MODIFY FILE (NAME=N'{1}', NEWNAME=N'{2}')",
@@ -692,7 +692,7 @@ namespace Microsoft.SqlServer.Management.Smo
             base.ValidateName(name);
             if (0 == name.Length)
             {
-                throw new UnsupportedObjectNameException(ExceptionTemplates.UnsupportedObjectNameExceptionText(ExceptionTemplates.FileGroup));
+                throw new UnsupportedObjectNameException(ExceptionTemplates.FormatUnsupportedObjectNameExceptionText(ExceptionTemplates.FileGroup));
             }
         }
 
@@ -778,7 +778,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (ServerVersion.Major == 7)
             {
-                throw new SmoException(ExceptionTemplates.CannotRenameObject("FileGroup", ServerVersion.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatCannotRenameObject("FileGroup", ServerVersion.ToString()));
             }
 
             renameQuery.Add(string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] MODIFY FILEGROUP [{1}]  NAME = [{2}]",
@@ -1037,7 +1037,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!df.ScriptDdl(sp, ddl, true, true, databaseIsView ? "FileName" : ""))
             {
-                throw new SmoException(ExceptionTemplates.NoSqlGen(df.Urn.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatNoSqlGen(df.Urn.ToString()));
             }
         }
 

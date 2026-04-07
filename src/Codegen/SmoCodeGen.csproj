@@ -9,6 +9,7 @@
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DefineConstants>$(DefineConstants);SMOCODEGEN;NATIVEBATCHPARSER</DefineConstants>
+    <LangVersion>13</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(ConnectionInfoSrc)\ConnectionEnums.cs" />
@@ -126,9 +127,10 @@
     <Compile Include="ExecuteSqlFake.cs" />
     <Compile Include="ModelGen.cs" />
     <Compile Include="StringEnumerator.cs" />
-    <SqlStringResource Include="$(ConnectionInfoSrc)\StringConnectionInfo.strings" namespace="Microsoft.SqlServer.Management.Common" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
-    <SqlStringResource Include="$(SqlEnumSrc)\StringSqlEnumerator.strings" namespace="Microsoft.SqlServer.Management.Smo.SqlEnum" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
-    <SqlStringResource Include="$(SfcSrc)\SfcStrings.strings" namespace="Microsoft.SqlServer.Management.Sdk.Sfc" resourcename="CodeGen" additionaloptions="-an CodeGen"/>
+    <!-- The following files are generated from .resx files located in different projects. They are included here to ensure they are compiled into the assembly. -->
+    <Compile Include="StringConnectionInfo.cs" />
+    <Compile Include="StringSqlEnumerator.cs" />
+    <Compile Include="SfcStrings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cfg.xml" />
@@ -140,7 +142,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
     <ProjectReference Include="$(BatchParserSrc)\Microsoft.Data.Tools.Sql.BatchParser.csproj" />
-    <PackageReference Include="System.Security.Principal.Windows" />  
+    <PackageReference Include="System.Security.Principal.Windows" />
   </ItemGroup>
   <!-- Validate the cfg.xml before the build.
        The file is framework independent so we only run it once for netfx to avoid duplication of errors when doing a full build -->

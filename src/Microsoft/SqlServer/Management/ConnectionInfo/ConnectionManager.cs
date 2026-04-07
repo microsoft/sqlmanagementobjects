@@ -16,6 +16,8 @@ namespace Microsoft.SqlServer.Management.Common
     using System.Globalization;
     using System.Diagnostics;
     using System.Diagnostics.Tracing;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.SqlServer.Server;
 
     ///<summary>
@@ -182,7 +184,7 @@ namespace Microsoft.SqlServer.Management.Common
             {
                 if (value < -1)
                 {
-                    throw new InvalidPropertyValueException(StringConnectionInfo.InvalidLockTimeout(value));
+                    throw new InvalidPropertyValueException(StringConnectionInfo.FormatInvalidLockTimeout(value));
                 }
 
                 if (lockTimeout != value)
@@ -735,7 +737,7 @@ end;";
 
                 var builder = new SqlConnectionStringBuilder(this.ConnectionString);
 
-                throw new ConnectionFailureException(StringConnectionInfo.ConnectionFailure($"{builder.DataSource}[{ConnectionString}]"), e);
+                throw new ConnectionFailureException(StringConnectionInfo.FormatConnectionFailure(builder.DataSource), e);
             }
             finally
             {
@@ -758,7 +760,8 @@ end;";
             ExecuteNonQuery,
             ExecuteReader,
             ExecuteScalar,
-            FillDataSet
+            FillDataSet,
+            FillDataTable
         }
 
         /// <summary>
@@ -845,11 +848,22 @@ end;";
             }
         }
 
-        private bool HandleExecuteException(SqlException exc, ExecuteTSqlAction action,
-                                object execObject, bool catchException,
-                                DataSet fillDataSet, out object result)
+        /// <summary>
+        /// Determines if a SqlException is related to expired access tokens
+        /// </summary>
+        /// <param name="exc">The SqlException to check</param>
+        /// <returns>True if the exception is related to expired tokens, false otherwise</returns>
+        private bool IsExpiredTokenException(SqlException exc) => AccessToken != null && exc.Number == 0 && exc.Class == 0xb;
+
+        /// <summary>
+        /// Attempts to prepare the connection for retry after an exception
+        /// </summary>
+        /// <param name="exc">The SqlException that occurred</param>
+        /// <param name="currentDatabaseContext">The current database context to restore</param>
+        /// <param name="catchException">Whether to catch and retry on exceptions</param>
+        /// <returns>True if a retry should be attempted, false otherwise</returns>
+        private bool TryPrepareConnectionForRetry(SqlException exc, string currentDatabaseContext, bool catchException)
         {
-            var currentDatabaseContext = SqlConnectionObject.Database;
             var sqlConnection = SqlConnectionObject;
             var retry = false;
             lock (connectionLock)
@@ -857,7 +871,7 @@ end;";
                 if (catchException)
                 {
                     // For exceptions related to expired tokens, we need to close the connection and force a reopen
-                    if (AccessToken != null && exc.Number == 0 && exc.Class == 0xb && sqlConnection.State == ConnectionState.Open)
+                    if (IsExpiredTokenException(exc) && sqlConnection.State == ConnectionState.Open)
                     {
                         sqlConnection.Close();
                     }
@@ -889,6 +903,15 @@ end;";
                     }
                 }
             }
+            return retry;
+        }
+
+        private bool HandleExecuteException(SqlException exc, ExecuteTSqlAction action,
+                                object execObject, bool catchException,
+                                DataSet fillDataSet, out object result)
+        {
+            var currentDatabaseContext = SqlConnectionObject.Database;
+            var retry = TryPrepareConnectionForRetry(exc, currentDatabaseContext, catchException);
 
             if (retry)
             {
@@ -905,6 +928,160 @@ end;";
             result = null;
             return false;
         }
+        /// <summary>
+        /// Executes T-SQL asynchronously using the appropriate methods depending on the action information passed as the parameter.
+        /// </summary>
+        /// <param name="action">Defines method to be used for executing T-SQL</param>
+        /// <param name="command">SqlCommand to execute</param>
+        /// <param name="catchException">If the exception to be caught.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing the result of the execution</returns>
+        protected async Task<object> ExecuteTSqlAsync(ExecuteTSqlAction action,
+                                SqlCommand command,
+                                bool catchException,
+                                CancellationToken cancellationToken)
+        {
+            //Connection should already be open.
+            var startTime = System.Diagnostics.Stopwatch.StartNew();
+            string queryText = "";
+            int commandTimeout = 0;
+
+            // Extract query info for logging
+            queryText = command.CommandText?.Length > 100 ? command.CommandText.Substring(0, 100) + "..." : command.CommandText ?? "";
+            commandTimeout = command.CommandTimeout;
+
+            try
+            {
+                object result;
+                switch (action)
+                {
+                    case ExecuteTSqlAction.FillDataSet:
+                        // FillDataSet uses SqlDataAdapter in the sync path, which is not supported in async.
+                        // Callers should use FillDataTable for async operations.
+                        throw new InvalidOperationException("ExecuteTSqlAction.FillDataSet is not supported in async execution. Use FillDataTable instead.");
+                    case ExecuteTSqlAction.FillDataTable:
+                        result = await PopulateDataTableAsync(command, cancellationToken).ConfigureAwait(false);
+                        break;
+                    case ExecuteTSqlAction.ExecuteNonQuery:
+                        result = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                        break;
+                    case ExecuteTSqlAction.ExecuteReader:
+                        result = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+                        break;
+                    case ExecuteTSqlAction.ExecuteScalar:
+                        result = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+                        break;
+                    default:
+                        return null;
+                }
+
+                startTime.Stop();
+
+                // Log performance metrics (only if performance logging is enabled)
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Verbose, SmoEventSource.Keywords.Performance))
+                {
+                    int rowsAffected = (result is int) ? (int)result : -1;
+                    SmoEventSource.Log.QueryExecutionCompleted(startTime.ElapsedMilliseconds, rowsAffected, queryText);
+
+                    // Check for long-running queries (configurable threshold, defaulting to 5 seconds)
+                    const long longRunningThreshold = 5000;
+                    if (startTime.ElapsedMilliseconds > longRunningThreshold)
+                    {
+                        SmoEventSource.Log.LongRunningQuery(startTime.ElapsedMilliseconds, longRunningThreshold, queryText);
+                    }
+                }
+                return result;
+            }
+            catch (SqlException exc)
+            {
+                // Cannot use await in catch filter, so we handle it in the catch block body
+                var handleResult = await HandleExecuteExceptionAsync(exc, action,
+                                command,
+                                catchException,
+                                cancellationToken).ConfigureAwait(false);
+                
+                if (handleResult.shouldReturn)
+                {
+                    // Check for timeout errors
+                    if (exc.Number == -2) // Timeout error
+                    {
+                        SmoEventSource.Log.ConnectionTimeout(commandTimeout, $"SQL execution ({action})");
+                    }
+
+                    return handleResult.result;
+                }
+                
+                // If not handled, re-throw
+                throw;
+            }
+            finally
+            {
+                startTime.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Populates a DataTable asynchronously from a SqlCommand by executing it as a reader
+        /// </summary>
+        protected async Task<DataTable> PopulateDataTableAsync(SqlCommand command, CancellationToken cancellationToken)
+        {
+            var dataTable = new DataTable();
+            dataTable.Locale = System.Globalization.CultureInfo.InvariantCulture;
+
+            using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+            {
+                // Load schema from the reader
+                var schemaTable = reader.GetSchemaTable();
+                if (schemaTable != null)
+                {
+                    foreach (DataRow schemaRow in schemaTable.Rows)
+                    {
+                        var columnName = schemaRow["ColumnName"].ToString();
+                        var dataType = (Type)schemaRow["DataType"];
+                        dataTable.Columns.Add(columnName, dataType);
+                    }
+                }
+
+                // Read all rows
+                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    var row = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        row[i] = reader.GetValue(i);
+                    }
+                    dataTable.Rows.Add(row);
+                }
+            }
+
+            return dataTable;
+        }
+
+        /// <summary>
+        /// Handles exceptions during async SQL execution with retry logic
+        /// </summary>
+        private async Task<(bool shouldReturn, object result)> HandleExecuteExceptionAsync(SqlException exc, ExecuteTSqlAction action,
+                                SqlCommand command, bool catchException,
+                                CancellationToken cancellationToken)
+        {
+            var currentDatabaseContext = SqlConnectionObject.Database;
+            var retry = TryPrepareConnectionForRetry(exc, currentDatabaseContext, catchException);
+
+            if (retry)
+            {
+                try
+                {
+                    var result = await ExecuteTSqlAsync(action, command, false, cancellationToken).ConfigureAwait(false); //Sending false and ensuring that only 1 reattempt is made.
+                    return (true, result);
+                }
+                catch (SqlException caughtException) //Catch exceptions occuring in retries.
+                {
+                    SmoEventSource.Log.ConnectionRetryException(caughtException.Message);
+                }
+            }
+            return (false, null);
+        }
+
         /// <summary>
         /// Verifies that a given database exists
         /// </summary>
@@ -938,7 +1115,7 @@ end;";
         {
             if (version.Major <= 7)
             {
-                throw new ConnectionFailureException(StringConnectionInfo.ConnectToInvalidVersion(version.ToString()));
+                throw new ConnectionFailureException(StringConnectionInfo.FormatConnectToInvalidVersion(version.ToString()));
             }
         }
 

@@ -103,7 +103,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
             /*
              * NOTE: If you're adding new value here,
              * please update appropriate enums in ConnectionEnums.cs, Enumerations.cs
-             * and src\Microsoft\SqlServer\Management\ConnectionInfo\StringConnectionInfo.strings
+             * and src\Microsoft\SqlServer\Management\ConnectionInfo\StringConnectionInfo.resx
              */
         }
 
@@ -339,7 +339,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                 }
                 else
                 {
-                    throw new ArgumentException(SR.ERROR_UnexpectedDatabaseEngineTypeDetected(this.TargetDatabaseEngineType.ToString()));
+                    throw new ArgumentException(SR.FormatERROR_UnexpectedDatabaseEngineTypeDetected(this.TargetDatabaseEngineType.ToString()));
                 }
             }
             else if (context.PropertyDescriptor.PropertyType == typeof(ScriptCompatibilityOptions))
@@ -450,7 +450,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     this.TargetDatabaseEngineEdition = ScriptDatabaseEngineEdition.SqlDatabaseEdgeEdition;
                     break;
                 default:
-                    throw new ArgumentException(SR.ERROR_UnexpectedDatabaseEngineEditionDetected(scriptingOptions.TargetDatabaseEngineEdition));
+                    throw new ArgumentException(SR.FormatERROR_UnexpectedDatabaseEngineEditionDetected(scriptingOptions.TargetDatabaseEngineEdition));
             }
 
         }
@@ -891,7 +891,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     {
                         if (this.TargetDatabaseEngineType != ScriptDatabaseEngineType.SqlAzure)
                         {
-                            throw new ArgumentException(SR.ERROR_UnsupportedDatabaseEngineEditionAndDatabaseEngineTypeOptionCombination(value.ToString(), this.TargetDatabaseEngineType.ToString()));
+                            throw new ArgumentException(SR.FormatERROR_UnsupportedDatabaseEngineEditionAndDatabaseEngineTypeOptionCombination(value.ToString(), this.TargetDatabaseEngineType.ToString()));
                         }
                     }
                     else if (value == ScriptDatabaseEngineEdition.SqlServerPersonalEdition
@@ -905,7 +905,7 @@ namespace Microsoft.SqlServer.Management.SqlScriptPublish
                     {
                         if (this.TargetDatabaseEngineType != ScriptDatabaseEngineType.SingleInstance)
                         {
-                            throw new ArgumentException(SR.ERROR_UnsupportedDatabaseEngineEditionAndDatabaseEngineTypeOptionCombination(value.ToString(), this.TargetDatabaseEngineType.ToString()));
+                            throw new ArgumentException(SR.FormatERROR_UnsupportedDatabaseEngineEditionAndDatabaseEngineTypeOptionCombination(value.ToString(), this.TargetDatabaseEngineType.ToString()));
                         }
                     }
 

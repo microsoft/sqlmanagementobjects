@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.SqlServer.Management.HadrData;
 
 namespace Microsoft.SqlServer.Management.HadrModel
@@ -29,7 +28,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="replica">Replica data</param>
         /// <param name="windowsLogins">Logins to create</param>
         public CreateLoginTask(AvailabilityGroupReplica replica, IEnumerable<string> windowsLogins)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.CreateLoginText, replica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatCreateLoginText(replica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (replica == null)
             {
@@ -52,9 +51,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         protected override void Perform(IExecutionPolicy policy)
         {
             this.UpdateStatus(new TaskEventArgs(this.Name, 
-                string.Format(Resource.CreatingLoginsOnReplica, 
-                                string.Join(",", this.windowsLogins), 
-                                this.replica.AvailabilityGroupReplicaData.ReplicaName), 
+                Resource.FormatCreatingLoginsOnReplica(string.Join(",", this.windowsLogins), this.replica.AvailabilityGroupReplicaData.ReplicaName), 
                 TaskEventStatus.Running));
 
             // This task will only be tried once.

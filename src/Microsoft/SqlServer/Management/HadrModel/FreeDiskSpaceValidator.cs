@@ -3,7 +3,6 @@
 
 using System;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using Microsoft.SqlServer.Management.HadrData;
 using SMO = Microsoft.SqlServer.Management.Smo;
@@ -33,7 +32,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupData">The availability group data</param>
         /// <param name="replica">The replica data</param>
         public FreeDiskSpaceValidator(AvailabilityGroupData availabilityGroupData, AvailabilityGroupReplica replica)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.ValidatingDiskSpace, replica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatValidatingDiskSpace(replica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (availabilityGroupData == null)
             {

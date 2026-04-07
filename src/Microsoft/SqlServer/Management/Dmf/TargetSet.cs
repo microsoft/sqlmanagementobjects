@@ -100,7 +100,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     case SfcDependencyAction.Drop:
                         return true;
                     default:
-                        throw new DmfException(ExceptionTemplatesSR.UnsupportedCrudDependencyAction(depAction.ToString()));
+                        throw new DmfException(ExceptionTemplatesSR.FormatUnsupportedCrudDependencyAction(depAction.ToString()));
                 }
             }
         }
@@ -216,7 +216,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
                 if (!m_urn.IsValidUrnSkeleton())
                 {
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.InvalidUrnSkeleton(targetTypeSkeleton)));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatInvalidUrnSkeleton(targetTypeSkeleton)));
                 }
 
                 this.Parent = parent;
@@ -282,7 +282,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         m_urn = new Urn(this.TargetTypeSkeleton);
                         if (!m_urn.IsValidUrnSkeleton())
                         {
-                            throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.InvalidUrnSkeleton(TargetTypeSkeleton)));
+                            throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatInvalidUrnSkeleton(TargetTypeSkeleton)));
                         }
                     }
 
@@ -775,7 +775,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             {
                 case TargetSetLevel.typeName:
                     return this.Levels;
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
 

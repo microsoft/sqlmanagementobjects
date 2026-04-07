@@ -77,7 +77,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
                 }
             }
             catch (Exception e)
@@ -195,7 +195,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             int minSeconds = 1, maxSeconds = 32767;
                             if (ts.TotalSeconds < minSeconds || ts.TotalSeconds > maxSeconds)
                             {
-                                throw new WrongPropertyValueException(ExceptionTemplates.InvalidPropertyNumberRange("ConnectTimeout", minSeconds.ToString(SmoApplication.DefaultCulture), maxSeconds.ToString(SmoApplication.DefaultCulture)));
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatInvalidPropertyNumberRange("ConnectTimeout", minSeconds.ToString(SmoApplication.DefaultCulture), maxSeconds.ToString(SmoApplication.DefaultCulture)));
                             }
 
                             statement.AppendFormat(SmoApplication.DefaultCulture,
@@ -228,7 +228,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             int minSeconds = 1, maxSeconds = 32767;
                             if (ts.TotalSeconds < minSeconds || ts.TotalSeconds > maxSeconds)
                             {
-                                throw new WrongPropertyValueException(ExceptionTemplates.InvalidPropertyNumberRange("DataTimeout",
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatInvalidPropertyNumberRange("DataTimeout",
                                                                     minSeconds.ToString(SmoApplication.DefaultCulture), maxSeconds.ToString(SmoApplication.DefaultCulture)));
                             }
 
@@ -268,7 +268,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     int upgradeOption = (int)property.Value;
                     if (!Enum.IsDefined(typeof(FullTextCatalogUpgradeOption), upgradeOption))
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("CatalogUpgradeOption"));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("CatalogUpgradeOption"));
                     }
 
                     // Script for Alter if dirty or Create if target version is greater than 10

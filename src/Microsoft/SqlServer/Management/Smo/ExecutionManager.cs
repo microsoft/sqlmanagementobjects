@@ -1000,7 +1000,7 @@ namespace Microsoft.SqlServer.Management.Smo
             ///Check in case someone called it in the future from within SMO SQLCLR
             if (SqlContext.IsAvailable)
             {
-                throw new SmoException(ExceptionTemplatesImpl.SmoSQLCLRUnAvailable);
+                throw new SmoException(ExceptionTemplates.SmoSQLCLRUnAvailable);
             }
 
             Thread thread = new Thread(new ThreadStart(this.ThreadProc));

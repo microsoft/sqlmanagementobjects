@@ -96,12 +96,12 @@ namespace Microsoft.SqlServer.Management.Smo
                         FormatFullNameForScripting(sp));
                     break;
                 case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
-                    throw new SmoException(ExceptionTemplates.ScriptHeaderTypeNotSupported(
+                    throw new SmoException(ExceptionTemplates.FormatScriptHeaderTypeNotSupported(
                         scriptHeaderType.ToString(),
                         this.GetType().Name,
                         this.Name));
                 default:
-                    throw new SmoException(ExceptionTemplates.UnknownEnumeration(scriptHeaderType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(scriptHeaderType.ToString()));
             }
 
             sb.Append(sp.NewLine);
@@ -302,7 +302,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (ScriptHeaderType.ScriptHeaderForCreateOrAlter == scriptHeaderType)
             {
                 throw new NotSupportedException(
-                    ExceptionTemplates.CreateOrAlterNotSupported(this.GetType().Name));
+                    ExceptionTemplates.FormatCreateOrAlterNotSupported(this.GetType().Name));
             }
             else
             {

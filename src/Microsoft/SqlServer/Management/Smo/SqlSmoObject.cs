@@ -666,7 +666,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (this.State == SqlSmoState.Dropped)
             {
-                throw new SmoException(ExceptionTemplates.ObjectDroppedExceptionText(this.GetType().ToString(), this.key.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatObjectDroppedExceptionText(this.GetType().ToString(), this.key.ToString()));
             }
 
             if (throwIfNotCreated && this.State == SqlSmoState.Creating)
@@ -998,7 +998,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 catch (MissingMethodException)
                 {
-                    throw new ArgumentException(ExceptionTemplates.InvalidPathChildCollectionNotFound(urnsuffix, newParent.GetType().Name));
+                    throw new ArgumentException(ExceptionTemplates.FormatInvalidPathChildCollectionNotFound(urnsuffix, newParent.GetType().Name));
                 }
                 if (null != childProperty)
                 {
@@ -1008,7 +1008,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if ((null == parentColl)&& (null == singletonParent))
             {
-                throw new FailedOperationException(ExceptionTemplates.SetParent, this, null, ExceptionTemplates.InvalidType(newParent.GetType().ToString()));
+                throw new FailedOperationException(ExceptionTemplates.SetParent, this, null, ExceptionTemplates.FormatInvalidType(newParent.GetType().ToString()));
         }
         }
 
@@ -1155,7 +1155,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (null != prop.Value && prop.Dirty)
                     {
                         // the user has modified this property, so we have to throw
-                        throw new SmoException(ExceptionTemplates.PropNotModifiable(propName, this.GetType().Name));
+                        throw new SmoException(ExceptionTemplates.FormatPropNotModifiable(propName, this.GetType().Name));
                     }
                 }
             }
@@ -1513,7 +1513,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return prop.Value;
 
                 case PropertyBagState.Full:
-                    throw new InternalSmoErrorException(ExceptionTemplates.FullPropertyBag(propname));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatFullPropertyBag(propname));
             }
 
 
@@ -1625,7 +1625,7 @@ namespace Microsoft.SqlServer.Management.Smo
 #if DEBUG
                     if (reader.Read())
                     {
-                        throw new InternalSmoErrorException(ExceptionTemplates.MultipleRowsForUrn(this.Urn));
+                        throw new InternalSmoErrorException(ExceptionTemplates.FormatMultipleRowsForUrn(this.Urn));
                     }
 #endif
                 }
@@ -1726,7 +1726,7 @@ namespace Microsoft.SqlServer.Management.Smo
 #if DEBUG
                 if (reader.Read())
                 {
-                    throw new InternalSmoErrorException(ExceptionTemplates.MultipleRowsForUrn(this.Urn));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatMultipleRowsForUrn(this.Urn));
                 }
 #endif
             }
@@ -2135,7 +2135,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 return server;
             }
-            throw new InternalSmoErrorException(ExceptionTemplates.ObjectNotUnderServer(this.GetType().ToString()));
+            throw new InternalSmoErrorException(ExceptionTemplates.FormatObjectNotUnderServer(this.GetType().ToString()));
         }
 
         internal void SetServerObject(Server server)
@@ -2291,7 +2291,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         internal virtual void ScriptCreateOrAlter(StringCollection query, ScriptingPreferences sp)
         {
-            throw new NotSupportedException(ExceptionTemplates.CreateOrAlterNotSupported(this.GetType().Name));
+            throw new NotSupportedException(ExceptionTemplates.FormatCreateOrAlterNotSupported(this.GetType().Name));
         }
 
         internal virtual void ScriptCreateOrAlterInternal(StringCollection query, ScriptingPreferences sp)
@@ -2371,7 +2371,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (objParent.State == SqlSmoState.Creating && throwIfParentIsCreating)
                 {
-                    throw new FailedOperationException(ExceptionTemplates.ParentMustExist(this.GetType().Name, this.FullQualifiedName));
+                    throw new FailedOperationException(ExceptionTemplates.FormatParentMustExist(this.GetType().Name, this.FullQualifiedName));
             }
             }
             else if(throwIfParentNotExist)
@@ -2466,7 +2466,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // already exists, and we throw
                 if (this.State != SqlSmoState.Creating)
                 {
-                    throw new FailedOperationException(ExceptionTemplates.ObjectAlreadyExists(this.Urn.Type, this.key.ToString()));
+                    throw new FailedOperationException(ExceptionTemplates.FormatObjectAlreadyExists(this.Urn.Type, this.key.ToString()));
                 }
 
                 //check parent object exists
@@ -2482,7 +2482,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (createQuery.Count <= 0)
             {
                 Urn urn = this.Urn;
-                throw new FailedOperationException(ExceptionTemplates.NoSqlGen(urn.ToString()));
+                throw new FailedOperationException(ExceptionTemplates.FormatNoSqlGen(urn.ToString()));
             }
 
             if (!this.IsDesignMode)
@@ -4018,7 +4018,7 @@ namespace Microsoft.SqlServer.Management.Smo
             int nodeCount = parsedUrn.Length;
             if (nodeCount < 1)
             {
-                throw new InternalSmoErrorException(ExceptionTemplates.CallingInitQueryUrnsWithWrongUrn(levelFilter));
+                throw new InternalSmoErrorException(ExceptionTemplates.FormatCallingInitQueryUrnsWithWrongUrn(levelFilter));
             }
 
             // figure out what is the children's type
@@ -4491,7 +4491,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if(!IsSupportedProperty(propertyName))
             {
                 throw new UnsupportedVersionException(
-                    ExceptionTemplates.PropertyNotSupportedWithDetails(
+                    ExceptionTemplates.FormatPropertyNotSupportedWithDetails(
                         propertyName,
                         this.DatabaseEngineType.ToString(),
                         this.ServerVersion.ToString(),
@@ -4501,7 +4501,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if(sp != null && !IsSupportedProperty(propertyName, sp))
             {
                 throw new UnsupportedVersionException(
-                    ExceptionTemplates.PropertyNotSupportedWithDetails(
+                    ExceptionTemplates.FormatPropertyNotSupportedWithDetails(
                         propertyName,
                         sp.TargetDatabaseEngineType.ToString(),
                         ScriptingOptions.ConvertToServerVersion(sp.TargetServerVersion).ToString(),
@@ -4584,7 +4584,7 @@ namespace Microsoft.SqlServer.Management.Smo
             int nodeCount = parsedUrn.Length;
             if (nodeCount < 1)
             {
-                throw new InternalSmoErrorException(ExceptionTemplates.CallingInitChildLevelWithWrongUrn(levelFilter));
+                throw new InternalSmoErrorException(ExceptionTemplates.FormatCallingInitChildLevelWithWrongUrn(levelFilter));
             }
 
             // figure out what is the children's type
@@ -4933,7 +4933,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            throw new SmoException(ExceptionTemplates.UnknownFilter(levelFilterBlock.ToString()));
+            throw new SmoException(ExceptionTemplates.FormatUnknownFilter(levelFilterBlock.ToString()));
         }
 
         private bool ObjectInFilterRec(SqlSmoObject current, FilterNodeOperator opNode)
@@ -4955,7 +4955,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return CompareAttributeToObject(current, opNode);
             }
 
-            throw new SmoException(ExceptionTemplates.UnknownFilter(opNode.ToString()));
+            throw new SmoException(ExceptionTemplates.FormatUnknownFilter(opNode.ToString()));
         }
 
         /// <summary>
@@ -5007,14 +5007,14 @@ namespace Microsoft.SqlServer.Management.Smo
                                 if (fun.FunctionType != FilterNodeFunction.Type.True &&
                                     fun.FunctionType != FilterNodeFunction.Type.False)
                                 {
-                                    throw new InternalSmoErrorException(ExceptionTemplates.UnsupportedUrnFilter(attr.Name, fun.FunctionType.ToString()));
+                                    throw new InternalSmoErrorException(ExceptionTemplates.FormatUnsupportedUrnFilter(attr.Name, fun.FunctionType.ToString()));
                                 }
                                 bool getsystemobject = (fun.FunctionType == FilterNodeFunction.Type.True);
                                 return (getsystemobject == (bool)current.GetPropValue("IsSystemObject"));
                             }
                             else
                             {
-                                throw new InternalSmoErrorException(ExceptionTemplates.UnsupportedUrnAttrib(attr.Name));
+                                throw new InternalSmoErrorException(ExceptionTemplates.FormatUnsupportedUrnAttrib(attr.Name));
                             }
                     }
                     break;
@@ -5067,7 +5067,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             // If we get to here, we didn't know what to do with this particular operator combo
-            throw new SmoException(ExceptionTemplates.UnknownFilter(oper.ToString()));
+            throw new SmoException(ExceptionTemplates.FormatUnknownFilter(oper.ToString()));
         }
 
         /// <summary>
@@ -5692,7 +5692,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <exception cref="System.ArgumentException"></exception>
         protected virtual AbstractCollectionBase GetCollectionInstance(string urnSuffix)
         {
-            throw new ArgumentException(ExceptionTemplates.InvalidPathChildCollectionNotFound(urnSuffix, GetType().Name));
+            throw new ArgumentException(ExceptionTemplates.FormatInvalidPathChildCollectionNotFound(urnSuffix, GetType().Name));
         }
 
         /// <summary>
@@ -5703,7 +5703,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <exception cref="System.ArgumentException"></exception>
         protected virtual SqlSmoObject GetSingletonInstance(string childTypeName)
         {
-            throw new ArgumentException(ExceptionTemplates.InvalidPathChildSingletonNotFound(childTypeName, GetType().Name));
+            throw new ArgumentException(ExceptionTemplates.FormatInvalidPathChildSingletonNotFound(childTypeName, GetType().Name));
         }
         /// <summary>
         ///
@@ -6442,7 +6442,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (IsExpressSku())
             {
-                throw new UnsupportedFeatureException(ExceptionTemplates.UnsupportedFeature(uft));
+                throw new UnsupportedFeatureException(ExceptionTemplates.FormatUnsupportedFeature(uft));
             }
         }
 
@@ -6454,7 +6454,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (DatabaseEngineType.SqlAzureDatabase == this.DatabaseEngineType)
             {
-                throw new UnknownPropertyException(propertyName, ExceptionTemplates.PropertyNotSupportedOnCloud(propertyName));
+                throw new UnknownPropertyException(propertyName, ExceptionTemplates.FormatPropertyNotSupportedOnCloud(propertyName));
             }
         }
 
@@ -6479,7 +6479,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (DatabaseEngineType.SqlAzureDatabase == this.DatabaseEngineType &&
                 ServerVersion.Major < 12)
             {
-                throw new UnsupportedFeatureException(ExceptionTemplates.PropertyNotSupportedForCloudVersion(propertyName, ServerVersion.ToString()));
+                throw new UnsupportedFeatureException(ExceptionTemplates.FormatPropertyNotSupportedForCloudVersion(propertyName, ServerVersion.ToString()));
             }
         }
 
@@ -6838,7 +6838,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (targetCompatLevel < upperLimit)
             {
-                throw new UnsupportedCompatLevelException(ExceptionTemplates.UnsupportedCompatLevelException((long)targetCompatLevel, (long)upperLimit)).SetHelpContext("UnsupportedCompatLevelException");
+                throw new UnsupportedCompatLevelException(ExceptionTemplates.FormatUnsupportedCompatLevelException((long)targetCompatLevel, (long)upperLimit)).SetHelpContext("UnsupportedCompatLevelException");
             }
         }
 
@@ -6968,14 +6968,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 case FragmentationOption.Detailed:
                     if (ServerVersion.Major < 8)
                     {
-                        throw new UnsupportedVersionException(ExceptionTemplates.InvalidOptionForVersion("EnumFragmentation", fragmentationOption.ToString(), GetSqlServerVersionName()));
+                        throw new UnsupportedVersionException(ExceptionTemplates.FormatInvalidOptionForVersion("EnumFragmentation", fragmentationOption.ToString(), GetSqlServerVersionName()));
                     }
 
                     optStr = "FragmentationDetailed";
                     break;
 
                 default:
-                    throw new InternalSmoErrorException(ExceptionTemplates.UnknownEnumeration("FragmentationOption"));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatUnknownEnumeration("FragmentationOption"));
             }
 
             return optStr;
@@ -7180,7 +7180,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (fileGroupName.Length > 0 && partitionSchemeName.Length > 0)
                 {
                     throw new WrongPropertyValueException(
-                        ExceptionTemplates.MutuallyExclusiveProperties("PartitionScheme",
+                        ExceptionTemplates.FormatMutuallyExclusiveProperties("PartitionScheme",
                         "FileGroup"));
                 }
                 else if (sp.Storage.FileGroup && fileGroupName.Length > 0)
@@ -7206,7 +7206,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             if (!(this.ParentColl.ParentInstance.State == SqlSmoState.Creating && this.ParentColl.ParentInstance is View))
                             {
                                 // the column does not exist, so we need to abort this scripting
-                                throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(PartitionScheme.UrnSuffix, partitionSchemeName, this.ToString() + ".[" + SqlStringBraket(psp.Name) + "]"));
+                                throw new SmoException(ExceptionTemplates.FormatObjectRefsNonexCol(PartitionScheme.UrnSuffix, partitionSchemeName, this.ToString() + ".[" + SqlStringBraket(psp.Name) + "]"));
                             }
                         }
 
@@ -7266,7 +7266,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (fileGroupName.Length > 0 && partitionSchemeName.Length > 0)
             {
                 throw new WrongPropertyValueException(
-                    ExceptionTemplates.MutuallyExclusiveProperties("FileStreamPartitionScheme",
+                    ExceptionTemplates.FormatMutuallyExclusiveProperties("FileStreamPartitionScheme",
                     "FileStreamFileGroup"));
             }
             else if (sp.Storage.FileStreamFileGroup && sp.Storage.FileStreamColumn && fileGroupName.Length > 0)
@@ -7372,7 +7372,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 //return custom error message
                 FailedOperationException foe = new FailedOperationException(
-                    ExceptionTemplates.FailedOperationExceptionTextScript(SqlSmoObject.GetTypeName(this.GetType().Name), this.ToString()), e);
+                    ExceptionTemplates.FormatFailedOperationExceptionTextScript(SqlSmoObject.GetTypeName(this.GetType().Name), this.ToString()), e);
                 //add additional properties
                 foe.Operation = ExceptionTemplates.Script;
                 foe.FailedObject = this;
@@ -7527,7 +7527,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (rule.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplates.EmptyInputParam("rule", "string"));
+                throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("rule", "string"));
             }
 
             if (null == ruleSchema)
@@ -7616,7 +7616,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (defaultName.Length == 0)
                 {
-                    throw new ArgumentException(ExceptionTemplates.EmptyInputParam("defaultName", "string"));
+                    throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("defaultName", "string"));
                 }
 
                 if (null == defaultSchema)
@@ -7735,7 +7735,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if (collationVersion > soVersion)
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedCollation(collationName, GetSqlServerName(sp)));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedCollation(collationName, GetSqlServerName(sp)));
             }
 
             return;
@@ -7971,15 +7971,15 @@ namespace Microsoft.SqlServer.Management.Smo
                 // TODO: FIX_IN_KATMAI: use paramarray here, avoid cascading if
                 if (keyFieldNames.Count == 1)
                 {
-                    throw new FailedOperationException(ExceptionTemplates.OperationNotInPendingState1(keyFieldNames[0]));
+                    throw new FailedOperationException(ExceptionTemplates.FormatOperationNotInPendingState1(keyFieldNames[0]));
                 }
                 else if (keyFieldNames.Count == 2)
                 {
-                    throw new FailedOperationException(ExceptionTemplates.OperationNotInPendingState2(keyFieldNames[0], keyFieldNames[1]));
+                    throw new FailedOperationException(ExceptionTemplates.FormatOperationNotInPendingState2(keyFieldNames[0], keyFieldNames[1]));
                 }
                 else if (keyFieldNames.Count == 3)
                 {
-                    throw new FailedOperationException(ExceptionTemplates.OperationNotInPendingState3(keyFieldNames[0], keyFieldNames[1], keyFieldNames[2]));
+                    throw new FailedOperationException(ExceptionTemplates.FormatOperationNotInPendingState3(keyFieldNames[0], keyFieldNames[1], keyFieldNames[2]));
                 }
                 else
                 {
@@ -8236,7 +8236,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             try
             {
-                return ExceptionTemplatesImpl.Keys.GetString(typeName);
+                return ExceptionTemplates.ResourceManager.GetString(typeName);
             }
             catch
             {
@@ -8526,7 +8526,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new FailedOperationException(ExceptionTemplates.PropertyNotFound(propertyName, propertyType.Name));
+                    throw new FailedOperationException(ExceptionTemplates.FormatPropertyNotFound(propertyName, propertyType.Name));
                 }
             }
         }
@@ -8587,7 +8587,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new FailedOperationException(ExceptionTemplates.PropertyNotFound(propertyName, propertyType.Name));
+                throw new FailedOperationException(ExceptionTemplates.FormatPropertyNotFound(propertyName, propertyType.Name));
             }
 
             return value;
@@ -8633,8 +8633,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return propInfo.PropertyType;
             }
 
-            //$TODO: Needs string review, and move to *.strings file for localization
-            throw new FailedOperationException("Cannot discover the property " + propertyName);
+            throw new FailedOperationException(ExceptionTemplates.FormatPropertyNotFoundByName(propertyName));
 
         }
 
@@ -8700,12 +8699,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist("Login", loginName));
+                    throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist("Login", loginName));
                 }
             }
             else
             {
-                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist("Role", roleName));
+                throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist("Role", roleName));
             }
         }
 

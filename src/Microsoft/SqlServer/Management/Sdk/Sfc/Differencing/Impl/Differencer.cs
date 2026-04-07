@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Differencing.SPI;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Sdk.Sfc.Differencing;
 
 namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
 {
@@ -102,7 +103,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             if (source.GetType() != target.GetType())
             {
                 LogTrace("CompareGraphs: argument types do not match.");
-                throw new ArgumentException(StringDifferencing.MismatchType(source.ToString(), target.ToString()));
+                throw new ArgumentException(StringDifferencing.FormatMismatchType(source.ToString(), target.ToString()));
             }
 
             SfcNodeAdapterProvider nodeAdapter = FindNodeAdapterProvider(source);
@@ -581,7 +582,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("AdaptNode: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
+                String msg = StringDifferencing.FormatFailedProviderLookup(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -607,7 +608,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetRelatedContainerNames: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -633,7 +634,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetNaturalOrder: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -659,7 +660,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetIsValueAvailable: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -692,7 +693,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetSortedList: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), source.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), source.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -718,7 +719,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetComparer: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), list.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), list.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -742,7 +743,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetRelatedObjectNames: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -766,7 +767,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
             {
                 SmoEventSource.Log.DifferencingException(e);
                 LogTrace("GetPropertyNames: exception occurred {0}.", e);
-                String msg = StringDifferencing.FailedProviderOperation(provider.ToString(), node.ToString());
+                String msg = StringDifferencing.FormatFailedProviderOperation(provider.ToString(), node.ToString());
                 throw new InvalidOperationException(msg, e);
             }
         }
@@ -788,7 +789,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 {
                     SmoEventSource.Log.DifferencingException(e);
                     LogTrace("AdaptNode: exception occurred {0}.", e);
-                    String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
+                    String msg = StringDifferencing.FormatFailedProviderLookup(provider.ToString(), node.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
@@ -813,7 +814,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 {
                     SmoEventSource.Log.DifferencingException(e);
                     LogTrace("FindNameProvider: exception occurred {0}.", e);
-                    String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
+                    String msg = StringDifferencing.FormatFailedProviderLookup(provider.ToString(), node.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
@@ -838,7 +839,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 {
                     SmoEventSource.Log.DifferencingException(e);
                     LogTrace("FindAvailableValueProvider: exception occurred {0}.", e);
-                    String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), node.ToString());
+                    String msg = StringDifferencing.FormatFailedProviderLookup(provider.ToString(), node.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
@@ -863,7 +864,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 {
                     SmoEventSource.Log.DifferencingException(e);
                     LogTrace("FindContainerSortingProvider: exception occurred {0}.", e);
-                    String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), source.ToString());
+                    String msg = StringDifferencing.FormatFailedProviderLookup(provider.ToString(), source.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }
@@ -888,7 +889,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Differencing.Impl
                 {
                     SmoEventSource.Log.DifferencingException(e);
                     LogTrace("FindPropertyComparerProvider: exception occurred {0}.", e);
-                    String msg = StringDifferencing.FailedProviderLookup(provider.ToString(), source.ToString());
+                    String msg = StringDifferencing.FormatFailedProviderLookup(provider.ToString(), source.ToString());
                     throw new InvalidOperationException(msg, e);
                 }
             }

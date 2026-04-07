@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Smo;
@@ -44,7 +43,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupData">agData</param>
         /// <param name="replica">the secondary replica in which to restore the logs</param>
         public RestoreLogTask(string databaseName, AvailabilityGroupData availabilityGroupData, AvailabilityGroupReplica replica)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.RestoreLogText, databaseName, replica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatRestoreLogText(databaseName, replica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (String.IsNullOrEmpty(databaseName))
             {

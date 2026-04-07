@@ -139,7 +139,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 if (prop.Value != null && ((JobStepFlags)prop.Value) >= JobStepFlags.LogToTableWithOverwrite)
                 {
                     throw new UnsupportedVersionException(
-                                                            ExceptionTemplates.InvalidPropertyValueForVersion(
+                                                            ExceptionTemplates.FormatInvalidPropertyValueForVersion(
                                                             this.GetType().Name,
                                                             "JobStepFlags",
                                                             prop.Value.ToString(), 

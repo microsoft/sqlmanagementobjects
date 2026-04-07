@@ -18,8 +18,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="replicaName">Name of the replica</param>
         /// <param name="missingFolders">Missing folders</param>
         public DatabaseFileLocationMissingOnReplicaException(string replicaName, IEnumerable<string> missingFolders)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.DatabaseFileLocationMissingOnReplicaException, replicaName, string.Join(CultureInfo.CurrentUICulture.TextInfo.ListSeparator, missingFolders)))
+            : base(Resource.FormatDatabaseFileLocationMissingOnReplicaException(replicaName, string.Join(CultureInfo.CurrentUICulture.TextInfo.ListSeparator, missingFolders)))
         {
         }
     }

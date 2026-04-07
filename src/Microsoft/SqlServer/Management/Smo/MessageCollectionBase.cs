@@ -34,7 +34,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var id = urn.GetAttribute("ID");
             if( null == id || id.Length == 0)
             {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("ID", urn.Type));
+                throw new SmoException(ExceptionTemplates.FormatPropertyMustBeSpecifiedInUrn("ID", urn.Type));
             }
 
             var language = urn.GetAttribute("Language");
@@ -59,7 +59,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new SmoException(ExceptionTemplates.UnknownLanguageId(languageId.ToString(SmoApplication.DefaultCulture)));
+                throw new SmoException(ExceptionTemplates.FormatUnknownLanguageId(languageId.ToString(SmoApplication.DefaultCulture)));
             }
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var lang = (ParentInstance as Server).Languages.ItemById(languageId);
             return null != lang
                 ? this[id, lang.Name]
-                : throw new FailedOperationException(ExceptionTemplates.ObjectDoesNotExist("LanguageID", languageId.ToString(SmoApplication.DefaultCulture)));
+                : throw new FailedOperationException(ExceptionTemplates.FormatObjectDoesNotExist("LanguageID", languageId.ToString(SmoApplication.DefaultCulture)));
         }
     }
     

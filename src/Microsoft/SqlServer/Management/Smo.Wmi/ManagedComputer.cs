@@ -187,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
             {
                 SqlSmoObject.FilterException(e);
 
-                throw new FailedOperationException(ExceptionTemplates.FailedOperationExceptionText(ExceptionTemplates.GetSmoObject, ExceptionTemplates.ManagedComputer, this.Name), e);
+                throw new FailedOperationException(ExceptionTemplates.FormatFailedOperationExceptionText(ExceptionTemplates.GetSmoObject, ExceptionTemplates.ManagedComputer, this.Name), e);
             }
         }
 
@@ -205,12 +205,12 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                     }
                     else
                     {
-                        throw new SmoException(ExceptionTemplates.InvalidServerUrn(urn.GetAttribute("Name")));
+                        throw new SmoException(ExceptionTemplates.FormatInvalidServerUrn(urn.GetAttribute("Name")));
                     }
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.InvalidUrn(urn.Type));
+                    throw new SmoException(ExceptionTemplates.FormatInvalidUrn(urn.Type));
                 }
             }
 
@@ -244,7 +244,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                 null, parentNode, new object [] {}, SmoApplication.DefaultCulture );
             if(null==childCollection)
             {
-                throw new MissingObjectException(ExceptionTemplates.MissingObjectExceptionText(
+                throw new MissingObjectException(ExceptionTemplates.FormatMissingObjectExceptionText(
                     childCollectionName, parentNode.GetType().ToString(), null )).SetHelpContext("MissingObjectExceptionText");
             }
 
@@ -258,7 +258,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                 );
             if(null==thisNode)
             {
-                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(SqlSmoObject.GetTypeName(nodeType), nodeName));
+                throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist(SqlSmoObject.GetTypeName(nodeType), nodeName));
             }
 
 
@@ -308,7 +308,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                     // the server.
                     // Provide a more user-friendly message in that case. this.Name represents 
                     // a machine name here.
-                    extraMessage = ExceptionTemplates.WMIProviderNotInstalled(this.Name);
+                    extraMessage = ExceptionTemplates.FormatWMIProviderNotInstalled(this.Name);
                 }
                 else
                 {
@@ -446,7 +446,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                     throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("MachineName"));
 
                 if (managementScope.IsConnected)
-                    throw new SmoException(ExceptionTemplates.PropertyCannotBeChangedAfterConnection("MachineName"));
+                    throw new SmoException(ExceptionTemplates.FormatPropertyCannotBeChangedAfterConnection("MachineName"));
 
                 // translate special network names into the machine name
                 if (value.Length == 0 || "." == value || "(local)" == value)
@@ -469,7 +469,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                     throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("Username"));
 
                 if (managementScope.IsConnected)
-                    throw new SmoException(ExceptionTemplates.PropertyCannotBeChangedAfterConnection("Username"));
+                    throw new SmoException(ExceptionTemplates.FormatPropertyCannotBeChangedAfterConnection("Username"));
 
                 managementScope.Options.Username = value; 
             }
@@ -481,7 +481,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                 throw new SmoException(ExceptionTemplates.InnerException, new ArgumentNullException("Password"));
 
             if (managementScope.IsConnected)
-                throw new SmoException(ExceptionTemplates.PropertyCannotBeChangedAfterConnection("Password"));
+                throw new SmoException(ExceptionTemplates.FormatPropertyCannotBeChangedAfterConnection("Password"));
 
             this.managementScope.Options.Password = password;
         }

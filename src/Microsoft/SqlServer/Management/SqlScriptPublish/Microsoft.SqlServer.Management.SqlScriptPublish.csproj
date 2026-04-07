@@ -5,8 +5,7 @@
     <RootNamespace>Microsoft.SqlServer.Management.SqlScriptPublish</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <SqlStringResource Include="SR.strings" />
-    <SqlStringResource Include="SqlScriptOptionsSR.strings" />
+    <EmbeddedResource Update="*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
@@ -14,7 +13,7 @@
     <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />
     <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SqlScriptPublishTests" Key="$(RealPublicKey)"/>
-	</ItemGroup>
+  </ItemGroup>
 </Project>

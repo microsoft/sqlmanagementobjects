@@ -1291,7 +1291,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 // This will thow if input is null
                 if (String.IsNullOrEmpty(input.Trim()))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("input")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("input")));
                 }
 
                 // Parsing is done using XPath parser
@@ -1310,13 +1310,13 @@ namespace Microsoft.SqlServer.Management.Dmf
                 {
                     methodTraceContext.TraceCatch(xpe);
                     CheckForDateFunctions (input);
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.ParsingError(input), xpe));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatParsingError(input), xpe));
                 }
                 catch (SFC.InvalidQueryExpressionEnumeratorException iqe)
                 {
                     methodTraceContext.TraceCatch(iqe);
                     CheckForDateFunctions (input);
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.ParsingError(input), iqe));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatParsingError(input), iqe));
                 }
 
                 // Create ExpressionNode
@@ -1348,7 +1348,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             if (rx.IsMatch (input))
             {
-                throw new DmfException (ExceptionTemplatesSR.ParsingUnquotedDatePart (input));
+                throw new DmfException (ExceptionTemplatesSR.FormatParsingUnquotedDatePart(input));
             }
         }
 
@@ -1822,7 +1822,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             else
             {
                 // conversion of the value type failed. see vsts#217413 for details. -anchals
-                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.TypeNotSupported(type.ToString())));
+                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatTypeNotSupported(type.ToString())));
             }
 
 
@@ -2582,7 +2582,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             if (type == OperatorType.NONE)
             {
-                throw new ArgumentException(ExceptionTemplatesSR.InvalidArgument(type.ToString()));
+                throw new ArgumentException(ExceptionTemplatesSR.FormatInvalidArgument(type.ToString()));
             }
 
             if (null == left || null == right)
@@ -4154,7 +4154,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     // Idially I would like to provide message explicitly indicating local or remote access
                     // with machine name. All that information is available here. (callRemote and machineName)
 
-                    throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.WmiException(ex.Message), ex));
+                    throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatWmiException(ex.Message), ex));
                 }
             }
 
@@ -4562,7 +4562,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             if (string.IsNullOrEmpty(stringToEscape))
             {
-                throw new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("StringToEscape"));
+                throw new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("StringToEscape"));
             }
 
             return replacedString.Replace(stringToEscape, newString + stringToEscape);

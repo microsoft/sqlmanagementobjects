@@ -644,7 +644,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     string destinationTableName = table.FormatFullNameForScripting(this.Scripter.Options.GetScriptingPreferences());
 
                     //Starting table's data transfer event
-                    this.DataTransferInformationEvent(ExceptionTemplates.StartingDataTransfer(destinationTableName));
+                    this.DataTransferInformationEvent(ExceptionTemplates.FormatStartingDataTransfer(destinationTableName));
 
                     string columnNames = this.SetColumnNameAndMapping(table, bulkCopy);
                     
@@ -673,7 +673,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         bulkCopy.WriteToServer(reader);
 
                         //Completed table's data transfer event
-                        this.DataTransferInformationEvent(ExceptionTemplates.CompletedDataTransfer(destinationTableName));
+                        this.DataTransferInformationEvent(ExceptionTemplates.FormatCompletedDataTransfer(destinationTableName));
                     }
                 }
             }
@@ -736,7 +736,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
         private void DataTransferProgressEvent(string statement)
         {
-            this.OnDataTransferProgress(DataTransferEventType.Progress, ExceptionTemplates.ExecutingScript(statement));
+            this.OnDataTransferProgress(DataTransferEventType.Progress, ExceptionTemplates.FormatExecutingScript(statement));
         }
 
         private void DataTransferInformationEvent(string message)
@@ -751,7 +751,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (string.IsNullOrEmpty(folder))
             {
-                throw new SmoException(ExceptionTemplates.InexistentDir(folder));
+                throw new SmoException(ExceptionTemplates.FormatInexistentDir(folder));
             }
 
             // For administrative purposes we will create a subfolder 
@@ -765,7 +765,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // double check that the directory creation succeeded
             if (!Directory.Exists(tempDir))
             {
-                throw new SmoException(ExceptionTemplates.InexistentDir(tempDir));
+                throw new SmoException(ExceptionTemplates.FormatInexistentDir(tempDir));
             }
 
             return tempDir;
@@ -806,7 +806,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            throw new SmoException(ExceptionTemplates.CantCreateTempFile(directory), e);
+                            throw new SmoException(ExceptionTemplates.FormatCantCreateTempFile(directory), e);
                         }
                     }
                 }

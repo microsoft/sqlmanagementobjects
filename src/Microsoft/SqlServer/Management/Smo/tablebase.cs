@@ -399,7 +399,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // if the table exists don't allow changes to its partition scheme parameters
                     if (State == SqlSmoState.Existing)
                     {
-                        m_PartitionSchemeParameters.LockCollection(ExceptionTemplates.ReasonObjectAlreadyCreated(UrnSuffix));
+                        m_PartitionSchemeParameters.LockCollection(ExceptionTemplates.FormatReasonObjectAlreadyCreated(UrnSuffix));
                     }
                 }
                 return m_PartitionSchemeParameters;
@@ -414,11 +414,11 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!this.IsFileTable)
             {
-                throw new InvalidOperationException(ExceptionTemplates.TableNotFileTable(this.Name));
+                throw new InvalidOperationException(ExceptionTemplates.FormatTableNotFileTable(this.Name));
             }
             if (!this.FileTableNamespaceEnabled)
             {
-                throw new InvalidOperationException(ExceptionTemplates.NamespaceNotEnabled(this.Name));
+                throw new InvalidOperationException(ExceptionTemplates.FormatNamespaceNotEnabled(this.Name));
             }
             string machineName = this.GetServerObject().NetName;
             string sqlServerFileStreamShare = this.GetServerObject().FilestreamShareName;
@@ -822,7 +822,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             // IsFileTable is supported as a hard coded 0 on Azure; we can't script file table to that target
                             if (!IsSupportedProperty("IsFileTable", sp) || sp.TargetDatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
                             {
-                                throw new UnsupportedVersionException(ExceptionTemplates.FileTableNotSupportedOnTargetEngine(GetSqlServerName(sp)));
+                                throw new UnsupportedVersionException(ExceptionTemplates.FormatFileTableNotSupportedOnTargetEngine(GetSqlServerName(sp)));
                             }
                             if (Columns.Count > 0 && this.State == SqlSmoState.Creating)
                             {
@@ -850,7 +850,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // do not require any user defined columns.
                     if (Columns.Count < 1 && !isEdgeTable)
                     {
-                        throw new SmoException(ExceptionTemplates.ObjectWithNoChildren("Table", "Column"));
+                        throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren("Table", "Column"));
                     }
 
                     // if we have requested the script to contain the ANSI_PADDING
@@ -1682,7 +1682,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (!isFileTable)
                     {
-                        throw new SmoException(ExceptionTemplates.PropertyOnlySupportedForFileTable("FileTableDirectoryName"));
+                        throw new SmoException(ExceptionTemplates.FormatPropertyOnlySupportedForFileTable("FileTableDirectoryName"));
                     }
                     if (!string.IsNullOrEmpty(withOptions.ToString()))
                     {
@@ -1696,7 +1696,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (!isFileTable)
                     {
-                        throw new SmoException(ExceptionTemplates.PropertyOnlySupportedForFileTable("FileTableNameColumnCollation"));
+                        throw new SmoException(ExceptionTemplates.FormatPropertyOnlySupportedForFileTable("FileTableNameColumnCollation"));
                     }
                     if (!string.IsNullOrEmpty(withOptions.ToString()))
                     {
@@ -2104,7 +2104,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // lock down the PartitionSchemeParameters collection
             if (null != m_PartitionSchemeParameters)
             {
-                m_PartitionSchemeParameters.LockCollection(ExceptionTemplates.ReasonObjectAlreadyCreated(UrnSuffix));
+                m_PartitionSchemeParameters.LockCollection(ExceptionTemplates.FormatReasonObjectAlreadyCreated(UrnSuffix));
             }
 
             // if there was a system-time temporal period created as well, reset the structure (do it anyways in fact)
@@ -2416,7 +2416,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 string partitionSchemeName = GetPropValueOptional(PartitionScheme, string.Empty);
 
                                 // the column does not exist, so we need to abort this scripting
-                                throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(Table.UrnSuffix, partitionSchemeName, this.ToString() + "." + MakeSqlBraket(partitionSchemeParameterName)));
+                                throw new SmoException(ExceptionTemplates.FormatObjectRefsNonexCol(Table.UrnSuffix, partitionSchemeName, this.ToString() + "." + MakeSqlBraket(partitionSchemeParameterName)));
                             }
                         }
 
@@ -3258,7 +3258,7 @@ namespace Microsoft.SqlServer.Management.Smo
             catch (Exception e)
             {
                 SqlSmoObject.FilterException(e);
-                throw new FailedOperationException(ExceptionTemplates.RebuildHeapError(e.Message), this, e);
+                throw new FailedOperationException(ExceptionTemplates.FormatRebuildHeapError(e.Message), this, e);
             }
 
             if (!this.ExecutionManager.Recording)
@@ -3435,7 +3435,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (pFileStreamFileGroup.Dirty && pFileStreamPartitionScheme.Dirty)
                     {
                         throw new WrongPropertyValueException(
-                               ExceptionTemplates.MutuallyExclusiveProperties("FileStreamPartitionScheme",
+                               ExceptionTemplates.FormatMutuallyExclusiveProperties("FileStreamPartitionScheme",
                                "FileStreamFileGroup"));
                     }
                     string sFullTableName = FormatFullNameForScripting(sp);
@@ -4127,7 +4127,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     //
                     if ( string.IsNullOrEmpty(colName) )
                     {
-                        throw new InvalidSmoOperationException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.MissingDataRetentionFilterColumn));
+                        throw new InvalidSmoOperationException(ExceptionTemplates.MissingDataRetentionFilterColumn);
                     }
 
                     colName = MakeSqlBraket(colName);
@@ -4262,7 +4262,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 // if the property value is not NULL and not a default of -1, throw an exception
                                 if (!prop.IsNull && (double)prop.Value != -1)
                                 {
-                                    throw new SmoException(ExceptionTemplates.ConflictingExternalTableProperties(prop.Name, prop.Value.ToString(), rejectTypeProp.Name, rejectTypeProp.Value.ToString()));
+                                    throw new SmoException(ExceptionTemplates.FormatConflictingExternalTableProperties(prop.Name, prop.Value.ToString(), rejectTypeProp.Name, rejectTypeProp.Value.ToString()));
                                 }
                             }
                             break;
@@ -4306,12 +4306,12 @@ namespace Microsoft.SqlServer.Management.Smo
                                 // A sharding must be supplied when using shared distribution.
                                 if (shardingColProperty.IsNull || string.IsNullOrEmpty(shardingColProperty.Value.ToString()))
                                 {
-                                    throw new SmoException(ExceptionTemplates.ShardingColumnNotSpecifiedForShardedDistribution(shardingColProperty.Name));
+                                    throw new SmoException(ExceptionTemplates.FormatShardingColumnNotSpecifiedForShardedDistribution(shardingColProperty.Name));
                                 }
                                 string shardingColName = shardingColProperty.Value.ToString();
                                 if (!Columns.Contains(shardingColName))
                                 {
-                                    throw new SmoException(ExceptionTemplates.ShardingColumnNotAddedToTable(shardingColName));
+                                    throw new SmoException(ExceptionTemplates.FormatShardingColumnNotAddedToTable(shardingColName));
                                 }
                                 break;
                             case ExternalTableDistributionType.Replicated:
@@ -4320,7 +4320,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 // A sharding column cannot be used when using a non-shared/no distribution.
                                 if (!shardingColProperty.IsNull && !string.IsNullOrEmpty(shardingColProperty.Value.ToString()))
                                 {
-                                    throw new SmoException(ExceptionTemplates.ShardingColumnNotSupportedWithNonShardedDistribution(shardingColProperty.Name, distributionProperty.Value.ToString()));
+                                    throw new SmoException(ExceptionTemplates.FormatShardingColumnNotSupportedWithNonShardedDistribution(shardingColProperty.Name, distributionProperty.Value.ToString()));
                                 }
                                 break;
                             default:
@@ -4332,7 +4332,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // A sharding column is only valid with sharded distribution.
                         if (!shardingColProperty.IsNull && !string.IsNullOrEmpty(shardingColProperty.Value.ToString()))
                         {
-                            throw new SmoException(ExceptionTemplates.ConflictingExternalTableProperties(shardingColProperty.Name, shardingColProperty.Value.ToString(), distributionProperty.Name, distributionProperty.Value.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatConflictingExternalTableProperties(shardingColProperty.Name, shardingColProperty.Value.ToString(), distributionProperty.Name, distributionProperty.Value.ToString()));
                         }
                     }
 
@@ -4348,7 +4348,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                         if ((remoteSchemaHasValue && !remoteObjectHasValue) || (!remoteSchemaHasValue && remoteObjectHasValue))
                         {
-                            throw new SmoException(ExceptionTemplates.DependentPropertyMissing(remoteSchemaProperty.Name, remoteObjectProperty.Name));
+                            throw new SmoException(ExceptionTemplates.FormatDependentPropertyMissing(remoteSchemaProperty.Name, remoteObjectProperty.Name));
                         }
                     }
                 }
@@ -4392,7 +4392,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (tableName.StartsWith("#", StringComparison.Ordinal))
             {
                 // we don't support temp tables
-                throw new WrongPropertyValueException(ExceptionTemplates.TempTablesNotSupported(tableName));
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatTempTablesNotSupported(tableName));
             }
         }
 
@@ -4595,11 +4595,11 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (!IsSupportedProperty("IsFileTable", sp))
                 {
-                    throw new SmoException(ExceptionTemplates.FileTableNotSupportedOnTargetEngine(GetSqlServerName(sp)));
+                    throw new SmoException(ExceptionTemplates.FormatFileTableNotSupportedOnTargetEngine(GetSqlServerName(sp)));
                 }
                 if (!isFileTable)
                 {
-                    throw new SmoException(ExceptionTemplates.PropertyOnlySupportedForFileTable(fileTableDirectoryName.Dirty ?
+                    throw new SmoException(ExceptionTemplates.FormatPropertyOnlySupportedForFileTable(fileTableDirectoryName.Dirty ?
                         "FileTableDirectoryName" : "FileTableNamespaceEnabled"));
                 }
             }
@@ -4912,7 +4912,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("LockEscalationType"));
+                throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("LockEscalationType"));
             }
 
             if (sbStatement.Length > 0)
@@ -5104,7 +5104,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // if the property is set but the table is not an external table, throw an exception
                     if (!CheckIsExternalTable())
                     {
-                        throw new SmoException(ExceptionTemplates.PropertyOnlySupportedForExternalTable(propertyName));
+                        throw new SmoException(ExceptionTemplates.FormatPropertyOnlySupportedForExternalTable(propertyName));
                     }
                 }
             }

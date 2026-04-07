@@ -15,7 +15,7 @@ using System.Linq;
 #if !STRACE
 using STrace = System.Diagnostics.Trace;
 #endif
-
+#pragma warning disable CA1822 // Mark members as static
 namespace Microsoft.SqlServer.Management.RegisteredServers
 {
     /// <summary>
@@ -330,7 +330,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     // this one upward
                 }
 
-                throw new RegisteredServerException(RegSvrStrings.FailedOperation(RegSvrStrings.Export), e);
+                throw new RegisteredServerException(RegSvrStrings.FormatFailedOperation(RegSvrStrings.Export), e);
             }
             finally
             {
@@ -445,25 +445,13 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// 
         /// </summary>
         [SfcIgnore]
-        public bool IsLocal
-        {
-            get
-            {
-                return this.LocalXmlStorageFile != null;
-            }
-        }
+        public bool IsLocal => this.LocalXmlStorageFile != null;
 
         /// <summary>
         /// Display name for this store
         /// </summary>
         [SfcIgnore]
-        public string DisplayName
-        {
-            get
-            {
-                return (this.IsLocal ? RegSvrStrings.LocalServerStoreDisplayName : RegSvrStrings.CentralManagementServersDisplayName);
-            }
-        }
+        public string DisplayName => (this.IsLocal ? RegSvrStrings.LocalServerStoreDisplayName : RegSvrStrings.CentralManagementServersDisplayName);
 
         /// <summary>
         /// The localized name of the local server store
@@ -472,13 +460,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// String compararer in GUI needs to know this so it can sort the local
         /// server store differently from other nodes
         /// </remarks>
-        public static string LocalServerStoreDisplayName
-        {
-            get
-            {
-                return RegSvrStrings.LocalServerStoreDisplayName;
-            }
-        }
+        public static string LocalServerStoreDisplayName => RegSvrStrings.LocalServerStoreDisplayName;
 
         /// <summary>
         /// The localized name of the shared server store
@@ -487,26 +469,14 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// String compararer in GUI needs to know this so it can sort the shared
         /// server store differently from other nodes
         /// </remarks>
-        public static string CentralManagementServersDisplayName
-        {
-            get
-            {
-                return RegSvrStrings.CentralManagementServersDisplayName;
-            }
-        }
+        public static string CentralManagementServersDisplayName => RegSvrStrings.CentralManagementServersDisplayName;
 
         /// <summary>
         /// Used in RegisterServer::Create() method
         /// to allow creation of objects without serialization
         /// </summary>
         [SfcIgnore]
-        internal bool IsSerializeOnCreation
-        {
-            get
-            {
-                return this.isSerializeOnCreation;
-            }
-        }
+        internal bool IsSerializeOnCreation => this.isSerializeOnCreation;
 
 
         /// Name of the builtin DatabaseEngine group 
@@ -521,77 +491,47 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         internal static readonly string sqlServerCompactEditionServerGroupName = "SqlServerCompactEditionServerGroup";
         /// Name of the builtin CentralManagementServer group
         internal static readonly string centralManagementServerGroupName = "CentralManagementServerGroup";
+        /// Name of the builtin MRU SQL connections group
+        internal static readonly string mruSqlConnectionsGroupName = "MruSqlConnectionsGroup";
 
         /// <summary>
         /// 
         /// </summary>
-        public string DatabaseEngineServerGroupName
-        {
-            get
-            {
-                return databaseEngineServerGroupName;
-            }
-        }
+        public string DatabaseEngineServerGroupName => databaseEngineServerGroupName;
 
         /// <summary>
         /// 
         /// </summary>
-        public string AnalysisServicesServerGroupName
-        {
-            get
-            {
-                return analysisServicesServerGroupName;
-            }
-        }
+        public string AnalysisServicesServerGroupName => analysisServicesServerGroupName;
 
 
         /// <summary>
         /// 
         /// </summary>
-        public string ReportingServicesServerGroupName
-        {
-            get
-            {
-                return reportingServicesServerGroupName;
-            }
-        }
+        public string ReportingServicesServerGroupName => reportingServicesServerGroupName;
 
 
         /// <summary>
         /// 
         /// </summary>
-        public string IntegrationServicesServerGroupName
-        {
-            get
-            {
-                return integrationServicesServerGroupName;
-            }
-        }
+        public string IntegrationServicesServerGroupName => integrationServicesServerGroupName;
 
 
         /// <summary>
         /// 
         /// </summary>
-        public string SqlServerCompactEditionServerGroupName
-        {
-            get
-            {
-                return sqlServerCompactEditionServerGroupName;
-            }
-        }
+        public string SqlServerCompactEditionServerGroupName => sqlServerCompactEditionServerGroupName;
 
 
         /// <summary>
         /// 
         /// </summary>
-        public string CentralManagementServerGroupName
-        {
-            get
-            {
-                return centralManagementServerGroupName;
-            }
-        }
+        public string CentralManagementServerGroupName => centralManagementServerGroupName;
 
+        /// <summary>
+        /// Gets the name of the MRU SQL connections group.
+        /// </summary>
+        public string MruSqlConnectionsGroupName => mruSqlConnectionsGroupName;
 
 
         private ServerGroupCollection serverGroups;
@@ -661,8 +601,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     if (null == centralManagementServerGroup)
                     {
                         centralManagementServerGroup =
-                            new ServerGroup(this, CentralManagementServerGroupName);
-                        centralManagementServerGroup.ServerType = ServerType.DatabaseEngine;
+                            new ServerGroup(this, CentralManagementServerGroupName)
+                            {
+                                ServerType = ServerType.DatabaseEngine
+                            };
                         centralManagementServerGroup.Create();
                     }
                 }
@@ -675,6 +617,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// Contains the set of connections and groups stored in the user's Azure Data Studio settings
         /// </summary>
         [SfcIgnore]
+        [Obsolete("Azure Data Studio connections are no longer supported.")]
         public AzureDataStudioConnectionStore AzureDataStudioConnectionStore
         {
             get
@@ -687,6 +630,40 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
                 return azureDataStudioConnectionStore ?? (azureDataStudioConnectionStore =
                     AzureDataStudioConnectionStore.LoadAzureDataStudioConnections(settingsFile:null));
+            }
+        }
+
+        private ServerGroup mruSqlConnectionsGroup;
+        /// <summary>
+        /// Contains the most recently used SQL connections, partitioned by SSMS installation folder path.
+        /// Each child ServerGroup represents an SSMS installation, whose RegisteredServer children
+        /// are the MRU connection entries for that installation.
+        /// </summary>
+        [SfcIgnore]
+        public ServerGroup MruSqlConnectionsGroup
+        {
+            get
+            {
+                if (!IsLocal)
+                {
+                    // this is a local only group
+                    return null;
+                }
+
+                if (null == mruSqlConnectionsGroup)
+                {
+                    mruSqlConnectionsGroup = ServerGroups[MruSqlConnectionsGroupName];
+                    if (null == mruSqlConnectionsGroup)
+                    {
+                        mruSqlConnectionsGroup =
+                            new ServerGroup(this, MruSqlConnectionsGroupName)
+                            {
+                                ServerType = ServerType.DatabaseEngine
+                            };
+                        mruSqlConnectionsGroup.Create();
+                    }
+                }
+                return mruSqlConnectionsGroup;
             }
         }
 
@@ -771,7 +748,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// 
         /// </summary>
         [SfcIgnore]
-        [Obsolete]
+        [Obsolete("SQL Server Compact Edition is no longer supported.")]
         public ServerGroup SqlServerCompactEditionServerGroup
         {
             get
@@ -797,22 +774,10 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// 
         /// </summary>
         [SfcIgnore]
-        public ServerConnection ServerConnection
-        {
-            get
-            {
-                return serverConnection;
-            }
-        }
+        public ServerConnection ServerConnection => serverConnection;
 
         private string localXmlStorageFile;
-        private string LocalXmlStorageFile
-        {
-            get
-            {
-                return this.localXmlStorageFile;
-            }
-        }
+        private string LocalXmlStorageFile => this.localXmlStorageFile;
 
         /// <summary>
         /// 
@@ -846,10 +811,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         /// 
         /// </summary>
         [SfcIgnore]
-        public string DomainName
-        {
-            get { return "RegisteredServers"; }
-        }
+        public string DomainName => "RegisteredServers";
 
         /// <summary>
         /// 
@@ -874,13 +836,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
         private static NopExecutionEngine nopExecutionEngine;
 
-        internal static NopExecutionEngine NopExecutionEngine
-        {
-            get
-            {
-                return nopExecutionEngine;
-            }
-        }
+        internal static NopExecutionEngine NopExecutionEngine => nopExecutionEngine;
 
         /// <summary>
         /// 
@@ -1172,7 +1128,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 case ServerGroup.typeName:
                     return this.ServerGroups;
                 default:
-                    throw new RegisteredServerException(RegSvrStrings.NoSuchCollection(elementType));
+                    throw new RegisteredServerException(RegSvrStrings.FormatNoSuchCollection(elementType));
             }
         }
         #endregion

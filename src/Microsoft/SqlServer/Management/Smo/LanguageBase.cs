@@ -222,7 +222,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     )
                 {
                     throw new SmoException(
-                        ExceptionTemplates.MutuallyExclusiveProperties(
+                        ExceptionTemplates.FormatMutuallyExclusiveProperties(
                         string.Format(CultureInfo.InvariantCulture,
                                         "{0}.Lcid",
                                         this.parentPropertyName),

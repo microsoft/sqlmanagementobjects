@@ -31,7 +31,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (partitionNumberStart > partitionNumberEnd)
             {
-                throw new SmoException(ExceptionTemplates.CannotCopyPartition(partitionNumberStart, partitionNumberEnd));
+                throw new SmoException(ExceptionTemplates.FormatCannotCopyPartition(partitionNumberStart, partitionNumberEnd));
             }
             PhysicalPartition[] tempArray = new PhysicalPartition[InternalStorage.Count - partitionNumberStart + 1];
             ((ICollection)this).CopyTo(tempArray, partitionNumberStart - 1);
@@ -396,7 +396,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if ((this.Count > 1) || ((this.Count == 1) && (this[0].PartitionNumber > 1)))
             {
-                throw new FailedOperationException(ExceptionTemplates.PartitionSchemeNotAssignedError(objectName), this, null);
+                throw new FailedOperationException(ExceptionTemplates.FormatPartitionSchemeNotAssignedError(objectName), this, null);
             }
         }
 

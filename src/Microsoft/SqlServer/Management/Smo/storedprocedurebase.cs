@@ -211,14 +211,14 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
                 case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
                     ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
-                        ExceptionTemplates.CreateOrAlterDownlevel(
+                        ExceptionTemplates.FormatCreateOrAlterDownlevel(
                             "Procedure",
                             GetSqlServerName(sp)));
 
                     sb.AppendFormat(SmoApplication.DefaultCulture, "{0} PROCEDURE {1}", Scripts.CREATE_OR_ALTER, FormatFullNameForScripting(sp));
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.UnknownEnumeration(scriptHeaderType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(scriptHeaderType.ToString()));
             }
 
             sb.Append(sp.NewLine);
@@ -305,13 +305,13 @@ namespace Microsoft.SqlServer.Management.Smo
             else
             {
                 // this check ensures we can't script a CLR Stored Proc that targets Cloud Engine
-                ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.ClrStoredProcedureDownlevel(
+                ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.FormatClrStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
 
                 // it insures we can't script a CLR SP that targets a 8.0 server
                 ThrowIfBelowVersion90(sp.TargetServerVersion,
-                    ExceptionTemplates.ClrStoredProcedureDownlevel(
+                    ExceptionTemplates.FormatClrStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
 
@@ -354,13 +354,13 @@ namespace Microsoft.SqlServer.Management.Smo
                 // Since minimum supported version is now SQL Server 2008 (version 10), this is always supported.
 
                 // this check ensures we can't script a CLR Stored Proc that targets Cloud Engine
-                ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.ClrStoredProcedureDownlevel(
+                ThrowIfCloud(sp.TargetDatabaseEngineType, ExceptionTemplates.FormatClrStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
 
                 // it insures we can't script a CLR SP that targets a 8.0 server
                 ThrowIfBelowVersion90(sp.TargetServerVersion,
-                    ExceptionTemplates.ClrStoredProcedureDownlevel(
+                    ExceptionTemplates.FormatClrStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
 
@@ -368,7 +368,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (this.Properties.Get("Text").Dirty && false == this.TextMode)
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.NoPropertyChangeForDotNet("TextBody"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatNoPropertyChangeForDotNet("TextBody"));
                 }
             }
             return bTransactSql;
@@ -537,7 +537,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (this.State != SqlSmoState.Creating && this.IsEncrypted && this.ImplementationType == ImplementationType.TransactSql)
             {
                 ThrowIfBelowVersion90(sp.TargetServerVersion,
-                    ExceptionTemplates.EncryptedStoredProcedureDownlevel(
+                    ExceptionTemplates.FormatEncryptedStoredProcedureDownlevel(
                         FormatFullNameForScripting(sp, true),
                         GetSqlServerName(sp)));
             }

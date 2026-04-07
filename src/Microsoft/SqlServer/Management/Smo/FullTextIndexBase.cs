@@ -338,7 +338,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                                 break;
                             default:
-                                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("Change Tracking"));
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("Change Tracking"));
                         }
                         sb.Append(sp.NewLine);
                     }
@@ -396,7 +396,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                                 break;
                             default:
-                                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("Change Tracking"));
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("Change Tracking"));
 
                         }
                     }
@@ -418,14 +418,14 @@ namespace Microsoft.SqlServer.Management.Smo
                                 withClause.Append("OFF");
                                 if ((null != strStopListName) && (strStopListName.Length > 0))
                                 {
-                                    throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "OFF"));
+                                    throw new SmoException(ExceptionTemplates.FormatPropertyNotValidException("StopListName", "StopListOption", "OFF"));
                                 }
                                 break;
                             case StopListOption.System:
                                 withClause.Append("SYSTEM");
                                 if ((null != strStopListName) && (strStopListName.Length > 0))
                                 {
-                                    throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
+                                    throw new SmoException(ExceptionTemplates.FormatPropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
                                 }
                                 break;
                             case StopListOption.Name:
@@ -439,7 +439,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 }
                                 break;
                             default:
-                                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("StopList Name"));
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("StopList Name"));
                         }
                     }
                     else if ((null != strStopListName) && (strStopListName.Length > 0))
@@ -545,7 +545,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             case ChangeTracking.Off:
                                 break;
                             default:
-                                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("Change Tracking"));
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("Change Tracking"));
                         }
                     }
                 }
@@ -582,7 +582,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             sb.Append("OFF");
                             break;
                         default:
-                            throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("Change Tracking"));
+                            throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("Change Tracking"));
                     }
                     queries.Add(sb.ToString());
                 }
@@ -662,7 +662,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             sb.Append("OFF");
                             if (null != strStopListName && propertyStopListName.Dirty && strStopListName.Length > 0)
                             {
-                                throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "OFF"));
+                                throw new SmoException(ExceptionTemplates.FormatPropertyNotValidException("StopListName", "StopListOption", "OFF"));
                             }
                             break;
 
@@ -670,7 +670,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             sb.Append("SYSTEM");
                             if (null != strStopListName && propertyStopListName.Dirty && strStopListName.Length > 0)
                             {
-                                throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
+                                throw new SmoException(ExceptionTemplates.FormatPropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
                             }
                             break;
 
@@ -685,7 +685,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             }
                             break;
                         default:
-                            throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("StopList NAme"));
+                            throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("StopList NAme"));
                     }
                     sb.Append(sp.NewLine);
 
@@ -700,11 +700,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (slOption == StopListOption.Off)
                     {
-                        throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "OFF"));
+                        throw new SmoException(ExceptionTemplates.FormatPropertyNotValidException("StopListName", "StopListOption", "OFF"));
                     }
                     else if (slOption == StopListOption.System)
                     {
-                        throw new SmoException(ExceptionTemplates.PropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
+                        throw new SmoException(ExceptionTemplates.FormatPropertyNotValidException("StopListName", "StopListOption", "SYSTEM"));
                     }
                     else if (slOption == StopListOption.Name)
                     {

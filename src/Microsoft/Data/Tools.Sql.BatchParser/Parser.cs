@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -407,7 +406,7 @@ namespace Microsoft.Data.Tools.Sql.BatchParser
                     case LexerTokenType.Serverlist:
                     case LexerTokenType.Xml:
                         RaiseError(ErrorCode.UnsupportedCommand,
-                            string.Format(CultureInfo.CurrentCulture, SR.EE_ExecutionError_CommandNotSupported, tokenType));
+                            SR.FormatEE_ExecutionError_CommandNotSupported(tokenType));
                         break;
                     default:
                         RaiseError(ErrorCode.UnrecognizedToken);
@@ -518,7 +517,7 @@ namespace Microsoft.Data.Tools.Sql.BatchParser
         {
             if (message == null)
             {
-                message = string.Format(CultureInfo.CurrentCulture, SR.BatchParser_IncorrectSyntax, token.Text);
+                message = SR.FormatBatchParser_IncorrectSyntax(token.Text);
             }
             throw new BatchParserException(errorCode, token, message);
         }
@@ -566,7 +565,7 @@ namespace Microsoft.Data.Tools.Sql.BatchParser
                     if (ThrowOnUnresolvedVariable == true)
                     {
                         RaiseError(ErrorCode.VariableNotDefined, inputToken,
-                            string.Format(CultureInfo.CurrentCulture, SR.BatchParser_VariableNotDefined, reference.VariableName));
+                            SR.FormatBatchParser_VariableNotDefined(reference.VariableName));
                     }
                     continue;
                 }

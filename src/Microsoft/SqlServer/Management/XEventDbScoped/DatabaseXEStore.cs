@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 
@@ -213,7 +213,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped
                 case TargetField.TypeTypeName: return new TargetField.Key(urnFragment.FieldDictionary);
             }
 
-            throw new XEventException(ExceptionTemplates.UnsupportedKey(urnFragment.Name));
+            throw new XEventException(ExceptionTemplates.FormatUnsupportedKey(urnFragment.Name));
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped
                 case DatabaseXEStore.TypeTypeName:
                     return null;
                 default:
-                    throw new XEventException(ExceptionTemplates.InvalidParameter("typeName"));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter("typeName"));
             }
         }
 

@@ -67,7 +67,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 					{
 						ManagementObject mop = GetPropertyManagementObject(p.Name);
 						if (null == mop)
-							throw new InternalSmoErrorException(ExceptionTemplates.CouldNotFindManagementObject("AdvancedProperty", p.Name));
+							throw new InternalSmoErrorException(ExceptionTemplates.FormatCouldNotFindManagementObject("AdvancedProperty", p.Name));
 
 						if (p.Type.Equals(typeof(System.Boolean)))
 						{
@@ -127,7 +127,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 			{
 				SqlSmoObject.FilterException(e);
 
-				throw new FailedOperationException(ExceptionTemplates.FailedOperationExceptionText(methodName, ExceptionTemplates.Service, this.Name), e);
+				throw new FailedOperationException(ExceptionTemplates.FormatFailedOperationExceptionText(methodName, ExceptionTemplates.Service, this.Name), e);
 			}
 		}
 		
@@ -317,7 +317,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 					{
 						SqlSmoObject.FilterException(e);
 
-						throw new FailedOperationException(ExceptionTemplates.FailedOperationExceptionText(ExceptionTemplates.AdvancedProperties, this.GetType().Name, this.Name), e);
+						throw new FailedOperationException(ExceptionTemplates.FormatFailedOperationExceptionText(ExceptionTemplates.AdvancedProperties, this.GetType().Name, this.Name), e);
 					}
 				}
 
@@ -354,7 +354,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 					{
 						SqlSmoObject.FilterException(e);
 
-						throw new FailedOperationException(ExceptionTemplates.FailedOperationExceptionText(ExceptionTemplates.AdvancedProperties, this.GetType().Name, this.Name), e);
+						throw new FailedOperationException(ExceptionTemplates.FormatFailedOperationExceptionText(ExceptionTemplates.AdvancedProperties, this.GetType().Name, this.Name), e);
 					}
 				}
 

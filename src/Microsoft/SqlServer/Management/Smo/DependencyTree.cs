@@ -30,7 +30,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
 			if( 0 >= siblings.Count )
 			{
-				throw new FailedOperationException( ExceptionTemplates.EmptyInputParam("siblings", "DependencyChainCollection")).SetHelpContext("EmptyInputParam");
+				throw new FailedOperationException( ExceptionTemplates.FormatEmptyInputParam("siblings", "DependencyChainCollection")).SetHelpContext("EmptyInputParam");
 			}
 
 			this.Index = index;
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Smo
 			// error checking
 			if( 0 >= urns.Length )
 			{
-				throw new FailedOperationException( ExceptionTemplates.EmptyInputParam("urns", "Urn[]")).SetHelpContext("EmptyInputParam");
+				throw new FailedOperationException( ExceptionTemplates.FormatEmptyInputParam("urns", "Urn[]")).SetHelpContext("EmptyInputParam");
 			}
 
 			this.server = server;
@@ -217,11 +217,11 @@ namespace Microsoft.SqlServer.Management.Smo
 						 sysobj.Properties["IsSystemObject"].Value != null &&
 						 (bool)sysobj.Properties["IsSystemObject"].Value )
 					{
-						throw new FailedOperationException(ExceptionTemplates.NoDepForSysObjects(urns[i].ToString())).SetHelpContext("NoDepForSysObjects");
+						throw new FailedOperationException(ExceptionTemplates.FormatNoDepForSysObjects(urns[i].ToString())).SetHelpContext("NoDepForSysObjects");
 					}
 					else
 					{
-						throw new FailedOperationException(ExceptionTemplates.UrnMissing(urns[i].ToString())).SetHelpContext("UrnMissing");
+						throw new FailedOperationException(ExceptionTemplates.FormatUrnMissing(urns[i].ToString())).SetHelpContext("UrnMissing");
 					}
 				}
 			}

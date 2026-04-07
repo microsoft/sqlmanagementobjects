@@ -8,17 +8,14 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.SqlServer.MaintenancePlanTasks" Key="$(RealPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.MaintenancePlanTasksUI" Key="$(RealPublicKey)" />
-    <InternalsVisibleTo Include="Microsoft.SqlServer.DTEnum" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.WmiEnum" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.DTEnum" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.WmiEnum" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(RealPublicKey)" />
   </ItemGroup>
   <ItemGroup>
-    <SqlStringResource Include="DatabaseRestorePlannerSR.strings" >
-        <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
-        <LogicalName>Microsoft.SqlServer.Management.Smo.DatabaseRestorePlannerSR.resources</LogicalName>
-    </SqlStringResource>
+    <EmbeddedResource Update="*.resx" EmitFormatMethods="true" />
   </ItemGroup>  
   <ItemGroup>
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />

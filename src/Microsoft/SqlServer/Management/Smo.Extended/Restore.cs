@@ -256,7 +256,7 @@ namespace Microsoft.SqlServer.Management.Smo
             verifyStmt.Append(Globals.newline);
             verifyStmt.AppendFormat(SmoApplication.DefaultCulture,
                                 "if @backupSetId is null begin raiserror({0}, 16, 1) end",
-                                SqlSmoObject.MakeSqlString(ExceptionTemplates.VerifyFailed0(this.Database)));
+                                SqlSmoObject.MakeSqlString(ExceptionTemplates.FormatVerifyFailed0(this.Database)));
             verifyStmt.Append(Globals.newline);
             verifyStmt.Append(ScriptVerify(srv, false, true));
 
@@ -332,7 +332,7 @@ namespace Microsoft.SqlServer.Management.Smo
             verifyStmt.Append(Globals.newline);
             verifyStmt.AppendFormat(SmoApplication.DefaultCulture,
                                 "if @backupSetId is null begin raiserror({0}, 16, 1) end",
-                                SqlSmoObject.MakeSqlString(ExceptionTemplates.VerifyFailed(this.Database, sqlVerifyAction.ToString())));
+                                SqlSmoObject.MakeSqlString(ExceptionTemplates.FormatVerifyFailed(this.Database, sqlVerifyAction.ToString())));
             verifyStmt.Append(Globals.newline);
             verifyStmt.Append(ScriptVerify(srv, false, true));
 
@@ -371,7 +371,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 case SqlVerifyAction.VerifyLog: return "L";
 
-                default: throw new InternalSmoErrorException(ExceptionTemplates.UnknownEnumeration("SqlVerifyAction"));
+                default: throw new InternalSmoErrorException(ExceptionTemplates.FormatUnknownEnumeration("SqlVerifyAction"));
             }
         }
 
@@ -612,7 +612,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (server.ServerVersion.Major < 9)
             {
-                throw new FailedOperationException(ExceptionTemplates.UnsupportedVersion(server.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
+                throw new FailedOperationException(ExceptionTemplates.FormatUnsupportedVersion(server.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
             }
             StringBuilder statement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             statement.Append("select * from msdb.dbo.suspect_pages");
@@ -625,7 +625,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (srv.ServerVersion.Major < 9)
             {
-                throw new FailedOperationException(ExceptionTemplates.UnsupportedVersion(srv.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
+                throw new FailedOperationException(ExceptionTemplates.FormatUnsupportedVersion(srv.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
             }
             StringBuilder statement = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             statement.Append("delete from msdb.dbo.suspect_pages");
@@ -981,7 +981,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (server.ServerVersion.Major < 9)
                 {
-                    throw new FailedOperationException(ExceptionTemplates.UnsupportedVersion(server.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
+                    throw new FailedOperationException(ExceptionTemplates.FormatUnsupportedVersion(server.ServerVersion.ToString())).SetHelpContext("UnsupportedVersion");
                 }
 
                 StringBuilder statement = new StringBuilder(Globals.INIT_BUFFER_SIZE);

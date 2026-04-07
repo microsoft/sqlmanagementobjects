@@ -18,8 +18,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="replicaName">replicaName</param>
         /// <param name="existingFiles">conflicting files</param>
         public DatabaseFileAlreadyExistsOnReplicaException(string replicaName, IEnumerable<string> existingFiles)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.ValidatingDatabaseFileExistingError, replicaName, string.Join(CultureInfo.CurrentUICulture.TextInfo.ListSeparator, existingFiles)))
+            : base(Resource.FormatValidatingDatabaseFileExistingError(replicaName, string.Join(CultureInfo.CurrentUICulture.TextInfo.ListSeparator, existingFiles)))
         {
         }
     }

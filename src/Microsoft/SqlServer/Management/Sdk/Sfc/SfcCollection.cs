@@ -327,13 +327,13 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // The object must exist in the collection
             if (!this.Contains(obj))
             {
-                throw new SfcInvalidRenameException(SfcStrings.KeyNotFound((obj.AbstractIdentityKey as K).ToString()));
+                throw new SfcInvalidRenameException(SfcStrings.FormatKeyNotFound((obj.AbstractIdentityKey as K).ToString()));
             }
 
             // The new key must not already be in collection
             if (this.Contains(newKey))
             {
-                throw new SfcInvalidRenameException(SfcStrings.KeyExists((obj.AbstractIdentityKey as K).ToString()));
+                throw new SfcInvalidRenameException(SfcStrings.FormatKeyExists((obj.AbstractIdentityKey as K).ToString()));
             }
 
             // Set all key properties in the objects from their values present in the new key
@@ -369,7 +369,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // Can't rename something with no key properties
             if (keysFound == 0)
             {
-                throw new SfcInvalidRenameException(SfcStrings.CannotRenameNoProperties(this.Parent));
+                throw new SfcInvalidRenameException(SfcStrings.FormatCannotRenameNoProperties(this.Parent));
             }
 
             // Raw remove from collection (will not involve mark for drop, etc.)

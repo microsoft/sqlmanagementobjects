@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
 using SMO = Microsoft.SqlServer.Management.Smo;
@@ -38,7 +37,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="availabilityGroupData">The availability group data</param>
         public AddDatabaseToExistingAvailabilityGroupTask(AvailabilityGroupData availabilityGroupData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AddDatabaseToExistingAvailabilityGroupText, availabilityGroupData.GroupName))
+            : base(Resource.FormatAddDatabaseToExistingAvailabilityGroupText(availabilityGroupData.GroupName))
         {
             if(availabilityGroupData == null)
             {

@@ -32,26 +32,11 @@
     <Compile Include="FailoverUtilities.cs" />
     <Compile Include="PrimaryDatabaseData.cs" />
     <Compile Include="ReplicaRole.cs" />
-    <Compile Include="Resource.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resource.resx</DependentUpon>
-    </Compile>
     <Compile Include="SortableBindingList.cs" />
     <Compile Include="UserSecurity.cs" />
     <EmbeddedResource Include="Resource.resx">
       <LogicalName>Microsoft.SqlServer.Management.HadrData.Resource.resources</LogicalName>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
+      <EmitFormatMethods>true</EmitFormatMethods>
     </EmbeddedResource>
   </ItemGroup>
-  <!--
-    Runs localization by default for a project which has strings to localize.
-    To suppress localization, /p:EnableLocalization=false should be passed in as a MSBuild argument.
-  -->
-  <PropertyGroup>
-    <EnableLocalization Condition="'$(EnableLocalization)' != ''">$(EnableLocalization)</EnableLocalization>
-    <EnableLocalization Condition="'$(EnableLocalization)' == ''">true</EnableLocalization>
-  </PropertyGroup>
 </Project>

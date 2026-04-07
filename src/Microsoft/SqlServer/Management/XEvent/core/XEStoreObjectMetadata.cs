@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -123,16 +123,16 @@ namespace Microsoft.SqlServer.Management.XEvent
                     // check if the package does not exist.
                     if (!this.store.Packages.Contains(pkgName))
                     {
-                        throw new XEventException(ExceptionTemplates.PackageNotExist(pkgName));
+                        throw new XEventException(ExceptionTemplates.FormatPackageNotExist(pkgName));
                     }
 
-                    throw new XEventException(ExceptionTemplates.ObjectNotExist(pkgName + "." + objName));
+                    throw new XEventException(ExceptionTemplates.FormatObjectNotExist(pkgName + "." + objName));
                 }
 
                 if (objs.Count > 1) 
                 {
                     // the object name is not unique
-                    throw new XEventException(ExceptionTemplates.ObjectNameNotUnique(pkgName + "." + objName));
+                    throw new XEventException(ExceptionTemplates.FormatObjectNameNotUnique(pkgName + "." + objName));
                 }
 
                 return objEnum.Current;
@@ -169,7 +169,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                 if (pkg == null)
                 {
                     throw new XEventException(
-                        ExceptionTemplates.PackageNotExist(string.Format(CultureInfo.InstalledUICulture, "[{0}].{1}", moduleID, pkgName)));
+                        ExceptionTemplates.FormatPackageNotExist(string.Format(CultureInfo.InstalledUICulture, "[{0}].{1}", moduleID, pkgName)));
                 }
 
                 T t = pkg.GetChildCollection<T>()[objName];
@@ -178,7 +178,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                 if (t == null)
                 {
                     throw new XEventException(
-                        ExceptionTemplates.ObjectNotExist(string.Format(CultureInfo.InstalledUICulture, "[{0}].{1}.{2}", moduleID, pkgName, objName)));
+                        ExceptionTemplates.FormatObjectNotExist(string.Format(CultureInfo.InstalledUICulture, "[{0}].{1}.{2}", moduleID, pkgName, objName)));
                 }
 
                 return t;

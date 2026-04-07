@@ -555,7 +555,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 catch (Exception ex)
                 {
                     traceContext.TraceCatch(ex);
-                    throw traceContext.TraceThrow(new PolicyEvaluationException(ExceptionTemplatesSR.PolicyEvaluationFailedOnDelegate(this.Name), ex));
+                    throw traceContext.TraceThrow(new PolicyEvaluationException(ExceptionTemplatesSR.FormatPolicyEvaluationFailedOnDelegate(this.Name), ex));
                 }
 
             }

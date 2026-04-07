@@ -9,26 +9,27 @@
     <ClsCompliant>true</ClsCompliant>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.RegisteredServers" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc.Tests" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc.UnitTests" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.DMFTestBase" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.DMFTests" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototypeTests" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.ManagementSDKTests.RegisterTestDomains" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(TestPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.TestShellTests.Manageability.PolicyBasedManagementTestBase" Key="$(RealPublicKey)"/>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.TestShellTests.Manageability.PolicyBasedManagementTests" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.RegisteredServers" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc.Tests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc.UnitTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.DMFTestBase" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.DMFTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.ManagementSDKTests.AcmePrototypeTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.ManagementSDKTests.RegisterTestDomains" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(TestPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.TestShellTests.Manageability.PolicyBasedManagementTestBase" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.TestShellTests.Manageability.PolicyBasedManagementTests" Key="$(RealPublicKey)" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="**\*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Enumerator\xml\Config.xml">
       <Link>xml\Config.xml</Link>
       <LogicalName>Config.xml</LogicalName>
     </EmbeddedResource>
-    <SqlStringResource Include="Differencing\StringDifferencing.strings" />
-    <SqlStringResource Include="SfcStrings.strings" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\Src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />

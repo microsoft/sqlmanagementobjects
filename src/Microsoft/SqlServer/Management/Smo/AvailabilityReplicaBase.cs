@@ -818,7 +818,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         && this.LoadBalancedReadOnlyRoutingList.Count != 0
                         ))
                 {
-                    throw new SmoException(ExceptionTemplatesImpl.CannotUpdateBothReadOnlyRoutingLists);
+                    throw new SmoException(ExceptionTemplates.CannotUpdateBothReadOnlyRoutingLists);
                 }
 
                 routingListTSQL = string.Equals(clientRoutingListTSQL, serverRoutingListTSQL, StringComparison.OrdinalIgnoreCase) ? clientLoadBalancedRoutingListTSQL : clientRoutingListTSQL;
@@ -1095,7 +1095,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return string.IsNullOrEmpty(replicaName);
             })))
             {
-                throw new InvalidArgumentException(ExceptionTemplatesImpl.ReadOnlyRoutingListContainsEmptyReplicaName);
+                throw new InvalidArgumentException(ExceptionTemplates.ReadOnlyRoutingListContainsEmptyReplicaName);
             }
 
             return readOnlyRoutingList == null ? string.Empty :

@@ -97,7 +97,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if ((index.GetPropValueOptional<IndexType>("IndexType").Value == IndexType.ClusteredIndex) != index.GetPropValueOptional<bool>("IsClustered"))
                     {
-                        throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingIndexProperties, "IsClustered", index.GetPropValueOptional<bool>("IsClustered").ToString(), "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
+                        throw new SmoException(ExceptionTemplates.FormatConflictingIndexProperties("IsClustered", index.GetPropValueOptional<bool>("IsClustered").ToString(), "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
                     }
                 }
             }
@@ -241,7 +241,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 //we need to validate this for other kind of indexes.
                 if (index.IsDesignMode && index.GetIsSystemNamed())
                 {
-                    throw new FailedOperationException(ExceptionTemplates.Script, this, null, ExceptionTemplates.PropertyNotSet("Name", typeof(Index).Name));
+                    throw new FailedOperationException(ExceptionTemplates.Script, this, null, ExceptionTemplates.FormatPropertyNotSet("Name", typeof(Index).Name));
                 }
             }
             #endregion
@@ -792,7 +792,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.NoObjectWithoutColumns("Index"));
+                    throw new SmoException(ExceptionTemplates.FormatNoObjectWithoutColumns("Index"));
                 }
 
                 sb.Append(columnsString.ToString());
@@ -1373,7 +1373,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             // the column does not exist, so we need to abort this scripting
                             ScriptSchemaObjectBase parentobj = index.Parent as TableViewTableTypeBase;
-                            throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(UrnSuffix, index.Name, parentobj.FullQualifiedName + ".[" + SqlStringBraket(col.Name) + "]"));
+                            throw new SmoException(ExceptionTemplates.FormatObjectRefsNonexCol(UrnSuffix, index.Name, parentobj.FullQualifiedName + ".[" + SqlStringBraket(col.Name) + "]"));
                         }
                     }
                     else
@@ -1509,7 +1509,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case IndexType.NonClusteredIndex:
                         return new NonClusteredRegularIndexScripter(index, sp);
                     default:
-                        throw new InvalidSmoOperationException(ExceptionTemplates.TableSqlDwIndexTypeRestrictions(index.InferredIndexType.ToString()));
+                        throw new InvalidSmoOperationException(ExceptionTemplates.FormatTableSqlDwIndexTypeRestrictions(index.InferredIndexType.ToString()));
                 }
             }
 
@@ -1833,7 +1833,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (!this.IsClustered.GetValueOrDefault(false))
                     {
-                        throw new InvalidSmoOperationException(ExceptionTemplates.UnexpectedIndexTypeDetected(index.InferredIndexType.ToString()));
+                        throw new InvalidSmoOperationException(ExceptionTemplates.FormatUnexpectedIndexTypeDetected(index.InferredIndexType.ToString()));
                     }
 
                     sb.Append(Globals.tab);
@@ -2145,7 +2145,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 base.Validate();
                 if (!string.IsNullOrEmpty(index.GetPropValueOptional("ParentXmlIndex", string.Empty)))
                 {
-                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingIndexProperties, "ParentXmlIndex", index.GetPropValueOptional("ParentXmlIndex").ToString(), "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatConflictingIndexProperties("ParentXmlIndex", index.GetPropValueOptional("ParentXmlIndex").ToString(), "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
                 }
             }
 
@@ -2174,7 +2174,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 base.Validate();
                 if (string.IsNullOrEmpty(index.GetPropValueOptional("ParentXmlIndex", string.Empty)))
                 {
-                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingIndexProperties, "ParentXmlIndex", string.Empty, "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatConflictingIndexProperties("ParentXmlIndex", string.Empty, "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
                 }
             }
 
@@ -2295,12 +2295,12 @@ namespace Microsoft.SqlServer.Management.Smo
                                 break;
                             case SpatialIndexType.GeometryAutoGrid:
                                 ThrowIfBelowVersion110(this.preferences.TargetServerVersion,
-                                    ExceptionTemplates.SpatialAutoGridDownlevel(this.index.FormatFullNameForScripting(this.preferences, true), GetSqlServerName(this.preferences)));
+                                    ExceptionTemplates.FormatSpatialAutoGridDownlevel(this.index.FormatFullNameForScripting(this.preferences, true), GetSqlServerName(this.preferences)));
                                 spatialGridType = " GEOMETRY_AUTO_GRID ";
                                 break;
                             case SpatialIndexType.GeographyAutoGrid:
                                 ThrowIfBelowVersion110(this.preferences.TargetServerVersion,
-                                    ExceptionTemplates.SpatialAutoGridDownlevel(this.index.FormatFullNameForScripting(this.preferences, true), GetSqlServerName(this.preferences)));
+                                    ExceptionTemplates.FormatSpatialAutoGridDownlevel(this.index.FormatFullNameForScripting(this.preferences, true), GetSqlServerName(this.preferences)));
                                 spatialGridType = " GEOGRAPHY_AUTO_GRID ";
                                 break;
                         }
@@ -2381,7 +2381,7 @@ namespace Microsoft.SqlServer.Management.Smo
                    || !level3.IsNull && (SpatialGeoLevelSize)level3.Value != SpatialGeoLevelSize.None
                    || !level4.IsNull && (SpatialGeoLevelSize)level4.Value != SpatialGeoLevelSize.None)
                     {
-                        throw new SmoException(ExceptionTemplates.NoAutoGridWithGrids(this.index.FormatFullNameForScripting(this.preferences, true)));
+                        throw new SmoException(ExceptionTemplates.FormatNoAutoGridWithGrids(this.index.FormatFullNameForScripting(this.preferences, true)));
                     }
                 }
 
@@ -3101,7 +3101,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // ParentXmlIndex is not supported for SXI
                 if (!string.IsNullOrEmpty(index.GetPropValueOptional("ParentXmlIndex", string.Empty)))
                 {
-                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingIndexProperties, "ParentXmlIndex", string.Empty, "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatConflictingIndexProperties("ParentXmlIndex", string.Empty, "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
                 }
 
                 this.CheckConstraintProperties();
@@ -3121,14 +3121,14 @@ namespace Microsoft.SqlServer.Management.Smo
                    {
                        if(defaultNameSpaceFound)
                        {
-                           throw new SmoException(string.Format(SmoApplication.DefaultCulture,ExceptionTemplates.MoreThenOneXmlDefaultNamespace,this.index.Name));
+                           throw new SmoException(ExceptionTemplates.FormatMoreThenOneXmlDefaultNamespace(this.index.Name));
                        }
                        defaultNameSpaceFound = true;
                    }
                 }
             }
             /// <summary>
-            /// Invalid options should go here. Also update ExceptionTemplates.strings
+            /// Invalid options should go here. Also update ExceptionTemplates.resx
             /// </summary>
             private void CheckInvalidOptions()
             {
@@ -3402,7 +3402,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // ParentXmlIndex is mandatory
                 if (string.IsNullOrEmpty(index.GetPropValueOptional("ParentXmlIndex", string.Empty)))
                 {
-                    throw new SmoException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.ConflictingIndexProperties, "ParentXmlIndex", string.Empty, "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatConflictingIndexProperties("ParentXmlIndex", string.Empty, "IndexType", index.GetPropValueOptional<IndexType>("IndexType").ToString()));
                 }
 
                 this.CheckConstraintProperties();
@@ -3416,7 +3416,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             /// <summary>
-            /// Invalid options should go here. Also update ExceptionTemplates.strings
+            /// Invalid options should go here. Also update ExceptionTemplates.resx
             /// </summary>
             private void CheckInvalidOptions()
             {

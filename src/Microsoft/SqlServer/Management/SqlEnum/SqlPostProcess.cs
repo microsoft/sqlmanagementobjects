@@ -44,7 +44,7 @@ namespace Microsoft.SqlServer.Management.Smo
             PostProcess instPostProcess = Util.CreateObjectInstance(m_assembly, m_className) as PostProcess;
             if( null == instPostProcess )
             {
-                throw new InternalEnumeratorException(StringSqlEnumerator.NotDerivedFrom(m_className, "PostProcess"));
+                throw new InternalEnumeratorException(StringSqlEnumerator.FormatNotDerivedFrom(m_className, "PostProcess"));
             }
             return instPostProcess;
         }

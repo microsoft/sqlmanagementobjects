@@ -512,7 +512,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (granteeNames.Length == 0)
             {
-                throw new SmoException(ExceptionTemplates.EmptyInputParam("granteeNames", "StringCollection"));
+                throw new SmoException(ExceptionTemplates.FormatEmptyInputParam("granteeNames", "StringCollection"));
             }
 
             sb.Append(" TO ");
@@ -758,7 +758,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             else
                             {
                                 //throw exception
-                                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(nameof(Column), column));
+                                throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist(nameof(Column), column));
                             }
                         }
                     }

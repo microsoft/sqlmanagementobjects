@@ -467,7 +467,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 "WINDOWS NEGOTIATE CERTIFICATE {0} ", MakeSqlBraket(certificate));
                         break;
                     default:
-                        throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(EndpointAuthenticationOrder).Name));
+                        throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(EndpointAuthenticationOrder).Name));
                 }
                 sb.Append(Globals.newline);
             }
@@ -495,7 +495,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append("DISABLED");
                         if (EndpointEncryptionAlgorithm.None != algorithm)
                         {
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
                         }
                         break;
                     case EndpointEncryption.Supported:
@@ -503,7 +503,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         algorithm = (EndpointEncryptionAlgorithm)GetPropValue("EndpointEncryptionAlgorithm");
                         if (EndpointEncryptionAlgorithm.None == algorithm)
                         {
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
                         }
                         break;
                     case EndpointEncryption.Required:
@@ -511,11 +511,11 @@ namespace Microsoft.SqlServer.Management.Smo
                         algorithm = (EndpointEncryptionAlgorithm)GetPropValue("EndpointEncryptionAlgorithm");
                         if (EndpointEncryptionAlgorithm.None == algorithm)
                         {
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
                         }
                         break;
                     default:
-                        throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(EndpointEncryption).Name));
+                        throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(EndpointEncryption).Name));
                 }
 
                 switch (algorithm)
@@ -535,7 +535,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append(" ALGORITHM RC4 AES");
                         break;
                     default:
-                        throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
+                        throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(EndpointEncryptionAlgorithm).Name));
                 }
             }
         }
@@ -817,7 +817,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case EndpointState.Stopped: stateStr = "STOPPED"; break;
                 case EndpointState.Disabled: stateStr = "DISABLED"; break;
                 default:
-                    throw new InternalSmoErrorException(ExceptionTemplates.UnknownEnumeration("EndpointState"));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatUnknownEnumeration("EndpointState"));
             }
        
             StringBuilder script = new StringBuilder();

@@ -539,7 +539,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (ScriptHeaderType.ScriptHeaderForCreateOrAlter == scriptHeaderType)
             {
                 throw new NotSupportedException(
-                    ExceptionTemplates.CreateOrAlterNotSupported(this.GetType().Name));
+                    ExceptionTemplates.FormatCreateOrAlterNotSupported(this.GetType().Name));
             }
             else
             {

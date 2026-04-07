@@ -35,7 +35,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 
             while (this.children.Contains(newName))
             {
-                newName = SRError.UniqueRegisteredNamePattern(i++, oldName);
+                newName = SRError.FormatUniqueRegisteredNamePattern(i++, oldName);
             }
             return newName;
         }

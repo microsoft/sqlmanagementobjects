@@ -447,7 +447,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             if (this.Facet != condition.Facet)
             {
-                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.ObjectSetAndConditionFacetMismatch(
+                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatObjectSetAndConditionFacetMismatch(
                     this.Name, this.Facet, condition.Name, condition.Facet)));
             }
 
@@ -1561,7 +1561,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             if (String.IsNullOrEmpty(domain))
             {
-                throw new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("domain"));
+                throw new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("domain"));
             }
 
             if (!String.IsNullOrEmpty(this.Facet))
@@ -1613,7 +1613,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             {
                 case TargetSet.typeName:
                     return this.TargetSets;
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
         #endregion

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
@@ -6,14 +6,11 @@
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="core\XsdResource.resx">
-      <LogicalName>Microsoft.SqlServer.Management.XEvent.XsdResource.resources</LogicalName>
-    </EmbeddedResource>
-    <SqlStringResource Include="core\ExceptionTemplates.strings" />
+    <EmbeddedResource Include="*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
     <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
-  </ItemGroup>  
+  </ItemGroup>
 </Project>

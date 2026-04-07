@@ -276,7 +276,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     isIdentifier = false;
                     break;
                 default:
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("DeviceType"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("DeviceType"));
             }
 
             return String.Format(SmoApplication.DefaultCulture, format,
@@ -292,7 +292,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // throw if version is less than SQL 11 PCU1
                 if (!IsBackupUrlDeviceSupported(targetVersion))
                 {
-                    throw new UnsupportedFeatureException(ExceptionTemplates.CredentialNotSupportedError(credentialName,
+                    throw new UnsupportedFeatureException(ExceptionTemplates.FormatCredentialNotSupportedError(credentialName,
                         targetVersion.ToString(),
                         BackupUrlDeviceSupportedServerVersion.ToString()));
                 }
@@ -645,7 +645,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         files.Append(bkMedia.MediaName + "; ");
                     }
 
-                    return ExceptionTemplates.BackupMediaSetNotComplete(files.ToString(0, files.Length - 2),
+                    return ExceptionTemplates.FormatBackupMediaSetNotComplete(files.ToString(0, files.Length - 2),
                         this.backupMediaSet.FamilyCount, this.missingFamilyNumber);
                 }
             }

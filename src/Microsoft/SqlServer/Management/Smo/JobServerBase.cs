@@ -463,7 +463,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
             try
             {
                 // This method is not supported on SQL Server 2008 and later
-                throw new UnsupportedVersionException(ExceptionTemplates.UnsupportedVersion(ServerVersion.ToString()));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatUnsupportedVersion(ServerVersion.ToString()));
             }
             catch(Exception e)
             {

@@ -197,7 +197,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     return this.PolicyCategories;
                 case ObjectSet.typeName:
                     return this.ObjectSets;
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
 
@@ -230,7 +230,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             }
             else
             {
-                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.UnsupportedConnectionType(connection.GetType().FullName)));
+                throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatUnsupportedConnectionType(connection.GetType().FullName)));
             }
         }
 
@@ -427,7 +427,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             if (null == args || args.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("args"));
+                throw new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("args"));
             }
 
             FacetInfoCollection facets = new FacetInfoCollection();
@@ -895,7 +895,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 case ConnectionEvaluationHistory.typeName: return new ConnectionEvaluationHistory.Key(urnFragment.FieldDictionary);
                 case EvaluationDetail.typeName: return new EvaluationDetail.Key(urnFragment.FieldDictionary);
             }
-            throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.UnsupportedKey(urnFragment.Name)));
+            throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatUnsupportedKey(urnFragment.Name)));
         }
 
         ISfcExecutionEngine ISfcDomain.GetExecutionEngine()
@@ -1133,7 +1133,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 SMO.SqlSmoObject smoTarget = Policy.GetOneTarget(this.SqlStoreConnection, target) as SMO.SqlSmoObject;
                 if (null == smoTarget)
                 {
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyOneTarget(target.ToString())));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyOneTarget(target.ToString())));
                 }
 
                 string lookupUrn = smoTarget.UrnOnlyId;
@@ -1316,7 +1316,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 if (target.ToString().Contains("PolicyHealthState"))
                 {
                     throw new ArgumentException("target",
-                        ExceptionTemplatesSR.UnsupportedTqeProp(target.ToString(), "PolicyHealthState"));
+                        ExceptionTemplatesSR.FormatUnsupportedTqeProp(target.ToString(), "PolicyHealthState"));
                 }
 
                 // special case for Server - enumerator's semantics do not
@@ -1560,7 +1560,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 DataTable dt = this.SmoObjectQuery.ExecuteDataTable(target, fields, null);
                 if (dt.Rows.Count == 0)
                 {
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyOneTarget(target.ToString())));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyOneTarget(target.ToString())));
                 }
                 PolicyCategorySubscription sub = new PolicyCategorySubscription(this, target, policyCategory);
                 sub.Create();
@@ -1634,7 +1634,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 {
                     if (targetObj != null)
                     {
-                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyOneTarget(target.ToString())));
+                        throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyOneTarget(target.ToString())));
                     }
                     targetObj = obj;
                 }
@@ -1642,7 +1642,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 // Must match at least one target
                 if (null == targetObj)
                 {
-                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyOneTarget(target.ToString())));
+                    throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyOneTarget(target.ToString())));
                 }
 
                 methodTraceContext.TraceParameterOut("returnVal", targetObj);
@@ -1939,15 +1939,15 @@ namespace Microsoft.SqlServer.Management.Dmf
                 }
                 if (String.IsNullOrEmpty(facetName))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("facetName")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("facetName")));
                 }
                 if (String.IsNullOrEmpty(policyName))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("policyName")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("policyName")));
                 }
                 if (String.IsNullOrEmpty(conditionName))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("conditionName")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("conditionName")));
                 }
 
                 object targetObj = GetTarget(target);
@@ -2008,15 +2008,15 @@ namespace Microsoft.SqlServer.Management.Dmf
                 }
                 if (String.IsNullOrEmpty(facetName))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("facetName")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("facetName")));
                 }
                 if (String.IsNullOrEmpty(policyName))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("policyName")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("policyName")));
                 }
                 if (String.IsNullOrEmpty(conditionName))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("conditionName")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("conditionName")));
                 }
                 if (writer == null)
                 {
@@ -2223,7 +2223,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     }
                     else
                     {
-                        throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.SinglePolicyExpected(
+                        throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatSinglePolicyExpected(
                                                                                          policy != null && policy.Name != null ? policy.Name : ExceptionTemplatesSR.UnknownPolicy,
                                                                                          p2 != null && p2.Name != null ? p2.Name : ExceptionTemplatesSR.UnknownPolicy)));
                     }
@@ -2240,7 +2240,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         if (string.Compare(deserializedObjectSet.Name, policy.ObjectSet, StringComparison.Ordinal) != 0)
                         {
                             // TODO: Change this to referenced objectset expected
-                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.ReferencedObjectExpected(ExceptionTemplatesSR.ObjectSet, deserializedObjectSet.Name)));
+                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatReferencedObjectExpected(ExceptionTemplatesSR.ObjectSet, deserializedObjectSet.Name)));
                         }
 
                         deserializedObjectSet.Parent = this;
@@ -2290,7 +2290,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         if (cond.Name != policy.Condition && cond.Name != policy.RootCondition
                             && !(null == referencedConditions || referencedConditions.Contains(cond.Name)))
                         {
-                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.ReferencedObjectExpected(ExceptionTemplatesSR.Condition, cond.Name)));
+                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatReferencedObjectExpected(ExceptionTemplatesSR.Condition, cond.Name)));
                         }
 
                         Condition existingCondition = Conditions[cond.IdentityKey];
@@ -2784,7 +2784,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                             {
                                 // if the input query expression is referring to 
                                 // more than one object this is considered an error
-                                throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyOneTarget(targetTreeRoot.ToString())));
+                                throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyOneTarget(targetTreeRoot.ToString())));
                             }
 
                             targetTreeRootUrn = obj.UrnOnlyId;
@@ -2839,7 +2839,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             if (this.SqlStoreConnection.ServerVersion < KilimanjaroVersion)
             {
-                throw new DmfException(ExceptionTemplatesSR.VersionNotSupported(this.SqlStoreConnection.ServerVersion.ToString(), KilimanjaroVersion.ToString()));
+                throw new DmfException(ExceptionTemplatesSR.FormatVersionNotSupported(this.SqlStoreConnection.ServerVersion.ToString(), KilimanjaroVersion.ToString()));
             }
 
             int objectId;
@@ -2885,7 +2885,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             }
             else
             {
-                throw new DmfException(ExceptionTemplatesSR.CannotMarkSystemObject(obj.GetType().Name));
+                throw new DmfException(ExceptionTemplatesSR.FormatCannotMarkSystemObject(obj.GetType().Name));
             }
 
             try
@@ -3627,7 +3627,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                                                         innerConn).ExecuteScalar());
                         if (memberCheck != 0)
                         {
-                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.OnlyRoleMember("PolicyAdministratorRole")));
+                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatOnlyRoleMember("PolicyAdministratorRole")));
                         }
 
                         PolicyStore ps = new PolicyStore(new SqlStoreConnection(innerConn));
@@ -3635,7 +3635,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         Policy p = ps.Policies[policy];
                         if (null == p)
                         {
-                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.MissingPolicy(policy)));
+                            throw methodTraceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatMissingPolicy(policy)));
                         }
 
                         if (p.HasScript)
@@ -3645,7 +3645,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                             // if we return failure we risk being in a DoS situation 
                             // where somebody creates rogue policies that reject
                             // all valid DDL
-                            SqlContext.Pipe.Send(ExceptionTemplatesSR.NoScriptInSqlClr(policy));
+                            SqlContext.Pipe.Send(ExceptionTemplatesSR.FormatNoScriptInSqlClr(policy));
                             methodTraceContext.TraceParameterOut("returnVal", 0);
                             return 0;
                         }
@@ -3680,7 +3680,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                                 command = command.TrimStart(new char[] { ' ' }).Substring(0, 147) + "...";
                             }
                             Condition c = ps.Conditions[p.Condition];
-                            SqlContext.Pipe.Send(ExceptionTemplatesSR.RollBack(policy, targetUri.ToString(), c.ExpressionNode.ToString(), p.Description, p.HelpText, p.HelpLink, command));
+                            SqlContext.Pipe.Send(ExceptionTemplatesSR.FormatRollBack(policy, targetUri.ToString(), c.ExpressionNode.ToString(), p.Description, p.HelpText, p.HelpLink, command));
                         }
                     }
                     catch (Exception e)
@@ -3970,7 +3970,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 {
                     // make sure that we have the object type
                     throw traceContext.TraceThrow(new BadEventDataException(
-                        ExceptionTemplatesSR.BadEventData(elementName, eventData.ToString())));
+                        ExceptionTemplatesSR.FormatBadEventData(elementName, eventData.ToString())));
                 }
 
                 methodTraceContext.TraceParameterOut("returnVal", elementValue);

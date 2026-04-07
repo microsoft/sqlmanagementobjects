@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
@@ -28,7 +27,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="availabilityGroupData">The availability group data</param>
         public AddReplicaTask(AvailabilityGroupData availabilityGroupData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AddReplicaText, availabilityGroupData.GroupName))
+            : base(Resource.FormatAddReplicaText(availabilityGroupData.GroupName))
         {
             if (availabilityGroupData == null)
             {
@@ -59,7 +58,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         protected override void Perform(IExecutionPolicy policy)
         {
             this.UpdateStatus(new TaskEventArgs(this.Name,
-                string.Format(Resource.CreatingAvailabilityGroup, this.availabilityGroupData.GroupName),
+                Resource.FormatCreatingAvailabilityGroup(this.availabilityGroupData.GroupName),
                 TaskEventStatus.Running));
 
             //Discover the AG

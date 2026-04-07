@@ -552,7 +552,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
                 if (OpenBracket)
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ParsingArgumentException(likePattern, ExceptionTemplatesSR.ParsingUnclosedBracketMsg)));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatParsingArgumentException(likePattern, ExceptionTemplatesSR.ParsingUnclosedBracketMsg)));
                 }
 
                 rxPattern.Append(cRxMatchAtTheEndIgnoreMultiline);

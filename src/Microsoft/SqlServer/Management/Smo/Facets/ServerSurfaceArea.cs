@@ -286,7 +286,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        throw new SmoException(ExceptionTemplates.UnknownEnumeration("EndpointState"));
+                        throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration("EndpointState"));
                     }
                 }
                 else if (desiredBrokerEndpointState != EndpointState.Stopped)

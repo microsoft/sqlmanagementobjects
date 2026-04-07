@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -17,7 +15,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="replicaName">The replica name</param>
         public InSufficientFreeSpaceForDatabaseFilesException(string replicaName)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.InSufficientFreeSpaceForDataFiles, replicaName))
+            : base(Resource.FormatInSufficientFreeSpaceForDataFiles(replicaName))
         {
         }
     }

@@ -110,7 +110,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             else
             {
-                throw new SfcNonSerializableTypeException(SfcStrings.SfcNonSerializableType(instance.GetType().Name));
+                throw new SfcNonSerializableTypeException(SfcStrings.FormatSfcNonSerializableType(instance.GetType().Name));
             }
         }
 
@@ -196,7 +196,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             catch (Exception e)
             {
-                throw new SfcSerializationException(SfcStrings.SfcInvalidSerializationInstance(instance.ToString()), e);
+                throw new SfcSerializationException(SfcStrings.FormatSfcInvalidSerializationInstance(instance.ToString()), e);
             }
         }
 
@@ -755,7 +755,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         {
                             //cannot use instance.ToString() for instance information since instance will most
                             //probably be null. So, using instanceUri in the exception message instead.
-                            throw new SfcSerializationException(SfcStrings.SfcInvalidDeserializationInstance(instanceUri), e);
+                            throw new SfcSerializationException(SfcStrings.FormatSfcInvalidDeserializationInstance(instanceUri), e);
                         }
                     }
                     else
@@ -975,7 +975,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             if (instance == null)
             {
                 throw new SfcSerializationException(
-                    SfcStrings.SfcInvalidSerializationInstance(instanceType.Name));
+                    SfcStrings.FormatSfcInvalidSerializationInstance(instanceType.Name));
             }
 
             //for non-sfc domain root (SMO), we force disconnect. Otherwise, because the default
@@ -1018,7 +1018,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         //property metadata for this property should exist, since that was used
                         //to serialize this property in the first place.
                         throw new SfcNonSerializablePropertyException(
-                                SfcStrings.SfcNonSerializableProperty(serializedRow.Name));
+                                SfcStrings.FormatSfcNonSerializableProperty(serializedRow.Name));
                     }
 
                     //adapter could be null if it wasn't specified. Rest of the code would detect this and use XmlSerializer
@@ -1034,7 +1034,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         if (propIndex < 0)
                         {
                             throw new SfcNonSerializablePropertyException(
-                            SfcStrings.SfcNonSerializableProperty(serializedRow.Name));
+                            SfcStrings.FormatSfcNonSerializableProperty(serializedRow.Name));
                         }
 
                         SfcProperty sfcProperty = sfcInstance.Properties[serializedRow.Name];
@@ -1071,7 +1071,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         catch (Exception e)
                         {
                             throw new SfcNonSerializablePropertyException(
-                            SfcStrings.SfcNonSerializableProperty(serializedRow.Name), e);
+                            SfcStrings.FormatSfcNonSerializableProperty(serializedRow.Name), e);
                         }
                     }
                 }
@@ -1156,7 +1156,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 }
                 else
                 {
-                    throw new SfcSerializationException(SfcStrings.SfcInvalidDeserializationMissingParent(instanceUri, parentUri));
+                    throw new SfcSerializationException(SfcStrings.FormatSfcInvalidDeserializationMissingParent(instanceUri, parentUri));
                 }
             }
         }

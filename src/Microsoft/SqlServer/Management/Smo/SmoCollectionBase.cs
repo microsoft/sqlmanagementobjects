@@ -102,7 +102,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (!key.IsNull)
                 {
-                    throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist(typeof(TObject).Name, key.ToString()));
+                    throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist(typeof(TObject).Name, key.ToString()));
                 }
                 else
                 {
@@ -120,7 +120,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 (needsValidation && (null != InitializeChildObject(key)))) &&
                 !AcceptDuplicateNames)
             {
-                throw new SmoException(ExceptionTemplates.CannotAddObject(typeof(TObject).ToString(), key.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatCannotAddObject(typeof(TObject).ToString(), key.ToString()));
             }
 
             // instantiate a new child object
@@ -420,7 +420,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // different collection
             if (obj.ParentColl != this)
             {
-                throw new FailedOperationException(ExceptionTemplates.WrongParent(obj.ToString()));
+                throw new FailedOperationException(ExceptionTemplates.FormatWrongParent(obj.ToString()));
             }
         }
 

@@ -184,7 +184,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new WrongPropertyValueException(ExceptionTemplates.InvalidSequenceValue(propertyName));
+                throw new WrongPropertyValueException(ExceptionTemplates.FormatInvalidSequenceValue(propertyName));
             }
         }
 
@@ -288,7 +288,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 SequenceCacheType cacheType = (SequenceCacheType)sequenceCacheType;
                 if (!Enum.IsDefined(typeof(SequenceCacheType), cacheType))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("SequenceCacheType"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("SequenceCacheType"));
                 }
                 switch ((SequenceCacheType)sequenceCacheType)
                 {
@@ -442,7 +442,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 SequenceCacheType sequenceCacheType = (SequenceCacheType)property.Value;
                 if (!Enum.IsDefined(typeof(SequenceCacheType), sequenceCacheType))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("SequenceCacheType"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("SequenceCacheType"));
                 }
                 switch (sequenceCacheType)
                 {

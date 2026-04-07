@@ -979,7 +979,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     SmoEventSource.Log.DataTypeScriptingError(columnData.DataType.ToString());
 
                     throw new InvalidSmoOperationException(
-                        ExceptionTemplates.DataScriptingUnsupportedDataTypeException(
+                        ExceptionTemplates.FormatDataScriptingUnsupportedDataTypeException(
                             this.tableName,
                             columnName,
                             columnData.DataType.ToString()));

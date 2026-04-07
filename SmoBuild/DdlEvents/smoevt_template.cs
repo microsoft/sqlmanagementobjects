@@ -2,7 +2,6 @@
 //		Copyright (c) Microsoft Corporation.
 //
 // @File:	smoevt.txt
-// @Owner: 	macies
 //
 // Description:
 //
@@ -151,7 +150,7 @@ namespace Microsoft.SqlServer.Management.Smo
 @@@ServerDdlTriggerEvent_string_mapping
 			}
 
-			throw new SmoException(ExceptionTemplates.UnknownEnumeration("ServerDdlTriggerEvent"));
+			throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration("ServerDdlTriggerEvent"));
 		}
 		internal enum ServerDdlTriggerEventValues
 		{
@@ -169,7 +168,7 @@ namespace Microsoft.SqlServer.Management.Smo
 @@@DatabaseDdlTriggerEvent_string_mapping
 			}
 
-			throw new SmoException(ExceptionTemplates.UnknownEnumeration("DatabaseDdlTriggerEvent"));
+			throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration("DatabaseDdlTriggerEvent"));
 		}
 		internal enum DatabaseDdlTriggerEventValues
 		{

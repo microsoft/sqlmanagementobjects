@@ -118,7 +118,7 @@ namespace Microsoft.SqlServer.Management.Common
 
         protected SqlOlapConnectionInfoBase()
         {
-            throw new InvalidOperationException(StringConnectionInfo.ClassDefaulConstructorCannotBeUsed("SqlOlapConnectionInfoBase"));
+            throw new InvalidOperationException(StringConnectionInfo.FormatClassDefaulConstructorCannotBeUsed("SqlOlapConnectionInfoBase"));
         }
 
         // need to know connection type: SQL, OLAP

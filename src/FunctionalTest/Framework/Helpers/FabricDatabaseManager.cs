@@ -107,17 +107,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 
             // Make sure we are logged in to Fabric CLI
             EnsureFabricCliLogin();
-            bool created = false;
+            var created = false;
             try
             {
-                string resourceTypeString = GetResourceTypeString(resourceType);
+                var resourceTypeString = GetResourceTypeString(resourceType);
                 Trace.TraceInformation($"Creating fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}' using fabric-cli.");
                 var resourcePath = GetResourcePath(workspaceName, resourceName, resourceType);
-                string output = ExecuteFabricCliCommand($"create {resourcePath}");
+                var output = ExecuteFabricCliCommand($"create {resourcePath}");
                 created = true;
                 Trace.TraceInformation($"Fabric {resourceTypeString.ToLowerInvariant()} created: {output}");
                 // Get the connection string for the newly created resource
-                string connectionString = ExecuteFabricCliCommand($"get {resourcePath} -q properties.connectionString -f")+DefaultAuthMethod;
+                var connectionString = ExecuteFabricCliCommand($"get {resourcePath} -q properties.connectionString -f")+DefaultAuthMethod;
+                System.Threading.Thread.Sleep(15000); // Sleep for 15 seconds to allow the resource to be fully provisioned and ready for connections
                 return connectionString;
             }
             catch (Exception ex)
@@ -164,7 +165,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 
             try
             {
-                string resourceTypeString = GetResourceTypeString(resourceType);
+                var resourceTypeString = GetResourceTypeString(resourceType);
                 Trace.TraceInformation($"Dropping fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}' using fabric-cli.");
                 var resourcePath = GetResourcePath(workspaceName, resourceName, resourceType);
                 ExecuteFabricCliCommand($"rm {resourcePath} -f");
@@ -172,7 +173,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             }
             catch (Exception ex)
             {
-                string resourceTypeString = GetResourceTypeString(resourceType);
+                var resourceTypeString = GetResourceTypeString(resourceType);
                 Trace.TraceError($"Failed to drop fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}': {ex.Message}");
                 throw new InvalidOperationException($"Error dropping fabric {resourceTypeString.ToLowerInvariant()} '{resourceName}'", ex);
             }
@@ -223,7 +224,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// </summary>
         private string ExecuteFabricCliCommand(string arguments, bool interactiveInputNeeded = false)
         {
-            string output = string.Empty;
+            var output = string.Empty;
             var error = string.Empty;
             
             var processStartInfo = new ProcessStartInfo
@@ -274,7 +275,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <returns>The formatted resource path.</returns>
         private string GetResourcePath(string workspaceName, string resourceName, FabricDatabaseType resourceType)
         {
-            string resourceTypeString = GetResourceTypeString(resourceType);
+            var resourceTypeString = GetResourceTypeString(resourceType);
             return $"/{workspaceName}.Workspace/{resourceName}.{resourceTypeString}";
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -187,7 +187,7 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             if (this.SecurityPredicates.Count == 0)
             {
-                throw new InvalidOperationException(ExceptionTemplates.SecurityPolicyNoPredicates(this.FullQualifiedName));
+                throw new InvalidOperationException(ExceptionTemplates.FormatSecurityPolicyNoPredicates(this.FullQualifiedName));
             }
 
             base.CreateImpl();

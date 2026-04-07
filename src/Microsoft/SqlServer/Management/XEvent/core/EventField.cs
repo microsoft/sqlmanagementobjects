@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -52,7 +52,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                 if (parent.Name != columnFullName)
                 {
                     tm.TraceError("Parameter eventColumnInfo can't be used with parameter parent.");
-                    throw new XEventException(ExceptionTemplates.InvalidParameter("eventColumnInfo"));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter("eventColumnInfo"));
                 }
                 this.Parent = parent;
                 this.Name = eventColumnInfo.Name;
@@ -106,7 +106,7 @@ namespace Microsoft.SqlServer.Management.XEvent
         protected override ISfcCollection GetChildCollection(string elementType)
         {
             TraceHelper.TraceContext.TraceError("No such collection for type {0}", elementType);
-            throw new XEventException(ExceptionTemplates.NoSuchCollection(elementType));
+            throw new XEventException(ExceptionTemplates.FormatNoSuchCollection(elementType));
         }
 
 
@@ -484,7 +484,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                             return false;
                         default:
                             tm.TraceError("Unknown depAction.");
-                            throw new XEventException(ExceptionTemplates.InvalidParameter("depAction"));
+                            throw new XEventException(ExceptionTemplates.FormatInvalidParameter("depAction"));
                     }
                 }
             }

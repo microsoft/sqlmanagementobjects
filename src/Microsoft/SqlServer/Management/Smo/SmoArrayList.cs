@@ -86,7 +86,7 @@ namespace Microsoft.SqlServer.Management.Smo
             var pos = InternalStorage.LookUp(insertAtKey);
             if (-1 == pos)
             {
-                throw new SmoException(ExceptionTemplates.ColumnBeforeNotExisting(insertAtKey.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatColumnBeforeNotExisting(insertAtKey.ToString()));
             }
 
             AddImpl(obj, pos);
@@ -108,7 +108,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     if (-1 != pos)
                     {
-                        throw new SmoException(ExceptionTemplates.CannotAddObject(typeof(TObject).Name, obj.ToString()));
+                        throw new SmoException(ExceptionTemplates.FormatCannotAddObject(typeof(TObject).Name, obj.ToString()));
                     }
                 }
 
@@ -190,7 +190,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else
             {
-                throw new InternalSmoErrorException(ExceptionTemplates.CouldNotFindKey(key.ToString()));
+                throw new InternalSmoErrorException(ExceptionTemplates.FormatCouldNotFindKey(key.ToString()));
             }
         }
 

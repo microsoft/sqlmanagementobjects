@@ -303,7 +303,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     // if we make it here, we didn't pass the switch statement and need to throw
                     throw new UnsupportedVersionException(
-                                ExceptionTemplates.InvalidPropertyValueForVersion(
+                                ExceptionTemplates.FormatInvalidPropertyValueForVersion(
                                 this.GetType().Name,
                                 "CompatibilityLevel",
                                 value.ToString(),
@@ -842,7 +842,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (azureEdition == null || slo == null)
                     {
-                        throw new ArgumentException(ExceptionTemplatesImpl.SqlDwCreateRequiredParameterMissing);
+                        throw new ArgumentException(ExceptionTemplates.SqlDwCreateRequiredParameterMissing);
                     }
                 }
 
@@ -1352,7 +1352,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         if (null == l)
                         {
                             throw new SmoException(ExceptionTemplates.InnerException,
-                                                   new ArgumentException(ExceptionTemplates.InvalidLogin(loginName)));
+                                                   new ArgumentException(ExceptionTemplates.FormatInvalidLogin(loginName)));
                         }
 
                         //Find the user that maps to our target login - if one exists. Script
@@ -1647,7 +1647,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 // only allowed values that make sense to set MirroringSafetyLevel
                                 // to are Full and Off.  if they set it to any others, we should
                                 // warn the caller by throwing rather than hiding the error.
-                                throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(mirroringSafetyLevel.ToString()));
+                                throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration(mirroringSafetyLevel.ToString()));
                         }
 
                         if (null != sMirroringSafetyLevel)
@@ -4229,7 +4229,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
                     case ShrinkMethod.EmptyFile:
                         // throw invalid parameter
-                        throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.InvalidShrinkMethod(ShrinkMethod.EmptyFile.ToString())));
+                        throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.FormatInvalidShrinkMethod(ShrinkMethod.EmptyFile.ToString())));
                     default:
                         throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.UnknownShrinkType));
                 }
@@ -4438,7 +4438,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.InvalidType(objectType.FullName));
+                    throw new SmoException(ExceptionTemplates.FormatInvalidType(objectType.FullName));
                 }
             }
             catch (Exception e)
@@ -5237,7 +5237,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (catalog.Length == 0)
                 {
-                    throw new ArgumentException(ExceptionTemplates.EmptyInputParam("catalog", "string"));
+                    throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("catalog", "string"));
                 }
 
                 StringCollection queries = new StringCollection();
@@ -5278,7 +5278,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (fileGroupName.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplates.EmptyInputParam("fileGroupName", "string"));
+                throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("fileGroupName", "string"));
             }
 
             try
@@ -5324,7 +5324,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (fileGroupName.Length == 0)
             {
-                throw new ArgumentException(ExceptionTemplates.EmptyInputParam("fileGroupName", "string"));
+                throw new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("fileGroupName", "string"));
             }
 
             try
@@ -5425,7 +5425,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (this.Name == "tempdb")
                 {
-                    throw new FailedOperationException(ExceptionTemplates.FailedOperationExceptionText3("UpdateIndexStatistics", ExceptionTemplates.Database, "tempdb", ExceptionTemplates.FailedOperationMessageNotSupportedTempdb));
+                    throw new FailedOperationException(ExceptionTemplates.FormatFailedOperationExceptionText3("UpdateIndexStatistics", ExceptionTemplates.Database, "tempdb", ExceptionTemplates.FailedOperationMessageNotSupportedTempdb));
                 }
 
                 CheckObjectState();
@@ -6158,7 +6158,7 @@ SortedList list = new SortedList();
                             recoveryModelStr = "BULK_LOGGED";
                             break;
                         default:
-                            throw new SmoException(ExceptionTemplates.UnknownRecoveryModel(recoveryModel.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownRecoveryModel(recoveryModel.ToString()));
                     }
 
 

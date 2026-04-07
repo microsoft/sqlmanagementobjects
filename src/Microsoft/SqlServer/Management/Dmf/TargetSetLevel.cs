@@ -131,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                     case SfcDependencyAction.Drop:
                         return true;
                     default:
-                        throw new DmfException(ExceptionTemplatesSR.UnsupportedCrudDependencyAction(depAction.ToString()));
+                        throw new DmfException(ExceptionTemplatesSR.FormatUnsupportedCrudDependencyAction(depAction.ToString()));
                 }
             }
         }
@@ -503,7 +503,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             switch (elementType)
             {
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
         #endregion PROPERTIES

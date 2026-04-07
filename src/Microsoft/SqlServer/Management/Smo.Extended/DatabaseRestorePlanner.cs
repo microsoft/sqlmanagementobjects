@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.SmoExtended;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -278,7 +279,7 @@ namespace Microsoft.SqlServer.Management.Smo
             plan.RestoreAction = RestoreActionType.Database;
             if (this.DatabaseName == null)
             {
-                throw new SmoException(ExceptionTemplates.PropertyNotSetExceptionText("DatabaseName"));
+                throw new SmoException(ExceptionTemplates.FormatPropertyNotSetExceptionText("DatabaseName"));
             }
             plan.DatabaseName = this.DatabaseName;
             //Get the backupsets for that database.

@@ -182,7 +182,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             get 
             {
-                return SfcStrings.PropertyNotSet(propertyName);
+                return SfcStrings.FormatPropertyNotSet(propertyName);
             }
         }
         
@@ -215,7 +215,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         }
 
         public SfcInvalidKeyException(string keyName, Exception innerException)
-            : base(SfcStrings.InvalidKey(keyName), innerException)
+            : base(SfcStrings.FormatInvalidKey(keyName), innerException)
         {
             this.keyName = keyName;
         }
@@ -246,7 +246,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             get
             {
-                return SfcStrings.InvalidKey(keyName);
+                return SfcStrings.FormatInvalidKey(keyName);
             }
         }
     }
@@ -379,7 +379,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         }
 
         public SfcObjectInitializationException(string keyName, Exception innerException)
-            : base(SfcStrings.SfcObjectInitFailed(keyName), innerException)
+            : base(SfcStrings.FormatSfcObjectInitFailed(keyName), innerException)
         {
             this.objName = keyName;
         }
@@ -408,7 +408,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             get
             {
-                return SfcStrings.SfcObjectInitFailed(objName);
+                return SfcStrings.FormatSfcObjectInitFailed(objName);
             }
         }
     }
@@ -980,7 +980,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         }
 
         public SfcInvalidConnectionContextModeChangeException(string fromMode, string toMode, Exception innerException)
-            : this(SfcStrings.SfcInvalidConnectionContextModeChange(fromMode, toMode), innerException)
+            : this(SfcStrings.FormatSfcInvalidConnectionContextModeChange(fromMode, toMode), innerException)
         {
             this.fromMode = fromMode;
             this.toMode = toMode;
@@ -1024,7 +1024,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             get
             {
-                return SfcStrings.SfcInvalidConnectionContextModeChange(fromMode, toMode);
+                return SfcStrings.FormatSfcInvalidConnectionContextModeChange(fromMode, toMode);
             }
         }
     }

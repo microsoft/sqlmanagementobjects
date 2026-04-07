@@ -59,7 +59,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 			CheckObjectState();
 			if ( State != SqlSmoState.Creating )
 			{
-				throw new SmoException(ExceptionTemplates.ObjectAlreadyExists(UrnSuffix, this.Name));
+				throw new SmoException(ExceptionTemplates.FormatObjectAlreadyExists(UrnSuffix, this.Name));
 			}
 			
 			ManagementClass mcls = new ManagementClass( GetManagedComputer().ManagementScope,

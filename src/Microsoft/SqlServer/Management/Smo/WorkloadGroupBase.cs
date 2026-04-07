@@ -533,7 +533,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (workloadGroup == null)
             {
-                throw new SmoException(ExceptionTemplates.CouldNotFindManagementObject("WorkloadGroup", groupName));
+                throw new SmoException(ExceptionTemplates.FormatCouldNotFindManagementObject("WorkloadGroup", groupName));
             }
             return workloadGroup;
         }

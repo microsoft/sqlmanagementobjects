@@ -14,6 +14,8 @@ namespace Microsoft.SqlServer.Management.Common
     using System.Reflection;
     using System.Security;
     using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Threading.Tasks;
 #if MICROSOFTDATA
     using Microsoft.Data.SqlClient;
 #else
@@ -1527,7 +1529,309 @@ namespace Microsoft.SqlServer.Management.Common
                 PoolDisconnect();
             }
         }
+        #region Async Methods
 
+        /// <summary>
+        /// Executes a T-SQL statement asynchronously.
+        /// The command terminator ('GO') is recognized by ExecuteNonQueryAsync.
+        /// Batches will be sent and executed individually.
+        /// The statement is recorded and not executed if CaptureMode has been set to true.
+        /// An int value is returned that contains the number of rows affected.
+        /// If multiple batches are executed, the total number of affected rows of all batches is returned.
+        /// The Connect() method will be called if the connection with the server is not open.
+        /// </summary>
+        /// <param name="sqlCommand">The T-SQL command to execute</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing the number of rows affected</returns>
+        public async Task<int> ExecuteNonQueryAsync(string sqlCommand, CancellationToken cancellationToken = default)
+        {
+            CheckDisconnected();
+
+            int statementsToReverse = 0;
+            int statementsExecuted = 0;
+            StringCollection col = GetStatements(sqlCommand, ExecutionTypes.Default, ref statementsToReverse);
+            if (!IsDirectExecutionMode())
+            {
+                foreach (string query in col)
+                {
+                    CaptureCommand(query);
+                }
+                return 0; //empty result
+            }
+
+            PoolConnect();
+            try
+            {
+                int nAffectedRows = 0;
+                foreach (string query in col)
+                {
+                    try
+                    {
+                        SqlCommand cmd = GetSqlCommand(query);
+
+                        // Certain internal commands as well as redundant USE stmts
+                        // have their CommandText blanked
+                        // Signals to us not to really execute anything
+                        if (!string.IsNullOrEmpty(cmd.CommandText))
+                        {
+                            CaptureCommand(query);
+                            nAffectedRows += (int)await ExecuteTSqlAsync(ExecuteTSqlAction.ExecuteNonQuery, cmd, true, cancellationToken).ConfigureAwait(false);
+                            statementsExecuted++;
+                        }
+                    }
+                    catch (SqlException e)
+                    {
+                        RefreshTransactionDepth(e.Class);
+                        if (statementsExecuted > 0 && e.Class <= 20) //not a connection problem
+                        {
+                            //reverse sets
+                            int mustReversNo = statementsToReverse < statementsExecuted ? statementsToReverse : statementsExecuted;
+                            for (int i = col.Count - mustReversNo; i < col.Count; i++)
+                            {
+                                await ExecuteNonQueryAsync(col[i], cancellationToken).ConfigureAwait(false);
+                            }
+                        }
+                        throw new ExecutionFailureException(StringConnectionInfo.ExecutionFailure, e);
+                    }
+                }
+                return nAffectedRows;
+            }
+            finally
+            {
+                PoolDisconnect();
+            }
+        }
+
+        /// <summary>
+        /// Executes T-SQL statements asynchronously from a collection of commands.
+        /// The command terminator ('GO') is recognized by ExecuteNonQueryAsync.
+        /// Batches separated with the GO statement will be sent and executed individually.
+        /// The statement is recorded and not executed if CaptureMode has been set to true.
+        /// Commands are executed sequentially. If cancellation is requested mid-batch,
+        /// the currently executing command is cancelled and remaining commands are not executed.
+        /// The Connect() method will be called if the connection with the server is not open.
+        /// </summary>
+        /// <param name="sqlCommands">Collection of SQL commands to execute</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing the number of rows affected by each command</returns>
+        public async Task<int> ExecuteNonQueryAsync(IEnumerable<string> sqlCommands, CancellationToken cancellationToken = default)
+        {
+            CheckDisconnected();
+
+            AutoDisconnectMode adm = this.AutoDisconnectMode;
+            this.AutoDisconnectMode = AutoDisconnectMode.NoAutoDisconnect;
+            try
+            {
+                int totalAffected = 0;
+                foreach (String query in sqlCommands)
+                {
+                    totalAffected += await ExecuteNonQueryAsync(query, cancellationToken).ConfigureAwait(false);
+                }
+                return totalAffected;
+            }
+            finally
+            {
+                this.AutoDisconnectMode = adm;
+                this.PoolDisconnect();
+            }
+        }
+
+        /// <summary>
+        /// Executes T-SQL statements asynchronously.
+        /// A SqlDataReader object is returned that can be used to read the stream of
+        /// rows that are returned by SQL Server.
+        /// The Connect() method will be called if the connection with the server is not open.
+        /// It doesn't automatically disconnect - caller is responsible for disposing the reader.
+        /// </summary>
+        /// <param name="sqlCommand">The SQL command text</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing the data reader</returns>
+        public async Task<SqlDataReader> ExecuteReaderAsync(string sqlCommand, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(sqlCommand))
+            {
+                return null;
+            }
+
+            SqlCommand command = GetSqlCommand(sqlCommand);
+            if (command == null || string.IsNullOrEmpty(command.CommandText))
+            {
+                return null;
+            }
+
+            CheckDisconnected();
+
+            CaptureCommand(command.CommandText);
+            if (!IsDirectExecutionMode())
+            {
+                return null;
+            }
+            
+            PoolConnect();
+            try
+            {
+                return await ExecuteTSqlAsync(ExecuteTSqlAction.ExecuteReader, command, true, cancellationToken).ConfigureAwait(false) as SqlDataReader;
+            }
+            catch (SqlException e)
+            {
+                RefreshTransactionDepth(e.Class);
+                throw new ExecutionFailureException(StringConnectionInfo.ExecutionFailure, e);
+            }
+            //no auto disconnect - reader must be disposed by caller
+        }
+
+        /// <summary>
+        /// Executes the T-SQL statements asynchronously in sqlCommand.
+        /// A DataTable is returned that contains the results.
+        /// The Connect() method will be called if the connection with the server is not open.
+        /// </summary>
+        /// <param name="sqlCommand">The SQL command</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing a DataTable with the results</returns>
+        public async Task<DataTable> ExecuteWithResultsAsync(string sqlCommand, CancellationToken cancellationToken = default)
+        {
+            CheckDisconnected();
+
+            CaptureCommand(sqlCommand);
+            if (!IsDirectExecutionMode())
+            {
+                return new DataTable { Locale = System.Globalization.CultureInfo.InvariantCulture };
+            }
+            
+            PoolConnect();
+            try
+            {
+                SqlCommand cmd = GetSqlCommand(sqlCommand);
+
+                // Due to deferred USEs, CommandText may be blank
+                if (!string.IsNullOrEmpty(cmd.CommandText))
+                {
+                    return await ExecuteTSqlAsync(ExecuteTSqlAction.FillDataTable, cmd, true, cancellationToken).ConfigureAwait(false) as DataTable;
+                }
+                return new DataTable { Locale = System.Globalization.CultureInfo.InvariantCulture };
+            }
+            catch (SqlException e)
+            {
+                RefreshTransactionDepth(e.Class);
+                throw new ExecutionFailureException(StringConnectionInfo.ExecutionFailure, e);
+            }
+            finally
+            {
+                PoolDisconnect();
+            }
+        }
+
+        /// <summary>
+        /// Executes the T-SQL statements asynchronously from a collection of commands.
+        /// A DataTable is returned that contains the combined results.
+        /// The Connect() method will be called if the connection with the server is not open.
+        /// Commands are executed sequentially. If cancellation is requested mid-batch,
+        /// the currently executing command is cancelled and remaining commands are not executed.
+        /// </summary>
+        /// <param name="sqlCommands">Collection of SQL commands to execute</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing a DataTable with the combined results</returns>
+        public async Task<DataTable> ExecuteWithResultsAsync(IEnumerable<string> sqlCommands, CancellationToken cancellationToken = default)
+        {
+            AutoDisconnectMode adm = this.AutoDisconnectMode;
+            this.AutoDisconnectMode = AutoDisconnectMode.NoAutoDisconnect;
+            try
+            {
+                DataTable combinedTable = null;
+                foreach (String query in sqlCommands)
+                {
+                    var result = await ExecuteWithResultsAsync(query, cancellationToken).ConfigureAwait(false);
+                    if (combinedTable == null)
+                    {
+                        combinedTable = result;
+                    }
+                    else if (result != null && result.Rows.Count > 0)
+                    {
+                        // Merge results
+                        combinedTable.Merge(result);
+                    }
+                }
+                return combinedTable ?? new DataTable { Locale = System.Globalization.CultureInfo.InvariantCulture };
+            }
+            finally
+            {
+                this.AutoDisconnectMode = adm;
+                this.PoolDisconnect();
+            }
+        }
+
+        /// <summary>
+        /// Executes a T-SQL statement asynchronously.
+        /// An object is returned that contains the first column of the first row of
+        /// the result set.
+        /// The Connect() method will be called if the connection with the server is not open.
+        /// </summary>
+        /// <param name="sqlCommand">The SQL command</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing the scalar result</returns>
+        public async Task<object> ExecuteScalarAsync(string sqlCommand, CancellationToken cancellationToken = default)
+        {
+            CheckDisconnected();
+
+            CaptureCommand(sqlCommand);
+            if (!IsDirectExecutionMode())
+            {
+                return null;
+            }
+            
+            PoolConnect();
+            try
+            {
+                object result = null;
+                SqlCommand cmd = GetSqlCommand(sqlCommand);
+                if (!string.IsNullOrEmpty(cmd.CommandText))
+                {
+                    if (cachedQueries)
+                    {
+                        // Make sure we create an entry for cache, if GetSqlCommand does not already do it
+                        SqlBatch item;
+                        if (!m_CommandCache.ContainsKey(cmd.CommandText))
+                        {
+                            item = new SqlBatch(cmd);
+                            m_CommandCache.Add(item);
+                        }
+                        else
+                        {
+                            item = (SqlBatch)m_CommandCache[cmd.CommandText];
+                        }
+
+                        // Set result to cached value, or update the cache
+                        if (!item.HasResult())
+                        {
+                            result = await ExecuteTSqlAsync(ExecuteTSqlAction.ExecuteScalar, cmd, true, cancellationToken).ConfigureAwait(false);
+                            // Add to cache
+                            item.Result = result;
+                        }
+                        else
+                        {
+                            result = item.Result;
+                        }
+                    }
+                    else // !cachedQueries
+                    {
+                        result = await ExecuteTSqlAsync(ExecuteTSqlAction.ExecuteScalar, cmd, true, cancellationToken).ConfigureAwait(false);
+                    }
+                }
+
+                return result;
+            }
+            catch (SqlException e)
+            {
+                RefreshTransactionDepth(e.Class);
+                throw new ExecutionFailureException(StringConnectionInfo.ExecutionFailure, e);
+            }
+            finally
+            {
+                PoolDisconnect();
+            }
+        }
+
+        #endregion
         /// <summary>
         /// Starts a new transaction. If CaptureMode is true, the transaction statement
         /// will be added to the capture buffer.It is possible to nest transactions.

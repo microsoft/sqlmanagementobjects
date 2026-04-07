@@ -959,7 +959,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (this.LoginType != LoginType.SqlLogin && this.LoginType != LoginType.ExternalUser && this.LoginType != LoginType.ExternalGroup)
             {
-                throw new UnsupportedVersionException(ExceptionTemplates.InvalidPropertyValueForVersion(this.GetType().Name, "LoginType", this.LoginType.ToString(), LocalizableResources.EngineCloud));
+                throw new UnsupportedVersionException(ExceptionTemplates.FormatInvalidPropertyValueForVersion(this.GetType().Name, "LoginType", this.LoginType.ToString(), LocalizableResources.EngineCloud));
             }
 
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
@@ -1165,7 +1165,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new UnsupportedVersionException(ExceptionTemplates.UnknownEnumeration(this.LoginType.GetType().Name));
+                    throw new UnsupportedVersionException(ExceptionTemplates.FormatUnknownEnumeration(this.LoginType.GetType().Name));
                 }
             }
 
@@ -1731,7 +1731,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        throw new SmoException(ExceptionTemplates.CannotAddObject("Credential", credentialName));
+                        throw new SmoException(ExceptionTemplates.FormatCannotAddObject("Credential", credentialName));
                     }
                 }
                 else
@@ -1769,7 +1769,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist("Credential", credentialName));
+                        throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist("Credential", credentialName));
                     }
                 }
                 else

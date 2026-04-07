@@ -5,20 +5,10 @@
     <RootNamespace>Microsoft.SqlServer.Management.Dmf</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="Microsoft.SqlServer.DmfSqlClrWrapper" Key="$(RealPublicKey)"/>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.DmfSqlClrWrapper" Key="$(RealPublicKey)" />
   </ItemGroup>
   <ItemGroup Label="string resources">
-    <SqlStringResource Include="ExceptionTemplates.strings" >
-      <outresxfilename>ExceptionTemplatesSR</outresxfilename>
-      <outcodefilename>ExceptionTemplatesSR</outcodefilename>
-      <outclassname>ExceptionTemplatesSR</outclassname>
-    </SqlStringResource>
-    <SqlStringResource Include="FacetProperties.strings" >
-      <outresxfilename>FacetPropertiesSR</outresxfilename>
-      <outcodefilename>FacetPropertiesSR</outcodefilename>
-      <outclassname>FacetPropertiesSR</outclassname>
-    </SqlStringResource>
-    <SqlStringResource Include="LocalizableResources.strings" />
+    <EmbeddedResource Update="*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
@@ -29,6 +19,6 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
-    <PackageReference Include="System.Security.Permissions"/>
+    <PackageReference Include="System.Security.Permissions" />
   </ItemGroup>
 </Project>

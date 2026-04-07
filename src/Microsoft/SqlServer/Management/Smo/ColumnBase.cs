@@ -858,7 +858,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     && (bool)Properties["Computed"].Value
                     && this.IsForeignKey)
                 {
-                    throw new SmoException(ExceptionTemplates.ComputedColumnDownlevelContraint(FormatFullNameForScripting(sp, true), GetSqlServerName(sp)));
+                    throw new SmoException(ExceptionTemplates.FormatComputedColumnDownlevelContraint(FormatFullNameForScripting(sp, true), GetSqlServerName(sp)));
                 }
             }
         }
@@ -924,7 +924,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (!isSupported)
                 {
                     // parent can be table, view, udf
-                    throw new SmoException(ExceptionTemplates.UnsupportedColumnTypeOnEngineType(((NamedSmoObject)this.Parent).Name, ((NamedSmoObject)this).Name, sqlDataType.ToString(), GetDatabaseEngineName(options)));
+                    throw new SmoException(ExceptionTemplates.FormatUnsupportedColumnTypeOnEngineType(((NamedSmoObject)this.Parent).Name, ((NamedSmoObject)this).Name, sqlDataType.ToString(), GetDatabaseEngineName(options)));
                 }
             }
         }
@@ -1543,7 +1543,7 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             if (null != name && name.Length != 0 && dcb.Name != name)
             {
-                throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.ColumnHasNoDefault(this.Name, name)));
+                throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.FormatColumnHasNoDefault(this.Name, name)));
             }
             return dcb;
         }
@@ -1719,7 +1719,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 CheckObjectState();
                 if (null != this.DefaultConstraint)
                 {
-                    throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.ColumnAlreadyHasDefault(this.Name)));
+                    throw new SmoException(ExceptionTemplates.InnerException, new ArgumentException(ExceptionTemplates.FormatColumnAlreadyHasDefault(this.Name)));
                 }
 
                 if (null == name)

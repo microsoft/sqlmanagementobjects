@@ -109,7 +109,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 if (0 != String.CompareOrdinal (this.RootLevel, ts.RootLevel))
                 {
                     // An illegal Target Set has been defined in the current list of target sets
-                    Exception ex = new DmfException(ExceptionTemplatesSR.InvalidUrnSkeleton(ts.TargetTypeSkeleton));
+                    Exception ex = new DmfException(ExceptionTemplatesSR.FormatInvalidUrnSkeleton(ts.TargetTypeSkeleton));
                     if (throwOnFirst)
                     {
                         throw new ObjectValidationException(this.GetType().Name, this.Name, ex);
@@ -179,7 +179,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                             }
                             if (!c.IsEnumerable)
                             {
-                                Exception ex = new DmfException(ExceptionTemplatesSR.ConditionCannotBeUsedForFiltering(tsl.Condition));
+                                Exception ex = new DmfException(ExceptionTemplatesSR.FormatConditionCannotBeUsedForFiltering(tsl.Condition));
                                 if (throwOnFirst)
                                 {
                                     throw methodTraceContext.TraceThrow(new ObjectValidationException(this.GetType().Name, this.Name, ex));

@@ -77,7 +77,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupData">Availability Group Data</param>
         /// <param name="replica">Information about the replica</param>
         public JoinDatabaseToAvailabilityGroupTask(string databaseName, AvailabilityGroupData availabilityGroupData, AvailabilityGroupReplica replica)
-            : base(string.Format(Resource.JoinDatabaseToAvailabilityGroupText, databaseName, availabilityGroupData.GroupName, replica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatJoinDatabaseToAvailabilityGroupText(databaseName, availabilityGroupData.GroupName, replica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (databaseName == null)
             {

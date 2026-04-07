@@ -39,14 +39,14 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!IsSupportedProperty("AllowEnclaveComputations") && allowEnclaveComputations)
             {
-                throw new InvalidVersionSmoOperationException(ExceptionTemplates.PropertyCannotBeSetForVersion("AllowEnclaveComputations",
+                throw new InvalidVersionSmoOperationException(ExceptionTemplates.FormatPropertyCannotBeSetForVersion("AllowEnclaveComputations",
                                                                                                                 "ColumnMasterKey",
                                                                                                                 parent.Version.ToString()));
             }
 
             if (!IsSupportedProperty("Signature") && signature != null)
             {
-                throw new InvalidVersionSmoOperationException(ExceptionTemplates.PropertyCannotBeSetForVersion("Signature",
+                throw new InvalidVersionSmoOperationException(ExceptionTemplates.FormatPropertyCannotBeSetForVersion("Signature",
                                                                                                                 "ColumnMasterKey",
                                                                                                                 parent.Version.ToString()));
             }
@@ -161,7 +161,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string fullyFormattedName = FormatFullNameForScripting(sp);
 
             this.ThrowIfNotSupported(this.GetType(),
-                ExceptionTemplates.ColumnMasterKeyDownlevel(
+                ExceptionTemplates.FormatColumnMasterKeyDownlevel(
                     fullyFormattedName,
                     GetSqlServerName(sp)),
                     sp: sp);
@@ -230,7 +230,7 @@ namespace Microsoft.SqlServer.Management.Smo
             string fullyFormattedName = FormatFullNameForScripting(sp);
 
             this.ThrowIfNotSupported(this.GetType(),
-                ExceptionTemplates.ColumnMasterKeyDownlevel(
+                ExceptionTemplates.FormatColumnMasterKeyDownlevel(
                     fullyFormattedName,
                     GetSqlServerName(sp)),
                     sp: sp);

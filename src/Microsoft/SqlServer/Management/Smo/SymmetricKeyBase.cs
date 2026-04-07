@@ -235,7 +235,7 @@ namespace Microsoft.SqlServer.Management.Smo
             validAlgorithms.AddRange(new string[] { "DES", "TRIPLE_DES", "RC2", "RC4", "RC4_128", "DESX", "TRIPLE_DES_3KEY", "AES_128", "AES_192", "AES_256" });
             if (!validAlgorithms.Contains(providerAlgorithm.ToUpper()))
             {
-                throw new ArgumentException(ExceptionTemplates.InvalidAlgorithm("SymmetricKey", providerAlgorithm));
+                throw new ArgumentException(ExceptionTemplates.FormatInvalidAlgorithm("SymmetricKey", providerAlgorithm));
             }
         }
 
@@ -835,7 +835,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append("AES_256");
                         break;
                     default:
-                        throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("SymmetricKeyEncryptionAlgorithm"));
+                        throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("SymmetricKeyEncryptionAlgorithm"));
                 }
 
                 if (null != createInfo.password)
@@ -901,7 +901,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append(MakeSqlBraket(keyEncryption.ObjectNameOrPassword));
                         break;
                     default:
-                        throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("KeyEncryptionType"));
+                        throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("KeyEncryptionType"));
                 }
                 useDelimiter = true;
             }

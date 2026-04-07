@@ -104,7 +104,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             loginMode != ServerLoginMode.Normal &&
                             loginMode != ServerLoginMode.Mixed)
                         {
-                            throw new SmoException(ExceptionTemplates.UnsupportedLoginMode(loginMode.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatUnsupportedLoginMode(loginMode.ToString()));
                         }
 
                         // LoginMode is enumeration, must be converted to its integer value
@@ -117,7 +117,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         AuditLevel auditLevel = (AuditLevel)o;
                         if (0 > auditLevel || AuditLevel.All < auditLevel)
                         {
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(AuditLevel).Name));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(AuditLevel).Name));
                         }
 
                         // auditLevel is enumeration, must be converted to its integer value
@@ -153,7 +153,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 }
 
                             default:
-                                throw new SmoException(ExceptionTemplates.UnknownEnumeration(perfMonMode.GetType().Name));
+                                throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(perfMonMode.GetType().Name));
                         }
 
                         continue;

@@ -247,7 +247,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "V ": return GetUrn(dp, "View", true, null);
                 case "X ": return GetUrn(dp, "ExtendedStoredProcedure", true, null);
             }
-            throw new InternalEnumeratorException(StringSqlEnumerator.FailedToCreateUrn(GetTriggeredString(dp, 0)));
+            throw new InternalEnumeratorException(StringSqlEnumerator.FormatFailedToCreateUrn(GetTriggeredString(dp, 0)));
         }
 
         public override object GetColumnData(string name, object data, DataProvider dp)

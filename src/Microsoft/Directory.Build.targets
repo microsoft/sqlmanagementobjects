@@ -11,7 +11,4 @@
   <PropertyGroup>
     <EnableQTest>false</EnableQTest>
   </PropertyGroup>
-  <ItemGroup>
-    
-  </ItemGroup>
 </Project>

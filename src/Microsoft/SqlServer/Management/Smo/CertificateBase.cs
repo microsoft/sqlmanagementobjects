@@ -626,7 +626,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
 
                 default:
-                    throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("CertificateSourceType"));
+                    throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("CertificateSourceType"));
             }
 
             // add the private key part

@@ -190,7 +190,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                     // if the event has "no_blocking"  capability 
                     if (((EventCapabilities)this.Parent.ObjectInfoSet.Get<EventInfo>(evt.ModuleID, evt.Name).Capabilities & EventCapabilities.NoBlock) != 0)
                     {
-                        exception = new XEventException(ExceptionTemplates.NoBlockingEventNotAllowedInNoEventLossSession(this.Name, evt.Name));
+                        exception = new XEventException(ExceptionTemplates.FormatNoBlockingEventNotAllowedInNoEventLossSession(this.Name, evt.Name));
                         if (throwOnFirst)
                         {
                             throw exception;
@@ -223,7 +223,7 @@ namespace Microsoft.SqlServer.Management.XEvent
             {
                 if (this.State != SfcObjectState.Existing)
                 {
-                    exception = new XEventException(ExceptionTemplates.InvalidState(this.State, SfcObjectState.Existing));
+                    exception = new XEventException(ExceptionTemplates.FormatInvalidState(this.State, SfcObjectState.Existing));
                     if (throwOnFirst)
                     {
                         throw exception;
@@ -250,7 +250,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                 if (methodName != ValidationMethod.Create && methodName != ValidationMethod.Alter)
                 {
                     tm.TraceError("Invalid parameter.");
-                    throw new XEventException(ExceptionTemplates.InvalidParameter(methodName));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter(methodName));
                 }
 
                 // This cannot possibly happen in the UI
@@ -437,7 +437,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                     return this.Targets;
                 default:
                     TraceHelper.TraceContext.TraceError("No such collection for type {0}", elementType);
-                    throw new XEventException(ExceptionTemplates.NoSuchCollection(elementType));
+                    throw new XEventException(ExceptionTemplates.FormatNoSuchCollection(elementType));
             }
         }
 
@@ -838,7 +838,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                         return EventRetentionModeEnum.NoEventLoss;
                 }
                 TraceHelper.TraceContext.TraceCriticalError("Unknown EventRetentionMode");
-                throw new XEventException(ExceptionTemplates.InvalidParameter(Session.EventRetentionModeProperty));
+                throw new XEventException(ExceptionTemplates.FormatInvalidParameter(Session.EventRetentionModeProperty));
             }
             set
             {
@@ -855,7 +855,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                         str = "N";
                         break;
                     default:
-                        throw new XEventException(ExceptionTemplates.InvalidParameter(Session.EventRetentionModeProperty));
+                        throw new XEventException(ExceptionTemplates.FormatInvalidParameter(Session.EventRetentionModeProperty));
                 }
                 this.Properties[Session.EventRetentionModeProperty].Value = str;
             }
@@ -989,7 +989,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                         return MemoryPartitionModeEnum.PerCpu;
                 }
                 TraceHelper.TraceContext.TraceCriticalError("Unrecognized MemoryPartitionMode");
-                throw new XEventException(ExceptionTemplates.InvalidParameter("MemoryPartitionMode"));
+                throw new XEventException(ExceptionTemplates.FormatInvalidParameter("MemoryPartitionMode"));
             }
             set
             {
@@ -1006,7 +1006,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                         str = "C";
                         break;
                     default:
-                        throw new XEventException(ExceptionTemplates.InvalidParameter("MemoryPartitionMode"));
+                        throw new XEventException(ExceptionTemplates.FormatInvalidParameter("MemoryPartitionMode"));
                 }
                 this.Properties["MemoryPartitionMode"].Value = str;
             }
@@ -1303,7 +1303,7 @@ namespace Microsoft.SqlServer.Management.XEvent
 
                 default:
                     TraceHelper.TraceContext.TraceError("Unknown sink.Action.");
-                    throw new XEventException(ExceptionTemplates.InvalidParameter("sink.Action"));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter("sink.Action"));
             }
         }
         #endregion

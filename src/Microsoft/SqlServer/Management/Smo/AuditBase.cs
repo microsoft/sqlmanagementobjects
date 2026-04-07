@@ -274,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlManagedInstance && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand)
             {
-                throw new UnsupportedEngineEditionException(ExceptionTemplates.InvalidPropertyValueForVersion(
+                throw new UnsupportedEngineEditionException(ExceptionTemplates.FormatInvalidPropertyValueForVersion(
                                                 this.GetType().Name,
                                                 property.Name,
                                                 property.Value.ToString(),
@@ -354,7 +354,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append(destination);
                         break;
                     default:
-                        throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("DestinationType"));
+                        throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("DestinationType"));
                 }
             }
 
@@ -382,7 +382,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else if (!string.IsNullOrEmpty(strFilter))
                 {
-                    throw new UnsupportedVersionException(ExceptionTemplates.PropertySupportedOnlyOn110("Filter")).SetHelpContext("SupportedOnlyOn110");
+                    throw new UnsupportedVersionException(ExceptionTemplates.FormatPropertySupportedOnlyOn110("Filter")).SetHelpContext("SupportedOnlyOn110");
                 }
             }
 
@@ -506,10 +506,10 @@ namespace Microsoft.SqlServer.Management.Smo
                                 return failureAction;
                             }
 
-                            throw new UnsupportedVersionException(ExceptionTemplates.PropertyValueSupportedOnlyOn110(nameof(OnFailure), "FailOperation")).SetHelpContext("PropertyValueSupportedOnlyOn110");
+                            throw new UnsupportedVersionException(ExceptionTemplates.FormatPropertyValueSupportedOnlyOn110(nameof(OnFailure), "FailOperation")).SetHelpContext("PropertyValueSupportedOnlyOn110");
 
                         default:
-                            throw new ArgumentException(ExceptionTemplates.UnknownEnumeration(nameof(OnFailure)));
+                            throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration(nameof(OnFailure)));
                     }
                 }, 
                 ref ssb);
@@ -560,7 +560,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     if (!Enum.IsDefined(typeof(AuditFileSizeUnit), maxFileSizeUnit.Value))
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("AuditFileSizeUnit"));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("AuditFileSizeUnit"));
                     }
 
                     sb.Append(maxFileSizeUnit.Value.ToString().ToUpperInvariant());
@@ -580,7 +580,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (maxRolloverFiles.Dirty && maxFiles.Dirty && (System.Int64)maxRolloverFiles.Value != int.MaxValue && (int)maxFiles.Value != 0)
                 {
                     throw new WrongPropertyValueException(
-                        ExceptionTemplates.MutuallyExclusiveProperties("MaximumRolloverFiles",
+                        ExceptionTemplates.FormatMutuallyExclusiveProperties("MaximumRolloverFiles",
                         "MaximumFiles"));
                 }
 
@@ -595,7 +595,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else
                     {
-                        throw new UnsupportedVersionException(ExceptionTemplates.PropertySupportedOnlyOn110("MaximumFiles")).SetHelpContext("SupportedOnlyOn110");
+                        throw new UnsupportedVersionException(ExceptionTemplates.FormatPropertySupportedOnlyOn110("MaximumFiles")).SetHelpContext("SupportedOnlyOn110");
                     }
                 }
             }
@@ -636,7 +636,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Property retentionDays = this.properties.Get("RetentionDays");
                 if ((int)retentionDays.Value < 0)
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.WrongPropertyValueException("RetentionDays", retentionDays.Value.ToString()));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatWrongPropertyValueException("RetentionDays", retentionDays.Value.ToString()));
                 }
                 if ((retentionDays.Dirty && !retentionDays.IsNull))
                 {

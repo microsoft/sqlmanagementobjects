@@ -909,7 +909,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             switch (elementType)
             {
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
         #endregion
@@ -969,7 +969,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 {
                     if (!FacetRepository.IsPropertyConfigurable(facetType, ci.Property))
                     {
-                        message = ExceptionTemplatesSR.PropertyCannotBeSet(ci.Property);
+                        message = ExceptionTemplatesSR.FormatPropertyCannotBeSet(ci.Property);
                         traceContext.TraceParameterOut("returnVal", false);
                         return false;
                     }

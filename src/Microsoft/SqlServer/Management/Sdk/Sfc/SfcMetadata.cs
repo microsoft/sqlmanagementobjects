@@ -963,32 +963,32 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
 
             if (isProperty && isObject)
             {
-                exceptionMessage = SfcStrings.AttributeConflict("SfcPropertyAttribute",
+                exceptionMessage = SfcStrings.FormatAttributeConflict("SfcPropertyAttribute",
                     "SfcObjectAttribute", typeName, propertyName);
             }
             else if (isObject && isReference)
             {
-                exceptionMessage = SfcStrings.AttributeConflict("SfcObjectAttribute",
+                exceptionMessage = SfcStrings.FormatAttributeConflict("SfcObjectAttribute",
                     "SfcReferenceAttribute", typeName, propertyName);
             }
             else if (isObject && isReferenceSelector)
             {
-                exceptionMessage = SfcStrings.AttributeConflict("SfcObjectAttribute",
+                exceptionMessage = SfcStrings.FormatAttributeConflict("SfcObjectAttribute",
                     "SfcReferenceSelectorAttribute", typeName, propertyName);
             }
             else if (isObject && isReferenceCollection)
             {
-                exceptionMessage = SfcStrings.AttributeConflict("SfcObjectAttribute",
+                exceptionMessage = SfcStrings.FormatAttributeConflict("SfcObjectAttribute",
                     "SfcReferenceCollectionAttribute", typeName, propertyName);
             }
             else if (isKey && isSku)
             {
-                exceptionMessage = SfcStrings.AttributeConflict("SfcKeyAttribute",
+                exceptionMessage = SfcStrings.FormatAttributeConflict("SfcKeyAttribute",
                     "SfcSkuAttribute", typeName, propertyName);
             }
             else if (isKey && isVersion)
             {
-                exceptionMessage = SfcStrings.AttributeConflict("SfcKeyAttribute",
+                exceptionMessage = SfcStrings.FormatAttributeConflict("SfcKeyAttribute",
                     "SfcVersionAttribute", typeName, propertyName);
             }
             throw new SfcMetadataException(exceptionMessage);

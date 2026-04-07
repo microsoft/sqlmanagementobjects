@@ -144,7 +144,7 @@ end catch
                 AvailabilityGroup.AvailabilityGroupScript + Globals.space + Globals.EqualSign + Globals.space +
                 SqlSmoObject.MakeSqlBraket(availabilityGroupName) + Globals.statementTerminator;
 
-            string exceptionMessage = ExceptionTemplates.DatabaseJoinAvailabilityGroupFailed(this.Parent.Parent.Name, availabilityGroupName, this.Name);
+            string exceptionMessage = ExceptionTemplates.FormatDatabaseJoinAvailabilityGroupFailed(this.Parent.Parent.Name, availabilityGroupName, this.Name);
           
             this.DoCustomAction(script, exceptionMessage);
         }
@@ -161,7 +161,7 @@ end catch
                 SqlSmoObject.MakeSqlBraket(this.Name) + Globals.space + Scripts.SET + Globals.space + Scripts.HADR +
                 Globals.space + Globals.Off + Globals.statementTerminator;
 
-            string exceptionMessage = ExceptionTemplates.DatabaseLeaveAvailabilityGroupFailed(this.Parent.Parent.Name, this.Parent.Name, this.Name);
+            string exceptionMessage = ExceptionTemplates.FormatDatabaseLeaveAvailabilityGroupFailed(this.Parent.Parent.Name, this.Parent.Name, this.Name);
 
             this.DoCustomAction(script, exceptionMessage);
         }
@@ -178,7 +178,7 @@ end catch
                 SqlSmoObject.MakeSqlBraket(this.Name) + Globals.space + Scripts.SET + Globals.space + Scripts.HADR +
                 Globals.space + Scripts.SUSPEND + Globals.statementTerminator;
 
-            string exceptionMessage = ExceptionTemplates.SuspendDataMovementFailed(this.Parent.Parent.Name, this.Parent.Name, this.Name);
+            string exceptionMessage = ExceptionTemplates.FormatSuspendDataMovementFailed(this.Parent.Parent.Name, this.Parent.Name, this.Name);
 
             this.DoCustomAction(script, exceptionMessage);
         }
@@ -195,7 +195,7 @@ end catch
                 SqlSmoObject.MakeSqlBraket(this.Name) + Globals.space + Scripts.SET + Globals.space + Scripts.HADR +
                 Globals.space + Scripts.RESUME + Globals.statementTerminator;
 
-            string exceptionMessage = ExceptionTemplates.ResumeDataMovementFailed(this.Parent.Parent.Name, this.Parent.Name, this.Name);
+            string exceptionMessage = ExceptionTemplates.FormatResumeDataMovementFailed(this.Parent.Parent.Name, this.Parent.Name, this.Name);
 
             this.DoCustomAction(script, exceptionMessage);
         }

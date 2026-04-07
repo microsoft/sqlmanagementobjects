@@ -43,7 +43,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     sb.Append("ROLE = WITNESS");
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.UnknownEnumeration(typeof(ServerMirroringRole).Name));
+                    throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(typeof(ServerMirroringRole).Name));
             }
 
             ScriptAuthenticationAndEncryption(sb, sp, true);

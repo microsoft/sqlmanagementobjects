@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -176,7 +176,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 // Check whether the path is well formed and also make sure that there is no other file with the same name
                 if (!BackupRestoreBase.CheckNewBackupFile(this.Server, this.TailLogBackupFile))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.BackupFileAlreadyExists(this.TailLogBackupFile));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatBackupFileAlreadyExists(this.TailLogBackupFile));
                 }
                 bk.Devices.Add(new BackupDeviceItem(this.TailLogBackupFile, DeviceType.File));
             }
@@ -321,7 +321,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if(suspectPages[i-1].Equals(suspectPages[i]))
                 {
-                    throw new SmoException(ExceptionTemplates.DuplicateSuspectPage(suspectPages[i].FileID,suspectPages[i].PageID));
+                    throw new SmoException(ExceptionTemplates.FormatDuplicateSuspectPage(suspectPages[i].FileID,suspectPages[i].PageID));
                 }
             }
         }

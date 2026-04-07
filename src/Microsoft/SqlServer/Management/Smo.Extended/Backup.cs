@@ -44,7 +44,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (BackupTruncateLogType.TruncateOnly == m_LogTruncation && 10 <= srv.ServerVersion.Major)
             {
                 throw new UnsupportedVersionException(
-                                ExceptionTemplates.InvalidPropertyValueForVersion(
+                                ExceptionTemplates.FormatInvalidPropertyValueForVersion(
                                 this.GetType().Name,
                                 "LogTruncation",
                                 BackupTruncateLogType.TruncateOnly.ToString(),
@@ -212,7 +212,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // when the mirror does not have enough devices throw exception
                         if (bd.Count != Devices.Count)
                         {
-                            throw new WrongPropertyValueException(ExceptionTemplates.MismatchingNumberOfMirrors(Devices.Count, bd.Count));
+                            throw new WrongPropertyValueException(ExceptionTemplates.FormatMismatchingNumberOfMirrors(Devices.Count, bd.Count));
                         }
                         sb.Append(" MIRROR TO ");
                         GetDevicesScript(sb, bd, targetVersion);
@@ -360,12 +360,12 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (!m_Initialize)
                 {
-                    throw new SmoException(ExceptionTemplates.ConflictingSwitches("FormatMedia", "Initialize"));
+                    throw new SmoException(ExceptionTemplates.FormatConflictingSwitches("FormatMedia", "Initialize"));
                 }
 
                 if (!m_SkipTapeHeader)
                 {
-                    throw new SmoException(ExceptionTemplates.ConflictingSwitches("FormatMedia", "SkipTapeHeader"));
+                    throw new SmoException(ExceptionTemplates.FormatConflictingSwitches("FormatMedia", "SkipTapeHeader"));
                 }
             }
 
@@ -479,7 +479,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (!Enum.IsDefined(typeof(BackupCompressionOptions), m_CompressionOption))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration("BackupCompressionOptions"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration("BackupCompressionOptions"));
                 }
 
                 if (BackupCompressionOptions.Default != m_CompressionOption)
@@ -498,7 +498,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         version = LocalizableResources.ServerShiloh;
                     }
 
-                    throw new UnknownPropertyException("CompressionOption", ExceptionTemplates.PropertyNotAvailableToWrite("CompressionOption", version));
+                    throw new UnknownPropertyException("CompressionOption", ExceptionTemplates.FormatPropertyNotAvailableToWrite("CompressionOption", version));
                 }
             }
 

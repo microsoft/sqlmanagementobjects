@@ -123,7 +123,7 @@ namespace Microsoft.SqlServer.Management.Common
             {
                 if (!CredWrite(ref cred, 0))
                 {
-                    throw new Win32Exception(StringConnectionInfo.UnableToSavePasswordFormat(user));
+                    throw new Win32Exception(StringConnectionInfo.FormatUnableToSavePasswordFormat(user));
                 }
             }
             finally

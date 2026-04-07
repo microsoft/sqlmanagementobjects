@@ -939,7 +939,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
             if ((m_ConnectionString != null) && IsValidString(ConnectionString))
             {
-                throw new PropertyNotAvailableException(StringConnectionInfo.PropertyNotAvailable(propertyName));
+                throw new PropertyNotAvailableException(StringConnectionInfo.FormatPropertyNotAvailable(propertyName));
             }
             else
             {
@@ -969,7 +969,7 @@ namespace Microsoft.SqlServer.Management.Common
             if (true == LoginSecure)
             {
                 throw new InvalidPropertyValueException(
-                    StringConnectionInfo.CannotSetWhenLoginSecure(propertyName));
+                    StringConnectionInfo.FormatCannotSetWhenLoginSecure(propertyName));
             }
         }
 
@@ -986,7 +986,7 @@ namespace Microsoft.SqlServer.Management.Common
             if (!IsValidString(str, checkEmpty))
             {
                 throw new InvalidPropertyValueException(
-                    StringConnectionInfo.InvalidPropertyValue(str ?? "null", propertyName, StringConnectionInfo.InvalidPropertyValueReasonString));
+                    StringConnectionInfo.FormatInvalidPropertyValue(str ?? "null", propertyName, StringConnectionInfo.InvalidPropertyValueReasonString));
             }
         }
 
@@ -997,7 +997,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
             if (!IsValidString(str, checkEmpty))
             {
-                throw new PropertyNotSetException(StringConnectionInfo.PropertyNotSetException(propertyName));
+                throw new PropertyNotSetException(StringConnectionInfo.FormatPropertyNotSetException(propertyName));
             }
             return str;
         }
@@ -1013,9 +1013,9 @@ namespace Microsoft.SqlServer.Management.Common
             if (n < value)
             {
                 throw new InvalidPropertyValueException(
-                    StringConnectionInfo.InvalidPropertyValue(n.ToString(ConnectionInfoBase.DefaultCulture),
+                    StringConnectionInfo.FormatInvalidPropertyValue(n.ToString(ConnectionInfoBase.DefaultCulture),
                                                         propertyName,
-                                                        StringConnectionInfo.InvalidPropertyValueReasonInt(value.ToString(ConnectionInfoBase.DefaultCulture))));
+                                                        StringConnectionInfo.FormatInvalidPropertyValueReasonInt(value.ToString(ConnectionInfoBase.DefaultCulture))));
             }
         }
 

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 #else
 using System.Data.SqlClient;
 #endif
-using System.Globalization;
 using System.Linq;
 using Microsoft.SqlServer.Management.HadrData;
 using SMO = Microsoft.SqlServer.Management.Smo;
@@ -48,7 +47,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupData">agData</param>
         /// <param name="replica">the secondary replica in which to restore the logs</param>
         public AddDBCredentialTask(string databaseName, AvailabilityGroupData availabilityGroupData, AvailabilityGroupReplica replica)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AddDatabaseCredentialText, databaseName, replica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatAddDatabaseCredentialText(databaseName, replica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (String.IsNullOrEmpty(databaseName))
             {

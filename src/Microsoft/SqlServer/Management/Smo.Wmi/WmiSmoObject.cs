@@ -90,7 +90,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                 }
 
                 if(null==current.ParentColl && !typeof(ManagedComputer).Equals(current.GetType()))
-                    throw new InternalSmoErrorException(ExceptionTemplates.ObjectNotUnderServer(this.GetType().ToString()));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatObjectNotUnderServer(this.GetType().ToString()));
 
                 m_ManagedComputer = current as ManagedComputer;
             }
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 
             // for the moment we can only have ServerAliases
             if( !(newParent is ManagedComputer ) )
-                throw new FailedOperationException(ExceptionTemplates.InvalidType(newParent.GetType().ToString())).SetHelpContext("InvalidType");
+                throw new FailedOperationException(ExceptionTemplates.FormatInvalidType(newParent.GetType().ToString())).SetHelpContext("InvalidType");
             parentColl = null;
             if( this is ServerAlias )
                 parentColl = ((ManagedComputer)newParent).ServerAliases;
@@ -210,7 +210,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                     Initialize();	
                     break;
                 case PropertyBagState.Full:
-                    throw new InternalSmoErrorException(ExceptionTemplates.FullPropertyBag(propname));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatFullPropertyBag(propname));
             }
 
             return Properties.Get(propname).Value;
@@ -272,7 +272,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
 #if DEBUG
                 // we check this only on the debug version
                 if(dt.Rows.Count > 1)
-                    throw new InternalSmoErrorException(ExceptionTemplates.MultipleRowsForUrn(req.Urn));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatMultipleRowsForUrn(req.Urn));
 #endif
                 AddObjectProps(dt.Columns, dt.Rows[0]);
                 return true;
@@ -300,7 +300,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                 Property p = Properties.Get(dc.ColumnName);
                 if(p==null)
                 {
-                    throw new InternalSmoErrorException(ExceptionTemplates.UnknownProperty(dc.ColumnName,  this.GetType().ToString()));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatUnknownProperty(dc.ColumnName,  this.GetType().ToString()));
                 }
 
                 // if the property is an enumeration then we have to 
@@ -368,7 +368,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
         protected void CheckObjectState()
         {
             if (this.State == SqlSmoState.Dropped)
-                throw new SmoException(ExceptionTemplates.ObjectDroppedExceptionText(this.GetType().ToString(), this.Name));
+                throw new SmoException(ExceptionTemplates.FormatObjectDroppedExceptionText(this.GetType().ToString(), this.Name));
 
             if (this.State == SqlSmoState.Pending)
                 throw new InvalidSmoOperationException("", SqlSmoState.Pending);
@@ -444,7 +444,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                                                 BindingFlags.NonPublic | BindingFlags.CreateInstance, 
                                                 null, args,null);		
                 if(null==newChild) 
-                    throw new InternalSmoErrorException(ExceptionTemplates.CantCreateType(childTypeName ));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatCantCreateType(childTypeName ));
 
                 // fill its properties
                 if(dt.Columns.Count > 1)
@@ -541,7 +541,7 @@ namespace Microsoft.SqlServer.Management.Smo.Wmi
                 SqlSmoObject.FilterException(e);
                 
                 // wrap ManagementException in SmoException
-                throw new FailedOperationException(ExceptionTemplates.FailedOperationExceptionText(methodName, this.GetType().Name, this.Name), e);
+                throw new FailedOperationException(ExceptionTemplates.FormatFailedOperationExceptionText(methodName, this.GetType().Name, this.Name), e);
             }
             
         }

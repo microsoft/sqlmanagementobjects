@@ -331,7 +331,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             EnumObject en = o as EnumObject;
             if( null == en )
             {
-                throw new InternalEnumeratorException(SfcStrings.NotDerivedFrom(oli.ImplementClass, "EnumObject"));
+                throw new InternalEnumeratorException(SfcStrings.FormatNotDerivedFrom(oli.ImplementClass, "EnumObject"));
             }
 
             return en;
@@ -352,7 +352,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     ISupportInitData ic = en as ISupportInitData;
                     if (null == ic)
                     {
-                        throw new InternalEnumeratorException(SfcStrings.ISupportInitDataNotImplement(oli.InitData));
+                        throw new InternalEnumeratorException(SfcStrings.FormatISupportInitDataNotImplement(oli.InitData));
                     }
                     ic.LoadInitData(oli.InitData, ver);
                 }
@@ -464,20 +464,20 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 //transform the fail to load assembly in a custom assembly
                 catch (FileNotFoundException e)
                 {
-                    throw new InternalEnumeratorException(SfcStrings.FailedToLoadAssembly(fullName), e);
+                    throw new InternalEnumeratorException(SfcStrings.FormatFailedToLoadAssembly(fullName), e);
                 }
                 catch (BadImageFormatException e)
                 {
-                    throw new InternalEnumeratorException(SfcStrings.FailedToLoadAssembly(fullName), e);
+                    throw new InternalEnumeratorException(SfcStrings.FormatFailedToLoadAssembly(fullName), e);
                 }
                 catch (SecurityException e)
                 {
-                    throw new InternalEnumeratorException(SfcStrings.FailedToLoadAssembly(fullName), e);
+                    throw new InternalEnumeratorException(SfcStrings.FormatFailedToLoadAssembly(fullName), e);
                 }
 
                 if( null == a )
                 {
-                    throw new InternalEnumeratorException(SfcStrings.FailedToLoadAssembly(fullName));
+                    throw new InternalEnumeratorException(SfcStrings.FormatFailedToLoadAssembly(fullName));
                 }
 
                 assemblyCache.Add(fullName,a);
@@ -498,7 +498,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             Object o = SmoManagementUtil.CreateInstance(assembly, objectType);
             if( null == o )
             {
-                throw new InternalEnumeratorException(SfcStrings.CouldNotInstantiateObj(objectType));
+                throw new InternalEnumeratorException(SfcStrings.FormatCouldNotInstantiateObj(objectType));
             }
             return o;
         }

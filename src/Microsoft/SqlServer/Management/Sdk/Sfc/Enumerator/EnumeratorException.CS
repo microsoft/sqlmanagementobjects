@@ -159,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <summary>
         /// TODO
         /// </summary>
-        public UnknownPropertyEnumeratorException(String propertyName) : base(SfcStrings.UnknownProperty(propertyName))
+        public UnknownPropertyEnumeratorException(String propertyName) : base(SfcStrings.FormatUnknownProperty(propertyName))
         {
             this.HResult = 3;
         }
@@ -167,7 +167,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <summary>
         /// TODO
         /// </summary>
-        public UnknownPropertyEnumeratorException(String propertyName, Exception innerException) : base(SfcStrings.UnknownProperty(propertyName), innerException)
+        public UnknownPropertyEnumeratorException(String propertyName, Exception innerException) : base(SfcStrings.FormatUnknownProperty(propertyName), innerException)
         {
             this.HResult = 3;
         }
@@ -201,7 +201,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <summary>
         /// TODO
         /// </summary>
-        public UnknownTypeEnumeratorException(String typeName) : base(SfcStrings.UnknownType(typeName))
+        public UnknownTypeEnumeratorException(String typeName) : base(SfcStrings.FormatUnknownType(typeName))
         {
             this.HResult = 4;
         }
@@ -209,7 +209,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <summary>
         /// TODO
         /// </summary>
-        public UnknownTypeEnumeratorException(String typeName, Exception innerException) : base(SfcStrings.UnknownType(typeName), innerException)
+        public UnknownTypeEnumeratorException(String typeName, Exception innerException) : base(SfcStrings.FormatUnknownType(typeName), innerException)
         {
             this.HResult = 4;
         }
@@ -396,7 +396,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 sUsageInfo += SfcStrings.UsageOrderBy + " ";
             }
-            throw new InvalidPropertyUsageEnumeratorException(SfcStrings.PropertyUsageError(propertyName, sUsageInfo));
+            throw new InvalidPropertyUsageEnumeratorException(SfcStrings.FormatPropertyUsageError(propertyName, sUsageInfo));
         }
     }
 

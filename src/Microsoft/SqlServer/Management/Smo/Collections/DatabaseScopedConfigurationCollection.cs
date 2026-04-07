@@ -36,7 +36,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     if (!this.Contains(name))
                     {
-                        throw new SmoException(ExceptionTemplates.UnsupportedDatabaseScopedConfiguration(name));
+                        throw new SmoException(ExceptionTemplates.FormatUnsupportedDatabaseScopedConfiguration(name));
                     }
                 }
             }

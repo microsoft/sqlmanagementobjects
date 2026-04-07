@@ -247,9 +247,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (!prop.Writable)
                 {
-                    throw new PropertyNotAvailableException(ExceptionTemplates.PropertyNotAvailableInDesignMode(GetName(index)));
+                    throw new PropertyNotAvailableException(ExceptionTemplates.FormatPropertyNotAvailableInDesignMode(GetName(index)));
                 }
-                throw new PropertyNotAvailableException(ExceptionTemplates.PropertyNotSetInDesignMode(GetName(index)));
+                throw new PropertyNotAvailableException(ExceptionTemplates.FormatPropertyNotSetInDesignMode(GetName(index)));
             }
             if (IsNull(index) && IsRetrieved(index))
             {

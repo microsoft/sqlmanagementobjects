@@ -5,8 +5,8 @@
     <RootNamespace>Microsoft.SqlServer.Management.RegisteredServers</RootNamespace>
     <ClsCompliant>true</ClsCompliant>
   </PropertyGroup>
-  <ItemGroup Label="string resources">
-    <SqlStringResource Include="RegSvrStrings.strings" />
+  <ItemGroup>
+    <EmbeddedResource Update="**\*.resx" EmitFormatMethods="true" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="xml\RegisteredServersStore.xml">

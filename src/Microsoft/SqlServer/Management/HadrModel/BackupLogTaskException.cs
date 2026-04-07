@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -15,7 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// Exception with Database Name and inner Exception
         /// </summary>
         public BackupLogTaskException(string databaseName, Exception inner)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.BackupLogTaskException, databaseName), inner)
+            : base(Resource.FormatBackupLogTaskException(databaseName), inner)
         {
         }
 
@@ -23,7 +22,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// Exception with Database Name 
         /// </summary>
         public BackupLogTaskException(string databaseName)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.BackupLogTaskException, databaseName))
+            : base(Resource.FormatBackupLogTaskException(databaseName))
         {
         }
     }

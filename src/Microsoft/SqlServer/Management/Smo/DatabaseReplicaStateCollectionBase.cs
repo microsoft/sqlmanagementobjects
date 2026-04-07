@@ -35,12 +35,12 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (string.IsNullOrEmpty(databaseName))
             {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("AvailabilityDatabaseName", urn.Type));
+                throw new SmoException(ExceptionTemplates.FormatPropertyMustBeSpecifiedInUrn("AvailabilityDatabaseName", urn.Type));
             }
 
             if (string.IsNullOrEmpty(replicaName))
             {
-                throw new SmoException(ExceptionTemplates.PropertyMustBeSpecifiedInUrn("AvailabilityReplicaServerName", urn.Type));
+                throw new SmoException(ExceptionTemplates.FormatPropertyMustBeSpecifiedInUrn("AvailabilityReplicaServerName", urn.Type));
             }
 
             return new DatabaseReplicaStateObjectKey(replicaName, databaseName);
@@ -127,7 +127,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (string.IsNullOrEmpty(ReplicaName) || string.IsNullOrEmpty(DatabaseName))
             {
-                throw new UnsupportedObjectNameException(ExceptionTemplates.UnsupportedObjectNameExceptionText(objectType.ToString())).SetHelpContext("UnsupportedObjectNameExceptionText");
+                throw new UnsupportedObjectNameException(ExceptionTemplates.FormatUnsupportedObjectNameExceptionText(objectType.ToString())).SetHelpContext("UnsupportedObjectNameExceptionText");
             }
         }
 

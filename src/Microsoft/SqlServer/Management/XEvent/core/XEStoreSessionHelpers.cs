@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
 using System;
@@ -34,7 +34,7 @@ namespace Microsoft.SqlServer.Management.XEvent
 
                 if (string.IsNullOrEmpty(fileName))
                 {
-                    throw new XEventException(ExceptionTemplates.InvalidParameter(fileName));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter(fileName));
                 }
 
                 if (!overwrite && File.Exists(fileName))
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.XEvent
 
                 if (string.IsNullOrEmpty(sessionName))
                 {
-                    throw new XEventException(ExceptionTemplates.InvalidParameter(sessionName));
+                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter(sessionName));
                 }
 
                 if (!File.Exists(fileName))
@@ -245,7 +245,7 @@ namespace Microsoft.SqlServer.Management.XEvent
 
                                 if (!coll.Contains(fieldName))
                                 {
-                                    throw new XEventException(ExceptionTemplates.InvalidParameter(fieldName));
+                                    throw new XEventException(ExceptionTemplates.FormatInvalidParameter(fieldName));
                                 }
 
                                 evt.EventFields[fieldName].Value = paramElement.Attributes["value"].InnerText; // when parsing, always create as a string
@@ -278,7 +278,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                             TargetColumnInfoCollection coll = this.ObjectInfoSet.Get<TargetInfo>(targetFullName).TargetColumnInfoSet;
                             if (!coll.Contains(fieldName))
                             {
-                                throw new XEventException(ExceptionTemplates.InvalidParameter(fieldName));
+                                throw new XEventException(ExceptionTemplates.FormatInvalidParameter(fieldName));
                             }
 
                             target.TargetFields[fieldName].Value = paramElement.Attributes["value"].InnerText; // when parsing, always create as a string

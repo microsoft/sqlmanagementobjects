@@ -36,7 +36,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     {
                         var pd = propertyDescriptor;
                         Assert.That(pd.Description, Is.Not.Null.And.Not.Empty, 
-                            $"{facetInfo.FacetType}.{pd.Name} is missing localized descriptions. Add these lines to LocalizableResources.strings in the appropriate section, maintaining the sorted order{System.Environment.NewLine}{MissingResourceLines(facetInfo, pd.Name)}"
+                            $"{facetInfo.FacetType}.{pd.Name} is missing localized descriptions. Add these lines to LocalizableResources.resx in the appropriate section, maintaining the sorted order{System.Environment.NewLine}{MissingResourceLines(facetInfo, pd.Name)}"
                             );
                     }
                 }
@@ -45,7 +45,15 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
 
         static string MissingResourceLines(FacetInfo facetInfo, string propertyName)
         {
-            return $"{facetInfo.FacetType.Name}_{propertyName}Name=<Display Name>{System.Environment.NewLine}{facetInfo.FacetType.Name}_{propertyName}Desc=<Description>";
+            var nl = System.Environment.NewLine;
+            var typeName = facetInfo.FacetType.Name;
+            return
+                $"  <data name=\"{typeName}_{propertyName}Name\" xml:space=\"preserve\">{nl}" +
+                $"    <value>&lt;Display Name&gt;</value>{nl}" +
+                $"  </data>{nl}" +
+                $"  <data name=\"{typeName}_{propertyName}Desc\" xml:space=\"preserve\">{nl}" +
+                $"    <value>&lt;Description&gt;</value>{nl}" +
+                $"  </data>";
         }
 
         [TestMethod]

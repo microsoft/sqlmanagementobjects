@@ -147,7 +147,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // script the columns
             if (this.Columns.Count < 1)
             {
-                throw new SmoException(ExceptionTemplates.ObjectWithNoChildren("UserDefinedTableType", "Column"));
+                throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren("UserDefinedTableType", "Column"));
             }
             sb.Append(Globals.LParen);
             sb.Append(sp.NewLine);

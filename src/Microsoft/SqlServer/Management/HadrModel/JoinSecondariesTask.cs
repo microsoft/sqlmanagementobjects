@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Smo;
@@ -26,7 +25,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="availabilityGroupData">AG data</param>
         public JoinSecondariesTask(AvailabilityGroupData availabilityGroupData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.JoinSecondariesText, availabilityGroupData.GroupName))
+            : base(Resource.FormatJoinSecondariesText(availabilityGroupData.GroupName))
         {
             if (availabilityGroupData == null)
             {

@@ -412,7 +412,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (null == colBase)
                 {
                     // the column does not exist, so we need to abort this scripting
-                    throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(UrnSuffix, Name, "[" + SqlStringBraket(ParentColl.ParentInstance.InternalName) + "].[" + SqlStringBraket(col.Name) + "]"));
+                    throw new SmoException(ExceptionTemplates.FormatObjectRefsNonexCol(UrnSuffix, Name, "[" + SqlStringBraket(ParentColl.ParentInstance.InternalName) + "].[" + SqlStringBraket(col.Name) + "]"));
                 }
 
                 // if this column is going to be ignored for scripting skip the whole index
@@ -638,7 +638,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (creating && StatisticsScanType.Resample == m_ScanType)
             {
-                throw new SmoException(ExceptionTemplates.InvalidScanType(StatisticsScanType.Resample.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatInvalidScanType(StatisticsScanType.Resample.ToString()));
             }
 
             UpdateStatisticsBody(sb, sp, m_ScanType, StatisticsTarget.All, GetNoRecompute(), IsSupportedProperty(nameof(IsAutoDropped), sp), GetAutoDrop(), m_sampleValue);

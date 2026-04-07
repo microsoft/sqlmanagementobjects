@@ -551,9 +551,13 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     {
                         result = RegSvrStrings.ReportingServicesServerGroupDisplayName;
                     }
+                    else if (this.Name.Equals(RegisteredServersStore.mruSqlConnectionsGroupName))
+                    {
+                        result = RegSvrStrings.MruSqlConnectionsGroupDisplayName;
+                    }
                     else
                     {
-                        Debug.Assert(false, "unexpected group");
+                        Debug.Fail("unexpected group");
                     }
                 }
 
@@ -575,7 +579,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 case RegisteredServer.typeName:
                     return this.RegisteredServers;
                 default:
-                    throw new RegisteredServerException(RegSvrStrings.NoSuchCollection(elementType));
+                    throw new RegisteredServerException(RegSvrStrings.FormatNoSuchCollection(elementType));
             }
         }
         #endregion
@@ -665,7 +669,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
 
             if (serverGroupCollection.Contains(this.Name))
             {
-                throw new RegisteredServerException(RegSvrStrings.ServerGroupAlreadyExists(this.Name));
+                throw new RegisteredServerException(RegSvrStrings.FormatServerGroupAlreadyExists(this.Name));
             }
 
             Validate(ValidationMethod.Create);
@@ -743,7 +747,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             if (this.IsSystemServerGroup)
             {
-                throw new RegisteredServerException(RegSvrStrings.CannotDropSystemServerGroup(this.Name));
+                throw new RegisteredServerException(RegSvrStrings.FormatCannotDropSystemServerGroup(this.Name));
             }
 
             base.DropImpl();
@@ -764,12 +768,12 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentException(RegSvrStrings.ArgumentNullOrEmpty("Name"));
+                throw new ArgumentException(RegSvrStrings.FormatArgumentNullOrEmpty("Name"));
             }
 
             if (this.IsSystemServerGroup)
             {
-                throw new RegisteredServerException(RegSvrStrings.CannotRenameSystemServerGroup(this.Name));
+                throw new RegisteredServerException(RegSvrStrings.FormatCannotRenameSystemServerGroup(this.Name));
             }
 
             Rename(new Key(name));
@@ -914,7 +918,8 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                     this.Name.Equals(RegisteredServersStore.analysisServicesServerGroupName) ||
                     this.Name.Equals(RegisteredServersStore.reportingServicesServerGroupName) ||
                     this.Name.Equals(RegisteredServersStore.sqlServerCompactEditionServerGroupName) ||
-                    this.Name.Equals(RegisteredServersStore.integrationServicesServerGroupName))
+                    this.Name.Equals(RegisteredServersStore.integrationServicesServerGroupName) ||
+                    this.Name.Equals(RegisteredServersStore.mruSqlConnectionsGroupName))
                 {
                     return true;
                 }
@@ -922,6 +927,16 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
                 return false;
             }
         }
+
+        /// <summary>
+        /// Returns true if this group stores MRU SQL connection data.
+        /// This is true for the top-level MruSqlConnectionsGroup and all its descendant groups
+        /// (installation sub-groups).
+        /// </summary>
+        [SfcIgnore]
+        public bool IsMruGroup =>
+            (this.Parent is RegisteredServersStore && this.Name.Equals(RegisteredServersStore.mruSqlConnectionsGroupName)) ||
+            (this.Parent is ServerGroup parentGroup ? parentGroup.IsMruGroup : false);
 
         /// <summary>
         /// Returns if SFC believes this is a dropped object.
@@ -1339,7 +1354,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
             {
                 RegisteredServersStore.FilterException(e);
 
-                throw new RegisteredServerException(RegSvrStrings.FailedOperation(RegSvrStrings.Import), e);
+                throw new RegisteredServerException(RegSvrStrings.FormatFailedOperation(RegSvrStrings.Import), e);
             }
         }
 

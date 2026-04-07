@@ -283,7 +283,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 case PropertyAlias.AliasKind.Prefix:
                     if( null == this.Request.PropertyAlias.Prefix )
                     {
-                        throw new InternalEnumeratorException(SfcStrings.InvalidPrefixAlias(prop));
+                        throw new InternalEnumeratorException(SfcStrings.FormatInvalidPrefixAlias(prop));
                     }
                     alias = this.Request.PropertyAlias.Prefix + prop;
                     break;
@@ -299,14 +299,14 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         }
                         if( i == this.Request.Fields.Length )
                         {
-                            throw new InternalEnumeratorException(SfcStrings.PropertyCannotHaveAlias(prop));
+                            throw new InternalEnumeratorException(SfcStrings.FormatPropertyCannotHaveAlias(prop));
                         }
 
                         if( null == this.Request.PropertyAlias.Aliases ||
                             this.Request.PropertyAlias.Aliases.Length <= i ||
                             null == this.Request.PropertyAlias.Aliases[i] )
                         {
-                            throw new InternalEnumeratorException(SfcStrings.AliasNotSpecified(prop));
+                            throw new InternalEnumeratorException(SfcStrings.FormatAliasNotSpecified(prop));
                         }
                     }
                     alias = this.Request.PropertyAlias.Aliases[i];

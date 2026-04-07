@@ -424,7 +424,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             switch (elementType)
             {
-                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.NoSuchCollection(elementType)));
+                default: throw traceContext.TraceThrow(new DmfException(ExceptionTemplatesSR.FormatNoSuchCollection(elementType)));
             }
         }
         #endregion
@@ -484,7 +484,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                 methodTraceContext.TraceParameters(name);
                 if (String.IsNullOrEmpty(name))
                 {
-                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.ArgumentNullOrEmpty("Name")));
+                    throw methodTraceContext.TraceThrow(new ArgumentException(ExceptionTemplatesSR.FormatArgumentNullOrEmpty("Name")));
                 }
                 base.RenameImpl(new PolicyCategory.Key(name));
             }

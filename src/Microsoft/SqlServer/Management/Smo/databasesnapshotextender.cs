@@ -137,7 +137,7 @@ namespace Microsoft.SqlServer.Management.Smo
             
             if (string.IsNullOrEmpty(this.Parent.Name))
             {
-                state.AddError(ExceptionTemplates.PropertyNotSet("Name", "Snapshot"), "Name");
+                state.AddError(ExceptionTemplates.FormatPropertyNotSet("Name", "Snapshot"), "Name");
             }
 
             return state;

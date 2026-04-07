@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
@@ -53,7 +52,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         public RestoreDatabaseTask(string databaseName,
             AvailabilityGroupData availabilityGroupData,
             AvailabilityGroupReplica availabilityGroupReplica)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.RestoreDatabaseText, databaseName, availabilityGroupReplica.AvailabilityGroupReplicaData.ReplicaName))
+            : base(Resource.FormatRestoreDatabaseText(databaseName, availabilityGroupReplica.AvailabilityGroupReplicaData.ReplicaName))
         {
             if (String.IsNullOrEmpty(databaseName))
             {

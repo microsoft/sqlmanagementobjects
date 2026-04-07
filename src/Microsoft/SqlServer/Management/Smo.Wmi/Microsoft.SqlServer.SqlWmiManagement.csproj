@@ -11,14 +11,6 @@
     <Reference Include="System.Management" />
   </ItemGroup>
   <ItemGroup>
-    <SqlStringResource Include="WmiMgmt.strings">
-      <OutResxFileName>WmiMgmtImpl</OutResxFileName>
-      <OutCodeFileName>WmiMgmtImpl</OutCodeFileName>
-      <Namespace>Microsoft.SqlServer.Management.Smo</Namespace>
-      <OutClassName>WmiMgmtImpl</OutClassName>
-    </SqlStringResource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="$(DmfCommonSrc)\Microsoft.SqlServer.Dmf.Common.csproj" />
     <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />

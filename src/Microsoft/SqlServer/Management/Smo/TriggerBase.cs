@@ -334,7 +334,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                     if (this.Properties.Get("Text").Dirty)
                     {
-                        throw new WrongPropertyValueException(ExceptionTemplates.NoPropertyChangeForDotNet("TextBody"));
+                        throw new WrongPropertyValueException(ExceptionTemplates.FormatNoPropertyChangeForDotNet("TextBody"));
                     }
                 }
             }
@@ -364,14 +364,14 @@ namespace Microsoft.SqlServer.Management.Smo
                             break;
                         case ScriptHeaderType.ScriptHeaderForCreateOrAlter:
                             ThrowIfCreateOrAlterUnsupported(sp.TargetServerVersion,
-                                ExceptionTemplates.CreateOrAlterDownlevel(
+                                ExceptionTemplates.FormatCreateOrAlterDownlevel(
                                     "Trigger",
                                     GetSqlServerName(sp)));
 
                             sbTmp.AppendFormat(SmoApplication.DefaultCulture, "{0} TRIGGER {1}", Scripts.CREATE_OR_ALTER, sTriggerName);
                             break;
                         default:
-                            throw new SmoException(ExceptionTemplates.UnknownEnumeration(scriptHeaderType.ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatUnknownEnumeration(scriptHeaderType.ToString()));
                     }
 
                     sbTmp.AppendFormat(SmoApplication.DefaultCulture, " ON {0} ", ((TableViewBase)ParentColl.ParentInstance).FormatFullNameForScripting(sp));

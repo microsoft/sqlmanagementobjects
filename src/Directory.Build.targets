@@ -7,24 +7,13 @@
   <ItemGroup Condition="'$(ExcludeVersionInfo)'==''">
     <Compile Include="$(IntermediateOutputPath)$(VersionInfoFile)" />
   </ItemGroup>
-  <ItemDefinitionGroup>
-    <SqlStringResource>
-      <namespace Condition="'$(rootnamespace)'!='' and '%(namespace)' == ''">$(rootnamespace)</namespace>
-      <namespace Condition="'$(rootnamespace)'=='' and '%(namespace)' == ''">%(filename)</namespace>
-      <outresxfilename Condition="'%(outresxfilename)'==''">%(filename)</outresxfilename>
-      <outcodefilename Condition="'%(outcodefilename)'==''">%(filename)</outcodefilename>
-      <outclassname Condition="'%(outclassname)'==''">%(filename)</outclassname>
-      <resourcename Condition="'%(resourcename)'==''">%(namespace)</resourcename>
-      <resourcename Condition="'%(resourcename)'!=''">%(resourcename)</resourcename>
-      <additionaloptions Condition="'%(additionaloptions)'==''"></additionaloptions>
-    </SqlStringResource>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <QCustomInput Include="@(SqlStringResource)" />
-  </ItemGroup>
-  <ItemGroup Condition="'@(SqlStringResource)' != ''">
-    <PackageReference Include="Microsoft.Data.Tools.StringResourceTool" PrivateAssets="all" />
-  </ItemGroup>
+  <!-- If there are any .resx files, we need to enable localization -->
+  <Target Name="SetLocalizationDefault" BeforeTargets="AssignTargetPaths">
+    <PropertyGroup>
+      <EnableLocalization Condition="'$(EnableLocalization)' != '' and '@(EmbeddedResource->WithMetadataValue(`Extension`, `.resx`))' != ''">$(EnableLocalization)</EnableLocalization>
+      <EnableLocalization Condition="'$(EnableLocalization)' == '' and '@(EmbeddedResource->WithMetadataValue(`Extension`, `.resx`))' != ''">true</EnableLocalization>
+    </PropertyGroup>
+  </Target>
   <Target Name="GenAssemblyVersionInfoCs" BeforeTargets="CoreCompile">
     <PropertyGroup>
         <Namespace Condition="'$(RootNamespace)' != ''">$(RootNamespace)</Namespace>

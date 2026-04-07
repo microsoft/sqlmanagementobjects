@@ -3,8 +3,6 @@
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
-    using System.Globalization;
-
     /// <summary>
     /// Class for generating a <see cref="HadrValidationErrorException"/> related to an invalid set of configuration options 
     /// for creating or altering a BASIC Availability Group.  
@@ -16,7 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// related to creating or altering a BASIC Availability Group.  
         /// </summary>
         public BasicAvailabilityGroupIncompatibleException(string reason)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.BasicAvailabilityGroupIncompatibleException, reason))
+            : base(Resource.FormatBasicAvailabilityGroupIncompatibleException(reason))
         {
         }
     }

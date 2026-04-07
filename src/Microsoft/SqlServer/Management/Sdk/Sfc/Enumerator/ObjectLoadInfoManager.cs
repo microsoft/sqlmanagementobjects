@@ -88,7 +88,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             ObjectLoadInfo oli = (ObjectLoadInfo)m_Hierarchy[s];
             if( null == oli )
             {
-                throw new InvalidQueryExpressionEnumeratorException(SfcStrings.UrnCouldNotBeResolvedAtLevel(s));
+                throw new InvalidQueryExpressionEnumeratorException(SfcStrings.FormatUrnCouldNotBeResolvedAtLevel(s));
             }
             return oli;
         }
@@ -102,7 +102,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 {
                     return curent_oli;
                 }
-                throw new InvalidQueryExpressionEnumeratorException(SfcStrings.UrnCouldNotBeResolvedAtLevel(s));
+                throw new InvalidQueryExpressionEnumeratorException(SfcStrings.FormatUrnCouldNotBeResolvedAtLevel(s));
             }
             return oli;
         }

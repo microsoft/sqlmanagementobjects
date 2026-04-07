@@ -192,7 +192,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if ((this.validationErrors[rowId] & ValidationError.NameError) == ValidationError.NameError)
                 {
-                    validationErrorsMessage.AppendFormat(SmoApplication.DefaultCulture, ExceptionTemplates.SearchPropertyNameNotValid(SearchPropertyListConstants.MaxSearchPropertyNameLength));
+                    validationErrorsMessage.AppendFormat(SmoApplication.DefaultCulture, ExceptionTemplates.FormatSearchPropertyNameNotValid(SearchPropertyListConstants.MaxSearchPropertyNameLength));
                     validationErrorsMessage.AppendLine();
                 }
 
@@ -210,7 +210,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if ((this.validationErrors[rowId] & ValidationError.DescriptionError) == ValidationError.DescriptionError)
                 {
-                    validationErrorsMessage.AppendFormat(SmoApplication.DefaultCulture, ExceptionTemplates.SearchPropertyDescriptionNotValid(SearchPropertyListConstants.MaxSearchPropertyDescriptionLength));
+                    validationErrorsMessage.AppendFormat(SmoApplication.DefaultCulture, ExceptionTemplates.FormatSearchPropertyDescriptionNotValid(SearchPropertyListConstants.MaxSearchPropertyDescriptionLength));
                     validationErrorsMessage.AppendLine();
                 }
 
@@ -382,7 +382,7 @@ DataRowChangeEventArgs e)
 
             if (nameErrors != 0)
             {
-                validationErrors.AppendFormat(SmoApplication.DefaultCulture,ExceptionTemplates.SearchPropertyNameNotValid(SearchPropertyListConstants.MaxSearchPropertyNameLength) );
+                validationErrors.AppendFormat(SmoApplication.DefaultCulture,ExceptionTemplates.FormatSearchPropertyNameNotValid(SearchPropertyListConstants.MaxSearchPropertyNameLength) );
             }
 
             else if (guidErrors != 0)
@@ -397,7 +397,7 @@ DataRowChangeEventArgs e)
 
             else if (descriptionErrors != 0)
             {
-                validationErrors.AppendFormat(SmoApplication.DefaultCulture, ExceptionTemplates.SearchPropertyDescriptionNotValid(SearchPropertyListConstants.MaxSearchPropertyDescriptionLength));
+                validationErrors.AppendFormat(SmoApplication.DefaultCulture, ExceptionTemplates.FormatSearchPropertyDescriptionNotValid(SearchPropertyListConstants.MaxSearchPropertyDescriptionLength));
             }
 
             else if (guidIntIdErrors != 0)

@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -18,7 +17,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="primaryServerName">Name of the server</param>
         /// <param name="backupLocation">The backup location</param>
         public PrimaryCannotWriteToLocationException(string primaryServerName, string backupLocation)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.PrimaryCannotWriteToLocation, primaryServerName, backupLocation))
+            : base(Resource.FormatPrimaryCannotWriteToLocation(primaryServerName, backupLocation))
         {
         }
 
@@ -29,7 +28,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="backupLocation">The backup location</param>
         /// <param name="innerException">The inner exception</param>
         public PrimaryCannotWriteToLocationException(string primaryServerName, string backupLocation, Exception innerException)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.PrimaryCannotWriteToLocation, primaryServerName, backupLocation), innerException)
+            : base(Resource.FormatPrimaryCannotWriteToLocation(primaryServerName, backupLocation), innerException)
         {
         }
     }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -16,10 +14,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupName">The availability group name</param>
         /// <param name="replicaServerName">The replica server name</param>
         public AvailabilityGroupNotJoinedOnReplicaException(string availabilityGroupName, string replicaServerName) : 
-            base(string.Format(CultureInfo.InvariantCulture,
-                    Resource.AvailabilityGroupNotJoined,
-                    availabilityGroupName,
-                    replicaServerName))
+            base(Resource.FormatAvailabilityGroupNotJoined(availabilityGroupName, replicaServerName))
         {
         }
     }

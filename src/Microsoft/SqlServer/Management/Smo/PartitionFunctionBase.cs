@@ -71,7 +71,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (PartitionFunctionParameters.Count == 0)
             {
-                throw new SmoException(ExceptionTemplates.ObjectWithNoChildren(this.GetType().Name, "PartitionFunctionParameter"));
+                throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren(this.GetType().Name, "PartitionFunctionParameter"));
             }
 
             statement.Append("(");

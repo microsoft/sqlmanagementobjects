@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Smo;
 
@@ -23,7 +22,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="failoverData"></param>
         public FailoverValidator(FailoverData failoverData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.ValidatingFailoverSettings, failoverData.TargetAvailabilityReplica.Name))
+            : base(Resource.FormatValidatingFailoverSettings(failoverData.TargetAvailabilityReplica.Name))
         {
             if (failoverData == null)
             {

@@ -623,14 +623,14 @@
     <Compile Include="$(SmoSourceDir)\XmlSchemaCollectionBase.cs" />
   </ItemGroup>
   <ItemGroup Label="string resources">
-    <SqlStringResource Include="$(SmoSourceDir)\BrokerLocalizableResources.strings">
-        <logicalname>Microsoft.SqlServer.Management.Smo.Broker.BrokerLocalizableResources.resources</logicalname>
-    </SqlStringResource>
-    <SqlStringResource Include="$(SmoSourceDir)\ExceptionTemplatesImpl.strings" />
-    <SqlStringResource Include="$(SmoSourceDir)\FacetSR.strings" />
-    <SqlStringResource Include="$(SmoSourceDir)\LocalizableResources.strings" />
+    <EmbeddedResource Include="BrokerLocalizableResources.resx">
+      <LogicalName>Microsoft.SqlServer.Management.Smo.Broker.BrokerLocalizableResources.resources</LogicalName>
+      <EmitFormatMethods>true</EmitFormatMethods>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExceptionTemplates.resx" EmitFormatMethods="true"/>
+    <EmbeddedResource Include="FacetSR.resx" EmitFormatMethods="true"/>
+    <EmbeddedResource Include="LocalizableResources.resx" EmitFormatMethods="true"/>
     <None Include="..\..\..\..\..\docs\README.md" Link="README.md" />
-    <None Include="@(SqlStringResource)" />
   </ItemGroup>
   <ItemGroup>
     <EventsFileName Include="ServerEvents.cs">
@@ -661,7 +661,6 @@
   </ItemGroup>
    <ItemGroup>
      <CodeGenInput Include="$(SfcSrc)\Enumerator\*.cs" />
-     <CodeGenInput Include="$(SfcSrc)\Enumerator\*.strings" />
      <CodeGenInput Include="$(SfcSrc)\Enumerator\xml\**\*.xml" />
      <CodeGenInput Include="$(SqlEnumSrc)\xml\**\*.xml" />
      <CodeGenInput Include="$(CodeGenSrc)\*" />
@@ -670,12 +669,7 @@
   <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
       <Reference Include="System.Management" />
   </ItemGroup>
-  <Target Name="RunCodeGen"
-    BeforeTargets="CoreResGen"
-    Condition="'$(BuildingInsideVisualStudio)'!='true' and '@(CodeGen)' != ''"
-    Inputs="$(MSBuildAllProjects);@(CodeGenInput)"
-    Outputs="@(CodeGen->'$(CodeGenOutputDir)\%(filename).cs')"
-    >
+  <Target Name="RunCodeGen" BeforeTargets="CoreResGen" Condition="'$(BuildingInsideVisualStudio)'!='true' and '@(CodeGen)' != ''" Inputs="$(MSBuildAllProjects);@(CodeGenInput)" Outputs="@(CodeGen->'$(CodeGenOutputDir)\%(filename).cs')">
       <PropertyGroup>
         <CodeGenCmd Condition="'$(TargetGroup)' == 'netfx'">"$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.exe"</CodeGenCmd>
         <CodeGenCmd Condition="'$(CodeGenCmd)' == ''">dotnet --roll-forward LatestMajor "$(OutDir)..\$(CodeGenPlatform)\SmoCodeGen.dll"</CodeGenCmd>

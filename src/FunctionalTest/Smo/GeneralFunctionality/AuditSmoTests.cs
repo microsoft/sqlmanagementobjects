@@ -56,7 +56,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 });
 
                 Assert.IsInstanceOf<_SMO.PropertyNotSetException>(exception.InnerException, "Unexpected inner exception");
-                Assert.That(exception.InnerException.Message, Is.EqualTo(ExceptionTemplates.PropertyNotSetExceptionText("DestinationType")), "Unexpected exception message");
+                Assert.That(exception.InnerException.Message, Is.EqualTo(ExceptionTemplates.FormatPropertyNotSetExceptionText("DestinationType")), "Unexpected exception message");
 
                 exception = Assert.Throws<FailedOperationException>(() =>
                 {
@@ -69,7 +69,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 });
 
                 Assert.IsInstanceOf<ArgumentException>(exception.InnerException, "Unexpected inner exception");
-                Assert.That(exception.InnerException.Message, Is.EqualTo(ExceptionTemplates.UnknownEnumeration("DestinationType")), "Unexpected exception message");
+                Assert.That(exception.InnerException.Message, Is.EqualTo(ExceptionTemplates.FormatUnknownEnumeration("DestinationType")), "Unexpected exception message");
             });
         }
 
@@ -94,8 +94,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 var unsupportedException = exception.FirstInstanceOf<UnsupportedVersionException>();
                 Assert.That(unsupportedException, Is.Not.Null, $"Unexpected exception: {exception.BuildRecursiveExceptionMessage()}");
 
-                string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.NotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
-                    ExceptionTemplates.NotSupportedOnCloudWithDetails(typeof(Audit).Name);
+                string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.FormatNotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
+                    ExceptionTemplates.FormatNotSupportedOnCloudWithDetails(typeof(Audit).Name);
 
                 Assert.That(unsupportedException.Message, Is.EqualTo(errorMsg), "Unexpected exception message");
             });
@@ -133,8 +133,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                     var sqlOnDemandError = exception.FirstInstanceOf<UnsupportedVersionException>();
                     Assert.That(sqlOnDemandError, Is.Not.Null, $"Unexpected error for SqlOnDemand: {exception.BuildRecursiveExceptionMessage()}");
 
-                    string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.NotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
-                        ExceptionTemplates.NotSupportedOnCloudWithDetails(typeof(Audit).Name);
+                    string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.FormatNotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
+                        ExceptionTemplates.FormatNotSupportedOnCloudWithDetails(typeof(Audit).Name);
 
                     Assert.That(sqlOnDemandError.Message, Is.EqualTo(errorMsg), "Unexpected exception message");
                 }
@@ -142,7 +142,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 {
                     Assert.IsInstanceOf<UnsupportedEngineEditionException>(exception.InnerException, "Unexpected inner exception");
                     Assert.That(exception.InnerException.Message,
-                        Is.EqualTo(ExceptionTemplates.InvalidPropertyValueForVersion(typeof(Audit).Name,
+                        Is.EqualTo(ExceptionTemplates.FormatInvalidPropertyValueForVersion(typeof(Audit).Name,
                             "DestinationType", "Url", server.GetSqlServerVersionName())),
                         "Unexpected exception message");
                 }
@@ -178,8 +178,8 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                     var sqlOnDemandError = exception.FirstInstanceOf<UnsupportedVersionException>();
                     Assert.That(sqlOnDemandError, Is.Not.Null, $"Unexpected error for SqlOnDemand: {exception.BuildRecursiveExceptionMessage()}");
 
-                    string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.NotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
-                        ExceptionTemplates.NotSupportedOnCloudWithDetails(typeof(Audit).Name);
+                    string errorMsg = server.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand ? ExceptionTemplates.FormatNotSupportedOnOnDemandWithDetails(typeof(Audit).Name) :
+                        ExceptionTemplates.FormatNotSupportedOnCloudWithDetails(typeof(Audit).Name);
 
                     Assert.That(sqlOnDemandError.Message, Is.EqualTo(errorMsg), "Unexpected exception message");
                 }
@@ -187,7 +187,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                 {
                     Assert.IsInstanceOf<UnsupportedEngineEditionException>(exception.InnerException, "Unexpected inner exception");
                     Assert.That(exception.InnerException.Message,
-                        Is.EqualTo(ExceptionTemplates.InvalidPropertyValueForVersion(typeof(Audit).Name,
+                        Is.EqualTo(ExceptionTemplates.FormatInvalidPropertyValueForVersion(typeof(Audit).Name,
                             "DestinationType", "ExternalMonitor", server.GetSqlServerVersionName())),
                         "Unexpected exception message");
                 }

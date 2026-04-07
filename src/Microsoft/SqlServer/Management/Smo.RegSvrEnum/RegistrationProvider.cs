@@ -156,21 +156,21 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
             catch(NotSupportedException invalidPath)
             {
 
-                throw new RegisteredServerException(SRError.PathNotSupported(filename), invalidPath);
+                throw new RegisteredServerException(SRError.FormatPathNotSupported(filename), invalidPath);
             }
             catch(DirectoryNotFoundException noDirectory)
             {
 
                 throw new RegisteredServerException(
-                    SRError.DirectoryNotFound(filename), noDirectory);
+                    SRError.FormatDirectoryNotFound(filename), noDirectory);
             }
             catch(UnauthorizedAccessException noAccess)
             {
-                throw new RegisteredServerException(SRError.AccessDenied(filename), noAccess);
+                throw new RegisteredServerException(SRError.FormatAccessDenied(filename), noAccess);
             } 
             catch (Exception ex)
             {
-                throw new RegisteredServerException(SRError.ErrUnableToExport(filename), ex);
+                throw new RegisteredServerException(SRError.FormatErrUnableToExport(filename), ex);
             }
         }
 
@@ -317,7 +317,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
                                         ", instead we have node of type {1}", typeof(ServerTypeRegistrationInfo).FullName, 
                                         node.GetType().FullName);
 #endif
-                                    throw new RegisteredServerException(SRError.RegSvrDatafileInvalid(registeredServersFilePath));
+                                    throw new RegisteredServerException(SRError.FormatRegSvrDatafileInvalid(registeredServersFilePath));
                                 }
 #if STRACE
                                 STrace.Trace(Tracing.RegProvider, Tracing.NormalTrace, 

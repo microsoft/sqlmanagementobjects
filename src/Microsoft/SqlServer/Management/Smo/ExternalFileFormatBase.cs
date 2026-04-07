@@ -182,7 +182,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 externalFileFormatType = (ExternalFileFormatType)this.GetPropValue(nameof(FormatType));
                 if (!Enum.IsDefined(typeof(ExternalFileFormatType), externalFileFormatType))
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.UnknownEnumeration(externalFileFormatType.ToString()));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatUnknownEnumeration(externalFileFormatType.ToString()));
                 }
             }
             

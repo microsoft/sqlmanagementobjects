@@ -437,7 +437,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         // This error means that WMI provider for SQL Server is not installed on
                         // the server.
                         // Provide a more user-friendly message in that case. 
-                        throw new SmoException(ExceptionTemplates.WMIProviderNotInstalled(this.Target.GetServerObject().Name), managementException);
+                        throw new SmoException(ExceptionTemplates.FormatWMIProviderNotInstalled(this.Target.GetServerObject().Name), managementException);
                     }
                     else
                     {
@@ -860,7 +860,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "UserDefinedType":
                     if (eventID == (int)ObjectEventValues.Alter)
                     {
-                        throw new SmoException(ExceptionTemplates.NotSupportedNotification(typeName, "Alter"));
+                        throw new SmoException(ExceptionTemplates.FormatNotSupportedNotification(typeName, "Alter"));
                     }
 
                     typeName = "Type";
@@ -882,7 +882,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case "Synonym":
                     if (eventID == (int)ObjectEventValues.Alter)
                     {
-                        throw new SmoException(ExceptionTemplates.NotSupportedNotification(typeName, "Alter"));
+                        throw new SmoException(ExceptionTemplates.FormatNotSupportedNotification(typeName, "Alter"));
                     }
 
                     break;               

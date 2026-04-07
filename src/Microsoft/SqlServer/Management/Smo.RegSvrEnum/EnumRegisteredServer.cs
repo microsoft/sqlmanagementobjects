@@ -48,7 +48,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 
             if(sqlRegType == null)
             {
-                throw new InternalEnumeratorException(SRError.SqlServerTypeNotFound(SqlServerTypeGuid.ToString()));
+                throw new InternalEnumeratorException(SRError.FormatSqlServerTypeNotFound(SqlServerTypeGuid.ToString()));
             }
 
             if (path == null || ((string)path).Length <= 0)
@@ -68,7 +68,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 
                 if(priInner == null)
                 {
-                    throw new InternalEnumeratorException(SRError.PathFilterInvalid(groupName));
+                    throw new InternalEnumeratorException(SRError.FormatPathFilterInvalid(groupName));
                 }
             }
 
@@ -174,7 +174,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 
                 if (priInner == null)
                 {
-                    throw new InternalEnumeratorException(SRError.PathFilterInvalid(groupName));
+                    throw new InternalEnumeratorException(SRError.FormatPathFilterInvalid(groupName));
                 }
             }
 

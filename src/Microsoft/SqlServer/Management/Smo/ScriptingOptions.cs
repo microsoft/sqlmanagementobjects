@@ -2365,7 +2365,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     break;
                 default:
                     // VBUMP
-                    throw new SmoException(ExceptionTemplates.InvalidVersion(majorVersion.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatInvalidVersion(majorVersion.ToString()));
             }
             return sqlSvrVersion;
         }

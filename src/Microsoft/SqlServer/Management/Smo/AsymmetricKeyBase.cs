@@ -151,7 +151,7 @@ namespace Microsoft.SqlServer.Management.Smo
             validAlgorithms.AddRange(new string[] { "RSA_512", "RSA_1024", "RSA_2048", "RSA_3072", "RSA_4096" });
             if (!validAlgorithms.Contains(providerAlgorithm.ToUpper()))
             {
-                throw new ArgumentException(ExceptionTemplates.InvalidAlgorithm("AsymmetricKey", providerAlgorithm));
+                throw new ArgumentException(ExceptionTemplates.FormatInvalidAlgorithm("AsymmetricKey", providerAlgorithm));
             }
         }
 
@@ -489,7 +489,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         break;
 
                     default:
-                        throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("AsymmetricKeySourceType"));
+                        throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("AsymmetricKeySourceType"));
                 }
             }
             else
@@ -516,7 +516,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     case AsymmetricKeyEncryptionAlgorithm.CryptographicProviderDefined:
                         throw new ArgumentException(ExceptionTemplates.SourceTypeShouldBeProvider);
                     default:
-                        throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("AsymmetricKeyEncryptionAlgorithm"));
+                        throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("AsymmetricKeyEncryptionAlgorithm"));
                 }
 
             }

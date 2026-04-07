@@ -226,7 +226,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
         {
             if (resolverType == null)
             {
-                throw new ArgumentNullException("resolverType", SfcStrings.SfcNullArgumentToSfcReferenceAttribute(typeof(SfcReferenceAttribute).Name));
+                throw new ArgumentNullException("resolverType", SfcStrings.FormatSfcNullArgumentToSfcReferenceAttribute(typeof(SfcReferenceAttribute).Name));
             }
             this.m_args = parameters;
 
@@ -250,7 +250,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             this.m_sfcReferenceResolver = ((SfcReferenceResolverFactoryDelegate)factory)(parameters) as ISfcReferenceResolver;
             if (this.m_sfcReferenceResolver == null)
             {
-                throw new InvalidOperationException(SfcStrings.SfcNullInvalidSfcReferenceResolver(resolverType.Name, typeof(ISfcReferenceResolver).Name));
+                throw new InvalidOperationException(SfcStrings.FormatSfcNullInvalidSfcReferenceResolver(resolverType.Name, typeof(ISfcReferenceResolver).Name));
             }
         }
 
@@ -412,7 +412,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
                 if (resolver == null)
                 {
                     // The resolver isn't really of the generic type requested so we have to throw
-                    throw new InvalidOperationException(SfcStrings.SfcNullInvalidSfcReferenceResolver(this.m_sfcReferenceResolver.GetType().Name, typeof(ISfcReferenceResolver<T, S>).Name));
+                    throw new InvalidOperationException(SfcStrings.FormatSfcNullInvalidSfcReferenceResolver(this.m_sfcReferenceResolver.GetType().Name, typeof(ISfcReferenceResolver<T, S>).Name));
                 }
                 return resolver.Resolve(instance, this.m_args);
             }
@@ -656,7 +656,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
         {
             if (resolverType == null)
             {
-                throw new ArgumentNullException("resolverType", SfcStrings.SfcNullArgumentToSfcReferenceAttribute(typeof(SfcReferenceCollectionAttribute).Name));
+                throw new ArgumentNullException("resolverType", SfcStrings.FormatSfcNullArgumentToSfcReferenceAttribute(typeof(SfcReferenceCollectionAttribute).Name));
             }
             this.args = parameters;
 
@@ -678,7 +678,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             this.resolver = ((SfcReferenceCollectionResolverFactoryDelegate)factory)(parameters) as ISfcReferenceCollectionResolver;
             if (this.resolver == null)
             {
-                throw new InvalidOperationException(SfcStrings.SfcNullInvalidSfcReferenceResolver(resolverType.Name, typeof(ISfcReferenceCollectionResolver).Name));
+                throw new InvalidOperationException(SfcStrings.FormatSfcNullInvalidSfcReferenceResolver(resolverType.Name, typeof(ISfcReferenceCollectionResolver).Name));
             }
         }
 
@@ -737,7 +737,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             if (resolver == null)
             {
                 // The resolver isn't really of the generic type requested so we have to throw
-                throw new InvalidOperationException(SfcStrings.SfcNullInvalidSfcReferenceResolver(this.resolver.GetType().Name, typeof(ISfcReferenceCollectionResolver<T, S>).Name));
+                throw new InvalidOperationException(SfcStrings.FormatSfcNullInvalidSfcReferenceResolver(this.resolver.GetType().Name, typeof(ISfcReferenceCollectionResolver<T, S>).Name));
             }
             return resolver.ResolveCollection(instance, this.args);
         }

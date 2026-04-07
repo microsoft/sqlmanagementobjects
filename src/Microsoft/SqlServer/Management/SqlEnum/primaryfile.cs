@@ -20,7 +20,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (null == sName)
             {
-                throw new InternalEnumeratorException(StringSqlEnumerator.PropMustBeSpecified("Name", "PrimaryFile"));
+                throw new InternalEnumeratorException(StringSqlEnumerator.FormatPropMustBeSpecified("Name", "PrimaryFile"));
             }
             res.StatementBuilder.AddPrefix(String.Format(CultureInfo.InvariantCulture, "declare @fileName nvarchar(255)\nselect @fileName = N'{0}'\n", Util.EscapeString(sName, '\'')));
             this.Filter = null;

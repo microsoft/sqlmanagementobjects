@@ -185,7 +185,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             // The OQ was created with Server in the ctor but the query does not start with "Server"
             if (nonSfcRoot != null && !query.ToString ().StartsWith ("Server", StringComparison.OrdinalIgnoreCase))
             {
-                throw new SfcInvalidQueryExpressionException (SfcStrings.InvalidSMOQuery (query.ToString ()));
+                throw new SfcInvalidQueryExpressionException (SfcStrings.FormatInvalidSMOQuery(query.ToString ()));
             }
         }
 

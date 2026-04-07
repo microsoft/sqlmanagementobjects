@@ -110,32 +110,125 @@ A new internal method `ExecuteTSqlAsync()` parallels the existing `ExecuteTSql()
 
 - None — this is the foundational layer. All other async components depend on this.
 
+### 5.6 Implementation Notes
+
+**Status:** Implemented in Step 1 (ServerConnection Async Methods)
+
+#### 5.6.1 ExecuteTSqlAsync Implementation
+
+The `ConnectionManager.ExecuteTSqlAsync()` method was implemented with the following key details:
+
+- **Method signature:** `protected async Task<object> ExecuteTSqlAsync(ExecuteTSqlAction action, SqlCommand command, bool catchException, CancellationToken cancellationToken)`
+- **Parameter type:** Changed from `object execObject` to `SqlCommand command` to enforce type safety, as this method only works with `SqlCommand` (unlike the synchronous `ExecuteTSql` which also accepts `SqlDataAdapter` for `FillDataSet` operations)
+- **Return type:** `Task<object>` to accommodate different return types based on action (int, SqlDataReader, DataTable, object)
+- **Async execution:** Uses `SqlCommand.ExecuteNonQueryAsync()`, `ExecuteReaderAsync()`, and `ExecuteScalarAsync()` directly
+- **ExecuteTSqlAction enum:** Added `FillDataTable` value to support async DataTable population. The enum now has: `Unknown`, `ExecuteNonQuery`, `ExecuteReader`, `ExecuteScalar`, `FillDataSet`, `FillDataTable`
+- **FillDataSet action:** Throws `InvalidOperationException` with message "ExecuteTSqlAction.FillDataSet is not supported in async execution. Use FillDataTable instead." This is because `FillDataSet` semantically implies using `SqlDataAdapter.Fill()`, which is inherently synchronous.
+- **FillDataTable action:** Calls `PopulateDataTableAsync()` helper method to populate a DataTable asynchronously. This provides a clean async path through the enum-based dispatch mechanism.
+- **PopulateDataTableAsync helper:** Protected method that reads schema and rows asynchronously using `SqlDataReader.ReadAsync()`. Called internally when `FillDataTable` action is specified.
+- **Exception handling:** Async retry logic implemented in `HandleExecuteExceptionAsync()`, mirroring the synchronous retry pattern for token expiration and connection failures
+- **Database validation:** `IsDatabaseValidAsync()` added to verify database existence during async retry flows
+- **ConfigureAwait(false):** All `await` calls use `ConfigureAwait(false)` to avoid synchronization context capture
+
+#### 5.6.2 ServerConnection Public Async Methods
+
+Six public async methods were added to `ServerConnection`:
+
+1. **ExecuteNonQueryAsync(string)** — Mirrors `ExecuteNonQuery()`, processes GO batches, respects CapturedSql mode
+2. **ExecuteNonQueryAsync(IEnumerable<string>)** — Sequential batch execution with cancellation support
+3. **ExecuteReaderAsync(string)** — Returns `SqlDataReader`, caller responsible for disposal
+4. **ExecuteWithResultsAsync(string)** — Returns `DataTable` populated asynchronously. Internally calls `ExecuteTSqlAsync(ExecuteTSqlAction.FillDataTable, ...)`, which delegates to `PopulateDataTableAsync()` to read results asynchronously.
+5. **ExecuteWithResultsAsync(IEnumerable<string>)** — Merges results from sequential commands into a single `DataTable`
+6. **ExecuteScalarAsync(string)** — Respects query caching when enabled
+
+#### 5.6.3 CapturedSql Mode Behavior
+
+All async methods respect `SqlExecutionModes.CaptureSql` mode identically to their synchronous counterparts:
+- Commands are captured via `CaptureCommand()` but not executed
+- `ExecuteNonQueryAsync` returns 0
+- `ExecuteScalarAsync` returns null
+- `ExecuteWithResultsAsync` returns empty `DataTable`
+- `ExecuteReaderAsync` returns null
+
+This ensures that script-generation scenarios work correctly in async mode.
+
+#### 5.6.4 Error Handling and Retry Logic
+
+The async execution path implements the same retry semantics as the synchronous path:
+- Connection failures trigger retry with connection reopening
+- Access token expiration detection (SqlException Number=0, Class=0xb)
+- Database context restoration via `IsDatabaseValidAsync()` check
+- Single retry attempt (no infinite loops)
+
+#### 5.6.5 Cancellation Behavior
+
+Cancellation is propagated through the entire async stack:
+- `CancellationToken` flows from public methods → `ExecuteTSqlAsync` → `SqlCommand` async methods
+- Cancellation during batch execution stops further command execution
+- `OperationCanceledException` or `ExecutionFailureException` thrown depending on timing
+- Previously completed commands in a batch are NOT rolled back (no implicit transaction)
+
+#### 5.6.6 Testing
+
+**Unit Tests** (`src/UnitTest/ConnectionInfo/ServerConnectionAsyncTests.cs`):
+- CapturedSql mode verification for all async methods
+- Batch command handling
+- Null/empty input handling
+- Cancellation token parameter validation
+
+**Functional Tests** (`src/FunctionalTest/Smo/GeneralFunctionality/ServerConnectionAsyncTests.cs`):
+- DDL execution via `ExecuteNonQueryAsync`
+- Sequential batch execution with row count validation
+- `ExecuteWithResultsAsync` DataTable population and schema verification
+- `ExecuteScalarAsync` result validation
+- `ExecuteReaderAsync` with async reading
+- Cancellation of long-running queries (WAITFOR DELAY)
+- Mid-batch cancellation with verification that remaining commands don't execute
+
+All tests use `ConfigureAwait(false)` and follow NUnit + MSTest patterns established in the test suite.
+
 ## 6. SFC Async Layer (Enumerator / Request / ExecuteSql)
 
 ### 6.1 Overview
 
 The SFC (SQL Foundation Classes) layer orchestrates query construction and execution. The key types in the async path are:
 
-| Type | Role |
-|------|------|
-| `Enumerator` | Front-end entry point — `GetData()` processes a `Request` |
-| `Request` | Describes what to fetch (URN, fields, result type) |
-| `ExecuteSql` | Wraps `ServerConnection` — executes constructed SQL |
-| `Environment` | Builds the object list from URN, chains `EnumObject.GetData()` calls |
+| Type | Assembly | Namespace | Role |
+|------|----------|-----------|------|
+| `Enumerator` | `Microsoft.SqlServer.Management.Sdk.Sfc` | `Microsoft.SqlServer.Management.Smo` | Front-end entry point — static `GetData()` processes a `Request`. Also has an instance `Process()` method that handles Azure/Cloud routing then delegates to static `GetData()`. |
+| `Request` | `Microsoft.SqlServer.Management.Sdk.Sfc` | `Microsoft.SqlServer.Management.Smo` | Describes what to fetch (URN, fields, result type) |
+| `ExecuteSql` (Sdk.Sfc) | `Microsoft.SqlServer.Management.Sdk.Sfc` | `Microsoft.SqlServer.Management.Smo` | Public class — wraps `ServerConnection`, executes constructed SQL |
+| `ExecuteSql` (SqlEnum) | `Microsoft.SqlServer.SqlEnum` | `Microsoft.SqlServer.Management.Smo` | Internal class — independent parallel implementation (does **not** derive from or wrap the Sdk.Sfc version). Adds database-scoped connection handling via `GetDatabaseConnection()`. |
+| `Environment` | `Microsoft.SqlServer.Management.Sdk.Sfc` | `Microsoft.SqlServer.Management.Smo` | Builds the object list from URN, chains `EnumObject.GetData()` calls |
+| `EnumResult` | `Microsoft.SqlServer.Management.Sdk.Sfc` | `Microsoft.SqlServer.Management.Smo` | Intermediate result container with `ResultType`, `CommandText`, and data. Provides static `ConvertToDataReader(EnumResult)` to convert results to `IDataReader`. |
+
+> **Implementation note — `EnumObject` subclasses:** The abstract `EnumObject.GetData(EnumResult)` is overridden in several subclasses. The ones that perform SQL execution and need async counterparts are: `SqlObjectBase` (Sdk.Sfc), `SqlObjectBase` (SqlEnum — separate class). `AvailableSQLServers` is **deferred** — it does not need async in this iteration. WMI/registry-based subclasses likewise do not need async in this iteration.
 
 ### 6.2 New Async Methods
 
 ```csharp
-// Enumerator (parameter order matches existing sync Enumerator.GetData)
+// Enumerator — static, matching existing static GetData()
 public static Task<EnumResult> GetDataAsync(object connectionInfo, Request request, CancellationToken cancellationToken = default);
 
-// ExecuteSql
-internal Task<DataTable> GetDataTableAsync(CancellationToken cancellationToken = default);
-internal Task<SqlDataReader> GetDataReaderAsync(CancellationToken cancellationToken = default);
+// --- ExecuteSql (Sdk.Sfc — Microsoft.SqlServer.Management.Sdk.Sfc assembly) ---
+class ExecuteSql  // public class in Sdk.Sfc
+{
+    internal Task<DataTable> GetDataTableAsync(CancellationToken cancellationToken = default);
+    internal Task<SqlDataReader> GetDataReaderAsync(CancellationToken cancellationToken = default);
+}
+
+// --- ExecuteSql (SqlEnum — Microsoft.SqlServer.SqlEnum assembly) ---
+class ExecuteSql  // internal class in SqlEnum
+{
+    internal Task<DataTable> GetDataTableAsync(CancellationToken cancellationToken = default);
+    internal Task<SqlDataReader> GetDataReaderAsync(CancellationToken cancellationToken = default);
+}
 
 // Environment (parameter order matches Enumerator for consistency)
 internal Task<EnumResult> GetDataAsync(object connectionInfo, Request request, CancellationToken cancellationToken = default);
 ```
+
+> **Note:** `Enumerator.Process()` (instance method) is not given an async counterpart in this iteration. SMO's `ExecutionManager` calls the static `Enumerator.GetData()`, so `GetDataAsync` (static) is sufficient. If Azure/Cloud routing via `Process()` needs async in the future, a `ProcessAsync()` can be added later.
 
 ### 6.3 Dependencies
 
@@ -193,7 +286,7 @@ AbstractCollectionBase
                  └─ RemovableCollectionBase
 ```
 
-### 8.2 New Async Method on SmoCollectionBase
+### 8.2 New Async Method on SmoCollectionBase\<TObject, TParent\>
 
 ```csharp
 public Task LoadAsync(CancellationToken cancellationToken = default);
@@ -265,6 +358,8 @@ The interfaces are intentionally focused on **script generation only**. They do 
 
 SMO base classes (e.g., `ScriptNameObjectBase`, `NamedSmoObject`) implement the appropriate interfaces. Objects outside the `Smo` assembly that support these operations can also implement the interfaces.
 
+> **Note:** An `IScriptable` interface already exists on `SqlSmoObject` (with `Script()` and `Script(ScriptingOptions)` returning `StringCollection`). The new `IScriptCreate`/`IScriptAlter`/`IScriptDrop` interfaces are distinct — they expose individual DDL script generation methods with modern return types. Implementation should avoid naming conflicts with `IScriptable`.
+
 ### 9.3 Extension Methods
 
 ```csharp
@@ -284,14 +379,36 @@ await table.AlterAsync(cancellationToken);
 await table.DropAsync(cancellationToken);
 ```
 
-### 9.4 Sync Refactoring Opportunity
+### 9.4 Post-Execution State Management
+
+The extension methods must handle the same post-execution state management that the sync `CreateImpl`/`AlterImpl`/`DropImpl` methods perform. Key methods involved:
+
+- `PostCreate()` — **protected virtual** on `SqlSmoObject`
+- `CleanObject()` — **protected virtual** on `SqlSmoObject`
+- `PropagateStateAndCleanUp()` — **private** on `SqlSmoObject`
+
+Since extension methods cannot access protected or private members, **internal bridge methods must be added** to `SqlSmoObject` before the extension methods can be implemented:
+
+```csharp
+// Internal bridges for async extension methods (add to SqlSmoObject)
+internal void InternalPostCreate() => PostCreate();
+internal void InternalCleanObject() => CleanObject();
+// PropagateStateAndCleanUp must be changed from private to internal
+```
+
+This refactoring is a prerequisite for the extension method approach.
+
+> **Assembly constraint:** Because these bridge methods are `internal`, the `SmoAsyncExtensions` class containing the extension methods **must** reside in the same assembly as `SqlSmoObject` (`Microsoft.SqlServer.Smo`) or be granted access via `[InternalsVisibleTo]`. See Section 12 for guidance on assembly placement.
+
+### 9.5 Sync Refactoring Opportunity
 
 The existing synchronous `Create()`, `Alter()`, and `Drop()` methods could eventually be refactored to consume the same `IScriptCreate` / `IScriptAlter` / `IScriptDrop` interfaces, unifying the script-generation contract. This is not required for the initial async implementation but is a desirable long-term goal.
 
-### 9.5 Dependencies
+### 9.6 Dependencies
 
 - Depends on: **ServerConnection async methods** (Section 5) for execution.
 - Depends on: Existing script-generation machinery in SMO base classes.
+- Depends on: Internal bridge methods on `SqlSmoObject` for post-execution state management (Section 9.4).
 
 ## 10. Component Dependency Graph
 
@@ -338,10 +455,11 @@ does not depend on or affect the async method implementations.
 |-----------|----------|
 | `IScriptCreate`, `IScriptAlter`, `IScriptDrop` interfaces | `Microsoft.SqlServer.ConnectionInfo` |
 | `ServerConnection` async methods | `Microsoft.SqlServer.ConnectionInfo` |
-| SFC async layer (`Enumerator`, `ExecuteSql`) | `Microsoft.SqlServer.SqlEnum` |
+| SFC async layer — `Enumerator`, `ExecuteSql` (Sdk.Sfc), `Environment` | `Microsoft.SqlServer.Management.Sdk.Sfc` |
+| SFC async layer — `ExecuteSql` (SqlEnum) | `Microsoft.SqlServer.SqlEnum` |
 | `SqlSmoObject.InitializeAsync`, `SmoCollectionBase.LoadAsync` | `Microsoft.SqlServer.Smo` |
 | `Server.AsyncOnlyMode` property | `Microsoft.SqlServer.Smo` |
-| `SmoAsyncExtensions` (extension methods) | TBD — `Microsoft.SqlServer.Smo` or a new assembly depending on whether all implementors of the interfaces are reachable |
+| `SmoAsyncExtensions` (extension methods) | `Microsoft.SqlServer.Smo` (preferred — avoids `InternalsVisibleTo` for bridge methods on `SqlSmoObject`), or a new assembly if needed, in which case `[InternalsVisibleTo]` must be added to `Microsoft.SqlServer.Smo` |
 
 ## 13. Testing Requirements
 

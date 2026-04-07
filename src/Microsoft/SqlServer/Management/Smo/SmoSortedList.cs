@@ -36,7 +36,7 @@ namespace Microsoft.SqlServer.Management.Smo
             
             if( null != objLookup )
             {
-                throw new SmoException(ExceptionTemplates.CannotAddObject(typeof(TObject).Name, obj.key.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatCannotAddObject(typeof(TObject).Name, obj.key.ToString()));
             }
 
             // we can add an object to a collection if it is in Creating state, or if 

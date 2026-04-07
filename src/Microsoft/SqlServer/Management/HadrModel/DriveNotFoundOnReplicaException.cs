@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -18,9 +16,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="driveLetter">Drive Letter</param>
         /// <param name="replicaName">Replica Name</param>
         public DriveNotFoundOnReplicaException(char driveLetter, string replicaName) 
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.DataBaseDiskSizeValidationException,
-                replicaName, driveLetter))
+            : base(Resource.FormatDriveNotFoundOnReplica(driveLetter, replicaName))
         {
         }
 

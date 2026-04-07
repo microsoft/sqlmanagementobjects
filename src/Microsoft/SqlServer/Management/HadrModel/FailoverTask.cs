@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 using Microsoft.SqlServer.Management.HadrData;
 using Microsoft.SqlServer.Management.Smo;
 
@@ -24,8 +23,8 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="failoverData"></param>
         public FailoverTask(FailoverData failoverData)
             : base(failoverData.TargetReplicaFailoverCategory == FailoverCategory.FailoverWithDataLoss ?
-                string.Format(CultureInfo.InvariantCulture, Resource.ForcedFailoverTaskText, failoverData.TargetAvailabilityReplica.Name)
-                : string.Format(CultureInfo.InvariantCulture, Resource.ManualFailoverTaskText, failoverData.TargetAvailabilityReplica.Name))
+                Resource.FormatForcedFailoverTaskText(failoverData.TargetAvailabilityReplica.Name)
+                : Resource.FormatManualFailoverTaskText(failoverData.TargetAvailabilityReplica.Name))
         {
             if (failoverData == null)
             {

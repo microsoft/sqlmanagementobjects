@@ -379,7 +379,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     }
                     else //If there is no container property for holding this type
                     {
-                        throw new SfcNonSerializableTypeException(SfcStrings.SfcNonSerializableType(
+                        throw new SfcNonSerializableTypeException(SfcStrings.FormatSfcNonSerializableType(
                             currentContainer.SfcInstance.GetType().Name));
                     }
                 }

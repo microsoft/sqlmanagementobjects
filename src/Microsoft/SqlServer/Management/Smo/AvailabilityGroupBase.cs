@@ -166,7 +166,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 AvailabilityGroup.FailoverScript + 
                 Globals.statementTerminator;
 
-            this.DoCustomAction(script, ExceptionTemplates.ManualFailoverFailed(this.Parent.Name, this.Name));
+            this.DoCustomAction(script, ExceptionTemplates.FormatManualFailoverFailed(this.Parent.Name, this.Name));
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 AvailabilityGroup.ForceFailoverAllowDataLossScript +
                 Globals.statementTerminator;
 
-            this.DoCustomAction(script, ExceptionTemplates.ForceFailoverFailed(this.Parent.Name, this.Name));
+            this.DoCustomAction(script, ExceptionTemplates.FormatForceFailoverFailed(this.Parent.Name, this.Name));
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Globals.RParen +
                 Globals.statementTerminator;
 
-            this.DoCustomAction(script, ExceptionTemplates.ForceFailoverFailed(this.Parent.Name, this.Name));
+            this.DoCustomAction(script, ExceptionTemplates.FormatForceFailoverFailed(this.Parent.Name, this.Name));
         }
 
         /// <summary>
@@ -339,7 +339,7 @@ namespace Microsoft.SqlServer.Management.Smo
             catch (Exception e)
             {
                 FilterException(e);
-                throw new FailedOperationException(ExceptionTemplates.EnumReplicaClusterNodes(this.Name), this, e);
+                throw new FailedOperationException(ExceptionTemplates.FormatEnumReplicaClusterNodes(this.Name), this, e);
             }
         }
 
@@ -511,7 +511,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // Cannot create an availability group without at least one replica
             if (null == this.AvailabilityReplicas || this.AvailabilityReplicas.Count < 1)
             {
-                throw new SmoException(ExceptionTemplates.ObjectWithNoChildren(AvailabilityGroup.UrnSuffix, AvailabilityReplica.UrnSuffix));
+                throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren(AvailabilityGroup.UrnSuffix, AvailabilityReplica.UrnSuffix));
             }
 
             // Cannot create an availability group without the parent server instance be a replica
@@ -520,13 +520,13 @@ namespace Microsoft.SqlServer.Management.Smo
             //
             if (!isDistributed && null == this.AvailabilityReplicas[this.Parent.ConnectionContext.TrueName])
             {
-                throw new SmoException(ExceptionTemplates.CannotCreateAvailabilityGroupWithoutCurrentIntance(this.Parent.Name, this.Name));
+                throw new SmoException(ExceptionTemplates.FormatCannotCreateAvailabilityGroupWithoutCurrentIntance(this.Parent.Name, this.Name));
             }
 
             // Can create an availability group with only 1 listeners
             if (null != this.AvailabilityGroupListeners && this.AvailabilityGroupListeners.Count > 1)
             {
-                throw new SmoException(ExceptionTemplates.ObjectWithMoreChildren(AvailabilityGroup.UrnSuffix, AvailabilityGroupListener.UrnSuffix));
+                throw new SmoException(ExceptionTemplates.FormatObjectWithMoreChildren(AvailabilityGroup.UrnSuffix, AvailabilityGroupListener.UrnSuffix));
             }
 
             if (null != this.AvailabilityGroupListeners && this.AvailabilityGroupListeners.Count == 1)
@@ -947,7 +947,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case AvailabilityGroupClusterType.External:
                     return ExternalScript;
                 default:
-                    throw new ArgumentException(ExceptionTemplates.UnknownEnumerationWithValue("AvailabilityGroupClusterType", availabilityGroupClusterType));
+                    throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumerationWithValue("AvailabilityGroupClusterType", availabilityGroupClusterType));
             }
         }
 
@@ -994,7 +994,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     return NoneScript;
 
                 default:
-                    throw new ArgumentException(ExceptionTemplates.UnknownEnumeration("AvailabilityGroupAutomatedBackupPreference"));
+                    throw new ArgumentException(ExceptionTemplates.FormatUnknownEnumeration("AvailabilityGroupAutomatedBackupPreference"));
             }
         }
 

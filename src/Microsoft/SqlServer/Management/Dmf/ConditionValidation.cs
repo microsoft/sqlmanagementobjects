@@ -238,7 +238,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                             }
                             else if (!this.IsEnumerable)
                             {
-                                Exception ex = new DmfException(ExceptionTemplatesSR.ConditionCannotBeUsedForFiltering(this.Name));
+                                Exception ex = new DmfException(ExceptionTemplatesSR.FormatConditionCannotBeUsedForFiltering(this.Name));
                                 if (throwOnFirst)
                                 {
                                     throw methodTraceContext.TraceThrow(new ObjectValidationException(ExceptionTemplatesSR.Condition, Name, ex));
@@ -359,7 +359,7 @@ namespace Microsoft.SqlServer.Management.Dmf
                         }
                         else if (!this.IsEnumerable)
                         {
-                            Exception ex = new DmfException(ExceptionTemplatesSR.ConditionCannotBeUsedForFiltering(this.Name));
+                            Exception ex = new DmfException(ExceptionTemplatesSR.FormatConditionCannotBeUsedForFiltering(this.Name));
                             throw methodTraceContext.TraceThrow(new ObjectValidationException(ExceptionTemplatesSR.Condition, Name, ex));
                         }
                     }

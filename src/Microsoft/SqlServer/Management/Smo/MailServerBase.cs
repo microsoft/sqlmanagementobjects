@@ -75,7 +75,7 @@ namespace Microsoft.SqlServer.Management.Smo.Mail
             {
                 throw new FailedOperationException(ExceptionTemplates.SetAccount,
                                                    this,
-                                                   new ArgumentException(ExceptionTemplates.EmptyInputParam("userName", "string")));
+                                                   new ArgumentException(ExceptionTemplates.FormatEmptyInputParam("userName", "string")));
             }
 
             Properties.Get("UserName").Value = userName;

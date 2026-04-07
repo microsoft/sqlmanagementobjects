@@ -79,7 +79,7 @@ namespace Microsoft.SqlServer.Management.XEvent
                     {
                         if (foundPkg != null) //if there is a duplicate
                         {
-                            throw new XEventException(ExceptionTemplates.PackageNameNotUnique(name));
+                            throw new XEventException(ExceptionTemplates.FormatPackageNameNotUnique(name));
                         }
                         foundPkg = pkg; // set the pkg
                     }

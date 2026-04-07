@@ -119,7 +119,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     // if the index exists don't allow changes to its columns
                     if (State == SqlSmoState.Existing)
                     {
-                        m_IndexedColumns.LockCollection(ExceptionTemplates.ReasonObjectAlreadyCreated(UrnSuffix));
+                        m_IndexedColumns.LockCollection(ExceptionTemplates.FormatReasonObjectAlreadyCreated(UrnSuffix));
                     }
                 }
                 return m_IndexedColumns;
@@ -173,7 +173,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Version currentVersion = new Version(this.ServerVersion.Major, this.ServerVersion.Minor, this.ServerVersion.BuildNumber);
                 if (currentVersion < minSxiVersion)
                     {
-                       throw new UnknownPropertyException(ExceptionTemplates.PropertySupportedOnlyOn110SP1("IndexedXmlPaths"));
+                       throw new UnknownPropertyException(ExceptionTemplates.FormatPropertySupportedOnlyOn110SP1("IndexedXmlPaths"));
                     }
 
                 CheckObjectState();
@@ -206,7 +206,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Version currentVersion = new Version(this.ServerVersion.Major, this.ServerVersion.Minor, this.ServerVersion.BuildNumber);
                 if (currentVersion < minSxiVersion)
                     {
-                       throw new UnknownPropertyException(ExceptionTemplates.PropertySupportedOnlyOn110SP1("IndexedXmlPathNamespaces"));
+                       throw new UnknownPropertyException(ExceptionTemplates.FormatPropertySupportedOnlyOn110SP1("IndexedXmlPathNamespaces"));
                     }
 
                 CheckObjectState();
@@ -296,7 +296,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (this.InferredIndexType != Smo.IndexType.ClusteredColumnStoreIndex &&
                     this.InferredIndexType != Smo.IndexType.NonClusteredColumnStoreIndex)
                 {
-                    throw new InvalidSmoOperationException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.PropertyValidOnlyForColumnStoreIndexes, "CompressionDelay"));
+                    throw new InvalidSmoOperationException(ExceptionTemplates.FormatPropertyValidOnlyForColumnStoreIndexes("CompressionDelay"));
                 }
                 return (int)this.Properties.GetValueWithNullReplacement("CompressionDelay", false, true);
             }
@@ -308,7 +308,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (this.InferredIndexType != Smo.IndexType.ClusteredColumnStoreIndex &&
                     this.InferredIndexType != Smo.IndexType.NonClusteredColumnStoreIndex)
                 {
-                    throw new InvalidSmoOperationException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.PropertyValidOnlyForColumnStoreIndexes, "CompressionDelay"));
+                    throw new InvalidSmoOperationException(ExceptionTemplates.FormatPropertyValidOnlyForColumnStoreIndexes("CompressionDelay"));
                 }
 
                 if (value >= m_minCompressionDelay &&
@@ -319,7 +319,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new InvalidSmoOperationException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.InvalidCompressionDelayValue,
+                    throw new InvalidSmoOperationException(ExceptionTemplates.FormatInvalidCompressionDelayValue(
                         value, m_minCompressionDelay, m_maxCompressionDelay, m_hkMinCompressionDelay, 0 /*Special value allowed in HKCS*/));
                 }
             }
@@ -451,7 +451,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            m_IndexedColumns.LockCollection(ExceptionTemplates.ReasonObjectAlreadyCreated(UrnSuffix));
+            m_IndexedColumns.LockCollection(ExceptionTemplates.FormatReasonObjectAlreadyCreated(UrnSuffix));
 
             if (!this.ExecutionManager.Recording)
             {
@@ -788,7 +788,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 if (null == col)
                 {
-                    throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(UrnSuffix, Name, parentobj.FullQualifiedName + ".[" + SqlStringBraket(idxcol.Name) + "]"));
+                    throw new SmoException(ExceptionTemplates.FormatObjectRefsNonexCol(UrnSuffix, Name, parentobj.FullQualifiedName + ".[" + SqlStringBraket(idxcol.Name) + "]"));
                 }
 
                 string dataType;
@@ -1484,7 +1484,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (this.DatabaseEngineType == Microsoft.SqlServer.Management.Common.DatabaseEngineType.SqlAzureDatabase &&
                 this.ServerVersion.Major < 12)
             {
-                throw new SmoException(ExceptionTemplates.PropertyNotSupportedForCloudVersion("REORGANIZE", this.ServerVersion.Major.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatPropertyNotSupportedForCloudVersion("REORGANIZE", this.ServerVersion.Major.ToString()));
             }
 
             StringCollection queries = new StringCollection();
@@ -2128,7 +2128,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 if (this.IndexType != Smo.IndexType.ClusteredColumnStoreIndex &&
                     this.IndexType != Smo.IndexType.NonClusteredColumnStoreIndex)
                 {
-                    throw new InvalidSmoOperationException(string.Format(SmoApplication.DefaultCulture, ExceptionTemplates.PropertyValidOnlyForColumnStoreIndexes, "CompressAllRowGroups"));
+                    throw new InvalidSmoOperationException(ExceptionTemplates.FormatPropertyValidOnlyForColumnStoreIndexes("CompressAllRowGroups"));
                 }
                 compressAllRowGroups = value;
             }
@@ -2284,7 +2284,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (partitionScheme.Length == 0)
             {
                 throw new FailedOperationException(ExceptionTemplates.DropAndMove, this, null,
-                            ExceptionTemplates.EmptyInputParam("partitionScheme", "string"));
+                            ExceptionTemplates.FormatEmptyInputParam("partitionScheme", "string"));
             }
 
             if (null == partitionSchemeParameters)
@@ -2296,7 +2296,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (partitionSchemeParameters.Count == 0)
             {
                 throw new FailedOperationException(ExceptionTemplates.DropAndMove, this, null,
-                            ExceptionTemplates.EmptyInputParam("partitionSchemeParameters", "Collection"));
+                            ExceptionTemplates.FormatEmptyInputParam("partitionSchemeParameters", "Collection"));
             }
 
             DropAndMoveImpl(partitionScheme, partitionSchemeParameters);
@@ -2327,7 +2327,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (fileGroup.Length == 0)
             {
                 throw new FailedOperationException(ExceptionTemplates.DropAndMove, this, null,
-                                    ExceptionTemplates.EmptyInputParam("fileGroup", "string"));
+                                    ExceptionTemplates.FormatEmptyInputParam("fileGroup", "string"));
             }
 
             DropAndMoveImpl(fileGroup, null);
@@ -2351,7 +2351,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!(bool)Properties["IsClustered"].Value)
             {
-                throw new SmoException(ExceptionTemplates.IndexMustBeClustered(((ScriptSchemaObjectBase)ParentColl.ParentInstance).FullQualifiedName, this.FullQualifiedName));
+                throw new SmoException(ExceptionTemplates.FormatIndexMustBeClustered(((ScriptSchemaObjectBase)ParentColl.ParentInstance).FullQualifiedName, this.FullQualifiedName));
             }
 
             ScriptingPreferences sp = new ScriptingPreferences(this);

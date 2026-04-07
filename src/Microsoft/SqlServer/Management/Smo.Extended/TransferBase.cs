@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo.Internal;
+using Microsoft.SqlServer.SmoExtended;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -254,7 +255,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (value == null)
                 {
-                    throw new WrongPropertyValueException(ExceptionTemplates.WrongPropertyValueException("DatabaseFileMappings", "NULL"));
+                    throw new WrongPropertyValueException(ExceptionTemplates.FormatWrongPropertyValueException("DatabaseFileMappings", "NULL"));
                 }
                 databaseFileMappings = value;
             }
@@ -405,7 +406,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 Scripter.ScriptingError -= ScripterOnScriptingError;
                 if (Options.ContinueScriptingOnError)
                 {
-                    queryEnumerable.Add(IncompatibleObjects.Select(n =>string.Format(@"-- {0}", DatabaseRestorePlannerSR.IncompatibleObject(n.Type, n.GetNameForType(n.Type)))));
+                    queryEnumerable.Add(IncompatibleObjects.Select(n =>string.Format(@"-- {0}", DatabaseRestorePlannerSR.FormatIncompatibleObject(n.Type, n.GetNameForType(n.Type)))));
                 }
 
                 return queryEnumerable;
@@ -414,7 +415,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 //return custom error message
                 FailedOperationException foe = new FailedOperationException(
-                                                                           ExceptionTemplates.FailedOperationExceptionTextScript(SqlSmoObject.GetTypeName(this.Database.GetType().Name), this.Database.ToString()), e);
+                                                                           ExceptionTemplates.FormatFailedOperationExceptionTextScript(SqlSmoObject.GetTypeName(this.Database.GetType().Name), this.Database.ToString()), e);
                 //add additional properties
                 foe.Operation = ExceptionTemplates.ScriptTransfer;
                 foe.FailedObject = this;
@@ -1245,7 +1246,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         }
                         else
                         {
-                            throw new SmoException(ExceptionTemplates.NeedToPassObject(smoObject.GetType().ToString()));
+                            throw new SmoException(ExceptionTemplates.FormatNeedToPassObject(smoObject.GetType().ToString()));
                         }
                     }
                 }

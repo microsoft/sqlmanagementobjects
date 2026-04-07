@@ -158,7 +158,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.NumericScale = 7;
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.DataTypeUnsupported(sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatDataTypeUnsupported(sqlDataType.ToString()));
             }
         }
 
@@ -207,7 +207,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.VectorDimensions = singleNumericValue;
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.DataTypeUnsupported(sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatDataTypeUnsupported(sqlDataType.ToString()));
             }
         }
 
@@ -231,7 +231,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.name = GetSqlName(sqlDataType);
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.DataTypeUnsupported(sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatDataTypeUnsupported(sqlDataType.ToString()));
             }
 
         }
@@ -255,7 +255,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.Name = type;
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.DataTypeUnsupported(sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatDataTypeUnsupported(sqlDataType.ToString()));
             }
         }
 
@@ -280,7 +280,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.Schema = schema;
                     break;
                 default:
-                    throw new SmoException(ExceptionTemplates.DataTypeUnsupported(sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatDataTypeUnsupported(sqlDataType.ToString()));
             }
         }
 
@@ -886,12 +886,12 @@ namespace Microsoft.SqlServer.Management.Smo
             if (input.State == SqlSmoState.Creating ||
                 input.State == SqlSmoState.Dropped)
             {
-                throw new SmoException(ExceptionTemplates.NoPendingObjForDataType(input.State.ToString()));
+                throw new SmoException(ExceptionTemplates.FormatNoPendingObjForDataType(input.State.ToString()));
             }
 
             if (input.State == SqlSmoState.Creating)
             {
-                throw new SmoException(ExceptionTemplates.NeedExistingObjForDataType(input.FullQualifiedName));
+                throw new SmoException(ExceptionTemplates.FormatNeedExistingObjForDataType(input.FullQualifiedName));
             }
         }
 
@@ -940,7 +940,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.CantSetTypeName(this.sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatCantSetTypeName(this.sqlDataType.ToString()));
                 }
             }
         }
@@ -993,7 +993,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.UnknownSqlDataType(value.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatUnknownSqlDataType(value.ToString()));
                 }
             }
         }
@@ -1033,7 +1033,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else
                 {
-                    throw new SmoException(ExceptionTemplates.CantSetTypeSchema(this.sqlDataType.ToString()));
+                    throw new SmoException(ExceptionTemplates.FormatCantSetTypeSchema(this.sqlDataType.ToString()));
                 }
             }
         }
@@ -1853,7 +1853,7 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             if (!IsDataTypeSupportedOnTargetVersion(dataType, sp.TargetServerVersion, sp.TargetDatabaseEngineType, sp.TargetDatabaseEngineEdition))
             {
-                throw new SmoException(ExceptionTemplates.UnsupportedColumnType(
+                throw new SmoException(ExceptionTemplates.FormatUnsupportedColumnType(
                     parentName,
                     columnName,
                     dataType.ToString(),

@@ -156,7 +156,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 #endif	    
             if (sfcExtension == null && throwOnUnregisteredDomain)
             {
-                throw new SfcUnregisteredXmlDomainException(SfcStrings.UnregisteredXmlSfcDomain(domainName));
+                throw new SfcUnregisteredXmlDomainException(SfcStrings.FormatUnregisteredXmlSfcDomain(domainName));
             }
 
             return sfcExtension;
@@ -190,7 +190,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             }
             if(throwOnUnregisteredDomain)
             {
-                throw new SfcUnregisteredXmlTypeException(SfcStrings.UnregisteredSfcXmlType(string.Empty, fullTypeName), null);
+                throw new SfcUnregisteredXmlTypeException(SfcStrings.FormatUnregisteredSfcXmlType(string.Empty, fullTypeName), null);
             }
 
             return null;
@@ -434,7 +434,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             else
             {
                 //$TODO - string has been localized but needs review
-                throw new SfcSerializationException(SfcStrings.DomainRootUnknown(instance.GetType().FullName));
+                throw new SfcSerializationException(SfcStrings.FormatDomainRootUnknown(instance.GetType().FullName));
             }
         }
 
@@ -484,7 +484,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         return info;
                     }
                 }
-                throw new SfcMetadataException(SfcStrings.DomainNotFound(domainName));
+                throw new SfcMetadataException(SfcStrings.FormatDomainNotFound(domainName));
             }
         }
 
@@ -502,7 +502,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                     return info;
                 }
             }
-            throw new SfcMetadataException(SfcStrings.DomainNotFound(namespaceQualifier));
+            throw new SfcMetadataException(SfcStrings.FormatDomainNotFound(namespaceQualifier));
         }
     }
 }

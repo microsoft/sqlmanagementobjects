@@ -131,7 +131,7 @@ namespace Microsoft.SqlServer.Management.Smo
             // go thru referencing columns
             if (Columns.Count == 0)
             {
-                throw new SmoException(ExceptionTemplates.NoObjectWithoutColumns("ForeignKey"));
+                throw new SmoException(ExceptionTemplates.FormatNoObjectWithoutColumns("ForeignKey"));
             }
 
             bool fFirstColumn = true;
@@ -157,7 +157,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (null == colBase)
                     {
                         // the column does not exist, so we need to abort this scripting
-                        throw new SmoException(ExceptionTemplates.ObjectRefsNonexCol(UrnSuffix, Name, "[" + SqlStringBraket(ParentColl.ParentInstance.InternalName) + "].[" + SqlStringBraket(colFrom.Name) + "]"));
+                        throw new SmoException(ExceptionTemplates.FormatObjectRefsNonexCol(UrnSuffix, Name, "[" + SqlStringBraket(ParentColl.ParentInstance.InternalName) + "].[" + SqlStringBraket(colFrom.Name) + "]"));
                     }
 
                     // if this column is going to be ignored for scripting, we cannot script this index

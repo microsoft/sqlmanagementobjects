@@ -42,7 +42,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
             // Verify AlwaysOn is enabled
             if (!data.PrimaryServer.IsHadrEnabled)
             {
-                throw new ArgumentException(string.Format(Resource.PrimaryServerNotHadrEnabled, data.PrimaryServer.Name));
+                throw new ArgumentException(Resource.FormatPrimaryServerNotHadrEnabled(data.PrimaryServer.Name));
             }
 
             // Verify that the user has permissions to query DMV's

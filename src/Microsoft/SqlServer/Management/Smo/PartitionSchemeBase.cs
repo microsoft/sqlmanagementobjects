@@ -69,7 +69,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (FileGroups.Count == 0)
             {
-                throw new SmoException(ExceptionTemplates.ObjectWithNoChildren(this.GetType().Name, "FileGroup"));
+                throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren(this.GetType().Name, "FileGroup"));
             }
 
             string pfnName = (string)GetPropValue("PartitionFunction");

@@ -457,7 +457,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
                 if (jobcat == null)
                 {
                     // A category with such name doesn't exist. We're doomed
-                    throw new InternalSmoErrorException(ExceptionTemplates.UnknownCategoryName(categoryName));
+                    throw new InternalSmoErrorException(ExceptionTemplates.FormatUnknownCategoryName(categoryName));
                 }
                 else
                 {
@@ -1394,7 +1394,7 @@ namespace Microsoft.SqlServer.Management.Smo.Agent
 
             if (null == jobSchedule)
             {
-                throw new MissingObjectException(ExceptionTemplates.ObjectDoesNotExist("ScheduleId", scheduleId.ToString()));
+                throw new MissingObjectException(ExceptionTemplates.FormatObjectDoesNotExist("ScheduleId", scheduleId.ToString()));
             }
 
             return jobSchedule;

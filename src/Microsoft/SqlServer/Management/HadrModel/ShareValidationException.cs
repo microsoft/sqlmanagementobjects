@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -17,7 +16,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="backupLocation">BackupLocation</param>
         public ShareValidationException(string backupLocation)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.InvalidShare, backupLocation))
+            : base(Resource.FormatInvalidShare(backupLocation))
         {
         }
 
@@ -27,7 +26,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="backupLocation">Backup Location</param>
         /// <param name="innerException">Inner Exception</param>
         public ShareValidationException(string backupLocation, Exception innerException)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.InvalidShare, backupLocation), innerException)
+            : base(Resource.FormatInvalidShare(backupLocation), innerException)
         {
         }
     }

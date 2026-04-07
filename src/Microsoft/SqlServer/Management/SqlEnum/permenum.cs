@@ -633,7 +633,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
             //Couldn't find a value with the asked for type, means a new permission must not have been added
-            throw new ArgumentException(StringSqlEnumerator.UnknownPermissionType(permissionType));
+            throw new ArgumentException(StringSqlEnumerator.FormatUnknownPermissionType(permissionType));
         }
 
         /// <summary>
@@ -650,7 +650,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return obj.PermissionName();
             }
             TraceHelper.Trace("SqlEnum.PermissionDecode.PermissionCodeToPermissionName", SQLToolsCommonTraceLvl.Error, "Undefined permission code {0} - has it been added to {1}?", permissionCode, typeof(T));
-            throw new InvalidOperationException(StringSqlEnumerator.UnknownPermissionCode(permissionCode));
+            throw new InvalidOperationException(StringSqlEnumerator.FormatUnknownPermissionCode(permissionCode));
         }
 
         /// <summary>
@@ -667,7 +667,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 return obj.PermissionType();
             }
             TraceHelper.Trace("SqlEnum.PermissionDecode.PermissionCodeToPermissionType", SQLToolsCommonTraceLvl.Error, "Undefined permission code {0} - has it been added to {1}?", permissionCode, typeof(T));
-            throw new InvalidOperationException(StringSqlEnumerator.UnknownPermissionCode(permissionCode));
+            throw new InvalidOperationException(StringSqlEnumerator.FormatUnknownPermissionCode(permissionCode));
         }
 
         /// <summary>

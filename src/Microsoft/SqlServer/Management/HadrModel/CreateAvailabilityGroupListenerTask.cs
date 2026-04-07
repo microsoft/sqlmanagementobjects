@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.HadrData;
 using SMO = Microsoft.SqlServer.Management.Smo;
@@ -25,7 +24,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="availabilityGroupData">The availability group data</param>
         public CreateAvailabilityGroupListenerTask(AvailabilityGroupData availabilityGroupData)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.CreateAvailabilityGroupListenerText , availabilityGroupData.AvailabilityGroupListener.ListenerName))
+            : base(Resource.FormatCreateAvailabilityGroupListenerText(availabilityGroupData.AvailabilityGroupListener.ListenerName))
         {
             if (availabilityGroupData == null)
             {
@@ -55,7 +54,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         protected override void Perform(IExecutionPolicy policy)
         {
             this.UpdateStatus(new TaskEventArgs(this.Name,
-                                    string.Format(Resource.CreatingAvailabilityGroup, this.availabilityGroupData.GroupName),
+                                    Resource.FormatCreatingAvailabilityGroup(this.availabilityGroupData.GroupName),
                                     TaskEventStatus.Running));
 
             // This task is only tried once.

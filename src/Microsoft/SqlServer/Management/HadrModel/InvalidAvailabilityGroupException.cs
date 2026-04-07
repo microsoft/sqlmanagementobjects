@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using System.Globalization;
-
 namespace Microsoft.SqlServer.Management.HadrModel
 {
     /// <summary>
@@ -17,8 +15,6 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupName"></param>
         /// <param name="serverName"></param>
         public InvalidAvailabilityGroupException(string availabilityGroupName, string serverName)
-            : base(string.Format(CultureInfo.InvariantCulture,
-                Resource.InvalidAvailabilityGroupException,
-                availabilityGroupName, serverName)) { }
+            : base(Resource.FormatInvalidAvailabilityGroupException(availabilityGroupName, serverName)) { }
     }
 }

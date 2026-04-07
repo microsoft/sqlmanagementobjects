@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.HadrModel
 {
@@ -16,7 +15,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// </summary>
         /// <param name="availabilityGroupName"></param>
         public AvailabilityGroupQuorumValidationTaskException(string availabilityGroupName)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AvailabilityGroupQuorumValidatorException, availabilityGroupName))
+            : base(Resource.FormatAvailabilityGroupQuorumValidatorException(availabilityGroupName))
         {
         }
 
@@ -26,7 +25,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="availabilityGroupName"></param>
         /// <param name="inner"></param>
         public AvailabilityGroupQuorumValidationTaskException(string availabilityGroupName, Exception inner)
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.AvailabilityGroupQuorumValidatorException, availabilityGroupName), inner)
+            : base(Resource.FormatAvailabilityGroupQuorumValidatorException(availabilityGroupName), inner)
         {
         }
     }

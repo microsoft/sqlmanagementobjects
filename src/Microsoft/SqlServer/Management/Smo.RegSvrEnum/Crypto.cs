@@ -2,16 +2,12 @@ using System;
 using System.Text;
 using System.Security.Permissions;
 using System.Runtime.InteropServices;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 {
 	/// <summary>
 	/// Summary description for DataProtection.
 	/// </summary>
-	//[StrongNameIdentityPermissionAttribute(
-	//	 SecurityAction.LinkDemand, 
-	//	 PublicKey="0024000004800000940000000602000000240000525341310004000001000100976BDD12F5AC899FF7F6081A3DA4EF2C88BC3B3571D299F67C24C5EBA386BEAA77F494B10DF5EE7C69ACB27A8F9A7801192F4274C6B2C442F12061BFF6A8F2A2490F7338C7DE6A096780A6D15A4B16E5522CB977BE0B8E4341AD32DA46617D2A0ED5962A904DDC50403A09AAAC75937A8ABB78B4CA119FF3F96DAC20C6E6B7DC")]
 	internal sealed class DataProtection
 	{
 		// statics only here
@@ -144,7 +140,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 				}
 				else 
 				{
-					throw new Exception(SRError.CryptUnprotectDataWin32Error(Marshal.GetLastWin32Error()));
+					throw new Exception(SRError.FormatCryptUnprotectDataWin32Error(Marshal.GetLastWin32Error()));
 				}
 			}
 			finally 
@@ -194,7 +190,7 @@ namespace Microsoft.SqlServer.Management.Smo.RegSvrEnum
 				}
 				else 
 				{
-					throw new Exception(SRError.CryptProtectDataWin32Error(Marshal.GetLastWin32Error()));
+					throw new Exception(SRError.FormatCryptProtectDataWin32Error(Marshal.GetLastWin32Error()));
 				}
 			}
 			finally 
