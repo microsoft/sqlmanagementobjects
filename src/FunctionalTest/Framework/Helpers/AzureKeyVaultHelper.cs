@@ -174,7 +174,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 
                         // Now verify that a managed identity is actually configured
                         // Use a minimal token request to test if managed identity is available
-                        // DEVNOTE(chgagnon) This is a workaround for a known issue in the Azure SDK where it doesn't
+                        // This is a workaround for a known issue in the Azure SDK where it doesn't
                         // silently continue to the next chained credential when this fails : https://github.com/Azure/azure-sdk-for-net/issues/47057
                         try
                         {
