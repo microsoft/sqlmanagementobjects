@@ -12,6 +12,7 @@
     <InternalsVisibleTo Include="Microsoft.SqlServer.Management.RegisteredServers" Key="$(RealPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc.Tests" Key="$(RealPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.Management.Sdk.Sfc.UnitTests" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SfcUnitTests" Key="$(TestPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)" />
     <InternalsVisibleTo Include="Microsoft.SqlServer.Test.DMFTestBase" Key="$(RealPublicKey)" />

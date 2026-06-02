@@ -744,7 +744,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
-            if (null != Properties.Get("Nullable").Value && (this.CheckIsExternalTableColumn(sp) == false || sp.TargetDatabaseEngineEdition != Common.DatabaseEngineEdition.SqlOnDemand))
+            // Fabric DW external tables support NULL/NOT NULL.
+            var isFabricDwExternalTable = this.CheckIsExternalTableColumn(sp) && sp.TargetEngineIsFabricDw();
+            if (null != Properties.Get("Nullable").Value && (!this.CheckIsExternalTableColumn(sp) || sp.TargetDatabaseEngineEdition != Common.DatabaseEngineEdition.SqlOnDemand || isFabricDwExternalTable))
             {
                 if (false == (bool)Properties["Nullable"].Value)
                 {
@@ -1120,7 +1122,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                 }
 
-                if(this.CheckIsExternalTableColumn(sp) == false || sp.TargetDatabaseEngineEdition != Common.DatabaseEngineEdition.SqlOnDemand)
+                // Fabric DW external tables support NULL/NOT NULL.
+                var isFabricDwExternalTable = this.CheckIsExternalTableColumn(sp) && sp.TargetEngineIsFabricDw();
+                if(!this.CheckIsExternalTableColumn(sp) || sp.TargetDatabaseEngineEdition != Common.DatabaseEngineEdition.SqlOnDemand || isFabricDwExternalTable)
                 {
                     if ((bool)Properties["Nullable"].Value)
                     {

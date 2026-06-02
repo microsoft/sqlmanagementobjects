@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <TargetFrameworks>$(NetfxVersion);net8.0</TargetFrameworks>
+    <TargetFrameworks>$(NetfxVersion);net8.0;net10.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <EnableDefaultItems>false</EnableDefaultItems>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -142,11 +142,10 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
     <ProjectReference Include="$(BatchParserSrc)\Microsoft.Data.Tools.Sql.BatchParser.csproj" />
-    <PackageReference Include="System.Security.Principal.Windows" />
   </ItemGroup>
   <!-- Validate the cfg.xml before the build.
        The file is framework independent so we only run it once for netfx to avoid duplication of errors when doing a full build -->
   <Target Name="ValidateCfgXml" Condition="'$(TargetFramework)'=='$(NetfxVersion)'" BeforeTargets="BeforeBuild">
-    <Exec Command="powershell -NoProfile -File &quot;$(EnlistmentRoot)\.scripts\ValidateXmlSchema.ps1&quot; -XmlFilesFolder &quot;$(MSBuildProjectDirectory)&quot; -SchemaFile &quot;$(CodeGenSrc)\cfg.xsd&quot; -Include cfg.xml" />
+    <Exec Command="powershell -NoProfile -File &quot;$(CodeGenSrc)\ValidateXmlSchema.ps1&quot; -XmlFilesFolder &quot;$(MSBuildProjectDirectory)&quot; -SchemaFile &quot;$(CodeGenSrc)\cfg.xsd&quot; -Include cfg.xml" />
   </Target>
 </Project>

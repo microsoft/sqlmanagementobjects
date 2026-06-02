@@ -109,16 +109,30 @@
       </prefix>
     </version>
     <version min_major='13' cloud_min_major='12'>
+      <!-- Fabric DW does not support sys.external_file_formats, so skip that join on Fabric -->
       <prefix fields='#DataSourceName#FileFormatName#FileFormatNameOd#ShardingColumnName#Location#LocationOd#RejectType#RejectValue#RejectSampleValue#ExternalTableDistribution#RemoteSchemaName#RemoteObjectName#' >
         create table #external_data (object_id int not null primary key, data_source_id int , file_format_id int , [location] nvarchar(4000), reject_type nvarchar(20), reject_value float, reject_sample_value float, datasource_name nvarchar(128), fileformat_name nvarchar(128), sharding_col_id int, distribution_type tinyint, remote_schema_name nvarchar(128), remote_object_name nvarchar(128))
+        if (serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%')
+        begin
         insert into #external_data
+        select tbl.object_id, eds.data_source_id, null, et.location, et.reject_type, et.reject_value, et.reject_sample_value, eds.name, null, et.sharding_col_id, et.distribution_type, et.remote_schema_name, et.remote_object_name
+        from sys.tables tbl
+        INNER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
+        LEFT OUTER JOIN sys.external_data_sources AS eds ON eds.data_source_id = et.data_source_id
+        WHERE
+        (tbl.is_external = 1)
+        end
+        else
+        begin
+        exec sp_executesql N'insert into #external_data
         select tbl.object_id, eds.data_source_id, eff.file_format_id, et.location, et.reject_type, et.reject_value, et.reject_sample_value, eds.name, eff.name, et.sharding_col_id, et.distribution_type, et.remote_schema_name, et.remote_object_name
         from sys.tables tbl
         INNER JOIN sys.external_tables AS et ON et.object_id = tbl.object_id
         LEFT OUTER JOIN sys.external_data_sources AS eds ON eds.data_source_id = et.data_source_id
         LEFT OUTER JOIN sys.external_file_formats AS eff ON eff.file_format_id = et.file_format_id
         WHERE
-        (tbl.is_external = 1)
+        (tbl.is_external = 1)'
+        end
       </prefix>
     </version>
     <version datawarehouse_enabled='true'>
@@ -492,7 +506,11 @@
     </version>
     <version min_major='13' datawarehouse_enabled='true'>
       <property name="FileFormatName" type="sysname" expensive="true">ISNULL(edt.fileformat_name,N'')</property>
+    </version>
+    <version min_major='13' cloud_min_major='12' datawarehouse_enabled='true'>
       <property name="Location" type="nvarchar" size="4000" expensive="true">ISNULL(edt.location,N'')</property>
+    </version>
+    <version min_major='13' datawarehouse_enabled='true'>
       <property name="RejectType" type="tinyint" report_type="ExternalTableRejectType" expensive="true">
         CASE WHEN edt.reject_type IS NULL THEN 255
         ELSE CASE edt.reject_type

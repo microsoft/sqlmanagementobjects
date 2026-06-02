@@ -35,8 +35,8 @@
       <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\SqlClrProvider\Microsoft.SqlServer.SqlClrProvider.csproj"/>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
-    <PackageReference Include="System.Security.Principal.Windows"  />
     <PackageReference Include="System.Management"  />
     <PackageReference Include="System.Data.OleDb"  />
+    <PackageReference Include="System.Security.Permissions"  />
   </ItemGroup>
 </Project>

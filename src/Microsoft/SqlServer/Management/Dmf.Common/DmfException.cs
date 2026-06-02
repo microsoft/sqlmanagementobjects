@@ -167,7 +167,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             Init();
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -302,7 +302,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData1"] = assemblyName;
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -419,7 +419,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.typeLeft = typeLeft;
             this.typeRight = typeRight;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ExpressionTypeMistmatchException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -542,7 +542,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData1"] = operatorName;
             Data["HelpLink.EvtData2"] = typeName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private OperatorNotApplicableException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -666,7 +666,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = functionName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionWrongArgumentTypeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -800,7 +800,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = functionName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionWrongArgumentsNumberException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -928,7 +928,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.interfaceName = interfaceName;
             this.objectTypeName = typeName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private AdapterAlreadyExistsException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1037,7 +1037,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.adapter = adapter;
             Data["HelpLink.EvtData1"] = adapter;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -1148,7 +1148,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -1267,7 +1267,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ExpressionSerializationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1452,7 +1452,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private TypeConversionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1574,7 +1574,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private UnsupportedTypeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1684,7 +1684,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private BadExpressionTreeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1787,7 +1787,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private UnsupportedObjectTypeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1908,7 +1908,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2005,7 +2005,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2121,7 +2121,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2227,7 +2227,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.propertyName = propertyName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2339,7 +2339,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ConversionNotSupportedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -2471,7 +2471,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData1"] = nodeType;
             Data["HelpLink.EvtData2"] = operand;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private InvalidOperandException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -2580,7 +2580,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData1"] = opType;
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2724,7 +2724,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = objectType;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2852,7 +2852,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = objectType;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -2979,7 +2979,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = objectType;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -3113,7 +3113,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData2"] = type1;
             Data["HelpLink.EvtData3"] = type2;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ConflictingPropertyValuesException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -3241,7 +3241,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -3314,7 +3314,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -3388,7 +3388,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -3469,7 +3469,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             SetHelpContext("FailedOperationExceptionText");
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private FailedOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -3640,7 +3640,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -3753,7 +3753,7 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.PropertyName = propertyName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -3845,7 +3845,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private MissingTypeFacetAssociationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -3979,7 +3979,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = functionName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionNotASmoObjectException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -4088,7 +4088,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -4179,7 +4179,7 @@ namespace Microsoft.SqlServer.Management.Dmf
 
             Data["HelpLink.EvtData1"] = functionName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionWrongReturnTypeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -4297,7 +4297,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -4372,7 +4372,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -4466,7 +4466,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData2"] = maxLength;
             Data["HelpLink.EvtData3"] = currentLength;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private StringPropertyTooLongException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -4593,7 +4593,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData1"] = objectSetName;
             Data["HelpLink.EvtData2"] = facetName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private TargetSetCountMismatchException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -4703,7 +4703,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData2"] = objectSetName;
             Data["HelpLink.EvtData3"] = facetName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private UnsupportedTargetSetForFacetException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -4802,7 +4802,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private NoTargetSetEnabledException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -4959,7 +4959,7 @@ namespace Microsoft.SqlServer.Management.Dmf
             Data["HelpLink.EvtData2"] = configValue;
             Data["HelpLink.EvtData3"] = runValue;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private RestartPendingException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

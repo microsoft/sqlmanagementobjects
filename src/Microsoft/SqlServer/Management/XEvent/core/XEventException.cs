@@ -48,7 +48,7 @@ namespace Microsoft.SqlServer.Management.XEvent
         {
             Init();
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
 
         /// <summary>
         /// Base constructor

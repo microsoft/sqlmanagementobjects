@@ -36,7 +36,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -87,7 +87,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 1;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -129,7 +129,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 2;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -171,7 +171,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 3;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -213,7 +213,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 4;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -273,7 +273,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.HResult = 5;
             m_type = type.ToString();
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -326,7 +326,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 7;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -368,7 +368,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 8;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -430,7 +430,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 9;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>
@@ -472,7 +472,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.HResult = 10;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>

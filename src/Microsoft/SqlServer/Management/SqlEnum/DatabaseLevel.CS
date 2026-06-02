@@ -75,6 +75,68 @@ namespace Microsoft.SqlServer.Management.Smo
             //here starts the difference compared to other sql objects 
             SqlEnumResult ser = (SqlEnumResult)res;
             
+            SqlObjectProperty prop;
+            string sValue;
+            StringCollection sc;
+            PrepareDatabaseLevelQuery(ser, out prop, out sValue, out sc);
+
+            try
+            {
+                SqlEnumResult resFin = (SqlEnumResult)base.GetData(ser);
+                ProcessDatabaseLevelResult(resFin, prop, sValue);
+                return resFin;
+            }
+            finally
+            {
+                CleanupDatabaseLevelQuery(prop, sValue, sc);
+            }
+        }
+
+        public override async System.Threading.Tasks.Task<EnumResult> GetDataAsync(EnumResult res, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if( ResultType.Reserved2 == this.Request.ResultType )
+            {
+                return res;
+            }
+            //if the request is for actuall data
+            //i'm the same as any sql object
+            if( ResultType.Reserved1 != this.Request.ResultType )
+            {
+                return await base.GetDataAsync(res, cancellationToken).ConfigureAwait(false);
+            }
+
+            //for DatabaseOption
+            if( false == this.SqlRequest.ResolveDatabases )
+            {
+                //so that sysdatabases is added
+                m_bForChildren = false;
+                
+                //get data regulary
+                return await base.GetDataAsync(res, cancellationToken).ConfigureAwait(false);
+            }
+
+            //here starts the difference compared to other sql objects 
+            SqlEnumResult ser = (SqlEnumResult)res;
+            
+            SqlObjectProperty prop;
+            string sValue;
+            StringCollection sc;
+            PrepareDatabaseLevelQuery(ser, out prop, out sValue, out sc);
+
+            try
+            {
+                SqlEnumResult resFin = (SqlEnumResult)await base.GetDataAsync(ser, cancellationToken).ConfigureAwait(false);
+                ProcessDatabaseLevelResult(resFin, prop, sValue);
+                return resFin;
+            }
+            finally
+            {
+                CleanupDatabaseLevelQuery(prop, sValue, sc);
+            }
+        }
+
+        private void PrepareDatabaseLevelQuery(SqlEnumResult ser, out SqlObjectProperty prop, out string sValue, out StringCollection sc)
+        {
             //filling the .Database field in SqlEnumREsult
             ser.Databases = GetRequestedDatabases(ser);
             ser.NameProperties.Add(this.NameProperty);
@@ -86,9 +148,9 @@ namespace Microsoft.SqlServer.Management.Smo
             CleanupFilter();
 
             //we don't need filtering if all it wanted was to select a database.
-            SqlObjectProperty prop = GetSqlProperty(this.NameProperty, ObjectPropertyUsages.Request | ObjectPropertyUsages.Reserved1);
-            string sValue = prop.GetValue(this);
-            StringCollection sc = null;
+            prop = GetSqlProperty(this.NameProperty, ObjectPropertyUsages.Request | ObjectPropertyUsages.Reserved1);
+            sValue = prop.GetValue(this);
+            sc = null;
             int level = ser.Level - 1;
 
             // we need to make the substitution of the database name property
@@ -117,44 +179,39 @@ namespace Microsoft.SqlServer.Management.Smo
                     spl.Table = "[{" + (2 * level - 1).ToString(CultureInfo.InvariantCulture) + "}]." + spl.Table;
                 }
             }
+        }
 
-            try
+        private void ProcessDatabaseLevelResult(SqlEnumResult resFin, SqlObjectProperty prop, string sValue)
+        {
+            //clear fail condition it was already evaluated when the database list was obtained
+            resFin.StatementBuilder.ClearFailCondition();
+            
+            // if we added any tables, add in filter to pinpoint in this database
+            int i = 0;
+            if( this.PropertyLinkList[i].IsUsed )
             {
-                SqlEnumResult resFin = (SqlEnumResult)base.GetData(ser);
-                
-                //clear fail condition it was already evaluated when the database list was obtained
-                resFin.StatementBuilder.ClearFailCondition();
-                
-                // if we added any tables, add in filter to pinpoint in this database
-                int i = 0;
-//				for(int i = 0; i < this.PropertyLinkList.Count; i++)
-//				{
-                    if( this.PropertyLinkList[i].IsUsed )
-                    {
-                        resFin.StatementBuilder.AddWhere(sValue + "=" + prop.Value);
-                    }
-//					break;
-//				}
-                return resFin;
-            }
-            finally
-            {
-                //retore Name property value
-                prop.Value = sValue;
-
-                //restore table names to two part name
-                if( null != sc )
-                {
-                    for(int i = 0; i < this.PropertyLinkList.Count; i++)
-                    {
-                        SqlPropertyLink spl = (SqlPropertyLink)this.PropertyLinkList[i];
-                        spl.Table = sc[i];
-                    }
-                }
-
-                m_bForChildren = false;
+                resFin.StatementBuilder.AddWhere(sValue + "=" + prop.Value);
             }
         }
+
+        private void CleanupDatabaseLevelQuery(SqlObjectProperty prop, string sValue, StringCollection sc)
+        {
+            //retore Name property value
+            prop.Value = sValue;
+
+            //restore table names to two part name
+            if( null != sc )
+            {
+                for(int i = 0; i < this.PropertyLinkList.Count; i++)
+                {
+                    SqlPropertyLink spl = (SqlPropertyLink)this.PropertyLinkList[i];
+                    spl.Table = sc[i];
+                }
+            }
+
+            m_bForChildren = false;
+        }
+
 
         protected override String AddLinkProperty(String name)
         {

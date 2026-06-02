@@ -164,7 +164,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         public XPathException(string msg, Exception e) : base(msg, e)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// TODO
         /// </summary>

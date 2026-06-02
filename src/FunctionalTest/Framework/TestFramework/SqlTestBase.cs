@@ -315,18 +315,31 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
             Action<Database> testMethod) => ExecuteFromDbPool(TestContext.FullyQualifiedTestClassName, testMethod);
 
         /// <summary>
+        /// Executes the specified test method from the pool associated with the test class.
+        /// The <paramref name="onDatabaseCreated"/> delegate is invoked once when the database is first created,
+        /// before any test method runs. Use it for one-time setup such as running SQL scripts.
+        /// </summary>
+        /// <param name="testMethod">The test method to execute</param>
+        /// <param name="onDatabaseCreated">Optional delegate invoked once after the database is first created</param>
+        public void ExecuteFromDbPool(
+            Action<Database> testMethod,
+            Action<Database> onDatabaseCreated) => ExecuteFromDbPool(TestContext.FullyQualifiedTestClassName, testMethod, onDatabaseCreated);
+
+        /// <summary>
         /// Executes the specified test method from the pool specified, creating a new Database in the pool if needed. Currently only supports
         /// creating basic DBs - if more options are required then this method can be extended to expose those as needed.
         /// </summary>
         /// <param name="poolName">The name of the pool</param>
         /// <param name="testMethod">The test method to execute</param>
+        /// <param name="onDatabaseCreated">Optional delegate invoked once after the database is first created</param>
         public void ExecuteFromDbPool(
             string poolName,
-            Action<Database> testMethod) => this.ExecuteTestMethodWithFailureRetry(
+            Action<Database> testMethod,
+            Action<Database> onDatabaseCreated = null) => this.ExecuteTestMethodWithFailureRetry(
                 () =>
                 {
                     var databaseHandler = DatabaseHandlerFactory.GetDatabaseHandler(this.TestDescriptorContext);
-                    var db = TestServerPoolManager.GetDbFromPool(poolName, databaseHandler);
+                    var db = TestServerPoolManager.GetDbFromPool(poolName, databaseHandler, onDatabaseCreated);
                     this.ServerContext = databaseHandler.ServerContext ?? db.GetServerObject();
                     if(this.ServerContext != null && this.ServerContext.ConnectionContext != null)
                     {

@@ -254,6 +254,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
+            // Fabric DW only supports NOT ENFORCED foreign key constraints.
+            if (sp.TargetEngineIsFabricDw())
+            {
+                sb.Append(sp.NewLine);
+                sb.Append("NOT ENFORCED ");
+            }
 
             return sb.ToString();
         }

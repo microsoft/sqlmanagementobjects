@@ -2095,7 +2095,7 @@ namespace Microsoft.SqlServer.Management.Smo
         // we cache it, since there is going to be a lot of references to it
         private Server m_server = null;
 
-        private Server TryGetServerObject()
+        protected internal Server TryGetServerObject()
         {
             if (null == m_server)
             {
@@ -4367,6 +4367,17 @@ namespace Microsoft.SqlServer.Management.Smo
                             yield return nameof(Table.DataRetentionPeriod);
                             yield return nameof(Table.DataRetentionPeriodUnit);
                             yield return nameof(Table.DataRetentionFilterColumnName);
+                        }
+                        // Location is only meaningful for external tables on standalone (SQL 2016+),
+                        // SqlDataWarehouse, and SqlOnDemand (Fabric DW). Disable for other cloud
+                        // editions so it is not included in enumeration or scripted output.
+                        if (databaseEngineEdition == DatabaseEngineEdition.SqlDatabase ||
+                            databaseEngineEdition == DatabaseEngineEdition.SqlStretchDatabase ||
+                            databaseEngineEdition == DatabaseEngineEdition.SqlManagedInstance ||
+                            databaseEngineEdition == DatabaseEngineEdition.SqlAzureArcManagedInstance ||
+                            databaseEngineEdition == DatabaseEngineEdition.SqlDatabaseEdge)
+                        {
+                            yield return nameof(Table.Location);
                         }
                         if (databaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
                         {

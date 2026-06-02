@@ -1285,6 +1285,6 @@
   </ItemGroup>
   <!-- Target to validate all XML files against EnumObject.xsd schema before build -->
   <Target Name="ValidateEnumObjectXmlFiles" Condition="'$(TargetFramework)'=='$(NetfxVersion)'" BeforeTargets="BeforeBuild">
-    <Exec Command="powershell -NoProfile -File &quot;$(EnlistmentRoot)\.scripts\ValidateXmlSchema.ps1&quot; -XmlFilesFolder &quot;$(MSBuildProjectDirectory)\xml&quot; -SchemaFile &quot;$(MSBuildProjectDirectory)\xml\EnumObject.xsd&quot;" />
+    <Exec Command="powershell -NoProfile -File &quot;$(CodeGenSrc)\ValidateXmlSchema.ps1&quot; -XmlFilesFolder &quot;$(MSBuildProjectDirectory)\xml&quot; -SchemaFile &quot;$(MSBuildProjectDirectory)\xml\EnumObject.xsd&quot;" />
   </Target>
 </Project>

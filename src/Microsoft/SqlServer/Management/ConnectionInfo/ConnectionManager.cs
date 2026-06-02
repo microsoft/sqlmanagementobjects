@@ -124,7 +124,7 @@ namespace Microsoft.SqlServer.Management.Common
 
         private bool CallerHavePermissionToUseSQLCLR()
         {
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0 && !NETSTANDARD2_0
             if (!SqlContext.IsAvailable)
                 return true;
 
@@ -730,14 +730,17 @@ end;";
                     SmoEventSource.Log.ConnectionFailure(false, connectionBuilder.DataSource ?? "", e.Message);
                 }
 
-                // Note: We cannot use 'this.ServerInstance' because it may not be be initialized
+                // Note: We cannot use 'this.ServerInstance' because it may not be initialized
                 // (i.e. it would have the default value of "(local)" which may be totally unrelated
                 // to the ConnectionString value and thus provide an error message that would be
                 // quite confusing.
 
-                var builder = new SqlConnectionStringBuilder(this.ConnectionString);
+                if (connectionBuilder == null)
+                {
+                    connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                }
 
-                throw new ConnectionFailureException(StringConnectionInfo.FormatConnectionFailure(builder.DataSource), e);
+                throw new ConnectionFailureException(StringConnectionInfo.FormatConnectionFailure(connectionBuilder.DataSource), e);
             }
             finally
             {
@@ -749,6 +752,163 @@ end;";
 
             //if we got here it means we succesfully connected
             bIsUserConnected = true;
+        }
+
+        /// <summary>
+        /// Asynchronously creates the actual connection to SQL Server. Ignored if already connected.
+        /// It is optional to call this method, as the connection will be opened when required.
+        /// Exceptions:
+        /// ConnectionFailureException
+        /// </summary>
+        public async Task ConnectAsync(CancellationToken cancellationToken = default)
+        {
+            if (IsForceDisconnected)
+            {
+                return;
+            }
+
+            if (this.IsOpen)
+            {
+                bIsUserConnected = true;
+                return;
+            }
+
+            var startTime = System.Diagnostics.Stopwatch.StartNew();
+            SqlConnectionStringBuilder connectionBuilder = null;
+
+            // Log connection attempt (only parse connection string if logging is enabled)
+            if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Connection))
+            {
+                connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                SmoEventSource.Log.ConnectionAttemptStarted(connectionBuilder.DataSource ?? "", connectionBuilder.InitialCatalog ?? "");
+            }
+
+            try
+            {
+                await InternalConnectAsync(cancellationToken).ConfigureAwait(false);
+                if (this.LockTimeout != -1)
+                {
+                    SqlCommand sqlCommand = this.SqlConnectionObject.CreateCommand();
+                    sqlCommand.CommandText = "SET LOCK_TIMEOUT " + (this.LockTimeout * 1000);
+                    sqlCommand.CommandType = CommandType.Text;
+                    await ExecuteTSqlAsync(ExecuteTSqlAction.ExecuteNonQuery, sqlCommand, true, cancellationToken).ConfigureAwait(false);
+                }
+
+                //no updates of the connection properties are allowed from now on
+                this.BlockUpdates = true;
+                m_InUse = true;
+
+                // Log successful connection
+                startTime.Stop();
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Informational, SmoEventSource.Keywords.Connection))
+                {
+                    if (connectionBuilder == null)
+                    {
+                        connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                    }
+                    SmoEventSource.Log.ConnectionEstablished(startTime.ElapsedMilliseconds, connectionBuilder.DataSource ?? "", connectionBuilder.InitialCatalog ?? "");
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Let cancellation exceptions propagate without wrapping
+                throw;
+            }
+            catch (Exception e)
+            {
+                // Log connection failure
+                startTime.Stop();
+                if (SmoEventSource.Log.IsEnabled(EventLevel.Warning, SmoEventSource.Keywords.Connection))
+                {
+                    if (connectionBuilder == null)
+                    {
+                        connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                    }
+                    SmoEventSource.Log.ConnectionFailure(false, connectionBuilder.DataSource ?? "", e.Message);
+                }
+
+                // Note: We cannot use 'this.ServerInstance' because it may not be initialized
+                // (i.e. it would have the default value of "(local)" which may be totally unrelated
+                // to the ConnectionString value and thus provide an error message that would be
+                // quite confusing.
+
+                if (connectionBuilder == null)
+                {
+                    connectionBuilder = new SqlConnectionStringBuilder(this.ConnectionString);
+                }
+
+                throw new ConnectionFailureException(StringConnectionInfo.FormatConnectionFailure(connectionBuilder.DataSource), e);
+            }
+
+            //if we got here it means we succesfully connected
+            bIsUserConnected = true;
+        }
+
+        /// <summary>
+        /// Asynchronously connects to the server, impersonating if necessary
+        /// </summary>
+        private async Task InternalConnectAsync(CancellationToken cancellationToken)
+        {
+            if (ConnectAsUser && !(IsReadAccessBlocked || SqlContext.IsAvailable))
+            {
+                try
+                {
+                    var userName = ConnectAsUserName;
+                    string domain = null;
+                    if (ConnectAsUserName.Contains(@"\"))
+                    {
+                        var nameParts = ConnectAsUserName.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (nameParts.Length == 2)
+                        {
+                            domain = nameParts[0];
+                            userName = nameParts[1];
+                        }
+                    }
+                    using (var handle = SafeNativeMethods.GetUserToken(userName, domain, ConnectAsUserPassword))
+                    {
+                        await InternalConnectImplAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                // this catch block is necessary because we want to prevent client exception
+                // handler code to execute before we undo the impersonation
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            else
+            {
+                await InternalConnectImplAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Internal implementation of async connection logic
+        /// </summary>
+        private async Task InternalConnectImplAsync(CancellationToken cancellationToken)
+        {
+            SqlConnection sqlConnection = this.SqlConnectionObject;
+            if (!this.IsConnectionOpen(sqlConnection))
+            {
+                var retryCount = 2;
+                while (true)
+                {
+                    //proceed with connection
+                    try
+                    {
+                        await sqlConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                        return;
+                    }
+                    catch (SqlException e) when (e.Number == 42109 && retryCount > 0)
+                    {
+                        // Handle Serverless wakeup with a retry
+                        retryCount--;
+                    }
+                }
+            }
+
+            // We don't use this.ServerVersion to avoid recursion
+            CheckServerVersion(ServerInformation.ParseStringServerVersion(sqlConnection.ServerVersion));
         }
 
         /// <summary>

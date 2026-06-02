@@ -22,7 +22,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         protected SfcMetadataException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -48,7 +48,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc.Metadata
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         protected SfcObjectNotFoundException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

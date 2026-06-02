@@ -22,7 +22,7 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
             {
                 DefaultRefreshDbListMillisecond = 120000;
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
                 try
                 {
                     using (var key = Registry.CurrentUser.OpenSubKey(RegPath))

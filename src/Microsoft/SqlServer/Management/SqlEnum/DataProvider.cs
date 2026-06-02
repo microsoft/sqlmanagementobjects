@@ -14,6 +14,8 @@ namespace Microsoft.SqlServer.Management.Smo
     using System.Reflection;
     using System.Collections;
     using System.Globalization;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     ///<summary>
     ///exeposes the results as a tsql as a DataTable or a data reader
@@ -147,6 +149,52 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        ///<summary>
+        ///the means to execute the query ( execSql ) and the query ( query ) asynchronously
+        ///it executes the query and gets a data reader
+        ///if retrive mode is DataTable it proceeds to fill it</summary>
+        public async Task SetConnectionAndQueryAsync(ExecuteSql execSql, string query, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            m_execSql = execSql;
+            m_dataReader = await m_execSql.GetDataReaderAsync(query, cancellationToken).ConfigureAwait(false);
+            m_schemaTable = null;
+            m_command = null; // Command not exposed in async path, cancellation handled via cancellationToken
+
+            //get all the rows right now
+            if ( RetriveMode.RetriveDataTable == m_RetriveMode )
+            {
+                try
+                {
+                    while( await ReadInternalAsync(cancellationToken).ConfigureAwait(false) )
+                    {
+                        ManipulateRowDataType();
+                        DataRow row = m_table.NewRow();
+                        for(int i = 0; i < rowData.Length; i++)
+                        {
+                            if( null == rowData[i] )
+                            {
+                                row[i] = System.DBNull.Value;
+                            }
+                            else
+                            {
+                                row[i] = rowData[i];
+                            }
+                        }
+                        m_table.Rows.Add(row);
+                    }
+                }
+                finally
+                {
+                    rowData = null;
+                    m_dataReader.Dispose();
+                    m_dataReader = null;
+                    m_schemaTable = null;
+                    m_execSql.Disconnect();
+                    m_execSql = null;
+                }
+            }
+        }
+
 #region InitDataStructures
 
         ///<summary>
@@ -238,7 +286,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 // BUG: VSTS 69514
 
-                // An Extended type is a type that uses the attribute "report_type" in the SMO xml 
+                // An Extended type is a type that uses the attribute "report_type" in the SMO xml
                 // All of the types that use "report_type" currently are base type int or tinyint in the server EXCEPT for SqlSecureString in LinkedServer
                 // LinkedServer uses SqlSecureString, so we need to make an exception for that type.
                 if( p.ExtendedType )
@@ -323,6 +371,39 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             //else use DataReader
             bool b = m_dataReader.Read();
+            if( b )
+            {
+                try
+                {
+                    m_dataReader.GetValues(rowData);
+                }
+                catch (OverflowException)
+                {
+                    for (int i = 0; i < rowData.Length; i++)
+                    {
+                        try
+                        {
+                            rowData[i] = m_dataReader.GetValue(i);
+                        }
+                        catch(OverflowException)
+                        {
+                            //GetSqlValue returns the data value in the specified column as a SQL Server type. 
+                            //This is needed if the values in the database that cannot be represented with CLR builtin types.
+                            //example:-  .NET Decimal type cannot handle a value as large as the SQL Server Decimal type.
+                            rowData[i] = m_dataReader.GetSqlValue(i);
+                        }
+                    }
+                }
+            }
+            return b;
+        }
+
+        ///<summary>
+        ///advance one row asynchronously</summary>
+        private async Task<bool> ReadInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            //else use DataReader
+            bool b = await m_dataReader.ReadAsync(cancellationToken).ConfigureAwait(false);
             if( b )
             {
                 try
@@ -554,6 +635,18 @@ namespace Microsoft.SqlServer.Management.Smo
         public bool Read()
         {
             bool b = ReadInternal();
+            if( b )
+            {
+                ManipulateRowData();
+            }
+            return b;
+        }
+
+        /// <summary>
+        /// advances to next row asynchronously, closes in case of failure</summary>
+        public async Task<bool> ReadAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            bool b = await ReadInternalAsync(cancellationToken).ConfigureAwait(false);
             if( b )
             {
                 ManipulateRowData();

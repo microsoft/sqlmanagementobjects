@@ -11,6 +11,8 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
     /// </summary>
     public class FabricWorkspaceDescriptor : TestDescriptor
     {
+        private Lazy<string> _workspaceId;
+
         /// <summary>
         /// Constructs a FabricWorkspaceDescriptor for the given environment.
         /// </summary>
@@ -20,6 +22,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         {
             Environment = environment ?? throw new ArgumentNullException(nameof(environment));
             FabricDatabaseManager = new FabricDatabaseManager(environment);
+            _workspaceId = new Lazy<string>(() => FabricDatabaseManager.GetWorkspaceId(WorkspaceName));
         }
 
         private FabricDatabaseManager FabricDatabaseManager { get; set; }
@@ -35,6 +38,18 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// Prefix for the database names created in this workspace
         /// </summary>
         public string DbNamePrefix { get; set; }
+
+        /// <summary>
+        /// Gets the workspace ID by querying the Fabric CLI.
+        /// The value is cached after the first retrieval to avoid repeated CLI invocations.
+        /// </summary>
+        public string WorkspaceId => _workspaceId.Value;
+
+        /// <summary>
+        /// Gets the artifact ID of a warehouse by its display name.
+        /// </summary>
+        public string GetWarehouseArtifactId(string warehouseDisplayName) =>
+            FabricDatabaseManager.GetWarehouseArtifactId(WorkspaceName, warehouseDisplayName);
 
         /// <summary>
         /// Creates a Fabric DB or Fabric DW instance depending on the DatabaseEngineEdition

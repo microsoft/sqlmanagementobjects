@@ -294,5 +294,29 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
             return GetResourcePath(workspaceName, dbName, FabricDatabaseType.SQLDatabase);
         }
 
+        /// <summary>
+        /// Gets the workspace ID by querying the Fabric CLI.
+        /// </summary>
+        /// <param name="workspaceName">The workspace name.</param>
+        /// <returns>The workspace ID (GUID).</returns>
+        public string GetWorkspaceId(string workspaceName)
+        {
+            EnsureFabricCliLogin();
+            return ExecuteFabricCliCommand($"get /{workspaceName}.Workspace -q id -f");
+        }
+
+        /// <summary>
+        /// Gets the artifact ID of a warehouse by querying the Fabric CLI.
+        /// </summary>
+        /// <param name="workspaceName">The workspace name.</param>
+        /// <param name="warehouseDisplayName">The display name of the warehouse.</param>
+        /// <returns>The warehouse artifact ID (GUID).</returns>
+        public string GetWarehouseArtifactId(string workspaceName, string warehouseDisplayName)
+        {
+            EnsureFabricCliLogin();
+            var resourcePath = GetResourcePath(workspaceName, warehouseDisplayName, FabricDatabaseType.Warehouse);
+            return ExecuteFabricCliCommand($"get {resourcePath} -q id -f");
+        }
+
     }
 }

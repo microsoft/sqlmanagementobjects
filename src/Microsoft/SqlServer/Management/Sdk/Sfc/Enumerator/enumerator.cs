@@ -6,6 +6,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     using System;
     using System.Collections;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Runtime.InteropServices;
     using Microsoft.SqlServer.Management.Common;
 
@@ -44,6 +46,35 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <param name="request">the request that has to be resolved</param>
         /// <returns>results coresponding to the request</returns>
         static public EnumResult GetData(Object connectionInfo, Request request)
+        {
+            Request preparedRequest = PrepareRequest(ref connectionInfo, request);
+            EnumResult result = new Environment().GetData(preparedRequest, connectionInfo);
+            Enumerator.TraceInfo("Serving response for request:\n{0}\n", request.Urn);
+            return result;
+        }
+
+        /// <summary>
+        /// retrieve data asynchronously
+        /// </summary>
+        /// <param name="connectionInfo">connection to be used</param>
+        /// <param name="request">the request that has to be resolved</param>
+        /// <param name="cancellationToken">cancellation token for the async operation</param>
+        /// <returns>task containing results corresponding to the request</returns>
+        static public async Task<EnumResult> GetDataAsync(Object connectionInfo, Request request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Request preparedRequest = PrepareRequest(ref connectionInfo, request);
+            EnumResult result = await new Environment().GetDataAsync(preparedRequest, connectionInfo, cancellationToken).ConfigureAwait(false);
+            Enumerator.TraceInfo("Serving response for request:\n{0}\n", request.Urn);
+            return result;
+        }
+
+        /// <summary>
+        /// Validates and prepares a request for processing by both sync and async GetData methods.
+        /// </summary>
+        /// <param name="connectionInfo">connection to be used (ref parameter to allow update)</param>
+        /// <param name="request">the request that has to be resolved</param>
+        /// <returns>prepared request with fixed property lists</returns>
+        private static Request PrepareRequest(ref Object connectionInfo, Request request)
         {
             if( null == request )
             {
@@ -100,11 +131,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 throw new QueryNotSupportedEnumeratorException(SfcStrings.NoPropertiesRequested);
             }
 
-            EnumResult result = new Environment().GetData(req, connectionInfo);
-
-            Enumerator.TraceInfo("Serving response for request:\n{0}\n", request.Urn);
-
-            return result;
+            return req;
         }
 
         /// <summary>

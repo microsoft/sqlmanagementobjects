@@ -15,7 +15,7 @@ namespace Microsoft.SqlServer.Management.Common
         internal TransferException() : base() {}
         internal TransferException(string message) : base(message) {}
         internal TransferException(string message, Exception innerException) : base(message, innerException) {}
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
 
         protected TransferException(SerializationInfo info, StreamingContext context)
             : base(info, context)

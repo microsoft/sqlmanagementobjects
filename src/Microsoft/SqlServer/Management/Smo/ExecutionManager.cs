@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Data;
 #if MICROSOFTDATA
@@ -11,7 +12,9 @@ using System.Data.SqlClient;
 #endif
 using System.Collections.Specialized;
 using System.Diagnostics.Tracing;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.SqlServer.Management.Common;
 using EventSource = Microsoft.SqlServer.Management.Common.SmoEventSource;
 using Microsoft.SqlServer.Server;
@@ -107,15 +110,21 @@ namespace Microsoft.SqlServer.Management.Smo
                     foreach (StackFrame f in frames)
                     {
                         if( null == f )
+                        {
                             continue;
+                        }
                         framepath.Append("->");
                         MethodBase mi = f.GetMethod();
                         if( null != mi )
                         {
                             if( null != mi.DeclaringType )
+                            {
                                 framepath.Append(mi.DeclaringType.Name + "." + mi.Name);
+                            }
                             else
+                            {
                                 framepath.Append(mi.Name);
+                            }
                         }
                     }
                     SmoEventSource.Log.ExecutionMessage(framepath.ToString());
@@ -157,19 +166,87 @@ namespace Microsoft.SqlServer.Management.Smo
                     foreach (StackFrame f in frames)
                     {
                         if( null == f )
+                        {
                             continue;
+                        }
                         framepath.Append("->");
                         MethodBase mi = f.GetMethod();
                         if( null != mi )
                         {
                             if( null != mi.DeclaringType )
+                            {
                                 framepath.Append(mi.DeclaringType.Name + "." + mi.Name);
+                            }
                             else
+                            {
                                 framepath.Append(mi.Name);
+                            }
                         }
                     }
                     EventSource.Log.ExecutionMessage(framepath.ToString());
                 }
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Get enumerator data asynchronously
+        /// </summary>
+        /// <param name="req">The request</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing DataTable with the results</returns>
+        internal async Task<DataTable> GetEnumeratorDataAsync(Request req, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            ConnectionContext.CheckDisconnected();
+
+#if INCLUDE_PERF_COUNT
+            StartTime();
+#endif
+            try
+            {
+                // Only convert URN to string if execution logging is enabled
+                if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
+                {
+                    EventSource.Log.GetDataForUrn(req.Urn.ToString());
+                }
+                EnumResult result = await Enumerator.GetDataAsync(this.ConnectionContext, req, cancellationToken).ConfigureAwait(false);
+                return (DataTable)result;
+            }
+            finally
+            {
+#if INCLUDE_PERF_COUNT
+                PerfLogUrn(req);
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Returns an IDataReader containing the results of the request asynchronously
+        /// </summary>
+        /// <param name="req">The request</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task containing IDataReader with the results</returns>
+        internal async Task<System.Data.IDataReader> GetEnumeratorDataReaderAsync(Request req, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            ConnectionContext.CheckDisconnected();
+
+            req.ResultType = ResultType.IDataReader;
+#if INCLUDE_PERF_COUNT
+            StartTime();
+#endif
+            try
+            {
+                // Only convert URN to string if execution logging is enabled
+                if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
+                {
+                    EventSource.Log.GetDataForUrn(req.Urn.ToString());
+                }
+                return EnumResult.ConvertToDataReader(await Enumerator.GetDataAsync(this.ConnectionContext, req, cancellationToken).ConfigureAwait(false));
+            }
+            finally
+            {
+#if INCLUDE_PERF_COUNT
+                PerfLogUrn(req);
 #endif
             }
         }
@@ -185,7 +262,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
 #if INCLUDE_PERF_COUNT
             if( PerformanceCounters.DoCount )
+            {
                 PerformanceCounters.ObjectInfoRequestCount++;
+            }
 #endif
             // Only format string if execution logging is enabled
             if (EventSource.Log.IsEnabled(EventLevel.Informational, EventSource.Keywords.Execution))
@@ -220,7 +299,9 @@ namespace Microsoft.SqlServer.Management.Smo
             {
 #if INCLUDE_PERF_COUNT
                 if( PerformanceCounters.DoCount )
+                {
                     PerformanceCounters.DependencyDiscoveryDuration += EndTime();
+                }
 #endif
         }
         }
@@ -324,6 +405,39 @@ namespace Microsoft.SqlServer.Management.Smo
             try
             {
                 this.ConnectionContext.ExecuteNonQuery(queries, executionType);
+            }
+            finally
+            {
+#if INCLUDE_PERF_COUNT
+                AfterSql();
+#endif
+            }
+        }
+
+        /// <summary>
+        /// wrapper for ConnectionContext ExecuteNonQueryAsync
+        /// </summary>
+        /// <param name="queries">Queries to execute</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task representing the async operation</returns>
+        internal async Task ExecuteNonQueryAsync(StringCollection queries, CancellationToken cancellationToken = default(CancellationToken))
+        {
+#if INCLUDE_PERF_COUNT
+            BeforeSql();
+            foreach(string q in queries)
+            {
+                EventSource.Log.ExecutionMessage("execute sql: " + q);
+            }
+#endif
+            foreach(string q in queries)
+            {
+                DumpTraceString("execute sql: " + q);
+            }
+
+            try
+            {
+                // Convert StringCollection to IEnumerable<string> using Cast
+                await this.ConnectionContext.ExecuteNonQueryAsync(queries.Cast<string>(), cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -485,6 +599,80 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        /// <summary>
+        /// Asynchronously executes a DBCC statement, using the specified <see cref="ServerMessageEventHandler"/> to pass Server Information messages received
+        /// and returning them
+        /// </summary>
+        /// <param name="queries">Queries to execute</param>
+        /// <param name="dbccMessageHandler">Handler for server messages</param>
+        /// <param name="errorsAsMessages">Whether to treat errors as messages</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task representing the async operation</returns>
+        internal async Task ExecuteNonQueryWithMessageAsync(StringCollection queries,
+            ServerMessageEventHandler dbccMessageHandler,
+            bool errorsAsMessages,
+            CancellationToken cancellationToken = default)
+        {
+            await ExecuteNonQueryWithMessageAsync(queries, dbccMessageHandler, errorsAsMessages, /*retry*/true, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously executes a DBCC statement, using the specified <see cref="ServerMessageEventHandler"/> to pass Server Information messages received
+        /// and returning them
+        /// </summary>
+        /// <param name="queries">Queries to execute</param>
+        /// <param name="dbccMessageHandler">Handler for server messages</param>
+        /// <param name="errorsAsMessages">Whether to treat errors as messages</param>
+        /// <param name="retry">Whether we should retry if an exception is thrown during execution</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>Task representing the async operation</returns>
+        internal async Task ExecuteNonQueryWithMessageAsync(StringCollection queries,
+            ServerMessageEventHandler dbccMessageHandler,
+            bool errorsAsMessages,
+            bool retry,
+            CancellationToken cancellationToken = default)
+        {
+            ExecResult er = null;
+            bool fireInfoMessageEventOnUserErrors = false;
+
+            // execute the statements, but we hook for ServerMessage events
+            this.ConnectionContext.ServerMessage += dbccMessageHandler;
+
+            if (errorsAsMessages)
+            {
+                fireInfoMessageEventOnUserErrors = this.ConnectionContext.SqlConnectionObject.FireInfoMessageEventOnUserErrors;
+                this.ConnectionContext.SqlConnectionObject.FireInfoMessageEventOnUserErrors = true;
+
+                er = new ExecResult();
+                this.ConnectionContext.ServerMessage += er.GetEventHandler();
+            }
+            try
+            {
+                await ExecuteNonQueryAsync(queries, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+
+                // we need to clean the event handler from the list no matter
+                // what happens in DBCC execution
+                this.ConnectionContext.ServerMessage -= dbccMessageHandler;
+                if (errorsAsMessages)
+                {
+                    this.ConnectionContext.SqlConnectionObject.FireInfoMessageEventOnUserErrors = fireInfoMessageEventOnUserErrors;
+                    if (null != er)
+                    {
+                        this.ConnectionContext.ServerMessage -= er.GetEventHandler();
+                    }
+                }
+
+            }
+            //if we had an error report it
+            if (true == errorsAsMessages && null != er && null != er.GetError())
+            {
+                throw new SmoException(er.GetError().ToString());
+            }
+        }
+
         internal DataSet ExecuteWithResultsAndMessages(string cmd,
             ServerMessageEventHandler dbccMessageHandler,
             bool errorsAsMessages)
@@ -543,13 +731,13 @@ namespace Microsoft.SqlServer.Management.Smo
             return d;
         }
 
-        internal void ExecuteNonQueryWithMessageAsync(StringCollection queries,
+        internal void ExecuteNonQueryWithMessageAPM(StringCollection queries,
             ServerMessageEventHandler dbccMessageHandler, bool errorsAsMessages)
         {
-            ExecuteNonQueryWithMessageAsync(queries, dbccMessageHandler, errorsAsMessages, /*retry*/true);
+            ExecuteNonQueryWithMessageAPM(queries, dbccMessageHandler, errorsAsMessages, /*retry*/true);
         }
 
-        internal void ExecuteNonQueryWithMessageAsync(StringCollection queries,
+        internal void ExecuteNonQueryWithMessageAPM(StringCollection queries,
             ServerMessageEventHandler dbccMessageHandler,
             bool errorsAsMessages,
             bool retry)
@@ -603,12 +791,12 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
-        internal void ExecuteNonQueryAsync(StringCollection queries)
+        internal void ExecuteNonQueryAsyncAPM(StringCollection queries)
         {
-            ExecuteNonQueryAsync(queries, /*retry*/true);
+            ExecuteNonQueryAsyncAPM(queries, /*retry*/true);
         }
 
-        internal void ExecuteNonQueryAsync(StringCollection queries, bool retry)
+        internal void ExecuteNonQueryAsyncAPM(StringCollection queries, bool retry)
         {
             //
             // There is no locking in this method because we assume that it cannot be
@@ -897,7 +1085,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
                 string skeleton = GetUrnSkeleton(req);
                 if( !PerformanceCounters.UrnSkeletonsPerf.Contains(skeleton) )
+                {
                     PerformanceCounters.UrnSkeletonsPerf[skeleton] = new FrequencyPair();
+                }
 
                 FrequencyPair fp = PerformanceCounters.UrnSkeletonsPerf[skeleton] as FrequencyPair;
 
@@ -914,7 +1104,9 @@ namespace Microsoft.SqlServer.Management.Smo
         void AfterSql()
         {
             if( PerformanceCounters.DoCount )
+            {
                 PerformanceCounters.SqlExecutionDuration = PerformanceCounters.SqlExecutionDuration + EndTime();
+            }
         }
 #endif
     }

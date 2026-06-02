@@ -1665,8 +1665,8 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void ScriptIndexOptions(StringBuilder sb)
             {
-                // index options are not supported for primary and unique keys on SQL DW tables
-                if (this.index.IsSqlDwIndex || preferences.TargetEngineIsAzureSqlDw())
+                // index options are not supported for primary and unique keys on SQL DW or Fabric DW tables
+                if (this.index.IsSqlDwIndex || preferences.TargetEngineIsAzureSqlDw() || preferences.TargetEngineIsFabricDw())
                 {
                     return;
                 }
@@ -1750,9 +1750,9 @@ namespace Microsoft.SqlServer.Management.Smo
 
             protected override void ScriptIndexDetails(StringBuilder sb)
             {
-                if (preferences.TargetEngineIsAzureSqlDw())
+                if (preferences.TargetEngineIsAzureSqlDw() || preferences.TargetEngineIsFabricDw())
                 {
-                    // Script enforcement if the target server is SQL DW. Always script NOT ENFORCED because for now, SQL DW only supports "NOT ENFORCED"
+                    // Always script NOT ENFORCED for SQL DW and Fabric DW — these engines only NOT ENFORCED constraints
                     sb.Append(" NOT ENFORCED ");
                 }
             }

@@ -1,6 +1,6 @@
 # Spec 0001: Async Interfaces for SMO
 
-**Status:** Draft  
+**Status:** Accepted  
 **Created:** 2026-02-10  
 **Authors:** SMO Team  
 
@@ -233,6 +233,66 @@ internal Task<EnumResult> GetDataAsync(object connectionInfo, Request request, C
 ### 6.3 Dependencies
 
 - Depends on: **ServerConnection async methods** (Section 5).
+
+### 6.4 Implementation Notes
+
+**Status:** Implemented in Step 2 (SFC Async Layer — Enumerator / ExecuteSql)
+
+#### 6.4.1 ExecuteSql Async Methods
+
+Both the Sdk.Sfc and SqlEnum versions of `ExecuteSql` have been updated with async methods:
+
+- **GetDataTableAsync(String query, CancellationToken cancellationToken)** — Calls `ServerConnection.ExecuteWithResultsAsync()` 
+- **GetDataReaderAsync(String query, CancellationToken cancellationToken)** — Calls `ServerConnection.ExecuteReaderAsync()`
+
+The SqlEnum version maintains the same database-scoped connection handling as the sync version, using `GetDatabaseConnection()` when needed.
+
+**SmoCodeGen Compatibility:** A stub implementation was added to `ExecuteSqlFake.cs` (used by the SmoCodeGen tool) to ensure the code generation process can compile successfully.
+
+#### 6.4.2 EnumObject Hierarchy Async Support
+
+The `EnumObject` base class and relevant subclasses were updated:
+
+- **EnumObject.GetDataAsync(EnumResult, CancellationToken)** — Virtual method with default implementation that delegates to sync `GetData()` wrapped in `Task.FromResult()`. This allows subclasses that don't perform SQL execution to work without changes.
+- **SqlObjectBase (Sdk.Sfc).GetDataAsync()** — Overrides base, implements truly async path using `BuildResultAsync()` and `FillDataAsync()`
+- **SqlObjectBase (SqlEnum).GetDataAsync()** — Separate implementation maintaining database-scoping behavior
+
+The `BuildResultAsync()` and `FillDataAsync()` helper methods mirror the sync versions but use async ExecuteSql methods and properly propagate cancellation tokens.
+
+#### 6.4.3 Environment Async Flow
+
+`Environment` received two async methods:
+
+- **GetDataAsync(Request, Object, CancellationToken)** — Public entry point matching sync `GetData()`
+- **GetDataAsync(CancellationToken)** — Private overload that iterates the `EnumObject` chain calling `GetDataAsync()` on each node
+
+The async flow mirrors the sync path: `GetObjectsFromCache()` → `InitObjects()` → iterate chain calling `EnumObject.GetDataAsync()`.
+
+#### 6.4.4 Enumerator Public API
+
+- **Enumerator.GetDataAsync(Object, Request, CancellationToken)** — Public static method matching the existing static `GetData()`. Creates an `Environment` and delegates to `Environment.GetDataAsync()`.
+
+No instance `ProcessAsync()` was added in this iteration, as SMO's `ExecutionManager` exclusively uses the static `Enumerator.GetData()` / `GetDataAsync()` methods.
+
+#### 6.4.5 ExecutionManager Bridge Layer
+
+`ExecutionManager` received three async methods to bridge SMO to the SFC async layer:
+
+- **GetEnumeratorDataAsync(Request, CancellationToken)** — Returns `Task<DataTable>`, delegates to `Enumerator.GetDataAsync()`
+- **GetEnumeratorDataReaderAsync(Request, CancellationToken)** — Returns `Task<IDataReader>`, delegates to `Enumerator.GetDataAsync()` and converts result
+- **ExecuteNonQueryAsync(StringCollection, CancellationToken)** — Converts `StringCollection` to `IEnumerable<string>` and delegates to `ServerConnection.ExecuteNonQueryAsync()`
+
+**StringCollection Conversion:** The `ExecuteNonQueryAsync` method uses the LINQ `Cast<string>()` extension method to convert `StringCollection` (which implements `IEnumerable`) to `IEnumerable<string>` for compatibility with `ServerConnection.ExecuteNonQueryAsync(IEnumerable<string>)`.
+
+**Code Deduplication:** Common logic in sync/async method pairs has been extracted to shared helper methods where possible (e.g., `SqlObjectUnion.PrepareUnionSql()`) to reduce code duplication while maintaining the distinct sync/async execution paths.
+
+#### 6.4.6 ConfigureAwait(false) Usage
+
+All `await` calls throughout the SFC async layer use `.ConfigureAwait(false)` to prevent `SynchronizationContext` capture and avoid potential deadlocks.
+
+#### 6.4.7 Default Parameter Syntax
+
+All `CancellationToken cancellationToken` parameters use `= default(CancellationToken)` rather than `= default` for compatibility with the net472 target framework, which does not support the shorter syntax for default parameter values.
 
 ## 7. Object Initialization and Property Access
 

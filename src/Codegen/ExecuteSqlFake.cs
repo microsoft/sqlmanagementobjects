@@ -37,6 +37,13 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        ///establish connection asynchronously if not already connected</summary>
+        internal System.Threading.Tasks.Task ConnectAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
         ///disconnect if the connection was initially disconnected</summary>
         internal void Disconnect()
         {
@@ -91,6 +98,14 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Execute a query asynchronously without results.
+        /// </summary>
+        public System.Threading.Tasks.Task ExecuteImmediateAsync(String query, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
         ///excute a query and return a DataTable with the results</summary>
         public DataTable ExecuteWithResults(String query)
         {
@@ -100,6 +115,22 @@ namespace Microsoft.SqlServer.Management.Smo
         /// <summary>
         ///execute a query and get a DataReader for the results</summary>
         public SqlDataReader GetDataReader(String query)
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
+        /// Execute a query asynchronously and return a DataTable with the results.
+        /// </summary>
+        public System.Threading.Tasks.Task<DataTable> GetDataTableAsync(String query, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
+        /// Execute a query asynchronously and get a DataReader for the results.
+        /// </summary>
+        public System.Threading.Tasks.Task<SqlDataReader> GetDataReaderAsync(String query, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             throw new Exception();
         }
@@ -179,6 +210,41 @@ namespace Microsoft.SqlServer.Management.Smo
         /// taken only for the last tsql
         /// </summary>
         static internal DataProvider GetDataProvider(StringCollection query, Object con, StatementBuilder sb, DataProvider.RetriveMode rm)
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
+        /// Execute the sql for the given connection returning results in a DataTable asynchronously.
+        /// This is a tsql for final results. 
+        /// StatementBuilder holds info for additional processing needs and formatting information.
+        /// The first tsqls in the list are executed without results, results are taken only for the last tsql.
+        /// </summary>
+        static internal System.Threading.Tasks.Task<DataTable> ExecuteWithResultsAsync(StringCollection query, Object con, StatementBuilder sb, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
+        /// Execute the sql for the given connection returning results in a DataProvider asynchronously.
+        /// This is a tsql for final results. 
+        /// StatementBuilder holds info for additional processing needs and formatting information.
+        /// The first tsqls in the list are executed without results, results are taken only for the last tsql.
+        /// </summary>
+        static internal System.Threading.Tasks.Task<DataProvider> GetDataProviderAsync(StringCollection query, Object con, StatementBuilder sb, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            throw new Exception();
+        }
+
+        /// <summary>
+        /// Execute the sql for the given connection returning results in a DataProvider asynchronously.
+        /// This is a tsql for final results. 
+        /// StatementBuilder holds info for additional processing needs and formatting information.
+        /// DataProvider.RetriveMode tells if the DataProvider must bring all rows 
+        /// in a DataTable or be prepared to be used as a DataReader.
+        /// The first tsqls in the list are executed without results, results are taken only for the last tsql.
+        /// </summary>
+        static internal System.Threading.Tasks.Task<DataProvider> GetDataProviderAsync(StringCollection query, Object con, StatementBuilder sb, DataProvider.RetriveMode rm, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             throw new Exception();
         }

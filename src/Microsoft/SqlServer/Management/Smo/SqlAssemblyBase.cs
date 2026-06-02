@@ -566,7 +566,21 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 fs = new FileStream(assemblyLocalPath, FileMode.Open, FileAccess.Read);
                 byte[] file = new byte[fs.Length];
-                fs.Read(file, 0, (int)fs.Length);
+#if NET6_0_OR_GREATER
+                fs.ReadExactly(file, 0, (int)fs.Length);
+#else
+                int bytesRead = 0;
+                int totalBytes = (int)fs.Length;
+                while (bytesRead < totalBytes)
+                {
+                    int read = fs.Read(file, bytesRead, totalBytes - bytesRead);
+                    if (read == 0)
+                    {
+                        throw new InvalidOperationException(string.Format(SmoApplication.DefaultCulture, "Failed to read assembly file: {0}", assemblyLocalPath));
+                    }
+                    bytesRead += read;
+                }
+#endif
 
                 foreach (byte b in file)
                 {

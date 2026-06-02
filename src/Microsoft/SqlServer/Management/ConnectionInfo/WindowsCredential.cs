@@ -174,7 +174,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="password">The password</param>
         /// <param name="version">The version identifier of the calling application</param>
         /// <exception cref="System.ComponentModel.Win32Exception">Thrown when saving the password fails</exception>
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static void SetSqlSsmsCredential(string instance, int authType, string user, Guid serverType, SecureString password, string version)
@@ -194,7 +194,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="password">The password</param>
         /// <param name="version">The version identifier of the calling application</param>
         /// <exception cref="System.ComponentModel.Win32Exception">Thrown when saving the password fails</exception>
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static void SetSqlRegSvrCredential(string instance, int authType, string user, Guid serverType, SecureString password, string version)
@@ -212,7 +212,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="serverType">The type of server connection. The valid values are application dependent.</param>
         /// <param name="version">The version identifier of the calling application</param>
         /// <returns></returns>
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static SecureString GetSqlSsmsCredential(string instance, int authType, string user, Guid serverType, string version)
@@ -231,7 +231,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="serverType">The type of server connection. The valid values are application dependent.</param>
         /// <param name="version">The version identifier of the calling application</param>
         /// <returns></returns>
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static SecureString GetSqlRegSvrCredential(string instance, int authType, string user, Guid serverType, string version)
@@ -248,7 +248,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="user">The user name</param>
         /// <param name="serverType">The type of server connection. The valid values are application dependent.</param>
         /// <param name="version">The version identifier of the calling application</param>
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static void RemoveSsmsCredential(string instance, int authType, string user, Guid serverType, string version)
@@ -265,7 +265,7 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="user">The user name</param>
         /// <param name="serverType">The type of server connection. The valid values are application dependent.</param>
         /// <param name="version">The version identifier of the calling application</param>
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static void RemoveRegSvrCredential(string instance, int authType, string user, Guid serverType, string version)
@@ -274,7 +274,7 @@ namespace Microsoft.SqlServer.Management.Common
             RemoveCredential(targetName);
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static void SetAzureDataStudioCredential(string instance, string database, string authType, string user, SecureString password)
@@ -283,7 +283,7 @@ namespace Microsoft.SqlServer.Management.Common
             SetSqlCredential(targetName, user, password);
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
 #endif
         public static SecureString GetAzureDataStudioCredential(string instance, string database, string authType, string user)

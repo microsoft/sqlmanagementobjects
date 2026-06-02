@@ -6,6 +6,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     using System;
     using System.Collections;
     using System.Collections.Specialized;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// classes that implement a XPATH level must be derived from this class
@@ -335,6 +337,18 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         /// <returns>result for the level Request</returns>
         public abstract EnumResult GetData(EnumResult erParent);
 
+        /// <summary>
+        /// Gets the EnumResult data asynchronously according to the Request which was previously set by the Environment
+        /// </summary>
+        /// <param name="erParent">The parent EnumResult</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation</param>
+        /// <returns>A task containing the result for the level Request</returns>
+        public virtual Task<EnumResult> GetDataAsync(EnumResult erParent, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // Default implementation: delegate to sync method
+            // Subclasses that perform SQL execution should override this
+            return Task.FromResult(GetData(erParent));
+        }
 
         /// <summary>
         /// return what types of results does this object support

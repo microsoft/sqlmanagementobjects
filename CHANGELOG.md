@@ -8,6 +8,13 @@ Once we push a new version to nuget.org add a double hash header for that versio
 - Migrate string resources from legacy .strings files to standard .resx files using ResxSourceGenerator
 - Add async SQL execution methods to ServerConnection and ConnectionManager
 
+- Add .NET 10.0 target framework support to SMO NuGet packages
+
+## 181.19.0
+
+- Migrate string resources from legacy .strings files to standard .resx files using ResxSourceGenerator
+- Add async SQL execution methods to ServerConnection and ConnectionManager
+
 ## 181.15.0
 
 - Fix bug when scripting ALTER USER for Windows Group users

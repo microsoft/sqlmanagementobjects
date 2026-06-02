@@ -6,6 +6,7 @@ using _VSUT = Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.SqlServer.Management.Common;
 using _SMO = Microsoft.SqlServer.Management.Smo;
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 #if MICROSOFTDATA
@@ -1714,6 +1715,7 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
         [_VSUT.TestMethod]
         [_VSUT.Timeout(3600000)]
         [UnsupportedDatabaseEngineType(DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance)]
         public void Index_DropOptions_ALL_ONPREM_SERVERS()
         {
             this.ExecuteFromDbPool(
@@ -2672,6 +2674,114 @@ $"CREATE TABLE [dbo].[HekatonColumnstoreScripting_testTable]{Environment.NewLine
 
                 Assert.That(script, Does.Not.Contain(unexpectedFragment), errorMessage);
             }
+        }
+
+        #endregion
+
+        #region Performance Tests
+
+        /// <summary>
+        /// Verifies that enumerating indexes with HasCompressedPartitions completes quickly even
+        /// when the database has many tables and indexes. The underlying query joins to
+        /// sys.internal_tables (or sys.all_objects on DW) to resolve extended index objects,
+        /// and previously used a non-sargable string concatenation join that scaled poorly.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 11)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, MinMajor = 12)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.Express)]
+        public void Index_EnumerateWithCompressedPartitions_CompletesQuickly()
+        {
+            this.ExecuteWithDbDrop(
+                database =>
+                {
+                    const int tableCount = 2000;
+                    const int indexesPerTable = 3;
+
+                    // Create many tables with multiple indexes to produce a large catalog
+                    var sb = new StringBuilder();
+                    for (var t = 0; t < tableCount; t++)
+                    {
+                        var tableName = $"perf_t{t}";
+                        sb.AppendLine($"CREATE TABLE [dbo].[{tableName}] (c0 int NOT NULL, c1 int, c2 int, c3 int);");
+                        for (var idx = 0; idx < indexesPerTable; idx++)
+                        {
+                            sb.AppendLine($"CREATE NONCLUSTERED INDEX [ix_{tableName}_{idx}] ON [dbo].[{tableName}] (c{idx + 1});");
+                        }
+                    }
+
+                    // Create a table with a spatial column and a compressed spatial index
+                    // on platforms that support spatial indexes. Spatial indexes produce
+                    // extended_index_ entries in sys.internal_tables, which validates
+                    // the #extended_indexes temp table is populated correctly.
+                    var supportsSpatial =
+                        !database.IsFabricDatabase &&
+                        database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDataWarehouse &&
+                        database.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabaseEdge;
+
+                    if (supportsSpatial)
+                    {
+                        database.ExecuteNonQuery(@"
+                            CREATE TABLE [dbo].[perf_spatial] (
+                                id int NOT NULL PRIMARY KEY CLUSTERED,
+                                geom geometry);
+                            CREATE SPATIAL INDEX [ix_perf_spatial_geom] ON [dbo].[perf_spatial] ([geom])
+                                WITH (BOUNDING_BOX = (-180, -90, 180, 90), DATA_COMPRESSION = PAGE);");
+                    }
+
+                    database.ExecuteNonQuery(sb.ToString());
+
+                    // Pick one table to enumerate indexes on
+                    var targetTable = database.Tables["perf_t0"];
+                    Assert.That(targetTable, Is.Not.Null, "Target table should exist after bulk creation");
+
+                    // Force the index enumeration query to include HasCompressedPartitions, which
+                    // triggers the join to extended index objects (the previously slow path).
+                    var stopwatch = Stopwatch.StartNew();
+
+                    targetTable.Indexes.ClearAndInitialize(string.Empty, new[]
+                    {
+                        nameof(_SMO.Index.HasCompressedPartitions)
+                    });
+
+                    // Access the property on each index to ensure the query actually ran
+                    foreach (_SMO.Index idx in targetTable.Indexes)
+                    {
+                        // Reading the property forces materialization of the fetched value
+                        _ = idx.HasCompressedPartitions;
+                    }
+
+                    stopwatch.Stop();
+
+                    Trace.TraceInformation(
+                        $"Index enumeration with {nameof(_SMO.Index.HasCompressedPartitions)} for {tableCount} tables " +
+                        $"completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds");
+
+                    Assert.That(stopwatch.Elapsed.TotalSeconds, Is.LessThan(10),
+                        "Index enumeration with HasCompressedPartitions should complete in under 10 seconds. " +
+                        "A slow result indicates the extended_indexes join may have regressed to the non-sargable path.");
+
+                    Assert.That(targetTable.Indexes.Count, Is.GreaterThanOrEqualTo(indexesPerTable),
+                        "Target table should have at least the created nonclustered indexes");
+
+                    // Verify the spatial index with DATA_COMPRESSION has HasCompressedPartitions = true.
+                    // This proves the #extended_indexes temp table correctly joins sys.internal_tables
+                    // rows (extended_index_*) back to the spatial index.
+                    if (supportsSpatial)
+                    {
+                        var spatialTable = database.Tables["perf_spatial"];
+                        Assert.That(spatialTable, Is.Not.Null, "Spatial table should exist");
+
+                        spatialTable.Indexes.ClearAndInitialize(
+                            $"[@Name='{SFC.Urn.EscapeString("ix_perf_spatial_geom")}']",
+                            new[] { nameof(_SMO.Index.HasCompressedPartitions) });
+
+                        var spatialIndex = spatialTable.Indexes["ix_perf_spatial_geom"];
+                        Assert.That(spatialIndex, Is.Not.Null, "Spatial index should exist");
+                        Assert.That(spatialIndex.HasCompressedPartitions, Is.True,
+                            "Spatial index created with DATA_COMPRESSION should report HasCompressedPartitions = true");
+                    }
+                });
         }
 
         #endregion

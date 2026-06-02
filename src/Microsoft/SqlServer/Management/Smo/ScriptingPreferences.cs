@@ -164,6 +164,11 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Indicates whether the target server is a Fabric connection.
+        /// </summary>
+        internal bool TargetIsFabricConnection { get; set; }
+
+        /// <summary>
         /// Sets the TargetServerVersion based on input ServerVersion structure.
         /// </summary>
         /// <param name="ver"></param>
@@ -284,6 +289,15 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
+        /// Returns true if the target is a Fabric Data Warehouse
+        /// </summary>
+        internal bool TargetEngineIsFabricDw()
+        {
+            return (this.TargetIsFabricConnection &&
+                    this.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand);
+        }
+
+        /// <summary>
         /// Sets the target server info based on input SMO object
         /// </summary>
         /// <param name="o"></param>
@@ -313,6 +327,9 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 SetTargetDatabaseEngineEdition(o.DatabaseEngineEdition);
             }
+
+            var server = o.TryGetServerObject();
+            TargetIsFabricConnection = server?.ExecutionManager.IsFabricConnection ?? false;
         }
 
         /// <summary>

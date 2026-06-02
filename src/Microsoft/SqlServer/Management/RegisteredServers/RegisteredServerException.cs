@@ -58,7 +58,7 @@ namespace Microsoft.SqlServer.Management.RegisteredServers
         {
             Init ();
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
 
         /// <summary>
         /// Base constructor

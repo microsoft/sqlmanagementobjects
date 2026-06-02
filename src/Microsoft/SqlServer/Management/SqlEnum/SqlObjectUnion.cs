@@ -48,12 +48,8 @@ namespace Microsoft.SqlServer.Management.Smo
             sql.Append(o.StatementBuilder.InternalSelect());
         }
 
-        //get the data from the object
-        public override EnumResult GetData(EnumResult erParent)
+        void PrepareUnionSql(SqlEnumResult ser, StringBuilder sql)
         {
-            StringBuilder sql = new StringBuilder();
-            SqlEnumResult ser = (SqlEnumResult)erParent;
-
             ProcessStatementBuilder(ser, this, sql);
 
             foreach(SqlObject o in m_listObjects)
@@ -64,8 +60,30 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             this.StatementBuilder.SetInternalSelect(sql);
             ser.StatementBuilder = this.StatementBuilder;
+        }
+
+        //get the data from the object
+        public override EnumResult GetData(EnumResult erParent)
+        {
+            StringBuilder sql = new StringBuilder();
+            SqlEnumResult ser = (SqlEnumResult)erParent;
+
+            PrepareUnionSql(ser, sql);
+
             //transform the StamentBuilder in whatever is asked in Request
             return BuildResult(erParent);
+        }
+
+        //get the data from the object asynchronously
+        public override async System.Threading.Tasks.Task<EnumResult> GetDataAsync(EnumResult erParent, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            StringBuilder sql = new StringBuilder();
+            SqlEnumResult ser = (SqlEnumResult)erParent;
+
+            PrepareUnionSql(ser, sql);
+
+            //transform the StamentBuilder in whatever is asked in Request
+            return await BuildResultAsync(erParent, cancellationToken).ConfigureAwait(false);
         }
 
         public override void PostProcess(EnumResult erChildren)

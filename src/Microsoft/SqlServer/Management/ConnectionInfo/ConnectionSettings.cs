@@ -1118,7 +1118,7 @@ namespace Microsoft.SqlServer.Management.Common
                 }
                 if (NetworkProtocol != NetworkProtocol.NotSpecified)
                 {
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0 && !NETSTANDARD2_0
                     //NetworkLibrary property not implemented in .NetCore
                     sbConnectionString.NetworkLibrary = GetNetworkProtocolString();
 #endif

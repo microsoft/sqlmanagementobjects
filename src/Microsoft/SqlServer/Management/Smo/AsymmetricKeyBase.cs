@@ -301,6 +301,18 @@ namespace Microsoft.SqlServer.Management.Smo
         {
         }
 
+        /// <summary>
+        /// Internal constructor that initializes createInfo for the cryptographic provider code path.
+        /// Used by unit tests to exercise ScriptCreate without calling Create (which requires a live connection).
+        /// </summary>
+        internal AsymmetricKey(Database database, string name, string providerAlgorithm, string providerKeyName, CreateDispositionType createDispositionType, AsymmetricKeySourceType sourceType)
+            : base()
+        {
+            this.key = new SimpleObjectKey(name);
+            this.SetParentImpl(database);
+            createInfo = new CreateInfo(providerAlgorithm, providerKeyName, createDispositionType, sourceType);
+        }
+
         ///<summary>
         /// returns the name of the type in the urn expression
         ///</summary>
@@ -479,7 +491,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         sb.Append("WITH ");
                         sb.Append(Globals.newline);
                         sb.Append(Globals.tab);
-                        sb.Append(string.Format(SmoApplication.DefaultCulture, "PROVIDER_KEY_NAME = '{0}', ", createInfo.providerKeyName));
+                        sb.AppendFormat(SmoApplication.DefaultCulture, "PROVIDER_KEY_NAME = {0}, ", MakeSqlString(createInfo.providerKeyName));
                         sb.Append(Globals.newline);
                         sb.Append(Globals.tab);
                         sb.Append(string.Format(SmoApplication.DefaultCulture, "ALGORITHM = {0}, ", createInfo.providerAlgorithm));

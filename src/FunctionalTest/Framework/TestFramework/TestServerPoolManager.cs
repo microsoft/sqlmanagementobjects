@@ -48,14 +48,15 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
         /// </summary>
         /// <param name="poolName">The name of the pool</param>
         /// <param name="databaseHandler">Handler to create database</param>
+        /// <param name="onDatabaseCreated">Optional delegate invoked once after the database is first created</param>
         /// <returns></returns>
-        public static Database GetDbFromPool(string poolName, IDatabaseHandler databaseHandler)
+        public static Database GetDbFromPool(string poolName, IDatabaseHandler databaseHandler, Action<Database> onDatabaseCreated = null)
         {
             var serverName = databaseHandler.TestDescriptor.Name;
-            return GetOrCreateDatabase(poolName, serverName, databaseHandler);
+            return GetOrCreateDatabase(poolName, serverName, databaseHandler, onDatabaseCreated);
         }
 
-        private static Database GetOrCreateDatabase(string poolName, string serverName, IDatabaseHandler handler)
+        private static Database GetOrCreateDatabase(string poolName, string serverName, IDatabaseHandler handler, Action<Database> onDatabaseCreated = null)
         {
             if (!DatabasePools.ContainsKey(poolName))
             {
@@ -67,6 +68,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             {
                 pool[serverName] = handler.HandleDatabaseCreation();
                 allDatabases.Add((pool[serverName], handler));
+                onDatabaseCreated?.Invoke(pool[serverName]);
             }
 
             return pool[serverName];

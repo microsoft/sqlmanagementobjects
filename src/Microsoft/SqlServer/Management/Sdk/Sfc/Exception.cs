@@ -36,7 +36,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             Init();
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         protected SfcException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
@@ -157,7 +157,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.propertyName = propertyName;
             Init();
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcPropertyNotSetException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -220,7 +220,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.keyName = keyName;
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidKeyException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -281,7 +281,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         }
 
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidKeyChainException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -318,7 +318,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidRenameException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -348,7 +348,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidMoveException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -383,7 +383,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             this.objName = keyName;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcObjectInitializationException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -438,7 +438,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidArgumentException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -470,7 +470,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidStreamException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -507,7 +507,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(SfcStrings.SfcInvalidSerialization, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcSerializationException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -537,7 +537,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcNonSerializableTypeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -567,7 +567,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcUnregisteredXmlDomainException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -596,7 +596,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcUnregisteredXmlTypeException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -626,7 +626,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcNonSerializablePropertyException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -656,7 +656,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcUnsupportedVersionSerializationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -686,7 +686,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcEmptyXmlException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -724,7 +724,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidXmlParentTypeException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -753,7 +753,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidQueryExpressionException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -785,7 +785,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcQueryConnectionUnavailableException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -821,7 +821,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidStateException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -850,7 +850,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message,innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcCRUDOperationFailedException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -880,7 +880,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcMissingParentException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -909,7 +909,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcObjectNotScriptableException(SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
@@ -947,7 +947,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -995,7 +995,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             this.fromMode = string.Empty;
             this.toMode = string.Empty;
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcInvalidConnectionContextModeChangeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1050,7 +1050,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private SfcSqlCeNotInstalledException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -1091,7 +1091,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -1132,7 +1132,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -1173,7 +1173,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Base constructor
         /// </summary>

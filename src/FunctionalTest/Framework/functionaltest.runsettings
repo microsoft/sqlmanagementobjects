@@ -44,10 +44,8 @@ Included items must then not match any entries in the exclude list to remain inc
                 <ModulePath>.*Microsoft\.SqlServer\.Management\.Sdk\.Sfc\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.Smo\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.SmoExtended\.dll$</ModulePath>
-                <ModulePath>.*Microsoft\.SqlServer\.Smo\.Notebook\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.RegSvrEnum\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.Management\.SmoMetadataProvider\.dll$</ModulePath>
-                <ModulePath>.*Microsoft\.SqlServer\.Management\.Assessment\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.SqlEnum\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.Management\.SqlScriptPublish\.dll$</ModulePath>
                 <ModulePath>.*Microsoft\.SqlServer\.Management\.XEvent\.dll$</ModulePath>
@@ -66,9 +64,8 @@ Included items must then not match any entries in the exclude list to remain inc
                 <!-- Don't forget "Attribute" at the end of the name -->
                 <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
                 <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
-                <Attribute>^System\.Runtime\.CompilerServices.CompilerGeneratedAttribute$</Attribute>
-                <Attribute>^System\.CodeDom\.Compiler.GeneratedCodeAttribute$</Attribute>
-                <Attribute>^System\.Diagnostics\.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>
+                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
                 <Attribute>^System\.ObsoleteAttribute</Attribute>
               </Exclude>
             </Attributes>

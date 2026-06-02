@@ -36,7 +36,7 @@ namespace Microsoft.SqlServer.Management.Common
                 // without granting blanket UnmanagedCode permission to client assemblies.
                 // Decrypting SqlSecureStrings created by client assemblies is not dangerous,
                 // so no special permissions are demanded of clients to do so.
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
                 new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Assert();
 #endif
 

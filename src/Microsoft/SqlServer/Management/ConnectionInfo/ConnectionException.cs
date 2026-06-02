@@ -35,7 +35,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         ///
         /// </summary>
@@ -71,7 +71,7 @@ namespace Microsoft.SqlServer.Management.Common
         public ConnectionCannotBeChangedException(String message, Exception innerException) : base(message, innerException)
         {
         }
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ConnectionCannotBeChangedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -106,7 +106,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private InvalidPropertyValueException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -141,7 +141,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ConnectionFailureException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -176,7 +176,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private ExecutionFailureException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -211,7 +211,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private NotInTransactionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -246,7 +246,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private InvalidArgumentException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -280,7 +280,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private PropertyNotSetException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -315,7 +315,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Serialization constructor
         /// </summary>
@@ -354,7 +354,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
         /// Serialization constructor
         /// </summary>
@@ -393,7 +393,7 @@ namespace Microsoft.SqlServer.Management.Common
         {
         }
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
         private DisconnectedConnectionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

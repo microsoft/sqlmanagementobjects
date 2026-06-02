@@ -5,6 +5,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 {
     using System;
     using System.Collections;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.SqlServer.Management.Common;
 
     /// <summary>
@@ -98,6 +100,34 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
             PutObjectsInCache();
 
+            return er;
+        }
+
+        public async Task<EnumResult> GetDataAsync(Request req, Object ci, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            //compile the m_xpath
+            m_xpath = req.Urn.XPathExpression;
+
+            //create and init enumeration objects
+            GetObjectsFromCache(req.Urn, ci);
+            InitObjects(req);
+
+
+            EnumResult er = await GetDataAsync(cancellationToken).ConfigureAwait(false);
+            PostProcess(er);
+
+            PutObjectsInCache();
+
+            return er;
+        }
+
+        private async Task<EnumResult> GetDataAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            EnumResult er = null;
+            foreach (CacheElement ce in m_listEnumObject)
+            {
+                er = await ce.EnumObject.GetDataAsync(er, cancellationToken).ConfigureAwait(false);
+            }
             return er;
         }
 
@@ -231,6 +261,5 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     }  
 }
     
-
 
 

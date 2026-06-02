@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Text;
 using System.Diagnostics;
 
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0 && !NETSTANDARD2_0
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 #endif
 
@@ -405,7 +405,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 
         private string ConvertToHexBinary(Byte[] byteValue)
         {
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
             return new SoapHexBinary(byteValue).ToString();
 #else
             StringBuilder sb = new StringBuilder(100);

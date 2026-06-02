@@ -315,11 +315,11 @@ namespace Microsoft.SqlServer.Management.Smo
                 // if any notification is requested by the clients, hook into the server's notification messages
                 if (null != Complete || null != PercentComplete || null != Information || null != NextMedia)
                 {
-                    this.server.ExecutionManager.ExecuteNonQueryWithMessageAsync(script, new ServerMessageEventHandler(OnInfoMessage), true);
+                    this.server.ExecutionManager.ExecuteNonQueryWithMessageAPM(script, new ServerMessageEventHandler(OnInfoMessage), true);
                 }
                 else
                 {
-                    this.server.ExecutionManager.ExecuteNonQueryAsync(script);
+                    this.server.ExecutionManager.ExecuteNonQueryAsyncAPM(script);
                 }
             }
             catch (Exception e)

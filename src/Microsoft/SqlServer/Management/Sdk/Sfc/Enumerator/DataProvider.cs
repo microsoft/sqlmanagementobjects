@@ -13,6 +13,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 #endif
     using System.Data;
     using System.Globalization;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.SqlServer.Management.Sdk.Sfc;
 
@@ -140,6 +142,50 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                         m_command.Dispose();
                         m_command = null;
                     }
+                    m_dataReader.Close();
+                    m_dataReader = null;
+                    m_execSql.Disconnect();
+                    m_execSql = null;
+                }
+            }
+        }
+
+        ///<summary>
+        ///the means to execute the query ( execSql ) and the query ( query ) asynchronously
+        ///it executes the query and gets a data reader
+        ///if retrive mode is DataTable it proceeds to fill it</summary>
+        public async Task SetConnectionAndQueryAsync(ExecuteSql execSql, string query, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            m_execSql = execSql;
+            m_dataReader = await m_execSql.GetDataReaderAsync(query, cancellationToken).ConfigureAwait(false);
+            m_command = null; // Command not exposed in async path, cancellation handled via cancellationToken
+
+            //get all the rows right now
+            if (RetriveMode.RetriveDataTable == m_RetriveMode)
+            {
+                try
+                {
+                    while (await ReadInternalAsync(cancellationToken).ConfigureAwait(false))
+                    {
+                        ManipulateRowDataType();
+                        DataRow row = m_table.NewRow();
+                        for (int i = 0; i < rowData.Length; i++)
+                        {
+                            if (null == rowData[i])
+                            {
+                                row[i] = System.DBNull.Value;
+                            }
+                            else
+                            {
+                                row[i] = rowData[i];
+                            }
+                        }
+                        m_table.Rows.Add(row);
+                    }
+                }
+                finally
+                {
+                    rowData = null;
                     m_dataReader.Close();
                     m_dataReader = null;
                     m_execSql.Disconnect();
@@ -285,6 +331,19 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         {
             //else use DataReader
             bool b = m_dataReader.Read();
+            if (b)
+            {
+                m_dataReader.GetValues(rowData);
+            }
+            return b;
+        }
+
+        ///<summary>
+        ///advance one row asynchronously</summary>
+        private async Task<bool> ReadInternalAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            //else use DataReader
+            bool b = await m_dataReader.ReadAsync(cancellationToken).ConfigureAwait(false);
             if (b)
             {
                 m_dataReader.GetValues(rowData);

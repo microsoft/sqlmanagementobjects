@@ -13,7 +13,7 @@ namespace Microsoft.SqlServer.Management.Smo
     using System.Data;
     using Microsoft.SqlServer.Management.Common;
     using System.Runtime.InteropServices;
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
     using Microsoft.SqlServer.Smo.UnSafeInternals;
 #endif
     using Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -634,7 +634,7 @@ namespace Microsoft.SqlServer.Management.Smo
             String sp = String.Format(CultureInfo.InvariantCulture, 
                 "declare @find_referencing_objects int\nset @find_referencing_objects = {0}\n",
                 rd.ParentDependencies ? 0 : 1);
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
             StreamReader tr = new StreamReader(ManagementUtil.LoadResourceFromAssembly(Assembly.GetExecutingAssembly(), resourceFileName));
 #else
             Assembly sqlEnumAssembly = SqlEnumNetCoreExtension.GetAssembly(typeof(SqlTypeConvert));

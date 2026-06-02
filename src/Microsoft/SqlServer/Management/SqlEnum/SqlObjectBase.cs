@@ -3,6 +3,8 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.SqlServer.Management.Smo
 {
@@ -627,6 +629,16 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         ///	<summary>
+        ///	fill StatementBuilder with the information for this level asynchronously </summary>
+        public override async Task<EnumResult> GetDataAsync(EnumResult erParent, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            PrepareGetData(erParent);
+
+            //transform the StamentBuilder in whatever is asked in Request
+            return await BuildResultAsync(erParent, cancellationToken).ConfigureAwait(false);
+        }
+
+        ///	<summary>
         /// build statement</summary>
         protected void BuildStatement(EnumResult erParent)
         {
@@ -801,8 +813,7 @@ namespace Microsoft.SqlServer.Management.Smo
             StringCollection sql = sqlresult.BuildSql();
             try
             {
-                var sb = new StringBuilder();
-                sqlresult.CommandText = sql.Cast<string>().Aggregate((current, next) => sb.AppendLine(next).ToString());
+                sqlresult.CommandText = string.Join(System.Environment.NewLine, sql.Cast<string>());
                 return FillData(resultType, sql, this.ConnectionInfo, sqlresult.StatementBuilder);
             }
             catch(ExecutionFailureException efe)
@@ -844,6 +855,143 @@ namespace Microsoft.SqlServer.Management.Smo
                 return ds;
             }
             throw new ResultTypeNotSupportedEnumeratorException(resultType);
+        }
+
+        ///	<summary>
+        ///	n queries to prepare 
+        ///	and the last one to fill the data asynchronously</summary>
+        protected virtual async Task<Object> FillDataAsync(ResultType resultType, StringCollection sql, Object connectionInfo, StatementBuilder sb, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if( resultType == ResultType.IDataReader )
+            {
+                return await ExecuteSql.GetDataProviderAsync(sql, connectionInfo, sb, cancellationToken).ConfigureAwait(false);
+            }
+            else if( resultType == ResultType.DataTable || resultType == ResultType.DataSet )
+            {
+                DataTable dt = await ExecuteSql.ExecuteWithResultsAsync(sql, connectionInfo, sb, cancellationToken).ConfigureAwait(false);
+                if( resultType == ResultType.DataTable )
+                {
+                    return dt;
+                }
+                DataSet ds = new DataSet();
+                ds.Locale = CultureInfo.InvariantCulture;
+                ds.Tables.Add((DataTable)dt);
+                return ds;
+            }
+            throw new ResultTypeNotSupportedEnumeratorException(resultType);
+        }
+
+        ///	<summary>
+        /// Get data from Sql Server asynchronously. If we fail to get into a database then ignore that database</summary>
+        protected async Task<Object> FillDataWithUseFailureAsync(SqlEnumResult sqlresult, ResultType resultType, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            StringCollection sql = sqlresult.BuildSql();
+            try
+            {
+                sqlresult.CommandText = string.Join(System.Environment.NewLine, sql.Cast<string>());
+                return await FillDataAsync(resultType, sql, this.ConnectionInfo, sqlresult.StatementBuilder, cancellationToken).ConfigureAwait(false);
+            }
+            catch(ExecutionFailureException efe)
+            {
+                SqlException e = efe.InnerException as SqlException;
+                //we want:
+                //Server: Msg 911, Level 16, State 1, Line 1
+                //Could not locate entry in sysdatabases for database 'foo'. No entry found with that name. Make sure that the name is entered correctly.
+                if( null ==  e || e.Class != 16 || e.State != 1 || e.Number != 911 )
+                {
+                    throw;
+                }
+                sql.Clear();
+                sql.Add(sqlresult.StatementBuilder.GetCreateTemporaryTableSqlConnect("#empty_result"));
+                sql.Add("select * from #empty_result\nDROP TABLE #empty_result");
+                return await FillDataAsync(resultType, sql, this.ConnectionInfo, sqlresult.StatementBuilder, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        ///	<summary>
+        ///	Based on the requested result type and on the result from the parent level 
+        ///return the requested info from this level asynchronously</summary>
+        internal async Task<EnumResult> BuildResultAsync(EnumResult result, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            DatabaseEngineType dbType = ExecuteSql.GetDatabaseEngineType(this.ConnectionInfo);
+
+            if( null == result )
+            {
+                result = new SqlEnumResult(this.StatementBuilder, ResultType.Reserved1, dbType);
+            }
+
+            SqlEnumResult sqlresult = (SqlEnumResult)result;
+            AddSpecialQueryToResult(sqlresult);
+
+            // Adding WITH (FORCE ORDER) query hint for the tables query in Sterling
+            // to mitigate the long-running query due to Query Optimizer bug #8334783.
+            // Once this one is fixed, this should be removed, or refactored
+            // as it may be generally useful for other situations when query
+            // hint is needed
+            //
+            AddQueryHintToResult(sqlresult);
+
+            if( null == Request || ResultType.Reserved1 == Request.ResultType || 
+                                    ResultType.Reserved2 == Request.ResultType)
+            {
+                return sqlresult;
+            }
+
+            ResultType resultType = Request.ResultType;
+            if( ResultType.Default == Request.ResultType )
+            {
+                resultType = ResultType.DataTable;
+            }
+
+            // if there is post processing to be done then we return DataTable
+            if (this.StatementBuilder.PostProcessList.Count > 0)
+            {
+                bool needsDataTable = false;
+                // See if we can do the post processing directly on the data reader
+                // in principle this is possible when data fields are calculated 
+                // from other hidden columns
+                foreach (DictionaryEntry postProcess in this.StatementBuilder.PostProcessList)
+                {
+                    if (postProcess.Value is PostProcessCreateSqlSecureString)
+                    {
+                        // PostProcessCreateSqlSecureString can be done directly
+                        continue;
+                    }
+#if !SMOCODEGEN
+                    else if (postProcess.Value is PostProcessBodyText)
+                    {
+                        // PostProcessBodyText can be done directly on supported server versions
+                        continue;
+                    }
+#endif
+                    else
+                    {
+                        needsDataTable = true;
+                        break;
+                    }
+                }
+
+                if (needsDataTable)
+                {
+                    if (resultType == ResultType.IDataReader)
+                    {
+                        TraceHelper.Trace("w", Microsoft.SqlServer.Management.Sdk.Sfc.SQLToolsCommonTraceLvl.Always,
+                            "IDataReader will be returned from a DataTable because post processing is needed");
+                    }
+
+                    resultType = ResultType.DataTable;
+                }
+            }
+
+            var sw = Stopwatch.StartNew();
+            Object data = await FillDataWithUseFailureAsync(sqlresult, resultType, cancellationToken).ConfigureAwait(false);
+            sw.Stop();
+            var enumResult = new EnumResult(data, resultType)
+            {
+                CommandElapsedTime = sw.Elapsed,                
+                CommandText = sqlresult.CommandText
+            };            
+            return enumResult;
         }
 
         ///	<summary>

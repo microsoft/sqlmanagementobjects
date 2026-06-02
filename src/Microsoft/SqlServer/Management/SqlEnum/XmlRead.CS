@@ -13,7 +13,7 @@ namespace Microsoft.SqlServer.Management.Smo
     using System.Collections.Specialized;
     using Microsoft.SqlServer.Management.Common;
     using System.Runtime.InteropServices;
-#if !NETCOREAPP
+#if !NETCOREAPP && !NETSTANDARD2_0
     using Microsoft.SqlServer.Smo.UnSafeInternals;
 #endif
     using Microsoft.SqlServer.Management.Sdk.Sfc;

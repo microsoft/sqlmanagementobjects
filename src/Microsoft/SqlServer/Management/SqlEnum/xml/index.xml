@@ -30,13 +30,13 @@
       <property_link fields='#BoundingBoxXMin#BoundingBoxYMin#BoundingBoxXMax#BoundingBoxYMax#Level1Grid#Level2Grid#Level3Grid#Level4Grid#CellsPerObject#' left_join='sys.spatial_index_tessellations as si'>i.object_id = si.object_id and i.index_id = si.index_id</property_link>
     </version>
     <version min_major ='10' cloud_min_major='12' datawarehouse_enabled='true'>
-      <property_link fields = '#TableIDForPartition#' left_join="sys.all_objects AS allobj">
-        allobj.name = 'extended_index_' + cast(i.object_id AS varchar) + '_' + cast(i.index_id AS varchar) AND allobj.type='IT'
+      <property_link fields = '#TableIDForPartition#' left_join="#extended_indexes AS allobj">
+        allobj.parent_object_id = i.object_id AND allobj.index_id = i.index_id
       </property_link>
     </version>
     <version min_major ='11' cloud_min_major='12' datawarehouse_enabled='true'>
-      <property_link fields = '#HasCompressedPartitions#HasXmlCompressedPartitions#' left_join="sys.all_objects AS allobj">
-        allobj.name = 'extended_index_' + cast(i.object_id AS varchar) + '_' + cast(i.index_id AS varchar) AND allobj.type='IT'
+      <property_link fields = '#HasCompressedPartitions#HasXmlCompressedPartitions#' left_join="#extended_indexes AS allobj">
+        allobj.parent_object_id = i.object_id AND allobj.index_id = i.index_id
       </property_link>
     </version>
 
@@ -66,6 +66,24 @@
     <version min_major='10'>
       <prefix fields="#SpaceUsed#">declare @PageSize float select @PageSize=v.low/1024.0 from master.dbo.spt_values v where v.number=&lt;msparam&gt;1&lt;/msparam&gt; and v.type=&lt;msparam&gt;E&lt;/msparam&gt;</prefix>
     </version>
+    <version min_major='10' cloud_min_major='12'>
+      <prefix fields='#TableIDForPartition#HasCompressedPartitions#HasXmlCompressedPartitions#'>
+        create table #extended_indexes (parent_object_id int, index_id int, object_id int);
+        insert into #extended_indexes (parent_object_id, index_id, object_id)
+        select it.parent_id, cast(replace(replace(it.name, 'extended_index_' + cast(it.parent_id as varchar) + '_', ''), 'extended_index_', '') as int), it.object_id
+        from sys.internal_tables it
+        where it.name like 'extended[_]index[_]%'
+      </prefix>
+    </version>
+    <version datawarehouse_enabled='true'>
+      <prefix fields='#TableIDForPartition#HasCompressedPartitions#HasXmlCompressedPartitions#'>
+        create table #extended_indexes (parent_object_id int, index_id int, object_id int);
+        insert into #extended_indexes (parent_object_id, index_id, object_id)
+        select o.parent_object_id, cast(replace(replace(o.name, 'extended_index_' + cast(o.parent_object_id as varchar) + '_', ''), 'extended_index_', '') as int), o.object_id
+        from sys.all_objects o
+        where o.type = 'IT' and o.name like 'extended[_]index[_]%'
+      </prefix>
+    </version>
     <version min_major='17' cloud_min_major='12'>
       <prefix fields='#VectorIndexMetric#VectorIndexType#'>
         create table #vectorindexes (object_id int, index_id int, distance_metric nvarchar(60), vector_index_type nvarchar(60));
@@ -91,6 +109,13 @@
         begin catch
         end catch
       </prefix>
+    </version>
+    <version min_major='10' cloud_min_major='12' datawarehouse_enabled='true'>
+      <postfix fields='#TableIDForPartition#HasCompressedPartitions#HasXmlCompressedPartitions#'>
+        drop table #extended_indexes
+      </postfix>
+    </version>
+    <version min_major='17' cloud_min_major='12'>
       <postfix fields='#VectorIndexMetric#VectorIndexType#'>
         drop table #vectorindexes
       </postfix>

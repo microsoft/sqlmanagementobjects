@@ -846,9 +846,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 // for memory optimized, external, SQL DW and regular tables, if at least one column exists, script the table
                 if (!isFileTable)
                 {
-                    // All tables must have at least one user defined column except edge tables. Edge tables
-                    // do not require any user defined columns.
-                    if (Columns.Count < 1 && !isEdgeTable)
+                    // All tables must have at least one user defined column except edge tables
+                    // and external tables on Fabric DW (which support schema inference from the data source).
+                    if (Columns.Count < 1 && !isEdgeTable &&
+                        !(isExternal && this.ExecutionManager.IsFabricConnection && this.DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand))
                     {
                         throw new SmoException(ExceptionTemplates.FormatObjectWithNoChildren("Table", "Column"));
                     }
@@ -1056,12 +1057,17 @@ namespace Microsoft.SqlServer.Management.Smo
             this.ValidateExternalTableRequiredStringProperty(DataSourceNamePropertyName, sp);
             string externalDataSourceName = this.GetPropertyOptional(DataSourceNamePropertyName).Value.ToString();
 
-            // script columns
-            sb.Append(sp.NewLine);
-            ScriptColumns(sp, sb, this.Columns);
+            // Fabric DW external tables support schema inference when no columns are specified,
+            // so the column list is optional. All other platforms require at least one column.
+            if (this.Columns.Count > 0)
+            {
+                sb.Append(sp.NewLine);
+                ScriptColumns(sp, sb, this.Columns);
 
-            sb.Append(sp.NewLine);
-            sb.Append(Globals.RParen);
+                sb.Append(sp.NewLine);
+                sb.Append(Globals.RParen);
+            }
+
             sb.Append(sp.NewLine);
 
             // create a list of external table options
@@ -2137,8 +2143,11 @@ namespace Microsoft.SqlServer.Management.Smo
             string FileFormatNamePropertyName = nameof(FileFormatName);
             if (DatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand && sp.TargetDatabaseEngineEdition == DatabaseEngineEdition.SqlOnDemand)
             {
-                LocationPropertyName = "LocationOd";
                 FileFormatNamePropertyName = "FileFormatNameOd";
+                if (!ExecutionManager.IsFabricConnection)
+                {
+                    LocationPropertyName = "LocationOd";
+                }
             }
             const string RejectTypePropertyName = nameof(RejectType);
             const string RejectValuePropertyName = nameof(RejectValue);

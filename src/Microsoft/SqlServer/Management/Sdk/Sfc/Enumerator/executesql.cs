@@ -12,6 +12,8 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
 #endif
     using System.Collections.Specialized;
     using System.Collections;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.SqlServer.Management.Common;
     using System.Runtime.InteropServices;
 
@@ -50,6 +52,31 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 try
                 {
                     m_conctx.Connect();
+                }
+                catch
+                {
+                    m_conctx.SqlExecutionModes = m_semInitial.Value;
+                    m_semInitial = null;
+                    throw;
+                }
+                bHasConnected = true;
+            }
+        }
+
+        /// <summary>
+        ///establish connection asynchronously if not already connected</summary>
+        internal async Task ConnectAsync(CancellationToken cancellationToken = default)
+        {
+            if (!m_semInitial.HasValue)
+            {
+                m_semInitial = m_conctx.SqlExecutionModes;
+            }
+            m_conctx.SqlExecutionModes = SqlExecutionModes.ExecuteSql;
+            if( false == m_conctx.IsOpen )
+            {
+                try
+                {
+                    await m_conctx.ConnectAsync(cancellationToken).ConfigureAwait(false);
                 }
                 catch
                 {
@@ -183,6 +210,42 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         }
 
         /// <summary>
+        /// Async version of TryToReconnect. Attempts to reconnect using OpenAsync if the connection is closed.
+        /// This should be used by async methods to avoid blocking I/O during reconnection attempts.
+        /// Returns true if reconnection succeeded or should retry due to connection-related exception.
+        /// </summary>
+        private async Task<bool> TryToReconnectAsync(ExecutionFailureException e, CancellationToken cancellationToken)
+        {
+            //check for valid exception. 
+            if (null == e)
+            {
+                return false;
+            }
+            //check that is a connection related problem
+            if (((SqlException)e.InnerException).Class >= 20)
+            {
+                //make shure we are closed
+                if (false == m_conctx.IsOpen)
+                {
+                    //attempt reopen with current settings
+                    //if fails report 
+                    try
+                    {
+                        await m_conctx.SqlConnectionObject.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (SqlException)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            //not a connection problem , the query was bad
+            return false;
+        }
+
+
+        /// <summary>
         ///execute a query without results</summary>
         public void ExecuteImmediate(String query)
         {
@@ -197,6 +260,33 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 if( TryToReconnect(e) )
                 {
                     m_conctx.ExecuteNonQuery(query, ExecutionTypes.NoCommands);
+                }
+                else
+                {
+                    throw; //go with the original exception
+                }
+            }
+        }
+
+        /// <summary>
+        /// Execute a query asynchronously without results.
+        /// </summary>
+        /// <param name="query">The query text to execute.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        /// <returns>A task representing the async operation.</returns>
+        internal async Task ExecuteImmediateAsync(String query, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Enumerator.TraceInfo("query:\n{0}\n", query);
+
+            try
+            {
+                await m_conctx.ExecuteNonQueryAsync(query, cancellationToken).ConfigureAwait(false);
+            }
+            catch (ExecutionFailureException e)
+            {
+                if (await TryToReconnectAsync(e, cancellationToken).ConfigureAwait(false))
+                {
+                    await m_conctx.ExecuteNonQueryAsync(query, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -260,6 +350,64 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 if( TryToReconnect(e) )
                 {
                     dr = m_conctx.ExecuteReader(query, out command);
+                }
+                else
+                {
+                    throw; //go with the original exception
+                }
+            }
+            return dr;
+        }
+
+        /// <summary>
+        /// Execute a query asynchronously and return a DataTable with the results.
+        /// </summary>
+        /// <param name="query">The query text to execute.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        /// <returns>A task containing the DataTable with results.</returns>
+        internal async Task<DataTable> GetDataTableAsync(String query, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Enumerator.TraceInfo("query:\n{0}\n", query);
+
+            DataTable dt = null;
+            try
+            {
+                dt = await m_conctx.ExecuteWithResultsAsync(query, cancellationToken).ConfigureAwait(false);
+            }
+            catch (ExecutionFailureException e)
+            {
+                if (await TryToReconnectAsync(e, cancellationToken).ConfigureAwait(false))
+                {
+                    dt = await m_conctx.ExecuteWithResultsAsync(query, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    throw; //go with the original exception
+                }
+            }
+            return dt;
+        }
+
+        /// <summary>
+        /// Execute a query asynchronously and get a DataReader for the results.
+        /// </summary>
+        /// <param name="query">The query text to execute.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        /// <returns>A task containing the SqlDataReader.</returns>
+        internal async Task<SqlDataReader> GetDataReaderAsync(String query, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Enumerator.TraceInfo("query:\n{0}\n", query);
+
+            SqlDataReader dr = null;
+            try
+            {
+                dr = await m_conctx.ExecuteReaderAsync(query, cancellationToken).ConfigureAwait(false);
+            }
+            catch (ExecutionFailureException e)
+            {
+                if (await TryToReconnectAsync(e, cancellationToken).ConfigureAwait(false))
+                {
+                    dr = await m_conctx.ExecuteReaderAsync(query, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -471,6 +619,88 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 e.Disconnect();
             }
         }
+
+        /// <summary>
+        /// Execute the sql for the given connection returning results in a DataTable asynchronously.
+        /// This is a tsql for final results. 
+        /// StatementBuilder holds info for additional processing needs and formatting information.
+        /// The first tsqls in the list are executed without results, results are taken only for the last tsql.
+        /// </summary>
+        static internal async Task<DataTable> ExecuteWithResultsAsync(StringCollection query, Object con, StatementBuilder sb, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            DataProvider dp = null;
+            dp = await GetDataProviderAsync(query, con, sb, DataProvider.RetriveMode.RetriveDataTable, cancellationToken).ConfigureAwait(false);
+            return dp.GetTable();
+        }
+
+        /// <summary>
+        /// Execute the sql for the given connection returning results in a DataProvider asynchronously.
+        /// This is a tsql for final results. 
+        /// StatementBuilder holds info for additional processing needs and formatting information.
+        /// The first tsqls in the list are executed without results, results are taken only for the last tsql.
+        /// </summary>
+        static internal async Task<DataProvider> GetDataProviderAsync(StringCollection query, Object con, StatementBuilder sb, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await GetDataProviderAsync(query, con, sb, DataProvider.RetriveMode.RetriveDataReader, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Execute the sql for the given connection returning results in a DataProvider asynchronously.
+        /// This is a tsql for final results. 
+        /// StatementBuilder holds info for additional processing needs and formatting information.
+        /// DataProvider.RetriveMode tells if the DataProvider must bring all rows 
+        /// in a DataTable or be prepared to be used as a DataReader.
+        /// The first tsqls in the list are executed without results, results are taken only for the last tsql.
+        /// </summary>
+        static internal async Task<DataProvider> GetDataProviderAsync(StringCollection query, Object con, StatementBuilder sb, DataProvider.RetriveMode rm, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            ExecuteSql e = new ExecuteSql(con);
+            await e.ConnectAsync(cancellationToken).ConfigureAwait(false);
+
+            bool bDataProvInitialized = false;
+            DataProvider dp = null;
+            try
+            {
+                try
+                {
+                    dp = new DataProvider(sb, rm);
+                    int i = 0;
+                    for(; i < query.Count - 1; i++)
+                    {
+                        await e.ExecuteImmediateAsync(query[i], cancellationToken).ConfigureAwait(false);
+                    }
+                    await dp.SetConnectionAndQueryAsync(e, query[i], cancellationToken).ConfigureAwait(false);
+                    bDataProvInitialized = true;
+                }
+                //if we fail we will attempt to run the cleanup sql
+                catch (ExecutionFailureException efe)
+                {
+                    //check that is not a connection related problem
+                    if (((SqlException)efe.InnerException).Class < 20 && sb.SqlPostfix.Length > 0)
+                    {
+                        try
+                        {
+                            await e.ExecuteImmediateAsync(sb.SqlPostfix, cancellationToken).ConfigureAwait(false);
+                        }
+                        //ignore eventual exception on cleanup
+                        catch (ExecutionFailureException)
+                        {
+                        }
+                    }
+                    throw; //rethrow the original exception
+                }
+            }
+            finally
+            {
+                //clean up in case of exception
+                if( null != dp && false == bDataProvInitialized )
+                {
+                    dp.Close();
+                }
+            }
+            return dp;
+        }
+
 
         /// <summary>
         ///return the server version for the server with the given connection</summary>

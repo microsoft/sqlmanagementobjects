@@ -1750,7 +1750,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     version value  0 means shiloh supported collation
                     version value  1 means yukon  supported collation
                     version value  2 means katmai supported collation   */
-                collations = this.ExecutionManager.ExecuteWithResults("SELECT COLLATIONPROPERTY('" + collationName + "', 'Version') as CollationVersion").Tables[0];
+                collations = this.ExecutionManager.ExecuteWithResults("SELECT COLLATIONPROPERTY(" + MakeSqlString(collationName) + ", 'Version') as CollationVersion").Tables[0];
             }
             finally
             {
