@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="ReplicaClusterNode" impl_type="SqlObject" min_major='11' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent='Name' local='ParentID'/>
+    </parent_link>
+    <property_link table="master.sys.dm_hadr_availability_replica_cluster_nodes" alias="arcn"></property_link>
+    <property_link left_join="master.sys.dm_hadr_cluster_members AS cm">UPPER(arcn.node_name) = UPPER(cm.member_name)</property_link>
+  </settings>
+
+  <properties>
+    <property name="ReplicaName" type="sysname">arcn.replica_server_name</property>
+    <property name="NodeName" type="sysname">cm.member_name</property>
+    <property name="ParentID" type="sysname" hidden="true">arcn.group_name</property>
+    <property name="MemberType" type="tinyint">cm.member_type</property>
+    <property name="MemberState" type="tinyint">cm.member_state</property>
+    <property name="NumberOfQuorumVotes" type="int">ISNULL(cm.number_of_quorum_votes, -1)</property>
+
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='4' expression="{0} + '/{3}[@ReplicaName=' + quotename({1},'''') + ' and @NodeName=' + quotename({2},'''') + ']'">
+        <link_field type='parent' field="Urn" />
+        <link_field type='local' field="ReplicaName" />
+        <link_field type='local' field="NodeName" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+
+    <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+      <link_multiple no='4' expression="{0} + '/{3}[@ReplicaName=' + quotename({1},'''') + ' and @NodeName=' + quotename({2},'''') + ']'">
+        <link_field type='parent' field="UrnWithId" />
+        <link_field type='local' field="ReplicaName" />
+        <link_field type='local' field="NodeName" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+
+  </properties>
+</EnumObject>

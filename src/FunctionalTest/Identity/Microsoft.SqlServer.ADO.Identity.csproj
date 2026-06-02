@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Configuration">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>Provides implementations of TokenCredential and SqlAuthenticationProvider suitable for use with federated service connection credentials in Azure Devops.</Description>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DocumentationFile>$(BaseOutputPath)\Documentation\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <DebugType>Embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/"  />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="System.Text.Json" PrivateAssets="None" />
+    <!-- Add privateassets packagereferences for some pinned indirect dependencies so they are not exposed to consumers -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all" IncludeAssets="None"/>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" PrivateAssets="all" IncludeAssets="None" />
+    <PackageReference Include="System.Security.AccessControl" PrivateAssets="all" IncludeAssets="None"/>
+    <PackageReference Include="System.Text.Encodings.Web" PrivateAssets="all" IncludeAssets="None"/>
+  </ItemGroup>
+  <ItemGroup Condition="'$(GacVersion)' == 'true'">
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Microsoft.Identity.Client"/>
+  </ItemGroup>
+</Project>

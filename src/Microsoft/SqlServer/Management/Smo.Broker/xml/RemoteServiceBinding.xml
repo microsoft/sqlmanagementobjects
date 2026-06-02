@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="RemoteServiceBinding" impl_type="ServiceBrokerSqlObject" min_major='9' >
+	<settings>
+		<property_link table = 'sys.remote_service_bindings sb'/>
+        <property_link fields='#Owner#' left_join="sys.database_principals AS dp">dp.principal_id = sb.principal_id</property_link>
+        <property_link fields='#CertificateUser#' left_join="sys.database_principals AS dp2">dp2.principal_id = sb.remote_principal_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+        <!-- extended properties support -->
+        <include file='inc_ext_prop.xml' />
+        <property name="ExtPropClass" type="int" hidden='true'>18</property>
+		<property name="NType" type="sysname" access='Read' hidden='true'>RemoteServiceBinding</property>
+		<property name="ID" type="int">sb.remote_service_binding_id</property>		
+        <property name="Name" type="sysname" cast='true'>cast(sb.name as varbinary(256))</property>
+        <property name="Owner" type="sysname" read_only_after_creation="true">dp.name</property>
+        <property name="RemoteService" type="sysname">sb.remote_service_name</property>
+        <property name="IsAnonymous" type="bit">sb.is_anonymous_on</property>
+        <property name="CertificateUser" type="sysname">dp2.name</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

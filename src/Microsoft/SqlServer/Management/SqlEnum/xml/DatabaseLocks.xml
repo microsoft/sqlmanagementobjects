@@ -1,0 +1,134 @@
+<?xml version="1.0" ?>
+<EnumObject type="Lock" impl_type="SqlObject" min_major='10' cloud_min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <property_link table='#t AS l' />
+        <version min_major='10'>
+          <property_link fields='#LockType#' join='master.dbo.spt_values AS v'>v.number = l.mode AND v.type = N'L'</property_link>
+        </version>
+        <version cloud_min_major='12'>
+          <property_link fields='#LockType#' join='#v AS v'>v.number = l.mode</property_link>
+        </version>
+        <!-- For azure we hard code the equivalent of select name, number from master.dbo.spt_values where type = N'L' -->
+        <version cloud_min_major='12'>
+          <prefix>
+            CREATE TABLE #v(name nvarchar(36), number int)
+            INSERT #v VALUES  (N'LOCK TYPES', 0),
+                            (N'NULL', 1),
+                            (N'Sch-S', 2),
+                            (N'Sch-M', 3),
+                            (N'S', 4),
+                            (N'U', 5),
+                            (N'X', 6),
+                            (N'IS', 7),
+                            (N'IU', 8),
+                            (N'IX', 9),
+                            (N'SIU', 10),
+                            (N'SIX', 11),
+                            (N'UIX', 12),
+                            (N'BU', 13),
+                            (N'RangeS-S', 14),
+                            (N'RangeS-U', 15),
+                            (N'RangeIn-Null', 16),
+                            (N'RangeIn-S', 17),
+                            (N'RangeIn-U', 18),
+                            (N'RangeIn-X', 19),
+                            (N'RangeX-S', 20),
+                            (N'RangeX-U', 21),
+                            (N'RangeX-X', 22);
+          </prefix>
+        </version>
+        <version min_major='10' cloud_min_major='12'>
+            <prefix>
+                CREATE TABLE #t(spid int, mode int, dbid int NULL, objid bigint, objid2 bigint, indid int, status tinyint, ltype nvarchar(120), objname sysname NULL, indname sysname NULL, dbname sysname NULL, sch sysname NULL)
+
+                INSERT #t SELECT spid = request_session_id,
+                mode = case request_mode when N'NL' then 1
+                when N'SCH_S'		then 2
+                when N'SCH_M'		then 3
+                when N'S'			then 4
+                when N'U'			then 5
+                when N'X'			then 6
+                when N'IS'			then 7
+                when N'IU'			then 8
+                when N'IX'			then 9
+                when N'SIU'			then 10
+                when N'SIX'			then 11
+                when N'UIX'			then 12
+                when N'BU'			then 13
+                when N'RS_S'		then 14
+                when N'RS_U'		then 15
+                when N'RI_NL'		then 16
+                when N'RI_S'		then 17
+                when N'RI_U'		then 18
+                when N'RI_X'		then 19
+                when N'RX_S'		then 20
+                when N'RX_U'		then 21
+                when N'RX_X'		then 22
+                when N'LAST_MODE'	then 23
+                end,
+                dbid=resource_database_id, objid=l.resource_associated_entity_id, objid2=l.resource_associated_entity_id, indid=NULL,
+                status = case l.request_status when N'GRANT' then 1
+                when N'CONVERT' then 2
+                when N'WAIT' then 3
+                end,
+                ltype = l.resource_type, objname=NULL, indname=NULL, dbname = NULL, sch = NULL
+                FROM sys.dm_tran_locks l WHERE resource_database_id = db_id() and resource_associated_entity_id != object_id('#t')
+            </prefix>
+              </version>
+        <version min_major='10' cloud_min_major='12'>
+            <prefix fields='#Database#Schema#Table#Index#'>
+                update #t set dbname = d.name FROM #t t LEFT OUTER JOIN sys.databases d ON d.database_id = t.dbid
+                update #t set objid2 = -objid2 where dbname is null
+            </prefix>
+        </version>
+        <prefix fields='#Database#Schema#Table#Index#'>
+            DECLARE name_cursor CURSOR
+            FOR select t.dbid, t.dbname FROM #t t GROUP BY t.dbid, t.dbname
+            OPEN name_cursor
+            DECLARE @dbid int
+            DECLARE @dbname sysname
+            DECLARE @sql nvarchar(1000)
+            FETCH NEXT FROM name_cursor INTO @dbid, @dbname
+            WHILE (@@FETCH_STATUS &lt;&gt; -1)
+            BEGIN
+            IF (@@FETCH_STATUS &lt;&gt; -2)
+            BEGIN
+        </prefix>
+        <version min_major='10' cloud_min_major='12'>
+            <prefix fields='#Database#Schema#Table#Index#'>
+                IF( NOT @dbname	IS NULL )--resource database
+                SELECT @sql = 'use ' + quotename(@dbname)
+                ELSE
+                SELECT @sql = ''
+                SELECT @sql = @sql + ' update #t set objname = o.name, indname = i.name, sch=schema_name(o.schema_id) FROM #t AS t ' +
+                'LEFT JOIN sys.all_objects AS o ON o.object_id = t.objid2 LEFT OUTER JOIN sys.indexes AS i ON i.object_id = t.objid2 AND i.index_id = t.indid ' +
+                'WHERE t.ltype in (''UNUSED1'',''OBJECT'') AND t.dbid = ' + CAST(@dbid AS NVARCHAR(20))
+            </prefix>
+        </version>
+        <prefix fields='#Database#Schema#Table#Index#'>
+        EXEC(@sql)
+    END 
+    FETCH NEXT FROM name_cursor INTO @dbid, @dbname
+END 
+CLOSE name_cursor 
+DEALLOCATE name_cursor
+        </prefix>
+        <postfix>
+            drop table #t
+        </postfix>
+        <version cloud_min_major='12'>
+          <postfix>
+            drop table #v
+          </postfix>
+        </version>
+    </settings>
+    <properties>
+        <property name="RequestorSpid" type="int">l.spid</property>
+        <property name="LockType" type="nvarchar" size='36'>v.name</property>
+        <property name="Database" type="sysname">ISNULL(l.dbname,N'')</property>
+        <property name="Schema" type="sysname">ISNULL(l.sch,N'')</property>
+        <property name="Table" type="sysname">ISNULL(l.objname,N'')</property>
+        <property name="Index" type="sysname">ISNULL(l.indname,N'')</property>
+        <property name="Status" type="tinyint" report_type='LockRequestStatus'>l.status</property>
+    </properties>
+</EnumObject>

@@ -1,0 +1,337 @@
+<?xml version="1.0" ?>
+<EnumObject type="Server" impl_type="Server" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major='10' max_major='10'>
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @RegPathParams sysname
+        declare @Arg sysname
+        declare @Param sysname
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+        declare @n int
+
+        select @n=0
+        select @RegPathParams=N'Software\Microsoft\MSSQLServer\MSSQLServer'+'\Parameters'
+        select @Param='dummy'
+        while(not @Param is null)
+        begin
+        select @Param=null
+        select @Arg='SqlArg'+convert(nvarchar,@n)
+
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', @RegPathParams, @Arg, @Param OUTPUT
+        if(@Param like '-d%')
+        begin
+        select @Param=substring(@Param, 3, 255)
+        select @MasterPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
+        end
+        else if(@Param like '-l%')
+        begin
+        select @Param=substring(@Param, 3, 255)
+        select @LogPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
+        end
+        else if(@Param like '-e%')
+        begin
+        select @Param=substring(@Param, 3, 255)
+        select @ErrorLogPath=substring(@Param, 1, len(@Param) - charindex('\', reverse(@Param)))
+        end
+
+        select @n=@n+1
+        end
+      </prefix>
+    </version>
+
+    <version min_major='10' max_major='13'>
+      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#">
+        create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
+        insert #SVer exec master.dbo.xp_msver
+      </prefix>
+    </version>
+
+    <version min_major='10'>
+      <prefix fields="#RootDirectory#">
+        declare @SmoRoot nvarchar(512)
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Setup', N'SQLPath', @SmoRoot OUTPUT
+      </prefix>
+    </version>
+
+    <version min_major='14' max_major='14'>
+      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#">
+        create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
+        insert #SVer exec master.dbo.xp_msver
+        insert #SVer select t.*
+        from sys.dm_os_host_info
+        CROSS APPLY (
+        VALUES
+        (1001, 'host_platform', 0, host_platform),
+        (1002, 'host_distribution', 0, host_distribution),
+        (1003, 'host_release', 0, host_release),
+        (1004, 'host_service_pack_level', 0, host_service_pack_level),
+        (1005, 'host_sku', host_sku, '')
+        ) t(id, [name], internal_value, [value])
+        
+      </prefix>
+    </version>
+
+    <!-- In addition to v14 section, properties specific to Managed Instances are added here.
+         We're detecting Managed Instances by checking if  SERVERPROPERTY('EngineEdition') equals to 8.
+         
+         The following properties are new additons: HardwareGeneration, ServiceTier, ReservedStorageSizeMB and UsedStorageSizeMB
+         The following properties are adjusted to reflect reality for Managed Instances: PhysicalMemory and ProcessorCount.
+    -->
+    <version min_major='15'>
+      <prefix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#HardwareGeneration#ServiceTier#ReservedStorageSizeMB#UsedStorageSizeMB#">
+          create table #SVer(ID int,  Name  sysname, Internal_Value int, Value nvarchar(512))
+          insert #SVer exec master.dbo.xp_msver
+          insert #SVer select t.*
+          from sys.dm_os_host_info
+          CROSS APPLY (
+          VALUES
+          (1001, 'host_platform', 0, host_platform),
+          (1002, 'host_distribution', 0, host_distribution),
+          (1003, 'host_release', 0, host_release),
+          (1004, 'host_service_pack_level', 0, host_service_pack_level),
+          (1005, 'host_sku', host_sku, ''),
+          (1006, 'HardwareGeneration', '', ''),
+          (1007, 'ServiceTier', '', ''),
+          (1008, 'ReservedStorageSizeMB', '0', '0'),
+          (1009, 'UsedStorageSizeMB', '0', '0')
+          ) t(id, [name], internal_value, [value])
+
+          -- Managed Instance-specific properties
+          if (SERVERPROPERTY('EngineEdition') = 8)
+          begin
+            DECLARE @gen4memoryPerCoreMB float = 7168.0
+            DECLARE @gen5memoryPerCoreMB float = 5223.0
+            DECLARE @physicalMemory float
+            DECLARE @virtual_core_count int
+            DECLARE @reservedStorageSize bigint
+            DECLARE @usedStorageSize decimal(18,2)
+            DECLARE @hwGeneration nvarchar(128)
+            DECLARE @serviceTier nvarchar(128)
+
+            SET @physicalMemory = (SELECT TOP 1 [virtual_core_count] *
+              (
+                CASE WHEN [hardware_generation] = 'Gen4' THEN @gen4memoryPerCoreMB
+                WHEN [hardware_generation] = 'Gen5' THEN @gen5memoryPerCoreMB
+                ELSE 0 END
+               )
+               FROM master.sys.server_resource_stats 
+               ORDER BY start_time DESC)
+      
+            IF (@physicalMemory &lt;&gt; 0) 
+            BEGIN
+              UPDATE #SVer SET [Internal_Value] =  @physicalMemory WHERE Name = N'PhysicalMemory'
+              UPDATE #SVer SET [Value] = CONCAT( @physicalMemory, ' (',  @physicalMemory * 1024, ')') WHERE Name = N'PhysicalMemory'
+            END
+
+            UPDATE #SVer SET [Internal_Value] = (SELECT TOP 1 [virtual_core_count] FROM master.sys.server_resource_stats ORDER BY start_time desc) WHERE Name = N'ProcessorCount'
+            UPDATE #SVer SET [Value] = [Internal_Value] WHERE Name = N'ProcessorCount'
+
+            SELECT TOP 1
+              @hwGeneration = [hardware_generation],
+              @serviceTier =[sku],
+              @virtual_core_count = [virtual_core_count],
+              @reservedStorageSize = [reserved_storage_mb],
+              @usedStorageSize = [storage_space_used_mb]
+            FROM master.sys.server_resource_stats
+            ORDER BY [start_time] DESC
+
+            UPDATE #SVer SET [Value] = @hwGeneration WHERE Name = N'HardwareGeneration'
+            UPDATE #SVer SET [Value] = @serviceTier WHERE Name = N'ServiceTier'
+            UPDATE #SVer SET [Value] = @reservedStorageSize WHERE Name = N'ReservedStorageSizeMB'
+            UPDATE #SVer SET [Value] = @usedStorageSize WHERE Name = N'UsedStorageSizeMB'
+          end
+      </prefix>
+    </version>
+
+    <version min_major='11' max_major='13'>
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLog nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+
+        select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex('\', reverse(physical_name))) from master.sys.database_files where name=N'master'
+        select @LogPath=substring(physical_name, 1, len(physical_name) - charindex('\', reverse(physical_name))) from master.sys.database_files where name=N'mastlog'
+        select @ErrorLog=cast(SERVERPROPERTY(N'errorlogfilename') as nvarchar(512))
+        select @ErrorLogPath=substring(@ErrorLog, 1, len(@ErrorLog) - charindex('\', reverse(@ErrorLog)))
+      </prefix>
+      <prefix fields="#FullyQualifiedNetName#">
+        declare @FullyQualifiedNetName nvarchar(255)
+        exec master.dbo.xp_getnetname @FullyQualifiedNetName OUTPUT, 1
+      </prefix>
+    </version>
+    <version min_major='14' max_major='14'>
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLog nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+        declare @Slash varchar = convert(varchar, serverproperty('PathSeparator'))
+        select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where name=N'master'
+        select @LogPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where name=N'mastlog'
+        select @ErrorLog=cast(SERVERPROPERTY(N'errorlogfilename') as nvarchar(512))
+        select @ErrorLogPath=IIF(@ErrorLog IS NULL, N'', substring(@ErrorLog, 1, len(@ErrorLog) - charindex(@Slash, reverse(@ErrorLog))))
+      </prefix>
+      <prefix fields="#FullyQualifiedNetName#">
+        declare @FullyQualifiedNetName nvarchar(255)
+        exec master.dbo.xp_getnetname @FullyQualifiedNetName OUTPUT, 1
+      </prefix>
+    </version>
+    <version min_major='15'>
+      <prefix fields="#MasterDBPath#MasterDBLogPath#ErrorLogPath#">
+        declare @MasterPath nvarchar(512)
+        declare @LogPath nvarchar(512)
+        declare @ErrorLog nvarchar(512)
+        declare @ErrorLogPath nvarchar(512)
+        declare @Slash varchar = convert(varchar, serverproperty('PathSeparator'))
+        if (SERVERPROPERTY('EngineEdition') = 8 /* SQL Managed Instance */)
+        begin
+          select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where file_id = 1
+          select @LogPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where file_id = 2
+        end
+        else
+        begin
+          select @MasterPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where name=N'master'
+          select @LogPath=substring(physical_name, 1, len(physical_name) - charindex(@Slash, reverse(physical_name))) from master.sys.database_files where name=N'mastlog'
+        end
+        select @ErrorLog=cast(SERVERPROPERTY(N'errorlogfilename') as nvarchar(512))
+        select @ErrorLogPath=IIF(@ErrorLog IS NULL, N'', substring(@ErrorLog, 1, len(@ErrorLog) - charindex(@Slash, reverse(@ErrorLog))))
+      </prefix>
+      <prefix fields="#FullyQualifiedNetName#">
+        declare @FullyQualifiedNetName nvarchar(255)
+        exec master.dbo.xp_getnetname @FullyQualifiedNetName OUTPUT, 1
+      </prefix>
+    </version> 
+    <version min_major='10' max_major='13'>
+      <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#">
+       drop table #SVer
+      </postfix>
+    </version>
+    <version min_major='14' max_major='14'>
+      <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#">
+        drop table #SVer
+      </postfix>
+    </version>
+    <version min_major="15" >
+      <postfix fields="#PhysicalMemory#ProcessorType#Product#Platform#Processors#OSVersion#Language#HostPlatform#HostDistribution#HostSku#HostServicePackLevel#HostRelease#HardwareGeneration#ServiceTier#ReservedStorageSizeMB#UsedStorageSizeMB#">
+        drop table #SVer
+      </postfix>
+    </version>
+  </settings>
+
+  <properties>
+    <property name="VersionMajor" type="int" access="Read" expensive='true'>(@@microsoftversion / 0x1000000) &amp; 0xff</property>
+    <property name="VersionMinor" type="int" access="Read" expensive='true'>(@@microsoftversion / 0x10000) &amp; 0xff</property>
+    <property name="BuildNumber" type="int" access="Read" expensive='true'>@@microsoftversion &amp; 0xffff</property>
+    <property name="IsCaseSensitive" type="bit" access="Read" cast='true'>case when 'a' &lt;&gt; 'A' then 1 else 0 end</property>
+    <property name="MaxPrecision" type="tinyint" access="Read">@@MAX_PRECISION</property>
+
+    <version min_major='10'>
+      <property name="Product" type="nvarchar" size="512" access="Read" expensive='true'>(select Value from #SVer where Name = N'ProductName')</property>
+      <property name="OSVersion" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'WindowsVersion')</property>
+      <property name="Language" type="sysname" access="Read" expensive='true'>(select Value from #SVer where Name = N'Language')</property>
+      <property name="Platform" type="nvarchar" size="512" access="Read" expensive='true'>(select Value from #SVer where Name = N'Platform')</property>
+      <property name="PhysicalMemory" type="int" access="Read" expensive='true'>(select Internal_Value from #SVer where Name = N'PhysicalMemory')</property>
+      <property name="Processors" type="int" access="Read" expensive='true'>(select Internal_Value from #SVer where Name = N'ProcessorCount')</property>
+      <property name="ErrorLogPath" type="nvarchar" size="512" access="Read">@ErrorLogPath</property>
+      <property name="RootDirectory" type="nvarchar" size='512' access="Read">@SmoRoot</property>
+    </version>
+
+    <version min_major="7" max_major="13" cloud_min_major="11" datawarehouse_enabled='true'>
+      <property name="HostPlatform" type="nvarchar" size="512" access="Read">N'Windows'</property>
+      <property name="PathSeparator" type="nvarchar" size="1" access="Read">N'\'</property>
+    </version>
+
+    <version min_major='14'>
+      <property name="HostPlatform" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_platform')</property>
+      <property name="HostDistribution" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_distribution')</property>
+      <property name="HostRelease" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_release')</property>
+      <property name="HostServicePackLevel" type="nvarchar" size="512" access="Read" expensive='true'>( select Value from #SVer where Name =N'host_service_pack_level')</property>
+      <property name="HostSku" type="int" access="Read" expensive='true'>( select Internal_Value from #SVer where Name =N'host_sku')</property>
+      <property name="PathSeparator" type="nvarchar" size="1" access="Read">SERVERPROPERTY('PathSeparator')</property>
+    </version>
+
+    <version min_major='10' cloud_min_major='12' >
+      <property name="IsFullTextInstalled" type="bit" cast='true' access="Read">FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')</property>
+    </version>
+    <version datawarehouse_enabled='true' >
+      <property name="IsFullTextInstalled" type="bit" cast='true' access="Read">0</property>
+    </version>
+    <version min_major='10'>
+      <property name="MasterDBLogPath" type="nvarchar" size="512" access="Read">@LogPath</property>
+      <property name="MasterDBPath" type="nvarchar" size="512" access="Read">@MasterPath</property>
+    </version>
+
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="VersionString" type="sysname" access="Read">SERVERPROPERTY(N'ProductVersion')</property>
+      <property name="Edition" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'Edition')</property>
+      <property name="ProductLevel" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'ProductLevel')</property>
+
+      <property name="IsSingleUser" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsSingleUser')</property>
+      <property name="EngineEdition" type="int" access='Read' cast='true'>SERVERPROPERTY('EngineEdition')</property>
+      <property name="Collation" type="sysname" access="Read">convert(sysname, serverproperty(N'collation'))</property>
+    </version>
+    <version min_major='10' max_major='13'>
+      <property name="NetName" type="sysname" access="Read" cast = 'true'>SERVERPROPERTY(N'MachineName')</property>
+      <property name="IsClustered" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsClustered')</property>
+    </version>
+    <version min_major='14'>
+      <!-- Managed Instance specifics - NULLs are returned for all of these properties, unlike other box editions -->
+      <property name="NetName" type="sysname" access="Read" cast = 'true'>ISNULL(SERVERPROPERTY(N'MachineName'),N'')</property>
+      <property name="IsClustered" type="bit" access="Read" cast='true'>ISNULL(SERVERPROPERTY('IsClustered'),N'')</property>
+    </version>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="ResourceVersionString" type="sysname" access="Read">SERVERPROPERTY(N'ResourceVersion')</property>
+      <property name="ResourceLastUpdateDateTime" type="datetime" access="Read">SERVERPROPERTY(N'ResourceLastUpdateDateTime')</property>
+      <property name="CollationID" type="int" access="Read">SERVERPROPERTY(N'CollationID')</property>
+      <property name="ComparisonStyle" type="int" access="Read">SERVERPROPERTY(N'ComparisonStyle')</property>
+      <property name="SqlCharSet" type="int" report_type2="System.Int16" access="Read">SERVERPROPERTY(N'SqlCharSet')</property>
+      <property name="SqlCharSetName" type="sysname" access="Read">SERVERPROPERTY(N'SqlCharSetName')</property>
+      <property name="SqlSortOrder" type="int" report_type2="System.Int16" access="Read">SERVERPROPERTY(N'SqlSortOrder')</property>
+      <property name="SqlSortOrderName" type="sysname" access="Read">SERVERPROPERTY(N'SqlSortOrderName')</property>
+    </version>
+    <version min_major='10'>
+      <property name="HasNullSaPassword" type="bit" access='Read' cast='true' expensive='true'>null</property>
+      <property name="BuildClrVersionString" type="sysname" access="Read">SERVERPROPERTY(N'BuildClrVersion')</property>
+    </version>
+    <version min_major='10' max_major='13'>
+      <property name="ComputerNamePhysicalNetBIOS" type="sysname" access="Read">SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS')</property>
+    </version>
+    <version min_major='14'>
+      <!-- Managed Instance specifics - NULLs are returned for all of these properties, unlike other box editions -->
+      <property name="ComputerNamePhysicalNetBIOS" type="sysname" access="Read">ISNULL(SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS'),N'')</property>
+    </version>
+
+    <!-- HADR Properties -->
+    <version min_major="11">
+      <property name="IsHadrEnabled" type="bit" cast="true" access="Read" expensive="true">SERVERPROPERTY(N'IsHadrEnabled')</property>
+      <property name="FullyQualifiedNetName" type="sysname" access="Read" expensive='true'>@FullyQualifiedNetName</property>
+    </version>
+
+    <!-- Polybase properties -->
+    <version min_major='13'>
+      <property name="IsPolyBaseInstalled" type="bit" cast='true' access="Read">SERVERPROPERTY('IsPolyBaseInstalled')</property>
+    </version>
+
+    <property name="IsXTPSupported" type="bit" cast="true" access="Read" expensive='true'>ISNULL(SERVERPROPERTY(N'IsXTPSupported'), 0)</property>
+
+  <!-- Managed-instance specific properties -->
+    <version min_major='15'>
+      <property name="HardwareGeneration" type="nvarchar" size="128" access="Read" expensive='true'>( select Value from #SVer where Name = N'HardwareGeneration' )</property>
+      <property name="ServiceTier" type="nvarchar" size="128" access="Read" expensive='true'>( select Value from #SVer where Name = N'ServiceTier' )</property>
+      <property name="ReservedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'ReservedStorageSizeMB' )</property>
+      <property name="UsedStorageSizeMB" type="int" access="Read" expensive='true'>( select cast(cast(Value as numeric(19,4)) as int) from #SVer where Name = N'UsedStorageSizeMB' )</property>
+    </version>
+
+    <!-- Fabric properties -->
+    <version min_major='10' datawarehouse_enabled='true'>
+      <property name="IsFabricServer" type="bit" cast="true" access="read">0</property>
+    </version>
+    <version cloud_min_major="12">
+      <!-- 12 == fabric db,  11 is either Synapse Serverless or Fabric DW depending on @@version -->
+      <property name="IsFabricServer" type="bit" cast="true" access="read">case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end</property>
+    </version>
+  </properties>
+</EnumObject>

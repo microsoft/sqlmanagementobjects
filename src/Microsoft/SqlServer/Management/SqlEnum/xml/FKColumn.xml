@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="FKColumn" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local='FK_ID' />
+		</parent_link>
+		<version min_major='10'  cloud_min_major='10'>
+			<property_link table="sys.foreign_key_columns AS fk" />
+			<property_link fields='#ID#Name#' 
+				join="sys.columns AS cfk">fk.parent_column_id = cfk.column_id and fk.parent_object_id = cfk.object_id</property_link>
+			<property_link fields='#ReferencedColumn#' 
+				join="sys.columns AS crk">fk.referenced_column_id = crk.column_id and fk.referenced_object_id = crk.object_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<version min_major='10'  cloud_min_major='10'>
+			<property name="Name" type="sysname" mode="design">cfk.name</property>
+			<property name="ID" type="int">fk.constraint_column_id</property>
+			<property name="ReferencedColumn" type="sysname" mode="design">crk.name</property>
+			<property name="FK_ID" type="int" hidden='true'>fk.constraint_object_id</property>
+		</version>
+	</properties>
+</EnumObject>

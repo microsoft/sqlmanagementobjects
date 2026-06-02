@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project >
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(NetfxVersion);net8.0;net10.0</TargetFrameworks>
+    <EnableLocalization>false</EnableLocalization>
+    <!-- Allow net8.0 test host to run on .NET 10+ runtime when .NET 8 runtime is not installed -->
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NewtonSoft.Json" />
+    <Compile Include="$(MSBuildthisfileDirectory)Common\UnitTestBase.cs" />
+  </ItemGroup>
+</Project>

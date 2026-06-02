@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<EnumObject type="DatabaseEncryptionKey" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<!--joining DEK catalog with itself on database_id to get the DEK object of the current database-->
+		<property_link table='sys.dm_database_encryption_keys AS dek'>DB_ID()=dek.database_id</property_link>
+		<!--DEK can be created with a certificate or an asymmetric key-->
+		<property_link fields='#EncryptorName#EncryptionType#' left_join='master.sys.certificates AS cer'>dek.encryptor_thumbprint=cer.thumbprint</property_link>
+		<property_link fields='#EncryptorName#EncryptionType#' left_join='master.sys.asymmetric_keys AS asymkey'>dek.encryptor_thumbprint=asymkey.thumbprint</property_link>
+	</settings>
+	<properties>
+			<property name="Urn" type="nvarchar" size="600">
+				<link_multiple no='1' expression="{0} + '/DatabaseEncryptionKey'">
+					<link_field type='parent' field="Urn" />
+				</link_multiple>
+			</property>
+			<property name="EncryptionState" type="int" report_type="DatabaseEncryptionState" access="Read">dek.encryption_state</property>
+			<property name="CreateDate" type="datetime" access="Read">dek.create_date</property>
+			<property name="OpenedDate" type="datetime" access="Read">dek.opened_date</property>
+			<property name="RegenerateDate" type="datetime" access="Read">dek.regenerate_date</property>
+			<property name="ModifyDate" type="datetime" access="Read">dek.modify_date</property>
+			<property name="SetDate" type="datetime" access="Read">dek.set_date</property>
+			<!--as of now AES is the only encryption algorithm used for encrypting -->
+			<property name="EncryptionAlgorithm" type="int" report_type="DatabaseEncryptionAlgorithm">(case dek.key_algorithm when 'AES' then (case dek.key_length when 128 then 0 when 192 then 1 when 256 then 2 end) when 'TRIPLE_DES_3KEY' then 3 end)</property>
+			<property name="Thumbprint" type="varbinary" size="32" access="Read">dek.encryptor_thumbprint</property>
+			<!--on SQL Managed Instance (EngineEdition = 8) Certificate is stored on physical master so we can't fetch it here-->
+			<property name="EncryptorName" type="sysname">(case when SERVERPROPERTY('EngineEdition') != 8 then ISNULL(cer.name, asymkey.name) else ISNULL(ISNULL(cer.name, asymkey.name), N'##MS_TdeCertificate##') end)</property>
+			<property name="EncryptionType" type="int" report_type="DatabaseEncryptionType">(case when SERVERPROPERTY('EngineEdition') != 8 then (case when cer.name is null then 1 else 0 end) else 0 end)</property>
+	</properties>
+</EnumObject>

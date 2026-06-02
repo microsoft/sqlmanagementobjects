@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="Configuration" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+	<version min_major='10'  cloud_min_major='12'>
+		<property_link table="sys.configurations" alias= "cfg"/>
+	</version>
+</settings>
+
+<properties>
+	<version min_major='10'  cloud_min_major='12'>
+		<property name="Name" type="nvarchar" size="35" access="Read">cfg.name</property>
+		<property name="Number" type="int" access="Read">cfg.configuration_id</property>
+		<property name="Minimum" type="int" access="Read">cfg.minimum</property>
+		<property name="Maximum" type="int" access="Read">cfg.maximum</property>
+		<property name="Dynamic" type="bit" access="Read">cfg.is_dynamic</property>
+		<property name="Advanced" type="bit" access="Read">cfg.is_advanced</property>
+		<property name="ConfigValue" type="int" access="Read">cfg.value</property>
+		<property name="RunValue" type="int" access="Read">cfg.value_in_use</property>
+		<property name="Description" type="nvarchar" size='510' access="Read">cfg.description</property>	
+	</version>
+  </properties>
+</EnumObject>

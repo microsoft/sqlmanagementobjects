@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://schemas.microsoft.com/sqlserver/2008/07/extendedeventsconfig"
+		elementFormDefault="qualified" xmlns="http://schemas.microsoft.com/sqlserver/2008/07/extendedeventsconfig"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			(c) Copyright 2009, Microsoft Corporation The following schema for Microsoft SQL Server is presented in XML format and is for informational purposes only. Microsoft Corporation ("Microsoft") may have trademarks, copyrights, or other intellectual property rights covering subject matter in the schema. Microsoft does not make any representation or warranty regarding the schema or any product or item developed based on the schema. The schema is provided to you on an AS IS basis. Microsoft disclaims all express, implied and statutory warranties, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, and freedom from infringement. Without limiting the generality of the foregoing, Microsoft does not make any warranty of any kind that any item developed based on the schema, or any portion of the schema, will not infringe any copyright, patent, trade secret, or other intellectual property right of any person or entity in any country. It is your responsibility to seek licenses for such intellectual property rights where appropriate. MICROSOFT SHALL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING OUT OF OR IN CONNECTION WITH THE USE OF THE SCHEMA, INCLUDING WITHOUT LIMITATION, ANY DIRECT, INDIRECT, INCIDENTAL, CONSEQUENTIAL (INCLUDING ANY LOST PROFITS), PUNITIVE OR SPECIAL DAMAGES, WHETHER OR NOT MICROSOFT HAS BEEN ADVISED OF SUCH DAMAGES.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:simpleType name="nonNegativeInt">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="retentionModes">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				retention modes supported
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="allowSingleEventLoss">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						An event can be lost from the session. A single event is only dropped when all the event buffers are full.
+						Losing a single event when event buffers are full allows for acceptable SQL Server performance characteristics,
+						while minimizing the loss of data in the processed event stream.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="allowMultipleEventLoss">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						Full event buffers containing multiple events can be lost from the session.
+						The number of events lost is dependent upon the memory size allocated to the session, the partitioning of the memory,
+						and the size of the events in the buffer. This option minimizes performance impact on the server when event buffers are quickly filled,
+						but large numbers of events can be lost from the session.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="noEventLoss">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						No event loss is allowed. This option ensures that all events raised will be retained.
+						Using this option forces all tasks that fire events to wait until space is available in an event buffer.
+						This cause detectable performance issues while the event session is active.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="partitionModes">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="none">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						A single set of buffers are created within the process
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="perNode">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						A set of buffers are created for each NUMA node.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="perCpu">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						A set of buffers are created for each CPU.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attributeGroup name="objectNames">
+		<xs:attribute name="module" type="xs:string" use="optional">
+		</xs:attribute>
+		<xs:attribute name="package" type="xs:string" use="required">
+		</xs:attribute>
+		<xs:attribute name="name" type="xs:string" use="required">
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:element name="parameter">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required" />
+			<xs:attribute name="value" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="pred_leaf">
+		<xs:sequence>
+			<xs:element name="comparator">
+				<xs:complexType>
+					<xs:attributeGroup ref="objectNames"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:choice>
+			<xs:element name="event">
+				<xs:complexType>
+				<xs:attributeGroup ref="objectNames"/>
+					<xs:attribute name="field" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+				<xs:element name="global">
+					<xs:complexType>
+						<xs:attributeGroup ref="objectNames"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="value"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="unary_expr">
+		<xs:choice>
+			<xs:element name="not" type="unary_expr"></xs:element>
+			<xs:element name="and" type="boolean_expr"></xs:element>
+			<xs:element name="or" type="boolean_expr"></xs:element>
+			<xs:element name="leaf" type="pred_leaf"></xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="boolean_expr">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="and" type="boolean_expr"></xs:element>
+				<xs:element name="or" type="boolean_expr"></xs:element>
+				<xs:element name="not" type="unary_expr"></xs:element>
+				<xs:element name="leaf" type="pred_leaf"></xs:element>
+			</xs:choice>
+			<xs:choice maxOccurs="1" minOccurs="1">
+				<xs:element name="and" type="boolean_expr"></xs:element>
+				<xs:element name="or" type="boolean_expr"></xs:element>
+				<xs:element name="not" type="unary_expr"></xs:element>
+				<xs:element name="leaf" type="pred_leaf"></xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="event_sessions">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="event_session" maxOccurs="unbounded" minOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+              <xs:element name="templateCategory" minOccurs="0" maxOccurs="1" type="xs:string" />
+              <xs:element name="templateName" minOccurs="0" maxOccurs="1" type="xs:string" />
+							<xs:element name="templateDescription" minOccurs="0" maxOccurs="1" type="xs:string" />
+							<xs:element name="event" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="action" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:attributeGroup ref="objectNames">
+												</xs:attributeGroup>
+											</xs:complexType>
+										</xs:element>
+										<xs:element ref="parameter" maxOccurs="unbounded" minOccurs="0" />
+										<xs:element name="predicate" minOccurs="0" maxOccurs="1" type="unary_expr" />
+									</xs:sequence>
+									<xs:attributeGroup ref="objectNames">
+									</xs:attributeGroup>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="target" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element ref="parameter" maxOccurs="unbounded" minOccurs="0" />
+									</xs:sequence>
+									<xs:attributeGroup ref="objectNames">
+									</xs:attributeGroup>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="name" type="xs:string" use="required">
+						</xs:attribute>
+						<xs:attribute name="maxMemory" type="nonNegativeInt" use="optional" default="4">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">
+									Specifies the maximum amount of memory in MB to allocate to the session for event buffering.
+									The default is 4 MB.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="eventRetentionMode" type="retentionModes" use="optional" default="allowSingleEventLoss">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">
+									Specifies the event retention mode to use for handling event loss.
+									Default is allowSingleEventLoss.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="dispatchLatency" type="xs:unsignedInt" use="optional" default="30">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">
+									Specifies the amount of time that events will be buffered in memory before being dispatched to event session targets.
+									Default value is 30 seconds.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="maxEventSize" type="xs:unsignedInt" use="optional" default="0">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">
+									Specifies the maximum allowable size for events in MB.
+									maxEventSize should only be set to allow single events larger than maxMemory; setting it to less than maxMemory will cause the value to be ignored.
+									When maxEventSize is set, two buffers of size are created in addition to maxMemory.
+									This means that the total memory used for event buffering is maxMemory + 2 * maxEventSize.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="memoryPartitionMode" type="partitionModes" use="optional" default="none">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">
+									Specifies the location where event buffers are created.
+									Default is none.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="trackCausality" type="xs:boolean" use="optional" default="false">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">
+									Specifies whether or not causality is tracked. If enabled, causality allows related events on different threads to be correlated together.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

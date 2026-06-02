@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<union>
+		<settings>
+			<include file='inc_perm.xml' alias='database'/>
+			<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+				<property_link fields = '#ObjectName#ObjectSchema#ObjectType#' join = 'sys.all_objects AS obj'>obj.object_id = prmssn.major_id and prmssn.class = 1</property_link>
+			</version>
+      <version min_major = '7' max_major = '8'>
+        <property_link fields = '#ObjectName#ObjectSchema#ObjectType#ObjectID#' join = 'dbo.sysobjects AS obj'>obj.id = prmssn.id</property_link>
+      </version>
+		</settings>
+		<properties>
+			<property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+
+			<version min_major = '7' max_major = '8'>
+				<property name="ObjectName" type="sysname">object_name(obj.id)</property>
+				<property name="ObjectSchema" type="sysname">user_name(obj.uid)</property>
+				<property name="ColumnName" type="sysname">null</property>
+				<property name="ObjectID" type="int">obj.id</property>
+				<property name="ObjectType" type="char" size='2'>obj.type</property>
+				<property name="IsTableType" type="bit">0</property>
+			</version>
+			
+			<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+				<property name="ObjectName" type="sysname">obj.name</property>
+				<property name="ObjectSchema" type="sysname">schema_name(obj.schema_id)</property>
+				<property name="ColumnName" type="sysname">COL_NAME(prmssn.major_id,prmssn.minor_id)</property>
+				<property name="ObjectID" type="int">prmssn.major_id</property>
+				<property name="ObjectType" type="char" size='2'>obj.type</property>
+				<property name="IsTableType" type="bit">0</property>
+			</version>
+		</properties>
+	</union>
+  <version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+    <union>
+      <settings>
+        <include file='inc_perm.xml' alias='database'/>
+        <property_link fields = '#ObjectName#' join = 'sys.schemas AS obj'>obj.schema_id = prmssn.major_id and prmssn.class = 3</property_link>
+      </settings>
+      <properties>
+        <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+
+        <property name="ObjectName" type="sysname">obj.name</property>
+        <property name="ObjectSchema" type="sysname">null</property>
+        <property name="ColumnName" type="sysname">null</property>
+        <property name="ObjectID" type="int">prmssn.major_id</property>
+        <property name="ObjectType" type="char" size='2'>null</property>
+        <property name="IsTableType" type="bit">0</property>
+      </properties>
+    </union>
+    <union>
+      <settings>
+        <include file='inc_perm.xml' alias='database'/>
+        <property_link fields = '#ObjectName#' join = 'sys.database_principals AS obj'>obj.principal_id = prmssn.major_id and prmssn.class = 4</property_link>
+      </settings>
+      <properties>
+        <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+
+        <property name="ObjectName" type="sysname">obj.name</property>
+        <property name="ObjectSchema" type="sysname">null</property>
+        <property name="ColumnName" type="sysname">null</property>
+        <property name="ObjectID" type="int">prmssn.major_id</property>
+        <property name="ObjectType" type="char" size='2'>null</property>
+        <property name="IsTableType" type="bit">0</property>
+      </properties>
+    </union>
+  </version>
+  <version min_major='9'>
+    <union>
+      <settings>
+        <include file='inc_perm.xml' alias='database'/>
+        <property_link fields = '#ObjectName#' join = 'sys.assemblies AS obj'>obj.assembly_id = prmssn.major_id and prmssn.class = 5</property_link>
+      </settings>
+      <properties>
+        <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+
+        <property name="ObjectName" type="sysname">obj.name</property>
+        <property name="ObjectSchema" type="sysname">null</property>
+        <property name="ColumnName" type="sysname">null</property>
+        <property name="ObjectID" type="int">prmssn.major_id</property>
+        <property name="ObjectType" type="char" size='2'>null</property>
+        <property name="IsTableType" type="bit">0</property>
+      </properties>
+    </union>
+  </version>
+  <version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+    <union>
+      <settings>
+        <include file='inc_perm.xml' alias='database'/>
+        <property_link fields = '#ObjectName#ObjectSchema#IsTableType#' join = 'sys.types AS obj'>obj.user_type_id = prmssn.major_id and prmssn.class = 6</property_link>
+      </settings>
+      <properties>
+        <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+
+        <property name="ObjectName" type="sysname">obj.name</property>
+        <property name="ObjectSchema" type="sysname">SCHEMA_NAME(obj.schema_id)</property>
+        <property name="ColumnName" type="sysname">null</property>
+        <property name="ObjectID" type="int">prmssn.major_id</property>
+        <property name="ObjectType" type="char" size='2'>null</property>
+        <version min_major = '9' max_major ='9'>
+          <property name="IsTableType" type="bit">0</property>
+        </version>
+        <version min_major = '10' cloud_min_major='10'>
+          <property name="IsTableType" type="bit">obj.is_table_type</property>
+        </version>
+      </properties>
+    </union>
+  </version>
+  <version min_major='9'>
+    <union>
+      <settings>
+        <include file='inc_perm.xml' alias='database'/>
+        <property_link fields = '#ObjectName#' join = 'sys.fulltext_catalogs AS obj'>obj.fulltext_catalog_id = prmssn.major_id and prmssn.class = 23</property_link>
+      </settings>
+      <properties>
+        <property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+
+        <property name="ObjectName" type="sysname">obj.name</property>
+        <property name="ObjectSchema" type="sysname">null</property>
+        <property name="ColumnName" type="sysname">null</property>
+        <property name="ObjectID" type="int">prmssn.major_id</property>
+        <property name="ObjectType" type="char" size='2'>null</property>
+        <property name="IsTableType" type="bit">0</property>
+      </properties>
+    </union>
+  </version>
+</EnumObject>

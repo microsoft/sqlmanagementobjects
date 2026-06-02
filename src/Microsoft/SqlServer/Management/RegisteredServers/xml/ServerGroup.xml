@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServerGroup" impl_type="ServerGroup" min_major='10' cloud_min_major='10'>
+	<settings autogenerate_disambiguation_variable='true'>
+                <parent_link>
+                  <link parent="ID" local="ParentGroupID" />
+                </parent_link>
+		<property_link table='msdb.dbo.sysmanagement_shared_server_groups' alias='sg{0}' />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='ID' type='int' access='Read'>sg{0}.server_group_id</property>
+		<property name='Name' type='sysname'>sg{0}.name</property>
+		<property name='Description' type='nvarchar' size = 'max'>sg{0}.description</property>
+		<property name='ServerType' type='int' >sg{0}.server_type</property>
+		<property name='ParentGroupID' type='int' access='Read'>ISNULL(sg{0}.parent_id,0)</property>
+		<property name='ServerGroupChildCount' type='int' access='Read'>sg{0}.num_server_group_children</property>
+		<property name='RegisteredServerChildCount' type='int' access='Read'>sg{0}.num_registered_server_children</property>
+	</properties>
+</EnumObject>

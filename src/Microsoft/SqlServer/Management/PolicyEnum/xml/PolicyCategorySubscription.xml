@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="PolicyCategorySubscription" impl_type="PolicyObject" min_major='10'>
+  <settings>
+    <property_link table='msdb.dbo.syspolicy_policy_category_subscriptions' alias='pgs'/>
+    <property_link fields = '#PolicyCategory#' left_join='msdb.dbo.syspolicy_policy_categories' alias='categories'>pgs.policy_category_id = categories.policy_category_id</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urnByID.xml' />
+    <property name='ID' type='int' access='Read'>pgs.policy_category_subscription_id</property>
+    <property name='TargetType' type='sysname'>pgs.target_type</property>
+    <property name='Target' type='sysname'>pgs.target_object</property>
+    <property name='PolicyCategory' type='sysname'>categories.name</property>
+  </properties>
+</EnumObject>

@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="TargetField" impl_type="XEventObject" cloud_min_major='12'>
+  <settings>
+
+      <!-- These links use parent alias & fields directly. Proper usage is to use parent_link tag. Leaving as it is for now.  -->
+    <property_link join='#oc' alias='col'>target.name = col.object_name</property_link>
+    <property_link left_join='sys.database_event_session_fields' alias='field'>target.event_session_id = field.event_session_id AND target.target_id = field.object_id AND col.name = field.name</property_link>
+    <prefix>
+      create table #oc (name sysname collate catalog_default, object_name sysname collate catalog_default, description nvarchar(3072))
+      insert into #oc select name, object_name, description from sys.dm_xe_object_columns where column_type = 'customizable'
+    </prefix>
+    <postfix>
+      drop table #oc
+    </postfix>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='ID' type='int'>ISNULL(field.object_id, -1)</property>
+    <property name='Name' type='nvarchar' size='60'>col.name</property>
+    <property name='Value' type='sql_variant'>field.value</property>
+    <property name='Description' type='nvarchar' size='512'>col.description</property>
+
+  </properties>
+</EnumObject>

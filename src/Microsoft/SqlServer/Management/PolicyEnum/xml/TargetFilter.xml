@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<EnumObject type="TargetFilter" impl_type="PolicyObject" min_major='10'>
+	<settings>
+    <parent_link>
+      <link parent="ID" local="PolicyID" />
+    </parent_link>
+		<property_link table='msdb.dbo.syspolicy_target_filters' alias='tf'/>
+	</settings>
+	<properties>
+		<include file='inc_urnByID.xml' />
+		<property name='ID' type='int' access='Read'>tf.target_filter_id</property>
+		<property name='PolicyID' type='int' access='Read' hidden='true'>tf.policy_id</property>
+		<property name='Type' type='sysname' access='Read'>tf.type</property>
+		<property name='Filter' type='nvarchar' size = 'max'>tf.filter</property>
+		<property name='TypeSkeleton' type='sysname' access='Read'>tf.type_skeleton</property>
+	</properties>
+</EnumObject>

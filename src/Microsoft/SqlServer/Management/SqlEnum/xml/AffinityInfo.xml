@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<EnumObject type="AffinityInfo" impl_type="SqlObject" min_major='10' min_minor ='50' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+	<version min_major='10' min_minor ='50'>
+		<property_link table="sys.dm_os_memory_nodes" alias= "mnd"/>
+    <property_link fields="#NodeStateDesc#GroupID#CpuIds#CpuAffinityMask#" join="(Select SUM (cpu_affinity_mask) as cpu_affinity_mask, 
+		SUM(online_scheduler_mask) as online_scheduler_mask,
+		processor_group,
+		node_state_desc,
+		memory_node_id
+		from sys.dm_os_nodes 
+		group by memory_node_id, node_state_desc, processor_group) AS nd">nd.memory_node_id = mnd.memory_node_id</property_link>
+    <property_link fields="#AffinityType#" join="sys.dm_os_sys_info AS inf">1=1</property_link>
+    <postfix fields="#NodeStateDesc#GroupID#CpuIds#CpuAffinityMask#">ORDER BY ID ASC</postfix>
+  </version>
+  </settings>
+  <properties>
+	<version min_major='10' min_minor ='50' >
+    <property name="AffinityType" type="int">inf.affinity_type</property>
+    <property name="NodeStateDesc" type="nvarchar" size ="256" access ="Read">nd.node_state_desc</property>
+		<property name="ID" type="int" access="Read">mnd.memory_node_id</property>
+		<property name="GroupID" type="int" access="Read">nd.processor_group</property>
+		<property name="CpuIds" type="bigint" access="Read">nd.cpu_affinity_mask</property>
+		<property name="CpuAffinityMask" type="bigint" access="Read">nd.online_scheduler_mask</property>
+		</version>
+  </properties>
+</EnumObject>

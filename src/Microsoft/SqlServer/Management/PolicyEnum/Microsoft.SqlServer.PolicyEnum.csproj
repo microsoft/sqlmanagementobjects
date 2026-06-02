@@ -1,0 +1,70 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.Dmf</RootNamespace>
+    <ClsCompliant>true</ClsCompliant>
+  </PropertyGroup>
+  <ItemGroup Label="Resource References">
+    <EmbeddedResource Include="xml\Condition.xml">
+      <LogicalName>Condition.xml</LogicalName>
+      <Link>xml\Condition.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ConnectionEvaluationHistory.xml">
+      <LogicalName>ConnectionEvaluationHistory.xml</LogicalName>
+      <Link>xml\ConnectionEvaluationHistory.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\EvaluationDetail.xml">
+      <LogicalName>EvaluationDetail.xml</LogicalName>
+      <Link>xml\EvaluationDetail.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\EvaluationHistory.xml">
+      <LogicalName>EvaluationHistory.xml</LogicalName>
+      <Link>xml\EvaluationHistory.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_urn.xml">
+      <LogicalName>inc_urn.xml</LogicalName>
+      <Link>xml\inc_urn.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\inc_urnByID.xml">
+      <LogicalName>inc_urnByID.xml</LogicalName>
+      <Link>xml\inc_urnByID.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\ObjectSet.xml">
+      <LogicalName>ObjectSet.xml</LogicalName>
+      <Link>xml\ObjectSet.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\Policy.xml">
+      <LogicalName>Policy.xml</LogicalName>
+      <Link>xml\Policy.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\PolicyCategory.xml">
+      <LogicalName>PolicyCategory.xml</LogicalName>
+      <Link>xml\PolicyCategory.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\PolicyCategorySubscription.xml">
+      <LogicalName>PolicyCategorySubscription.xml</LogicalName>
+      <Link>xml\PolicyCategorySubscription.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\PolicyStore.xml">
+      <LogicalName>PolicyStore.xml</LogicalName>
+      <Link>xml\PolicyStore.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\TargetSet.xml">
+      <LogicalName>TargetSet.xml</LogicalName>
+      <Link>xml\TargetSet.xml</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xml\TargetSetLevel.xml">
+      <LogicalName>TargetSetLevel.xml</LogicalName>
+      <Link>xml\TargetSetLevel.xml</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SfcSRc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <PackageReference Include="System.Security.Permissions"  />
+  </ItemGroup>
+</Project>

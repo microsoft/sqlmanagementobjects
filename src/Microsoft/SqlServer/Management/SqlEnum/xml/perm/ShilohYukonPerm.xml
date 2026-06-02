@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major='7' max_major='8'>
+			<parent_link>
+				<link parent="ExtPropMajorID" local="MajorID" />
+			</parent_link>
+		</version>
+
+		<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+			<parent_link>
+				<link parent="ExtPropMajorID" local="MajorID" />
+				<link parent="ExtPropMinorID" local="MinorID" />
+				<link parent="ExtPropClass" local="TrueObjectClass" />
+			</parent_link>
+		</version>		
+	</settings>
+	<properties>
+		<include file='inc_perm.xml' alias='database'/>
+		<property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+	</properties>
+</EnumObject>
