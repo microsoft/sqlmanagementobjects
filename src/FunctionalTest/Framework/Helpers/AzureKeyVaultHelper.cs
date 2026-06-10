@@ -53,7 +53,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         /// <param name="keyVaultName"></param>
         public AzureKeyVaultHelper(string keyVaultName)
         {
-            
+
             KeyVaultName = keyVaultName;
         }
 
@@ -114,16 +114,16 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
         {
             TraceHelper.TraceInformation($"Getting credential for Azure in tenant {AzureTenantId}");
             var credentials = new List<Azure.Core.TokenCredential>();
-            
+
             // Only add ManagedIdentityCredential if we're running on an Azure VM
             if (isAzureVM)
             {
                 TraceHelper.TraceInformation("Detected Azure VM environment. Adding ManagedIdentityCredential.");
                 credentials.Add(new ManagedIdentityCredential(AzureManagedIdentityClientId));
             }
-            
+
             credentials.Add(new DefaultAzureCredential(new DefaultAzureCredentialOptions { ExcludeManagedIdentityCredential = true, TenantId = AzureTenantId }));
-            
+
             var options = new AzureDevOpsFederatedTokenCredentialOptions() { TenantId = AzureTenantId, ClientId = AzureApplicationId };
             if (options.ServiceConnectionId != null)
             {
@@ -165,7 +165,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
                 {
                     client.Timeout = TimeSpan.FromSeconds(2);
                     client.DefaultRequestHeaders.Add("Metadata", "true");
-                    
+
                     // First check if IMDS is available
                     var instanceResponse = client.GetAsync("http://169.254.169.254/metadata/instance?api-version=2021-02-01").Result;
                     if (instanceResponse.IsSuccessStatusCode)
@@ -174,8 +174,6 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.Helpers
 
                         // Now verify that a managed identity is actually configured
                         // Use a minimal token request to test if managed identity is available
-                        // DEVNOTE(chgagnon) This is a workaround for a known issue in the Azure SDK where it doesn't
-                        // silently continue to the next chained credential when this fails : https://github.com/Azure/azure-sdk-for-net/issues/47057
                         try
                         {
                             using (var identityResponse = client.GetAsync("http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://vault.azure.net").Result)
