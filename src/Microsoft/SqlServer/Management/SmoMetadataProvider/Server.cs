@@ -100,8 +100,22 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
                 }
                 else
                 {
-                    var smoDb =
-                        this.m_smoMetadataObject.Databases[this.m_smoMetadataObject.ConnectionContext.DatabaseName];
+                    string currentDatabaseName = this.m_smoMetadataObject.ConnectionContext.DatabaseName;
+                    var smoDb = this.m_smoMetadataObject.Databases[currentDatabaseName];
+
+                    // On an Azure/Fabric endpoint we have no access to 'master' and only add the current
+                    // database. If it cannot be resolved by name (inaccessible, or the endpoint catalog does
+                    // not expose that exact name) the SMO Databases indexer returns null. Guard against it:
+                    // otherwise a null-backed Database is added and its Name is later dereferenced, throwing
+                    // a bare NullReferenceException from inside the metadata collection that cannot be diagnosed.
+                    if (smoDb == null)
+                    {
+                        throw new InvalidOperationException(string.Format(
+                            System.Globalization.CultureInfo.CurrentCulture,
+                            "The database '{0}' could not be found or is not accessible on server '{1}'.",
+                            currentDatabaseName, this.m_smoMetadataObject.Name));
+                    }
+
                     databases.Add(new Database(smoDb, this));
                 }
                 this.SetDatabases(databases);
