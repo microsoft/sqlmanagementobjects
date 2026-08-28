@@ -3,6 +3,8 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+- Fix `Database.Owner` returning the previous owner after `Database.SetOwner()` until `Refresh()` was called. The cached property is now invalidated and re-fetched from the server on next access.
+
 ## 181.36.0
 
 - Fix default value for QueryStoreOptions CapturePolicyStaleThresholdInHrs to be 24
