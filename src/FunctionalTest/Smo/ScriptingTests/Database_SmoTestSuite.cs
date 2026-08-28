@@ -1190,6 +1190,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     {
 
                         database.SetOwner(login.Name);
+                        Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database should reflect the new owner immediately after calling SetOwner, without needing Refresh");
                         database.Refresh();
                         Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database was not changed to '{0}' after calling SetOwner");
                     }
@@ -1227,6 +1228,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     try
                     {
                         database.SetOwner(login.Name, dropExistingUser: true);
+                        Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database should reflect the new owner immediately after calling SetOwner, without needing Refresh");
                         database.Refresh();
                         Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database was not changed to '{0}' after calling SetOwner");
                     }
