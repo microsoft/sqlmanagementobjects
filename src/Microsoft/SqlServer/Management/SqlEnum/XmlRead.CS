@@ -432,19 +432,20 @@ namespace Microsoft.SqlServer.Management.Smo
             string realPath = CodeGenSettings.Directory;
 
             // Additional paths to look into. Pray that they have no duplicates!
+            // Built with Path.Combine so they resolve correctly on both Windows and Linux.
             string[] subPaths = {
-                @"..\..\..\SqlEnum\xml",
-                @"..\..\..\SqlEnum\xml\endpoint",
-                @"..\..\..\SqlEnum\xml\extendedproperty",
-                @"..\..\..\SqlEnum\xml\include",
-                @"..\..\..\SqlEnum\xml\perm",
-                @"..\..\..\Smo.Broker\xml",
-                @"..\..\..\SMO\Enumerator\sql\src\xml",
-                @"..\..\..\SMO\Enumerator\sql\src\xml\endpoint",
-                @"..\..\..\SMO\Enumerator\sql\src\xml\extendedproperty",
-                @"..\..\..\SMO\Enumerator\sql\src\xml\include",
-                @"..\..\..\SMO\Enumerator\sql\src\xml\perm",
-                @"..\..\..\SMO\Enumerator\ServiceBroker\src\xml" };
+                Path.Combine("..", "..", "..", "SqlEnum", "xml"),
+                Path.Combine("..", "..", "..", "SqlEnum", "xml", "endpoint"),
+                Path.Combine("..", "..", "..", "SqlEnum", "xml", "extendedproperty"),
+                Path.Combine("..", "..", "..", "SqlEnum", "xml", "include"),
+                Path.Combine("..", "..", "..", "SqlEnum", "xml", "perm"),
+                Path.Combine("..", "..", "..", "Smo.Broker", "xml"),
+                Path.Combine("..", "..", "..", "SMO", "Enumerator", "sql", "src", "xml"),
+                Path.Combine("..", "..", "..", "SMO", "Enumerator", "sql", "src", "xml", "endpoint"),
+                Path.Combine("..", "..", "..", "SMO", "Enumerator", "sql", "src", "xml", "extendedproperty"),
+                Path.Combine("..", "..", "..", "SMO", "Enumerator", "sql", "src", "xml", "include"),
+                Path.Combine("..", "..", "..", "SMO", "Enumerator", "sql", "src", "xml", "perm"),
+                Path.Combine("..", "..", "..", "SMO", "Enumerator", "ServiceBroker", "src", "xml") };
 
             string realFile = "";
             foreach( string subPath in subPaths )

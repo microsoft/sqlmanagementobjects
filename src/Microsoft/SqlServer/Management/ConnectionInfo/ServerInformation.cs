@@ -106,15 +106,9 @@ namespace Microsoft.SqlServer.Management.Common
 
         private static readonly HashSet<DatabaseEngineEdition> validEditions = new HashSet<DatabaseEngineEdition>(Enum.GetValues(typeof(DatabaseEngineEdition)).Cast<DatabaseEngineEdition>());
         // this query needs to be safe on all platforms. DW and Sql2005 don't support CONNECTIONPROPERTY
-        private const string serverVersionQuery = @"DECLARE @edition sysname;
-SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
-SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',
-SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
-SERVERPROPERTY('ProductVersion') AS ProductVersion,
-@@MICROSOFTVERSION AS MicrosoftVersion,
-case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,
-convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
-";
+        // Declared as a single line with explicit \r\n so the text is identical regardless of how this
+        // source file's own line endings were checked out or which OS is running.
+        private const string serverVersionQuery = "DECLARE @edition sysname;\r\nSET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);\r\nSELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',\r\nSERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,\r\nSERVERPROPERTY('ProductVersion') AS ProductVersion,\r\n@@MICROSOFTVERSION AS MicrosoftVersion,\r\ncase when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,\r\nconvert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;\r\n";
         static public ServerInformation GetServerInformation(IDbConnection sqlConnection, IDbDataAdapter dataAdapter, string serverVersionString)
         {
             var serverVersion = ParseStringServerVersion(serverVersionString);
@@ -122,18 +116,15 @@ convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
 
             if (serverVersion.Major >= 14)
             {
-                cmdBuilder.AppendLine(@"select host_platform from sys.dm_os_host_info");
+                cmdBuilder.Append("select host_platform from sys.dm_os_host_info\r\n");
             }
             else
             {
                 // Pre v14 is all Windows
-                cmdBuilder.AppendLine(@"select N'Windows' as host_platform");
+                cmdBuilder.Append("select N'Windows' as host_platform\r\n");
             }
                 
-            cmdBuilder.AppendLine(@"if @edition = N'SQL Azure' 
-  select 'TCP' as ConnectionProtocol
-else
-  exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')");
+            cmdBuilder.Append("if @edition = N'SQL Azure' \r\n  select 'TCP' as ConnectionProtocol\r\nelse\r\n  exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')\r\n");
 
             using (var sqlCommand = sqlConnection.CreateCommand())
             {

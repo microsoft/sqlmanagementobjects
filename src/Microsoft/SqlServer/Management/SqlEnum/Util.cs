@@ -426,7 +426,18 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else if (pathType == PathType.Windows)
             {
-                return Path.Combine(path1, path2);
+                // Don't use System.IO.Path here: its behavior follows the host OS, but a Windows path
+                // needs to combine the same way whether we're running on Windows or Linux.
+                if (path1.Length == 0)
+                {
+                    return path2;
+                }
+                if (IsWindowsPathRooted(path2))
+                {
+                    return path2;
+                }
+                char lastChar = path1[path1.Length - 1];
+                return (lastChar == '\\' || lastChar == '/') ? path1 + path2 : path1 + '\\' + path2;
             }
             else // mimic Path.Combine
             {
@@ -437,6 +448,28 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 return String.Format("{0}/{1}", path1.TrimEnd('/'), path2);
             }
+        }
+
+        /// <summary>
+        /// Mimics Path.IsPathRooted for a Windows-style path, without relying on the host OS's own rules
+        /// (System.IO.Path's behavior on Linux differs from Windows for backslash/drive-letter paths).
+        /// </summary>
+        static private bool IsWindowsPathRooted(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            if (path[0] == '\\' || path[0] == '/')
+            {
+                return true;
+            }
+            return path.Length >= 2 && path[1] == ':' && IsWindowsDriveLetter(path[0]);
+        }
+
+        static private bool IsWindowsDriveLetter(char c)
+        {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
         }
 
         /// <summary>
@@ -472,7 +505,29 @@ namespace Microsoft.SqlServer.Management.Smo
             }
             else if (pathType == PathType.Windows)
             {
-                return Path.GetDirectoryName(s1);
+                // Don't use System.IO.Path here: its behavior follows the host OS, but a Windows path's
+                // directory name needs to be computed the same way whether we're running on Windows or Linux.
+                if (s1.Length == 0)
+                {
+                    return s1;
+                }
+                // A bare drive root (e.g. "C:\") has no parent directory
+                if (s1.Length == 3 && IsWindowsDriveLetter(s1[0]) && s1[1] == ':' && (s1[2] == '\\' || s1[2] == '/'))
+                {
+                    return null;
+                }
+                int lastSeparatorIndex = s1.LastIndexOfAny(new[] { '\\', '/' });
+                if (lastSeparatorIndex < 0)
+                {
+                    return String.Empty;
+                }
+                string dir = s1.Substring(0, lastSeparatorIndex);
+                // Path.GetDirectoryName keeps the trailing separator for a bare drive root, e.g. "C:\MyDir" -> "C:\"
+                if (dir.Length == 2 && IsWindowsDriveLetter(dir[0]) && dir[1] == ':')
+                {
+                    dir += '\\';
+                }
+                return dir;
             }
             else // mimic Path.GetDirectoryName
             {
@@ -543,7 +598,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 pathType = path.StartsWith("/") ? PathType.Linux : PathType.Windows;
             }
-            return pathType == PathType.Windows ? Path.IsPathRooted(path) : path.StartsWith("/");
+            return pathType == PathType.Windows ? IsWindowsPathRooted(path) : path.StartsWith("/");
         }
     }
 }

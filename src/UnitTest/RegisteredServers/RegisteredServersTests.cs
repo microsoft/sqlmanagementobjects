@@ -75,6 +75,11 @@ namespace Microsoft.SqlServer.Test.RegisteredServersUnitTests
         [TestCategory("Unit")]
         public void ServerGroup_Alter_saves_file_with_added_server()
         {
+            if (!OperatingSystem.IsWindows())
+            {
+                // Assert.Ignore (NUnit) isn't understood by the MSTest adapter running this class and is reported as a failure, so use MSTest's own Inconclusive instead.
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.Inconclusive("Encrypted credential persistence relies on Windows DPAPI (ProtectedData), which isn't supported on this platform.");
+            }
             var tempFile = Path.GetTempFileName();
             File.Delete(tempFile);
             try
