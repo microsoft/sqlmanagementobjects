@@ -8,7 +8,9 @@
   </ItemGroup>
   <PropertyGroup>
       <Perl Condition="'$(Perl)' == '' and '$(IsWindowsBuild)' == 'true' and Exists('c:\strawberry\perl\bin\perl.exe')">c:\strawberry\perl\bin\perl.exe</Perl>
-      <Perl Condition="'$(Perl)' == '' and '$(IsWindowsBuild)' == 'true'">$(EnlistmentRoot)/packages/StrawberryPerl.5.28.0.1/bin/perl.exe</Perl>
+      <Perl Condition="'$(Perl)' == '' and '$(IsWindowsBuild)' == 'true' and Exists('$(EnlistmentRoot)\packages\StrawberryPerl.5.28.0.1\bin\perl.exe')">$(EnlistmentRoot)\packages\StrawberryPerl.5.28.0.1\bin\perl.exe</Perl>
+      <Perl Condition="'$(Perl)' == '' and '$(IsWindowsBuild)' == 'true' and Exists('$(EnlistmentRoot)\StrawberryPerl.5.28.0.1\bin\perl.exe')">$(EnlistmentRoot)\StrawberryPerl.5.28.0.1\bin\perl.exe</Perl>
+      <Perl Condition="'$(Perl)' == '' and '$(IsWindowsBuild)' == 'true'">$(EnlistmentRoot)\packages\StrawberryPerl.5.28.0.1\bin\perl.exe</Perl>
       <!-- On non-Windows OSes perl is expected to be installed and available on PATH (see init.sh) -->
       <Perl Condition="'$(Perl)' == ''">perl</Perl>
     </PropertyGroup>

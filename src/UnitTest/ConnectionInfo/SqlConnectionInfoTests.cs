@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using System;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using Assert = NUnit.Framework.Assert;
 
 
@@ -34,7 +35,7 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
         [TestCategory("Unit")]
         public void SqlConnectionInfo_impersonation_failure_throws_ConnectionFailureException()
         {
-            if (!OperatingSystem.IsWindows())
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Assert.Ignore (NUnit) isn't understood by the MSTest adapter running this class and is reported as a failure, so use MSTest's own Inconclusive instead.
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.Inconclusive("ConnectAsUser impersonation relies on the Windows LogonUser API (advapi32.dll), which isn't supported on this platform.");

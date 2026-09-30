@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Assert = NUnit.Framework.Assert;
 
 namespace Microsoft.SqlServer.Test.RegisteredServersUnitTests
@@ -75,7 +76,7 @@ namespace Microsoft.SqlServer.Test.RegisteredServersUnitTests
         [TestCategory("Unit")]
         public void ServerGroup_Alter_saves_file_with_added_server()
         {
-            if (!OperatingSystem.IsWindows())
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Assert.Ignore (NUnit) isn't understood by the MSTest adapter running this class and is reported as a failure, so use MSTest's own Inconclusive instead.
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.Inconclusive("Encrypted credential persistence relies on Windows DPAPI (ProtectedData), which isn't supported on this platform.");
