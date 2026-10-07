@@ -16,7 +16,6 @@ namespace Microsoft.SqlServer.Management.Common
         /// </summary>
         public SqlServerManagementException()
         {
-            Init();
         }
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace Microsoft.SqlServer.Management.Common
         public SqlServerManagementException(string message)
             : base(message)
         {
-            Init();
         }
 
         /// <summary>
@@ -38,7 +36,6 @@ namespace Microsoft.SqlServer.Management.Common
             :
             base(message, innerException)
         {
-            Init();
         }
 
 #if !NETCOREAPP && !NETSTANDARD2_0 // This overload is obsolete and will be removed in a future version of .NET
@@ -48,22 +45,18 @@ namespace Microsoft.SqlServer.Management.Common
         }
 #endif
 
-        private void Init()
-        {
-            Data.Add("HelpLink.ProdName", ProductName);
-            Data.Add("HelpLink.BaseHelpUrl", "https://go.microsoft.com/fwlink");
-            Data.Add("HelpLink.LinkId", "20476");
-        }
+        /// <summary>
+        /// The fwlink LinkId used to build <see cref="HelpLink"/>. Override in derived
+        /// exceptions to target a feature-area-specific help page.
+        /// </summary>
+        protected virtual string HelpLinkId => "20476";
 
         /// <summary>
-        /// ProductName specifies the ProdName value used in the HelpLink property of SqlServerManagementException instances.
+        /// Gets a help link for the exception.
         /// </summary>
-        public static string ProductName
-        {
-            get
-            {
-                return "Microsoft SQL Server";
-            }
-        }
+        public override string HelpLink =>
+            // LinkId is last so that it appears at the bottom of the information
+            // displayed in the privacy confirmation dialog.
+            $"https://go.microsoft.com/fwlink?LinkId={HelpLinkId}";
     }
 }

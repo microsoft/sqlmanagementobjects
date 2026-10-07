@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 #if MICROSOFTDATA
@@ -46,6 +47,48 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
             };
             sqlConnection = new SqlConnection(connStr.ToString());
             return new ServerConnection(sqlConnection);
+        }
+
+        /// <summary>
+        /// Verifies that ConnectAsync opens the SQL connection under the configured Windows identity.
+        /// This test requires a specifically named generic credential to be available in the local windows credential manager for 
+        /// impersonation. The credential has to be for a user with interactive logon rights and who has integrated security access
+        /// to the test server. 
+        /// Create a Generic Credential named smotests. The user name should be in either "domain\user" format or SPN "user@domain" format.
+        /// </summary>
+        [TestMethod]
+        [SupportedServerVersionRange(Edition = DatabaseEngineEdition.Enterprise, HostPlatform = "Windows", MaxMajor = 15, MinMajor = 15)]
+        public async Task ServerConnection_ConnectAsync_WithConnectAsUser_UsesImpersonatedIdentity()
+        {
+            await ExecuteFromDbPoolAsync(async (db) =>
+            {
+                if (!TryReadImpersonationCredential(out var userName, out var password))
+                {
+                    Trace.TraceInformation("smotests credential not found for impersonation, skipping test");
+                    return;
+                }
+
+                var serverConnection = new ServerConnection(ServerContext.ConnectionContext.ServerInstance)
+                {
+                    ConnectAsUser = true,
+                    ConnectAsUserName = userName,
+                    ConnectAsUserPassword = password,
+                    NonPooledConnection = true
+                };
+
+                try
+                {
+                    await serverConnection.ConnectAsync().ConfigureAwait(false);
+                    var actualUserName = (string)await serverConnection.ExecuteScalarAsync("SELECT SUSER_SNAME()").ConfigureAwait(false);
+
+                    Assert.That(actualUserName, Is.EqualTo(userName).IgnoreCase,
+                        "SUSER_SNAME() should match the identity configured by ConnectAsUserName");
+                }
+                finally
+                {
+                    serverConnection.Disconnect();
+                }
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -360,6 +403,59 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
                     table.Drop();
                 }
             });
+        }
+
+        private static bool TryReadImpersonationCredential(out string userName, out string password)
+        {
+            userName = null;
+            password = null;
+
+            if (!CredRead("smotests", CredentialType.Generic, 0, out var credentialPointer))
+            {
+                return false;
+            }
+
+            try
+            {
+                var credential = Marshal.PtrToStructure<Credential>(credentialPointer);
+                userName = credential.UserName;
+                password = credential.CredentialBlob == IntPtr.Zero
+                    ? string.Empty
+                    : Marshal.PtrToStringUni(credential.CredentialBlob, (int)credential.CredentialBlobSize / 2);
+                return !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password);
+            }
+            finally
+            {
+                CredFree(credentialPointer);
+            }
+        }
+
+        [DllImport("Advapi32.dll", EntryPoint = "CredReadW", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool CredRead(string target, CredentialType type, int reservedFlag, out IntPtr credentialPointer);
+
+        [DllImport("Advapi32.dll", EntryPoint = "CredFree", SetLastError = true)]
+        private static extern bool CredFree(IntPtr credential);
+
+        private enum CredentialType
+        {
+            Generic = 1
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct Credential
+        {
+            public uint Flags;
+            public CredentialType Type;
+            public IntPtr TargetName;
+            public IntPtr Comment;
+            public System.Runtime.InteropServices.ComTypes.FILETIME LastWritten;
+            public uint CredentialBlobSize;
+            public IntPtr CredentialBlob;
+            public uint Persist;
+            public uint AttributeCount;
+            public IntPtr Attributes;
+            public IntPtr TargetAlias;
+            public string UserName;
         }
     }
 }
