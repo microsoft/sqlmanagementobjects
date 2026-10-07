@@ -436,7 +436,7 @@ public class CodeGen
         string output_dir = "";
         if (args.Length == 4)
         {
-            output_dir = args[3] + "\\";
+            output_dir = args[3];
         }
 
         bool bGenerateNewFile = false;
@@ -724,7 +724,7 @@ public class CodeGen
         bool bGenMetadata = Boolean.Parse(GetAttribute("gen_metadata", node, "true"));
         string sUrn = GetAttribute("urn", node, null);
 
-        string modelOutputDir = output_dir + "model\\";
+        string modelOutputDir = Path.Combine(output_dir, "model");
 
         if (!String.IsNullOrEmpty(output_dir) && !Directory.Exists(output_dir))
         {

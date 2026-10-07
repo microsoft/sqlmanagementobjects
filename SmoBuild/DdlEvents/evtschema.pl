@@ -22,7 +22,7 @@ $OutputDir = $ARGV[1];
 open(EVTSCHEMACPP, $eventsschema_cpp) || die "Cannot open $eventsschema_cpp\n";
 
 # New destination file
-open(OUTF, ">" . $OutputDir . "\\eventsschema.tmp") || die "Cannot write to eventsschema.tmp\n";
+open(OUTF, ">" . $OutputDir . "/eventsschema.tmp") || die "Cannot write to eventsschema.tmp\n";
 
 # read and copy
 while(<EVTSCHEMACPP>)
@@ -46,7 +46,7 @@ close(OUTF);
 sub IncludeFile
 {
 	local($IncName) = @_;
-	open(INCFILE, $OutputDir . "\\" . $IncName) || die "Cannot open " . $IncName . "\n";
+	open(INCFILE, $OutputDir . "/" . $IncName) || die "Cannot open " . $IncName . "\n";
 	while(<INCFILE>)
 	{
 		print OUTF $_;

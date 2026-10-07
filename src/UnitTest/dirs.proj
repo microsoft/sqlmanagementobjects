@@ -2,5 +2,7 @@
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
     <ProjectFile Include="**\*.csproj" />
+    <!-- RegSvrEnumUnitTests only targets net472 (the .NET Framework), which isn't available on non-Windows builds -->
+    <ProjectFile Remove="**\Microsoft.SqlServer.Test.RegSvrEnumUnitTests.csproj" Condition="'$(IsWindowsBuild)' != 'true'" />
   </ItemGroup>
 </Project>

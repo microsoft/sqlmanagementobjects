@@ -9,7 +9,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <DocumentationFile>"$(OutputPath)\Microsoft.SqlServer.Management.Assessment.xml"</DocumentationFile>
+    <DocumentationFile>"$(OutputPath)/Microsoft.SqlServer.Management.Assessment.xml"</DocumentationFile>
   </PropertyGroup>  
   
   <ItemGroup>

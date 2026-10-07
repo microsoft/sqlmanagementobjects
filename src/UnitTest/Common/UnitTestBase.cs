@@ -37,4 +37,16 @@ namespace Microsoft.SqlServer.Test
 
         }
     }
+
+    public static class StringTestExtensions
+    {
+        /// <summary>
+        /// Converts \r\n in a string literal to Environment.NewLine, so string literals authored
+        /// with \r\n compare correctly against output that uses the host OS's native newline.
+        /// </summary>
+        public static string FixNewLines(this string input)
+        {
+            return Environment.NewLine == "\r\n" ? input : input.Replace("\r\n", Environment.NewLine);
+        }
+    }
 }

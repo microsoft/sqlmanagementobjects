@@ -33,20 +33,7 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             var connectMock = new Mock<IDbConnection>();
             var commandMock = new Mock<IDbCommand>();
             var dataAdapterMock = new Mock<IDbDataAdapter>();
-            var expectedScript = @"DECLARE @edition sysname;
-SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
-SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',
-SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
-SERVERPROPERTY('ProductVersion') AS ProductVersion,
-@@MICROSOFTVERSION AS MicrosoftVersion,
-case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,
-convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
-select host_platform from sys.dm_os_host_info
-if @edition = N'SQL Azure' 
-  select 'TCP' as ConnectionProtocol
-else
-  exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')
-";
+            var expectedScript = "DECLARE @edition sysname;\r\nSET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);\r\nSELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',\r\nSERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,\r\nSERVERPROPERTY('ProductVersion') AS ProductVersion,\r\n@@MICROSOFTVERSION AS MicrosoftVersion,\r\ncase when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,\r\nconvert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;\r\nselect host_platform from sys.dm_os_host_info\r\nif @edition = N'SQL Azure' \r\n  select 'TCP' as ConnectionProtocol\r\nelse\r\n  exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')\r\n";
             // The Moq verification doesn't print a nice diff of the expected/actual,
             // so let's use the nUnit assert for the string comparison
             commandMock.SetupSet(c => c.CommandText = It.IsAny<string>()).
@@ -85,20 +72,7 @@ else
             var commandMock = new Mock<IDbCommand>();
             var dataAdapterMock = new Mock<IDbDataAdapter>();
             var expectedScript =
-                @"DECLARE @edition sysname;
-SET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);
-SELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',
-SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,
-SERVERPROPERTY('ProductVersion') AS ProductVersion,
-@@MICROSOFTVERSION AS MicrosoftVersion,
-case when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,
-convert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;
-select N'Windows' as host_platform
-if @edition = N'SQL Azure' 
-  select 'TCP' as ConnectionProtocol
-else
-  exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')
-";
+                "DECLARE @edition sysname;\r\nSET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);\r\nSELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',\r\nSERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,\r\nSERVERPROPERTY('ProductVersion') AS ProductVersion,\r\n@@MICROSOFTVERSION AS MicrosoftVersion,\r\ncase when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,\r\nconvert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;\r\nselect N'Windows' as host_platform\r\nif @edition = N'SQL Azure' \r\n  select 'TCP' as ConnectionProtocol\r\nelse\r\n  exec ('select CONVERT(nvarchar(40),CONNECTIONPROPERTY(''net_transport'')) as ConnectionProtocol')\r\n";
 
             // The Moq verification doesn't print a nice diff of the expected/actual,
             // so let's use the nUnit assert for the string comparison
