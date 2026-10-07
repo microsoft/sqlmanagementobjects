@@ -432,6 +432,10 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     return path2;
                 }
+                if (path2.Length == 0)
+                {
+                    return path1;
+                }
                 if (IsWindowsPathRooted(path2))
                 {
                     return path2;
@@ -470,6 +474,22 @@ namespace Microsoft.SqlServer.Management.Smo
         static private bool IsWindowsDriveLetter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        }
+
+        static private bool IsWindowsUncRoot(string path)
+        {
+            if (path.Length < 2 || (path[0] != '\\' && path[0] != '/') || (path[1] != '\\' && path[1] != '/'))
+            {
+                return false;
+            }
+
+            int serverSeparatorIndex = path.IndexOfAny(['\\', '/'], 2);
+            if (serverSeparatorIndex < 0 || serverSeparatorIndex == path.Length - 1)
+            {
+                return true;
+            }
+
+            return path.IndexOfAny(['\\', '/'], serverSeparatorIndex + 1) < 0;
         }
 
         /// <summary>
@@ -516,12 +536,16 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     return null;
                 }
-                int lastSeparatorIndex = s1.LastIndexOfAny(new[] { '\\', '/' });
+                if (IsWindowsUncRoot(s1))
+                {
+                    return null;
+                }
+                var lastSeparatorIndex = s1.LastIndexOfAny(['\\', '/']);
                 if (lastSeparatorIndex < 0)
                 {
                     return String.Empty;
                 }
-                string dir = s1.Substring(0, lastSeparatorIndex);
+                var dir = s1[..lastSeparatorIndex];
                 // Path.GetDirectoryName keeps the trailing separator for a bare drive root, e.g. "C:\MyDir" -> "C:\"
                 if (dir.Length == 2 && IsWindowsDriveLetter(dir[0]) && dir[1] == ':')
                 {
@@ -533,13 +557,13 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (s1 == null || s1.Trim().Length == 0)
                 {
-                    throw new ArgumentNullException("s1");
+                    throw new ArgumentNullException(nameof(s1));
                 }
                 if (s1 == "/")
                 {
                     return null;
                 }
-                var lastSeparatorIndex = s1.LastIndexOf("/", StringComparison.Ordinal);
+                var lastSeparatorIndex = s1.LastIndexOf('/');
                 // No directory
                 if (lastSeparatorIndex < 0)
                 {
