@@ -435,9 +435,7 @@
     <property name="VersionMinor" type="int" access="Read" expensive='true'>(@@microsoftversion / 0x10000) &amp; 0xff</property>
     <property name="BuildNumber" type="int" access="Read" expensive='true'>@@microsoftversion &amp; 0xffff</property>
     <property name="IsCaseSensitive" type="bit" access="Read" cast='true'>case when 'a' &lt;&gt; 'A' then 1 else 0 end</property>
-    <version min_major="11" cloud_min_major="12">
-      <property name="IsLocalDB" type="bit" access="Read" cast="true">ISNULL(SERVERPROPERTY(N'IsLocalDB'), 0)</property>
-    </version>
+    <property name="IsLocalDB" type="bit" access="Read" cast="true">ISNULL(SERVERPROPERTY(N'IsLocalDB'), 0)</property>
     <property name="MaxPrecision" type="tinyint" access="Read">@@MAX_PRECISION</property>
 
     <version min_major='10' cloud_min_major='12' >

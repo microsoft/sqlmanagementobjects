@@ -27,7 +27,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Soap;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
@@ -117,12 +116,6 @@ namespace Microsoft.SqlServer.Smo.UnSafeInternals
                     return false;
             }
             return true;
-        }
-
-        [SecurityPermission(SecurityAction.Assert, Unrestricted = true)]
-        internal static void SerializeWithSoapFormatter(MemoryStream memoryStream, Exception pfe)
-        {
-            new SoapFormatter().Serialize(memoryStream, pfe);
         }
 
         [SecurityPermission(SecurityAction.Assert, Unrestricted = true)]

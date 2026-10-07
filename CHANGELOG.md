@@ -3,6 +3,13 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 181.37.1
+
+- Add `ServerConnection.Edition` and `ServerConnection.EditionID` to expose the values of `SERVERPROPERTY('Edition')` and `SERVERPROPERTY('EditionID')`.
+- Ensure asynchronous connections configured with `ConnectAsUser` open under the specified Windows identity.
+- Remove `SoapFormatter`-based exception serialization from `SqlClrProvider`.
+- Simplify the exception `HelpLink` URL to only include `LinkId`. `SqlServerManagementException` now exposes a virtual `HelpLinkId` property for feature-area-specific help pages.
+
 ## 181.36.0
 
 - Fix default value for QueryStoreOptions CapturePolicyStaleThresholdInHrs to be 24

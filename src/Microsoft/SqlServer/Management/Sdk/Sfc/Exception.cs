@@ -3,9 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
 using Microsoft.SqlServer.Management.Common;
 #if NETFRAMEWORK
 using System.Security.Permissions;
@@ -19,118 +17,22 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
     [Serializable]
     public class SfcException : SqlServerManagementException
     {
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected SfcException() : base() 
         {
-            Init();
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected SfcException(string message) : base(message) 
         {
-            Init();
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected SfcException(string message, Exception innerException) : base(message, innerException) 
         {
-            Init();
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         protected SfcException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
 #endif
-        private void Init()
-        {
-            Data.Add("HelpLink.ProdVer", ProdVer);
-        }
-
-        static SfcException()
-        {
-            prodVer = string.Empty;
-
-            object[] attribs = SmoManagementUtil.GetExecutingAssembly().GetCustomAttributes(true);
-            if( null != attribs )
-            {
-                foreach( object o in attribs )
-                {
-                    if( o is AssemblyFileVersionAttribute )
-                    {
-                        prodVer = ((AssemblyFileVersionAttribute)o).Version;
-                        break;
-                    }
-                }
-            }
-        }
-
-        private static string prodVer;
-        protected static string ProdVer
-        {
-            get 
-            {
-                return prodVer;
-            }
-        }
-
-        internal protected SfcException SetHelpContext(string resource)
-        {
-            // TODO: Need to figure out whether this is the right thing to do as we do not use
-            // the same exception templates that SMO uses.
-            Data["HelpLink.EvtSrc"] = ("Microsoft.SqlServer.Management.Sdk.Sfc.ExceptionTemplates." + resource);
-            
-            return this;
-        }
-
-        // TODO: We need to decide whether we keep this alive for SFC.
-        //
-        // Ideally this code would be shared with SmoException or pushed down into SqlServerManagementException
-        //
-        // Will output a link to the help web site
-        // http://www.microsoft.com/products/ee/transform.aspx?ProdName=Microsoft%20SQL%20Server&ProdVer=09.00.0000.00&EvtSrc=MSSQLServer&EvtID=15401
-        public override string HelpLink
-        {
-            get 
-            {
-                StringBuilder link = new StringBuilder();
-                link.Append(Data["HelpLink.BaseHelpUrl"] as string);
-                link.Append("?");
-                link.AppendFormat("ProdName={0}", Data["HelpLink.ProdName"] as string);
-                
-                if( Data.Contains("HelpLink.ProdVer"))
-                {
-                    link.AppendFormat("&ProdVer={0}", Data["HelpLink.ProdVer"] as string);
-                }
-
-                if ( Data.Contains("HelpLink.EvtSrc"))
-                {
-                    link.AppendFormat("&EvtSrc={0}", Data["HelpLink.EvtSrc"] as string);
-                }
-
-                if ( Data.Contains("HelpLink.EvtData1") )
-                {
-                    link.AppendFormat("&EvtID={0}", Data["HelpLink.EvtData1"] as string);
-                    for( int i = 2; i < 10; i++)
-                    {
-                        if( Data.Contains("HelpLink.EvtData" + i))
-                        {
-                            link.Append("+");
-                            link.Append(Data["HelpLink.EvtData" + i] as string);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                // this needs to be the last one so that it appears at the bottom of the
-                // list of information displayed in the privacy confirmation dialog.
-                link.AppendFormat("&LinkId={0}", Data["HelpLink.LinkId"] as string);
-
-                return link.ToString().Replace(' ', '+');
-            }
-        }
     }
 
 
@@ -155,7 +57,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
         internal SfcPropertyNotSetException(string propertyName, Exception innerException) : base(string.Empty, innerException)
         {
             this.propertyName = propertyName;
-            Init();
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private SfcPropertyNotSetException(SerializationInfo info, StreamingContext context)
@@ -184,11 +85,6 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
             {
                 return SfcStrings.FormatPropertyNotSet(propertyName);
             }
-        }
-        
-        private void Init()
-        {
-            SetHelpContext("SfcPropertyNotSetException");
         }
     }
 

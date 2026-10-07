@@ -31,6 +31,105 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
     [TestClass]
     public class ServerConnectionTests : SqlTestBase
     {
+        [TestMethod]
+        public void ServerConnection_server_information_properties_match_connected_server()
+        {
+            ExecuteTest(() =>
+            {
+                var connectionString = new SqlConnectionStringBuilder(ServerContext.ConnectionContext.ConnectionString)
+                {
+                    Pooling = false
+                };
+
+                using (var sqlConnection = new SqlConnection(connectionString.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    var serverConnection = new ServerConnection(sqlConnection);
+                    var expectedValues = serverConnection.ExecuteWithResults(
+                        @"DECLARE @edition sysname = CONVERT(sysname, SERVERPROPERTY(N'Edition'));
+SELECT @edition AS Edition,
+    CONVERT(bigint, SERVERPROPERTY(N'EditionID')) AS EditionID,
+       CONVERT(int, SERVERPROPERTY(N'EngineEdition')) AS DatabaseEngineEdition,
+       CONVERT(nvarchar(128), SERVERPROPERTY(N'ProductVersion')) AS ProductVersion,
+       CONVERT(sysname, SERVERPROPERTY(N'Collation')) AS Collation,
+       @@MICROSOFTVERSION AS MicrosoftVersion,
+       CASE WHEN SERVERPROPERTY(N'EngineEdition') = 12 THEN 1
+            WHEN SERVERPROPERTY(N'EngineEdition') = 11 AND @@VERSION LIKE N'Microsoft Azure SQL Data Warehouse%' THEN 1
+            ELSE 0 END AS IsFabricServer;").Tables[0].Rows[0];
+
+                    var expectedEdition = Convert.ToString(expectedValues["Edition"]);
+                    var expectedEngineType = expectedEdition == "SQL Azure"
+                        ? DatabaseEngineType.SqlAzureDatabase
+                        : DatabaseEngineType.Standalone;
+                    var expectedEngineEdition = (DatabaseEngineEdition)Convert.ToInt32(expectedValues["DatabaseEngineEdition"]);
+                    const DatabaseEngineEdition dynamicsCrmEdition = (DatabaseEngineEdition)1000;
+                    if (expectedEngineType == DatabaseEngineType.SqlAzureDatabase &&
+                        !Enum.IsDefined(typeof(DatabaseEngineEdition), expectedEngineEdition) &&
+                        expectedEngineEdition != dynamicsCrmEdition)
+                    {
+                        expectedEngineEdition = DatabaseEngineEdition.SqlDatabase;
+                    }
+
+                    var connectionVersion = new Version(sqlConnection.ServerVersion);
+                    var expectedServerVersion = new ServerVersion(connectionVersion.Major, connectionVersion.Minor, connectionVersion.Build);
+                    if (expectedEngineEdition == DatabaseEngineEdition.SqlManagedInstance ||
+                        expectedEngineEdition == DatabaseEngineEdition.SqlOnDemand)
+                    {
+                        var microsoftVersion = Convert.ToUInt32(expectedValues["MicrosoftVersion"]);
+                        expectedServerVersion = new ServerVersion(
+                            (int)(microsoftVersion / 0x01000000),
+                            (int)(microsoftVersion / 0x010000 & 15),
+                            (int)microsoftVersion & 255);
+                    }
+
+                    if (expectedEngineEdition == DatabaseEngineEdition.SqlManagedInstance)
+                    {
+                        expectedEngineType = DatabaseEngineType.Standalone;
+                    }
+
+                    var expectedHostPlatform = connectionVersion.Major >= 14
+                        ? Convert.ToString(serverConnection.ExecuteScalar("SELECT host_platform FROM sys.dm_os_host_info"))
+                        : HostPlatformNames.Windows;
+                    var expectedConnectionProtocol = NetworkProtocol.TcpIp;
+                    if (expectedEdition != "SQL Azure")
+                    {
+                        var netTransport = Convert.ToString(serverConnection.ExecuteScalar("SELECT CONVERT(nvarchar(40), CONNECTIONPROPERTY('net_transport'))"));
+                        switch (netTransport.ToLowerInvariant())
+                        {
+                            case "named pipe":
+                                expectedConnectionProtocol = NetworkProtocol.NamedPipes;
+                                break;
+                            case "shared memory":
+                                expectedConnectionProtocol = NetworkProtocol.SharedMemory;
+                                break;
+                            case "via":
+                                expectedConnectionProtocol = NetworkProtocol.Via;
+                                break;
+                            case "tcp":
+                            case "http":
+                            case "ssl":
+                                expectedConnectionProtocol = NetworkProtocol.TcpIp;
+                                break;
+                            default:
+                                expectedConnectionProtocol = NetworkProtocol.NotSpecified;
+                                break;
+                        }
+                    }
+
+                    Assert.That(serverConnection.Edition, Is.EqualTo(expectedEdition), "Unexpected Edition");
+                    Assert.That(serverConnection.EditionID, Is.EqualTo(Convert.ToInt64(expectedValues["EditionID"])), "Unexpected EditionID");
+                    Assert.That(serverConnection.ProductVersion, Is.EqualTo(new Version(Convert.ToString(expectedValues["ProductVersion"]))), "Unexpected ProductVersion");
+                    Assert.That(serverConnection.DatabaseEngineType, Is.EqualTo(expectedEngineType), "Unexpected DatabaseEngineType");
+                    Assert.That(serverConnection.DatabaseEngineEdition, Is.EqualTo(expectedEngineEdition), "Unexpected DatabaseEngineEdition");
+                    Assert.That(serverConnection.ServerVersion.ToString(), Is.EqualTo(expectedServerVersion.ToString()), "Unexpected ServerVersion");
+                    Assert.That(serverConnection.HostPlatform, Is.EqualTo(expectedHostPlatform), "Unexpected HostPlatform");
+                    Assert.That(serverConnection.ConnectionProtocol, Is.EqualTo(expectedConnectionProtocol), "Unexpected ConnectionProtocol");
+                    Assert.That(serverConnection.IsFabricServer, Is.EqualTo(Convert.ToBoolean(expectedValues["IsFabricServer"])), "Unexpected IsFabricServer");
+                    Assert.That(serverConnection.Collation, Is.EqualTo(Convert.ToString(expectedValues["Collation"])), "Unexpected Collation");
+                }
+            });
+        }
+
         /// <summary>
         /// 
         /// </summary>

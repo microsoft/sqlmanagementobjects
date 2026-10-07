@@ -7,6 +7,7 @@
   </PropertyGroup>
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
   <ItemGroup>
+    <ProjectReference Include="$(HadrModelSrc)\Microsoft.SqlServer.Management.HadrModel.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />

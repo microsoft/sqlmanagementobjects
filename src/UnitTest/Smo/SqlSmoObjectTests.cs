@@ -386,9 +386,6 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     "IsContainedAuthentication",
                     "IsFullTextInstalled",
                     "IsHadrEnabled",
-                    // IsLocalDB only exists on SQL Server 2012 (major 11) and later, so it has no value on
-                    // SQL Server 2008/2008 R2 (major 10.x) and is intentionally allowed to be missing there.
-                    "IsLocalDB",
                     "IsPolyBaseInstalled",
                     "IsSingleUser",
                     "IsXTPSupported",

@@ -101,7 +101,6 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                     Assert.That(helpLink.Scheme, Is.EqualTo("https"), $"{exception.GetType().AssemblyQualifiedName} HelpLink scheme");
                     Assert.That(helpLink.AbsolutePath, Is.EqualTo("/fwlink"), $"{exception.GetType().AssemblyQualifiedName} HelpLink path");
                     Assert.That(helpLink.Query, Contains.Substring("LinkId=20476"), $"{exception.GetType().AssemblyQualifiedName} HelpLink LinkId");
-                    Assert.That(helpLink.Query, Contains.Substring("ProdName=Microsoft+SQL+Server"), $"{exception.GetType().AssemblyQualifiedName} HelpLink ProdName");
                 }
             }
             else
