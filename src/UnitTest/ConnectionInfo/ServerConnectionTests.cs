@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft.
 // Licensed under the MIT license.
+using System;
 #if MICROSOFTDATA
 using Microsoft.Data.SqlClient;
 #else
@@ -174,6 +175,80 @@ namespace Microsoft.SqlServer.ConnectionInfoUnitTests
             Assert.That(serverConn.DatabaseName, Is.EqualTo("somedatabase"), "ConnectionString property");
             serverConn = new ServerConnection(new SqlConnectionInfo("someserver") { DatabaseName = "somedatabase" });
             Assert.That(serverConn.DatabaseName, Is.EqualTo("somedatabase"), "SqlConnectionInfo");
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_server_information_can_be_overridden_while_disconnected()
+        {
+            var serverConnection = new ServerConnection("someserver")
+            {
+                ServerVersion = new ServerVersion(16, 2, 1234),
+                ProductVersion = new Version(16, 2, 1234, 5),
+                DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
+                Edition = "Nonsense Edition",
+                EditionID = 4294967296L,
+                DatabaseEngineEdition = DatabaseEngineEdition.SqlDatabase,
+                IsFabricServer = true,
+                Collation = "Nonsense_Collation"
+            };
+
+            Assert.That(serverConnection.ServerVersion.ToString(), Is.EqualTo("16.2.1234"), "Unexpected ServerVersion");
+            Assert.That(serverConnection.ProductVersion, Is.EqualTo(new Version(16, 2, 1234, 5)), "Unexpected ProductVersion");
+            Assert.That(serverConnection.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Unexpected DatabaseEngineType");
+            Assert.That(serverConnection.Edition, Is.EqualTo("Nonsense Edition"), "Edition override");
+            Assert.That(serverConnection.EditionID, Is.EqualTo(4294967296L), "Unexpected EditionID");
+            Assert.That(serverConnection.DatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.SqlDatabase), "Unexpected DatabaseEngineEdition");
+            Assert.That(serverConnection.IsFabricServer, Is.True, "Unexpected IsFabricServer");
+            Assert.That(serverConnection.Collation, Is.EqualTo("Nonsense_Collation"), "Unexpected Collation");
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_server_information_uses_overrides_in_design_mode()
+        {
+            var serverConnection = new ServerConnection("someserver")
+            {
+                ServerVersion = new ServerVersion(16, 2, 1234),
+                ProductVersion = new Version(16, 2, 1234, 5),
+                DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
+                Edition = "Nonsense Edition",
+                EditionID = 4294967296L,
+                DatabaseEngineEdition = DatabaseEngineEdition.SqlDatabase,
+                IsFabricServer = true,
+                Collation = "Nonsense_Collation"
+            };
+            (serverConnection as ISfcConnection).ForceDisconnected();
+
+            Assert.That(serverConnection.ServerVersion.ToString(), Is.EqualTo("16.2.1234"), "Unexpected ServerVersion");
+            Assert.That(serverConnection.ProductVersion, Is.EqualTo(new Version(16, 2, 1234, 5)), "Unexpected ProductVersion");
+            Assert.That(serverConnection.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Unexpected DatabaseEngineType");
+            Assert.That(serverConnection.Edition, Is.EqualTo("Nonsense Edition"), "Unexpected Edition");
+            Assert.That(serverConnection.EditionID, Is.EqualTo(4294967296L), "Unexpected EditionID");
+            Assert.That(serverConnection.DatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.SqlDatabase), "Unexpected DatabaseEngineEdition");
+            Assert.That(serverConnection.IsFabricServer, Is.True, "Unexpected IsFabricServer");
+            Assert.That(serverConnection.Collation, Is.EqualTo("Nonsense_Collation"), "Unexpected Collation");
+            Assert.That(serverConnection.HostPlatform, Is.EqualTo(HostPlatformNames.Windows), "Unexpected HostPlatform");
+            Assert.That(serverConnection.ConnectionProtocol, Is.EqualTo(NetworkProtocol.NotSpecified), "Unexpected ConnectionProtocol");
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void ServerConnection_server_information_uses_defaults_in_design_mode()
+        {
+            var serverConnection = new ServerConnection("someserver");
+            (serverConnection as ISfcConnection).ForceDisconnected();
+
+            Assert.That(serverConnection.ServerVersion.ToString(), Is.EqualTo("0.0.0"), "Unexpected ServerVersion");
+            Assert.That(serverConnection.ProductVersion, Is.EqualTo(new Version(0, 0, 0)), "Unexpected ProductVersion");
+            Assert.That(serverConnection.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.Standalone), "Unexpected DatabaseEngineType");
+            Assert.That(serverConnection.Edition, Is.Empty, "Unexpected Edition");
+            Assert.That(serverConnection.EditionID, Is.Zero, "Unexpected EditionID");
+            Assert.That(serverConnection.DatabaseEngineEdition, Is.EqualTo(DatabaseEngineEdition.Unknown), "Unexpected DatabaseEngineEdition");
+            Assert.That(serverConnection.IsFabricServer, Is.False, "Unexpected IsFabricServer");
+            Assert.That(serverConnection.Collation, Is.EqualTo("SQL_Latin1_General_CP1_CI_AS"), "Unexpected Collation");
+            Assert.That(serverConnection.HostPlatform, Is.EqualTo(HostPlatformNames.Windows), "Unexpected HostPlatform");
+            Assert.That(serverConnection.ConnectionProtocol, Is.EqualTo(NetworkProtocol.NotSpecified), "Unexpected ConnectionProtocol");
         }
 
         [TestMethod]

@@ -5707,7 +5707,9 @@ SortedList list = new SortedList();
                         ServerInformation si = new ServerInformation(this.ExecutionManager.GetServerVersion(),
                             this.ExecutionManager.GetProductVersion(),
                             this.ExecutionManager.GetDatabaseEngineType(),
-                            this.ExecutionManager.GetDatabaseEngineEdition());
+                            this.ExecutionManager.GetDatabaseEngineEdition(),
+                            edition: this.ExecutionManager.ConnectionContext.Edition,
+                            editionID: this.ExecutionManager.ConnectionContext.EditionID);
                         SqlEnumResult ser = (SqlEnumResult)Enumerator.GetData(si, req);
 
                         StatementBuilder stm = ser.StatementBuilder;

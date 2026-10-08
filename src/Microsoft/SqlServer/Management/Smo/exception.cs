@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using Microsoft.SqlServer.Management.Common;
@@ -49,10 +48,6 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
 
-    internal class SmoExceptionSingleton
-    {
-        internal string prodVer;
-    }
     /// <summary>
     /// The base class for all SMO exception classes.
     /// </summary>
@@ -63,31 +58,25 @@ namespace Microsoft.SqlServer.Management.Smo
         /// Called by the T:Microsoft.SqlServer.Management.Smo.SqlServerManagementException.
         /// Do not call directly.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SmoException()
             : base()
         {
-            Init();
         }
         /// <summary>
         /// Called by the T:Microsoft.SqlServer.Management.Smo.SqlServerManagementException.
         /// Do not call directly.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SmoException(string message)
             : base(message)
         {
-            Init();
         }
         /// <summary>
         /// Called by the T:Microsoft.SqlServer.Management.Smo.SqlServerManagementException.
         /// Do not call directly.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public SmoException(string message, Exception innerException)
             : base(message, innerException)
         {
-            Init();
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
 
@@ -96,43 +85,8 @@ namespace Microsoft.SqlServer.Management.Smo
         {
         }
 #endif
-        private void Init()
-        {
-            Data.Add("HelpLink.ProdVer", ProdVer);
-        }
-
-        static SmoException()
-        {
-            smoExceptionSingleton.prodVer = string.Empty;
-
-            object[] attribs = typeof(SmoException).GetAssembly().GetCustomAttributes(true);
-            if( null != attribs )
-            {
-                foreach( object o in attribs )
-                {
-                    if( o is AssemblyFileVersionAttribute )
-                    {
-                        smoExceptionSingleton.prodVer = ((AssemblyFileVersionAttribute)o).Version;
-                        break;
-                    }
-                }
-            }
-        }
-
-        static readonly SmoExceptionSingleton smoExceptionSingleton = new SmoExceptionSingleton();
-        protected static string ProdVer
-        {
-            get
-            {
-                return smoExceptionSingleton.prodVer;
-            }
-        }
-
         internal protected SmoException SetHelpContext(string resource)
         {
-
-            Data["HelpLink.EvtSrc"] = ("Microsoft.SqlServer.Management.Smo.ExceptionTemplates." + resource);
-
             return this;
         }
 
@@ -144,55 +98,6 @@ namespace Microsoft.SqlServer.Management.Smo
             get
             {
                 return SmoExceptionType.SmoException;
-            }
-        }
-
-        // will output a link to the help web site
-        // http://www.microsoft.com/products/ee/transform.aspx?ProdName=Microsoft%20SQL%20Server&ProdVer=09.00.0000.00&EvtSrc=MSSQLServer&EvtID=15401
-        /// <summary>
-        /// Gets a link as string to the support web site.
-        /// </summary>
-        public override string HelpLink
-        {
-            get
-            {
-                StringBuilder link = new StringBuilder(Globals.INIT_BUFFER_SIZE);
-                link.Append(Data["HelpLink.BaseHelpUrl"] as string);
-                link.Append("?");
-                link.AppendFormat("ProdName={0}", Data["HelpLink.ProdName"] as string);
-
-                if( Data.Contains("HelpLink.ProdVer"))
-                {
-                    link.AppendFormat("&ProdVer={0}", Data["HelpLink.ProdVer"] as string);
-                }
-
-                if ( Data.Contains("HelpLink.EvtSrc"))
-                {
-                    link.AppendFormat("&EvtSrc={0}", Data["HelpLink.EvtSrc"] as string);
-                }
-
-                if ( Data.Contains("HelpLink.EvtData1") )
-                {
-                    link.AppendFormat("&EvtID={0}", Data["HelpLink.EvtData1"] as string);
-                    for( int i = 2; i < 10; i++)
-                    {
-                        if( Data.Contains("HelpLink.EvtData" + i))
-                        {
-                            link.Append("+");
-                            link.Append(Data["HelpLink.EvtData" + i] as string);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                // this needs to be the last one so that it appears at the bottom of the
-                // list of information displayed in the privacy confirmation dialog.
-                link.AppendFormat("&LinkId={0}", Data["HelpLink.LinkId"] as string);
-
-                return link.ToString().Replace(' ', '+');
             }
         }
     }
@@ -404,7 +309,6 @@ namespace Microsoft.SqlServer.Management.Smo
         public WrongPropertyValueException(Property propertyObject) : base()
         {
             this.property = propertyObject;
-            Data["HelpLink.EvtData1"] = propertyObject.Name;
             Init();
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
@@ -521,8 +425,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.propertyName = propertyName;
             this.receivedType = receivedType;
             this.expectedType = expectedType;
-
-            Data["HelpLink.EvtData1"] = propertyName;
         }
 
 #if !NETCOREAPP && !NETSTANDARD2_0
@@ -624,15 +526,11 @@ namespace Microsoft.SqlServer.Management.Smo
         public UnknownPropertyException(string propertyName) : base(string.Empty)
         {
             this.propertyName = propertyName;
-
-            Data["HelpLink.EvtData1"] = propertyName;
         }
 
         internal UnknownPropertyException(string propertyName, string message) : base(message)
         {
             this.propertyName = propertyName;
-
-            Data["HelpLink.EvtData1"] = propertyName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
 
@@ -740,7 +638,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             this.propertyName = propertyName;
             Init();
-            Data["HelpLink.EvtData1"] = propertyName;
         }
 
 #if !NETCOREAPP && !NETSTANDARD2_0
@@ -843,8 +740,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.objectKind = objectKind;
             this.objectName = objectName;
             this.reason = reason;
-            Data["HelpLink.EvtData1"] = propertyName;
-
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
 
@@ -949,8 +844,6 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             this.opName = opName;
             this.state = state;
-
-            Data["HelpLink.EvtData1"] = opName;
         }
 
 #if !NETCOREAPP && !NETSTANDARD2_0
@@ -1323,7 +1216,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.propertyName = propertyName;
             this.failedObject = failedObject;
             Init();
-            Data["HelpLink.EvtData1"] = propertyName;
         }
 
         internal PropertyCannotBeRetrievedException(string propertyName, object failedObject, string reason) : base()
@@ -1332,7 +1224,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.failedObject = failedObject;
             this.reason = reason;
             Init();
-            Data["HelpLink.EvtData1"] = propertyName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
 
@@ -1541,11 +1432,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.failedObject = failedObject;
 
             SetHelpContext("FailedOperationExceptionText");
-            Data.Add("HelpLink.EvtData1", operation);
-            if( null != failedObject )
-            {
-                Data.Add("HelpLink.EvtData2", failedObject.GetType().Name);
-            }
         }
 
         /// <summary>
@@ -1561,11 +1447,6 @@ namespace Microsoft.SqlServer.Management.Smo
             this.reason = reason;
 
             SetHelpContext("FailedOperationExceptionText");
-            Data.Add("HelpLink.EvtData1", operation);
-            if( null != failedObject )
-            {
-                Data.Add("HelpLink.EvtData2", failedObject.GetType().Name);
-            }
         }
         /// <summary>
         /// Gets the type of exeption from the

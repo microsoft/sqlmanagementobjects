@@ -31,7 +31,25 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="dt"></param>
         /// <param name="databaseEngineEdition"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition)
-            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, isFabricServer: false, collation: string.Empty)
+            : this(sv, productVersion, dt, databaseEngineEdition, edition: string.Empty, editionID: 0)
+        {
+
+        }
+
+        /// <summary>
+        /// Constructs a new ServerInformation object with the given values and HostPlatform of Windows
+        /// Use this constructor only when the real value of the host platform isn't needed
+        /// </summary>
+        /// <param name="sv"></param>
+        /// <param name="productVersion"></param>
+        /// <param name="dt"></param>
+        /// <param name="databaseEngineEdition"></param>
+        /// <param name="edition"></param>
+        /// <param name="editionID"></param>
+        public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition,
+            string edition, long editionID)
+            : this(sv, productVersion, dt, databaseEngineEdition, HostPlatformNames.Windows, NetworkProtocol.NotSpecified,
+                  isFabricServer: false, collation: string.Empty, edition: edition, editionID: editionID)
         {
 
         }
@@ -49,6 +67,27 @@ namespace Microsoft.SqlServer.Management.Common
         /// <param name="collation"></param>
         public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition,
             string hostPlatform, NetworkProtocol connectionProtocol, bool isFabricServer, string collation)
+            : this(sv, productVersion, dt, databaseEngineEdition, hostPlatform, connectionProtocol, isFabricServer, collation,
+                  edition: string.Empty, editionID: 0)
+        {
+
+        }
+
+        /// <summary>
+        /// Constructs a new ServerInformation object with the given values
+        /// </summary>
+        /// <param name="sv"></param>
+        /// <param name="productVersion"></param>
+        /// <param name="dt"></param>
+        /// <param name="databaseEngineEdition"></param>
+        /// <param name="hostPlatform"></param>
+        /// <param name="connectionProtocol">net_transport value from dm_exec_connections for the current spid</param>
+        /// <param name="isFabricServer"></param>
+        /// <param name="collation"></param>
+        /// <param name="edition"></param>
+        /// <param name="editionID"></param>
+        public ServerInformation(ServerVersion sv, Version productVersion, DatabaseEngineType dt, DatabaseEngineEdition databaseEngineEdition,
+            string hostPlatform, NetworkProtocol connectionProtocol, bool isFabricServer, string collation, string edition, long editionID)
         {
             ServerVersion = sv;
             ProductVersion = productVersion;
@@ -58,6 +97,8 @@ namespace Microsoft.SqlServer.Management.Common
             ConnectionProtocol = connectionProtocol;
             IsFabricServer = isFabricServer;
             Collation = collation;
+            Edition = edition;
+            EditionID = editionID;
         }
 
         /// <summary>
@@ -80,6 +121,16 @@ namespace Microsoft.SqlServer.Management.Common
         /// The DatabaseEngineType of the connection as given by SERVERPROPERTY('EDITION')
         /// </summary>
         public DatabaseEngineType DatabaseEngineType { get; }
+
+        /// <summary>
+        /// The edition of the connection as given by SERVERPROPERTY('Edition')
+        /// </summary>
+        public string Edition { get; }
+
+        /// <summary>
+        /// The edition identifier of the connection as given by SERVERPROPERTY('EditionID')
+        /// </summary>
+        public long EditionID { get; }
 
         /// <summary>
         /// The DatabaseEngineEdition of the connection as given by SERVERPROPERTY('EngineEdition')
@@ -108,7 +159,7 @@ namespace Microsoft.SqlServer.Management.Common
         // this query needs to be safe on all platforms. DW and Sql2005 don't support CONNECTIONPROPERTY
         // Declared as a single line with explicit \r\n so the text is identical regardless of how this
         // source file's own line endings were checked out or which OS is running.
-        private const string serverVersionQuery = "DECLARE @edition sysname;\r\nSET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);\r\nSELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',\r\nSERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,\r\nSERVERPROPERTY('ProductVersion') AS ProductVersion,\r\n@@MICROSOFTVERSION AS MicrosoftVersion,\r\ncase when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,\r\nconvert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;\r\n";
+    private const string serverVersionQuery = "DECLARE @edition sysname;\r\nSET @edition = cast(SERVERPROPERTY(N'EDITION') as sysname);\r\nSELECT case when @edition = N'SQL Azure' then 2 else 1 end as 'DatabaseEngineType',\r\n@edition AS Edition,\r\nCONVERT(bigint, SERVERPROPERTY(N'EditionID')) AS EditionID,\r\nSERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition,\r\nSERVERPROPERTY('ProductVersion') AS ProductVersion,\r\n@@MICROSOFTVERSION AS MicrosoftVersion,\r\ncase when serverproperty('EngineEdition') = 12 then 1 when serverproperty('EngineEdition') = 11 and @@version like 'Microsoft Azure SQL Data Warehouse%' then 1 else 0 end as IsFabricServer,\r\nconvert(sysname, SERVERPROPERTY(N'Collation')) AS Collation;\r\n";
         static public ServerInformation GetServerInformation(IDbConnection sqlConnection, IDbDataAdapter dataAdapter, string serverVersionString)
         {
             var serverVersion = ParseStringServerVersion(serverVersionString);
@@ -165,6 +216,8 @@ namespace Microsoft.SqlServer.Management.Common
                 var isFabricServer = Convert.ToBoolean(dataSet.Tables[0].Rows[0]["IsFabricServer"]);
                 var connectionProtocol = dataSet.Tables[2].Rows[0]["ConnectionProtocol"];
                 var collation = Convert.ToString(dataSet.Tables[0].Rows[0]["Collation"]);
+                var serverEdition = Convert.ToString(dataSet.Tables[0].Rows[0]["Edition"]);
+                var serverEditionID = Convert.ToInt64(dataSet.Tables[0].Rows[0]["EditionID"]);
 
                 return new ServerInformation(serverVersion,
                     new Version((string)dataSet.Tables[0].Rows[0]["ProductVersion"]),
@@ -173,7 +226,9 @@ namespace Microsoft.SqlServer.Management.Common
                     (string)dataSet.Tables[1].Rows[0]["host_platform"],
                     connectionProtocol == DBNull.Value ? NetworkProtocol.NotSpecified : ProtocolFromNetTransport((string)connectionProtocol),
                     isFabricServer,
-                    collation
+                    collation,
+                    serverEdition,
+                    serverEditionID
                     );
             }
         }

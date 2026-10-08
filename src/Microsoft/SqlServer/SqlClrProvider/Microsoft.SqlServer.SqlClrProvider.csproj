@@ -11,7 +11,4 @@
     <InternalsVisibleTo Include="Microsoft.SqlServer.Smo" Key="$(RealPublicKey)"/>
     <InternalsVisibleTo Include="Microsoft.SqlServer.SqlEnum" Key="$(RealPublicKey)"/>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
-  </ItemGroup>
 </Project>

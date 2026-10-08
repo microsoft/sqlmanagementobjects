@@ -291,6 +291,46 @@ namespace Microsoft.SqlServer.Management.Common
                 }
             }
         }
+
+        /// <summary>
+        /// Gets or sets the Edition server property of this connection.
+        /// </summary>
+        public string Edition
+        {
+            get { return m_editionOverride ?? GetServerInformation().Edition; }
+            set
+            {
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_editionOverride != value)
+                {
+                    m_editionOverride = value;
+                    m_serverInformation = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the EditionID server property of this connection.
+        /// </summary>
+        public long EditionID
+        {
+            get { return m_editionIDOverride ?? GetServerInformation().EditionID; }
+            set
+            {
+                if (!IsForceDisconnected && IsOpen)
+                {
+                    throw new ConnectionException(StringConnectionInfo.CannotBeSetWhileConnected);
+                }
+                if (m_editionIDOverride != value)
+                {
+                    m_editionIDOverride = value;
+                    m_serverInformation = null;
+                }
+            }
+        }
         
         /// <summary>
         /// The edition of the Database Engine
@@ -443,7 +483,8 @@ namespace Microsoft.SqlServer.Management.Common
                 }
                 else //Not Connected because of Offline/Design Mode.
                 {
-                    m_serverInformation = new ServerInformation(m_serverVersionOverride,new Version(m_serverVersionOverride.Major, m_serverVersionOverride.Minor, m_serverVersionOverride.BuildNumber),  m_databaseEngineTypeOverride ?? DatabaseEngineType.Standalone, m_databaseEngineEditionOverride ?? DatabaseEngineEdition.Unknown, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, m_isFabricServerOverride?? false, m_collationOverride ?? "SQL_Latin1_General_CP1_CI_AS");
+                    var serverVersion = m_serverVersionOverride ?? new ServerVersion(0, 0);
+                    m_serverInformation = new ServerInformation(serverVersion, new Version(serverVersion.Major, serverVersion.Minor, serverVersion.BuildNumber),  m_databaseEngineTypeOverride ?? DatabaseEngineType.Standalone, m_databaseEngineEditionOverride ?? DatabaseEngineEdition.Unknown, HostPlatformNames.Windows, NetworkProtocol.NotSpecified, m_isFabricServerOverride?? false, m_collationOverride ?? "SQL_Latin1_General_CP1_CI_AS", m_editionOverride ?? string.Empty, m_editionIDOverride ?? 0);
                 }
             }
             return m_serverInformation;
@@ -866,7 +907,15 @@ end;";
                     }
                     using (var handle = SafeNativeMethods.GetUserToken(userName, domain, ConnectAsUserPassword))
                     {
-                        await InternalConnectImplAsync(cancellationToken).ConfigureAwait(false);
+#if NETCOREAPP
+                        await WindowsIdentity.RunImpersonatedAsync(
+                            handle,
+                            () => InternalConnectImplAsync(cancellationToken)).ConfigureAwait(false);
+#else
+                        WindowsIdentity.RunImpersonated(
+                            handle,
+                            () => InternalConnectImplAsync(cancellationToken).GetAwaiter().GetResult());
+#endif
                     }
                 }
                 // this catch block is necessary because we want to prevent client exception
@@ -1450,6 +1499,8 @@ end;";
         private DatabaseEngineEdition? m_databaseEngineEditionOverride;
         private bool? m_isFabricServerOverride;
         private string m_collationOverride;
+        private string m_editionOverride;
+        private long? m_editionIDOverride;
 
         public event StatementEventHandler StatementExecuted
         {

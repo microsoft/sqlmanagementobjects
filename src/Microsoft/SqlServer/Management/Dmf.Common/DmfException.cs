@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-using Microsoft.SqlServer.Management.Common;
 using System;
 using System.Reflection;
+using System.Runtime.Serialization;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Dmf.Common;
 #if NETFRAMEWORK
 using System.Diagnostics.CodeAnalysis;
 #endif
-using System.Runtime.Serialization;
 #if NETFRAMEWORK
 using System.Security.Permissions;
 #endif
-using System.Text;
-using Microsoft.SqlServer.Management.Dmf.Common;
 
 namespace Microsoft.SqlServer.Management.Dmf
 {
@@ -128,8 +127,6 @@ namespace Microsoft.SqlServer.Management.Dmf
 
     public class DmfException : SqlServerManagementException
     {
-        const int INIT_BUFFER_SIZE = 1024;
-
         /// <summary>
         /// Base constructor
         /// </summary>
@@ -203,9 +200,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <returns></returns>
         internal protected DmfException SetHelpContext(string resource)
         {
-
-            Data["HelpLink.EvtSrc"] = (resource);
-
             return this;
         }
 
@@ -221,47 +215,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         }
 
 
-        /// <summary>
-        /// will output a link to the help web site
-        /// <!--http://www.microsoft.com/products/ee/transform.aspx?ProdName=Microsoft%20SQL%20Server&ProdVer=09.00.0000.00&EvtSrc=MSSQLServer&EvtID=15401-->
-        /// </summary>
-        public override string HelpLink
-        {
-            get
-            {
-                StringBuilder link = new StringBuilder(INIT_BUFFER_SIZE);
-                link.Append(Data["HelpLink.BaseHelpUrl"] as string);
-                link.Append("?");
-                link.AppendFormat("ProdName={0}", Data["HelpLink.ProdName"] as string);
-
-                if (Data.Contains("HelpLink.ProdVer"))
-                    link.AppendFormat("&ProdVer={0}", Data["HelpLink.ProdVer"] as string);
-
-                if (Data.Contains("HelpLink.EvtSrc"))
-                    link.AppendFormat("&EvtSrc={0}", Data["HelpLink.EvtSrc"] as string);
-
-                if (Data.Contains("HelpLink.EvtData1"))
-                {
-                    link.AppendFormat("&EvtID={0}", Data["HelpLink.EvtData1"] as string);
-                    for (int i = 2; i < 10; i++)
-                    {
-                        if (Data.Contains("HelpLink.EvtData" + i))
-                        {
-                            link.Append("+");
-                            link.Append(Data["HelpLink.EvtData" + i] as string);
-                        }
-                        else
-                            break;
-                    }
-                }
-
-                // this needs to be the last one so that it appears at the bottom of the
-                // list of information displayed in the privacy confirmation dialog.
-                link.AppendFormat("&LinkId={0}", Data["HelpLink.LinkId"] as string);
-
-                return link.ToString().Replace(' ', '+');
-            }
-        }
     }
 
     /// <summary>
@@ -299,7 +252,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base()
         {
             this.assembly = assemblyName;
-            Data["HelpLink.EvtData1"] = assemblyName;
         }
 
 #if !NETCOREAPP && !NETSTANDARD2_0
@@ -538,9 +490,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.operatorName = operatorName;
             this.type = typeName;
-
-            Data["HelpLink.EvtData1"] = operatorName;
-            Data["HelpLink.EvtData2"] = typeName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private OperatorNotApplicableException(SerializationInfo info, StreamingContext context)
@@ -663,8 +612,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.functionName = functionName;
             this.receivedType = receivedType;
             this.expectedType = expectedType;
-
-            Data["HelpLink.EvtData1"] = functionName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionWrongArgumentTypeException(SerializationInfo info, StreamingContext context)
@@ -797,8 +744,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.functionName = functionName;
             this.receivedCount = receivedCount;
             this.expectedCount = expectedCount;
-
-            Data["HelpLink.EvtData1"] = functionName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionWrongArgumentsNumberException(SerializationInfo info, StreamingContext context)
@@ -807,8 +752,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             functionName = info.GetString("functionName");
             receivedCount = info.GetInt32("receivedCount");
             expectedCount = info.GetInt32("expectedCount");
-
-            Data["HelpLink.EvtData1"] = functionName;
         }
 
         /// <summary>
@@ -1035,7 +978,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base()
         {
             this.adapter = adapter;
-            Data["HelpLink.EvtData1"] = adapter;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
@@ -2467,9 +2409,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.nodeType = nodeType;
             this.operand = operand;
-
-            Data["HelpLink.EvtData1"] = nodeType;
-            Data["HelpLink.EvtData2"] = operand;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private InvalidOperandException(SerializationInfo info, StreamingContext context)
@@ -2576,8 +2515,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base()
         {
             this.opType = opType;
-
-            Data["HelpLink.EvtData1"] = opType;
         }
 
 #if !NETCOREAPP && !NETSTANDARD2_0
@@ -2707,8 +2644,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.objectType = objectType;
             this.objectName = objectName;
-
-            Data["HelpLink.EvtData1"] = objectType;
         }
 
         /// <summary>
@@ -2721,8 +2656,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.objectType = objectType;
             this.objectName = objectName;
-
-            Data["HelpLink.EvtData1"] = objectType;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
@@ -2849,8 +2782,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.objectType = objectType;
             this.objectName = objectName;
-
-            Data["HelpLink.EvtData1"] = objectType;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
@@ -2976,8 +2907,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.objectType = objectType;
             this.objectName = objectName;
-
-            Data["HelpLink.EvtData1"] = objectType;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         /// <summary>
@@ -3109,9 +3038,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.name1 = name1;
             this.type2 = type2;
             this.name2 = name2;
-
-            Data["HelpLink.EvtData2"] = type1;
-            Data["HelpLink.EvtData3"] = type2;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private ConflictingPropertyValuesException(SerializationInfo info, StreamingContext context)
@@ -3517,11 +3443,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.failedObjectType = failedObjectType;
 
             SetHelpContext("FailedOperationExceptionText");
-            Data.Add("HelpLink.EvtData1", operation);
-            if (null != failedObjectType)
-            {
-                Data.Add("HelpLink.EvtData2", failedObjectType);
-            }
         }
 
         string operation = string.Empty;
@@ -3976,8 +3897,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.functionName = functionName;
             this.targetType = targetType;
-
-            Data["HelpLink.EvtData1"] = functionName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionNotASmoObjectException(SerializationInfo info, StreamingContext context)
@@ -4176,8 +4095,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.functionName = functionName;
             this.receivedType = receivedType;
             this.expectedType = expectedType;
-
-            Data["HelpLink.EvtData1"] = functionName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private FunctionWrongReturnTypeException(SerializationInfo info, StreamingContext context)
@@ -4461,10 +4378,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.propertyName = propertyName;
             this.maxLength = maxLength;
             this.currentLength = currentLength;
-
-            Data["HelpLink.EvtData1"] = propertyName;
-            Data["HelpLink.EvtData2"] = maxLength;
-            Data["HelpLink.EvtData3"] = currentLength;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private StringPropertyTooLongException(SerializationInfo info, StreamingContext context)
@@ -4589,9 +4502,6 @@ namespace Microsoft.SqlServer.Management.Dmf
         {
             this.objectSetName = objectSetName;
             this.facetName = facetName;
-
-            Data["HelpLink.EvtData1"] = objectSetName;
-            Data["HelpLink.EvtData2"] = facetName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private TargetSetCountMismatchException(SerializationInfo info, StreamingContext context)
@@ -4698,10 +4608,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.targetSetSkeleton = targetSetSkeleton;
             this.objectSetName = objectSetName;
             this.facetName = facetName;
-
-            Data["HelpLink.EvtData1"] = targetSetSkeleton;
-            Data["HelpLink.EvtData2"] = objectSetName;
-            Data["HelpLink.EvtData3"] = facetName;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private UnsupportedTargetSetForFacetException(SerializationInfo info, StreamingContext context)
@@ -4791,8 +4697,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             : base()
         {
             this.objectSetName = objectSetName;
-
-            Data["HelpLink.EvtData1"] = objectSetName;
         }
 
         /// <summary>
@@ -4954,10 +4858,6 @@ namespace Microsoft.SqlServer.Management.Dmf
             this.propertyName = propertyName;
             this.configValue = configValue;
             this.runValue = runValue;
-
-            Data["HelpLink.EvtData1"] = propertyName;
-            Data["HelpLink.EvtData2"] = configValue;
-            Data["HelpLink.EvtData3"] = runValue;
         }
 #if !NETCOREAPP && !NETSTANDARD2_0
         private RestartPendingException(SerializationInfo info, StreamingContext context)

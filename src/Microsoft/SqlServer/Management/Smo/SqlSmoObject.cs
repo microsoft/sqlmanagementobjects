@@ -3687,7 +3687,9 @@ namespace Microsoft.SqlServer.Management.Smo
                     hostPlatform: server == null ? HostPlatformNames.Windows : server.HostPlatform,
                     connectionProtocol: ExecutionManager.GetConnectionProtocol(),
                     isFabricServer: ExecutionManager.IsFabricConnection,
-                    collation: ExecutionManager.ConnectionContext.Collation);
+                    collation: ExecutionManager.ConnectionContext.Collation,
+                    edition: ExecutionManager.ConnectionContext.Edition,
+                    editionID: ExecutionManager.ConnectionContext.EditionID);
             }
         }
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 
 namespace Microsoft.SqlServer.Management.HadrModel
@@ -97,7 +98,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="taskDelegate">optional delegate used to override the provider implementation</param>
         public void Perform(IExecutionPolicy policy, CancellationToken token = default(CancellationToken), ScenarioTaskHandler taskDelegate = null)
         {
-            Exception exception = null;
+            ExceptionDispatchInfo exceptionDispatchInfo = null;
 
             this.token = token;
 
@@ -130,7 +131,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
                         if (policy.Expired)
                         {
                             this.UpdateStatus(new TaskEventArgs(this.Name, Resource.FormatTaskEventArgsTaskExecutionFailed(ex.Message)));
-                            exception = ex;
+                            exceptionDispatchInfo = ExceptionDispatchInfo.Capture(ex);
                             break;
                         }
                         else
@@ -142,9 +143,9 @@ namespace Microsoft.SqlServer.Management.HadrModel
                     }
                 }
 
-                if (exception != null)
+                if (exceptionDispatchInfo != null)
                 {
-                    throw exception;
+                    exceptionDispatchInfo.Throw();
                 }
                 else
                 {
@@ -161,7 +162,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
         /// <param name="rollbackDelegate">optional delegate used to override the provider implementation</param>
         public void Rollback(IExecutionPolicy policy, ScenarioTaskHandler rollbackDelegate = null)
         {
-            Exception exception = null;
+            ExceptionDispatchInfo exceptionDispatchInfo = null;
 
             if (policy == null)
             {
@@ -186,7 +187,7 @@ namespace Microsoft.SqlServer.Management.HadrModel
                         if (policy.Expired)
                         {
                             this.UpdateStatus(new TaskEventArgs(this.Name, Resource.FormatTaskEventArgsTaskExecutionFailed(ex.Message)));
-                            exception = ex;
+                            exceptionDispatchInfo = ExceptionDispatchInfo.Capture(ex);
                             break;
                         }
                         else
@@ -198,9 +199,9 @@ namespace Microsoft.SqlServer.Management.HadrModel
                     }
                 }
 
-                if (exception != null)
+                if (exceptionDispatchInfo != null)
                 {
-                    throw exception;
+                    exceptionDispatchInfo.Throw();
                 }
                 else
                 {

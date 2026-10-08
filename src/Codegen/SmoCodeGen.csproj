@@ -138,7 +138,6 @@
   <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
     <Compile Include="$(SqlClrSrc)\FxCopExclusions.cs" />
     <Compile Include="$(SqlClrSrc)\SqlClrProvider.cs" />
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
     <ProjectReference Include="$(BatchParserSrc)\Microsoft.Data.Tools.Sql.BatchParser.csproj" />

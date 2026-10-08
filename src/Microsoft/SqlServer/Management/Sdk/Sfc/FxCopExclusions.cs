@@ -4,7 +4,6 @@
 using System.Diagnostics.CodeAnalysis;
 
 [module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "type", Target = "Microsoft.SqlServer.Management.Sdk.Sfc.ISfcRenamable")]
-[module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "member", Target = "Microsoft.SqlServer.Management.Sdk.Sfc.SfcException.ProdVer", MessageId = "Ver")]
 [module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Scope = "member", Target = "Microsoft.SqlServer.Management.Sdk.Sfc.SfcSecureString.EscapeSquote(System.String):System.String")]
 [module: SuppressMessage("Microsoft.Usage", "CA2209:AssembliesShouldDeclareMinimumSecurity")]
 [module: SuppressMessage("Microsoft.Design", "CA1014:MarkAssembliesWithClsCompliant")]

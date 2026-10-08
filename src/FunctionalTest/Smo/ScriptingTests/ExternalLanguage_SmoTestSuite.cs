@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
@@ -19,7 +20,6 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
     /// Test suite for testing External Language properties and scripting.
     /// </summary>
     [_VSUT.TestClass]
-    [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
     [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlManagedInstance, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabaseEdge)]
     public class ExternalLanguage_SmoTestSuite : SmoObjectTestBase
     {
@@ -99,6 +99,12 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         private static readonly string ExternalLanguagePrefix = "ExternalLanguage";
 
+        /// <summary>
+        /// Trace flag for the engine's ExtensibilityFirstPartyLangRegistration feature switch, which
+        /// controls whether sys.external_languages surfaces the first-party languages.
+        /// </summary>
+        private const int FirstPartyLanguageRegistrationTraceFlag = 10776;
+
         #endregion // Static Vars
 
         #region Database Test Helpers
@@ -126,6 +132,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// to Existing once the ExternalLanguage object is created.
         /// </summary>
         [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         public void ExternalLanguage_Can_Enumerate_ExternalLanguage_and_ExternalLanguageFile_Properties()
         {
             this.ExecuteFromDbPool(
@@ -146,12 +153,130 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         }
 
         /// <summary>
+        /// Guards the non-system branch of IsSystemObject so user languages stay scriptable after the
+        /// 18.0.248+ expression started reading the is_system_language column.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
+        public void ExternalLanguage_UserLanguage_IsNotSystemObject()
+        {
+            this.ExecuteFromDbPool(
+                "ExternalLanguageIsSystemObject",
+                db =>
+                {
+                    string languageName = $"MyLanguage{Guid.NewGuid()}";
+                    _SMO.ExternalLanguage el = new _SMO.ExternalLanguage(db, languageName);
+                    el.AddFile(FileNameForDummyLang1, contentFromBinary: DummyContent_1);
+                    el.Create();
+
+                    // IsSystemObject is Read-only, so re-read to exercise the enumerator query.
+                    db.ExternalLanguages.Refresh();
+                    _SMO.ExternalLanguage refreshed = db.ExternalLanguages[languageName];
+                    Assert.That(refreshed, Is.Not.Null, "User-created external language should be enumerated.");
+                    Assert.That(refreshed.IsSystemObject, Is.False,
+                        "A user-created external language must not be flagged as a system object.");
+                });
+        }
+
+        /// <summary>
+        /// Guards the legacy name-based branch of IsSystemObject, which flags 'R' and 'Python' on every
+        /// supported version. It does not cover the SQL 18.0.248+ is_system_language column; that branch is
+        /// covered by <see cref="ExternalLanguage_FirstPartySystemLanguage_IsSystemObject"/>.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
+        public void ExternalLanguage_SystemLanguage_IsSystemObject()
+        {
+            this.ExecuteFromDbPool(
+                "ExternalLanguageSystemObject",
+                db =>
+                {
+                    const string systemLanguageName = "R";
+
+                    // Never drop a pre-existing 'R': on 18+ it may be engine-managed. Seed one only if absent.
+                    db.ExternalLanguages.Refresh();
+                    if (db.ExternalLanguages[systemLanguageName] == null)
+                    {
+                        _SMO.ExternalLanguage el = new _SMO.ExternalLanguage(db, systemLanguageName);
+                        el.AddFile(FileNameForDummyLang1, contentFromBinary: DummyContent_1);
+                        el.Create();
+
+                        // IsSystemObject is Read-only, so re-read to exercise the enumerator query.
+                        db.ExternalLanguages.Refresh();
+                    }
+
+                    _SMO.ExternalLanguage refreshed = db.ExternalLanguages[systemLanguageName];
+                    Assert.That(refreshed, Is.Not.Null, "The 'R' external language should be enumerated.");
+                    Assert.That(refreshed.IsSystemObject, Is.True,
+                        "An external language named 'R' must be flagged as a system object.");
+                });
+        }
+
+        /// <summary>
+        /// Guards the SQL 18.0.248+ is_system_language branch of IsSystemObject against a first-party language
+        /// such as '##MS_Fp_Demo##', which the name-based check does not match. Those rows only exist while
+        /// the engine's first-party language registration is on, so the trace flag is enabled for the test.
+        /// </summary>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 18, MinBuild = 248)]
+        public void ExternalLanguage_FirstPartySystemLanguage_IsSystemObject()
+        {
+            this.ExecuteFromDbPool(
+                "ExternalLanguageFirstPartySystemObject",
+                db =>
+                {
+                    _SMO.Server server = db.Parent;
+
+                    // The feature switch follows global trace flag changes at runtime, so the first-party
+                    // languages appear without restarting the server.
+                    bool enabledTraceFlag = false;
+                    if (!server.IsTraceFlagOn(FirstPartyLanguageRegistrationTraceFlag, true))
+                    {
+                        server.ExecutionManager.ExecuteNonQuery($"DBCC TRACEON ({FirstPartyLanguageRegistrationTraceFlag}, -1)");
+                        enabledTraceFlag = true;
+                    }
+
+                    try
+                    {
+                        DataSet firstPartyLanguages = db.ExecuteWithResults(
+                            "SELECT language FROM sys.external_languages WHERE is_system_language = 1 AND language NOT IN ('R','Python')");
+                        DataTable firstPartyTable = firstPartyLanguages.Tables[0];
+
+                        if (firstPartyTable.Rows.Count == 0)
+                        {
+                            // Assert.Ignore is surfaced as a failure by the db pool runner, so trace and skip.
+                            TraceHelper.TraceInformation("The engine does not register first-party external languages; skipping the is_system_language assertion.");
+                            return;
+                        }
+
+                        string languageName = (string)firstPartyTable.Rows[0]["language"];
+
+                        // IsSystemObject is Read-only, so re-read to exercise the enumerator query.
+                        db.ExternalLanguages.Refresh();
+                        _SMO.ExternalLanguage firstPartyLanguage = db.ExternalLanguages[languageName];
+                        Assert.That(firstPartyLanguage, Is.Not.Null,
+                            $"The first-party external language '{languageName}' should be enumerated.");
+                        Assert.That(firstPartyLanguage.IsSystemObject, Is.True,
+                            $"The first-party external language '{languageName}' must be flagged as a system object.");
+                    }
+                    finally
+                    {
+                        if (enabledTraceFlag)
+                        {
+                            server.ExecutionManager.ExecuteNonQuery($"DBCC TRACEOFF ({FirstPartyLanguageRegistrationTraceFlag}, -1)");
+                        }
+                    }
+                });
+        }
+
+        /// <summary>
         /// This is a regression tests to make sure that scripting of an ExternalLanguage
         /// works when the ContentType is Binary. It validates the scripting both after
         /// a Create() and an Alter(), so in a way it augments the scripting baseline test
         /// we already have (VerifyBaseline_*).
         /// </summary>
         [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         public void ExternalLanguage_Can_Script_When_ContentType_Is_Binary()
         {
             this.ExecuteFromDbPool(
@@ -198,6 +323,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests creating, altering, and dropping an external language through SMO from binary content.
         /// </summary>
         [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestCategory(SqlTestCategory.Staging)]
         public void ExternalLanguage_TestCreateAlterDropFromBinary()
@@ -214,6 +340,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests creating, altering, and dropping an external language through SMO from file path.
         /// </summary>
         [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestCategory(SqlTestCategory.Staging)]
         public void ExternalLanguage_TestCreateAlterDropFromPath()
@@ -230,6 +357,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// Tests dropping an external language with IF EXISTS option through SMO.
         /// </summary>
         [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 15)]
         [UnsupportedHostPlatform(SqlHostPlatforms.Linux)]
         [SqlTestCategory(SqlTestCategory.Staging)]
         public void SmoDropIfExists_ExternalLanguage()
