@@ -10,15 +10,15 @@ jobs:
   # the build isn't quite Linux-ready
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v4
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+    - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         global-json-file: global.json
     - run: |
         dotnet build dirs.proj
       env:
         DOTNET_ROLL_FORWARD: LatestMajor
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with: 
         name: tests
         path: bin\Debug\net8.0
@@ -29,12 +29,12 @@ jobs:
       matrix:
         sqlImage: ['2022','2019']
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v4
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+    - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         global-json-file: global.json
     - name: Download build files
-      uses: actions/download-artifact@v4.1.7
+      uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
       with: 
         name: tests
         path: tests
@@ -55,7 +55,7 @@ jobs:
       env: 
         DOTNET_ROLL_FORWARD: LatestMajor
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with: 
         name: test-results-${{ matrix.sqlImage }}
         path: TestResults
