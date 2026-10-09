@@ -1369,6 +1369,18 @@ namespace Microsoft.SqlServer.Management.Smo
                     this.ScriptChangeOwner(query, loginName);
 
                     this.ExecutionManager.ExecuteNonQuery(query);
+
+                    if (!this.ExecutionManager.Recording)
+                    {
+                        //The query only propagates the new owner to the server, so the cached
+                        //Owner value is stale now. Invalidate it so it is retrieved from the
+                        //server on next access. We don't store the caller-provided name because
+                        //the server may canonicalize it differently (e.g. different casing on
+                        //a case-insensitive server).
+                        Property owner = this.Properties.Get("Owner");
+                        owner.SetRetrieved(false);
+                        this.propertyBagState = PropertyBagState.Lazy;
+                    }
                 }
             }
             catch (Exception e)

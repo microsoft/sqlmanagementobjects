@@ -1190,8 +1190,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     {
 
                         database.SetOwner(login.Name);
+                        Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database should reflect the new owner immediately after calling SetOwner, without needing Refresh");
                         database.Refresh();
                         Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database was not changed to '{0}' after calling SetOwner");
+
+                        if (!database.Parent.Information.IsCaseSensitive)
+                        {
+                            //The server resolves the login case-insensitively and keeps its own spelling,
+                            //so Owner has to return the stored name and not the casing passed to SetOwner
+                            database.SetOwner(login.Name.ToUpperInvariant());
+                            Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database should return the login name as stored on the server, not the casing passed to SetOwner");
+                        }
                     }
                     finally
                     {
@@ -1227,6 +1236,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                     try
                     {
                         database.SetOwner(login.Name, dropExistingUser: true);
+                        Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database should reflect the new owner immediately after calling SetOwner, without needing Refresh");
                         database.Refresh();
                         Assert.That(database.Owner, Is.EqualTo(login.Name), "Owner of database was not changed to '{0}' after calling SetOwner");
                     }
