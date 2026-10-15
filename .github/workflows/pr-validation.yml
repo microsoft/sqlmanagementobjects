@@ -18,6 +18,8 @@ jobs:
         dotnet build dirs.proj
       env:
         DOTNET_ROLL_FORWARD: LatestMajor
+        # NuGet package vulnerability errors should not block PR validation.
+        WarningsNotAsErrors: NU1901;NU1902;NU1903;NU1904
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with: 
         name: tests
