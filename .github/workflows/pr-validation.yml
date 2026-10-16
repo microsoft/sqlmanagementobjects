@@ -5,12 +5,17 @@ on:
     branches:
     - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
   # the build isn't quite Linux-ready
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+      with:
+        persist-credentials: false
     - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         global-json-file: global.json
@@ -30,6 +35,8 @@ jobs:
         sqlImage: ['2022','2019']
     steps:
     - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+      with:
+        persist-credentials: false
     - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         global-json-file: global.json
