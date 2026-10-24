@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<EnumObject type="RemovableDrive" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings main_table="#fixdrv">
+		<prefix>
+create table #fixdrv ( Name sysname NOT NULL, Size int NOT NULL ) insert #fixdrv EXECUTE master.dbo.xp_fixeddrives 2
+update #fixdrv set Name = Name + ':'
+		</prefix>
+		<postfix> drop table #fixdrv</postfix>
+	</settings>
+	<properties>
+		<property name="Name" type="sysname" access="Read">Name</property>
+		<property name="Size" type="int" access="Read">Size</property>
+	</properties>
+</EnumObject>

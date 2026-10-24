@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="ComputedText" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ColumnID" />
+			<link parent="ParentID" local="TableID" />
+		</parent_link>
+		<property_link table='dbo.syscomments comt' />
+	</settings>
+	<properties>
+		<property name="ID" type="int" access="Read" cast='true'>comt.colid</property>
+		<property name="Text" type="varchar" size='8000' access="Read">comt.text</property>
+		<property name="ObjectIdentifier" type="nvarchar" size='300' 
+			access="Read">cast(comt.id as nvarchar(20)) + N'_' + cast(comt.number as nvarchar(20)) + N'_' + cast(db_id() as nvarchar(20)) + N'_0'</property>		
+		<property name="TableID" type="int" access="Read" hidden='true'>comt.id</property>
+		<property name="ColumnID" type="int" access="Read" hidden='true'>comt.number</property>
+	</properties>
+</EnumObject>

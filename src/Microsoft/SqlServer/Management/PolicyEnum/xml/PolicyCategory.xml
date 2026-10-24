@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<EnumObject type="PolicyCategory" impl_type="PolicyObject" min_major='10'>
+	<settings>
+		<property_link table='msdb.dbo.syspolicy_policy_categories' alias='pc'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='ID' type='int' access='Read'>pc.policy_category_id</property>
+		<property name='Name' type='sysname'>pc.name</property>
+		<property name='MandateDatabaseSubscriptions' type='bit'>pc.mandate_database_subscriptions</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="Microsoft\dirs.proj" />
+    <ProjectReference Include="UnitTest\dirs.proj" />
+    <ProjectReference Include="FunctionalTest\dirs.proj" />
+  </ItemGroup>
+</Project>

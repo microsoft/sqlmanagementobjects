@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<EnumObject type="IndexedJsonPath" impl_type="SqlObject" min_major='17' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings >
+    <parent_link>
+      <link parent="ID" local="IndexID" />
+      <link parent="ParentID" local="TableID" />
+    </parent_link>
+  
+    <property_link fields="#Path#TableID#IndexID#" table = "#jsonindexpaths as jip" />
+    <prefix fields='#Path#TableID#IndexID#'>
+      create table #jsonindexpaths (object_id int, index_id int, path varchar(8000) COLLATE Latin1_General_100_BIN2_UTF8);
+      begin try
+        exec sp_executesql N'
+        insert into #jsonindexpaths (object_id, index_id, path)
+        select object_id, index_id, path
+        from sys.json_index_paths'
+      end try
+      begin catch
+      end catch
+    </prefix>
+    <postfix fields='#Path#TableID#IndexID#'>
+      drop table #jsonindexpaths
+    </postfix>
+  </settings>
+  <properties>
+      <property name="TableID" type="int" hidden='true'>ISNULL(jip.object_id, 0)</property>
+      <property name="IndexID" type="int" hidden='true'>ISNULL(jip.index_id, 0)</property>
+      <property name="Path" type="varchar" size='8000' read_only_after_creation="true">ISNULL(jip.path, '')</property>
+  </properties>
+</EnumObject>

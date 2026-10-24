@@ -1,0 +1,794 @@
+<?xml version='1.0' ?>
+<EnumObject type='backupset' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table='#backupset AS btmp' />
+    <property_link join='msdb.dbo.backupset AS bkps'>bkps.backup_set_id = btmp.backup_set_id</property_link>
+    <version min_major='10'>
+      <prefix>
+        declare @server_name nvarchar(512)
+        set @server_name = cast(serverproperty(N'Servername') as nvarchar(512))
+      </prefix>
+    </version>
+
+    <version min_major='10' >
+      <prefix>
+        DECLARE
+        @first_full_backupset_id      INTEGER,
+        @first_full_backup_startdate  DATETIME,
+        @count_entries					INTEGER,
+        @in_restore_plan				BIT,
+        @last_backupset_type			CHAR(1),
+        @last_backupset_id				INTEGER,
+        @last_backupset_family_guid		UNIQUEIDENTIFIER,
+        @last_backupset_diff_base_guid	UNIQUEIDENTIFIER,
+        @last_backupset_recovery_fork_guid	UNIQUEIDENTIFIER,
+        @full_backupset_id				INTEGER,
+        @full_backupset_start_date		DATETIME,
+        @full_backupset_recovery_fork_guid	UNIQUEIDENTIFIER,
+
+
+        @loop_var						BIT,
+        @loop_backup_set_id				INTEGER,
+        @loop_start_date				DATETIME,
+        @count_unique_fork_guid INTEGER,
+
+        @t1_backup_set_id				INTEGER,
+        @t1_type						CHAR(1),
+        @t1_backup_start_date			DATETIME,
+        @t1_first_recovery_fork_guid	UNIQUEIDENTIFIER,
+        @t1_last_recovery_fork_guid		UNIQUEIDENTIFIER,
+        @t1_first_lsn					NUMERIC(25, 0),
+        @t1_last_lsn					NUMERIC(25, 0),
+        @t1_checkpoint_lsn				NUMERIC(25, 0),
+        @t1_database_backup_lsn			NUMERIC(25, 0),
+        @t1_fork_point_lsn				NUMERIC(25, 0),
+        @t1_backup_set_uuid				UNIQUEIDENTIFIER,
+        @t1_database_guid				UNIQUEIDENTIFIER,
+        @t1_diff_base_guid				UNIQUEIDENTIFIER,
+
+        @t2_backup_set_id				INTEGER,
+        @t2_type						CHAR(1),
+        @t2_backup_start_date			DATETIME,
+        @t2_first_recovery_fork_guid	UNIQUEIDENTIFIER,
+        @t2_last_recovery_fork_guid		UNIQUEIDENTIFIER,
+        @t2_first_lsn					NUMERIC(25, 0),
+        @t2_last_lsn					NUMERIC(25, 0),
+        @t2_checkpoint_lsn				NUMERIC(25, 0),
+        @t2_database_backup_lsn			NUMERIC(25, 0),
+        @t2_fork_point_lsn				NUMERIC(25, 0),
+        @t2_backup_set_uuid				UNIQUEIDENTIFIER,
+        @t2_database_guid				UNIQUEIDENTIFIER,
+        @t2_diff_base_guid				UNIQUEIDENTIFIER
+
+
+        CREATE TABLE #backupset(
+        backup_set_id					INTEGER				NOT NULL,
+        is_in_restore_plan				BIT					NOT NULL,
+        backup_start_date				DATETIME			NOT NULL,
+        type						    CHAR(1)				NOT NULL,
+        database_name				    NVARCHAR(256)		NOT NULL,
+        database_guid				    UNIQUEIDENTIFIER	,
+        family_guid						UNIQUEIDENTIFIER	,
+        first_recovery_fork_guid		UNIQUEIDENTIFIER	,
+        last_recovery_fork_guid			UNIQUEIDENTIFIER	,
+        first_lsn					    NUMERIC(25, 0)		,
+        last_lsn					    NUMERIC(25, 0)		,
+        checkpoint_lsn					NUMERIC(25, 0)		,
+        database_backup_lsn				NUMERIC(25, 0)		,
+        fork_point_lsn					NUMERIC(25, 0)		,
+        restore_till_lsn				NUMERIC(25, 0)		,
+        backup_set_uuid					UNIQUEIDENTIFIER	,
+        differential_base_guid			UNIQUEIDENTIFIER
+        )
+        /**********************************************************************/
+        /* Identify the first                                                 */
+        /**********************************************************************/
+        SELECT @first_full_backupset_id = backupset_outer.backup_set_id
+        ,@first_full_backup_startdate = backupset_outer.backup_start_date
+        FROM msdb.dbo.backupset backupset_outer
+        WHERE backupset_outer.database_name = @db_name
+        AND backupset_outer.server_name = @server_name
+        AND backupset_outer.type = 'D' -- Full Database Backup
+        AND backupset_outer.backup_start_date = (  SELECT MAX(backupset_inner.backup_start_date)
+        FROM msdb.dbo.backupset backupset_inner
+        WHERE backupset_inner.database_name = backupset_outer.database_name
+        AND backupset_inner.server_name = @server_name
+        AND backupset_inner.type = backupset_outer.type
+        AND backupset_inner.backup_start_date &lt;= @restore_to_datetime
+        AND backupset_inner.is_copy_only = 0 )
+        AND backupset_outer.is_copy_only = 0
+        /*******************************************************************************************/
+        /* Find the first full database backup needed in the restore plan and store its attributes */
+        /* in #backupset work table                                                                */
+        /*******************************************************************************************/
+        INSERT #backupset(
+        backup_set_id
+        ,is_in_restore_plan
+        ,backup_start_date
+        ,type
+        ,database_name
+        ,last_recovery_fork_guid
+        )
+        SELECT backup_set_id
+        ,1                   --  The full database backup is always needed for the restore plan
+        ,backup_start_date
+        ,type
+        ,database_name
+        ,last_recovery_fork_guid
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_id = @first_full_backupset_id
+        AND msdb.dbo.backupset.server_name = @server_name
+
+        /***************************************************************/
+        /* Find the log and differential backups that occurred after   */
+        /* the full backup and store them in #backupset work table     */
+        /***************************************************************/
+        INSERT #backupset(
+        backup_set_id
+        ,is_in_restore_plan
+        ,backup_start_date
+        ,type
+        ,database_name
+        ,last_recovery_fork_guid
+        )
+        SELECT backup_set_id
+        ,0
+        ,backup_start_date
+        ,type
+        ,database_name
+        ,last_recovery_fork_guid
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.database_name = @db_name
+        AND msdb.dbo.backupset.server_name = @server_name
+        AND msdb.dbo.backupset.type IN ('I', 'L')  -- Differential, Log backups
+        AND msdb.dbo.backupset.backup_start_date &gt;= @first_full_backup_startdate
+
+        /**********************************************************************************/
+        /* identify and mark the backup logs that need to be included in the restore plan */
+        /**********************************************************************************/
+        UPDATE #backupset
+        SET is_in_restore_plan = 1
+        WHERE #backupset.type = 'I'
+        AND #backupset.backup_start_date = (SELECT MAX(backupset_inner.backup_start_date)
+        FROM #backupset backupset_inner
+        WHERE backupset_inner.type = #backupset.type
+        AND backupset_inner.backup_start_date &lt;= @restore_to_datetime)
+
+        /**************************************************************************************/
+        /* Log backups that occurred after the different are always part of the restore plan. */
+        /**************************************************************************************/
+        UPDATE #backupset
+        SET is_in_restore_plan = 1
+        WHERE #backupset.type = 'L'
+        AND #backupset.backup_start_date &lt;= @restore_to_datetime
+        AND #backupset.backup_start_date &gt;= (SELECT backupset_inner.backup_start_date
+        FROM #backupset backupset_inner
+        WHERE backupset_inner.type = 'I'
+        AND backupset_inner.is_in_restore_plan = 1)
+
+        /**************************************************************************************/
+        /* If @restore_to_datetime is greater than the last startdate of the last log backup, */
+        /* include the next log backup in the restore plan                                    */
+        /**************************************************************************************/
+        UPDATE #backupset
+        SET is_in_restore_plan = 1
+        WHERE #backupset.type = 'L'
+        AND #backupset.backup_start_date = (SELECT MIN(backupset_inner.backup_start_date)
+        FROM #backupset backupset_inner
+        WHERE backupset_inner.type = 'L'
+        AND backupset_inner.backup_start_date > @restore_to_datetime
+        AND backupset_inner.is_in_restore_plan = 0)
+
+        /**************************************************************************************/
+        /* If there are no differential backups, all log backups that occurred after the full */
+        /* backup are needed in the restore plan.                                             */
+        /**************************************************************************************/
+        UPDATE #backupset
+        SET is_in_restore_plan = 1
+        WHERE #backupset.type = 'L'
+        AND #backupset.backup_start_date &lt;= @restore_to_datetime
+        AND NOT EXISTS(SELECT *
+        FROM #backupset backupset_inner
+        WHERE backupset_inner.type = 'I')
+
+      </prefix>
+    </version>
+
+    <version min_major='10' >
+      <prefix>
+
+        /**************************************************************************************/
+        /* The above plan is based on backup_start_date which fails in case when the DB is    */
+        /* restored to a previous state i.e forked. In which case we need to base it on lsn   */
+        /* numbers. This forking condition can be checked by matching the                     */
+        /* last_recovery_fork_guid of the backupset if it doesn't match, we need to change    */
+        /* the plan.                                                                          */
+        /**************************************************************************************/
+
+        SELECT @count_unique_fork_guid = COUNT( DISTINCT last_recovery_fork_guid )
+        FROM #backupset
+
+        IF @count_unique_fork_guid &gt; 1
+        BEGIN
+
+        DELETE
+        FROM #backupset
+        /**************************************************************************************/
+        /* First we look for a T-Log backup taken after the given point-in-time to get the    */
+        /* tail log, that can be used to restore to the exact point-in-time.                  */
+        /**************************************************************************************/
+
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.database_name = @db_name
+        AND msdb.dbo.backupset.type IN ('D', 'L')
+        AND msdb.dbo.backupset.backup_start_date &gt;= @restore_to_datetime
+        ORDER BY msdb.dbo.backupset.backup_start_date ASC,
+        msdb.dbo.backupset.last_lsn ASC
+
+        SELECT @last_backupset_type = bset.type
+        FROM #backupset as bset
+
+        IF @last_backupset_type = 'D' --Full
+        BEGIN
+        DELETE FROM #backupset
+        END
+
+        /**********************************************************************/
+        /* If no T-Log backup exits for after the time T, get the last backup */
+        /**********************************************************************/
+
+        SELECT @count_entries = COUNT(bset.backup_set_id)
+        FROM #backupset as bset
+
+        IF @count_entries &lt; 1
+        BEGIN
+
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.database_name = @db_name
+        AND msdb.dbo.backupset.backup_start_date &lt;= @restore_to_datetime
+        ORDER BY msdb.dbo.backupset.backup_start_date DESC,
+        msdb.dbo.backupset.last_lsn DESC
+
+        END
+
+        SELECT @last_backupset_type = bset.type,
+        @last_backupset_id = bset.backup_set_id,
+        @last_backupset_family_guid = bset.family_guid,
+        @last_backupset_diff_base_guid = bset.differential_base_guid,
+        @last_backupset_recovery_fork_guid = bset.last_recovery_fork_guid
+        FROM #backupset as bset
+
+        /**************************************************************************************/
+        /* If the selected backup is Full ('D') return.                                       */
+        /**************************************************************************************/
+
+        IF (@last_backupset_type = 'D')
+        BEGIN
+        GOTO done
+        END
+
+        /**************************************************************************************/
+        /* If the selected backup is Differential('I'),select the Diff-base backup(Full) also */
+        /**************************************************************************************/
+        IF (@last_backupset_type = 'I')
+        BEGIN
+
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_uuid = @last_backupset_diff_base_guid
+        AND msdb.dbo.backupset.family_guid = @last_backupset_family_guid
+
+        GOTO done
+        END
+
+        SELECT @t1_type = bset.type,
+        @t1_backup_set_id = bset.backup_set_id,
+        @t1_backup_set_uuid = bset.backup_set_uuid,
+        @t1_backup_start_date = bset.backup_start_date,
+        @t1_diff_base_guid = bset.differential_base_guid,
+        @t1_last_recovery_fork_guid = bset.last_recovery_fork_guid,
+        @t1_first_recovery_fork_guid = bset.first_recovery_fork_guid,
+        @t1_database_guid = bset.database_guid,
+        @t1_first_lsn = bset.first_lsn,
+        @t1_last_lsn = bset.last_lsn,
+        @t1_checkpoint_lsn = bset.checkpoint_lsn,
+        @t1_database_backup_lsn = bset.database_backup_lsn,
+        @t1_fork_point_lsn = bset.fork_point_lsn
+        FROM #backupset as bset
+
+        SET @loop_backup_set_id = @t1_backup_set_id
+        SET @loop_start_date = @t1_backup_start_date
+
+        /**************************************************************************************/
+        /* This Loop iterates thru the backup with the same family_guid in reverse order and  */
+        /* constructs the T-Log chain, until it finds the compatible Diff or Backup           */
+        /**************************************************************************************/
+        SET @loop_var = 1
+        WHILE ( @loop_var = 1 )
+        BEGIN
+
+        SELECT TOP(1)
+        @t2_backup_set_id = backup_set_id,
+        @t2_backup_set_uuid = backup_set_uuid,
+        @t2_backup_start_date =	backup_start_date,
+        @t2_type = type,
+        @t2_first_recovery_fork_guid = first_recovery_fork_guid,
+        @t2_last_recovery_fork_guid= last_recovery_fork_guid,
+        @t2_database_guid = database_guid,
+        @t2_first_lsn = first_lsn,
+        @t2_last_lsn = last_lsn,
+        @t2_checkpoint_lsn = checkpoint_lsn,
+        @t2_database_backup_lsn = database_backup_lsn,
+        @t2_fork_point_lsn= fork_point_lsn,
+        @t2_diff_base_guid = differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.family_guid = @last_backupset_family_guid
+        AND msdb.dbo.backupset.backup_start_date &lt;= @loop_start_date
+        AND msdb.dbo.backupset.backup_set_id &lt; @loop_backup_set_id
+        ORDER BY msdb.dbo.backupset.backup_start_date DESC,
+        msdb.dbo.backupset.last_lsn DESC,
+        msdb.dbo.backupset.backup_set_id DESC
+
+        IF( @t2_backup_set_id IS NULL OR @t2_backup_set_id = @loop_backup_set_id)
+        BEGIN
+        GOTO done
+        END
+
+        IF( @t1_fork_point_lsn IS NULL )
+        BEGIN
+
+        IF (@t2_type = 'D' AND @t2_database_guid = @t1_database_guid AND @t2_first_lsn = @t1_first_lsn AND  @t2_last_recovery_fork_guid = @t1_first_recovery_fork_guid )
+        BEGIN
+        GOTO AddFullBackup
+        END
+
+        IF (@t2_type = 'I' AND @t2_database_guid = @t1_database_guid AND  @t2_last_recovery_fork_guid = @t1_first_recovery_fork_guid )
+        BEGIN
+        GOTO AddDiffBackup
+        END
+
+        IF (@t2_type = 'L' AND @t2_last_recovery_fork_guid = @t1_first_recovery_fork_guid AND @t2_last_lsn = @t1_first_lsn)
+        BEGIN
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_id = @t2_backup_set_id
+
+        SET	@t1_type = @t2_type
+        SET	@t1_backup_set_id = @t2_backup_set_id
+        SET	@t1_backup_set_uuid = @t2_backup_set_uuid
+        SET	@t1_backup_start_date = @t2_backup_start_date
+        SET	@t1_diff_base_guid = @t2_diff_base_guid
+        SET	@t1_last_recovery_fork_guid = @t2_last_recovery_fork_guid
+        SET	@t1_first_recovery_fork_guid = @t2_first_recovery_fork_guid
+        SET	@t1_database_guid = @t2_database_guid
+        SET	@t1_first_lsn = @t2_first_lsn
+        SET	@t1_last_lsn = @t2_last_lsn
+        SET	@t1_checkpoint_lsn = @t2_checkpoint_lsn
+        SET	@t1_database_backup_lsn = @t2_database_backup_lsn
+        SET	@t1_fork_point_lsn = @t2_fork_point_lsn
+
+        END
+
+        END
+        ELSE
+        BEGIN
+
+        IF (@t2_type = 'D' AND ((@t2_last_recovery_fork_guid = @t1_first_recovery_fork_guid AND @t2_last_lsn &lt;= @t1_fork_point_lsn)
+        OR @t2_last_recovery_fork_guid = @t1_last_recovery_fork_guid AND @t2_last_lsn &gt; @t1_fork_point_lsn AND @t2_last_lsn &lt; @t1_last_lsn))
+        BEGIN
+        GOTO AddFullBackup
+        END
+
+        IF (@t2_type = 'I'
+        AND ((@t2_last_recovery_fork_guid = @t1_first_recovery_fork_guid AND @t2_last_lsn &lt;= @t1_fork_point_lsn)
+        OR @t2_last_recovery_fork_guid = @t1_last_recovery_fork_guid AND @t2_last_lsn &gt; @t1_fork_point_lsn AND @t2_last_lsn &lt; @t1_last_lsn))
+        BEGIN
+        GOTO AddDiffBackup
+        END
+
+        IF (@t2_type = 'L' AND @t2_last_recovery_fork_guid = @t1_first_recovery_fork_guid AND @t2_last_lsn = @t1_first_lsn)
+        BEGIN
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_id = @t2_backup_set_id
+
+        SET	@t1_type = @t2_type
+        SET	@t1_backup_set_id = @t2_backup_set_id
+        SET	@t1_backup_set_uuid = @t2_backup_set_uuid
+        SET	@t1_backup_start_date = @t2_backup_start_date
+        SET	@t1_diff_base_guid = @t2_diff_base_guid
+        SET	@t1_last_recovery_fork_guid = @t2_last_recovery_fork_guid
+        SET	@t1_first_recovery_fork_guid = @t2_first_recovery_fork_guid
+        SET	@t1_database_guid = @t2_database_guid
+        SET	@t1_first_lsn = @t2_first_lsn
+        SET	@t1_last_lsn = @t2_last_lsn
+        SET	@t1_checkpoint_lsn = @t2_checkpoint_lsn
+        SET	@t1_database_backup_lsn = @t2_database_backup_lsn
+        SET	@t1_fork_point_lsn = @t2_fork_point_lsn
+
+        END
+        END
+
+        SET @loop_backup_set_id = @t2_backup_set_id
+        SET @loop_start_date = @t2_backup_start_date
+
+        END
+
+        AddFullBackup:
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_id = @t2_backup_set_id
+        GOTO done
+
+        AddDiffBackup:
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_id = @t2_backup_set_id
+
+        INSERT #backupset(
+        backup_set_id,
+        is_in_restore_plan,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+        )
+        SELECT TOP(1)
+        backup_set_id,
+        1,
+        backup_start_date,
+        type,
+        database_name,
+        database_guid,
+        family_guid,
+        first_recovery_fork_guid,
+        last_recovery_fork_guid,
+        first_lsn,
+        last_lsn,
+        checkpoint_lsn,
+        database_backup_lsn,
+        fork_point_lsn,
+        backup_set_uuid,
+        differential_base_guid
+
+        FROM msdb.dbo.backupset
+        WHERE msdb.dbo.backupset.backup_set_uuid = @t2_diff_base_guid
+        AND msdb.dbo.backupset.family_guid = @last_backupset_family_guid
+
+
+        done:
+
+        SELECT @count_entries = COUNT( bset.backup_set_id )
+        FROM #backupset AS bset
+        WHERE bset.type = 'D'
+
+        /**************************************************************************************/
+        /* If the backupset info in the msdb is incomplete then the restore_plan may be       */
+        /* broken. In those cases just don't return anything.                                 */
+        /**************************************************************************************/
+
+        IF @count_entries &lt; 1
+        BEGIN
+        DELETE
+        FROM #backupset
+        END
+
+
+        END
+
+      </prefix>
+    </version>
+
+
+
+    <postfix>
+      drop table #backupset
+    </postfix>
+  </settings>
+  <properties>
+    <property name='Name' type='nvarchar' size='128'>bkps.name</property>
+    <property name='ID' type='int'>bkps.backup_set_id</property>
+    <property name='IsInRestorePlan' type='int'>btmp.is_in_restore_plan</property>
+    <property name='BackupSetUuid' type='uniqueidentifier'>bkps.backup_set_uuid</property>
+    <property name='MediaSetId' type='int'>bkps.media_set_id</property>
+    <property name='FirstFamilyNumber' type='tinyint'>bkps.first_family_number</property>
+    <property name='FirstMediaNumber' type='smallint'>bkps.first_media_number</property>
+    <property name='LastFamilyNumber' type='tinyint'>bkps.last_family_number</property>
+    <property name='LastMediaNumber' type='smallint'>bkps.last_media_number</property>
+    <property name='CatalogFamilyNumber' type='tinyint'>bkps.catalog_family_number</property>
+    <property name='CatalogMediaNumber' type='smallint'>bkps.catalog_media_number</property>
+    <property name='Position' type='int'>bkps.position</property>
+    <property name='ExpirationDate' type='datetime'>bkps.expiration_date</property>
+    <property name='SoftwareVendorId' type='int'>bkps.software_vendor_id</property>
+    <property name='Description' type='nvarchar' size='255'>bkps.description</property>
+    <property name='UserName' type='nvarchar' size='128'>bkps.user_name</property>
+    <property name='SoftwareMajorVersion' type='tinyint'>bkps.software_major_version</property>
+    <property name='SoftwareMinorVersion' type='tinyint'>bkps.software_minor_version</property>
+    <property name='SoftwareBuildVersion' type='smallint'>bkps.software_build_version</property>
+    <property name='TimeZone' type='smallint'>bkps.time_zone</property>
+    <property name='MtfMinorVersion' type='tinyint'>bkps.mtf_minor_version</property>
+    <property name='FirstLsn' type='numeric' size='13'>bkps.first_lsn</property>
+    <property name='LastLsn' type='numeric' size='13'>bkps.last_lsn</property>
+    <property name='CheckpointLsn' type='numeric' size='13'>bkps.checkpoint_lsn</property>
+    <property name='DatabaseBackupLsn' type='numeric' size='13'>bkps.database_backup_lsn</property>
+    <property name='DatabaseCreationDate' type='datetime'>bkps.database_creation_date</property>
+    <property name='BackupStartDate' type='datetime'>bkps.backup_start_date</property>
+    <property name='BackupFinishDate' type='datetime'>bkps.backup_finish_date</property>
+    <property name='Type' type='char' size='1'>bkps.type</property>
+    <property name='SortOrder' type='smallint'>bkps.sort_order</property>
+    <property name='CodePage' type='smallint'>bkps.code_page</property>
+    <property name='CompatibilityLevel' type='tinyint'>bkps.compatibility_level</property>
+    <property name='DatabaseVersion' type='int'>bkps.database_version</property>
+    <property name='BackupSize' type='numeric' size='13'>bkps.backup_size</property>
+    <property name='DatabaseName' type='nvarchar' size='128'>bkps.database_name</property>
+    <property name='ServerName' type='nvarchar' size='128'>bkps.server_name</property>
+    <property name='MachineName' type='nvarchar' size='128'>bkps.machine_name</property>
+    <version min_major='10'>
+      <property name='Flags' type='int'>bkps.flags</property>
+      <property name='UnicodeLocale' type='int'>bkps.unicode_locale</property>
+      <property name='UnicodeCompareStyle' type='int'>bkps.unicode_compare_style</property>
+      <property name='CollationName' type='nvarchar' size='128'>bkps.collation_name</property>
+    </version>
+    <version min_major='10'>
+      <property name='IsCopyOnly' type='bit'>bkps.is_copy_only</property>
+    </version>
+  </properties>
+</EnumObject>

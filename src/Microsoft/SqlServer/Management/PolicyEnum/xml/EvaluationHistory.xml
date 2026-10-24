@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="EvaluationHistory" impl_type="PolicyObject" min_major='10'>
+  <settings>
+    <parent_link>
+      <link parent="ID" local="PolicyId" />
+    </parent_link>
+    <property_link table='msdb.dbo.syspolicy_policy_execution_history' alias='h'/>
+  </settings>
+  <properties>
+    <include file='inc_urnByID.xml' />
+    <property name='PolicyId' type='int' access='Read'>h.policy_id</property>
+    <property name='ID' type='bigint' access='Read'>h.history_id</property>
+    <property name='StartDate' type='datetime' access='Read'>h.start_date</property>
+    <property name='EndDate' type='datetime' access='Read'>h.end_date</property>
+    <property name='Result' type='bit' access='Read'>h.result</property>
+    <property name='Exception' type='nvarchar' size ='max' access='Read'>ISNULL(h.exception,N'')</property>
+    <property name='PolicyName' type='sysname' access='Read'>pp.name</property>
+  </properties>
+</EnumObject>

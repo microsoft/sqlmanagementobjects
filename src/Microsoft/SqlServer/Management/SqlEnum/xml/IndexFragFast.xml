@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<EnumObject type="FragmentationFast" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+
+		</settings>
+
+	<properties>
+		<include file='inc_IndexFrag.xml' />
+		<version min_major='10'>
+			<property name="FragmentationLevel" type="sysname" hidden='true'>LIMITED</property>
+		</version>
+	</properties>
+</EnumObject>

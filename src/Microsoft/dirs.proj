@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="**\*.csproj" />
+    <!-- SqlClrProvider doesn't build for all platforms, let it get pulled in as needed-->
+    <ProjectReference Remove="**\Microsoft.SqlServer.SqlClrProvider.csproj" />
+  </ItemGroup>
+</Project>

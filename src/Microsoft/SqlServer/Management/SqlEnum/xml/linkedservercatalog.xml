@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<EnumObject type="LinkedServerCatalog" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <!-- 
+          Logic: For getting a value from the parent
+          1)Expose a hidden property called Servername
+          2)Get the Servername from the parent query ({0})
+          3)Insert the Servername into #tmp_sp_catalogs 
+        -->
+        <parent_link>
+            <link parent="Name" local="ServerName" />
+        </parent_link>
+        <request_parent_select>
+            <field name='Name' />
+            <field name='ProductName' />
+            <field name='ProviderName' />
+        </request_parent_select>
+        <property_link table="#tmp_sp_catalogs" alias="tsc" />
+        <!-- 
+          1) Check whether the catalog support exist or not for this provider
+          2) If catalog support is not exist then return default as the catalog name and set IsCatalogSupport to "0"
+          3) For sql servers IsSysObject should be set to 1 if catalog is in ('master','model','msdb','tempdb')
+        -->
+        <version min_major='10'>
+            <prefix>
+                <link_multiple no='1' expression="
+                create table #tmp_sp_catalogs (is_catalog_support bit null,server_name nvarchar(128) null, product_name nvarchar(128) null,provider_name nvarchar(128) null,catalog_name nvarchar(128) null, description nvarchar(4000) null)
+                declare @ServerName sysname
+                declare @ProductName sysname
+                        declare @ProviderName sysname
+                declare crs cursor local fast_forward
+                for ( {0} ) 
+                open crs 
+                fetch crs into @ServerName,@ProductName,@ProviderName
+                while @@fetch_status &gt;= 0 
+                begin
+                create table #tmp_catalog_exist_test (id int null,description sysname null,flags varchar null)
+                        DECLARE @IsCatalogSupport bit  
+                if (UPPER(@ProviderName) like 'SQLNCLI%' or UPPER(@ProviderName) like 'MSOLEDBSQL%' ) 
+                          begin  
+                   set @IsCatalogSupport = 1
+                end
+                else
+                begin
+                    insert into #tmp_catalog_exist_test(id,description,flags) EXEC master.dbo.xp_prop_oledb_provider @ProviderName
+                    select @IsCatalogSupport = count(*) from #tmp_catalog_exist_test  where id = 233  
+                end 
+          if (@IsCatalogSupport = 0)
+                    begin
+                    insert into #tmp_sp_catalogs (catalog_name,is_catalog_support) values ('default',0)
+                    end
+                    else
+                    begin
+                    BEGIN TRY
+                    insert into #tmp_sp_catalogs (catalog_name,description) EXEC master.dbo.sp_catalogs @server_name = @ServerName
+                    update #tmp_sp_catalogs set is_catalog_support = 1
+                    END TRY
+                    BEGIN CATCH
+                    insert into #tmp_sp_catalogs (catalog_name,is_catalog_support) values ('default',0)   
+                    END CATCH
+                    end
+                    update #tmp_sp_catalogs set server_name = @ServerName
+                    update #tmp_sp_catalogs set product_name = @ProductName
+                    update #tmp_sp_catalogs set provider_name = @ProviderName
+                    fetch crs into @ServerName,@ProductName,@ProviderName
+                end
+                close crs
+                deallocate crs">
+                    <link_field field="ParentSelect" />
+                </link_multiple>
+            </prefix>
+            <postfix>
+                drop table #tmp_sp_catalogs
+                drop table #tmp_catalog_exist_test
+            </postfix>
+        </version>
+    </settings>
+    <properties>
+        <property name="Urn" type="nvarchar" size="4000">
+            <link_multiple no='4' expression="{0} + '/{3}[@Name=' + quotename({1},'''') + ' and @IsCatalogSupport=' + quotename({2},'''') + ']'">
+                <link_field type='parent' field="Urn" />
+                <link_field type='local' field="Name" />
+                <link_field type='local' field="IsCatalogSupport" />
+                <link_field field="NType" />
+            </link_multiple>
+        </property>
+        <property name="NType" type="sysname" access='Read' hidden='true'>LinkedServerCatalog</property>
+        <property name="ServerName" type="nvarchar" size="128" hidden='true'>tsc.server_name</property>
+        <property name="ProductName" type="nvarchar" size="128" hidden='true'>tsc.product_name</property>
+        <property name="ProvideName" type="nvarchar" size="128" hidden='true'>tsc.provider_name</property>
+        <property name="Name" type="nvarchar" size="128">tsc.catalog_name</property>
+        <property name="Description" type="nvarchar" size="4000">ISNULL(tsc.description, '')</property>
+        <property name="IsCatalogSupport" type="bit" access='Read' >tsc.is_catalog_support</property>
+        <property name="IsSystemObject" type="bit" access='Read' >case when ( ((tsc.product_name in ('SQL Server')) or tsc.is_catalog_support = 1) and (tsc.catalog_name in ('master','model','msdb','tempdb')) ) then 1 else 0 end</property>
+    </properties>
+</EnumObject>

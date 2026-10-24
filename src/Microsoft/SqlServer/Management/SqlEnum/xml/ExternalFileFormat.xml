@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalFileFormat" impl_type="SqlObject" min_major='13' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table="sys.external_file_formats" alias="eff"/>
+  </settings>
+  <properties>
+    <include file="inc_urn.xml"/>
+    <include file='inc_named_object.xml' alias='eff' for="#ExtPropClass#ExtPropMajorID#ExtPropMinorID#"/>
+    <property name="Name" type="sysname">eff.name</property>
+    <property name="ID" type="int" access="read">eff.file_format_id</property>
+    <property name="FormatType" type="tinyint" report_type="ExternalFileFormatType">
+       CASE eff.format_type when 'DELIMITEDTEXT' then 0 when 'RCFILE' then 1 when 'ORC' then 2 when 'PARQUET' then 3 when 'JSON' then 4 when 'DELTA' then 5 END
+    </property>
+    <property name="FieldTerminator" type="nvarchar" size="10">ISNULL(eff.field_terminator,N'')</property>
+    <property name="StringDelimiter" type="nvarchar" size="10">ISNULL(eff.string_delimiter,N'')</property>
+    <property name="DateFormat" type="nvarchar" size="50">ISNULL(eff.date_format,N'')</property>
+    <property name="UseTypeDefault" type="bit" cast="true">CASE eff.use_type_default when 'FALSE' then 0 when NULL then 0 when 'TRUE' then 1 END</property>
+    <property name="SerDeMethod" type="nvarchar" size="255">ISNULL(eff.serde_method,N'')</property>
+    <property name="RowTerminator" type="nvarchar" size="10" access="read">ISNULL(eff.row_terminator,N'')</property>
+    <property name="Encoding" type="nvarchar" size="10" access="read">ISNULL(eff.encoding,N'')</property>
+    <property name="DataCompression" type="nvarchar" size="255">ISNULL(eff.data_compression,N'')</property>
+    <version datawarehouse_enabled='true' cloud_min_major='12' min_major='16'>
+      <property name="FirstRow" type="int" read_only_after_creation ="true">ISNULL(eff.first_row, 0)</property>
+    </version>
+  </properties>
+</EnumObject>

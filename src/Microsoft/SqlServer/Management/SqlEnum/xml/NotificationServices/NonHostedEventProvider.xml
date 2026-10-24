@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NonHostedEventProvider' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<property_link table="#tmp_nh_event_provider" alias="nhep" />
+		<prefix>
+CREATE TABLE #tmp_nh_event_provider(
+    ProviderId int,
+    ProviderName nvarchar(255),
+    ProviderClassName nvarchar(255),
+    AssemblyName nvarchar(260),
+    SystemName nvarchar(255),
+    StartTime datetime,
+    Interval int,
+    Timeout int,
+    ActivationState tinyint
+)
+INSERT #tmp_nh_event_provider EXEC [SchemaPrefix].NSGetProviders 'NonHostedOnly'
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_nh_event_provider
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">nhep.ProviderName</property>
+        <property name="Id" type="int">nhep.ProviderId</property>
+		<property name="ActivationState" type="tinyint" report_type="NSActivationState" access="Read">nhep.ActivationState</property>
+	</properties>
+</EnumObject>

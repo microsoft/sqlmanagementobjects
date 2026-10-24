@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NotificationField' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="NotificationClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="NotificationClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_notification_field" alias="nf" />
+		<prefix>
+CREATE TABLE #tmp_notification_field(
+    NotificationFieldId int,
+    NotificationClassId int,
+    FieldName nvarchar(255),
+    FieldType nvarchar(255),
+    FieldDigestGrouping bit
+)
+INSERT #tmp_notification_field EXEC [SchemaPrefix].NSGetNotificationFields
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_notification_field
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="ID" type="int">nf.NotificationFieldId</property>
+        <property name="NotificationClassId" type="int" hidden="true">nf.NotificationClassId</property>
+		<property name="Name" type="nvarchar" size="255">nf.FieldName</property>
+		<property name="Type" type="nvarchar" size="255">nf.FieldType</property>
+		<property name="DigestGrouping" type="bit">nf.FieldDigestGrouping</property>
+	</properties>
+</EnumObject>

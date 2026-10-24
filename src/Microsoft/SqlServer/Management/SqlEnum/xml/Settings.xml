@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<EnumObject type="Server" impl_type="Server" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <!--
+    this code will truncate paths longer than 512 unicode chars
+    -->
+  <settings>
+    <version min_major='10'>
+      <prefix fields="#NumberOfLogFiles#"> 
+        declare @NumErrorLogs int
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'NumErrorLogs', @NumErrorLogs OUTPUT
+      </prefix>
+      <prefix fields="#LoginMode#">
+        declare @SmoLoginMode int
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', @SmoLoginMode OUTPUT
+      </prefix>
+      <prefix fields="#AuditLevel#">
+        declare @SmoAuditLevel int
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'AuditLevel', @SmoAuditLevel OUTPUT
+      </prefix>
+      <prefix fields="#BackupDirectory#">
+        declare @BackupDirectory nvarchar(512)
+        if 1=isnull(cast(SERVERPROPERTY('IsLocalDB') as bit), 0)
+          select @BackupDirectory=cast(SERVERPROPERTY('instancedefaultdatapath') as nvarchar(512))
+        else
+          exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'BackupDirectory', @BackupDirectory OUTPUT
+      </prefix>
+      <prefix fields="#MailProfile#">
+        declare @SmoMailProfile nvarchar(512)
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'MailAccountName', @SmoMailProfile OUTPUT
+      </prefix>
+      <prefix fields="#PerfMonMode#">
+        declare @SmoPerfMonMode int
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'Performance', @SmoPerfMonMode OUTPUT
+
+        if @SmoPerfMonMode is null
+        begin 
+          set @SmoPerfMonMode = 1000
+        end
+      </prefix>
+    </version>
+    <version min_major='10' max_major='10'>
+      <prefix fields="#DefaultFile#">
+        declare @SmoDefaultFile nvarchar(512)
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'DefaultData', @SmoDefaultFile OUTPUT
+      </prefix>
+      <prefix fields="#DefaultLog#">
+        declare @SmoDefaultLog nvarchar(512)
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'DefaultLog', @SmoDefaultLog OUTPUT
+      </prefix>
+    </version>
+    <version min_major="11">
+      <prefix fields="#ErrorLogSizeKb#">
+        declare @ErrorLogSizeKb int
+        exec master.dbo.xp_instance_regread  N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'ErrorLogSizeInKb', @ErrorLogSizeKb OUTPUT
+      </prefix>
+    </version>
+  </settings>
+
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='2' expression="{0} + '/{1}'">
+        <link_field type='parent' field="Urn" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+  
+    <property name="AuditLevel" type="int"  report_type='AuditLevel'>@SmoAuditLevel</property>
+    <property name="NumberOfLogFiles" type="int">ISNULL(@NumErrorLogs, -1)</property>
+    <property name="LoginMode" type="int" report_type='ServerLoginMode'>(case when @SmoLoginMode &lt; 3 then @SmoLoginMode else 9 end)</property>
+    <version min_major='10' max_major='10'>
+      <property name="DefaultFile" type="nvarchar" size="512">ISNULL(@SmoDefaultFile,N'')</property>
+      <property name="DefaultLog" type="nvarchar" size="512">ISNULL(@SmoDefaultLog,N'')</property>
+    </version>
+    <version min_major='11'>
+      <property name="DefaultFile" type="nvarchar" size="512">ISNULL(SERVERPROPERTY('instancedefaultdatapath'),'')</property>
+      <property name="DefaultLog" type="nvarchar" size="512">SERVERPROPERTY('instancedefaultlogpath')</property>
+      <property name="ErrorLogSizeKb" type="int">ISNULL(@ErrorLogSizeKb, 0)</property>
+    </version>
+    <version min_major='10'>
+      <property name="TapeLoadWaitTime" type="int">-1</property>
+    </version>
+    <property name="MailProfile" type="nvarchar" size="512">ISNULL(@SmoMailProfile,N'')</property>		
+    <property name="BackupDirectory" type="nvarchar" size="512" notusage='filter,order'>@BackupDirectory</property>
+    <property name="PerfMonMode" type="int" report_type='PerfMonMode'>@SmoPerfMonMode</property>		
+  </properties>
+</EnumObject>

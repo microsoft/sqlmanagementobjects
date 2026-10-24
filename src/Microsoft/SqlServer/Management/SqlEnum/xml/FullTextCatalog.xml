@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<EnumObject type="FullTextCatalog" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10' cloud_min_major='12'>
+			<property_link table='sys.fulltext_catalogs AS cat' />
+			<property_link fields='#FileGroup#' left_join='sys.filegroups AS fg'>cat.data_space_id = fg.data_space_id</property_link>
+			<property_link fields='#Owner#' left_join='sys.database_principals AS dp'>cat.principal_id=dp.principal_id</property_link>
+
+    </version>
+		<post_process fields = '#PopulationCompletionDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDateSeconds1990' 
+				triggered_fields='#PopulationCompletionDateInt#'/>
+		<post_process fields = '#PopulationCompletionAge#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateTimeSpanHMS' 
+				triggered_fields='#PopulationCompletionAgeInt#PopulationCompletionAgeNow#'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">cat.name</property>
+
+		<version min_major='10' cloud_min_major='12'>
+			<property name="UniqueKeyCount" type="int" access='Read' expensive='true'>FULLTEXTCATALOGPROPERTY(cat.name,'UniqueKeyCount')</property>		
+		</version>
+			
+		<version min_major='10' cloud_min_major='12'>
+			<property name="ID" type="int" access='Read'>cat.fulltext_catalog_id</property>
+			<property name="IsAccentSensitive" type="bit" cast='true'>FULLTEXTCATALOGPROPERTY(cat.name,'AccentSensitivity')</property>
+			<property name="IsDefault" type="bit" cast='true' read_only_after_creation="true">cat.is_default</property>
+			<property name="FileGroup" type="sysname">ISNULL(fg.name, N'')</property>
+			<property name="Owner" type="sysname">dp.name</property>
+		</version>
+
+		<property name="ErrorLogSize" type="int" access='Read'>FULLTEXTCATALOGPROPERTY(cat.name,'LogSize')</property>
+		<property name="FullTextIndexSize" type="int" access='Read'>FULLTEXTCATALOGPROPERTY(cat.name,'IndexSize')</property>
+		<property name="ItemCount" type="int" access='Read'>FULLTEXTCATALOGPROPERTY(cat.name,'ItemCount')</property>		
+		<property name="PopulationStatus" type="int" report_type="CatalogPopulationStatus" access='Read'>FULLTEXTCATALOGPROPERTY(cat.name,'PopulateStatus')</property>
+		<property name="PopulationCompletionAgeInt" type="int" hidden='true'>FULLTEXTCATALOGPROPERTY(cat.name,'PopulateCompletionAge')</property>
+		<property name="PopulationCompletionAgeNow" type="datetime" hidden='true'>GETDATE()</property>
+		<property name="PopulationCompletionAge" type="int" report_type2='System.TimeSpan' access='Read'>0</property>
+		
+		<property name='PopulationCompletionDateInt' type='int' hidden='true'>FULLTEXTCATALOGPROPERTY(cat.name,'PopulateCompletionAge')</property>		
+		<property name="PopulationCompletionDate" type="datetime" access='Read'>cast(null as datetime)</property>
+
+    <version min_major='10' cloud_min_major='12'>
+      <property name="RootPath" type="nvarchar" size='260' read_only_after_creation="true">ISNULL(cat.path,N'')</property>
+      <property name="HasFullTextIndexedTables" type="bit" cast='true' access='Read'>(select (case when exists(select distinct object_id from sys.fulltext_indexes fti where cat.fulltext_catalog_id = fti.fulltext_catalog_id and OBJECTPROPERTY(object_id, 'IsTable')=1) then 1 else 0 end))</property>
+    </version>
+
+    <!-- extended properties support -->
+    <property name="ExtPropClass" type="int" hidden='true'>23</property>
+        <property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+
+    <version min_major ="10">
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+
+  </properties>
+</EnumObject>

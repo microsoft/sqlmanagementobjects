@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<EnumObject min_major='7' cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+            <!-- 
+            here we have to fetch from both sys.sql_modules and sys.system_sql_modules
+            because user objects are stored in the former, and system objects are 
+            stored in the latter
+            -->
+			<property_link 
+				fields = '#Recompile#IsEncrypted#Definition#SqlReturnsNullOnNullInput#SqlExecutionContext#SqlExecutionContextPrincipal#'
+				left_join='sys.sql_modules AS sm{0}'>sm{0}.object_id = {0}.object_id</property_link>
+            <property_link 
+				fields = '#Recompile#IsEncrypted#Definition#'
+				left_join='sys.system_sql_modules AS ssm{0}'>ssm{0}.object_id = {0}.object_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<version min_major='7' max_major='8' >
+			<include file='inc_sql_module.xml' alias='{0}'/>
+		</version>
+   <version min_major='9' cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="AnsiNullsStatus" type="bit" cast='true' mode="design">ISNULL(OBJECTPROPERTYEX({0}.object_id,N'ExecIsAnsiNullsOn'),0)</property>
+			<property name="QuotedIdentifierStatus" type="bit" cast='true' mode="design">ISNULL(OBJECTPROPERTYEX({0}.object_id,N'ExecIsQuotedIdentOn'),0)</property>
+			<property name="IsSchemaBound" type="bit" cast='true' mode="design">ISNULL(OBJECTPROPERTYEX({0}.object_id, N'IsSchemaBound'),0)</property>
+			<include file='inc_sql_module.xml' alias='sm{0}'/>
+			
+			<property name="SqlReturnsNullOnNullInput" type="bit" cast='true' hidden='true'>sm{0}.null_on_null_input</property>
+			<property name="SqlExecutionContext" type="int" report_type="ExecutionContext" hidden='true'>case isnull(sm{0}.execute_as_principal_id, -1) when -1 then 1 when -2 then 2 else 3 end</property>
+			<property name="SqlExecutionContextDdl" type="int" report_type="ExecutionContext" hidden='true'>case isnull(sm{0}.execute_as_principal_id, -1) when -1 then 1 else 2 end</property>
+			<property name="SqlExecutionContextPrincipal" type="sysname" hidden='true'>ISNULL(user_name(sm{0}.execute_as_principal_id),N'')</property>
+		</version>
+	</properties>
+</EnumObject>

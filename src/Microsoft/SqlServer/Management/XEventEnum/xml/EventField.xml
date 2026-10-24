@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject type="EventField" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link join='#c' alias='col'>event.name = col.object_name</property_link>
+    <property_link left_join='sys.server_event_session_fields' alias='field'>event.event_session_id = field.event_session_id AND event.event_id = field.object_id AND col.name = field.name</property_link>
+    <property_link join='#p' alias='package'>event.package = package.name AND package.guid = col.object_package_guid</property_link>
+    <prefix>
+      create table #c (object_name sysname, name sysname, description nvarchar(3072), object_package_guid uniqueidentifier)
+      create table #p (name sysname, guid uniqueidentifier)
+      insert into #c select object_name, name, description, object_package_guid from sys.dm_xe_object_columns where column_type = 'customizable'
+      insert into #p select name, guid from sys.dm_xe_packages
+    </prefix>
+    <postfix>
+      drop table #c
+      drop table #p
+    </postfix>
+
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='ID' type='int'>ISNULL(field.object_id, -1)</property>
+    <property name='Name' type='nvarchar' size='60'>col.name</property>
+    <property name='Value' type='sql_variant'>field.value</property>
+    <property name='Description' type='nvarchar' size='512'>col.description</property>
+  </properties>
+</EnumObject>

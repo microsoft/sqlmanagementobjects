@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- This document contains the serialized values of Operator nodes for use in the tests -->
+<Nodes>
+  <!-- Test escaped quotes in constant value-->
+  <Operator>
+    <TypeClass>Bool</TypeClass>
+    <OpType>EQ</OpType>
+    <Count>2</Count>
+    <Function>
+      <TypeClass>String</TypeClass>
+      <FunctionType>ExecuteSql</FunctionType>
+      <ReturnType>String</ReturnType>
+      <Count>2</Count>
+      <Constant>
+        <TypeClass>String</TypeClass>
+        <ObjType>System.String</ObjType>
+        <Value>string</Value>
+      </Constant>
+      <Constant>
+        <TypeClass>String</TypeClass>
+        <ObjType>System.String</ObjType>
+        <Value> select ''one'' </Value>
+      </Constant>
+    </Function>
+    <Constant>
+      <TypeClass>String</TypeClass>
+      <ObjType>System.String</ObjType>
+      <Value />
+    </Constant>
+  </Operator>
+
+  <!-- Test double set of escaped quotes in constant value-->
+  <Operator>
+    <TypeClass>Bool</TypeClass>
+    <OpType>EQ</OpType>
+    <Count>2</Count>
+    <Function>
+      <TypeClass>String</TypeClass>
+      <FunctionType>ExecuteSql</FunctionType>
+      <ReturnType>String</ReturnType>
+      <Count>2</Count>
+      <Constant>
+        <TypeClass>String</TypeClass>
+        <ObjType>System.String</ObjType>
+        <Value>string</Value>
+      </Constant>
+      <Constant>
+        <TypeClass>String</TypeClass>
+        <ObjType>System.String</ObjType>
+        <Value> select ''''one'''' </Value>
+      </Constant>
+    </Function>
+    <Constant>
+      <TypeClass>String</TypeClass>
+      <ObjType>System.String</ObjType>
+      <Value />
+    </Constant>
+  </Operator>
+
+  <!-- Test regular string -->
+  <Operator>
+    <TypeClass>Bool</TypeClass>
+    <OpType>EQ</OpType>
+    <Count>2</Count>
+    <Function>
+      <TypeClass>String</TypeClass>
+      <FunctionType>ExecuteSql</FunctionType>
+      <ReturnType>String</ReturnType>
+      <Count>2</Count>
+      <Constant>
+        <TypeClass>String</TypeClass>
+        <ObjType>System.String</ObjType>
+        <Value>string</Value>
+      </Constant>
+      <Constant>
+        <TypeClass>String</TypeClass>
+        <ObjType>System.String</ObjType>
+        <Value> select one </Value>
+      </Constant>
+    </Function>
+    <Constant>
+      <TypeClass>String</TypeClass>
+      <ObjType>System.String</ObjType>
+      <Value />
+    </Constant>
+  </Operator>
+</Nodes>

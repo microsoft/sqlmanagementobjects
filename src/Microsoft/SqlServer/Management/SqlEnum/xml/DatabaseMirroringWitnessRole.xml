@@ -1,0 +1,18 @@
+<?xml version='1.0' ?>
+<EnumObject type='DatabaseMirroringWitnesses' impl_type='SqlObject' min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='sys.database_mirroring_witnesses' alias='dmw'/>
+	</settings>
+	<properties>
+		<property name='Database' type='sysname'>dmw.database_name</property>
+		<property name='PrincipalServer' type='sysname'>dmw.principal_server_name</property>
+		<property name='MirrorServer' type='sysname'>dmw.mirror_server_name</property>
+		<property name='MirroringSafetyLevel' type='tinyint'>dmw.safety_level</property>
+		<property name='SafetySequenceNumber' type='int'>dmw.safety_sequence_number</property>
+		<property name='RoleSequenceNumber' type='int'>dmw.role_sequence_number</property>
+		<property name='MirroringID' type='uniqueidentifier'>dmw.mirroring_guid</property>
+		<property name='BackupFamilyID' type='uniqueidentifier'>dmw.family_guid</property>
+		<property name='IsSuspended' type='bit'>dmw.is_suspended</property>
+		<property name='SuspendedSequenceNumber' type='int'>dmw.is_suspended_sequence_number</property>
+	</properties>
+</EnumObject>

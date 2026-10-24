@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExtendedProperty" impl_type="SqlObject" min_major='8' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major='9' cloud_min_major='12'>
+			<include file ="ExtendedProperty.xml"/>
+		</version>
+	</settings>
+	<properties>
+		<version min_major='8' max_major='8'>
+			<include file='inc_urn.xml' />
+			<property name="Name" type="sysname">p.name</property>
+			<property name="Value" type='sql_variant'>p.value</property>
+		</version>
+	</properties>
+</EnumObject>

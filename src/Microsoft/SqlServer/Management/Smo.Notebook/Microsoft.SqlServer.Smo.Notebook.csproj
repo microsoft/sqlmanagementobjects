@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.Smo.Notebook</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SqlScriptPublishSrc)\Microsoft.SqlServer.Management.SqlScriptPublish.csproj" />
+    <PackageReference Include="NewtonSoft.Json" />
+
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SMO" Key="$(RealPublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoNotebookUnitTests" Key="$(RealPublicKey)" />
+  </ItemGroup>
+</Project>
+

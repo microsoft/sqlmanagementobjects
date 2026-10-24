@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<EnumObject type="DirectMember" impl_type="SqlObject" min_major='10' cloud_min_major="10" datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major='10' cloud_min_major="10" datawarehouse_enabled='true'>
+      <parent_link>
+        <link_multiple no="1" expression="{0} = m.role_principal_id">
+          <link_field type="parent" field="ID" />
+        </link_multiple>
+      </parent_link>
+      <property_link table='sys.database_role_members AS m' />
+      <property_link table='sys.database_principals AS u'>u.principal_id = m.member_principal_id</property_link>
+    </version>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="{0} + '/' + {1}+ '[@Name=' + quotename({2},'''') + ']'">
+        <link_field type='parent' field="DatabaseUrn" />
+        <link_field type='local' field="MemberType" />
+        <link_field type='local' field="Name" />
+      </link_multiple>
+    </property>
+    <property name="Name" type="sysname">u.name</property>
+    <version min_major='10' cloud_min_major="10" datawarehouse_enabled='true'>
+      <property name="ID" type="int">u.principal_id</property>
+      <property name="MemberType" type="sysname" hidden='true'>
+        (CASE u.type
+        WHEN 'A' THEN N'ApplicationRole'
+        WHEN 'R' THEN N'Role'
+        ELSE N'User' END)
+      </property>
+    </version>
+    <version min_major='10'>
+      <property name="Login" type="sysname">suser_sname(u.sid)</property>
+    </version>
+    <version cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="Login" type="sysname">0</property>
+    </version>
+  </properties>
+</EnumObject>

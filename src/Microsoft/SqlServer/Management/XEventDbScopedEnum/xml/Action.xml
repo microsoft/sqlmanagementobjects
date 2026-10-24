@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<EnumObject type="Action" impl_type="XEventObject" cloud_min_major='12'>
+  <settings>
+    <parent_link>
+        <link parent="ParentID" local="SessionID" />
+        <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table='sys.database_event_session_actions' alias='action'></property_link>
+
+    <!--action share names with other objects in dm_xe_objects, so here we need to add a filter on object_type-->
+    <property_link  join='#a' alias='object'>action.name = object.name</property_link>
+    <prefix>
+      create table #a (name sysname collate catalog_default not null, description nvarchar(3072) not null)
+      insert into #a select name, description from sys.dm_xe_objects where object_type='action'
+    </prefix>
+    <postfix>
+      drop table #a
+    </postfix>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />    
+    <property name="SessionID" type="int" hidden="true">action.event_session_id</property>			
+    <property name="ParentID" type="int" hidden="true">action.event_id</property>			
+    <property name='Name' type='nvarchar' size='128'>action.package + '.' + action.name</property>
+    <property name='ModuleID' type='nvarchar' size='128'>action.module</property>
+    <property name='PackageName' type='nvarchar' size='60'>action.package</property>
+    <property name='Description' type='nvarchar' size='512'>object.description</property>
+    
+  </properties>
+</EnumObject>

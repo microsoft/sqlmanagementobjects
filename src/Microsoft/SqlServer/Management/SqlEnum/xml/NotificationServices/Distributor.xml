@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='Distributor' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<property_link table="#tmp_distributors" alias="dds" />
+		<prefix>
+CREATE TABLE #tmp_distributors(
+	DistributorId int,
+	DistributorName nvarchar(255),
+	SystemName nvarchar(255),
+    ThreadPoolSize int,
+    QuantumDuration int,
+    ActivationState tinyint
+)
+INSERT #tmp_distributors EXEC [SchemaPrefix].NSGetDistributors
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_distributors
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="256">dds.DistributorName</property>
+		<property name="Id" type="int">dds.DistributorId</property>
+		<property name="SystemName" type="nvarchar" size="256">dds.SystemName</property>
+        <property name="ThreadPoolSize" type="int">dds.ThreadPoolSize</property>
+        <property name="QuantumDuration" type="int">dds.QuantumDuration</property>
+		<property name="ActivationState" type="tinyint" report_type="NSActivationState" access="Read">dds.ActivationState</property>
+	</properties>
+</EnumObject>

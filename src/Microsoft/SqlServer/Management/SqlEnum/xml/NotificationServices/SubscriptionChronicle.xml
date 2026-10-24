@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='SubscriptionChronicle' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="SubscriptionClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="SubscriptionClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_subscription_chronicle" alias="sch" />
+		<prefix>
+CREATE TABLE #tmp_subscription_chronicle(
+    SubscriptionChronicleId int,
+    ChronicleName nvarchar(255),
+    SubscriptionClassId int,
+    SqlStatementsXml nvarchar(max)
+)
+INSERT #tmp_subscription_chronicle EXEC [SchemaPrefix].NSGetSubscriptionChronicles
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_subscription_chronicle
+        </postfix>
+        <post_process fields="#SqlStatements#" 
+            class_name="Microsoft.SqlServer.Management.Smo.PostProcessXmlToList" 
+            triggered_fields="#SqlStatementsXml#" />
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="Id" type="int" hidden="true">sch.SubscriptionChronicleId</property>
+        <property name="SubscriptionClassId" type="int" hidden="true">sch.SubscriptionClassId</property>
+		<property name="Name" type="nvarchar" size="255">sch.ChronicleName</property>
+		<property name="SqlStatements" type="int" report_type2="System.Object">null</property>
+        <property name="SqlStatementsXml" type="nvarchar" size="max" hidden="true">sch.SqlStatementsXml</property>
+	</properties>
+</EnumObject>

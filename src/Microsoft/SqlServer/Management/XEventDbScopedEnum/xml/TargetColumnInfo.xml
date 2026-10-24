@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="TargetColumnInfo" impl_type="XEventObject" cloud_min_major='12'>
+  <settings>
+      <!-- Grigoryp 11/10/11 These links use parent alias & fields directly. Proper usage is to use parent_link tag. Leaving as it is for now.  -->
+    <property_link table='sys.dm_xe_object_columns' alias='columns'>columns.column_type='customizable' AND columns.object_name = objects.name AND columns.object_package_guid=objects.package_guid</property_link>
+    <property_link join='sys.dm_xe_packages' alias='typepackage'>columns.type_package_guid = typepackage.guid</property_link>
+
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+
+      <property name='ID' type='int'>columns.column_id</property>
+      <property name='Name' type='nvarchar' size = '60'>columns.name</property>
+      <property name='TypeName' type='nvarchar' size='60'>columns.type_name</property>
+      <property name='TypePackageID' type='uniqueidentifier' cast='true'>columns.type_package_guid</property>
+      <property name='TypePackageName' type='nvarchar' size ='60'>typepackage.name</property>
+      <property name='Value' type='nvarchar' size = '256'>columns.column_value</property>
+      <property name='Description' type='nvarchar' size = '512'>columns.description</property>
+      <property name='Capabilities' type='int'>ISNULL(columns.capabilities,0)</property>
+      <property name='CapabilitiesDesc' type='nvarchar' size='256'>columns.capabilities_desc</property>
+
+  </properties>
+</EnumObject>

@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="Login" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="SRVID" />
+		</parent_link>
+		<version min_major='10' >
+			<property_link table='sys.linked_logins ll'/>
+			<property_link fields = '#Name#'
+				left_join='sys.server_principals sp'>ll.local_principal_id = sp.principal_id</property_link>
+		</version>
+	</settings>	
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="NType" type="sysname" access='Read' hidden='true'>LinkedServerLogin</property>
+		<version min_major='10' >
+			<property name="Name" type="sysname">ISNULL(sp.name, '')</property>
+			<property name="RemoteUser" type="sysname">ISNULL(ll.remote_name, N'')</property>
+			<property name="Impersonate" type="bit" cast = "true">ll.uses_self_credential</property>
+			<property name="SRVID" type="int" hidden="true">ll.server_id</property>
+			<property name="DateLastModified" type="datetime" access='Read'>ll.modify_date</property>
+		</version>		
+	</properties>
+</EnumObject>

@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>  
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+  </PropertyGroup>
+ 
+  <!-- Project references -->
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+  </ItemGroup>
+  
+  <!-- Source file references -->
+  <ItemGroup>
+    <Compile Include="AGListenerNetworkMode.cs" />
+    <Compile Include="AvailabilityGroupData.cs" />
+    <Compile Include="AvailabilityGroupListenerConfiguration.cs" />
+    <Compile Include="AvailabilityGroupListenerSubnet.cs" />
+    <Compile Include="AvailabilityGroupReplica.cs" />
+    <Compile Include="AvailabilityGroupReplicaCollection.cs" />
+    <Compile Include="AvailabilityGroupReplicaData.cs" />
+    <Compile Include="AvailabilityObjectState.cs" />
+    <Compile Include="CollectionsExtensionMethods.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="DataSynchronizationOption.cs" />
+    <Compile Include="FailoverCategory.cs" />
+    <Compile Include="FailoverData.cs" />
+    <Compile Include="FailoverUtilities.cs" />
+    <Compile Include="PrimaryDatabaseData.cs" />
+    <Compile Include="ReplicaRole.cs" />
+    <Compile Include="SortableBindingList.cs" />
+    <Compile Include="UserSecurity.cs" />
+    <EmbeddedResource Include="Resource.resx">
+      <LogicalName>Microsoft.SqlServer.Management.HadrData.Resource.resources</LogicalName>
+      <EmitFormatMethods>true</EmitFormatMethods>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

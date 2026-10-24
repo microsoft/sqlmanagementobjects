@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject type="ResumableIndex" impl_type="SqlObject" min_major='14' cloud_min_major='12' datawarehouse_enabled='false' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table="sys.index_resumable_operations as ri"/>
+  </settings>
+  <properties>
+    <include file="inc_urn.xml" />
+    <property name="Name" type="sysname" access="Read">ri.name</property>
+    <property name="ParentID" type="int" hidden='true'>ri.object_id</property>
+    <property name="ID" type ="int" access="Read">ri.index_id</property>
+    <property name="PartitionNumber" type="int" access="Read">ISNULL(ri.partition_number, 0)</property>
+    <property name="SqlText" type="nvarchar" access="Read">ri.sql_text</property>
+    <property name="ResumableOperationState" type="tinyint" report_type="ResumableOperationStateType" access="Read">ri.state</property>
+    <property name="StartTime" type="datetime" access="Read">ri.start_time</property>
+    <property name="LastPauseTime" type="datetime" access="Read">ri.last_pause_time</property>
+    <property name="TotalExecutionTime" type="int" access="Read">ri.total_execution_time</property>
+    <property name="PageCount" type="bigint" access="Read">ri.page_count</property>
+    <property name="PercentComplete" type="real" access="Read">ri.percent_complete</property>
+
+    <!-- Only MaxDOP should be modifiable for resume. -->
+    <property name="MaxDOP" type ="smallint" access="ReadWrite">ri.last_max_dop_used</property>
+  </properties>
+</EnumObject>

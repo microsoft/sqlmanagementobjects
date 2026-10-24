@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major='7' max_major='8'>
+			<parent_link>
+				<link_multiple no="3" expression="(prmssn.protecttype in (204,206) or     /*grant exists without same grant with grant */
+(prmssn.protecttype = 205 and not exists(select * from dbo.sysprotects p2 where p2.id = prmssn.id and p2.uid = prmssn.uid and p2.action = prmssn.action and p2.columns = prmssn.columns and p2.grantor = prmssn.grantor and p2.protecttype = 204)))
+and prmssn.action in (26,193,197) and prmssn.id = {1}
+and	(((convert(tinyint,substring(prmssn.columns,1,1))&amp;1) = 0 and (convert(int,substring(prmssn.columns,{0}/8+1,1))&amp;power(2,{0}&amp;7)) != 0)
+or ((convert(tinyint,substring(prmssn.columns,1,1))&amp;1) != 0 and (convert(int,substring(prmssn.columns,{0}/8+1,1))&amp;power(2,{0}&amp;7)) = 0))
+and 0 != (permissions({1}, {2}) &amp; case prmssn.action when 26  then 4         /*REFERENCES basebit */ when 193 then 1 /*SELECT basebit */ when 197 then 2 /*UPDATE basebit */end)">
+					<link_field type="parent" field="ID" />
+					<link_field type="parent" field="ParentID" />
+					<link_field type="parent" field="Name" />
+				</link_multiple>
+			</parent_link>
+		</version>
+		<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+			<parent_link>
+				<link parent="ExtPropMajorID" local="MajorID" />
+				<link parent="ExtPropMinorID" local="MinorID" />
+				<link parent="ExtPropClass" local="TrueObjectClass" />
+			</parent_link>
+		</version>		
+	</settings>
+	<properties>
+		<include file='inc_perm.xml' alias='database'/>		
+		<property name="Code" type="int" report_type = 'ObjectPermissionSetValue'>null</property>
+		
+		<property name="ColumnName" type="sysname">
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="Name" />
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

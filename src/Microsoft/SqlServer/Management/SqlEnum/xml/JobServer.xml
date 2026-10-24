@@ -1,0 +1,96 @@
+﻿  <EnumObject type='SPGetSqlagentProperties' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major = '10' >
+      <property_link table='#tmp_sp_get_sqlagent_properties' alias='tsgsp' fields="#MsxServerName#SqlServerRestart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#MsxServerName#SqlAgentAutoStart#ReplaceAlertTokensEnabled#"/>
+
+      <prefix fields="#MsxServerName#SqlServerRestart#SqlAgentAutoStart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#ReplaceAlertTokensEnabled#">
+        create table #tmp_sp_get_sqlagent_properties
+        (auto_start int null, msx_server_name sysname null, sqlagent_type int null, startup_account nvarchar(255) null, sqlserver_restart int null, jobhistory_max_rows int null, jobhistory_max_rows_per_job int null, errorlog_file nvarchar(255) null, errorlogging_level int null, error_recipient nvarchar(30) null, monitor_autostart int null, local_host_server sysname null, job_shutdown_timeout int null, cmdexec_account varbinary(64) null, regular_connections int null, host_login_name sysname null, host_login_password varbinary(512) null, login_timeout int null, idle_cpu_percent int null, idle_cpu_duration int null, oem_errorlog int null, sysadmin_only int null, email_profile nvarchar(64) null, email_save_in_sent_folder int null, cpu_poller_enabled int null, replace_alert_tokens_enabled int null)
+        insert into #tmp_sp_get_sqlagent_properties(auto_start, msx_server_name, sqlagent_type, startup_account, sqlserver_restart, jobhistory_max_rows, jobhistory_max_rows_per_job, errorlog_file, errorlogging_level, error_recipient, monitor_autostart, local_host_server, job_shutdown_timeout, cmdexec_account, regular_connections, host_login_name, host_login_password, login_timeout, idle_cpu_percent, idle_cpu_duration, oem_errorlog, sysadmin_only, email_profile, email_save_in_sent_folder, cpu_poller_enabled, replace_alert_tokens_enabled)
+        exec msdb.dbo.sp_get_sqlagent_properties
+      </prefix>
+
+      <prefix fields="#MsxAccountName#MsxAccountCredentialName#">
+        create table #tmpMsxAccountName
+        (msx_connection int null, msx_credential_id int null, msx_credential_name nvarchar(300) null, msx_login_name nvarchar(300) null)
+        insert into #tmpMsxAccountName(msx_connection, msx_credential_id, msx_credential_name, msx_login_name)
+        exec msdb.dbo.sp_msx_get_account
+      </prefix>
+      <prefix fields = '#DatabaseMailProfile#'>
+        declare @DatabaseMailProfile nvarchar(255)
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'DatabaseMailProfile', @param = @DatabaseMailProfile OUT, @no_output = N'no_output'
+      </prefix>
+      <prefix fields = '#AgentMailType#'>
+        declare @AgentMailType int
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\SQLServerAgent', N'UseDatabaseMail', @param = @AgentMailType OUT, @no_output = N'no_output'
+      </prefix>
+      <prefix fields="#ServiceAccount#">
+        declare @ServiceAccount nvarchar(512)
+        EXEC master.sys.xp_instance_regread 'HKEY_LOCAL_MACHINE', 'SYSTEM\CurrentControlSet\Services\SQLSERVERAGENT', N'ObjectName', @ServiceAccount OUTPUT
+      </prefix>
+      <prefix fields="#ServiceStartMode#">
+        declare @ServiceStartMode int
+        set @ServiceStartMode = 2
+        EXEC master.sys.xp_instance_regread 'HKEY_LOCAL_MACHINE', 'SYSTEM\CurrentControlSet\Services\SQLSERVERAGENT', N'Start', @ServiceStartMode OUTPUT
+      </prefix>
+    </version>
+    <version min_major="10">
+      <prefix fields="#AgentDomainGroup#">
+        declare @AgtGroup nvarchar(512)
+        exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Setup', N'AGTGroup', @AgtGroup OUTPUT
+      </prefix>
+    </version>
+        <postfix fields="#MsxServerName#SqlServerRestart#SqlAgentAutoStart#SqlAgentRestart#MaximumHistoryRows#MaximumJobHistoryRows#ErrorLogFile#AgentLogLevel#NetSendRecipient#AgentShutdownWaitTime#SqlAgentMailProfile#SaveInSentFolder#WriteOemErrorLog#IsCpuPollingEnabled#IdleCpuPercentage#IdleCpuDuration#SysAdminOnly#LoginTimeout#HostLoginName#LocalHostAlias#JobServerType#ReplaceAlertTokensEnabled#">
+drop table #tmp_sp_get_sqlagent_properties
+        </postfix>
+    
+		<postfix fields="#MsxAccountName#MsxAccountCredentialName#">
+drop table #tmpMsxAccountName
+		</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml'/>
+		<version min_major = '10' >
+      <property name="Name" type="sysname" cast='true'>serverproperty(N'Servername')</property>
+    </version>
+
+    <property name='MsxServerName' type='sysname' access="Read" notusage='order'>ISNULL(tsgsp.msx_server_name,N'')</property>
+    <property name="JobServerType" type="int" report_type='Agent.JobServerType' access="Read">tsgsp.sqlagent_type</property>
+    <property name='SqlServerRestart' type='bit' cast='true'>tsgsp.sqlserver_restart</property>
+    <property name="SqlAgentRestart" type="bit" cast='true'>tsgsp.monitor_autostart</property>
+    <property name='MaximumHistoryRows' type='int'>tsgsp.jobhistory_max_rows</property>
+    <property name='MaximumJobHistoryRows' type='int'>tsgsp.jobhistory_max_rows_per_job</property>
+    <property name='ErrorLogFile' type='nvarchar' size = '255'>tsgsp.errorlog_file</property>
+    <property name='AgentLogLevel' type='int' report_type = "Agent.AgentLogLevels">tsgsp.errorlogging_level</property>
+    <property name='NetSendRecipient' type='nvarchar' size = '30'>ISNULL(tsgsp.error_recipient,N'')</property>
+    <property name='AgentShutdownWaitTime' type='int'>tsgsp.job_shutdown_timeout</property>
+    <property name='SqlAgentMailProfile' type='nvarchar' size = '64'>ISNULL(tsgsp.email_profile,N'')</property>
+    <property name='SaveInSentFolder' type='bit' cast='true'>tsgsp.email_save_in_sent_folder</property>
+    <property name='WriteOemErrorLog' type='bit' cast='true'>tsgsp.oem_errorlog</property>
+    <property name='IsCpuPollingEnabled' type='bit' cast='true'>tsgsp.cpu_poller_enabled</property>
+    <property name='IdleCpuPercentage' type='int'>tsgsp.idle_cpu_percent</property>
+    <property name='IdleCpuDuration' type='int'>tsgsp.idle_cpu_duration</property>
+    <property name='LoginTimeout' type='int'>tsgsp.login_timeout</property>
+    <property name='HostLoginName' type='sysname' access="Read">ISNULL(tsgsp.host_login_name,N'')</property>
+    <property name='LocalHostAlias' type='sysname'>ISNULL(tsgsp.local_host_server,N'')</property>
+    <property name="SqlAgentAutoStart" type="bit" cast='true'>tsgsp.auto_start</property>
+
+    <version min_major = '10' >
+            <property name='ReplaceAlertTokensEnabled' type='bit' cast='true'>tsgsp.replace_alert_tokens_enabled</property>
+			<property name="MsxAccountName" type="nvarchar" size = "255" access="Read"
+				expensive="true">ISNULL((select top 1 msx_login_name from #tmpMsxAccountName),N'')</property>
+			<property name="MsxAccountCredentialName" type="nvarchar" size = "255" access="Read"
+				expensive="true">ISNULL((select top 1 msx_credential_name from #tmpMsxAccountName),N'')</property>
+			<property name='DatabaseMailProfile' type='nvarchar' size='255'>ISNULL(@DatabaseMailProfile,N'')</property>
+			<property name='AgentMailType' type='int' report_type='Agent.AgentMailType'>ISNULL(@AgentMailType, 0)</property>
+      <!-- SysAdminOnly defaults to 1 because we need to have this property
+           in the property bag for Yukon -->
+      <property name='SysAdminOnly' type='bit' cast='true' access="Read">1</property>
+      <property name="ServiceStartMode" type="int" report_type="ServiceStartMode"  access="Read">@ServiceStartMode</property>
+      <property name="ServiceAccount" type="nvarchar" size="512" access="Read">ISNULL(@ServiceAccount,N'')</property>
+    </version>
+    <version min_major ="10" >
+      <property name="AgentDomainGroup" type="nvarchar" size="128" access="Read">ISNULL(suser_sname(sid_binary(ISNULL(@AgtGroup,N''))),N'')</property>
+    </version>
+	</properties>
+</EnumObject>

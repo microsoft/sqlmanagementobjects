@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+  </PropertyGroup>
+  <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
+  <ItemGroup>
+      <ProjectReference Include="$(EnlistmentRoot)\src\CollectionGenerator\CollectionGenerator.csproj" ExcludeAssets="analyzers" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+      <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

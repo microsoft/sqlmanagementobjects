@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  
+  <!-- Root element: EnumObject -->
+  <xs:element name="EnumObject">
+    <xs:annotation>
+      <xs:documentation>
+        Root element defining a SQL Server Management Object (SMO) type.
+        Used by both Code Generation (for creating class definitions) and runtime (for generating queries to populate/modify objects).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="settings" type="SettingsType"/>
+        <xs:element name="properties" type="PropertiesType"/>
+        <xs:element name="property" type="PropertyType">
+          <xs:annotation>
+            <xs:documentation>
+              Provides the definition of a property. This is used by codegen and during runtime to populate the Property value (usually from the value returned from the SQL query for the object).
+              Can be defined at the root level or within version-specific containers for version-gated properties.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="union" type="UnionType">
+          <xs:annotation>
+            <xs:documentation>
+              Defines a union of multiple queries that combine results from different sources using SQL UNION.
+              Each union element contains its own settings and properties sections that define how to query and populate the object from a specific source.
+              Multiple union elements at the same level will have their results combined via UNION in the generated SQL query.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="version" type="VersionContainerType">
+          <xs:annotation>
+            <xs:documentation>
+              Version-specific settings or properties container at the root level.
+              Used to selectively include/exclude entire settings or properties sections based on SQL Server version.
+              Contents are only included if connection version meets the specified requirements.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="type" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The name of the class type this file is representing (e.g., "Table", "Index", "Column").</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="impl_type" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Implementation type for the object (typically "SqlObject").</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="min_major" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum major version (On-Prem) this object is supported in (e.g., '7' for SQL Server 7.0).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="max_major" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum major version (On-Prem) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="min_minor" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum minor version (On-Prem) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="max_minor" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum minor version (On-Prem) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="min_build" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum build version (On-Prem) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="max_build" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum build version (On-Prem) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cloud_min_major" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum major version (Cloud/Azure SQL) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cloud_max_major" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum major version (Cloud/Azure SQL) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cloud_min_minor" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum minor version (Cloud/Azure SQL) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cloud_max_minor" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum minor version (Cloud/Azure SQL) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cloud_min_build" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Minimum build version (Cloud/Azure SQL) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cloud_max_build" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Maximum build version (Cloud/Azure SQL) this object is supported in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="datawarehouse_enabled" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Whether this object is enabled for Azure Synapse Analytics (Data Warehouse), in addition to other specified versions.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Settings container type -->
+  <xs:complexType name="SettingsType">
+    <xs:annotation>
+      <xs:documentation>
+        Container for object settings including parent links, property links, and query modifications.
+        IMPORTANT: Child nodes MUST be defined in a specific order (see README.md for details).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="distinct" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to use DISTINCT in the generated query (order 1).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="parent_link" type="ParentLinkType">
+        <xs:annotation>
+          <xs:documentation>Defines properties whose values are pulled from the parent object (order 2).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="fail_condition" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Condition that causes the enumeration to fail (order 3).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="request_parent_select" type="RequestParentSelectType">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies which parent object properties should be selected and made available for child object queries (order 4).
+            Used when child objects need to reference parent property values in their queries.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="include" type="IncludeType">
+        <xs:annotation>
+          <xs:documentation>Includes another XML file's definitions into this object (order 5).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="property_link" type="PropertyLinkType">
+        <xs:annotation>
+          <xs:documentation>
+            Defines a join to a table or view (order 6).
+            Can be a FROM clause (table), JOIN clause (join), or LEFT JOIN clause (left_join).
+            Best practice: Use temp tables for new property_link entries on objects with many joins to avoid performance penalties.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="prefix" type="PrefixPostfixType">
+        <xs:annotation>
+          <xs:documentation>
+            SQL statements to execute before fetching properties (order 7).
+            Commonly used to create temp tables or declare variables.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="postfix" type="PrefixPostfixType">
+        <xs:annotation>
+          <xs:documentation>
+            SQL statements to execute after fetching properties (order 8).
+            Commonly used to drop temp tables or clean up resources.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="post_process" type="PostProcessType">
+        <xs:annotation>
+          <xs:documentation>
+            Defines client-side post-processing for property values (order 9).
+            Allows calculations and transformations on returned data before properties are set.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="orderby_redirect" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Redirects ordering to a different property (order 10).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="special_query" type="SpecialQueryType">
+        <xs:annotation>
+          <xs:documentation>
+            Special query modifications (order 11).
+            This tag has 2 specialized uses and one standard behavior. Originally it was a special case for table.xml, to add a filter to hide temp tables when enumerating tables in tempdb, and to enable adding a query hint for optimizing the overall tables query.
+            Now it also acts similarly to post_process by being a general purpose conditioned SQL tag with a fields attribute and a body which is added to the WHERE clause of the query with an AND condition.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="version" type="VersionContainerType">
+        <xs:annotation>
+          <xs:documentation>
+            Version-specific settings container.
+            Used to selectively include/exclude elements based on SQL Server version.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="main_table" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the main table or temp table to use in the generated query.
+          Can be a system table, temp table, or catalog view with optional alias.
+          Examples: "#fixdrv" (temp table), "sys.partition_functions AS spf" (catalog view with alias), "dbo.syscomments c" (system table with alias).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="distinct" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies whether to use DISTINCT in the generated query to eliminate duplicate rows.
+          When true, adds DISTINCT to the SELECT clause.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Parent link type -->
+  <xs:complexType name="ParentLinkType">
+    <xs:annotation>
+      <xs:documentation>Defines mappings between parent object properties and child object properties.</xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="link">
+        <xs:complexType>
+          <xs:attribute name="parent" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>The name of the property on the parent object.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="local" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>The name of the property on the child object (will call parentObj.ParentProperty).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="link_multiple" type="LinkMultipleType">
+        <xs:annotation>
+          <xs:documentation>
+            Defines a complex expression for mapping parent properties to child properties using link_multiple syntax.
+            Used for advanced parent-child relationships where simple field mapping is insufficient.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- Request parent select type -->
+  <xs:complexType name="RequestParentSelectType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines which parent object properties should be included in the parent SELECT query.
+        These properties are then available for use in child object queries via link_multiple expressions or other query constructs.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="field" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>
+                The name of the parent object property to select.
+                Example: 'ID', 'Name', 'JobID'.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Property link type -->
+  <xs:complexType name="PropertyLinkType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a join to a table or view. Join type is determined by attributes in this order: table, join, left_join.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="link_multiple" type="LinkMultipleType"/>
+    </xs:choice>
+    <xs:attribute name="table" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Object is added as a FROM clause (e.g., "sys.tables AS tbl").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="join" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Object is joined via a JOIN clause (e.g., "sys.indexes AS idx").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="left_join" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Object is joined via a LEFT JOIN clause (e.g., "sys.xml_indexes AS xi").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="alias" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Alias for the table/view being linked.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="fields" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The fields (properties) which trigger this property link to be applied.
+          Format: #-separated list surrounded by # (e.g., "#FieldName1#FieldName2#").
+          Link is skipped if none of the listed properties are requested.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expression_is_for_table_name" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, the link_multiple expression is used as the table name rather than as a join condition.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Include type -->
+  <xs:complexType name="IncludeType">
+    <xs:annotation>
+      <xs:documentation>Includes definitions from another XML file (relative path from xml directory).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="file" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Relative path to the XML file to include (e.g., "parameter.xml", "include/inc_type.xml").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="alias" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Optional alias to use when including the file's definitions.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="for" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The fields (properties) which trigger this include to be applied.
+          Format: #-separated list surrounded by # (e.g., "#IsSystemObject#", "#Name#ID#CreateDate#").
+          Include is skipped if none of the listed properties are requested.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ro_after_creation" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Properties from the included file that are read-only after object creation.
+          Format: #-separated list surrounded by # (e.g., "#Text#", "#DataType#NumericPrecision#NumericScale#").
+          These properties can only be set during object creation, not modified afterward.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Prefix/Postfix type -->
+  <xs:complexType name="PrefixPostfixType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        SQL statements to execute before (prefix) or after (postfix) property fetching.
+        Can contain plain SQL text or link_multiple elements for dynamic SQL generation.
+        Best practice: Use prefix to create temp tables and postfix to drop them for performance optimization.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="link_multiple" type="LinkMultipleType"/>
+    </xs:choice>
+    <xs:attribute name="fields" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Fields that trigger this prefix/postfix to be executed.
+          Format: #-separated list surrounded by # (e.g., "#FieldName1#FieldName2#").
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Post-process type -->
+  <xs:complexType name="PostProcessType">
+    <xs:annotation>
+      <xs:documentation>
+        Post-processing for additional calculations on returned data.
+        Allows client-side manipulation before property values are set.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="class_name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The name of the class that handles post-processing (non-SMO types, used as-is).
+          Should extend PostProcess class.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="smo_class_name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The name of the SMO class that handles post-processing (prefixed with SMO namespace).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="fields" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The list of fields which will cause the post-processing to happen.
+          Format: #-separated list surrounded by # (e.g., "#DefaultValue#").
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="triggered_fields" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The list of fields needed to compute the value for the field requested by the user.
+          Format: #-separated list surrounded by # (e.g., "#IDText#DatabaseName#ParamName#").
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Special query type -->
+  <xs:complexType name="SpecialQueryType">
+    <xs:annotation>
+      <xs:documentation>
+        Special query tag for adding conditional SQL to WHERE clause.
+        Acts as a general-purpose conditioned SQL tag with a fields attribute; body is added to WHERE clause with AND condition.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="fields" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Fields that trigger this special query to be applied.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="database" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the database context where this special query should be applied.
+              Example: "tempdb" to apply special filtering only when enumerating objects in the tempdb database.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="hint" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies a query hint to optimize the overall query.
+              Can be used to add query optimization hints to the generated SQL statement.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Version container type -->
+  <xs:complexType name="VersionContainerType">
+    <xs:annotation>
+      <xs:documentation>
+        Container for version-specific elements.
+        Contents are only included if connection version meets the specified requirements.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="parent_link" type="ParentLinkType">
+        <xs:annotation>
+          <xs:documentation>Defines properties whose values are pulled from the parent object.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="request_parent_select" type="RequestParentSelectType">
+        <xs:annotation>
+          <xs:documentation>
+            Defines which parent object properties should be included in the parent SELECT query.
+            These properties are then available for use in child object queries via link_multiple expressions or other query constructs.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="property_link" type="PropertyLinkType"/>
+      <xs:element name="prefix" type="PrefixPostfixType"/>
+      <xs:element name="postfix" type="PrefixPostfixType"/>
+      <xs:element name="post_process" type="PostProcessType"/>
+      <xs:element name="property" type="PropertyType"/>
+      <xs:element name="include" type="IncludeType"/>
+      <xs:element name="special_query" type="SpecialQueryType"/>
+      <xs:element name="union" type="UnionType"/>
+      <xs:element name="version" type="VersionContainerType"/>
+    </xs:choice>
+    <xs:attribute name="min_major" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Minimum major version (On-Prem) for contents to be included (e.g., '9' for SQL Server 2005).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_major" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Maximum major version (On-Prem) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min_minor" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Minimum minor version (On-Prem) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_minor" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Maximum minor version (On-Prem) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min_build" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Minimum build version (On-Prem) for contents to be included (e.g., '950' for SQL Server 2025 CTP features).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_build" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Maximum build version (On-Prem) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cloud_min_major" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Minimum major version (Cloud/Azure SQL) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cloud_max_major" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Maximum major version (Cloud/Azure SQL) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cloud_min_minor" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Minimum minor version (Cloud/Azure SQL) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cloud_max_minor" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Maximum minor version (Cloud/Azure SQL) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cloud_min_build" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Minimum build version (Cloud/Azure SQL) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cloud_max_build" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Maximum build version (Cloud/Azure SQL) for contents to be included.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="datawarehouse_enabled" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>Whether contents are enabled for Azure Synapse Analytics (Data Warehouse).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Properties container type -->
+  <xs:complexType name="PropertiesType">
+    <xs:annotation>
+      <xs:documentation>Container for property definitions used by codegen and runtime to populate property values.</xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="property" type="PropertyType"/>
+      <xs:element name="include" type="IncludeType"/>
+      <xs:element name="version" type="VersionContainerType"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- Property type -->
+  <xs:complexType name="PropertyType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a property of the SMO object.
+        Used by codegen to create the property definition and during runtime to populate the property value from SQL query results.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="link_multiple" type="LinkMultipleType"/>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>The name of the property (e.g., "Name", "ID", "IsReadOnly").</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              T-SQL type (e.g., "int", "bit", "nvarchar") which is mapped to the appropriate CLR type.
+              See Util.cs!DbTypeToClrType for the mapping.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="report_type" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              CLR type for this property (prefixed with SMO namespace).
+              MUST be used for SMO types to ensure correct namespace (e.g., "IndexType", "ServerVersion").
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="report_type2" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              CLR type for this property (used as-is).
+              Should be used for non-SMO types (e.g., "System.String", "System.Int32").
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="smo_class_name" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              For post_process elements only. Class name that post_process is updating (prefixed with SMO namespace).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="class_name" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              For post_process elements only. Class name that post_process is updating (used as-is for non-SMO types).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="size" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Size for variable-length types (e.g., "4000" for nvarchar(4000)).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="cast" type="xs:boolean">
+          <xs:annotation>
+            <xs:documentation>
+              If true, the generated T-SQL will CAST the property to the specified type.
+              Example: type='bit' cast='true' results in CAST(myPropValue AS bit).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="convert" type="xs:boolean">
+          <xs:annotation>
+            <xs:documentation>
+              If true, the generated T-SQL will use CONVERT function to explicitly convert the value to the specified type.
+              Similar to cast but uses CONVERT syntax instead of CAST.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="mode" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Modes this property is available for (maps to PropertyMode enum).
+              Can accept either single values (e.g., "design", "deploy") or a #-separated list of values (e.g., "design#deploy").
+              "design" mode adds SfcPropertyFlags.Design attribute and allows default values for readonly properties in unit testing.
+              "deploy" mode adds SfcPropertyFlags.Deploy attribute.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="expensive" type="xs:boolean">
+          <xs:annotation>
+            <xs:documentation>
+              Marks property as expensive to fetch - only this property will be fetched when accessed (not batched).
+              Properties marked expensive are NOT pre-populated during Script() calls.
+              If set, Properties.Get returns NULL until property is explicitly requested via methods that fetch it.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="hidden" type="xs:boolean">
+          <xs:annotation>
+            <xs:documentation>
+              If true (or attribute exists with any value), property is hidden from the user.
+              Hidden properties have no Request/Filter/OrderBy usages by default.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="access" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Access level for the property (case-insensitive).
+              Valid values: "Read" (read-only, cannot be modified), "ReadWrite" (can be read and modified), "Write" (write-only).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="read_only_after_creation" type="xs:boolean">
+          <xs:annotation>
+            <xs:documentation>
+              If true, property can only be set during object creation, not modified afterward (e.g., Identity, Computed).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="usage" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              What this property can be used for in SFC requests.
+              Valid values: "request" (ObjectPropertyUsages.Request), "filter" (ObjectPropertyUsages.Filter), "order" (ObjectPropertyUsages.OrderBy).
+              Defaults to All (all three) if neither usage nor notusage is specified and hidden=false.
+              Only one of usage or notusage is allowed; usage takes precedence.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="notusage" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              What this property CANNOT be used for in SFC requests.
+              Valid values: "request", "filter", "order".
+              Only one of usage or notusage is allowed; usage takes precedence if both specified.
+              NOTE: Post-processed properties automatically have Filter and OrderBy usages removed (calculated client-side).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="default_value" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Default value for the property used during code generation.
+              Example: "0" for integer properties that should default to zero.
+              Used in conjunction with cfg.xml to set default values for properties in unit testing.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="key_index" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the position of this property in the object's key for URN construction and object identification.
+              Value is typically a numeric index (e.g., "0", "1") indicating the order of key properties.
+              Used by SMO to identify which properties form the unique key for the object.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="table" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies an additional table to join for this property.
+              The table is added as a FROM clause specifically for retrieving this property's value.
+              Example: "master.dbo.spt_values v2" to join a lookup table for the property.
+              Used in conjunction with the 'link' attribute to define the join condition.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="link" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the join condition for the table specified in the 'table' attribute.
+              Defines how the additional table is linked to the main query.
+              Example: "v2.low=-1 and v2.type='SRV' and v1.number=v2.number"
+              Must be used together with the 'table' attribute.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+  </xs:complexType>
+
+  <!-- Link multiple type -->
+  <xs:complexType name="LinkMultipleType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a multi-field expression for building complex property values or URNs.
+        Used to compose values from multiple fields using parameterized expressions with placeholders ({0}, {1}, etc.).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="link_field" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Defines a field that will be substituted into the expression's placeholder positions.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="type" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                The type of field link.
+                Common values: "parent" (refers to parent object property), "local" (refers to current object property).
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="field" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>
+                The name of the field to link.
+                Example: "Urn", "FullName", "Name".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="default_value" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                Optional default value to use when the field value is not available or null.
+                Examples: "null", "0", "'*'", "default".
+                Commonly used with type='filter' fields to provide fallback values.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="no" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The number of link_field elements expected (e.g., '1', '2', '3').
+          Used for validation to ensure the correct number of fields are provided for the expression.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expression" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The expression template with placeholders for field substitution.
+          Uses {0}, {1}, {2}, etc. as placeholders that will be replaced by values from link_field elements in order.
+          Example: "{0} + '/AlertSystem'" or "case COLUMNPROPERTY(clmns.id, clmns.name, N'IsIdentity') when 1 then ident_seed({0}) else 0 end"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="hidden" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>If true, the link_multiple result is hidden from the user.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Union type -->
+  <xs:complexType name="UnionType">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a union query component that combines results from multiple sources using SQL UNION.
+        Each union element represents one query in the UNION statement and contains its own settings and properties.
+        Used for objects that need to aggregate data from different system tables or views into a single result set.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="settings" type="SettingsType">
+        <xs:annotation>
+          <xs:documentation>Defines the query settings for this union component, including table links and filters.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="properties" type="PropertiesType">
+        <xs:annotation>
+          <xs:documentation>Defines the properties to be selected in this union component's query.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+</xs:schema>

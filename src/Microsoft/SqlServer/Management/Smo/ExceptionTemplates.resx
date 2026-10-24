@@ -1,0 +1,3219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="InvalidPasswordHash" xml:space="preserve">
+    <value>Invalid value given for password hash. Specify a valid hash value.</value>
+  </data>
+  <data name="LoginPropertyNotSet" xml:space="preserve">
+    <value>You must set the Login property before creating an user.</value>
+  </data>
+  <data name="LoginEnable" xml:space="preserve">
+    <value>Enable Login.</value>
+  </data>
+  <data name="LoginDisable" xml:space="preserve">
+    <value>Disable Login.</value>
+  </data>
+  <data name="AddCredential" xml:space="preserve">
+    <value>Add Credential</value>
+  </data>
+  <data name="DropCredential" xml:space="preserve">
+    <value>Drop Credential</value>
+  </data>
+  <data name="InvalidTypeForMetadataProvider" xml:space="preserve">
+    <value>'{typeName}' is not a Type that has a metadata provider.</value>
+  </data>
+  <data name="InvalidPropertyExpression" xml:space="preserve">
+    <value>Expression '{expression}' does not specify a property.</value>
+  </data>
+  <data name="EnterServerRoleName" xml:space="preserve">
+    <value>Enter server role name</value>
+  </data>
+  <data name="ServerRoleOwnerNameEmpty" xml:space="preserve">
+    <value>The ServerRole.Owner property cannot be set to empty or null before calling the Create or Alter method.</value>
+  </data>
+  <data name="CreateAlterNotSupported" xml:space="preserve">
+    <value>CREATE, ALTER and DROP are not supported for Server Roles on versions earlier than SQL 2012</value>
+  </data>
+  <data name="EnterSequenceName" xml:space="preserve">
+    <value>Enter sequence name</value>
+  </data>
+  <data name="EnterMinValue" xml:space="preserve">
+    <value>The minimum value textbox cannot be empty when minimum value checkbox is selected.</value>
+  </data>
+  <data name="EnterMaxValue" xml:space="preserve">
+    <value>The maximum value textbox cannot be empty when maximum value checkbox is selected.</value>
+  </data>
+  <data name="EnterIncrementValue" xml:space="preserve">
+    <value>The increment value textbox cannot be empty.</value>
+  </data>
+  <data name="EnterStartValue" xml:space="preserve">
+    <value>The restart value textbox cannot be empty when the restart value option is selected.</value>
+  </data>
+  <data name="InvalidSequenceValue" xml:space="preserve">
+    <value>You must specify a valid integer value for property {propertyName}.</value>
+  </data>
+  <data name="UpgradeDll" xml:space="preserve">
+    <value>Upgrade DLL</value>
+  </data>
+  <data name="ProviderEnable" xml:space="preserve">
+    <value>Enable Cryptographic Provider</value>
+  </data>
+  <data name="ProviderDisable" xml:space="preserve">
+    <value>Disable Cryptographic Provider</value>
+  </data>
+  <data name="SourceTypeShouldBeProvider" xml:space="preserve">
+    <value>Source Type should be 'Provider'</value>
+  </data>
+  <data name="CannotSetPrivilege" xml:space="preserve">
+    <value>The privilege {privName} cannot be set for this type of object.</value>
+  </data>
+  <data name="CyclicalForeignKeys" xml:space="preserve">
+    <value>There is a cyclical foreign key relationship in the database. Cannot generate data-only script.</value>
+  </data>
+  <data name="UsersWithoutLoginsDownLevel" xml:space="preserve">
+    <value>Creating a user without an associated login is not supported in {targetVersion}.;</value>
+  </data>
+  <data name="EncryptedUserDefinedFunctionsDownlevel" xml:space="preserve">
+    <value>{udf} is an encrypted User Defined Function.  Encrypted User Defined Functions are not supported in {targetVersion}.</value>
+  </data>
+  <data name="EncryptedStoredProcedureDownlevel" xml:space="preserve">
+    <value>{sproc} is an encrypted Stored Procedure.  Encrypted Stored Procedures are not supported in {targetVersion}.</value>
+  </data>
+  <data name="EncryptedViewsFunctionsDownlevel" xml:space="preserve">
+    <value>{view} is an encrypted View.  Encrypted Views are not supported in {targetVersion}.</value>
+  </data>
+  <data name="SchemaDownlevel" xml:space="preserve">
+    <value>Error with Schema {objectName}.  Schemas are not supported in {targetVersion}.</value>
+  </data>
+  <data name="ColumnEncryptionKeyDownlevel" xml:space="preserve">
+    <value>Error with Column Encryption Key {objectName}.  Column Encryption Keys are not supported in {targetVersion}.</value>
+  </data>
+  <data name="ColumnMasterKeyDownlevel" xml:space="preserve">
+    <value>Error with Column Master Key {objectName}.  Column Master Keys are not supported in {targetVersion}.</value>
+  </data>
+  <data name="DdlTriggerDownlevel" xml:space="preserve">
+    <value>Error with DDL Trigger {objectName}.  DDL Triggers are not supported in {targetVersion}.</value>
+  </data>
+  <data name="ClrUserDefinedFunctionDownlevel" xml:space="preserve">
+    <value>Error with CLR User Defined Function {objectName}.  CLR User Defined Functions are not supported in {targetVersion}.</value>
+  </data>
+  <data name="ClrStoredProcedureDownlevel" xml:space="preserve">
+    <value>Error with CLR Stored Procedure {objectName}.  CLR Stored Procedure are not supported in {targetVersion}.</value>
+  </data>
+  <data name="ColumnEncryptionKeyNoValues" xml:space="preserve">
+    <value>Error creating Column Encryption Key {objectName}.  Must specify at least one Column Encryption Key value before creation.</value>
+  </data>
+  <data name="SecurityPolicyNoPredicates" xml:space="preserve">
+    <value>Error creating Security Policy {objectName}.  Must specify at least one security predicate before creation.</value>
+  </data>
+  <data name="NullParameterTable" xml:space="preserve">
+    <value>Table cannot be null.</value>
+  </data>
+  <data name="ComputedColumnDownlevelContraint" xml:space="preserve">
+    <value>The computed column {objectName} has a check or foreign key constraint, which is not supported in {targetVersion}.</value>
+  </data>
+  <data name="NullParameterScriptingOptions" xml:space="preserve">
+    <value>ScriptingOptions cannot be null.</value>
+  </data>
+  <data name="DataScriptingUnsupportedDataTypeException" xml:space="preserve">
+    <value>Column {columnName} in table {tableName} contains a data type {dataType}, which is not currently supported by data scripting.</value>
+  </data>
+  <data name="StoredProcedureDownlevelExecutionContext" xml:space="preserve">
+    <value>The stored procedure {objectName} contains an execution context {executionPrincipal}, which is not supported in {targetVersion}.</value>
+  </data>
+  <data name="UserDefinedFunctionDownlevelExecutionContext" xml:space="preserve">
+    <value>The user defined function {objectName} contains an execution context {executionPrincipal}, which is not supported in {targetVersion}.</value>
+  </data>
+  <data name="TriggerDownlevelExecutionContext" xml:space="preserve">
+    <value>The trigger {objectName} contains an execution context {executionPrincipal}, which is not supported in {targetVersion}.</value>
+  </data>
+  <data name="UnsupportedColumnCollation" xml:space="preserve">
+    <value>Column {columnName} in object {parentName} contains the collation {collationName}, which is not supported in the target server version, {targetVersion}.</value>
+  </data>
+  <data name="UnsupportedDatabaseCollation" xml:space="preserve">
+    <value>The source database's collation is {collationName}.  {targetVersion}, does not support this collation.</value>
+  </data>
+  <data name="UnsupportedColumnType" xml:space="preserve">
+    <value>Column {columnName} in object {parentName} contains type {columnDataType}, which is not supported in the target server version {targetVersion}, engine type {engineType}, edition {editionType}.</value>
+  </data>
+  <data name="UnsupportedColumnTypeOnEngineType" xml:space="preserve">
+    <value>Column {columnName} in object {parentName} contains type {columnDataType}, which is not supported in the target engine type, {engineType}.</value>
+  </data>
+  <data name="UnsupportedDataTypeOnTarget" xml:space="preserve">
+    <value>Data type {dataType} is not supported in the target server: version {targetVersion}, engine type {engineType}, edition type {editionType}.</value>
+  </data>
+  <data name="UnscriptableDataTypeOnTarget" xml:space="preserve">
+    <value>Data type {dataType} which cannot be scripted in the target server: version {targetVersion}, engine type {engineType}, edition type {editionType}.</value>
+  </data>
+  <data name="CollectionNotAvailable" xml:space="preserve">
+    <value>{objectname} collection is not accessible on server version {serverversion}.</value>
+  </data>
+  <data name="CreateOrAlterDownlevel" xml:space="preserve">
+    <value>CREATE OR ALTER syntax is not supported on {objectName} in {targetVersion}.</value>
+  </data>
+  <data name="CreateOrAlterNotSupported" xml:space="preserve">
+    <value>CREATE OR ALTER is not supported for type {objectName}.</value>
+  </data>
+  <data name="TriggerNotSupported" xml:space="preserve">
+    <value>INSTEAD OF triggers are not supported on server version {serverversion}.</value>
+  </data>
+  <data name="CannotEnableViewTrigger" xml:space="preserve">
+    <value>You cannot set Enabled property while creating a view trigger.</value>
+  </data>
+  <data name="ReplicationOptionNotSupportedForCloud" xml:space="preserve">
+    <value>{optionName} option is not supported on Microsoft Azure SQL Database. For generating script, try setting TextMode property as false.</value>
+  </data>
+  <data name="UnknownRecoveryModel" xml:space="preserve">
+    <value>Recovery model {modelname} is unknown.</value>
+  </data>
+  <data name="UnknownUserAccess" xml:space="preserve">
+    <value>Unknown user access {modelname}.</value>
+  </data>
+  <data name="CannotRenameObject" xml:space="preserve">
+    <value>You cannot rename object {objectname} on server version {serverversion}.</value>
+  </data>
+  <data name="PropertyNotSet" xml:space="preserve">
+    <value>Set property {propname} for {objtype} object to accomplish this action.</value>
+  </data>
+  <data name="ColumnAlreadyHasDefault" xml:space="preserve">
+    <value>Column {name} already has a default.</value>
+  </data>
+  <data name="ColumnHasNoDefault" xml:space="preserve">
+    <value>Column '{colname}' does not have a default named '{defname}'.</value>
+  </data>
+  <data name="NoSparseOnColumnSet" xml:space="preserve">
+    <value>Column sets cannot be sparse.</value>
+  </data>
+  <data name="NoSparseOnComputed" xml:space="preserve">
+    <value>Computed columns cannot be sparse.</value>
+  </data>
+  <data name="NoColumnSetOnComputed" xml:space="preserve">
+    <value>Computed columns cannot be column set.</value>
+  </data>
+  <data name="NoGeneratedAlwaysColumnsOnNonTables" xml:space="preserve">
+    <value>Columns with generated always values can only be defined on tables.</value>
+  </data>
+  <data name="NoSparseOrColumnSetOnTemporalColumns" xml:space="preserve">
+    <value>Columns belonging to a system-time period cannot be sparse or column-set.</value>
+  </data>
+  <data name="ComputedTemporalColumns" xml:space="preserve">
+    <value>Columns belonging to a system-time period cannot be computed.</value>
+  </data>
+  <data name="IdentityTemporalColumns" xml:space="preserve">
+    <value>Columns belonging to a system-time period cannot be identity columns.</value>
+  </data>
+  <data name="NullableTemporalColumns" xml:space="preserve">
+    <value>Columns belonging to a system-time period cannot be nullable.</value>
+  </data>
+  <data name="InvalidAlwaysEncryptedPropertyValues" xml:space="preserve">
+    <value>ColumnEncryptionKeyName, EncryptionAlgorithm and EncryptionType must all be set to enable Encryption on the column.</value>
+  </data>
+  <data name="NoMemoryOptimizedTemporalTables" xml:space="preserve">
+    <value>Memory-optimized tables cannot be system-versioned.</value>
+  </data>
+  <data name="SystemVersionedTableWithoutPeriod" xml:space="preserve">
+    <value>System-versioned table must have system-versioned period defined.</value>
+  </data>
+  <data name="HistoryTableWithoutSystemVersioning" xml:space="preserve">
+    <value>History table can only be provided when system-versioning is turned on.</value>
+  </data>
+  <data name="NoTemporalFileTables" xml:space="preserve">
+    <value>System-versioned temporal tables or tables with defined system-versioning period cannot be file tables.</value>
+  </data>
+  <data name="NoAddingPeriodOnDroppedTable" xml:space="preserve">
+    <value>Period cannot be defined on tables that are dropped or marked to be dropped.</value>
+  </data>
+  <data name="CannotHaveMultiplePeriods" xml:space="preserve">
+    <value>Period cannot be defined on a table that already has a period defined.</value>
+  </data>
+  <data name="NoDroppingPeriodOnDroppedTable" xml:space="preserve">
+    <value>Period cannot be dropped on a non-existing table.</value>
+  </data>
+  <data name="NoDroppingPeriodOnNotYetCreatedTable" xml:space="preserve">
+    <value>Period cannot be dropped on tables that are already dropped or marked to be dropped.</value>
+  </data>
+  <data name="CannotDropNonExistingPeriod" xml:space="preserve">
+    <value>Table does not have a period defined.</value>
+  </data>
+  <data name="MustProvideExistingColumn" xml:space="preserve">
+    <value>An existing table column must be provided.</value>
+  </data>
+  <data name="PeriodMustHaveDifferentColumns" xml:space="preserve">
+    <value>Starting and ending column for a system-time period cannot be the same.</value>
+  </data>
+  <data name="PeriodStartColumnMustBeGeneratedAlways" xml:space="preserve">
+    <value>Period start column must have GeneratedAlwaysType property correctly set.</value>
+  </data>
+  <data name="PeriodEndColumnMustBeGeneratedAlways" xml:space="preserve">
+    <value>Period end column must have GeneratedAlwaysType property correctly set.</value>
+  </data>
+  <data name="PeriodInvalidDataType" xml:space="preserve">
+    <value>Columns defining system-time period must be of DateTime2 type.</value>
+  </data>
+  <data name="InvalidPeriodColumnName" xml:space="preserve">
+    <value>Must provide valid, non-empty column name.</value>
+  </data>
+  <data name="BothHistoryTableNameAndSchemaMustBeProvided" xml:space="preserve">
+    <value>When turning on system versioning, either both history table name and history table schema must be provided or none of them.</value>
+  </data>
+  <data name="NoHiddenColumnsOnNonGeneratedAlwaysColumns" xml:space="preserve">
+    <value>Only system-time period columns can be declared as hidden.</value>
+  </data>
+  <data name="InvalidHistoryRetentionPeriodSpecification" xml:space="preserve">
+    <value>History retention period value was not specified correctly. Expected value greater than 0.</value>
+  </data>
+  <data name="InvalidHistoryRetentionPeriodUnitSpecification" xml:space="preserve">
+    <value>History retention period unit was not specified correctly. Expected value other than UNDEFINED.</value>
+  </data>
+  <data name="LedgerTypeMustBeProvided" xml:space="preserve">
+    <value>Ledger tables cannot be defined without the LedgerTableType being defined as AppendOnlyLedgerTable or UpdatableLedgerTable.</value>
+  </data>
+  <data name="BothLedgerViewNameAndSchemaMustBeProvided" xml:space="preserve">
+    <value>When defining ledger view, either both the view name and view schema must be provided or neither of them.</value>
+  </data>
+  <data name="CannotProvideLedgerViewColumnNamesWithoutLedgerViewNameAndSchema" xml:space="preserve">
+    <value>Ledger view schema and view name must be provided in order to specify ledger view column names.</value>
+  </data>
+  <data name="NoDataMaskingOnNonTables" xml:space="preserve">
+    <value>Data Masking can be applied only to table columns.</value>
+  </data>
+  <data name="NoDataMaskingOnColumnSet" xml:space="preserve">
+    <value>Cannot apply a data masking function on a column set.</value>
+  </data>
+  <data name="NoDataMaskingOnTemporalColumns" xml:space="preserve">
+    <value>Cannot apply a data masking function on columns with generated always values.</value>
+  </data>
+  <data name="NoDataMaskingOnComputedColumns" xml:space="preserve">
+    <value>Cannot apply a data masking function on computed columns.</value>
+  </data>
+  <data name="NoDataMaskingOnFileStreamColumns" xml:space="preserve">
+    <value>Cannot apply a data masking function on columns with the FILESTREAM storage attribute.</value>
+  </data>
+  <data name="NoDataMaskingOnEncryptedColumns" xml:space="preserve">
+    <value>Cannot apply a data masking function on encrypted columns.</value>
+  </data>
+  <data name="NoDataClassificationOnNonTables" xml:space="preserve">
+    <value>Data Classification can be applied only to table columns.</value>
+  </data>
+  <data name="NoDataClassificationOnComputedColumns" xml:space="preserve">
+    <value>Cannot apply a data classification on computed columns.</value>
+  </data>
+  <data name="MismatchingServerName" xml:space="preserve">
+    <value>The input Urn belongs to server {urnsrvname}, instead of server {srvname}.</value>
+  </data>
+  <data name="MissingBackupDevices" xml:space="preserve">
+    <value>No backup devices are set.</value>
+  </data>
+  <data name="MissingBackupDeviceType" xml:space="preserve">
+    <value>You must specify the type of the backup devices.</value>
+  </data>
+  <data name="MismatchingNumberOfMirrors" xml:space="preserve">
+    <value>There is a mismatch in the number of mirrored devices. Expected {i1}, received {i2}.</value>
+  </data>
+  <data name="BackupToPipesNotSupported" xml:space="preserve">
+    <value>Backup to pipe device is not supported on server version {serverversion}.</value>
+  </data>
+  <data name="PipeDeviceNotSupported" xml:space="preserve">
+    <value>Pipe devices not supported.</value>
+  </data>
+  <data name="BackupToUrlNotSupported" xml:space="preserve">
+    <value>Backup to URL device is not supported on server version {serverVersion}. Backup to URL device can be used on server version {supportedVersion} or later.</value>
+  </data>
+  <data name="CredentialNotSupportedError" xml:space="preserve">
+    <value>Credential {credential} is not supported on server version {serverVersion}. Microsoft Azure storage account credentials are supported on server version {supportedVersion} or later.</value>
+  </data>
+  <data name="BackupEncryptionNotSupported" xml:space="preserve">
+    <value>Encryption option is not supported on a version earlier than SQL Server 2014.</value>
+  </data>
+  <data name="LoginHasUser" xml:space="preserve">
+    <value>The proposed new database owner {name} is mapped as user {dbname} in this database.</value>
+  </data>
+  <data name="LoginHasAlias" xml:space="preserve">
+    <value>The proposed new database owner {name} already has an alias in this database.</value>
+  </data>
+  <data name="InvalidLogin" xml:space="preserve">
+    <value>The login '{loginname}' does not exist on this server.</value>
+  </data>
+  <data name="UnknownShrinkType" xml:space="preserve">
+    <value>Unknown Shrink type.</value>
+  </data>
+  <data name="InvalidShrinkMethod" xml:space="preserve">
+    <value>Shrink method {name} is not supported here.</value>
+  </data>
+  <data name="CannotChangePrimary" xml:space="preserve">
+    <value>The primary file must reside in the PRIMARY filegroup.</value>
+  </data>
+  <data name="OnlyOnePrimaryFile" xml:space="preserve">
+    <value>The PRIMARY filegroup already has a primary file.</value>
+  </data>
+  <data name="MustSpecifyGrowth" xml:space="preserve">
+    <value>You must specify Growth if you want to change GrowthType for this object.</value>
+  </data>
+  <data name="WrongPercentageGrowth" xml:space="preserve">
+    <value>Percentage growth must be a positive integer.</value>
+  </data>
+  <data name="WrongSize" xml:space="preserve">
+    <value>The size specified represents a value that is out of bounds.</value>
+  </data>
+  <data name="InvalidSizeFileStream" xml:space="preserve">
+    <value>Size cannot be specified for filestream filegroups.</value>
+  </data>
+  <data name="InvalidMaxSizeFileStream" xml:space="preserve">
+    <value>Maxsize cannot be specified for filestream filegroups.</value>
+  </data>
+  <data name="InvalidGrowthFileStream" xml:space="preserve">
+    <value>Growth or growth type cannot be specified for filestream filegroups.</value>
+  </data>
+  <data name="PrimaryAlreadyDefault" xml:space="preserve">
+    <value>Primary filegroup is already the default filegroup.</value>
+  </data>
+  <data name="ColumnNotVarbinaryMax" xml:space="preserve">
+    <value>Isfilestream property is supported only on the varbinary(max) data type.</value>
+  </data>
+  <data name="NotClusteredIndex" xml:space="preserve">
+    <value>The FILESTREAM_ON clause is supported only on a clustered index.</value>
+  </data>
+  <data name="NotNonClusteredIndex" xml:space="preserve">
+    <value>The filter clause is supported only on a nonclustered index.</value>
+  </data>
+  <data name="UnsupportedFileGroupType" xml:space="preserve">
+    <value>Unsupported filegroup type.</value>
+  </data>
+  <data name="ObjectRefsNonexCol" xml:space="preserve">
+    <value>The {objname} '{key}' references nonexistent column '{col}'.</value>
+  </data>
+  <data name="OrderHintRefsNonexCol" xml:space="preserve">
+    <value>The UserDefinedFunction '{key}' has an ORDER hint that references nonexistent column '{col}'.</value>
+  </data>
+  <data name="CannotCopyPartition" xml:space="preserve">
+    <value>Cannot copy partitions while start partition number({startPartition}) exceeds the value of end partition number ({endPartition}).</value>
+  </data>
+  <data name="PartitionNumberStartOutOfRange" xml:space="preserve">
+    <value>Start Partition number should lie between 1 and {maxvalue};</value>
+  </data>
+  <data name="VarDecimalAndDataCompressionConflict" xml:space="preserve">
+    <value>Vardecimal storage format cannot be enabled along with data compression.</value>
+  </data>
+  <data name="RebuildHeapOnClusteredIndexError" xml:space="preserve">
+    <value>Table with clustered index cannot execute RebuildHeap(). Call Rebuild on the clustered index.</value>
+  </data>
+  <data name="RebuildHeapError" xml:space="preserve">
+    <value>Exception occurred during execution of RebuildHeap process. {msg}.</value>
+  </data>
+  <data name="PartitionSchemeNotAssignedError" xml:space="preserve">
+    <value>Object '{msg}' does not have a partition scheme. You must specify a partition scheme before you can add a PhysicalPartition object that has a partition number greater than 1.</value>
+  </data>
+  <data name="CannotAddObject" xml:space="preserve">
+    <value>{typename} '{objectName}' could not be added to the collection, because it already exists.</value>
+  </data>
+  <data name="UnknownObjectType" xml:space="preserve">
+    <value>Unknown object type {name}.</value>
+  </data>
+  <data name="TooFewFiles" xml:space="preserve">
+    <value>At least one file is needed for Database Attach.</value>
+  </data>
+  <data name="UnknownProperty" xml:space="preserve">
+    <value>Property {name} does not belong to {typename}.</value>
+  </data>
+  <data name="ObjectNotUnderServer" xml:space="preserve">
+    <value>object {name} does not live under Server.</value>
+  </data>
+  <data name="UnknownChild" xml:space="preserve">
+    <value>Child object does not fit with the type of the child collection.</value>
+  </data>
+  <data name="UnknownChildCollection" xml:space="preserve">
+    <value>{objtypename} object does not contain a collection of {childname}.</value>
+  </data>
+  <data name="CantCreateType" xml:space="preserve">
+    <value>Type {name} could not be created.</value>
+  </data>
+  <data name="ObjectAlreadyExists" xml:space="preserve">
+    <value>The {type} '{name}' already exists.</value>
+  </data>
+  <data name="NoSqlGen" xml:space="preserve">
+    <value>No Transact-SQL was generated to create the object '{objname}'.</value>
+  </data>
+  <data name="InvalidType" xml:space="preserve">
+    <value>Type {typename} is invalid.</value>
+  </data>
+  <data name="WrongUrn" xml:space="preserve">
+    <value>The {objectType} object cannot be created with Urn='{urn}'.</value>
+  </data>
+  <data name="NoDepForSysObjects" xml:space="preserve">
+    <value>Scripting system objects with dependencies is not supported when AllowSystemObjects is set to false. Error at Urn ='{objUrn}'.</value>
+  </data>
+  <data name="UrnMissing" xml:space="preserve">
+    <value>Urn '{urn}' is missing from the dependencies list.</value>
+  </data>
+  <data name="InvalidGranteeList" xml:space="preserve">
+    <value>The grantee list is not valid.</value>
+  </data>
+  <data name="DatabaseAlreadyExists" xml:space="preserve">
+    <value>Cannot attach a database with the same name as an existing database.</value>
+  </data>
+  <data name="ObjectWithNoChildren" xml:space="preserve">
+    <value>Cannot create {objectName} that does not contain at least one {childName}.</value>
+  </data>
+  <data name="ColumnBeforeNotExisting" xml:space="preserve">
+    <value>Failed to insert column, because column '{colname}' does not exist.</value>
+  </data>
+  <data name="PropNotModifiable" xml:space="preserve">
+    <value>Modifying the {propName} property of the {objectType} object is not allowed. You must drop and recreate the object with the desired property.</value>
+  </data>
+  <data name="UnsupportedLoginMode" xml:space="preserve">
+    <value>The login mode {loginmode} is not supported.</value>
+  </data>
+  <data name="CannotSetDefInitFlds" xml:space="preserve">
+    <value>The type {typename} cannot have default init fields.</value>
+  </data>
+  <data name="ReasonTextIsEncrypted" xml:space="preserve">
+    <value>The text is encrypted.</value>
+  </data>
+  <data name="ReasonPropertyIsNotSupportedOnCurrentServerVersion" xml:space="preserve">
+    <value>Property is not supported on current server version</value>
+  </data>
+  <data name="ObjectWithMoreChildren" xml:space="preserve">
+    <value>Cannot create {objectName} that has more than one {childName}.</value>
+  </data>
+  <data name="WrongHybridIPAddresses" xml:space="preserve">
+    <value>Cannot create {objectName} that has hybrid IP addresses.</value>
+  </data>
+  <data name="WrongDHCPv6IPAddress" xml:space="preserve">
+    <value>Cannot create {objectName} that uses IP v6 for DHCP IP address.</value>
+  </data>
+  <data name="WrongMultiDHCPIPAddresses" xml:space="preserve">
+    <value>Cannot create {objectName} that uses more than one DHCP IP addresses.</value>
+  </data>
+  <data name="GetDHCPAddressFailed" xml:space="preserve">
+    <value>The listener '{listenerName}' should have exactly one DHCP-leased IP address, but {count} were found.</value>
+  </data>
+  <data name="CannotAddDHCPIPAddress" xml:space="preserve">
+    <value>Cannot create {objectName} when the {propName} property is set to true. Set this property to false and try again.</value>
+  </data>
+  <data name="CannotRemoveDHCPIPAddress" xml:space="preserve">
+    <value>Cannot remove DHCP address from the listener</value>
+  </data>
+  <data name="SearchPropertyListNameNotValid" xml:space="preserve">
+    <value>Property names must contain at least one character and must not exceed {maxLength} characters.</value>
+  </data>
+  <data name="SearchPropertyNameNotValid" xml:space="preserve">
+    <value>The 'Property Name' field is empty. Specify a property name of 1 to {maxLength} characters that is unique within the search property list.</value>
+  </data>
+  <data name="SearchPropertyIntIDNotValid" xml:space="preserve">
+    <value>The 'Property Int ID' field must contain a valid integer from 0 to 2147483647.</value>
+  </data>
+  <data name="SearchPropertySetGuidNotValid" xml:space="preserve">
+    <value>The 'Property Set GUID' field must contain the globally unique identifier (GUID) of the property set to which the specified property belongs. The format for a GUID is 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).</value>
+  </data>
+  <data name="SearchPropertyDescriptionNotValid" xml:space="preserve">
+    <value>The 'Property Description' field must not exceed {maxLength} characters.</value>
+  </data>
+  <data name="SearchPropertyGuidIntIdNotValid" xml:space="preserve">
+    <value>The 'Property Set GUID' and 'Property Int ID' combination must be unique.</value>
+  </data>
+  <data name="NullOrEmptyParameterSourceDatabaseName" xml:space="preserve">
+    <value>The 'Source database' field cannot be null or empty. Specify the name of a database from which you want to copy a search property list.</value>
+  </data>
+  <data name="NullOrEmptyParameterSourceSearchPropertyListName" xml:space="preserve">
+    <value>The 'Source search property list' field cannot be null or empty. Specify the name of the search property list that you want to copy.</value>
+  </data>
+  <data name="EmptySourceSearchPropertyListName" xml:space="preserve">
+    <value> The 'Source search property list' field cannot be empty. Specify the name of the search property list that you want to copy.</value>
+  </data>
+  <data name="SearchPropertyListNameAllWhiteSpaces" xml:space="preserve">
+    <value>The search property list name cannot consist of all whitespace characters.</value>
+  </data>
+  <data name="EmptyRestorePlan" xml:space="preserve">
+    <value>Empty restore plan.</value>
+  </data>
+  <data name="MultipleDatabaseSelectedToRestore" xml:space="preserve">
+    <value>Multiple database selected to be restored.</value>
+  </data>
+  <data name="ConflictWithNoRecovery" xml:space="preserve">
+    <value>Specifying this option when restoring a backup with the NORECOVERY option is not permitted.</value>
+  </data>
+  <data name="BackupsOfDifferentDb" xml:space="preserve">
+    <value>Backups selected are from different source database.</value>
+  </data>
+  <data name="FullBackupShouldBeFirst" xml:space="preserve">
+    <value>Full backup should be restored first.</value>
+  </data>
+  <data name="BackupsNotInSequence" xml:space="preserve">
+    <value>Backups selected are not in sequence.</value>
+  </data>
+  <data name="NoFullBackupSelected" xml:space="preserve">
+    <value>No full database backup is selected to be restored.</value>
+  </data>
+  <data name="WrongDiffbackup" xml:space="preserve">
+    <value>Differential backup restore should happen just after the full database restore with NORECOVERY.</value>
+  </data>
+  <data name="DiffBackupNotCompatible" xml:space="preserve">
+    <value>Differential backup selected is not compatible with Full backup.</value>
+  </data>
+  <data name="WrongTLogbackup" xml:space="preserve">
+    <value>T-Log backup selected is not in the correct sequence.</value>
+  </data>
+  <data name="TailLogBackupDeviceNull" xml:space="preserve">
+    <value>Tail-log backup device is not set.</value>
+  </data>
+  <data name="OnlyLastRestoreWithNoRecovery" xml:space="preserve">
+    <value>Only the last restore operation in the restore plan can be with recovery.</value>
+  </data>
+  <data name="UnsupportedServerVersion" xml:space="preserve">
+    <value>This operation is only supported for SQL Server 2005 and later.</value>
+  </data>
+  <data name="BackupMediaSetNotComplete" xml:space="preserve">
+    <value>Backup mediaset is not complete. Files: {files}. Family count:{familyCount}. Missing family sequence number:{missing}</value>
+  </data>
+  <data name="BackupMediaSetEmpty" xml:space="preserve">
+    <value>Backup mediaset is empty.</value>
+  </data>
+  <data name="GetMediaSetGuid" xml:space="preserve">
+    <value>Get backup media guid.</value>
+  </data>
+  <data name="MediaNotPartOfSet" xml:space="preserve">
+    <value>Backup Media not a part of the Backup Media Set.</value>
+  </data>
+  <data name="UnableToReadDevice" xml:space="preserve">
+    <value>Unable to read backup device: {backupDeviceName}.</value>
+  </data>
+  <data name="FileGroupNotSupported" xml:space="preserve">
+    <value>DatabaseRestorePlan class doesn't support File/Filegroup restore.</value>
+  </data>
+  <data name="InvalidDatabaseState" xml:space="preserve">
+    <value>The state of the database doesn't support Page restore.</value>
+  </data>
+  <data name="PageRestoreOnlyForFullRecovery" xml:space="preserve">
+    <value>Page restore only possible for database in full recovery model.</value>
+  </data>
+  <data name="BackupFileAlreadyExists" xml:space="preserve">
+    <value>Backup file already exits: {backupFile}</value>
+  </data>
+  <data name="CloseConnectionsFailed" xml:space="preserve">
+    <value>Unable to close existing connections.</value>
+  </data>
+  <data name="BackupTailLog" xml:space="preserve">
+    <value>Backup: Tail-log</value>
+  </data>
+  <data name="Restoring" xml:space="preserve">
+    <value>Restoring: {backupset}</value>
+  </data>
+  <data name="BackupFileNotFound" xml:space="preserve">
+    <value>Backup file not found: {file}</value>
+  </data>
+  <data name="TailLog" xml:space="preserve">
+    <value>Tail-log</value>
+  </data>
+  <data name="UnableToCreateRestoreSequence" xml:space="preserve">
+    <value>Unable to create restore plan due to break in the LSN chain.</value>
+  </data>
+  <data name="UnableToCreatePageRestoreSequence" xml:space="preserve">
+    <value>Unable to create Page restore plan due to forked restore path or broken LSN chain.</value>
+  </data>
+  <data name="UnableToCreatePlanTakeTLogBackup" xml:space="preserve">
+    <value>No backup has been taken after the last Restore operation. Take a Transaction-Log backup to enable Page Restore.</value>
+  </data>
+  <data name="OperationCancelledByUser" xml:space="preserve">
+    <value>Operation canceled by user.</value>
+  </data>
+  <data name="CannotRestoreFileBootPage" xml:space="preserve">
+    <value>Cannot restore file boot page: [{fileid},{pageid}]</value>
+  </data>
+  <data name="CannotRestoreDatabaseBootPage" xml:space="preserve">
+    <value>Cannot restore database boot page: [{fileid},{pageid}]</value>
+  </data>
+  <data name="DuplicateSuspectPage" xml:space="preserve">
+    <value>Duplicate page selected: [{fileId},{pageId}]</value>
+  </data>
+  <data name="InvalidSuspectpage" xml:space="preserve">
+    <value>Invalid page</value>
+  </data>
+  <data name="InvalidPathChildCollectionNotFound" xml:space="preserve">
+    <value>Invalid path: There is no collection of {child} objects that is a child of {parent}.</value>
+  </data>
+  <data name="InvalidPathChildSingletonNotFound" xml:space="preserve">
+    <value>Invalid path: There is no singleton child of type {child} that is a child of {parent}.</value>
+  </data>
+  <data name="SqlInnerException" xml:space="preserve">
+    <value>An exception occurred while executing a Transact-SQL statement.</value>
+  </data>
+  <data name="InnerException" xml:space="preserve">
+    <value>An exception occurred in SMO.</value>
+  </data>
+  <data name="InnerWmiException" xml:space="preserve">
+    <value>An exception occurred in SMO while trying to manage a service.</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>Unknown error.</value>
+  </data>
+  <data name="WMIException" xml:space="preserve">
+    <value>The call failed with WMI error {errorCode}. Please consult the WMI documentation.</value>
+  </data>
+  <data name="CallingInitChildLevelWithWrongUrn" xml:space="preserve">
+    <value>InitChildLevel has been called with {urn}.</value>
+  </data>
+  <data name="CallingInitQueryUrnsWithWrongUrn" xml:space="preserve">
+    <value>InitQueryUrns has been called with a query of '{urn}'.</value>
+  </data>
+  <data name="UnsupportedObjectQueryUrn" xml:space="preserve">
+    <value>The SMO object query '{urn}' is unsupported. Each level must represent a valid collection or single object.</value>
+  </data>
+  <data name="UnsupportedBackupDeviceType" xml:space="preserve">
+    <value>Cannot create device with type {name}.</value>
+  </data>
+  <data name="UnableToRetrieveBackupHistory" xml:space="preserve">
+    <value>Cannot retrieve backup history.</value>
+  </data>
+  <data name="UnsupportedVersion" xml:space="preserve">
+    <value>This method cannot be called on the server version {version}.</value>
+  </data>
+  <data name="UnsupportedCompatLevelException" xml:space="preserve">
+    <value>The object or one of its properties is not supported for the target compatibility level {targetLevel}. The minimum supported compatibility level is {minLevel}.</value>
+  </data>
+  <data name="ObjectDoesNotExist" xml:space="preserve">
+    <value>The {type} '{name}' does not exist on the server.</value>
+  </data>
+  <data name="UnsupportedFeature" xml:space="preserve">
+    <value>{type} is not supported on this edition of SQL Server.</value>
+  </data>
+  <data name="OneFilePageSupported" xml:space="preserve">
+    <value>You can specify pages for only one file in this operation.</value>
+  </data>
+  <data name="NoObjectWithoutColumns" xml:space="preserve">
+    <value>Cannot create {objName} without specifying one or more columns.</value>
+  </data>
+  <data name="ConflictingScriptingOptions" xml:space="preserve">
+    <value>Cannot specify both {opt1} and {opt2} as scripting options.</value>
+  </data>
+  <data name="InvalidScriptingOutput" xml:space="preserve">
+    <value>At least one of the properties {opt1}, or {opt2} must be specified.</value>
+  </data>
+  <data name="ScriptDataNotSupportedByThisMethod" xml:space="preserve">
+    <value>This method does not support scripting data.</value>
+  </data>
+  <data name="ForeignKeyCycleInObjects" xml:space="preserve">
+    <value>There is a cyclical foreign key relationship in the database. Cannot generate data-only script.</value>
+  </data>
+  <data name="NotSupportedForCloudVersion" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on version '{version}' of Microsoft Azure SQL Database.</value>
+  </data>
+  <data name="NotSupportedForSqlDw" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure Synapse Analytics dedicated SQL pools Edition.</value>
+  </data>
+  <data name="NotSupportedForSqlOd" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition.</value>
+  </data>
+  <data name="NotSupportedForSqlDb" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure SQL Database Edition.</value>
+  </data>
+  <data name="NotSupportedForSqlEdge" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure SQL Edge Edition.</value>
+  </data>
+  <data name="NotSupportedOnStandalone" xml:space="preserve">
+    <value>This object is not supported on Standalone SQL Server.</value>
+  </data>
+  <data name="NotSupportedOnStandaloneWithDetails" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Standalone SQL Server.</value>
+  </data>
+  <data name="NotSupportedOnCloud" xml:space="preserve">
+    <value>This object is not supported on Microsoft Azure SQL Database.</value>
+  </data>
+  <data name="NotSupportedOnCloudWithDetails" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure SQL Database.</value>
+  </data>
+  <data name="NotSupportedOnOnDemandWithDetails" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure Synapse SQL On-Demand Edition.</value>
+  </data>
+  <data name="NotSupportedOnSqlEdge" xml:space="preserve">
+    <value>Object of type '{type}' is not supported on Microsoft Azure SQL Edge Edition.</value>
+  </data>
+  <data name="InvalidScriptingOptions" xml:space="preserve">
+    <value>The scripting options 'TargetServerVersion|TargetDatabaseEngineType|TargetDatabaseEngineEdition' specified for current object are not valid.</value>
+  </data>
+  <data name="ScriptingNotSupportedForSqlDw" xml:space="preserve">
+    <value>Scripting object of type '{type}' is not supported while working against Microsoft Azure Synapse Analytics dedicated SQL pools Edition.</value>
+  </data>
+  <data name="ScriptingNotSupportedForSqlDb" xml:space="preserve">
+    <value>Scripting object of type '{type}' is not supported while working against Microsoft Azure SQL Database Edition.</value>
+  </data>
+  <data name="ScriptingNotSupportedOnStandalone" xml:space="preserve">
+    <value>Scripting object of type '{type}' is not supported while working against Standalone SQL Server.</value>
+  </data>
+  <data name="ScriptingNotSupportedOnCloud" xml:space="preserve">
+    <value>Scripting object of type '{type}' is not supported while working against Microsoft Azure SQL Database.</value>
+  </data>
+  <data name="ScriptingNotSupportedOnEdge" xml:space="preserve">
+    <value>Scripting object of type '{type}' is not supported while working against Microsoft Azure SQL Edge.</value>
+  </data>
+  <data name="CreateOrAlterNotSupportedVersion" xml:space="preserve">
+    <value>CREATE OR ALTER syntax is not supported on the specified version of SQL Server.</value>
+  </data>
+  <data name="SupportedOnlyBelow110" xml:space="preserve">
+    <value>This method or property is accessible only while working against a version earlier than SQL Server 2012.</value>
+  </data>
+  <data name="SupportedOnlyBelow100" xml:space="preserve">
+    <value>This method or property is accessible only while working against a version earlier than SQL Server 2008.</value>
+  </data>
+  <data name="SupportedOnlyBelow90" xml:space="preserve">
+    <value>This method or property is accessible only while working against a version earlier than SQL Server 2005.</value>
+  </data>
+  <data name="SupportedOnlyOn150" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2019.</value>
+  </data>
+  <data name="SupportedOnlyOn160" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2022.</value>
+  </data>
+  <data name="SupportedOnlyOn170" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2025 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn140" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2017 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn130" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2016 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn120" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2014 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn110" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2012 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn105" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2008 R2 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn100" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2008 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn90" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2005 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn80SP3" xml:space="preserve">
+    <value>This method or property is accessible only while working against Microsoft SQL Server 2000 Service Pack 3 or later.</value>
+  </data>
+  <data name="SupportedOnlyOn80" xml:space="preserve">
+    <value>This method or property is accessible only while working against SQL Server 2000 or later.</value>
+  </data>
+  <data name="NotSupportedForVersionEarlierThan110" xml:space="preserve">
+    <value>This method or property is not supported while working against a version earlier than SQL Server 2012.</value>
+  </data>
+  <data name="NotSupportedForVersionEarlierThan120" xml:space="preserve">
+    <value>This method or property is not supported while working against a version earlier than SQL Server 2014.</value>
+  </data>
+  <data name="NotSupportedForVersionEarlierThan130" xml:space="preserve">
+    <value>This method or property is not supported while working against a version earlier than SQL Server 2016.</value>
+  </data>
+  <data name="NotSupportedForVersionEarlierThan140" xml:space="preserve">
+    <value>This method or property is not supported while working against a version earlier than SQL Server 2017.</value>
+  </data>
+  <data name="NotSupportedForVersionEarlierThan150" xml:space="preserve">
+    <value>This method or property is not supported while working against a version earlier than SQL Server 2019.</value>
+  </data>
+  <data name="PropertySupportedOnlyOn110SP1" xml:space="preserve">
+    <value>The '{propertyName}' property is accessible only while working against SQL Server 2012 Service Pack 1 or later.</value>
+  </data>
+  <data name="PropertySupportedOnlyOn110" xml:space="preserve">
+    <value>The '{propertyName}' property is accessible only while working against SQL Server 2012 or later.</value>
+  </data>
+  <data name="PropertySupportedOnlyOn170" xml:space="preserve">
+    <value>The '{propertyName}' property is accessible only while working against SQL Server 2025 or later.</value>
+  </data>
+  <data name="PropertyNotSupportedForCloudVersion" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported on version '{version}' of Microsoft Azure SQL Database.</value>
+  </data>
+  <data name="PropertyNotSupportedOnStandalone" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported on Standalone SQL Server.</value>
+  </data>
+  <data name="PropertyNotSupportedOnCloud" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported on Microsoft Azure SQL Database.</value>
+  </data>
+  <data name="PropertyNotSupportedOnEdge" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported on Microsoft Azure SQL Edge.</value>
+  </data>
+  <data name="PropertyNotSupportedWithDetails" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported on {engineEdition} edition database of {engineType} SQL Server with version {version}.</value>
+  </data>
+  <data name="PropertyValueSupportedOnlyOn110" xml:space="preserve">
+    <value>The '{propertyName}' property with value '{propertyValue}' is accessible only while working against SQL Server 2012 or later.</value>
+  </data>
+  <data name="PropertyValueNotSupportedForSqlDw" xml:space="preserve">
+    <value>The '{propertyName}' property with value '{propertyValue}' is not supported on Microsoft Azure Synapse Analytics dedicated SQL pools Edition.</value>
+  </data>
+  <data name="PropertyValueNotSupportedForSqlDb" xml:space="preserve">
+    <value>The '{propertyName}' property with value '{propertyValue}' is not supported on Microsoft Azure SQL Database Edition.</value>
+  </data>
+  <data name="WrongPropertyValueException" xml:space="preserve">
+    <value>The '{propertyName}' property cannot have a value of '{propertyValue}' for this version of SQL Server.</value>
+  </data>
+  <data name="InvalidPropertyValueForVersion" xml:space="preserve">
+    <value>'{typeName}'.'{propertyName}': '{propertyValue}' is not a valid option for {sqlVersionName}.</value>
+  </data>
+  <data name="PropertyCannotBeSetForVersion" xml:space="preserve">
+    <value>The '{propertyName}' property cannot be set for the '{objectType}' object in {version};</value>
+  </data>
+  <data name="EmptyInputParam" xml:space="preserve">
+    <value>The input parameter {paramName} must be a non-empty {paramKind} for this operation to succeed.</value>
+  </data>
+  <data name="MustSpecifyOneParameter" xml:space="preserve">
+    <value>You must specify at least one parameter with a non-empty name for this aggregate function.</value>
+  </data>
+  <data name="MutuallyExclusiveProperties" xml:space="preserve">
+    <value>{prop1} and {prop2} cannot both be set at the same time.</value>
+  </data>
+  <data name="NeedPSParams" xml:space="preserve">
+    <value>PartitionSchemeParameters need to be non-empty when PartitionScheme has been set.</value>
+  </data>
+  <data name="IndexMustBeClustered" xml:space="preserve">
+    <value>{tableName}.{indexName} is not a clustered index.</value>
+  </data>
+  <data name="ParentMustExist" xml:space="preserve">
+    <value>Cannot create {objectType} '{objectName}' if parent is not yet created.</value>
+  </data>
+  <data name="ViewCannotHaveKeys" xml:space="preserve">
+    <value>You cannot create a PRIMARY KEY or an UNIQUE KEY on a view.</value>
+  </data>
+  <data name="InvalidAcctName" xml:space="preserve">
+    <value>The account name is not valid.</value>
+  </data>
+  <data name="OperationOnlyInPendingState" xml:space="preserve">
+    <value>Cannot perform the operation on this object, because the object is a member of a collection.</value>
+  </data>
+  <data name="OperationNotInPendingState" xml:space="preserve">
+    <value>Cannot execute this operation for an object that is in Pending state.</value>
+  </data>
+  <data name="OperationNotInPendingState1" xml:space="preserve">
+    <value>Before executing this operation you need to set {prop1} for this object.</value>
+  </data>
+  <data name="OperationNotInPendingState2" xml:space="preserve">
+    <value>Before executing this operation you need to set {prop1} and {prop2} for this object.</value>
+  </data>
+  <data name="OperationNotInPendingState3" xml:space="preserve">
+    <value>Before executing this operation you need to set {prop1} and {prop2} and {prop3} for this object.</value>
+  </data>
+  <data name="RemoteServerEndpointRequired" xml:space="preserve">
+    <value>RemoteDataArchiveEndpoint has to be set to enable Remote Data Archive for a database.</value>
+  </data>
+  <data name="DatabaseScopedCredentialsRequired" xml:space="preserve">
+    <value>DatabaseScopedCredential has to be set to enable Remote Data Archive for a database.</value>
+  </data>
+  <data name="UnsupportedDatabaseScopedConfiguration" xml:space="preserve">
+    <value>'{configName}' is not a valid Database Scoped Configuration.</value>
+  </data>
+  <data name="MissingBoundingParameters" xml:space="preserve">
+    <value>You must specify bounding-box parameters for geometry spatial indexes.</value>
+  </data>
+  <data name="InvalidNonGeometryParameters" xml:space="preserve">
+    <value>You cannot specify bounding-box parameters for geography  spatial indexes.</value>
+  </data>
+  <data name="UnsupportedNonSpatialParameters" xml:space="preserve">
+    <value>You cannot specify bounding-box parameters, grid levels, or cells for non-spatial indexes.</value>
+  </data>
+  <data name="NotSpatialIndexOnView" xml:space="preserve">
+    <value>You cannot create a spatial index on a view.</value>
+  </data>
+  <data name="OneColumnInSpatialIndex" xml:space="preserve">
+    <value>A spatial index can contain only one column.</value>
+  </data>
+  <data name="NoSpatialIndexUnique" xml:space="preserve">
+    <value>Spatial indexes cannot be unique.</value>
+  </data>
+  <data name="NoSpatialIndexClustered" xml:space="preserve">
+    <value>Spatial indexes cannot be clustered.</value>
+  </data>
+  <data name="LowPriorityCannotBeSetForDrop" xml:space="preserve">
+    <value>The clustered index cannot be dropped in low priority when the OnlineIndexOperation property is not set as true.</value>
+  </data>
+  <data name="SpatialAutoGridDownlevel" xml:space="preserve">
+    <value>Error with spatial index {objectName}.  GEOMETRY_AUTO_GRID and GEOGRAPHY_AUTO_GRID are not supported in {targetVersion}.</value>
+  </data>
+  <data name="NoAutoGridWithGrids" xml:space="preserve">
+    <value>Error with spatial index {objectName}. Specifying GRIDS is not supported with GEOMETRY_AUTO_GRID and GEOGRAPHY_AUTO_GRID.</value>
+  </data>
+  <data name="OnlyHashIndexIsSupportedInAlter" xml:space="preserve">
+    <value>Only hash indexes on memory optimized tables can be altered.</value>
+  </data>
+  <data name="NotXmlIndexOnView" xml:space="preserve">
+    <value>An XML index cannot be created on a view.</value>
+  </data>
+  <data name="OneColumnInXmlIndex" xml:space="preserve">
+    <value>An XML index can have only one column.</value>
+  </data>
+  <data name="BucketCountForHashIndex" xml:space="preserve">
+    <value>A hash index must specify a bucket count.</value>
+  </data>
+  <data name="ScriptMemoryOptimizedIndex" xml:space="preserve">
+    <value>An index of a memory optimized table cannot be scripted.</value>
+  </data>
+  <data name="HashIndexTableDependency" xml:space="preserve">
+    <value>Only memory optimized tables can have hash indexes.</value>
+  </data>
+  <data name="TableMemoryOptimizedIndexDependency" xml:space="preserve">
+    <value>Only hash or nonclustered indexes can be created on memory optimized tables.</value>
+  </data>
+  <data name="TableSqlDwIndexRestrictions" xml:space="preserve">
+    <value>Only clustered columnstore, clustered, non-clustered or heap indexes can be created on SQL DW tables.</value>
+  </data>
+  <data name="TableSqlDwIndexTypeRestrictions" xml:space="preserve">
+    <value>Unexpected index type detected. Only clustered, non-clustered or clustered columnstore index types create be created for SQL DW. The actual index type is {indexType}.</value>
+  </data>
+  <data name="UnexpectedIndexTypeDetected" xml:space="preserve">
+    <value>Unexpected index type detected.  Expecting to script a clustered index.  However, the actual index type is {indexType}.</value>
+  </data>
+  <data name="NoXmlIndexUnique" xml:space="preserve">
+    <value>An XML index cannot be unique.</value>
+  </data>
+  <data name="NoXmlIndexClustered" xml:space="preserve">
+    <value>An XML index cannot be clustered.</value>
+  </data>
+  <data name="UnsupportedNonXmlParameters" xml:space="preserve">
+    <value>Cannot specify ParentXmlIndex or SecondaryXmlIndexType for non-XML indexes.</value>
+  </data>
+  <data name="UnsupportedNonVectorParameters" xml:space="preserve">
+    <value>Cannot specify VectorIndexMetric or VectorIndexType for non-Vector indexes.</value>
+  </data>
+  <data name="UnsupportedNonJsonIndexParameters" xml:space="preserve">
+    <value>Cannot specify JsonIndexPaths or JsonIndexBuildProperties for non-JSON indexes.</value>
+  </data>
+  <data name="CantSetDefaultFalse" xml:space="preserve">
+    <value>The IsDefault property cannot be set to false. Please select another file group and try to make it default.</value>
+  </data>
+  <data name="TimeoutMustBePositive" xml:space="preserve">
+    <value>A positive value must be supplied for the transaction termination time.</value>
+  </data>
+  <data name="NoPropertyChangeForDotNet" xml:space="preserve">
+    <value>The {propertyName} property cannot be changed for .NET run-time routines.</value>
+  </data>
+  <data name="ClrNotSupported" xml:space="preserve">
+    <value>Invalid value for property {propName}. .NET run-time routines are not supported on server version {version}.</value>
+  </data>
+  <data name="InvalidPropertyNumberRange" xml:space="preserve">
+    <value>Invalid value for {propName} property: the value must be a number between {numberMin} and {numberMax}.</value>
+  </data>
+  <data name="ChangeTrackingException" xml:space="preserve">
+    <value>Change tracking must be set on before you can set the change tracking properties of a database.</value>
+  </data>
+  <data name="MissingChangeTrackingParameters" xml:space="preserve">
+    <value>You must specify both the retention period and the retention period units.</value>
+  </data>
+  <data name="TrackColumnsException" xml:space="preserve">
+    <value>Change tracking must be enabled on a table before you can set track columns.</value>
+  </data>
+  <data name="InvalidCollation" xml:space="preserve">
+    <value>Collation '{name}' is not valid.</value>
+  </data>
+  <data name="UnsupportedCollation" xml:space="preserve">
+    <value>Collation '{name}' is not supported for {version}.</value>
+  </data>
+  <data name="ViewColumnsCannotBeModified" xml:space="preserve">
+    <value>View columns cannot be modified or created.</value>
+  </data>
+  <data name="NeedToPassObject" xml:space="preserve">
+    <value>Transfer cannot process {objtype}. You need to pass an instance class object.</value>
+  </data>
+  <data name="InexistentDir" xml:space="preserve">
+    <value>The directory '{dir}' does not exist.</value>
+  </data>
+  <data name="CantCreateTempFile" xml:space="preserve">
+    <value>Cannot create temporary file in directory '{dir}'.</value>
+  </data>
+  <data name="UnknownFilter" xml:space="preserve">
+    <value>Internal error: the filter '{filter}' cannot be processed by the prefetch operation.</value>
+  </data>
+  <data name="SystemMessageReadOnly" xml:space="preserve">
+    <value>The SystemMessage object is read only.</value>
+  </data>
+  <data name="MessageIDTooSmall" xml:space="preserve">
+    <value>The user defined messages need to have id's bigger than 50000.</value>
+  </data>
+  <data name="DataTypeUnsupported" xml:space="preserve">
+    <value>DataType instantiation failed: {dt} type not supported by the constructor.</value>
+  </data>
+  <data name="CantSetTypeName" xml:space="preserve">
+    <value>Cannot set Name property for the {type} type.</value>
+  </data>
+  <data name="CantSetTypeSchema" xml:space="preserve">
+    <value>Cannot set Schema property for the {type} type.</value>
+  </data>
+  <data name="UnknownSqlDataType" xml:space="preserve">
+    <value>The value {type} does not belong to SqlDataType enumeration.</value>
+  </data>
+  <data name="NeedExistingObjForDataType" xml:space="preserve">
+    <value>DataType instantiation failed: the object {objName} does not exist on the server.</value>
+  </data>
+  <data name="NoPendingObjForDataType" xml:space="preserve">
+    <value>An object in {state} state cannot be used to create a DataType.</value>
+  </data>
+  <data name="CantSetContainedDatabaseCatalogCollation" xml:space="preserve">
+    <value>Cannot explicitly set the CatalogCollation property to ContainedDatabaseFixedCollation.</value>
+  </data>
+  <data name="ViewFragInfoNotInV7" xml:space="preserve">
+    <value>Fragmentation information is not available for views on SQL Server 7.0.</value>
+  </data>
+  <data name="InvalidOptionForVersion" xml:space="preserve">
+    <value>{method} failed: the {optionName} option is not available for {SqlVersionName}.</value>
+  </data>
+  <data name="InvalidParamForVersion" xml:space="preserve">
+    <value>{method} failed: the {paramName} parameter cannot be specified on {SqlVersionName}.</value>
+  </data>
+  <data name="UnknownLanguageId" xml:space="preserve">
+    <value>{langid} is not a valid language id on the server.</value>
+  </data>
+  <data name="UnknownEnumeration" xml:space="preserve">
+    <value>Unexpected value for enumeration type {type}.</value>
+  </data>
+  <data name="UnknownEnumerationWithValue" xml:space="preserve">
+    <value>Unexpected value {value} for enumeration type {type}.</value>
+  </data>
+  <data name="MissingConfigVariable" xml:space="preserve">
+    <value>The function {fnName} was called without supplying variable {varName}.</value>
+  </data>
+  <data name="DtsNotInstalled" xml:space="preserve">
+    <value>The Integration Services component is not installed or you do not have permission to use it.</value>
+  </data>
+  <data name="NSNotInstalled" xml:space="preserve">
+    <value>The Notification Services component is not installed or you do not have permissions to use it.</value>
+  </data>
+  <data name="InvalidNSOperation" xml:space="preserve">
+    <value>The Notification Services operation performed is invalid.</value>
+  </data>
+  <data name="NSNotConnectedToServer" xml:space="preserve">
+    <value>Unable to perform this operation as the object is not connected to a server.</value>
+  </data>
+  <data name="InvalidThreadPoolSize" xml:space="preserve">
+    <value>The ThreadPoolSize entry is not valid. It must be a non-negative integer.</value>
+  </data>
+  <data name="InvalidQuantumLimit" xml:space="preserve">
+    <value>The specified quantum limit is not valid. The quantum limit value must be a non-negative integer.</value>
+  </data>
+  <data name="InvalidQuantumDuration" xml:space="preserve">
+    <value>The quantum duration specified is not valid. The value must be at least 1 second.</value>
+  </data>
+  <data name="InvalidThrottle" xml:space="preserve">
+    <value>The specified throttle value is not valid. The value must be a non-negative integer.</value>
+  </data>
+  <data name="InvalidFailuresBeforeLoggingEvent" xml:space="preserve">
+    <value>The FailuresBeforeLoggingEvent entry is not valid. It must be a non-negative integer.</value>
+  </data>
+  <data name="InvalidFailuresBeforeAbort" xml:space="preserve">
+    <value>The FailuresBeforeAbort entry is not valid. It must be a non-negative integer.</value>
+  </data>
+  <data name="InvalidMulticastRecipientLimit" xml:space="preserve">
+    <value>The MulticastRecipientLimit entry is not valid. It must be a non-negative integer.</value>
+  </data>
+  <data name="InvalidNotificationClassBatchSize" xml:space="preserve">
+    <value>The NotificationBatchSize value is not valid. It must be an non-negative integer.</value>
+  </data>
+  <data name="ThreadPoolSizeNotValidForEdition" xml:space="preserve">
+    <value>The {componentName} ThreadPoolSize value must be {threadPoolSize} for the Standard Edition of Notification Services.</value>
+  </data>
+  <data name="StartTimeGreaterThanADay" xml:space="preserve">
+    <value>The start time for a vacuumer is the time within a day and cannot be greater than 24 hours.</value>
+  </data>
+  <data name="InvalidPropertySetForExistingObject" xml:space="preserve">
+    <value>Cannot set property {propertyName} for an existing Notification Service Instance or Application.</value>
+  </data>
+  <data name="InvalidEncryptArgumentsAndArgumentKey" xml:space="preserve">
+    <value>Invalid values for properties Instance.{EncryptArguments} and Instance.{ArgumentKey}. If you set Instance.{EncryptArguments} then you must provide a valid Instance.{ArgumentKey}. If you provide an Instance.{ArgumentKey} then you must set Instance.{EncryptArguments}. You must set these properties correctly to encrypt or decrypt argument values.</value>
+  </data>
+  <data name="InvalidSerializerAdapterFound" xml:space="preserve">
+    <value>Serializer Adapter {name} Exception: Invalid input object type {actualType}.  The adaptor expects object of type {expectedType}.</value>
+  </data>
+  <data name="InvalidConversionError" xml:space="preserve">
+    <value>Serializer adapter {name} Exception: Cannot convert text value {input} to an object of type {type}.</value>
+  </data>
+  <data name="RequiredChildMissingFromParent" xml:space="preserve">
+    <value>A required object of type: {requiredChildType} is missing from parent object: '{parentName}' (Type: {parentType}).</value>
+  </data>
+  <data name="NoPermissions" xml:space="preserve">
+    <value>No permissions have been specified.</value>
+  </data>
+  <data name="WrongParent" xml:space="preserve">
+    <value>Parent property of object {objectName} does not match the collection's parent to which it is added.</value>
+  </data>
+  <data name="VerifyFailed" xml:space="preserve">
+    <value>Verify failed. Backup information for database '{database}' (type {backupType}) not found.</value>
+  </data>
+  <data name="VerifyFailed0" xml:space="preserve">
+    <value>Verify failed. Backup information for database '{database}' not found.</value>
+  </data>
+  <data name="PrimaryFgMustHaveFiles" xml:space="preserve">
+    <value>The PRIMARY filegroup must have at least one file.</value>
+  </data>
+  <data name="NeedToSetParent" xml:space="preserve">
+    <value>You must set Parent property.</value>
+  </data>
+  <data name="InvalidVersion" xml:space="preserve">
+    <value>Invalid version: {version}.</value>
+  </data>
+  <data name="ErrorInCreatingState" xml:space="preserve">
+    <value>You cannot execute this operation since the object has not been created.</value>
+  </data>
+  <data name="ConflictingSwitches" xml:space="preserve">
+    <value>The {prop1} and {prop2} properties have conflicting settings.</value>
+  </data>
+  <data name="BackupFailed" xml:space="preserve">
+    <value>Backup operation failed.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>Restore operation failed.</value>
+  </data>
+  <data name="BadCompatLevel" xml:space="preserve">
+    <value>{level} database compatibility level is not supported.</value>
+  </data>
+  <data name="SetPasswordError" xml:space="preserve">
+    <value>SetPassword cannot be used on existing objects. Use ChangePassword to change the password for an existing object.</value>
+  </data>
+  <data name="PassPhraseAndIdentityNotSpecified" xml:space="preserve">
+    <value>Both pass phrase and identity phrase are not specified.</value>
+  </data>
+  <data name="PassPhraseNotSpecified" xml:space="preserve">
+    <value>Pass phrase is not specified.</value>
+  </data>
+  <data name="NotEnoughRights" xml:space="preserve">
+    <value>Could not read metadata, possibly due to insufficient access rights.</value>
+  </data>
+  <data name="SqlDwCreateRequiredParameterMissing" xml:space="preserve">
+    <value>AzureEdition and AzureServiceObjective values must be valid to create a DW database instance.</value>
+  </data>
+  <data name="CannotAlterKeyWithProvider" xml:space="preserve">
+    <value>Keys encrypted with cryptographic providers cannot be altered.</value>
+  </data>
+  <data name="InvalidAlgorithm" xml:space="preserve">
+    <value>{argument} is not a valid algorithm to create the {parent}.</value>
+  </data>
+  <data name="AlterQueryStorePropertyForRestoringDatabase" xml:space="preserve">
+    <value>Unable to modify Query Store properties when database is in restoring state.</value>
+  </data>
+  <data name="IncludeHeaderTemplate" xml:space="preserve">
+    <value>/****** Object:  {objectType} {name}    Script Date: {dateString} ******/</value>
+  </data>
+  <data name="NoUrnSuffix" xml:space="preserve">
+    <value>Internal SMO error. This object does not have UrnSuffix or it is empty string.</value>
+  </data>
+  <data name="FullPropertyBag" xml:space="preserve">
+    <value>Internal SMO error. OnPropertyMissing("{propName}") was called for a full property bag.</value>
+  </data>
+  <data name="MultipleRowsForUrn" xml:space="preserve">
+    <value>Internal SMO error. SqlSmoObject.ImplInitialize() got multiple rows for urn '{urnName}'.</value>
+  </data>
+  <data name="GetParentFailed" xml:space="preserve">
+    <value>Internal SMO error. Trying to get the Parent property through reflection failed.</value>
+  </data>
+  <data name="ParentNull" xml:space="preserve">
+    <value>Internal SMO error. Parent property is null.</value>
+  </data>
+  <data name="CouldNotFindKey" xml:space="preserve">
+    <value>Internal SMO error. Could not find key {keyName}.</value>
+  </data>
+  <data name="UnsupportedUrnFilter" xml:space="preserve">
+    <value>Internal SMO error. During prefetch the filter attribute {attrib} does not support function type {functionType}.</value>
+  </data>
+  <data name="UnsupportedUrnAttrib" xml:space="preserve">
+    <value>Internal SMO error. During prefetch the filter attribute {attrib} is not supported.</value>
+  </data>
+  <data name="InvalidFileInformationData" xml:space="preserve">
+    <value>Invalid data returned while querying the file information on server.</value>
+  </data>
+  <data name="MappingObjectIdMissing" xml:space="preserve">
+    <value>The {typename} with ID={id} does not exist. You cannot create a {typename}Mapping.</value>
+  </data>
+  <data name="EmptyMapping" xml:space="preserve">
+    <value>Cannot create a {parent} object if the {mappingname}Collection is empty.</value>
+  </data>
+  <data name="ExecutionContextPrincipalIsNotSpecified" xml:space="preserve">
+    <value>ExecutionContextPrincipal property needs to be set for this activation execution context</value>
+  </data>
+  <data name="MissingBrokerEndpoint" xml:space="preserve">
+    <value>To configure Service Broker, you must create a Service Broker endpoint by using the CREATE ENDPOINT Transact-SQL statement.</value>
+  </data>
+  <data name="CannotEnableSoapEndpoints" xml:space="preserve">
+    <value>Enabling all the SOAP endpoints at the same time is not supported. However, you can manually enable a single SOAP endpoint.</value>
+  </data>
+  <data name="ServiceError0" xml:space="preserve">
+    <value>The request was accepted.</value>
+  </data>
+  <data name="ServiceError1" xml:space="preserve">
+    <value>The request is not supported.</value>
+  </data>
+  <data name="ServiceError2" xml:space="preserve">
+    <value>The user did not have the necessary access.</value>
+  </data>
+  <data name="ServiceError3" xml:space="preserve">
+    <value>The service cannot be stopped because other running services depend on it.</value>
+  </data>
+  <data name="ServiceError4" xml:space="preserve">
+    <value>The requested control code is not valid, or it is unacceptable to the service.</value>
+  </data>
+  <data name="ServiceError5" xml:space="preserve">
+    <value>The requested control code cannot be sent to the service because the state of the service (Win32_BaseService:State) is equal to 0, 1, or 2.</value>
+  </data>
+  <data name="ServiceError6" xml:space="preserve">
+    <value>The service has not been started.</value>
+  </data>
+  <data name="ServiceError7" xml:space="preserve">
+    <value>The service did not respond to the start request in a timely fashion.</value>
+  </data>
+  <data name="ServiceError8" xml:space="preserve">
+    <value>Unknown failure when starting the service.</value>
+  </data>
+  <data name="ServiceError9" xml:space="preserve">
+    <value>The directory path to the service executable was not found.</value>
+  </data>
+  <data name="ServiceError10" xml:space="preserve">
+    <value>The service is already running.</value>
+  </data>
+  <data name="ServiceError11" xml:space="preserve">
+    <value>The database to add a new service is locked.</value>
+  </data>
+  <data name="ServiceError12" xml:space="preserve">
+    <value>A dependency for which this service relies on has been removed from the system.</value>
+  </data>
+  <data name="ServiceError13" xml:space="preserve">
+    <value>The service failed to find the service needed from a dependent service.</value>
+  </data>
+  <data name="ServiceError14" xml:space="preserve">
+    <value>The service has been disabled from the system.</value>
+  </data>
+  <data name="ServiceError15" xml:space="preserve">
+    <value>The service does not have the correct authentication to run on the system.</value>
+  </data>
+  <data name="ServiceError16" xml:space="preserve">
+    <value>This service is being removed from the system.</value>
+  </data>
+  <data name="ServiceError17" xml:space="preserve">
+    <value>There is no execution thread for the service.</value>
+  </data>
+  <data name="ServiceError18" xml:space="preserve">
+    <value>There are circular dependencies when starting the service.</value>
+  </data>
+  <data name="ServiceError19" xml:space="preserve">
+    <value>There is a service running under the same name.</value>
+  </data>
+  <data name="ServiceError20" xml:space="preserve">
+    <value>There are invalid characters in the name of the service.</value>
+  </data>
+  <data name="ServiceError21" xml:space="preserve">
+    <value>Invalid parameters have been passed to the service.</value>
+  </data>
+  <data name="ServiceError22" xml:space="preserve">
+    <value>The account that this service is to run under, is either invalid or lacks the permissions to run the service.</value>
+  </data>
+  <data name="ServiceError23" xml:space="preserve">
+    <value>The service exists in the database of services available from the system.</value>
+  </data>
+  <data name="ServiceError24" xml:space="preserve">
+    <value>The service is currently paused in the system.</value>
+  </data>
+  <data name="UnknownCategoryName" xml:space="preserve">
+    <value>Unknown Category Name {name}.</value>
+  </data>
+  <data name="UnknownCategoryType" xml:space="preserve">
+    <value>Unknown Category Type {typename}.</value>
+  </data>
+  <data name="UnknownOperator" xml:space="preserve">
+    <value>The operator {name} does not exist.</value>
+  </data>
+  <data name="UnsupportedFeatureSqlAgent" xml:space="preserve">
+    <value>SQL Server Agent</value>
+  </data>
+  <data name="UnsupportedFeatureSqlMail" xml:space="preserve">
+    <value>Database Mail</value>
+  </data>
+  <data name="UnsupportedFeatureServiceBroker" xml:space="preserve">
+    <value>SQL Server Service Broker</value>
+  </data>
+  <data name="UnsupportedFeatureFullText" xml:space="preserve">
+    <value>Full-text</value>
+  </data>
+  <data name="UnsupportedFeatureResourceGovernor" xml:space="preserve">
+    <value>Resource Governor</value>
+  </data>
+  <data name="UnsupportedFeatureSmartAdmin" xml:space="preserve">
+    <value>Smart Admin</value>
+  </data>
+  <data name="InvalidServerUrn" xml:space="preserve">
+    <value>The input Urn refers to server {serverName}.</value>
+  </data>
+  <data name="InvalidUrn" xml:space="preserve">
+    <value>Urn that starts with {type} is currently not supported.</value>
+  </data>
+  <data name="WMIProviderNotInstalled" xml:space="preserve">
+    <value>SQL Server WMI provider is not available on {machineName}.</value>
+  </data>
+  <data name="PropertyCannotBeChangedAfterConnection" xml:space="preserve">
+    <value>Property {propertyName} cannot be changed after connection is established.</value>
+  </data>
+  <data name="CouldNotFindManagementObject" xml:space="preserve">
+    <value>Could not find management object for {type} {name}.</value>
+  </data>
+  <data name="CannotSubscribe" xml:space="preserve">
+    <value>Cannot create an event subscription.</value>
+  </data>
+  <data name="CannotStartSubscription" xml:space="preserve">
+    <value>Cannot start an event subscription.</value>
+  </data>
+  <data name="NotSupportedNotification" xml:space="preserve">
+    <value>Property could not be set. The {className} object does not support {eventType} event notification.</value>
+  </data>
+  <data name="InnerRegSvrException" xml:space="preserve">
+    <value>An exception occurred in the RegisteredServer store while updating it.</value>
+  </data>
+  <data name="SqlServerTypeName" xml:space="preserve">
+    <value>Microsoft SQL Servers</value>
+  </data>
+  <data name="MissingObjectExceptionText" xml:space="preserve">
+    <value>The object {parentName} is missing from parent {objectName}. Server version is {serverVersion}.</value>
+  </data>
+  <data name="PropertyNotSetExceptionText" xml:space="preserve">
+    <value>To accomplish this action, set property {propertyName}.</value>
+  </data>
+  <data name="MissingObjectNameExceptionText" xml:space="preserve">
+    <value>The {parentName} object is missing the {objectType} with the name {objectName}.</value>
+  </data>
+  <data name="WrongPropertyValueExceptionText" xml:space="preserve">
+    <value>Cannot execute this operation while the property {propName} is set to '{propValue}'.</value>
+  </data>
+  <data name="PropertyTypeMismatchExceptionText" xml:space="preserve">
+    <value>Type mismatch when trying to assign value to property {propname}. Received {received} instead of {expected}.</value>
+  </data>
+  <data name="MissingPropertyExceptionText" xml:space="preserve">
+    <value>The property {propertyName} does not exist on server version {serverVersion}, or you do not have access to it.</value>
+  </data>
+  <data name="UnknownPropertyExceptionText" xml:space="preserve">
+    <value>{propertyName}: unknown property.</value>
+  </data>
+  <data name="PropertyReadOnlyExceptionText" xml:space="preserve">
+    <value>Cannot change property {name}. It is read-only.</value>
+  </data>
+  <data name="InvalidSmoOperationExceptionText" xml:space="preserve">
+    <value>You cannot perform operation {opName} on an object in state {state}.</value>
+  </data>
+  <data name="PropertyCannotBeRetrievedExceptionText" xml:space="preserve">
+    <value>Property {objType} is not available for {propname} '{objName}'. This property may not exist for this object, or may not be retrievable due to insufficient access rights.</value>
+  </data>
+  <data name="ObjectDroppedExceptionText" xml:space="preserve">
+    <value>Cannot access properties or methods for the {type} '{name}', because it has been dropped.</value>
+  </data>
+  <data name="UnsupportedObjectNameExceptionText" xml:space="preserve">
+    <value>Cannot use empty object names for {objectType}.</value>
+  </data>
+  <data name="FailedtoInitialize" xml:space="preserve">
+    <value>Failed to initialize Urn {urn}.</value>
+  </data>
+  <data name="PropertyMustBeSpecifiedInUrn" xml:space="preserve">
+    <value>The input Urn must specify {propName} at level {nodeType}.</value>
+  </data>
+  <data name="InvalidScanType" xml:space="preserve">
+    <value>Error creating Statistic object; {scanType} is not a valid statistic scan type.</value>
+  </data>
+  <data name="ColumnsMustBeSpecified" xml:space="preserve">
+    <value>Error creating Statistic object, columns must be specified.</value>
+  </data>
+  <data name="PasswdModiOnlyForStandardLogin" xml:space="preserve">
+    <value>Password can be modified only for a Standard login.</value>
+  </data>
+  <data name="DenyLoginModiNotForStandardLogin" xml:space="preserve">
+    <value>DenyWindowsLogin cannot be modified for a Standard login.</value>
+  </data>
+  <data name="CloudSidNotApplicableOnStandalone" xml:space="preserve">
+    <value>Logins cannot be scripted by using a service security ID (SID) from Microsoft Azure SQL Database to a local instance of SQL Server.</value>
+  </data>
+  <data name="CannotCreateExtendedPropertyWithoutSchema" xml:space="preserve">
+    <value>Cannot create ExtendedProperty, because schema is not specified on the parent object.</value>
+  </data>
+  <data name="InvalidSchema" xml:space="preserve">
+    <value>Schema is not valid.</value>
+  </data>
+  <data name="FailedToChangeSchema" xml:space="preserve">
+    <value>Schema can only be changed for an existing object.</value>
+  </data>
+  <data name="InvalidUrnServerLevel" xml:space="preserve">
+    <value>Invalid Urn filter on server level: filter must be empty, or server attribute must be equal with the true server name.</value>
+  </data>
+  <data name="ServerLevelMustBePresent" xml:space="preserve">
+    <value>Server level must be present.</value>
+  </data>
+  <data name="TempTablesNotSupported" xml:space="preserve">
+    <value>Invalid table name: '{tableName}'. Temporary tables are not supported.</value>
+  </data>
+  <data name="PlanGuideNameCannotStartWithHash" xml:space="preserve">
+    <value>Invalid plan guide name: '{planGuideName}'. A plan guide name cannot start with a number sign (#).</value>
+  </data>
+  <data name="PropertiesNotValidException" xml:space="preserve">
+    <value>The properties {propNames} cannot be set when the property {propName} is set to {propValue}.</value>
+  </data>
+  <data name="TypeSchemaMustBeDbo" xml:space="preserve">
+    <value>UserDefinedDataType {prop} must be dbo. It is {value}.</value>
+  </data>
+  <data name="OperationInProgress" xml:space="preserve">
+    <value>An operation is already in progress.</value>
+  </data>
+  <data name="UnsupportedPermission" xml:space="preserve">
+    <value>Unsupported permission {permName}.</value>
+  </data>
+  <data name="InvalidVersionSmoOperation" xml:space="preserve">
+    <value>Operation is not supported on {version}.</value>
+  </data>
+  <data name="ContainmentNotSupported" xml:space="preserve">
+    <value>This operation cannot be performed because contained databases are not supported on server version {version}.</value>
+  </data>
+  <data name="AweEnabledNotSupported" xml:space="preserve">
+    <value>This operation cannot be performed because memory management by awe enabled is not supported on server version {version}.</value>
+  </data>
+  <data name="PasswordError" xml:space="preserve">
+    <value>Password is not supported in this version of SQL Server.</value>
+  </data>
+  <data name="MediaPasswordError" xml:space="preserve">
+    <value>Media Password is not supported in this version of SQL Server.</value>
+  </data>
+  <data name="CannotChangePassword" xml:space="preserve">
+    <value>Cannot change password for Windows login.</value>
+  </data>
+  <data name="CannotChangePasswordForUser" xml:space="preserve">
+    <value>The user has no password, so password cannot be changed.</value>
+  </data>
+  <data name="PasswordOnlyForDatabaseAuthenticatedNonWindowsUser" xml:space="preserve">
+    <value>A password cannot be provided because the user is not authenticated in the database.</value>
+  </data>
+  <data name="DefaultLanguageOnlyForDatabaseAuthenticatedUser" xml:space="preserve">
+    <value>Default language cannot be specified because the user is not authenticated in the database.</value>
+  </data>
+  <data name="CannotCopyPasswordToUser" xml:space="preserve">
+    <value>The user cannot be converted to a contained user because the user is not mapped to a login.</value>
+  </data>
+  <data name="FollowingPropertiesCanBeSetOnlyWithContainmentEnabled" xml:space="preserve">
+    <value>The following properties cannot be set because the database is not a contained database: {prop1}, {prop2}, {prop3}, {prop4} and {prop5}.</value>
+  </data>
+  <data name="OperationNotSupportedWhenPartOfAUDF" xml:space="preserve">
+    <value>Operation is not supported when part of a UserDefinedFunction.</value>
+  </data>
+  <data name="FailedToWriteProperty" xml:space="preserve">
+    <value>Writing property {propName} of {objectType} '{objectName}' is not allowed when {reason}.</value>
+  </data>
+  <data name="ReasonIntextMode" xml:space="preserve">
+    <value>TextMode has been set</value>
+  </data>
+  <data name="ReasonNotIntextMode" xml:space="preserve">
+    <value>TextMode has not been set</value>
+  </data>
+  <data name="SyntaxErrorInTextHeader" xml:space="preserve">
+    <value>Syntax error in TextHeader of {objectType} '{objectName}'.</value>
+  </data>
+  <data name="IncorrectTextHeader" xml:space="preserve">
+    <value>The {propNameSmall} specified in the TextHeader property of {objectType} '{objectName}' must match {propName} property.</value>
+  </data>
+  <data name="ScriptHeaderTypeNotSupported" xml:space="preserve">
+    <value>ScriptHeaderType {scriptHeaderType} is not supported for {objectType} '{objectName}'.</value>
+  </data>
+  <data name="CollectionCannotBeModified" xml:space="preserve">
+    <value>Collection cannot be modified when</value>
+  </data>
+  <data name="KeyOptionsIncorrect" xml:space="preserve">
+    <value>Symmetric key options are incorrect</value>
+  </data>
+  <data name="PropertyIsInvalidInUrn" xml:space="preserve">
+    <value>The input Urn property {propName} at level {nodeType} has invalid value.</value>
+  </data>
+  <data name="TableOrViewParentForUpdateStatistics" xml:space="preserve">
+    <value>Parent of Column must be Table or View in order to call UpdateStatistics</value>
+  </data>
+  <data name="ReasonObjectAlreadyCreated" xml:space="preserve">
+    <value>{objName} is already created.</value>
+  </data>
+  <data name="PropertyAvailable" xml:space="preserve">
+    <value>This property is not available on</value>
+  </data>
+  <data name="CannotReadProperty" xml:space="preserve">
+    <value>Cannot read property {propName}.</value>
+  </data>
+  <data name="CannotWriteProperty" xml:space="preserve">
+    <value>Cannot write property {propName}.</value>
+  </data>
+  <data name="CannotAccessProperty" xml:space="preserve">
+    <value>Cannot access property {propName}.</value>
+  </data>
+  <data name="PropertyNotAvailableToWrite" xml:space="preserve">
+    <value>Cannot write property {propName}. This property is not available on {version}.</value>
+  </data>
+  <data name="ServerPropertyMustBeSetForOlap" xml:space="preserve">
+    <value>Server property needs to be set for the OLAP subsystem</value>
+  </data>
+  <data name="InvalidInstanceName" xml:space="preserve">
+    <value>Server name cannot be split into machine and instance names.</value>
+  </data>
+  <data name="TransferCtorErr" xml:space="preserve">
+    <value>You must supply an existing Database object.</value>
+  </data>
+  <data name="UnsupportedVersionException" xml:space="preserve">
+    <value>Either the object or one of its properties is not supported on the target server version.</value>
+  </data>
+  <data name="UnsupportedEngineTypeException" xml:space="preserve">
+    <value>Either the object or one of its properties is not supported on the target engine type.</value>
+  </data>
+  <data name="UnsupportedEngineEditionException" xml:space="preserve">
+    <value>Either the object or one of its properties is not supported on the target engine edition.</value>
+  </data>
+  <data name="CantScriptObject" xml:space="preserve">
+    <value>Cannot script the object with Urn='{urn}'.</value>
+  </data>
+  <data name="PropertyNotValidException" xml:space="preserve">
+    <value>The property {propName1} cannot be set if the property {propName2} is set to {propValue}.</value>
+  </data>
+  <data name="TargetRecoveryTimeNotNegative" xml:space="preserve">
+    <value>Target Recovery Time cannot be negative.</value>
+  </data>
+  <data name="InvalidEdgeConstraintParent" xml:space="preserve">
+    <value>Edge constraints are only allowed on edge tables.</value>
+  </data>
+  <data name="EmptyConstraintName" xml:space="preserve">
+    <value>The constraint name cannot be null or empty.</value>
+  </data>
+  <data name="InvalidEdgeConstraintDefinition" xml:space="preserve">
+    <value>Edge constraints should have at least one encapsulated clause having from and to sides.</value>
+  </data>
+  <data name="InvalidEdgeConstraintReferentialAction" xml:space="preserve">
+    <value>An invalid referential action for edge constraint was encountered. The value that was received for delete referential action is '{referentialAction}'. Edge constraints can only support CASCADE and NO ACTION options on delete.</value>
+  </data>
+  <data name="ObjectIdCannotBeSet" xml:space="preserve">
+    <value>ObjectId can be set only while creating a new user or login.</value>
+  </data>
+  <data name="CannotEnableUDTTTrigger" xml:space="preserve">
+    <value>Trigger cannot be enabled for the user-defined table type.</value>
+  </data>
+  <data name="NotIndexOnUDTT" xml:space="preserve">
+    <value>A nonclustered index on a user-defined disk-based table type must be a primary key or a unique constraint. An index on a user-defined memory optimized table type is required.</value>
+  </data>
+  <data name="NotXmlIndexOnUDTT" xml:space="preserve">
+    <value>An XML index cannot be created on a user-defined table type.</value>
+  </data>
+  <data name="NotFullTextIndexOnUDTT" xml:space="preserve">
+    <value>Full-text indexes cannot be created on a user-defined table type.</value>
+  </data>
+  <data name="UDTTColumnsCannotBeModified" xml:space="preserve">
+    <value>Columns of a user-defined table type cannot be modified.</value>
+  </data>
+  <data name="UDTTCannotBeModified" xml:space="preserve">
+    <value>User-defined table type cannot be modified.</value>
+  </data>
+  <data name="UDTTIndexCannotBeModified" xml:space="preserve">
+    <value>User-defined table type index cannot be modified.</value>
+  </data>
+  <data name="NotFragInfoOnUDTT" xml:space="preserve">
+    <value>Cannot have fragmentation information on a user-defined table type.</value>
+  </data>
+  <data name="NotStatisticsOnUDTT" xml:space="preserve">
+    <value>Statistic cannot be computed on a user-defined table type.</value>
+  </data>
+  <data name="NotTriggersOnUDTT" xml:space="preserve">
+    <value>Triggers cannot be created on a user-defined table type.</value>
+  </data>
+  <data name="NotCheckIndexOnUDTT" xml:space="preserve">
+    <value>Check index cannot be run on a user-defined table type.</value>
+  </data>
+  <data name="UDTTChecksCannotBeModified" xml:space="preserve">
+    <value>User-defined table type checks cannot be modified.</value>
+  </data>
+  <data name="OperationNotSupportedWhenPartOfUDTT" xml:space="preserve">
+    <value>This operation is not supported when it is part of a user-defined table type.</value>
+  </data>
+  <data name="AddAuditSpecificationDetail" xml:space="preserve">
+    <value>Add Audit Specification Detail</value>
+  </data>
+  <data name="RemoveAuditSpecificationDetail" xml:space="preserve">
+    <value>RemoveAuditSpecificationDetail</value>
+  </data>
+  <data name="EnterAuditName" xml:space="preserve">
+    <value>Audit name was not provided</value>
+  </data>
+  <data name="EnterOwner" xml:space="preserve">
+    <value>Owner was not provided</value>
+  </data>
+  <data name="EnterFilePath" xml:space="preserve">
+    <value>File path was not provided</value>
+  </data>
+  <data name="EnterName" xml:space="preserve">
+    <value>Name was not provided</value>
+  </data>
+  <data name="EnterServerAudit" xml:space="preserve">
+    <value>Server audit was not provided</value>
+  </data>
+  <data name="EnterStoragePath" xml:space="preserve">
+    <value>Storage path was not provided</value>
+  </data>
+  <data name="ReserveDiskSpaceNotAllowedWhenMaxFileSizeIsUnlimited" xml:space="preserve">
+    <value>Cannot reserve disk space when maximum file size is unlimited</value>
+  </data>
+  <data name="EnterServerCertificate" xml:space="preserve">
+    <value>Enter server certificate</value>
+  </data>
+  <data name="EnterServerAsymmetricKey" xml:space="preserve">
+    <value>Enter server asymmetric key</value>
+  </data>
+  <data name="CertificateNotBackedUp" xml:space="preserve">
+    <value>The certificate '{certificateName}' which is used for encrypting the database encryption key has not been backed up.</value>
+  </data>
+  <data name="FailedOperationExceptionText" xml:space="preserve">
+    <value>{opName} failed for {objType} '{objName}'.</value>
+  </data>
+  <data name="FailedOperationExceptionText2" xml:space="preserve">
+    <value>{opName} failed.</value>
+  </data>
+  <data name="FailedOperationExceptionText3" xml:space="preserve">
+    <value>{opName} failed for {objType} '{objName}'. Reason: {Reason}.</value>
+  </data>
+  <data name="FailedOperationExceptionTextColl" xml:space="preserve">
+    <value>{opName} failed for {coll}  of {objType} '{parent}'.</value>
+  </data>
+  <data name="FailedOperationExceptionTextScript" xml:space="preserve">
+    <value>The {objType} '{objName}' cannot be scripted as its data is not accessible.</value>
+  </data>
+  <data name="FailedOperationMessageNotSupportedTempdb" xml:space="preserve">
+    <value>this object does not support this operation for database tempdb</value>
+  </data>
+  <data name="InvalidOperationInDisconnectedMode" xml:space="preserve">
+    <value>This operation cannot be performed in disconnected mode.</value>
+  </data>
+  <data name="CannotCreateAvailabilityGroupWithoutCurrentIntance" xml:space="preserve">
+    <value>The current instance '{instanceName}' must be included as an availability replica to create the availability group '{agName}'.</value>
+  </data>
+  <data name="JoinAvailabilityGroupFailed" xml:space="preserve">
+    <value>Failed to join the instance '{replicaName}' to the availability group '{agName}'.</value>
+  </data>
+  <data name="ForceFailoverFailed" xml:space="preserve">
+    <value>Failed to perform a forced failover of the availability group '{agName}' to server instance '{serverName}'.</value>
+  </data>
+  <data name="ManualFailoverFailed" xml:space="preserve">
+    <value>Failed to perform a manual failover of the availability group '{agName}' to server instance '{serverName}'.</value>
+  </data>
+  <data name="DatabaseJoinAvailabilityGroupFailed" xml:space="preserve">
+    <value>Failed to join the database '{dbName}' to the availability group '{agName}' on the availability replica '{replicaName}'.</value>
+  </data>
+  <data name="DatabaseJoinAvailabilityGroupInvalidGroupName" xml:space="preserve">
+    <value>The availability group name '{agName}' does not match the parent availability group name '{parentAgName}' for the database '{dbName}'.</value>
+  </data>
+  <data name="DatabaseLeaveAvailabilityGroupFailed" xml:space="preserve">
+    <value>The database '{dbName}' failed to leave the availability group '{agName}' on the availability replica '{replicaName}'.</value>
+  </data>
+  <data name="SuspendDataMovementFailed" xml:space="preserve">
+    <value>Failed to suspend data movement in database '{dbName}', which resides on the availability replica '{replicaName}' in the availability group '{agName}'.</value>
+  </data>
+  <data name="ResumeDataMovementFailed" xml:space="preserve">
+    <value>Failed to resume data movement in database '{dbName}', which resides on the availability replica '{replicaName}' in the availability group '{agName}'.</value>
+  </data>
+  <data name="EnumClusterMemberState" xml:space="preserve">
+    <value>Failed to enumerate the cluster members state for the current instance '{serverName}'.</value>
+  </data>
+  <data name="EnumReplicaClusterNodes" xml:space="preserve">
+    <value>Failed to enumerate the cluster nodes for the availability group '{serverName}'.</value>
+  </data>
+  <data name="EnumClusterSubnets" xml:space="preserve">
+    <value>Failed to enumerate the cluster subnets on the current instance '{serverName}'.</value>
+  </data>
+  <data name="RestartListenerFailed" xml:space="preserve">
+    <value>Failed to restart listener '{listenerName}' of availability group '{agName}'.</value>
+  </data>
+  <data name="PropertyCannotBeRetrievedFromSecondary" xml:space="preserve">
+    <value>Property {propname} is not available. This can occur if you attempt to access this property from a secondary replica or resolving replica.</value>
+  </data>
+  <data name="GrantAGCreateDatabasePrivilegeFailed" xml:space="preserve">
+    <value>Failed to grant create database privilege. Server: '{serverName}', Availability group '{agName}'.</value>
+  </data>
+  <data name="RevokeAGCreateDatabasePrivilegeFailed" xml:space="preserve">
+    <value>Failed to revoke create database privilege. Server: '{serverName}', Availability group '{agName}'.</value>
+  </data>
+  <data name="ReadOnlyRoutingListContainsEmptyReplicaName" xml:space="preserve">
+    <value>The specified read-only routing list contains empty replica names.</value>
+  </data>
+  <data name="CannotUpdateBothReadOnlyRoutingLists" xml:space="preserve">
+    <value>ReadOnlyRoutingList and LoadBalancedReadOnlyRoutingList cannot be updated at the same time.</value>
+  </data>
+  <data name="DistributedAvailabilityGroupTwoReplicasRequired" xml:space="preserve">
+    <value>Two availability groups must be provided when creating distributed availability group.</value>
+  </data>
+  <data name="DistributedAvailabilityGroupNoReplicatedDatabases" xml:space="preserve">
+    <value>No availability databases should be specified when creating a distributed availability group.</value>
+  </data>
+  <data name="DistributedAvailabilityGroupFailoverMode" xml:space="preserve">
+    <value>Only manual failover mode is supported when creating a distributed availability group.</value>
+  </data>
+  <data name="DistributedAvailabilityGroupAvailabilityMode" xml:space="preserve">
+    <value>Only Asynchronous Commit and Synchronous Commit are supported availability modes when creating a distributed availability group.</value>
+  </data>
+  <data name="DistributedAvailabilityGroupNoOptions" xml:space="preserve">
+    <value>DISTRIBUTED option cannot be combined with any other availability group options when creating a distributed availability group.</value>
+  </data>
+  <data name="SetAccount" xml:space="preserve">
+    <value>Set account</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Alter" xml:space="preserve">
+    <value>Alter</value>
+  </data>
+  <data name="CreateOrAlter" xml:space="preserve">
+    <value>CreateOrAlter</value>
+  </data>
+  <data name="Drop" xml:space="preserve">
+    <value>Drop</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Script" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="Grant" xml:space="preserve">
+    <value>Grant</value>
+  </data>
+  <data name="Revoke" xml:space="preserve">
+    <value>Revoke</value>
+  </data>
+  <data name="Deny" xml:space="preserve">
+    <value>Deny</value>
+  </data>
+  <data name="GrantWithGrant" xml:space="preserve">
+    <value>GrantWithGrant</value>
+  </data>
+  <data name="Bind" xml:space="preserve">
+    <value>Bind</value>
+  </data>
+  <data name="Unbind" xml:space="preserve">
+    <value>Unbind</value>
+  </data>
+  <data name="AddDefaultConstraint" xml:space="preserve">
+    <value>Add default constraint</value>
+  </data>
+  <data name="TestMailProfile" xml:space="preserve">
+    <value>Test mail profile</value>
+  </data>
+  <data name="TestNetSend" xml:space="preserve">
+    <value>Test net send</value>
+  </data>
+  <data name="SetState" xml:space="preserve">
+    <value>Set state</value>
+  </data>
+  <data name="DropAndMove" xml:space="preserve">
+    <value>Drop and move</value>
+  </data>
+  <data name="GetSmoObject" xml:space="preserve">
+    <value>Attempt to retrieve data for object</value>
+  </data>
+  <data name="AdvancedProperties" xml:space="preserve">
+    <value>Advanced properties</value>
+  </data>
+  <data name="AddCollection" xml:space="preserve">
+    <value>Add object to collection</value>
+  </data>
+  <data name="RemoveCollection" xml:space="preserve">
+    <value>Remove object from collection</value>
+  </data>
+  <data name="This" xml:space="preserve">
+    <value>Indexer</value>
+  </data>
+  <data name="Abort" xml:space="preserve">
+    <value>Abort</value>
+  </data>
+  <data name="AddMember" xml:space="preserve">
+    <value>Add member</value>
+  </data>
+  <data name="DropMember" xml:space="preserve">
+    <value>Drop member</value>
+  </data>
+  <data name="EnumMembers" xml:space="preserve">
+    <value>Enumerate members</value>
+  </data>
+  <data name="EnumPermissions" xml:space="preserve">
+    <value>Enumerate permissions</value>
+  </data>
+  <data name="EnumContainingRoles" xml:space="preserve">
+    <value>Enumerate containing roles</value>
+  </data>
+  <data name="EnumAgentProxyAccounts" xml:space="preserve">
+    <value>Enumerate agent proxy accounts</value>
+  </data>
+  <data name="AddMemberServer" xml:space="preserve">
+    <value>Add member server</value>
+  </data>
+  <data name="EnumMemberServers" xml:space="preserve">
+    <value>Enumerate member servers</value>
+  </data>
+  <data name="RemoveMemberServer" xml:space="preserve">
+    <value>Remove member server</value>
+  </data>
+  <data name="ResetOccurrenceCount" xml:space="preserve">
+    <value>Reset occurrence count</value>
+  </data>
+  <data name="AddNotification" xml:space="preserve">
+    <value>Add notification</value>
+  </data>
+  <data name="RemoveNotification" xml:space="preserve">
+    <value>Remove notification</value>
+  </data>
+  <data name="UpdateNotification" xml:space="preserve">
+    <value>Update notification</value>
+  </data>
+  <data name="EnumNotifications" xml:space="preserve">
+    <value>Enumerate notifications</value>
+  </data>
+  <data name="ApplyToTargetServer" xml:space="preserve">
+    <value>Apply to target server</value>
+  </data>
+  <data name="ApplyToTargetServerGroup" xml:space="preserve">
+    <value>Apply to target server group</value>
+  </data>
+  <data name="EnumAlerts" xml:space="preserve">
+    <value>Enumerate alerts</value>
+  </data>
+  <data name="EnumHistory" xml:space="preserve">
+    <value>Enumerate history</value>
+  </data>
+  <data name="EnumJobStepOutputLogs" xml:space="preserve">
+    <value>Enumerate job step output logs</value>
+  </data>
+  <data name="EnumTargetServers" xml:space="preserve">
+    <value>Enumerate target servers</value>
+  </data>
+  <data name="EnumJobSteps" xml:space="preserve">
+    <value>Enumerate job steps</value>
+  </data>
+  <data name="Invoke" xml:space="preserve">
+    <value>Invoke</value>
+  </data>
+  <data name="PurgeHistory" xml:space="preserve">
+    <value>Purge history</value>
+  </data>
+  <data name="AddSharedSchedule" xml:space="preserve">
+    <value>Add shared schedule</value>
+  </data>
+  <data name="RemoveSharedSchedule" xml:space="preserve">
+    <value>Remove shared schedule</value>
+  </data>
+  <data name="RemoveAllJobSchedules" xml:space="preserve">
+    <value>Remove all job schedules</value>
+  </data>
+  <data name="RemoveAllJobSteps" xml:space="preserve">
+    <value>Remove all job steps</value>
+  </data>
+  <data name="RemoveFromTargetServer" xml:space="preserve">
+    <value>Remove from target server</value>
+  </data>
+  <data name="RemoveFromTargetServerGroup" xml:space="preserve">
+    <value>Remove from target server group</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="SetPassword" xml:space="preserve">
+    <value>Set password</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="MakeContained" xml:space="preserve">
+    <value>Make Contained</value>
+  </data>
+  <data name="EnumDatabaseMappings" xml:space="preserve">
+    <value>Enumerate database mappings</value>
+  </data>
+  <data name="GetDatabaseUser" xml:space="preserve">
+    <value>Get database user</value>
+  </data>
+  <data name="AddToRole" xml:space="preserve">
+    <value>Add to role</value>
+  </data>
+  <data name="AttachDatabase" xml:space="preserve">
+    <value>Attach database</value>
+  </data>
+  <data name="DetachDatabase" xml:space="preserve">
+    <value>Detach database</value>
+  </data>
+  <data name="EnumCollations" xml:space="preserve">
+    <value>Enumerate collations</value>
+  </data>
+  <data name="EnumPerformanceCounters" xml:space="preserve">
+    <value>Enumerate performance counters</value>
+  </data>
+  <data name="EnumErrorLogs" xml:space="preserve">
+    <value>Enumerate error logs</value>
+  </data>
+  <data name="EnumDatabaseMirrorWitnessRoles" xml:space="preserve">
+    <value>Enumerate database mirror witness roles</value>
+  </data>
+  <data name="ReadErrorLog" xml:space="preserve">
+    <value>Read error log</value>
+  </data>
+  <data name="KillDatabase" xml:space="preserve">
+    <value>Kill database</value>
+  </data>
+  <data name="KillProcess" xml:space="preserve">
+    <value>Kill process</value>
+  </data>
+  <data name="GetActiveDBConnectionCount" xml:space="preserve">
+    <value>Get active connection count</value>
+  </data>
+  <data name="DropAllActiveDBConnections" xml:space="preserve">
+    <value>Drop all active database connections</value>
+  </data>
+  <data name="EnumDirectories" xml:space="preserve">
+    <value>Enumerate directories</value>
+  </data>
+  <data name="EnumLocks" xml:space="preserve">
+    <value>Enumerate locks</value>
+  </data>
+  <data name="AddPrivateKey" xml:space="preserve">
+    <value>Add private key</value>
+  </data>
+  <data name="ExportCertificate" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ChangePrivateKeyPassword" xml:space="preserve">
+    <value>Change private key password</value>
+  </data>
+  <data name="RemovePrivateKey" xml:space="preserve">
+    <value>Remove private key</value>
+  </data>
+  <data name="AddKeyEncryption" xml:space="preserve">
+    <value>Add key encryption</value>
+  </data>
+  <data name="DropKeyEncryption" xml:space="preserve">
+    <value>Drop key encryption</value>
+  </data>
+  <data name="SymmetricKeyOpen" xml:space="preserve">
+    <value>Open symmetric key</value>
+  </data>
+  <data name="SymmetricKeyClose" xml:space="preserve">
+    <value>Close symmetric key</value>
+  </data>
+  <data name="EnumLogins" xml:space="preserve">
+    <value>Enumerate logins</value>
+  </data>
+  <data name="EnumWindowsDomainGroups" xml:space="preserve">
+    <value>Enumerate domain groups</value>
+  </data>
+  <data name="EnumProcesses" xml:space="preserve">
+    <value>Enumerate processes</value>
+  </data>
+  <data name="EnumStartupProcedures" xml:space="preserve">
+    <value>Enumerate startup procedures</value>
+  </data>
+  <data name="EnumWindowsUserInfo" xml:space="preserve">
+    <value>Enumerate user information</value>
+  </data>
+  <data name="EnumWindowsGroupInfo" xml:space="preserve">
+    <value>Enumerate group information</value>
+  </data>
+  <data name="EnumAvailableMedia" xml:space="preserve">
+    <value>Enumerate available media</value>
+  </data>
+  <data name="EnumServerAttributes" xml:space="preserve">
+    <value>Enumerate server attributes</value>
+  </data>
+  <data name="DeleteBackupHistory" xml:space="preserve">
+    <value>Delete backup history</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="EnumBoundColumns" xml:space="preserve">
+    <value>Enumerate bound columns</value>
+  </data>
+  <data name="EnumBoundDataTypes" xml:space="preserve">
+    <value>Enumerate bound data types</value>
+  </data>
+  <data name="CheckAllocations" xml:space="preserve">
+    <value>Check allocations</value>
+  </data>
+  <data name="CheckCatalog" xml:space="preserve">
+    <value>Check catalog</value>
+  </data>
+  <data name="CheckIdentityValues" xml:space="preserve">
+    <value>Check identity values</value>
+  </data>
+  <data name="CheckTables" xml:space="preserve">
+    <value>Check tables</value>
+  </data>
+  <data name="CheckTable" xml:space="preserve">
+    <value>Check table</value>
+  </data>
+  <data name="Shrink" xml:space="preserve">
+    <value>Shrink</value>
+  </data>
+  <data name="RecalculateSpaceUsage" xml:space="preserve">
+    <value>Recalculate space usage</value>
+  </data>
+  <data name="PrefetchObjects" xml:space="preserve">
+    <value>Prefetch objects</value>
+  </data>
+  <data name="EnumTransactions" xml:space="preserve">
+    <value>Enumerate transactions</value>
+  </data>
+  <data name="GetTransactionCount" xml:space="preserve">
+    <value>Get transaction count</value>
+  </data>
+  <data name="ImportXmlSchema" xml:space="preserve">
+    <value>Import XML schema</value>
+  </data>
+  <data name="ExtendXmlSchema" xml:space="preserve">
+    <value>Extend XML schema</value>
+  </data>
+  <data name="RemoveFullTextCatalogs" xml:space="preserve">
+    <value>Remove full-text catalogs</value>
+  </data>
+  <data name="SetDefaultFullTextCatalog" xml:space="preserve">
+    <value>Set default full-text catalog</value>
+  </data>
+  <data name="SetDefaultFileGroup" xml:space="preserve">
+    <value>Set default file group</value>
+  </data>
+  <data name="SetDefaultFileStreamFileGroup" xml:space="preserve">
+    <value>Set default filestream file group</value>
+  </data>
+  <data name="CheckFileGroup" xml:space="preserve">
+    <value>Check file group</value>
+  </data>
+  <data name="CheckIndex" xml:space="preserve">
+    <value>Check index</value>
+  </data>
+  <data name="Checkpoint" xml:space="preserve">
+    <value>Checkpoint</value>
+  </data>
+  <data name="Cleanup" xml:space="preserve">
+    <value>Cleanup</value>
+  </data>
+  <data name="CannotReadProp" xml:space="preserve">
+    <value>Cannot read property</value>
+  </data>
+  <data name="UpdateLanguageResources" xml:space="preserve">
+    <value>Update language resources</value>
+  </data>
+  <data name="CatalogUpgradeOptions" xml:space="preserve">
+    <value>Catalog upgrade options</value>
+  </data>
+  <data name="EnumLanguages" xml:space="preserve">
+    <value>Enumerate languages</value>
+  </data>
+  <data name="EnumSemanticLanguages" xml:space="preserve">
+    <value>Enumerate Semantic language models</value>
+  </data>
+  <data name="ClearHostLoginAccount" xml:space="preserve">
+    <value>Clear host login account</value>
+  </data>
+  <data name="SetProxyAccount" xml:space="preserve">
+    <value>Set proxy account</value>
+  </data>
+  <data name="ClearProxyAccount" xml:space="preserve">
+    <value>Clear proxy account</value>
+  </data>
+  <data name="SetMsxAccount" xml:space="preserve">
+    <value>Set master server account</value>
+  </data>
+  <data name="ClearMsxAccount" xml:space="preserve">
+    <value>Clear master server account</value>
+  </data>
+  <data name="CycleErrorLog" xml:space="preserve">
+    <value>Cycle agent error log</value>
+  </data>
+  <data name="EnumJobHistory" xml:space="preserve">
+    <value>Enumerate job history</value>
+  </data>
+  <data name="EnumJobs" xml:space="preserve">
+    <value>Enumerate jobs</value>
+  </data>
+  <data name="MoreThanOneProxyAccountIsNotSupported" xml:space="preserve">
+    <value>Only one proxy account is supported on this platform</value>
+  </data>
+  <data name="AddSubSystems" xml:space="preserve">
+    <value>Add subsystems</value>
+  </data>
+  <data name="DeleteJobStepLogs" xml:space="preserve">
+    <value>Delete job step output logs</value>
+  </data>
+  <data name="RemoveSubSystems" xml:space="preserve">
+    <value>Remove subsystems</value>
+  </data>
+  <data name="EnumSubSystems" xml:space="preserve">
+    <value>Enumerate subsystems</value>
+  </data>
+  <data name="AddMailAccountToProfile" xml:space="preserve">
+    <value>Add MailAccount to MailProfile</value>
+  </data>
+  <data name="RemoveMailAccountFromProfile" xml:space="preserve">
+    <value>Remove MailAccount from MailProfile</value>
+  </data>
+  <data name="EnumMailAccountsForProfile" xml:space="preserve">
+    <value>Enumerate MailAccounts associated with MailProfile</value>
+  </data>
+  <data name="AddPrincipalToMailProfile" xml:space="preserve">
+    <value>Add Principal to MailProfile</value>
+  </data>
+  <data name="RemovePrincipalFromMailProfile" xml:space="preserve">
+    <value>Remove Principal from MailProfile</value>
+  </data>
+  <data name="EnumPrincipalsForMailProfile" xml:space="preserve">
+    <value>Enumerate Principals associated with MailProfile</value>
+  </data>
+  <data name="AddLoginToProxyAccount" xml:space="preserve">
+    <value>Add login to proxy account</value>
+  </data>
+  <data name="RemoveLoginFromProxyAccount" xml:space="preserve">
+    <value>Remove login from proxy account</value>
+  </data>
+  <data name="EnumLoginsOfProxyAccount" xml:space="preserve">
+    <value>Enumerate login of proxy account</value>
+  </data>
+  <data name="AddServerRoleToProxyAccount" xml:space="preserve">
+    <value>Add server role to proxy account</value>
+  </data>
+  <data name="RemoveServerRoleFromProxyAccount" xml:space="preserve">
+    <value>Remove server role from proxy account</value>
+  </data>
+  <data name="EnumServerRolesOfProxyAccount" xml:space="preserve">
+    <value>Enumerate server role of proxy account</value>
+  </data>
+  <data name="AddMSDBRoleToProxyAccount" xml:space="preserve">
+    <value>Add msdb role to proxy account</value>
+  </data>
+  <data name="RemoveMSDBRoleFromProxyAccount" xml:space="preserve">
+    <value>Remove msdb role from proxy account</value>
+  </data>
+  <data name="EnumMSDBRolesOfProxyAccount" xml:space="preserve">
+    <value>Enumerate msdb role of proxy account</value>
+  </data>
+  <data name="MsxDefect" xml:space="preserve">
+    <value>MSX defect</value>
+  </data>
+  <data name="MsxEnlist" xml:space="preserve">
+    <value>MSX enlist</value>
+  </data>
+  <data name="PurgeJobHistory" xml:space="preserve">
+    <value>Purge job history</value>
+  </data>
+  <data name="ReassignJobsByLogin" xml:space="preserve">
+    <value>Reassign jobs by login</value>
+  </data>
+  <data name="CreateRestorePlan" xml:space="preserve">
+    <value>Create restore plan</value>
+  </data>
+  <data name="DropJobsByLogin" xml:space="preserve">
+    <value>Drop jobs by login</value>
+  </data>
+  <data name="StartMonitor" xml:space="preserve">
+    <value>Start monitor</value>
+  </data>
+  <data name="StopMonitor" xml:space="preserve">
+    <value>Stop monitor</value>
+  </data>
+  <data name="EnumProxies" xml:space="preserve">
+    <value>Enumerate proxies</value>
+  </data>
+  <data name="DropJobsByServer" xml:space="preserve">
+    <value>Drop jobs by server</value>
+  </data>
+  <data name="CompareUrn" xml:space="preserve">
+    <value>Compare Urn objects</value>
+  </data>
+  <data name="Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="DisableAllIndexes" xml:space="preserve">
+    <value>Disable all indexes</value>
+  </data>
+  <data name="EnableAllIndexes" xml:space="preserve">
+    <value>Enable all indexes</value>
+  </data>
+  <data name="DiscoverDependencies" xml:space="preserve">
+    <value>Discover dependencies</value>
+  </data>
+  <data name="DropBackupHistory" xml:space="preserve">
+    <value>Drop backup history</value>
+  </data>
+  <data name="ChangeMirroringState" xml:space="preserve">
+    <value>Change mirroring state</value>
+  </data>
+  <data name="IsMember" xml:space="preserve">
+    <value>Is Member</value>
+  </data>
+  <data name="Recreate" xml:space="preserve">
+    <value>Recreate</value>
+  </data>
+  <data name="Enable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="EnumColumns" xml:space="preserve">
+    <value>Enumerate columns</value>
+  </data>
+  <data name="EnumForeignKeys" xml:space="preserve">
+    <value>Enumerate foreign keys</value>
+  </data>
+  <data name="EnumIndexes" xml:space="preserve">
+    <value>Enumerate indexes</value>
+  </data>
+  <data name="EnumFragmentation" xml:space="preserve">
+    <value>Enumerate fragmentation information</value>
+  </data>
+  <data name="EnumReferences" xml:space="preserve">
+    <value>Enumerate references</value>
+  </data>
+  <data name="SetOffline" xml:space="preserve">
+    <value>Set offline</value>
+  </data>
+  <data name="SetEncryption" xml:space="preserve">
+    <value>Set encryption</value>
+  </data>
+  <data name="SetOwner" xml:space="preserve">
+    <value>Set owner</value>
+  </data>
+  <data name="StartPopulation" xml:space="preserve">
+    <value>Start population</value>
+  </data>
+  <data name="StopPopulation" xml:space="preserve">
+    <value>Stop population</value>
+  </data>
+  <data name="Rebuild" xml:space="preserve">
+    <value>Rebuild</value>
+  </data>
+  <data name="Reorganize" xml:space="preserve">
+    <value>Reorganize</value>
+  </data>
+  <data name="UpdateStatistics" xml:space="preserve">
+    <value>Update statistics</value>
+  </data>
+  <data name="SetHostLoginAccount" xml:space="preserve">
+    <value>Set host login account</value>
+  </data>
+  <data name="SetMailServerAccount" xml:space="preserve">
+    <value>Set mail server login account</value>
+  </data>
+  <data name="SetMailServerPassword" xml:space="preserve">
+    <value>Set mail server login password</value>
+  </data>
+  <data name="EnumLastStatisticsUpdates" xml:space="preserve">
+    <value>Enumerate last statistics update</value>
+  </data>
+  <data name="RebuildIndexes" xml:space="preserve">
+    <value>Rebuild indexes</value>
+  </data>
+  <data name="ResumeIndexes" xml:space="preserve">
+    <value>Resume indexes</value>
+  </data>
+  <data name="AbortIndexes" xml:space="preserve">
+    <value>Abort Indexes</value>
+  </data>
+  <data name="PauseIndexes" xml:space="preserve">
+    <value>Pause Indexes</value>
+  </data>
+  <data name="ReCompileReferences" xml:space="preserve">
+    <value>Recompile references</value>
+  </data>
+  <data name="TruncateData" xml:space="preserve">
+    <value>Truncate data</value>
+  </data>
+  <data name="TruncateLog" xml:space="preserve">
+    <value>Truncate Log</value>
+  </data>
+  <data name="TruncatePartitionsNotSupported" xml:space="preserve">
+    <value>Truncate partitions is not supported on a version earlier than SQL Server 2014.</value>
+  </data>
+  <data name="SwitchPartition" xml:space="preserve">
+    <value>Switch partition</value>
+  </data>
+  <data name="MergeHashPartition" xml:space="preserve">
+    <value>Merge hash partition</value>
+  </data>
+  <data name="MergeRangePartition" xml:space="preserve">
+    <value>Merge range partition</value>
+  </data>
+  <data name="SplitHashPartition" xml:space="preserve">
+    <value>Split hash partition</value>
+  </data>
+  <data name="SplitRangePartition" xml:space="preserve">
+    <value>Split range partition</value>
+  </data>
+  <data name="GetRangeValues" xml:space="preserve">
+    <value>Get range values</value>
+  </data>
+  <data name="ResetNextUsed" xml:space="preserve">
+    <value>Reset next used filegroup</value>
+  </data>
+  <data name="GetFileGroups" xml:space="preserve">
+    <value>Get FileGroups</value>
+  </data>
+  <data name="GetDefaultInitFields" xml:space="preserve">
+    <value>Get default init fields</value>
+  </data>
+  <data name="SetDefaultInitFields" xml:space="preserve">
+    <value>Set default init fields</value>
+  </data>
+  <data name="GetPropertyNames" xml:space="preserve">
+    <value>Get property names</value>
+  </data>
+  <data name="SetParent" xml:space="preserve">
+    <value>SetParent</value>
+  </data>
+  <data name="InitObject" xml:space="preserve">
+    <value>Initialize object</value>
+  </data>
+  <data name="SetName" xml:space="preserve">
+    <value>SetName</value>
+  </data>
+  <data name="SetNamespace" xml:space="preserve">
+    <value>SetNamespace</value>
+  </data>
+  <data name="SetSchema" xml:space="preserve">
+    <value>SetSchema</value>
+  </data>
+  <data name="ExecuteNonQuery" xml:space="preserve">
+    <value>ExecuteNonQuery</value>
+  </data>
+  <data name="SetSnapshotIsolation" xml:space="preserve">
+    <value>Set snapshot isolation</value>
+  </data>
+  <data name="AlterDatabaseScopedConfiguration" xml:space="preserve">
+    <value>Alter database scoped configuration</value>
+  </data>
+  <data name="EnumNamespaces" xml:space="preserve">
+    <value>Enumerate namespaces</value>
+  </data>
+  <data name="EnumTypes" xml:space="preserve">
+    <value>Enumerate types</value>
+  </data>
+  <data name="AddSchemaDocument" xml:space="preserve">
+    <value>Add schema document</value>
+  </data>
+  <data name="ScriptTransfer" xml:space="preserve">
+    <value>Script transfer</value>
+  </data>
+  <data name="SetIdentityPhrase" xml:space="preserve">
+    <value>Set Identity Phrase</value>
+  </data>
+  <data name="SetEncryptionOptions" xml:space="preserve">
+    <value>Set Encryption Options</value>
+  </data>
+  <data name="EnumStatistics" xml:space="preserve">
+    <value>Enum statistics</value>
+  </data>
+  <data name="GetJobByID" xml:space="preserve">
+    <value>Get job by ID</value>
+  </data>
+  <data name="RemoveJobByID" xml:space="preserve">
+    <value>Remove job by ID</value>
+  </data>
+  <data name="RemoveJobsByLogin" xml:space="preserve">
+    <value>Remove jobs by login</value>
+  </data>
+  <data name="EnumCandidateKeys" xml:space="preserve">
+    <value>Enum candidate keys</value>
+  </data>
+  <data name="ExecuteWithResults" xml:space="preserve">
+    <value>Execute with results</value>
+  </data>
+  <data name="UpdateIndexStatistics" xml:space="preserve">
+    <value>Update index statistics</value>
+  </data>
+  <data name="EnumMatchingSPs" xml:space="preserve">
+    <value>Enum matching SPs</value>
+  </data>
+  <data name="EnumObjects" xml:space="preserve">
+    <value>Enum objects</value>
+  </data>
+  <data name="ReadBackupHeader" xml:space="preserve">
+    <value>Read backup header</value>
+  </data>
+  <data name="ReadMediaHeader" xml:space="preserve">
+    <value>Read media header</value>
+  </data>
+  <data name="DetachedDatabaseInfo" xml:space="preserve">
+    <value>Detached database info</value>
+  </data>
+  <data name="IsDetachedPrimaryFile" xml:space="preserve">
+    <value>Is detached primaryFile</value>
+  </data>
+  <data name="IsWindowsGroupMember" xml:space="preserve">
+    <value>Is windows group member</value>
+  </data>
+  <data name="EnumDetachedDatabaseFiles" xml:space="preserve">
+    <value>Enum detached database files</value>
+  </data>
+  <data name="EnumDetachedLogFiles" xml:space="preserve">
+    <value>Enum detached log files</value>
+  </data>
+  <data name="ServerEnumMembers" xml:space="preserve">
+    <value>Enum members</value>
+  </data>
+  <data name="Contains" xml:space="preserve">
+    <value>Collection lookup</value>
+  </data>
+  <data name="PingSqlServerVersion" xml:space="preserve">
+    <value>Ping Sql Server version</value>
+  </data>
+  <data name="SetServiceAccount" xml:space="preserve">
+    <value>Set service account</value>
+  </data>
+  <data name="ChangeServicePassword" xml:space="preserve">
+    <value>Change service account password</value>
+  </data>
+  <data name="RecoverMasterKey" xml:space="preserve">
+    <value>Recover</value>
+  </data>
+  <data name="RegenerateMasterKey" xml:space="preserve">
+    <value>Regenerate</value>
+  </data>
+  <data name="ImportMasterKey" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ExportMasterKey" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ChangeAcctMasterKey" xml:space="preserve">
+    <value>Change account</value>
+  </data>
+  <data name="AddEncryptionMasterKey" xml:space="preserve">
+    <value>Add encryption</value>
+  </data>
+  <data name="DropEncryptionMasterKey" xml:space="preserve">
+    <value>Drop encryption</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="EnumKeyEncryptions" xml:space="preserve">
+    <value>Enumerate key encryptions</value>
+  </data>
+  <data name="Compare" xml:space="preserve">
+    <value>Compare</value>
+  </data>
+  <data name="Insert" xml:space="preserve">
+    <value>Insert</value>
+  </data>
+  <data name="AddRange" xml:space="preserve">
+    <value>Add range</value>
+  </data>
+  <data name="SetRange" xml:space="preserve">
+    <value>Set range</value>
+  </data>
+  <data name="AddDevice" xml:space="preserve">
+    <value>Add device</value>
+  </data>
+  <data name="SetMirrors" xml:space="preserve">
+    <value>Set Mirrors</value>
+  </data>
+  <data name="SetDatabase" xml:space="preserve">
+    <value>Set Database</value>
+  </data>
+  <data name="SqlManagement" xml:space="preserve">
+    <value>SQL Management</value>
+  </data>
+  <data name="EnumEncryptionAlgorithms" xml:space="preserve">
+    <value>Enumerate Cryptographic Provider Encryption Algorithms</value>
+  </data>
+  <data name="EnumProviderKeys" xml:space="preserve">
+    <value>Enumerate Cryptographic Provider Keys</value>
+  </data>
+  <data name="SetIpAddress" xml:space="preserve">
+    <value>Set IPAddress</value>
+  </data>
+  <data name="SetSubnetIp" xml:space="preserve">
+    <value>Set SubnetIP</value>
+  </data>
+  <data name="SetSubnetMask" xml:space="preserve">
+    <value>Set SubnetMask</value>
+  </data>
+  <data name="GetDHCPAddress" xml:space="preserve">
+    <value>Retrieve DHCP IP Address</value>
+  </data>
+  <data name="GetQueryStoreOptions" xml:space="preserve">
+    <value>Get Query Store Options</value>
+  </data>
+  <data name="SetQueryStoreOptions" xml:space="preserve">
+    <value>Set Query Store Options</value>
+  </data>
+  <data name="InvalidQueryStoreOptions" xml:space="preserve">
+    <value>Invalid Query Store Options</value>
+  </data>
+  <data name="ReauthorizeRemoteDataArchive" xml:space="preserve">
+    <value>Reauthorize Remote Data Archive</value>
+  </data>
+  <data name="GetRemoteDataArchiveMigrationStatusReports" xml:space="preserve">
+    <value>Get Remote Data Archive Migration Status Reports</value>
+  </data>
+  <data name="GetRemoteDatabaseMigrationStatistics" xml:space="preserve">
+    <value>Get Remote Database Migration Statistics</value>
+  </data>
+  <data name="GetRemoteTableMigrationStatistics" xml:space="preserve">
+    <value>Get Remote Table Migration Statistics</value>
+  </data>
+  <data name="Table" xml:space="preserve">
+    <value>Table</value>
+  </data>
+  <data name="FileTable" xml:space="preserve">
+    <value>FileTable</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Server" xml:space="preserve">
+    <value>Server</value>
+  </data>
+  <data name="Database" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="ExtendedProperty" xml:space="preserve">
+    <value>ExtendedProperty</value>
+  </data>
+  <data name="DatabaseOptions" xml:space="preserve">
+    <value>DatabaseOptions</value>
+  </data>
+  <data name="Synonym" xml:space="preserve">
+    <value>Synonym</value>
+  </data>
+  <data name="Sequence" xml:space="preserve">
+    <value>Sequence</value>
+  </data>
+  <data name="FullTextIndex" xml:space="preserve">
+    <value>FullTextIndex</value>
+  </data>
+  <data name="FullTextIndexColumn" xml:space="preserve">
+    <value>FullTextIndexColumn</value>
+  </data>
+  <data name="Check" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="ForeignKey" xml:space="preserve">
+    <value>ForeignKey</value>
+  </data>
+  <data name="ForeignKeyColumn" xml:space="preserve">
+    <value>ForeignKeyColumn</value>
+  </data>
+  <data name="PartitionSchemeParameter" xml:space="preserve">
+    <value>PartitionSchemeParameter</value>
+  </data>
+  <data name="PlanGuide" xml:space="preserve">
+    <value>PlanGuide</value>
+  </data>
+  <data name="Trigger" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="Index" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="BrokerPriority" xml:space="preserve">
+    <value>BrokerPriority</value>
+  </data>
+  <data name="IndexedColumn" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="Statistic" xml:space="preserve">
+    <value>Statistic</value>
+  </data>
+  <data name="Column" xml:space="preserve">
+    <value>Column</value>
+  </data>
+  <data name="DefaultConstraint" xml:space="preserve">
+    <value>DefaultConstraint</value>
+  </data>
+  <data name="StoredProcedure" xml:space="preserve">
+    <value>StoredProcedure</value>
+  </data>
+  <data name="StoredProcedureParameter" xml:space="preserve">
+    <value>StoredProcedureParameter</value>
+  </data>
+  <data name="SqlAssembly" xml:space="preserve">
+    <value>SqlAssembly</value>
+  </data>
+  <data name="SqlAssemblyFile" xml:space="preserve">
+    <value>SqlAssemblyFile</value>
+  </data>
+  <data name="UserDefinedType" xml:space="preserve">
+    <value>UserDefinedType</value>
+  </data>
+  <data name="UserDefinedAggregate" xml:space="preserve">
+    <value>UserDefinedAggregate</value>
+  </data>
+  <data name="UserDefinedAggregateParameter" xml:space="preserve">
+    <value>UserDefinedAggregateParameter</value>
+  </data>
+  <data name="FullTextCatalog" xml:space="preserve">
+    <value>FullTextCatalog</value>
+  </data>
+  <data name="FullTextStopList" xml:space="preserve">
+    <value>FullTextStopList</value>
+  </data>
+  <data name="SearchPropertyList" xml:space="preserve">
+    <value>SearchPropertyList</value>
+  </data>
+  <data name="ExtendedStoredProcedure" xml:space="preserve">
+    <value>ExtendedStoredProcedure</value>
+  </data>
+  <data name="UserDefinedFunction" xml:space="preserve">
+    <value>UserDefinedFunction</value>
+  </data>
+  <data name="UserDefinedFunctionParameter" xml:space="preserve">
+    <value>UserDefinedFunctionParameter</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="Schema" xml:space="preserve">
+    <value>Schema</value>
+  </data>
+  <data name="DatabaseRole" xml:space="preserve">
+    <value>DatabaseRole</value>
+  </data>
+  <data name="ApplicationRole" xml:space="preserve">
+    <value>ApplicationRole</value>
+  </data>
+  <data name="LogFile" xml:space="preserve">
+    <value>LogFile</value>
+  </data>
+  <data name="FileGroup" xml:space="preserve">
+    <value>FileGroup</value>
+  </data>
+  <data name="DataFile" xml:space="preserve">
+    <value>DataFile</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Rule" xml:space="preserve">
+    <value>Rule</value>
+  </data>
+  <data name="UserDefinedDataType" xml:space="preserve">
+    <value>UserDefinedDataType</value>
+  </data>
+  <data name="UserDefinedTableType" xml:space="preserve">
+    <value>UserDefinedTableType</value>
+  </data>
+  <data name="PartitionFunction" xml:space="preserve">
+    <value>PartitionFunction</value>
+  </data>
+  <data name="PartitionScheme" xml:space="preserve">
+    <value>PartitionScheme</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="ServerRole" xml:space="preserve">
+    <value>ServerRole</value>
+  </data>
+  <data name="LinkedServer" xml:space="preserve">
+    <value>LinkedServer</value>
+  </data>
+  <data name="LinkedServerLogin" xml:space="preserve">
+    <value>LinkedServerLogin</value>
+  </data>
+  <data name="SystemDataType" xml:space="preserve">
+    <value>SystemDataType</value>
+  </data>
+  <data name="JobServer" xml:space="preserve">
+    <value>JobServer</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="AlertSystem" xml:space="preserve">
+    <value>AlertSystem</value>
+  </data>
+  <data name="Alert" xml:space="preserve">
+    <value>Alert</value>
+  </data>
+  <data name="Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="TargetServer" xml:space="preserve">
+    <value>TargetServer</value>
+  </data>
+  <data name="TargetServerGroup" xml:space="preserve">
+    <value>TargetServerGroup</value>
+  </data>
+  <data name="Job" xml:space="preserve">
+    <value>Job</value>
+  </data>
+  <data name="JobStep" xml:space="preserve">
+    <value>JobStep</value>
+  </data>
+  <data name="JobSchedule" xml:space="preserve">
+    <value>JobSchedule</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="UserOptions" xml:space="preserve">
+    <value>UserOptions</value>
+  </data>
+  <data name="BackupDevice" xml:space="preserve">
+    <value>BackupDevice</value>
+  </data>
+  <data name="FullTextService" xml:space="preserve">
+    <value>FullTextService</value>
+  </data>
+  <data name="ServerActiveDirectory" xml:space="preserve">
+    <value>ServerActiveDirectory</value>
+  </data>
+  <data name="ServerAlias" xml:space="preserve">
+    <value>ServerAlias</value>
+  </data>
+  <data name="PhysicalPartition" xml:space="preserve">
+    <value>PhysicalPartition</value>
+  </data>
+  <data name="Audit" xml:space="preserve">
+    <value>Audit</value>
+  </data>
+  <data name="ServerAuditSpecification" xml:space="preserve">
+    <value>ServerAuditSpecification</value>
+  </data>
+  <data name="DatabaseAuditSpecification" xml:space="preserve">
+    <value>DatabaseAuditSpecification</value>
+  </data>
+  <data name="ManagedComputer" xml:space="preserve">
+    <value>ManagedComputer</value>
+  </data>
+  <data name="Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="XmlSchemaCollection" xml:space="preserve">
+    <value>XmlSchemaCollection</value>
+  </data>
+  <data name="DatabaseEncryptionKey" xml:space="preserve">
+    <value>DatabaseEncryptionKey</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="RestoreAsync" xml:space="preserve">
+    <value>Asynchronous restore</value>
+  </data>
+  <data name="EnumAvailableSqlServers" xml:space="preserve">
+    <value>EnumAvailableSQLServers</value>
+  </data>
+  <data name="GetDataType" xml:space="preserve">
+    <value>Get DataType</value>
+  </data>
+  <data name="SetDataType" xml:space="preserve">
+    <value>Set DataType</value>
+  </data>
+  <data name="Backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="AvailabilityGroup" xml:space="preserve">
+    <value>Availability Group</value>
+  </data>
+  <data name="AvailabilityReplica" xml:space="preserve">
+    <value>Availability Replica</value>
+  </data>
+  <data name="AvailabilityDatabase" xml:space="preserve">
+    <value>Availability Database</value>
+  </data>
+  <data name="AvailabilityGroupListener" xml:space="preserve">
+    <value>Availability Group Listener</value>
+  </data>
+  <data name="AvailabilityGroupListenerIPAddress" xml:space="preserve">
+    <value>Availability Group Listener IP Address</value>
+  </data>
+  <data name="SecurityPolicy" xml:space="preserve">
+    <value>Security Policy</value>
+  </data>
+  <data name="SecurityPredicate" xml:space="preserve">
+    <value>Security Predicate</value>
+  </data>
+  <data name="ExternalDataSource" xml:space="preserve">
+    <value>External Data Source</value>
+  </data>
+  <data name="ExternalFileFormat" xml:space="preserve">
+    <value>External File Format</value>
+  </data>
+  <data name="ColumnMasterKey" xml:space="preserve">
+    <value>Column Master Key</value>
+  </data>
+  <data name="Win32Error" xml:space="preserve">
+    <value>Win32 error, error code: {code}. Please contact your administrator for more information.</value>
+  </data>
+  <data name="SmoSQLCLRUnAvailable" xml:space="preserve">
+    <value>This functionality is disabled in the SQLCLR. It is recommended that you execute from your client application.</value>
+  </data>
+  <data name="MoveToPool" xml:space="preserve">
+    <value>Move the workload group to another resource pool.</value>
+  </data>
+  <data name="ResourcePoolNotExist" xml:space="preserve">
+    <value>Resource pool {poolName} does not exist.</value>
+  </data>
+  <data name="CannotMoveToInternalResourcePool" xml:space="preserve">
+    <value>Cannot move workload group {workloadGroupName} to an internal resource pool.</value>
+  </data>
+  <data name="CannotMoveToSamePool" xml:space="preserve">
+    <value>Cannot move the group to the same pool that it is currently in.</value>
+  </data>
+  <data name="AffinityTypeCannotBeSet" xml:space="preserve">
+    <value>AffinityType is set to Auto, and affinity is set on one or more CPUs. Change AffinityType to Manual, or remove the affinity setting from all CPUs.</value>
+  </data>
+  <data name="AffinityValueCannotBeSet" xml:space="preserve">
+    <value>NumaNodeAffinity cannot be set to Partial. Change the affinity setting to None or Full.</value>
+  </data>
+  <data name="NoCPUAffinitized" xml:space="preserve">
+    <value>AffinityType is set to Manual, and affinity is not set on any CPU. Change AffinityType to Auto, or set affinity on one or more CPUs.</value>
+  </data>
+  <data name="WrongIndexRangeProvidedCPU" xml:space="preserve">
+    <value>The specified range of CPUs is not valid. The value for startIndex {startIndex} must be less than the value for endIndex {endIndex}.</value>
+  </data>
+  <data name="WrongIndexRangeProvidedNuma" xml:space="preserve">
+    <value>The specified range for NumaNode is not valid. The value for startIndex {startIndex} must be less than the value for endIndex {endIndex}.</value>
+  </data>
+  <data name="HoleInIndexRangeProvidedCPU" xml:space="preserve">
+    <value>A CPU with the id of {index} does not exist on this system. Use sys.dm_os_schedulers to locate valid CPUs for this system or use SetAffinityToRange(startCpuId, endCpuId, affinityMask, ignoreMissingIds) with ignoreMissingIds set to true.</value>
+  </data>
+  <data name="HoleInIndexRangeProvidedNumaNode" xml:space="preserve">
+    <value>A NumaNode with the id if {index} does not exist on this system. Use SetAffinityToRange(startNumaNodeId, endNumaNodeId, affinityMask, ignoreMissingIds) with ignoreMissingIds set to true.</value>
+  </data>
+  <data name="WrongIndexRangeProvidedScheduler" xml:space="preserve">
+    <value>The specified range of Schedulers is not valid. The value for startIndex {startIndex} must be less than the value for endIndex {endIndex}.</value>
+  </data>
+  <data name="ResourceGovernorPoolMissing" xml:space="preserve">
+    <value>The resource governor resource pool information is not complete. This can happen if a pool was created but the resource governor is not reconfigured.</value>
+  </data>
+  <data name="CannotSwitchDesignModeOff" xml:space="preserve">
+    <value>Switching design mode off is not supported.</value>
+  </data>
+  <data name="ServerVersionNotSpecified" xml:space="preserve">
+    <value>ConnectionContext.ServerVersion property must be specified in Design Mode.</value>
+  </data>
+  <data name="PropertyNotSetInDesignMode" xml:space="preserve">
+    <value>Property '{name}' does not have a value. Ensure the property has been set when working with the object in Design Mode.</value>
+  </data>
+  <data name="PropertyNotAvailableInDesignMode" xml:space="preserve">
+    <value>Property '{name}' is a readonly property. It is not available in Design Mode.</value>
+  </data>
+  <data name="OperationNotAvailableInDesignMode" xml:space="preserve">
+    <value>This operation is not available in Design Mode.</value>
+  </data>
+  <data name="PropertyNotFound" xml:space="preserve">
+    <value>Cannot discover property '{propertyName}' of type '{typeName}'.</value>
+  </data>
+  <data name="PropertyNotFoundByName" xml:space="preserve">
+    <value>Cannot discover property '{propertyName}'.</value>
+  </data>
+  <data name="OnlyDesignModeSupported" xml:space="preserve">
+    <value>Only Design Mode is supported at this time.</value>
+  </data>
+  <data name="OnlySmoObjectsSupported" xml:space="preserve">
+    <value>Only SMO objects are supported at this time.</value>
+  </data>
+  <data name="RootNotFound" xml:space="preserve">
+    <value>Domain root was not found. Object model may not have a Parent property on every object in the hierarchy, or the object did not have a Parent property set.</value>
+  </data>
+  <data name="UnknownDomain" xml:space="preserve">
+    <value>Unknown domain: '{name}'.</value>
+  </data>
+  <data name="FileWritingException" xml:space="preserve">
+    <value>File writing exception.</value>
+  </data>
+  <data name="InvalideFileName" xml:space="preserve">
+    <value>Invalid filename.</value>
+  </data>
+  <data name="FolderPathNotFound" xml:space="preserve">
+    <value>Folder path specified does not exist.</value>
+  </data>
+  <data name="FilePerObjectUrnMissingName" xml:space="preserve">
+    <value>Cannot create file for unnamed object {urn}.</value>
+  </data>
+  <data name="OrderingCycleDetected" xml:space="preserve">
+    <value>Cyclic dependencies found.</value>
+  </data>
+  <data name="IncorrectEndpointProtocol" xml:space="preserve">
+    <value>Endpoint supports TCP and HTTP protocol only.</value>
+  </data>
+  <data name="FileTableNotSupportedOnTargetEngine" xml:space="preserve">
+    <value>FileTable objects are not supported in {targetVersion}.</value>
+  </data>
+  <data name="FileTableCannotHaveUserColumns" xml:space="preserve">
+    <value>FileTable objects cannot contain user defined columns.</value>
+  </data>
+  <data name="PropertyOnlySupportedForFileTable" xml:space="preserve">
+    <value>Property '{propName}' is only supported for a FileTable object.</value>
+  </data>
+  <data name="TableNotFileTable" xml:space="preserve">
+    <value>Table '{name}' is not a FileTable</value>
+  </data>
+  <data name="NamespaceNotEnabled" xml:space="preserve">
+    <value>FileTable namespace is not enabled for Table '{name}'</value>
+  </data>
+  <data name="TableNotExternalTable" xml:space="preserve">
+    <value>Table '{name}' is not an External Table</value>
+  </data>
+  <data name="PropertyOnlySupportedForExternalTable" xml:space="preserve">
+    <value>Property '{propName}' is only supported for External Table objects.</value>
+  </data>
+  <data name="ConflictingExternalTableProperties" xml:space="preserve">
+    <value>Cannot set the property '{propName}' to '{propValue}' because it conflicts with property '{confPropName}' that is set to '{confPropValue}'.</value>
+  </data>
+  <data name="ExternalTableCannotContainChecks" xml:space="preserve">
+    <value>External Table objects cannot contain check constraints.</value>
+  </data>
+  <data name="ExternalTableCannotContainForeignKeys" xml:space="preserve">
+    <value>External Table objects cannot contain foreign keys.</value>
+  </data>
+  <data name="ExternalTableCannotContainPartitionSchemeParameters" xml:space="preserve">
+    <value>External Table objects cannot contain partition scheme parameters.</value>
+  </data>
+  <data name="ExternalTableCannotContainTriggers" xml:space="preserve">
+    <value>External Table objects cannot contain triggers.</value>
+  </data>
+  <data name="ExternalTableCannotContainIndexes" xml:space="preserve">
+    <value>External Table objects cannot contain indexes.</value>
+  </data>
+  <data name="ExternalTableCannotContainPhysicalPartitions" xml:space="preserve">
+    <value>External Table objects cannot contain physical partitions.</value>
+  </data>
+  <data name="IdentityColumnForExternalTable" xml:space="preserve">
+    <value>External Table objects cannot contain identity columns.</value>
+  </data>
+  <data name="TruncateOperationNotSupportedOnExternalTables" xml:space="preserve">
+    <value>The truncate operation is not supported on External Tables.</value>
+  </data>
+  <data name="ChangeTrackingNotSupportedOnExternalTables" xml:space="preserve">
+    <value>The change tracking option is not supported on External Tables.</value>
+  </data>
+  <data name="ShardingColumnNotSupportedWithNonShardedDistribution" xml:space="preserve">
+    <value>The '{shardingColPropName}' property cannot be used with '{distributionName}' distribution.</value>
+  </data>
+  <data name="ShardingColumnNotSpecifiedForShardedDistribution" xml:space="preserve">
+    <value>The '{shardingColPropName}' property must be assigned a valid value when using 'SHARDED' distribution.</value>
+  </data>
+  <data name="ShardingColumnNotAddedToTable" xml:space="preserve">
+    <value>The column '{shardingColName}' used as the sharding key is not part of the table's column collection.</value>
+  </data>
+  <data name="DependentPropertyMissing" xml:space="preserve">
+    <value>The '{propName}' and '{dependentPropName}' properties must be used together.</value>
+  </data>
+  <data name="ColumnStoreCompressionNotSettable" xml:space="preserve">
+    <value>Cannot set ColumnStore compression.</value>
+  </data>
+  <data name="NoIndexUnique" xml:space="preserve">
+    <value>Cannot specify the UNIQUE constraint for Spatial, XML, or Columnstore indexes.</value>
+  </data>
+  <data name="NoIndexIgnoreDupKey" xml:space="preserve">
+    <value>Cannot specify the IGNORE_DUP_KEY option with Spatial, XML, or Columnstore indexes. IGNORE_DUP_KEY only applies to UNIQUE indexes and these index types cannot be UNIQUE.</value>
+  </data>
+  <data name="NoIndexOptimizeForSequentialKey" xml:space="preserve">
+    <value>Cannot specify the OPTIMIZE_FOR_SEQUENTIAL_KEY option with Spatial, XML, or Columnstore indexes.</value>
+  </data>
+  <data name="NoIndexClustered" xml:space="preserve">
+    <value>Cannot create a Spatial, XML, or Columnstore index as a clustered index.</value>
+  </data>
+  <data name="InvaildColumnStoreIndexOption" xml:space="preserve">
+    <value>Cannot use the following options with a Columnstore index: PAD_INDEX ,STATISTICS_NORECOMPUTE ,SORT_IN_TEMPDB ,IGNORE_DUP_KEY ,ONLINE ,FILLFACTOR ,ALLOW_ROW_LOCKS and ALLOW_PAGE_LOCKS.</value>
+  </data>
+  <data name="IndexOnTableView" xml:space="preserve">
+    <value>Cannot create a nonclustered index on a user defined table type or a table valued function.</value>
+  </data>
+  <data name="IncludedColumnNotSupported" xml:space="preserve">
+    <value>Cannot define an included column on this index type.</value>
+  </data>
+  <data name="ConflictingIndexProperties" xml:space="preserve">
+    <value>Cannot set the property '{propName}' to '{propValue}' because the property '{confPropName}' is already set to '{confPropValue}'.</value>
+  </data>
+  <data name="SelectiveXmlIndexDoesNotSupportReorganize" xml:space="preserve">
+    <value>Selective Xml Index cannot be modified.</value>
+  </data>
+  <data name="MoreThenOneXmlDefaultNamespace" xml:space="preserve">
+    <value>There can not be more than one default namespace on index '{name}'.</value>
+  </data>
+  <data name="SecondarySelectiveXmlIndexModify" xml:space="preserve">
+    <value>Secondary Selective Xml Index cannot be modified</value>
+  </data>
+  <data name="JsonIndexAlter" xml:space="preserve">
+    <value>Altering JSON indexes is not currently supported.</value>
+  </data>
+  <data name="UnsupportedPropertyForSXI" xml:space="preserve">
+    <value>The property '{propertyName}' is not supported for Selective Xml Index.</value>
+  </data>
+  <data name="InvaildSXIOption" xml:space="preserve">
+    <value>Cannot use the following options with a Selective XML index: ONLINE.</value>
+  </data>
+  <data name="UnsupportedValueForSXI" xml:space="preserve">
+    <value>Value '{value}' is not supported for property '{propertyName}' with respect to Selective Xml Index. '{suggestion}'</value>
+  </data>
+  <data name="InvalidUpgradeToCCIIndexType" xml:space="preserve">
+    <value>Only a Clustered index can be converted to a Clustered Columnstore Index.</value>
+  </data>
+  <data name="PropertyValidOnlyForColumnStoreIndexes" xml:space="preserve">
+    <value>The '{propertyName}' property is only valid for Columnstore Indexes.</value>
+  </data>
+  <data name="InvalidCompressionDelayValue" xml:space="preserve">
+    <value>The specified COMPRESSION_DELAY option value '{value}' is invalid. The valid range for disk-based table is between ({minDiskBased}, {max}) minutes and for memory-optimized table is {zeroValue} or between ({minMemoryOptimized}, {max}) minutes.</value>
+  </data>
+  <data name="ExecutingScript" xml:space="preserve">
+    <value>Executing query "{statement}"</value>
+  </data>
+  <data name="TransferDataException" xml:space="preserve">
+    <value>An error occurred while transferring data. See the inner exception for details.</value>
+  </data>
+  <data name="StartingDataTransfer" xml:space="preserve">
+    <value>Begin processing table: {tableName}</value>
+  </data>
+  <data name="CompletedDataTransfer" xml:space="preserve">
+    <value>Finish processing table: {tableName}</value>
+  </data>
+  <data name="ColumnCollationIncompatible" xml:space="preserve">
+    <value>Database contains tables whose columns have a different collation than the database.</value>
+  </data>
+  <data name="ConflictingExternalFileFormatProperties" xml:space="preserve">
+    <value>Cannot set the property '{propName}' to '{propValue}' because the property '{propName}' is not supported for external file format type '{fileFormatType}'.</value>
+  </data>
+  <data name="UnsupportedPropertyForAlter" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported for the alter operation.</value>
+  </data>
+  <data name="UnsupportedResourceManagerLocationProperty" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported for the external data stored in WASB, secure WASB, ASV, or secure ASV.</value>
+  </data>
+  <data name="UnsupportedParamForDataSourceType" xml:space="preserve">
+    <value>The '{propertyName}' property is not supported for external data sources of type '{dataSourceType}'.</value>
+  </data>
+  <data name="AlterNotSupportedForRelationalTypes" xml:space="preserve">
+    <value>Altering an external data source of type '{dataSourceType}' is not supported.</value>
+  </data>
+  <data name="InvalidIndexSpecifiedForModifyingTextToCreateOrAlter" xml:space="preserve">
+    <value>The specified index {index} should lie between {startIndex} and {endIndex}.</value>
+  </data>
+  <data name="InvalidTextForModifyingToCreateOrAlter" xml:space="preserve">
+    <value>The text does not start with 'CREATE'.</value>
+  </data>
+  <data name="ExpectedGraphColumnNotFound" xml:space="preserve">
+    <value>The expected graph column is not found.</value>
+  </data>
+  <data name="MissingDataRetentionFilterColumn" xml:space="preserve">
+    <value>Data Retention requires one column in the table to be set as a data retention filter column.</value>
+  </data>
+  <data name="MissingExternalLanguageFileSpec" xml:space="preserve">
+    <value>At least a file spec must be defined for the external language.</value>
+  </data>
+  <data name="BadPropertiesCombination" xml:space="preserve">
+    <value>Both external language file path and language content bits were updated and have values.</value>
+  </data>
+</root>

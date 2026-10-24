@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="StoredProcedure" impl_type="SqlObject" min_major='10'   cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10'  cloud_min_major='10'>
+			<property_link table='sys.all_objects AS xproc'>xproc.type='X'</property_link>
+		</version>
+    <version min_major='10'  cloud_min_major='12'>
+      <property_link fields='#DllLocation#' left_join='sys.extended_procedures as ep'>ep.object_id = xproc.object_id</property_link>
+    </version>
+	</settings>
+	<properties>
+		<include file='inc_object.xml' alias='xproc' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#' />
+		<include file='inc_system_object.xml' alias='xproc' for="#IsSystemObject#" />
+		
+		<version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+    <version min_major='10'  cloud_min_major='12'>
+      <property name="DllLocation" type="nvarchar" size="4000" read_only_after_creation="true">ISNULL(ep.dll_name,N'')</property>
+    </version>
+  </properties>
+</EnumObject>

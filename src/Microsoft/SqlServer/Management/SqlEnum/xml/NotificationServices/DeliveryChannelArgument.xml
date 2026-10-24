@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='DeliveryChannelArgument' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Name" local="DeliveryChannelName" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="DeliveryChannelName" /> 
+		</request_parent_select>
+		<property_link table="#tmp_delivery_channels_args" alias="dcab" />
+		<prefix>
+CREATE TABLE #tmp_delivery_channels_args(
+    DeliveryChannelName nvarchar(255),
+    ArgumentName nvarchar(255),
+    ArgumentValue nvarchar(4000)
+)
+INSERT #tmp_delivery_channels_args EXEC [SchemaPrefix].NSGetDeliveryChannelArguments
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_delivery_channels_args
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">dcab.ArgumentName</property>
+        <property name="Value" type="nvarchar" size="4000">dcab.ArgumentValue</property>
+        <property name="DeliveryChannelName" type="nvarchar" size="255" hidden="true">dcab.DeliveryChannelName</property>
+	</properties>
+</EnumObject>

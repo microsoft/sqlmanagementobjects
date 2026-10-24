@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ConnectionStrings>
+  <!-- We store secrets as environment variables for the github action but we need a non-empty AkvAccess node -->
+  <AkvAccess>
+    <VaultName>unusedButRequired</VaultName>
+  </AkvAccess>
+  <!-- SAPASSWORD has to be set as environment variable in the github action -->
+  <ConnectionString name="localhost"
+            connectionString="Data Source=.;Initial Catalog=master;User ID=sa;Trust Server Certificate=true"
+            databaseenginetype="Standalone"
+            enabled_features='Hekaton, SqlClr'
+            passwordCredential='SAPASSWORD'
+            hostplatform="Linux"
+            db_engine_edition="Enterprise"/>
+</ConnectionStrings>
+

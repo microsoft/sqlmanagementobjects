@@ -1,0 +1,24 @@
+<?xml version='1.0' ?>
+<EnumObject type='MaintenancePlan' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='msdb.dbo.sysmaintplan_subplans' alias='sp'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>sp.subplan_name</property>
+		<property name='ID' type='uniqueidentifier'>sp.subplan_id</property>
+		<property name='Description' type='nvarchar' size = '512'>sp.subplan_description</property>
+		<property name='JobID' type='uniqueidentifier'>sp.job_id</property>
+		<!-- Yukon added the msx_job_id column in SP2. -->
+		<version  min_major='10'>
+			<property name='MsxJobID' type='uniqueidentifier'>sp.msx_job_id</property>
+			<property name='FromMSX' type='bit'>sp.msx_plan</property>
+		</version>
+		<property name='ScheduleID' type='int'>sp.schedule_id</property>
+
+		<property name='ParentID' type='uniqueidentifier' hidden='true'>sp.plan_id</property>
+	</properties>
+</EnumObject>

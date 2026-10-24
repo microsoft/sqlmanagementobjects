@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<EnumObject type="AditionalParameters" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table = '#srvargs arg'/>
+		<prefix > 
+declare @Arg sysname
+declare @Param sysname
+declare @n int
+
+select @n=0
+select @Param='dummy'
+
+create table #srvargs (value nvarchar(512) NOT NULL)
+
+while(not @Param is null)
+begin
+	select @Param=null
+	select @Arg='SqlArg'+convert(nvarchar,@n)
+
+		</prefix>
+		<version min_major = '10'>
+			<prefix > 
+	exec master.dbo.xp_instance_regread N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer\Parameters', @Arg, @Param OUTPUT
+			</prefix>
+		</version>
+		<prefix > 
+	insert #srvargs  select @Param where not @Param is null
+
+	select @n=@n+1
+end
+		</prefix>
+		<postfix>
+drop table #srvargs		
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Value" type="nvarchar" size="512">arg.value</property>
+	</properties>
+</EnumObject>	

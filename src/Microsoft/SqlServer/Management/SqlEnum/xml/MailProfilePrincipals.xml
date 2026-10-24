@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<EnumObject type="MailProfilePrincipals" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent='Name' local='ProfileName' />
+		</parent_link>
+		<request_parent_select>
+			<field name='Name' />
+		</request_parent_select>
+		<property_link table="#principal_profile_tmp ppt" />
+		<prefix>
+			<link_multiple no='1' expression="
+create table #principal_profile_tmp(
+		principal_id int, 
+		principal_name sysname, 
+		profile_id int, 
+		profile_name sysname, 
+		is_default bit
+)
+declare @ProfileName sysname
+
+declare crs cursor local fast_forward
+	for ( {0} ) 
+open crs 
+fetch crs into @ProfileName
+while @@fetch_status &gt;= 0 
+begin 
+		insert #principal_profile_tmp (principal_id,principal_name,profile_id,profile_name,is_default) exec msdb.dbo.sysmail_help_principalprofile_sp @profile_name=@ProfileName
+		fetch crs into @ProfileName
+end 
+close crs
+deallocate crs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+			drop table #principal_profile_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="PrincipalName" type="sysname">ppt.principal_name</property>
+		<property name="PrincipalID" type="int">ppt.principal_id</property>
+		<property name="ProfileName" type="sysname">ppt.profile_name</property>
+		<property name="ProfileID" type="int">ppt.profile_id</property>
+		<property name="IsDefault" type="bit">ppt.is_default</property>
+	</properties>
+</EnumObject>

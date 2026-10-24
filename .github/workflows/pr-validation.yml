@@ -1,0 +1,62 @@
+name: pr-validation
+
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+  # the build isn't quite Linux-ready
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+    - run: |
+        dotnet build dirs.proj
+      env:
+        DOTNET_ROLL_FORWARD: LatestMajor
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: tests
+        path: bin\Debug\net8.0
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        sqlImage: ['2022','2019']
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+    - name: Download build files
+      uses: actions/download-artifact@v4.1.7
+      with: 
+        name: tests
+        path: tests
+    - name: Copy toolsconnectioninfo
+      run: cp .github/workflows/ToolsConnectionInfo.xml ./tests
+    - name: Install SQL Server
+      run: |
+        export SAPASSWORD=$(date +%s|sha256sum|base64|head -c 32)
+        echo "SAPASSWORD=$SAPASSWORD" >> $GITHUB_ENV
+        docker run -m 2GB -e ACCEPT_EULA=1 -d --name sql -p:1433:1433 -e SA_PASSWORD=$SAPASSWORD mcr.microsoft.com/mssql/server:${{ matrix.sqlImage }}-latest
+        sleep 10
+        docker logs sql
+    - name: Run tests against Linux SQL
+      run: |
+        cat tests/ToolsConnectionInfo.xml
+        docker ps -a
+        dotnet test tests/Microsoft.SqlServer.Test.Smo.dll --logger "trx;LogFilePrefix=SmoTests;verbosity=diag" --filter "TestCategory!=Staging&TestCategory!=Legacy"
+      env: 
+        DOTNET_ROLL_FORWARD: LatestMajor
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with: 
+        name: test-results-${{ matrix.sqlImage }}
+        path: TestResults
+      if: ${{ always() }}

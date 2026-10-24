@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Globals">
+    <RootNamespace>Microsoft.SqlServer.ConnectionInfoUnitTests</RootNamespace>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <NoWarn>0436;$(NoWarn)</NoWarn>
+    <!-- 
+      NATIVEBATCHPARSER is defined when building for SqlClr (GAC netfx builds).
+      The native batch parser uses reflection to load BatchParserClient assembly, which is required 
+      for SqlClr compatibility but introduces loading dependencies that are not available in unit test 
+      environments. Some tests (e.g., CapturedSql mode, argument validation) are conditionally excluded 
+      when NATIVEBATCHPARSER is defined because they require the managed BatchParser implementation 
+      from Microsoft.Data.Tools.Sql.BatchParser to function correctly in isolated unit test scenarios.
+    -->
+    <DefineConstants Condition="'$(UseNativeBatchParser)'=='true'">$(DefineConstants);NATIVEBATCHPARSER</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
+  <ItemGroup>
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <Compile Include="..\Common\UnitTestBase.cs" />
+  </ItemGroup>
+</Project>

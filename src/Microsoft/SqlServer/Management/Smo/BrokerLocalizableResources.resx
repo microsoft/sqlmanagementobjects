@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NamedSmoObject_NameName" xml:space="preserve">
+    <value>Name     </value>
+  </data>
+  <data name="NamedSmoObject_NameDesc" xml:space="preserve">
+    <value>Gets or sets the name of the object.(inherited from NamedSmoObject) </value>
+  </data>
+  <data name="ScriptSchemaObjectBase_SchemaName" xml:space="preserve">
+    <value>Schema</value>
+  </data>
+  <data name="ScriptSchemaObjectBase_SchemaDesc" xml:space="preserve">
+    <value>Gets or sets the schema.(inherited from ScriptSchemaObjectBase)    </value>
+  </data>
+  <data name="MessageType_Name" xml:space="preserve">
+    <value>Message Type</value>
+  </data>
+  <data name="MessageType_Desc" xml:space="preserve">
+    <value>Name of the Service Broker message type. This defines the formats of messages that are allowed in conversations.</value>
+  </data>
+  <data name="MessageType_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="MessageType_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the message type.</value>
+  </data>
+  <data name="MessageType_MessageTypeValidationName" xml:space="preserve">
+    <value>Message type validation</value>
+  </data>
+  <data name="MessageType_MessageTypeValidationDesc" xml:space="preserve">
+    <value>Specifies whether Service Broker validates that messages of this type are empty, well-formed XML, or comply with an XML schema.</value>
+  </data>
+  <data name="MessageType_OwnerName" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="MessageType_ParentName" xml:space="preserve">
+    <value>Parent</value>
+  </data>
+  <data name="ServiceContract_MessageTypeMappingsName" xml:space="preserve">
+    <value>Message Type Mappings</value>
+  </data>
+  <data name="ServiceContract_ExtendedPropertiesName" xml:space="preserve">
+    <value>Extended Properties</value>
+  </data>
+  <data name="ServiceContract_ExtendedPropertiesDesc" xml:space="preserve">
+    <value>Gets the collection of extended properties for the service contract.</value>
+  </data>
+  <data name="ServiceContract_MessageTypeMappingsDesc" xml:space="preserve">
+    <value>Gets the collection of message type mappings for this service contract.</value>
+  </data>
+  <data name="MessageType_ParentDesc" xml:space="preserve">
+    <value>Gets the parent ServiceBroker object.</value>
+  </data>
+  <data name="MessageType_OwnerDesc" xml:space="preserve">
+    <value>The database principal that owns the message type.</value>
+  </data>
+  <data name="MessageType_ValidationXmlSchemaCollectionName" xml:space="preserve">
+    <value>XML schema collection</value>
+  </data>
+  <data name="MessageType_ValidationXmlSchemaCollectionDesc" xml:space="preserve">
+    <value>The collection of XML schemas used to validate messages of this type.</value>
+  </data>
+  <data name="MessageType_ValidationXmlSchemaCollectionSchemaName" xml:space="preserve">
+    <value>XML schema collection database schema</value>
+  </data>
+  <data name="MessageType_ValidationXmlSchemaCollectionSchemaDesc" xml:space="preserve">
+    <value>Name of the database schema that contains the XML schema collection.</value>
+  </data>
+  <data name="MessageType_IsSystemObjectName" xml:space="preserve">
+    <value>Is System Object  </value>
+  </data>
+  <data name="MessageType_ExtendedPropertiesName" xml:space="preserve">
+    <value>Extended Properties</value>
+  </data>
+  <data name="MessageType_ExtendedPropertiesDesc" xml:space="preserve">
+    <value>Gets the collection of extended properties for the message type.</value>
+  </data>
+  <data name="MessageType_IsSystemObjectDesc" xml:space="preserve">
+    <value>Gets the Boolean property that specifies whether the message type is a system object. </value>
+  </data>
+  <data name="ServiceContract_Name" xml:space="preserve">
+    <value>Service Contract</value>
+  </data>
+  <data name="ServiceContract_Desc" xml:space="preserve">
+    <value>Name of the Service Broker contract. This defines the message types that are allowed in conversations.</value>
+  </data>
+  <data name="ServiceContract_OwnerName" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="ServiceContract_OwnerDesc" xml:space="preserve">
+    <value>The database principal that owns the service contract.</value>
+  </data>
+  <data name="ServiceContract_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="ServiceContract_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the service contract.</value>
+  </data>
+  <data name="ServiceContract_IsSystemObjectName" xml:space="preserve">
+    <value>Is System Object  </value>
+  </data>
+  <data name="ServiceContract_IsSystemObjectDesc" xml:space="preserve">
+    <value>Gets the Boolean property that specifies whether the message type is a system object. </value>
+  </data>
+  <data name="ServiceQueue_Name" xml:space="preserve">
+    <value>Service Queue</value>
+  </data>
+  <data name="ServiceQueue_Desc" xml:space="preserve">
+    <value>Name of the queue, which receives Service Broker messages.</value>
+  </data>
+  <data name="ServiceQueue_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="ServiceQueue_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the service queue.</value>
+  </data>
+  <data name="ServiceQueue_ActivationExecutionContextName" xml:space="preserve">
+    <value>Activation execution context</value>
+  </data>
+  <data name="ServiceQueue_ActivationExecutionContextDesc" xml:space="preserve">
+    <value>Indicates whether the activation EXECUTE AS clause specified OWNER, SELF, or a specific database principal.</value>
+  </data>
+  <data name="ServiceQueue_CreateDateName" xml:space="preserve">
+    <value>Create date</value>
+  </data>
+  <data name="ServiceQueue_CreateDateDesc" xml:space="preserve">
+    <value>Date when the queue was created.</value>
+  </data>
+  <data name="ServiceQueue_DateLastModifiedName" xml:space="preserve">
+    <value>Last modified date</value>
+  </data>
+  <data name="ServiceQueue_DateLastModifiedDesc" xml:space="preserve">
+    <value>Date when the queue was last altered.</value>
+  </data>
+  <data name="ServiceQueue_ExecutionContextPrincipalName" xml:space="preserve">
+    <value>Execution context principal</value>
+  </data>
+  <data name="ServiceQueue_ExtendedPropertiesName" xml:space="preserve">
+    <value>Extended Properties</value>
+  </data>
+  <data name="ServiceQueue_ExtendedPropertiesDesc" xml:space="preserve">
+    <value>Gets the collection of extended properties for the service queue.</value>
+  </data>
+  <data name="ServiceQueue_ExecutionContextPrincipalDesc" xml:space="preserve">
+    <value>The database principal under which the activation stored procedure runs.</value>
+  </data>
+  <data name="ServiceQueue_FileGroupName" xml:space="preserve">
+    <value>File group</value>
+  </data>
+  <data name="ServiceQueue_FileGroupDesc" xml:space="preserve">
+    <value>File group on which the queue is located</value>
+  </data>
+  <data name="ServiceQueue_IsActivationEnabledName" xml:space="preserve">
+    <value>Is activation enabled</value>
+  </data>
+  <data name="ServiceQueue_IsActivationEnabledDesc" xml:space="preserve">
+    <value>Specifies whether activation is enabled is queue</value>
+  </data>
+  <data name="ServiceQueue_IsEnqueueEnabledName" xml:space="preserve">
+    <value>Is enqueue enabled</value>
+  </data>
+  <data name="ServiceQueue_IsEnqueueEnabledDesc" xml:space="preserve">
+    <value>Specifies whether an activation stored procedure is run to receive messages from the queue.</value>
+  </data>
+  <data name="ServiceQueue_IsRetentionEnabledName" xml:space="preserve">
+    <value>Is retention enabled</value>
+  </data>
+  <data name="ServiceQueue_IsRetentionEnabledDesc" xml:space="preserve">
+    <value>Specifies whether messages are retained until the conversation ends, or deleted when the receive commits.</value>
+  </data>
+  <data name="ServiceQueue_IsPoisonMessageHandlingEnabledName" xml:space="preserve">
+    <value>Is poison message handling enabled</value>
+  </data>
+  <data name="ServiceQueue_IsPoisonMessageHandlingEnabledDesc" xml:space="preserve">
+    <value>Specifies whether poison message handling is enabled for the queue.</value>
+  </data>
+  <data name="ServiceQueue_MaxReadersName" xml:space="preserve">
+    <value>Maximum readers</value>
+  </data>
+  <data name="ServiceQueue_MaxReadersDesc" xml:space="preserve">
+    <value>The maximum number of copies of the activation stored procedure that can be run concurrently.</value>
+  </data>
+  <data name="ServiceQueue_ProcedureDatabaseName" xml:space="preserve">
+    <value>Procedure database</value>
+  </data>
+  <data name="ServiceQueue_ProcedureDatabaseDesc" xml:space="preserve">
+    <value>Name of the database that contains the activation stored procedure.</value>
+  </data>
+  <data name="ServiceQueue_ProcedureNameName" xml:space="preserve">
+    <value>Procedure name</value>
+  </data>
+  <data name="ServiceQueue_ProcedureNameDesc" xml:space="preserve">
+    <value>Name of the activation stored procedure used to process messages in this queue.</value>
+  </data>
+  <data name="ServiceQueue_ProcedureSchemaName" xml:space="preserve">
+    <value>Procedure schema</value>
+  </data>
+  <data name="ServiceQueue_NameName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ServiceQueue_NameDesc" xml:space="preserve">
+    <value>Gets or sets the name of the service queue.</value>
+  </data>
+  <data name="ServiceQueue_ProcedureSchemaDesc" xml:space="preserve">
+    <value>Name of the schema that contains the stored procedure</value>
+  </data>
+  <data name="ServiceQueue_RowCountName" xml:space="preserve">
+    <value>Message count</value>
+  </data>
+  <data name="ServiceQueue_RowCountAsDoubleName" xml:space="preserve">
+    <value>Row Count (Double)</value>
+  </data>
+  <data name="ServiceQueue_RowCountAsDoubleDesc" xml:space="preserve">
+    <value>Gets the number of messages in the queue as a double-precision floating point number.</value>
+  </data>
+  <data name="ServiceQueue_RowCountDesc" xml:space="preserve">
+    <value>The number of messages in the queue.</value>
+  </data>
+  <data name="ServiceQueue_IsSystemObjectName" xml:space="preserve">
+    <value>Is System Object  </value>
+  </data>
+  <data name="ServiceQueue_IsSystemObjectDesc" xml:space="preserve">
+    <value>Gets the Boolean property that specifies whether the message type is a system object. </value>
+  </data>
+  <data name="ServiceQueue_SchemaName" xml:space="preserve">
+    <value>Schema</value>
+  </data>
+  <data name="ServiceQueue_SchemaDesc" xml:space="preserve">
+    <value>Gets or sets the schema.(inherited from ScriptSchemaObjectBase) </value>
+  </data>
+  <data name="BrokerService_Name" xml:space="preserve">
+    <value>Broker Service</value>
+  </data>
+  <data name="BrokerService_Desc" xml:space="preserve">
+    <value>Name of the service. This is an address that is used in Service Broker conversations.</value>
+  </data>
+  <data name="BrokerService_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="BrokerService_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the broker service.</value>
+  </data>
+  <data name="BrokerService_OwnerName" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="BrokerService_OwnerDesc" xml:space="preserve">
+    <value>The database principal that owns the Service Broker service.</value>
+  </data>
+  <data name="BrokerService_QueueNameName" xml:space="preserve">
+    <value>Queue name</value>
+  </data>
+  <data name="BrokerService_QueueNameDesc" xml:space="preserve">
+    <value>Name of the queue that is used to receive messages sent to the service.</value>
+  </data>
+  <data name="BrokerService_QueueSchemaName" xml:space="preserve">
+    <value>Queue schema</value>
+  </data>
+  <data name="BrokerService_ServiceContractMappingsName" xml:space="preserve">
+    <value>Service Contract Mappings</value>
+  </data>
+  <data name="BrokerService_ServiceContractMappingsDesc" xml:space="preserve">
+    <value>Gets the collection of service contract mappings for this broker service.</value>
+  </data>
+  <data name="BrokerService_QueueSchemaDesc" xml:space="preserve">
+    <value>Name of the schema to which the queue belongs</value>
+  </data>
+  <data name="BrokerService_IsSystemObjectName" xml:space="preserve">
+    <value>Is System Object  </value>
+  </data>
+  <data name="BrokerService_IsSystemObjectDesc" xml:space="preserve">
+    <value>Gets the Boolean property that specifies whether the message type is a system object. </value>
+  </data>
+  <data name="ServiceRoute_Name" xml:space="preserve">
+    <value>Service Route</value>
+  </data>
+  <data name="ServiceRoute_Desc" xml:space="preserve">
+    <value>Name of the route. This specifies the network address of a Service Broker service.</value>
+  </data>
+  <data name="ServiceRoute_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="ServiceRoute_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the service route.</value>
+  </data>
+  <data name="ServiceRoute_AddressName" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="ServiceRoute_AddressDesc" xml:space="preserve">
+    <value>The network address of the instance of the Database Engine that is hosting the Service Broker service.</value>
+  </data>
+  <data name="ServiceRoute_BrokerInstanceName" xml:space="preserve">
+    <value>Broker instance</value>
+  </data>
+  <data name="ServiceRoute_BrokerInstanceDesc" xml:space="preserve">
+    <value>The unique identifier that Service Broker assigned to the database that hosts the service.</value>
+  </data>
+  <data name="ServiceRoute_ExpirationDateName" xml:space="preserve">
+    <value>Expiration date</value>
+  </data>
+  <data name="ServiceRoute_ExpirationDateDesc" xml:space="preserve">
+    <value>The date and time when the route expires.</value>
+  </data>
+  <data name="ServiceRoute_MirrorAddressName" xml:space="preserve">
+    <value>Mirror address</value>
+  </data>
+  <data name="ServiceRoute_MirrorAddressDesc" xml:space="preserve">
+    <value>The network address of a mirrored copy of the Service Broker service that is addressed by this route.</value>
+  </data>
+  <data name="ServiceRoute_OwnerName" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="ServiceRoute_OwnerDesc" xml:space="preserve">
+    <value>The database principal that owns the service route.</value>
+  </data>
+  <data name="ServiceRoute_RemoteServiceName" xml:space="preserve">
+    <value>Remote service</value>
+  </data>
+  <data name="ServiceRoute_RemoteServiceDesc" xml:space="preserve">
+    <value>The Service Broker service whose address is specified by the service route.</value>
+  </data>
+  <data name="RemoteServiceBinding_Name" xml:space="preserve">
+    <value>Remote Service Binding</value>
+  </data>
+  <data name="RemoteServiceBinding_Desc" xml:space="preserve">
+    <value>Name of the remote service binding. This defines the security credentials that are used to communicate with a remote service.</value>
+  </data>
+  <data name="RemoteServiceBinding_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="RemoteServiceBinding_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the remote service binding.</value>
+  </data>
+  <data name="RemoteServiceBinding_OwnerName" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="RemoteServiceBinding_OwnerDesc" xml:space="preserve">
+    <value>The database principal that owns the remote service binding.</value>
+  </data>
+  <data name="RemoteServiceBinding_CertificateUserName" xml:space="preserve">
+    <value>Certificate user</value>
+  </data>
+  <data name="RemoteServiceBinding_CertificateUserDesc" xml:space="preserve">
+    <value>User that holds the certificate associated with remote service binding</value>
+  </data>
+  <data name="RemoteServiceBinding_IsAnonymousName" xml:space="preserve">
+    <value>Is anonymous</value>
+  </data>
+  <data name="RemoteServiceBinding_IsAnonymousDesc" xml:space="preserve">
+    <value>Specifies whether connections to the remote service are anonymous and do not send local conversation security credentials.</value>
+  </data>
+  <data name="RemoteServiceBinding_RemoteServiceName" xml:space="preserve">
+    <value>Remote Service</value>
+  </data>
+  <data name="RemoteServiceBinding_RemoteServiceDesc" xml:space="preserve">
+    <value>The remote service for which the remote service binding provides connection security credentials.</value>
+  </data>
+  <data name="BrokerPriority_Name" xml:space="preserve">
+    <value>Broker Priority</value>
+  </data>
+  <data name="BrokerPriority_Desc" xml:space="preserve">
+    <value>Name of the Servie Broker priority.</value>
+  </data>
+  <data name="BrokerPriority_IDName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="BrokerPriority_IDDesc" xml:space="preserve">
+    <value>Gets the ID value that uniquely identifies the broker priority.</value>
+  </data>
+  <data name="BrokerPriority_ContractNameName" xml:space="preserve">
+    <value>Contract name</value>
+  </data>
+  <data name="BrokerPriority_ContractNameDesc" xml:space="preserve">
+    <value>Name of a contract if the conversation priority applies to a conversation.</value>
+  </data>
+  <data name="BrokerPriority_LocalServiceNameName" xml:space="preserve">
+    <value>Local service name</value>
+  </data>
+  <data name="BrokerPriority_LocalServiceNameDesc" xml:space="preserve">
+    <value>Name of local service if the conversation priority applies to a conversation endpoint.</value>
+  </data>
+  <data name="BrokerPriority_RemoteServiceNameName" xml:space="preserve">
+    <value>Remote service schema</value>
+  </data>
+  <data name="BrokerService_ExtendedPropertiesName" xml:space="preserve">
+    <value>Extended Properties</value>
+  </data>
+  <data name="BrokerService_ExtendedPropertiesDesc" xml:space="preserve">
+    <value>Gets the collection of extended properties for the broker service.</value>
+  </data>
+  <data name="BrokerPriority_RemoteServiceNameDesc" xml:space="preserve">
+    <value>Specifies the name of remote service if the conversation priority applies to a conversation endpoint.</value>
+  </data>
+  <data name="BrokerPriority_PriorityLevelName" xml:space="preserve">
+    <value>Priority level</value>
+  </data>
+  <data name="BrokerPriority_PriorityLevelDesc" xml:space="preserve">
+    <value>Priority level assigned to the priority.</value>
+  </data>
+</root>

@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<EnumObject min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings/>
+  <properties>
+    <version min_major='10'  cloud_min_major='10'>
+      <property name="HasAfterTrigger" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'HasAfterTrigger')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="HasInsertTrigger" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'HasInsertTrigger')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="HasDeleteTrigger" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'HasDeleteTrigger')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="HasInsteadOfTrigger" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'HasInsteadOfTrigger')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="HasUpdateTrigger" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'HasUpdateTrigger')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+    </version>
+        
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property name="HasIndex" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'IsIndexed')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="IsIndexable" type="bit" access="Read" cast='true'>
+        <link_multiple no='1' expression="OBJECTPROPERTY({0}, N'IsIndexable')">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+    </version>
+     
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <!-- fragmentation info support -->
+      <property name="TableNameFromFilter" type="sysname" hidden='true'>
+        <link_multiple no='2' expression="quotename({1}) + N'.' + quotename({0})">
+          <link_field type='filter' field="Name" default_value="null"/>
+          <link_field type='filter' field="Schema" default_value="null"/>
+        </link_multiple>
+      </property>
+    </version>
+  </properties>
+</EnumObject>

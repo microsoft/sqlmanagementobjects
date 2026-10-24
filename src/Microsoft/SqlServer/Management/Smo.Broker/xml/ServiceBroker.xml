@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServiceBroker" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='1' expression="{0} + '/ServiceBroker'">
+				<link_field type='parent' field="Urn" />
+			</link_multiple>
+		</property>
+    <version min_major='10'>
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='2' expression="{0} + '/{1}'">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      <property name="PolicyHealthState" type="int" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+        <link_multiple no='1' expression="case when 1=msdb.dbo.fn_syspolicy_is_automation_enabled() and exists (select * from msdb.dbo.syspolicy_system_health_state where target_query_expression_with_id like 'Server/Database[@Id=' + CONVERT(nvarchar(15), db_id()) + ']/{0}%' ESCAPE '\') then 1 else 0 end">
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+    </version>
+  </properties>
+</EnumObject>

@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='7' cloud_min_major='10'  datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major = '7' max_major = '8'>
+			<property_link  table="dbo.sysprotects AS prmssn"/>
+			<property_link fields='#CodeDescription#' 
+						join='master.dbo.spt_values AS val1'>val1.number = prmssn.protecttype and val1.type = 'T'</property_link>
+			<property_link fields='#StateDescription#' 
+						join='master.dbo.spt_values AS val2'>val2.number = prmssn.action and val2.type = 'T'</property_link>
+			<property_link fields = '#Grantee#GranteeType#Name#' 
+					join = 'sysusers AS grantee_principal'>grantee_principal.uid = prmssn.uid</property_link>
+			<property_link fields = '#Grantor#GrantorType#Name#' 
+					join = 'sysusers AS grantor_principal'>grantor_principal.uid = prmssn.grantor</property_link>
+			<post_process fields='#Code#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessPermissionCode'
+					triggered_fields='#SqlCodePP#'/>
+		</version>
+
+		<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+			<property_link table = 'sys.{0}_permissions AS prmssn'/>
+			<property_link fields = '#Grantee#GranteeType#Name#' 
+					join = 'sys.{0}_principals AS grantee_principal'>grantee_principal.principal_id = prmssn.grantee_principal_id</property_link>
+			<property_link fields = '#Grantor#GrantorType#Name#' 
+					join = 'sys.{0}_principals AS grantor_principal'>grantor_principal.principal_id = prmssn.grantor_principal_id</property_link>
+			<post_process fields='#Code#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessPermissionCode'
+					triggered_fields='#SqlCodePP#HiddenObjectClass#'/>
+		</version>
+		
+	</settings>
+	<properties>
+		<version min_major = '7' max_major = '8'>
+			<property name="Name" type="nvarchar" size = '512'>grantee_principal.name + N'_' + 
+                    convert(nvarchar(10), (CASE when 1 = grantee_principal.issqlrole THEN 3 WHEN 1 = grantee_principal.isapprole THEN 4 ELSE 2 END)) + N'_' + 
+                    grantor_principal.name + N'_' +
+                    convert(nvarchar(10), (CASE when 1 = grantor_principal.issqlrole THEN 3 WHEN 1 = grantor_principal.isapprole THEN 4 ELSE 2 END)) + N'_' +
+                    convert(nvarchar(10), (prmssn.id)) + N'_' +
+                    convert(nvarchar(10), prmssn.protecttype) + N'_' +
+                    convert(nvarchar(10), prmssn.action)
+            </property>
+			<property name="Grantee" type="sysname">grantee_principal.name</property>
+			<property name="GranteeType" type="int" report_type='PrincipalType'
+>CASE when 1 = grantee_principal.issqlrole THEN 3 WHEN 1 = grantee_principal.isapprole THEN 4 ELSE 2 END</property>
+			<property name="Grantor" type="sysname">grantor_principal.name</property>
+			<property name="GrantorType" type="int" report_type='PrincipalType'
+>CASE when 1 = grantor_principal.issqlrole THEN 3 WHEN 1 = grantor_principal.isapprole THEN 4 ELSE 2 END</property>
+			<property name="ObjectClass" type="int"  
+								report_type = 'ObjectClass'>CASE prmssn.id WHEN 0 THEN 0 ELSE 1 END </property>		
+			<!--	Grant_WGO	204		ascii('W')
+					Grant		205		ascii('G')
+					Deny		206		ascii('D')	-->
+			<property name="PermissionState" type="int" 
+				report_type = "PermissionState">CASE prmssn.protecttype WHEN 204 THEN 87 WHEN 205 THEN 71 WHEN 206 THEN 68 END</property>
+			
+			<!-- mark them expensive, we only want them used in special cases -->
+			<property name="IntCode" type="int" expensive='true' cast='true'>prmssn.protecttype</property>			
+			<property name="CodeDescription" type="nvarchar" size='100' expensive='true'>val1.name</property>		
+			<property name="StateDescription" type="nvarchar" size='100' expensive='true'>val2.name</property>		
+			
+			<!-- hidden properties -->
+			<property name="TrueObjectClass" type="int" hidden='true'>CASE prmssn.id WHEN 0 THEN 0 ELSE 1 END </property>		
+			<property name="SqlCodePP" type="int" cast='true'  hidden='true'>prmssn.action</property>
+			<property name="MajorID" type="int" hidden='true'>prmssn.id</property>
+		</version>
+	
+		<version min_major = '9' cloud_min_major='10'  datawarehouse_enabled='true'>
+			<property name="Name" type="nvarchar" size = '512'>grantee_principal.name + N'_' + 
+                    convert(nvarchar(10), (CASE grantee_principal.type WHEN 'R' THEN 3 WHEN 'A' THEN 4 ELSE 2 END - CASE '{0}' WHEN  'database' THEN 0 ELSE 2 END)) + N'_' + 
+                    grantor_principal.name + N'_' +
+                    convert(nvarchar(10), (CASE grantor_principal.type WHEN 'R' THEN 3 WHEN 'A' THEN 4 ELSE 2 END - CASE '{0}' WHEN  'database' THEN 0 ELSE 2 END)) + N'_' +
+                    convert(nvarchar(10), (CASE WHEN (prmssn.class=4 or prmssn.class=100 )THEN CASE (SELECT oc.type FROM sys.{0}_principals AS oc WHERE oc.principal_id = prmssn.major_id) WHEN 'R' THEN 201 WHEN 'A' THEN 202 ELSE 200 END + CASE prmssn.class WHEN 4 THEN 0 ELSE 100 END ELSE prmssn.class END)) + N'_' +
+                    convert(nvarchar(10), ascii(prmssn.state)) + N'_' +
+                    convert(varchar(10), convert(varbinary(10), prmssn.type))
+            </property>
+			<property name="Grantee" type="sysname">grantee_principal.name</property>
+			<property name="GranteeType" type="int" report_type='PrincipalType'
+>CASE grantee_principal.type WHEN 'R' THEN 3 WHEN 'A' THEN 4 ELSE 2 END - CASE '{0}' WHEN  'database' THEN 0 ELSE 2 END</property>
+			<property name="Grantor" type="sysname">grantor_principal.name</property>
+			<property name="GrantorType" type="int" report_type='PrincipalType'
+>CASE grantor_principal.type WHEN 'R' THEN 3 WHEN 'A' THEN 4 ELSE 2 END - CASE '{0}' WHEN  'database' THEN 0 ELSE 2 END</property>
+			<property name="ObjectClass" type="int" report_type = 'ObjectClass'
+>CASE WHEN (prmssn.class=4 or prmssn.class=101 ) THEN CASE (SELECT oc.type FROM sys.{0}_principals AS oc WHERE oc.principal_id = prmssn.major_id) WHEN 'R' THEN CASE prmssn.class WHEN 4 THEN 201 ELSE 301 END WHEN 'A' THEN 202 ELSE CASE prmssn.class WHEN 4 THEN 200 ELSE 101 END END ELSE prmssn.class END</property>		
+			<property name="PermissionState" type="int" report_type = "PermissionState">ascii(prmssn.state)</property>			
+			
+			<!-- mark them expensive, we only want them used in special cases -->
+			<property name="StringCode" type="char" size='4' expensive='true'>prmssn.type</property>
+			<property name="StringState" type="char" size='1' expensive='true'>prmssn.state</property>		
+
+			<!-- hidden properties -->
+      <property name="HiddenObjectClass" type="int" hidden='true'
+>CASE WHEN (prmssn.class=4 or prmssn.class=101 ) THEN CASE (SELECT oc.type FROM sys.{0}_principals AS oc WHERE oc.principal_id = prmssn.major_id) WHEN 'R' THEN CASE prmssn.class WHEN 4 THEN 201 ELSE 301 END WHEN 'A' THEN 202 ELSE CASE prmssn.class WHEN 4 THEN 200 ELSE 101 END END ELSE prmssn.class END</property>
+			<property name="TrueObjectClass" type="int" hidden='true'>prmssn.class</property>		
+			<property name="SqlCodePP" type="char" size='4' hidden='true'>prmssn.type</property>				
+			<property name="MajorID" type="int" hidden='true'>prmssn.major_id</property>
+			<property name="MinorID" type="int" hidden='true'>prmssn.minor_id</property>
+		</version>
+	</properties>
+</EnumObject>

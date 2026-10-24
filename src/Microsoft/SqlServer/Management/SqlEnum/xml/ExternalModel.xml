@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalModel" impl_type="SqlObject" min_major='17' cloud_min_major= '12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+            <property_link table="#externalmodels" alias="emds"/>
+            <property_link fields="#Credential#" left_join="sys.database_scoped_credentials AS c">c.credential_id = emds.credential_id</property_link>
+            <property_link fields='#Owner#' join='sys.database_principals AS princip'>princip.principal_id = emds.principal_id</property_link>
+
+            <!-- Create temp table -->
+            <prefix>
+                create table #externalmodels (
+                external_model_id int,
+                name sysname,
+                location nvarchar(4000),
+                api_format nvarchar(100),
+                model_type_id int,
+                model nvarchar(100),
+                parameters nvarchar(max),
+                credential_id int,
+                principal_id int
+                );
+                begin try
+                exec sp_executesql N'
+                insert into #externalmodels (
+                external_model_id, name, location, api_format, model_type_id, model, parameters, credential_id, principal_id
+                )
+                select external_model_id, name, location, api_format, model_type_id, model, CONVERT(NVARCHAR(MAX),parameters), credential_id, principal_id
+                from sys.external_models';
+                end try
+                begin catch
+                end catch
+            </prefix>
+            <!-- Drop temp table -->
+            <postfix>
+                drop table #externalmodels
+            </postfix>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">emds.name</property>
+        <property name="ID" type="int" access='Read'>emds.external_model_id</property>
+        <property name="Owner" type="sysname">princip.name</property>
+        <property name="Location" type="nvarchar" size="4000">ISNULL(emds.location,N'')</property>
+        <property name="ApiFormat" type="nvarchar" size="100">ISNULL(emds.api_format,N'')</property>
+        <property name="ModelType" type="int" report_type="ExternalModelType">emds.model_type_id</property>
+        <property name="Model" type="nvarchar" size="100">ISNULL(emds.model,N'')</property>
+        <property name="Parameters" type="nvarchar" size="max">ISNULL(emds.parameters,N'{}')</property>
+        <property name="Credential" type="sysname">ISNULL(c.name,N'')</property>
+    </properties>
+
+    <!-- extended properties support -->
+    <property name="ExtPropClass" type="int" hidden='true'>110</property>
+    <property name="ExtPropMajorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+            <link_field type='local' field="ID" />
+        </link_multiple>
+    </property>
+    <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+</EnumObject>
