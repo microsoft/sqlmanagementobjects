@@ -12,8 +12,7 @@
         When adding new package dependencies here, make sure to also add those packages to
         Microsoft.SqlServer.Smo.TestUtils.nuspec if they affect any of the related test utilities.
         -->
-    <PackageVersion Include="Azure.Core" Version="1.47.1" />
-    <PackageVersion Include="Azure.Identity" Version="1.14.2" />
+    <PackageVersion Include="Azure.Core" Version="1.50.0" />
     <PackageVersion Include="Azure.ResourceManager" Version="1.8.0" />
     <PackageVersion Include="Azure.ResourceManager.Storage" Version="1.1.1" />
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.20.0" />
