@@ -3,6 +3,10 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 181.38.0
+
+- Upgrade Microsoft.Data.SqlClient to version 6.1.6.
+
 ## 181.37.1
 
 - Add `ServerConnection.Edition` and `ServerConnection.EditionID` to expose the values of `SERVERPROPERTY('Edition')` and `SERVERPROPERTY('EditionID')`.
