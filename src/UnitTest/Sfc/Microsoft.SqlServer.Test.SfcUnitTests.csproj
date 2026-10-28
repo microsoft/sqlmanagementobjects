@@ -8,5 +8,6 @@
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\Sdk\Sfc\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(EnlistmentRoot)\src\Microsoft\SqlServer\Management\ConnectionInfo\Microsoft.SqlServer.ConnectionInfo.csproj" />
   </ItemGroup>
 </Project>

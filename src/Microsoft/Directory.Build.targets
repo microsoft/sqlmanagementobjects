@@ -2,7 +2,7 @@
 <Project >
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <DocumentationFile>$(BaseOutputPath)\Documentation\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(BaseOutputPath)/Documentation/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
      <!-- Ignore XML Doc warnings temporarily until they can be fixed - see TFS#10083927
     1591 - Missing XML comment for publicly visible type or member -->
     <NoWarn>$(NoWarn);1591</NoWarn>

@@ -4,5 +4,7 @@
     <ProjectReference Include="**\*.csproj" />
     <!-- SqlClrProvider doesn't build for all platforms, let it get pulled in as needed-->
     <ProjectReference Remove="**\Microsoft.SqlServer.SqlClrProvider.csproj" />
+    <!-- RegSvrEnum only targets net472 (the .NET Framework), which isn't available on non-Windows builds -->
+    <ProjectReference Remove="**\Microsoft.SqlServer.RegSvrEnum.csproj" Condition="'$(IsWindowsBuild)' != 'true'" />
   </ItemGroup>
 </Project>

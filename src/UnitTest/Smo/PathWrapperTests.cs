@@ -26,6 +26,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             Assert.That(PathWrapper.Combine(@"c:^*&)(_=@#'\^&#2.*(.txt", @"subdir\file.txt"),
                 Is.EqualTo(@"c:^*&)(_=@#'\^&#2.*(.txt\subdir\file.txt"), "unsupported characters");
             Assert.That(PathWrapper.Combine(@"", @"subdir\file.txt"), Is.EqualTo(@"subdir\file.txt"), "path1 empty");
+            Assert.That(PathWrapper.Combine(@"c:\temp", ""), Is.EqualTo(@"c:\temp"), "path2 empty");
             Assert.That(PathWrapper.Combine(@"\\server\share\", "folder"), Is.EqualTo(@"\\server\share\folder"),
                 "unc path");
             Assert.That(
@@ -75,6 +76,8 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             Assert.That(PathWrapper.GetDirectoryName(@"C:\MyDir"), Is.EqualTo(@"C:\"), "folder in root");
             Assert.That(PathWrapper.GetDirectoryName(@"C:\"), Is.Null, "root");
             Assert.That(PathWrapper.GetDirectoryName(@"filename", PathType.Windows), Is.Empty, "no folder");
+            Assert.That(PathWrapper.GetDirectoryName(@"\\server\share"), Is.Null, "unc share root");
+            Assert.That(PathWrapper.GetDirectoryName(@"\\server\share\"), Is.EqualTo(@"\\server\share"), "unc share root with trailing separator");
             Assert.That(PathWrapper.GetDirectoryName(@"\\server\share\folder"), Is.EqualTo(@"\\server\share"), "unc path");
         }
 

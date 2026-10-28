@@ -28,7 +28,7 @@ doskey prod=pushd %BASEDIR%src\Microsoft\SqlServer\Management\$*
 doskey sfc=pushd %BASEDIR%src\Microsoft\SqlServer\Management\Sdk\sfc
 doskey smo=pushd %BASEDIR%src\Microsoft\SqlServer\Management\Smo
 doskey smoenum=pushd %BASEDIR%src\Microsoft\SqlServer\Management\SqlEnum\$*
-doskey clean=powershell.exe -ExecutionPolicy Unrestricted -File "%BASEDIR%init.ps1" -Clean
+
 doskey tst=pushd %BASEDIR%src\FunctionalTest\Smo\$*
 doskey slngen19=slngen -vs "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.exe" $*
 
@@ -44,16 +44,30 @@ doskey netcoretests=pushd %BASEDIR%bin\debug\net8.0$Tvstest.console.exe microsof
 
 title git %BASEDIR%
 
-REM Migration to PowerShell environment
-powershell.exe -ExecutionPolicy Unrestricted -File "%BASEDIR%init.ps1" -Initialize
-if "%errorlevel%" neq "0" (
-    echo Failed to setup local dev build environment correctly
+REM Read the required SDK version from global.json so this script never drifts from it
+for /f "usebackq tokens=2 delims=:, " %%V in (`findstr /r /c:"\"version\"" %BASEDIR%global.json`) do set DOTNET_SDK_VERSION=%%~V
+set DOTNET_SDK_VERSION=%DOTNET_SDK_VERSION:"=%
+dotnet --list-sdks | findstr /b /c:"%DOTNET_SDK_VERSION% " >nul
+IF ERRORLEVEL 1 (
+  echo .NET SDK %DOTNET_SDK_VERSION% ^(required by global.json^) was not found.
+  echo Install it from https://dotnet.microsoft.com/download/dotnet/%DOTNET_SDK_VERSION:~0,-4%
 )
 
 dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
 dotnet tool install --global Microsoft.SqlPackage
+
+set NUGET_EXE=%BASEDIR%Build\Local\Nuget\nuget.exe
+IF NOT EXIST %NUGET_EXE% (
+  echo nuget.exe not found, downloading from https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+  IF NOT EXIST %BASEDIR%Build\Local\Nuget mkdir %BASEDIR%Build\Local\Nuget
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://dist.nuget.org/win-x86-commandline/latest/nuget.exe' -OutFile '%NUGET_EXE%'"
+  IF NOT EXIST %NUGET_EXE% (
+    echo Failed to download nuget.exe. Please download it manually from https://dist.nuget.org/win-x86-commandline/latest/nuget.exe and place it at %NUGET_EXE%
+    goto :EOF
+  )
+)
 IF NOT EXIST %BASEDIR%packages\StrawberryPerl.5.28.0.1\bin\perl.exe (
-  %BASEDIR%Build\Local\Nuget\nuget.exe install StrawberryPerl -Version 5.28.0.1
+  %NUGET_EXE% install StrawberryPerl -Version 5.28.0.1
 )
 
 echo.

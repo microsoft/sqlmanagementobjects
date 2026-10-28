@@ -303,7 +303,7 @@ die "Failed to read Event Info Array.\n" if $EventInfoStatus != 2;
 # print event group enumeration
 if($option == 0)
 {
-	open(FOUT, ">" . $OutputDir . "\\grpenum.inc") || die "Cannot write to " . $OutputDir . "\\grpenum.inc\n";
+	open(FOUT, ">" . $OutputDir . "/grpenum.inc") || die "Cannot write to " . $OutputDir . "/grpenum.inc\n";
 	print FOUT "// Extended Event Group for SQLTrace\n";
 	print FOUT "enum ETraceEventGroup {\n";
 	print FOUT "\tEGROUP_TRCAT_START = EGROUP_TRCAT_ALL,  // Setting beginning\n";
@@ -318,7 +318,7 @@ if($option == 0)
 
 #
 # print event group name
-	open(FOUT, ">" . $OutputDir . "\\grpdefs.inc") || die "Cannot write to " . $OutputDir . "\\grpdefs.inc\n";
+	open(FOUT, ">" . $OutputDir . "/grpdefs.inc") || die "Cannot write to " . $OutputDir . "/grpdefs.inc\n";
 	print FOUT "// Extended Event Groups for SQLTrace\n";
 	for (my $i = 1; $i <= $#rgsCategoryIDs; $i++)
 	{
@@ -330,7 +330,7 @@ if($option == 0)
 
 #
 # print paraminfo array
-	open(FOUT, ">" . $OutputDir . "\\parinfo.inc") || die "Cannot write to " . $OutputDir . "\\parinfo.inc\n";
+	open(FOUT, ">" . $OutputDir . "/parinfo.inc") || die "Cannot write to " . $OutputDir . "/parinfo.inc\n";
 	my $ColumnCount = @rgsColumnNames;
 	print FOUT "//----------------------------------------------------------------\n";
 	print FOUT "// TraceEventTag Enum\n";
@@ -400,7 +400,7 @@ if($option == 0)
 
 	#
 # print schema array
-	open(FOUT, ">" . $OutputDir . "\\schema.inc") || die "Cannot write to " . $OutputDir . "\\schema.inc\n";
+	open(FOUT, ">" . $OutputDir . "/schema.inc") || die "Cannot write to " . $OutputDir . "/schema.inc\n";
 	print FOUT "// Schema array extended for SQLTrace\n";
 	for (my $i = $EventClassStart; $i <= $#rgsEventIDs; $i++)
 	{
@@ -447,7 +447,7 @@ if($option == 0)
 
 #
 # Generate event hierarchy graph for reference.  This file is not used for compilation.
-	open(FOUT, ">" . $OutputDir . "\\hierarchy.txt") || die "Cannot write to " . $OutputDir . "\\hierarchy.txt.\n";
+	open(FOUT, ">" . $OutputDir . "/hierarchy.txt") || die "Cannot write to " . $OutputDir . "/hierarchy.txt.\n";
 	print FOUT "==========  SQL Trace event hierarchy ==================\n\n";
 	print FOUT "ALL_EVENTS\n";
 	print FOUT "|____ TRC_ALL_EVENTS\n";
@@ -483,8 +483,8 @@ if($option == 0)
 	# Form more information, take a look at:
 	# 	http://blogs.msdn.com/brettsh/archive/2006/06/07/620986.aspx
 	# ----------------------------------------------------------------
-	open(FOUT, ">:raw:encoding(UTF16-LE):crlf:utf8", $OutputDir . "\\etwcls.mof")
-		|| die "Cannot write to " . $OutputDir . "\\etwcls.mof\n";
+	open(FOUT, ">:raw:encoding(UTF16-LE):crlf:utf8", $OutputDir . "/etwcls.mof")
+		|| die "Cannot write to " . $OutputDir . "/etwcls.mof\n";
 	print FOUT "\x{FEFF}";  # print BOM (Byte Order Mark) for the unicode file
 	# ----------------------------------------------------------------
 
@@ -548,7 +548,7 @@ if($option == 0)
 #
 # GUID include file which lists all ETW event class GUIDs
 #
-	open(FOUT, ">" .$OutputDir . "\\etwguid.inc") || die "Cannot write to " . $OutputDir . "\\etwguid.inc\n";
+	open(FOUT, ">" .$OutputDir . "/etwguid.inc") || die "Cannot write to " . $OutputDir . "/etwguid.inc\n";
 	print FOUT "// Array of Event Class Info\n\n";
 
 	for (my $i = $EventClassStart; $i <= $#rgsEventIDs; $i++)
@@ -566,7 +566,7 @@ if($option == 0)
 
 	# Dump All Columns to XML
 	#
-	open(FOUT, ">" .$OutputDir . "\\events_trace_template.xst") || die "Cannot write to " . $OutputDir . "\\events_trace_template.xst\n";
+	open(FOUT, ">" .$OutputDir . "/events_trace_template.xst") || die "Cannot write to " . $OutputDir . "/events_trace_template.xst\n";
 	for (my $col = 1; $col < $ColumnCount; $col++)
 	{
 		#print param defs for active cols except for SPID/EventClass
@@ -585,7 +585,7 @@ if($option == 0)
 # 2: instance guid (INSTGUID)
 if($option == 1)
 {
-	open(FOUT, ">" . $OutputDir . "\\etwsetup.inc") || die "Cannot write to " . $OutputDir . "\\etwsetup.inc\n";
+	open(FOUT, ">" . $OutputDir . "/etwsetup.inc") || die "Cannot write to " . $OutputDir . "/etwsetup.inc\n";
 	print FOUT "{NOPARAM, L\"// ************************************************************************\\n\"},\n";
 	print FOUT "{NOPARAM, L\"//	\\tCopyrights (c) Microsoft Corporation\\n//\\n\"},\n";
 	print FOUT "{NOPARAM, L\"// ************************************************************************\\n\\n\"},\n";

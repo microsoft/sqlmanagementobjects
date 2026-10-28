@@ -11,7 +11,10 @@
       Enlistment root is based off of wherever this file is.  Be sure not to set this property anywhere else.
     -->
     <EnlistmentRoot>$(MSBuildThisFileDirectory.TrimEnd('\\'))</EnlistmentRoot>
-    <NetfxVersion>net472</NetfxVersion>
+    <!-- Whether we are building on a Windows OS. net472 (the .NET Framework) can only be built/run on Windows,
+         so builds on other OSes (e.g. Linux) skip it and only produce netstandard2.0/net8.0/net10.0 assemblies. -->
+    <IsWindowsBuild Condition="'$(IsWindowsBuild)'==''">$([MSBuild]::IsOSPlatform('Windows'))</IsWindowsBuild>
+    <NetfxVersion Condition="'$(IsWindowsBuild)'=='true'">net472</NetfxVersion>
   </PropertyGroup>
 
   <!-- BinSkim BA2004: EnableSecureSourceCodeHashing (C#) -->

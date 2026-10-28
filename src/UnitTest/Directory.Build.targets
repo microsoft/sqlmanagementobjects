@@ -5,25 +5,32 @@
   </PropertyGroup>
   <Target Condition="'$(BuildingInsideVisualStudio)' != 'true' and '$(SkipUnitTests)' != 'true'" 
     Inputs="$(MSBuildAllProjects);$(OutputPath)$(AssemblyName).dll"
-    Outputs="$(Outdir)\Testrun_$(AssemblyName).txt"
+    Outputs="$(Outdir)/Testrun_$(AssemblyName).txt"
     Name="RunUnitTests" 
     AfterTargets="CopyFilesToOutputDirectory">
     <PropertyGroup>
       
-      <RunSettings>/Settings:$(EnlistmentRoot)\src\UnitTest\unittest.runsettings</RunSettings>
-      <VsTestDirectory>$(PkgMicrosoft_TestPlatform)\tools\net462\Common7\IDE\Extensions\TestPlatform\</VsTestDirectory>
+      <RunSettings>/Settings:$(EnlistmentRoot)/src/UnitTest/unittest.runsettings</RunSettings>
+      <DotnetRunSettings>--settings &quot;$(EnlistmentRoot)/src/UnitTest/unittest.runsettings&quot;</DotnetRunSettings>
+      <VsTestDirectory>$(PkgMicrosoft_TestPlatform)/tools/net462/Common7/IDE/Extensions/TestPlatform/</VsTestDirectory>
       <TestDll>$(OutputPath)$(AssemblyName).dll</TestDll>
       <TestCategory Condition="'$(TestCategory)' == ''">Unit</TestCategory>
       <TestFilter Condition="'$(TestCategory)' != ''">/TestCaseFilter:&quot;TestCategory=$(TestCategory)&quot;</TestFilter>
+      <DotnetTestFilter Condition="'$(TestCategory)' != ''">--filter &quot;TestCategory=$(TestCategory)&quot;</DotnetTestFilter>
     </PropertyGroup>
-    <Delete Files="$(OutputPath)UnitTestResults\Testrun_$(AssemblyName).trx" />
-    <Exec Command="&quot;$(VsTestDirectory)vstest.console.exe&quot; &quot;$(TestDll)&quot; $(TestFilter) $(RunSettings) /logger:console /logger:trx;LogFileName=Testrun_$(AssemblyName).trx /ResultsDirectory:&quot;$(OutputPath)UnitTestResults&quot;">
+    <Delete Files="$(OutputPath)UnitTestResults/Testrun_$(AssemblyName).trx" />
+    <!-- Windows: run via the vstest.console.exe testhost -->
+    <Exec Condition="'$(IsWindowsBuild)' == 'true'" Command="&quot;$(VsTestDirectory)vstest.console.exe&quot; &quot;$(TestDll)&quot; $(TestFilter) $(RunSettings) /logger:console /logger:trx;LogFileName=Testrun_$(AssemblyName).trx /ResultsDirectory:&quot;$(OutputPath)UnitTestResults&quot;">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
+    </Exec>
+    <!-- Non-Windows (e.g. Linux): run via the dotnet CLI instead of the Windows-only vstest.console.exe -->
+    <Exec Condition="'$(IsWindowsBuild)' != 'true'" Command="dotnet test &quot;$(TestDll)&quot; $(DotnetTestFilter) $(DotnetRunSettings) --logger console --logger &quot;trx;LogFileName=Testrun_$(AssemblyName).trx&quot; --results-directory &quot;$(OutputPath)UnitTestResults&quot;">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
     </Exec>
     <ItemGroup>
       <TestData Include="Category: $(TestCategory)"/>
       <TestData Include="Error code: $(ErrorCode)"/>
     </ItemGroup>
-    <WriteLinesToFile File="$(Outdir)\Testrun_$(AssemblyName).txt" Lines="@(TestData)" Overwrite="true" Encoding="ASCII" />
+    <WriteLinesToFile File="$(Outdir)/Testrun_$(AssemblyName).txt" Lines="@(TestData)" Overwrite="true" Encoding="ASCII" />
   </Target>
 </Project>

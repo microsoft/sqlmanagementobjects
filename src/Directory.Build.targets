@@ -38,7 +38,7 @@ public const int MajorVersion = $(AssemblyMajorVersion)%3B
     </AssemblyVersionInfoContents>
     </PropertyGroup>
        <!-- Get the last version number we built with (if any) -->
-    <ReadLinesFromFile Condition="Exists('$(IntermediateOutputPath)\LastVersionNumber')" File="$(IntermediateOutputPath)\LastVersionNumber">
+    <ReadLinesFromFile Condition="Exists('$(IntermediateOutputPath)/LastVersionNumber')" File="$(IntermediateOutputPath)/LastVersionNumber">
       <Output TaskParameter="Lines" PropertyName="LastVersionNumber" />
     </ReadLinesFromFile>
 
@@ -46,7 +46,7 @@ public const int MajorVersion = $(AssemblyMajorVersion)%3B
     <WriteLinesToFile Condition="('$(LastVersionNumber)'!='$(VersionDigest)') or !Exists('$(IntermediateOutputPath)$(VersionInfoFile)')" File="$(IntermediateOutputPath)$(VersionInfoFile)" Lines="$(AssemblyVersionInfoContents)" Overwrite="true" Encoding="Unicode" />
 
     <!-- Write the new version number (if it has changed) -->
-    <WriteLinesToFile Condition="'$(LastVersionNumber)'!='$(VersionDigest)'" File="$(IntermediateOutputPath)\LastVersionNumber" Lines="$(VersionDigest)" Overwrite="true" Encoding="Unicode" />
+    <WriteLinesToFile Condition="'$(LastVersionNumber)'!='$(VersionDigest)'" File="$(IntermediateOutputPath)/LastVersionNumber" Lines="$(VersionDigest)" Overwrite="true" Encoding="Unicode" />
   </Target>
   <Target Name="GetAdditionalAssemblyAttributes" AfterTargets="GetAssemblyAttributes">
     <ItemGroup>

@@ -157,7 +157,7 @@ namespace Microsoft.SqlServer.Management.Sdk.Sfc
                 m_Hierarchy = new SortedList(System.StringComparer.Ordinal);
 
 #if SMOCODEGEN
-                string realFile = Path.Combine(Path.Combine(CodeGenSettings.Directory, "core\\src\\xml"), "Config.xml");
+                string realFile = Path.Combine(CodeGenSettings.Directory, "core", "src", "xml", "Config.xml");
                 if (!File.Exists(realFile))
                 {
                     realFile = Path.Combine(Path.Combine(CodeGenSettings.Directory, "xml"), "Config.xml");

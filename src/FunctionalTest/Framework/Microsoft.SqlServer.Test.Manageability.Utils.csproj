@@ -34,7 +34,7 @@
     </Content>
   </ItemGroup>
   <PropertyGroup>
-    <DocumentationFile>$(BaseOutputPath)\Documentation\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(BaseOutputPath)/Documentation/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 </Project>

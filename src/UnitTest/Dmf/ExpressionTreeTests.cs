@@ -51,7 +51,7 @@ namespace Microsoft.SqlServer.Test.DmfUnitTests
                    var xml = SerializeExpressionNode(node);
                    Assert.That(node.ToString(), Is.EqualTo(testCase[0]), $"Should round trip expression [{testCase[0]}]");
                    Assert.That(node.ToStringForDisplay(), Is.EqualTo(testCase[1]), $"ToStringForDisplay of [{testCase[0]}]");
-                   Assert.That(xml, Is.EqualTo(testCase[2]), $"SerializeExpressionNode for [{testCase[0]}]");
+                   Assert.That(xml, Is.EqualTo(testCase[2].FixNewLines()), $"SerializeExpressionNode for [{testCase[0]}]");
                }
            });
         }
