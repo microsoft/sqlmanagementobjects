@@ -1722,7 +1722,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             withOptions.Append(Globals.commaspace);
                             withOptions.Append(Globals.newline);
                         }
-                        withOptions.AppendFormat(SmoApplication.DefaultCulture, "FILETABLE_PRIMARY_KEY_CONSTRAINT_NAME=[{0}]", pkIndex);
+                        withOptions.Append($"FILETABLE_PRIMARY_KEY_CONSTRAINT_NAME={MakeSqlBraket(pkIndex)}");
                     }
 
                     if (!string.IsNullOrEmpty(stream_idIndex))
@@ -1732,7 +1732,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             withOptions.Append(Globals.commaspace);
                             withOptions.Append(Globals.newline);
                         }
-                        withOptions.AppendFormat(SmoApplication.DefaultCulture, "FILETABLE_STREAMID_UNIQUE_CONSTRAINT_NAME=[{0}]", stream_idIndex);
+                        withOptions.Append($"FILETABLE_STREAMID_UNIQUE_CONSTRAINT_NAME={MakeSqlBraket(stream_idIndex)}");
                     }
 
                     if (!string.IsNullOrEmpty(fullpathIndex))
@@ -1742,7 +1742,7 @@ namespace Microsoft.SqlServer.Management.Smo
                             withOptions.Append(Globals.commaspace);
                             withOptions.Append(Globals.newline);
                         }
-                        withOptions.AppendFormat(SmoApplication.DefaultCulture, "FILETABLE_FULLPATH_UNIQUE_CONSTRAINT_NAME=[{0}]", fullpathIndex);
+                        withOptions.Append($"FILETABLE_FULLPATH_UNIQUE_CONSTRAINT_NAME={MakeSqlBraket(fullpathIndex)}");
                     }
                 }
             }
@@ -4580,8 +4580,8 @@ namespace Microsoft.SqlServer.Management.Smo
                     query.Add(
                         string.Format(
                             SmoApplication.DefaultCulture,
-                            "EXEC sys.sp_tableoption N'{0}', N'vardecimal storage format', N'{1}'",
-                            FormatFullNameForScripting(sp),
+                            "EXEC sys.sp_tableoption {0}, N'vardecimal storage format', N'{1}'",
+                            MakeSqlString(FormatFullNameForScripting(sp)),
                             (this.IsVarDecimalStorageFormatEnabled ? "ON" : "OFF")));
                 }
             }

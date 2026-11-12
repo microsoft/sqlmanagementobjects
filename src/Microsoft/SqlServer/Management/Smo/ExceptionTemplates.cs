@@ -6,26 +6,9 @@ namespace Microsoft.SqlServer.Management.Smo
 {
     internal partial class ExceptionTemplates
     {
-        public static string IncludeHeader (string objectType, string name, string dateString)
-        {
-            string safeName;
-            if( name.Contains("*/") )
-            {
-                // Avoid SQL injection: do not pass names containing closing comment '*/' to the header
-                safeName = "?";
-            }
-            else if( name.Contains("/*") )
-            {
-                // This is not as bad, but will also break the script, so don't let it in the comment
-                safeName = "?";
-            }
-            else
-            {
-                safeName = name;
-            }
-
-            return ExceptionTemplates.FormatIncludeHeaderTemplate(objectType, safeName, dateString);
-        }
+        public static string IncludeHeader (string objectType, string name, string dateString) =>
+            ExceptionTemplates.FormatIncludeHeaderTemplate(
+                objectType, SmoUtility.EscapeSqlBlockComment(name), dateString);
     }
 
 }

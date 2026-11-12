@@ -1087,62 +1087,57 @@ namespace Microsoft.SqlServer.Management.Dmf
         /// <returns></returns>
         protected static object ResolveEnum(string stringObjType, string stringValue)
         {
-            using (MethodTraceContext methodTraceContext = traceContext.GetMethodContext("ResolveEnum"))
+            using var methodTraceContext = traceContext.GetMethodContext(nameof(ResolveEnum));
+            methodTraceContext.TraceParameters(stringObjType, stringValue);
+            object value = null;
+
+            // Even a trusted assembly's GetType can resolve generic arguments from
+            // other assemblies; keep policy input from triggering that resolution.
+            if (stringObjType.IndexOfAny([',', '[', ']', '\\']) >= 0)
             {
-                // Tracing Input Parameters
-                methodTraceContext.TraceParameters(stringObjType, stringValue);
-                // $FUTURE grigoryp 1/17/07
-                // This code will have to be reviewed when we get to 3rd party assemblies
-                // We may have troubles getting type info for enums defined in those assembles
-                //
-
-                object value = null;
-
-                Type t = System.Type.GetType(stringObjType, false);
-                if (null == t)
-                {
-                    Assembly assm = typeof(Microsoft.SqlServer.Management.Smo.Server).Assembly;
-                    t = assm.GetType(stringObjType, false);
-                }
-                if (null == t)
-                {
-                    Assembly assm = typeof(Microsoft.SqlServer.Management.Smo.LoginType).Assembly;
-                    t = assm.GetType(stringObjType, false);
-                }
-                if (null == t)
-                {
-                    // load this assembly through reflection as we don't want to take a 
-                    // build time dependency on the ServiceBrokerEnum.dll 
-                    // because it would mean we need to fork it for the *configuration* 
-                    // set of assemblies
-                    Assembly assm = typeof(Microsoft.SqlServer.Management.Smo.LoginType).Assembly;
-                    string brokerAsmName = assm.FullName.Replace("SqlEnum", "ServiceBrokerEnum");
-                    Assembly assmBroker = Assembly.Load(brokerAsmName);
-                    t = assmBroker.GetType(stringObjType, false);
-                }
-                if (null == t)
-                {
-                    Assembly assm = typeof(Microsoft.SqlServer.Management.Common.DatabaseEngineType).Assembly;
-                    t = assm.GetType(stringObjType, false);
-                }
-                if (null == t && !Microsoft.SqlServer.Server.SqlContext.IsAvailable)
-                {
-                    // Don't load Adapters in SqlClr
-
-                    string[] nameparts = Assembly.GetExecutingAssembly().FullName.Split(new char[] { ',' }, 2);
-                    // AS & RS SAC facets + ExtendedProtection
-                    string aname = "Microsoft.SqlServer.Dmf.Adapters, " + nameparts[1];
-                    Assembly adapters = Assembly.Load(aname);
-                    t = adapters.GetType(stringObjType, false);
-                }
-                if (null != t && t.IsEnum)
-                {
-                    value = Enum.Parse(t, stringValue);
-                }
-
                 methodTraceContext.TraceParameterOut("returnVal", value);
                 return value;
             }
+
+            if (string.IsNullOrEmpty(stringObjType))
+            {
+                methodTraceContext.TraceParameterOut("returnVal", value);
+                return value;
+            }
+
+            Type t = typeof(object).Assembly.GetType(stringObjType, throwOnError: false);
+            t ??= typeof(ExpressionNode).Assembly.GetType(stringObjType, throwOnError: false);
+            t ??= typeof(Microsoft.SqlServer.Management.Smo.Server).Assembly.GetType(stringObjType, throwOnError: false);
+            t ??= typeof(Microsoft.SqlServer.Management.Smo.LoginType).Assembly.GetType(stringObjType, throwOnError: false);
+            if (t is null)
+            {
+                // load this assembly through reflection as we don't want to take a
+                // build time dependency on the ServiceBrokerEnum.dll
+                // because it would mean we need to fork it for the *configuration*
+                // set of assemblies
+                Assembly assm = typeof(Microsoft.SqlServer.Management.Smo.LoginType).Assembly;
+                string brokerAsmName = assm.FullName.Replace("SqlEnum", "ServiceBrokerEnum");
+                Assembly assmBroker = Assembly.Load(brokerAsmName);
+                t = assmBroker.GetType(stringObjType, throwOnError: false);
+            }
+            t ??= typeof(Microsoft.SqlServer.Management.Common.DatabaseEngineType).Assembly.GetType(stringObjType, throwOnError: false);
+            if (t is null && !Microsoft.SqlServer.Server.SqlContext.IsAvailable)
+            {
+                // Don't load Adapters in SqlClr
+
+                string[] nameparts = Assembly.GetExecutingAssembly().FullName.Split([','], 2);
+                // AS & RS SAC facets + ExtendedProtection
+                string aname = $"Microsoft.SqlServer.Dmf.Adapters, {nameparts[1]}";
+                Assembly adapters = Assembly.Load(aname);
+                t = adapters.GetType(stringObjType, throwOnError: false);
+            }
+            if (t is { IsEnum: true })
+            {
+                value = Enum.Parse(t, stringValue);
+            }
+
+            methodTraceContext.TraceParameterOut("returnVal", value);
+            return value;
         }
 
         /// <summary>
@@ -4655,10 +4650,16 @@ namespace Microsoft.SqlServer.Management.Dmf
                         // special care here because the enum is specified via a string,
                         // and we need to transform it. this is not always straightforward 
                         // because the enum might be defined in a different assembly.
+                        string enumType = ((ExpressionNodeConstant)ChildrenList[cEnumPos]).Value.ToString();
+                        object enumValue = ResolveEnum(enumType,
+                            ((ExpressionNodeConstant)ChildrenList[cEnumValPos]).Value.ToString());
+                        if (enumValue is null)
+                        {
+                            throw traceContext.TraceThrow(new UnsupportedObjectTypeException(enumType, this.GetType().ToString()));
+                        }
+
                         return new SFC.FilterNodeConstant(
-                            Convert.ToInt32(ResolveEnum(
-                                ((ExpressionNodeConstant)ChildrenList[cEnumPos]).Value.ToString(),
-                                ((ExpressionNodeConstant)ChildrenList[cEnumValPos]).Value.ToString())),
+                            Convert.ToInt32(enumValue),
                             SFC.FilterNodeConstant.ObjectType.Number);
                     }
             }

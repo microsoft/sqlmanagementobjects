@@ -406,7 +406,8 @@ namespace Microsoft.SqlServer.Management.Smo
                 Scripter.ScriptingError -= ScripterOnScriptingError;
                 if (Options.ContinueScriptingOnError)
                 {
-                    queryEnumerable.Add(IncompatibleObjects.Select(n =>string.Format(@"-- {0}", DatabaseRestorePlannerSR.FormatIncompatibleObject(n.Type, n.GetNameForType(n.Type)))));
+                    queryEnumerable.Add(IncompatibleObjects.Select(n => SmoUtility.FormatSqlLineComment(
+                        DatabaseRestorePlannerSR.FormatIncompatibleObject(n.Type, n.GetNameForType(n.Type)))));
                 }
 
                 return queryEnumerable;

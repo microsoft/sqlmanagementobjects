@@ -292,8 +292,8 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 // Drop column
                 sb.AppendFormat(SmoApplication.DefaultCulture,
-                    "EXEC dbo.sp_fulltext_column @tabname=N'{0}', @colname={1}, @action=N'drop'",
-                    table.FormatFullNameForScripting(sp),
+                    "EXEC dbo.sp_fulltext_column @tabname={0}, @colname={1}, @action=N'drop'",
+                    MakeSqlString(table.FormatFullNameForScripting(sp)),
                     FormatFullNameForScripting(sp, false));
 
                 dropQuery.Add(sb.ToString());
@@ -336,5 +336,4 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 }
-
 

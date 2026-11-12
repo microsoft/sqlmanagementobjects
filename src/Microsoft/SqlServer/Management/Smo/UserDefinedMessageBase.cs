@@ -285,8 +285,8 @@ namespace Microsoft.SqlServer.Management.Smo
             StringBuilder sb = new StringBuilder(Globals.INIT_BUFFER_SIZE);
             sb.Append("EXEC master.dbo.sp_addmessage ");
 
-            sb.AppendFormat(SmoApplication.DefaultCulture, " @msgnum={0}, @lang=N'{1}'",
-                                    ((MessageObjectKey)this.key).ID, ((MessageObjectKey)this.key).Language);
+            sb.AppendFormat(SmoApplication.DefaultCulture, " @msgnum={0}, @lang={1}",
+                                    ((MessageObjectKey)this.key).ID, MakeSqlString(((MessageObjectKey)this.key).Language));
 
             int count = 2;
             Property prop = Properties["Severity"];
@@ -340,8 +340,8 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             sb.AppendFormat(SmoApplication.DefaultCulture,
-                                "EXEC master.dbo.sp_dropmessage @msgnum={0}, @lang=N'{1}'",
-                                    ((MessageObjectKey)this.key).ID, language);
+                                "EXEC master.dbo.sp_dropmessage @msgnum={0}, @lang={1}",
+                                    ((MessageObjectKey)this.key).ID, MakeSqlString(language));
             queries.Add(sb.ToString());
         }
         
@@ -391,5 +391,4 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 }
-
 

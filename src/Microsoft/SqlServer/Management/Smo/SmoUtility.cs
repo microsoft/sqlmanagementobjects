@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using Microsoft.SqlServer.Management.Common;
 
 namespace Microsoft.SqlServer.Management.Smo
@@ -598,20 +599,43 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         /// <summary>
-        /// Encodes a string collection as a comment block.
+        /// Returns text safe for a SQL block comment, replacing delimiter-bearing text with a question mark.
+        /// </summary>
+        internal static string EscapeSqlBlockComment(string text) =>
+            text.Contains("/*") || text.Contains("*/") ? "?" : text;
+
+        internal static string FormatSqlLineComment(string text)
+        {
+            char[] characters = text.ToCharArray();
+            for (int i = 0; i < characters.Length; i++)
+            {
+                if (char.IsControl(characters[i]) || characters[i] == '\u2028' || characters[i] == '\u2029')
+                {
+                    characters[i] = ' ';
+                }
+            }
+            return "-- " + new string(characters);
+        }
+
+        /// <summary>
+        /// Encodes every physical line in a string collection as a SQL comment.
         /// </summary>
         /// <param name="stringCollection">String collection object</param>
         /// <param name="headComment">Extra comment in the head of comment block</param>
         internal static void EncodeStringCollectionAsComment(StringCollection stringCollection, string headComment = "")
         {
+            var firstScriptIndex = 0;
             if (!String.IsNullOrEmpty(headComment))
             {
-                stringCollection.Insert(0, "/*** " + headComment + " ***/");
+                stringCollection.Insert(0, $"/*** {EscapeSqlBlockComment(headComment)} ***/");
+                firstScriptIndex = 1;
             }
 
-            for (int id = 1; id < stringCollection.Count; id++)
+            var lineSeparators = new[] { "\r\n", "\r", "\n", "\u0085", "\u2028", "\u2029" };
+            for (int scriptIndex = firstScriptIndex; scriptIndex < stringCollection.Count; scriptIndex++)
             {
-                stringCollection[id] = "-- " + stringCollection[id];
+                var lines = stringCollection[scriptIndex].Split(lineSeparators, StringSplitOptions.None);
+                stringCollection[scriptIndex] = string.Join(Environment.NewLine, lines.Select(FormatSqlLineComment));
             }
         }
     }

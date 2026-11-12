@@ -7,6 +7,9 @@
   </PropertyGroup>
   <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
   <ItemGroup>
+    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="$(HadrModelSrc)\Microsoft.SqlServer.Management.HadrModel.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />

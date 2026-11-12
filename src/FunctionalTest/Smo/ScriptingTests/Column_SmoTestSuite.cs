@@ -220,6 +220,65 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 });
         }
 
+        [TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
+        [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
+        public void Column_MaskingFunction_PreservesCatalogAndCallerValuesAcrossCreateAndAlter()
+        {
+            ExecuteFromDbPool(database =>
+            {
+                var tableName = $"MaskingRoundTrip_{Guid.NewGuid():N}";
+                var table = new Table(database, tableName);
+                var column = new Column(table, "MaskedColumn", DataType.NVarChar(100))
+                {
+                    IsMasked = true,
+                    MaskingFunction = "partial(1, \"O'Brien\", 0)",
+                    Nullable = true
+                };
+                table.Columns.Add(column);
+                table.Create();
+                Assert.That(column.MaskingFunction, Is.EqualTo("partial(1, \"O''Brien\", 0)"),
+                    "After CREATE, caller-supplied values must be reloaded in catalog representation.");
+
+                table.Columns.ClearAndInitialize(string.Empty,
+                    new[] { nameof(Column.IsMasked), nameof(Column.MaskingFunction) });
+                column = table.Columns[column.Name];
+                var originalFunction = column.MaskingFunction;
+                Assert.That(originalFunction, Is.EqualTo("partial(1, \"O''Brien\", 0)"),
+                    "The engine catalog must expose the escaped single-apostrophe padding.");
+
+                var createScript = table.Script().Cast<string>().ToArray();
+                table.Drop();
+                foreach (var batch in createScript)
+                {
+                    database.ExecuteNonQuery(batch);
+                }
+                database.Tables.Refresh();
+                table = database.Tables[tableName];
+                column = table.Columns["MaskedColumn"];
+                Assert.That(column.MaskingFunction, Is.EqualTo(originalFunction),
+                    "Scripting and recreating an existing table must preserve its catalog masking definition.");
+
+                column.DataType = DataType.NVarChar(200);
+                column.Alter();
+                column.Refresh();
+                Assert.That(column.MaskingFunction, Is.EqualTo(originalFunction),
+                    "ALTER of the column type must reapply the unchanged catalog mask exactly.");
+
+                column.MaskingFunction = "partial(1, \"Two''Quotes\", 0)";
+                column.Alter();
+                Assert.That(column.MaskingFunction, Is.EqualTo("partial(1, \"Two''''Quotes\", 0)"),
+                    "After ALTER, the cached property must represent the engine catalog, not raw caller input.");
+                column.Nullable = false;
+                column.Alter();
+                column.Refresh();
+                Assert.That(column.MaskingFunction, Is.EqualTo("partial(1, \"Two''''Quotes\", 0)"),
+                    "A subsequent ALTER must not reinterpret a previously supplied raw value as catalog text.");
+            });
+        }
+
         /// <summary>
         /// Verifies that dropped columns on ledger tables are not scripted.
         /// </summary>

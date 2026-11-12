@@ -82,7 +82,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.Append(sp.NewLine);
             }
 
-            sb.AppendFormat(SmoApplication.DefaultCulture, "EXEC dbo.sp_addextendedproc {0}, '{1}'", MakeSqlString(sXStoredProcName), (string)Properties["DllLocation"].Value);
+            sb.AppendFormat(SmoApplication.DefaultCulture, "EXEC dbo.sp_addextendedproc {0}, {1}", MakeSqlString(sXStoredProcName), MakeSqlString((string)Properties[nameof(DllLocation)].Value));
             sb.Append(sp.NewLine);
 
             queries.Add(sb.ToString());
@@ -178,5 +178,4 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 }
-
 

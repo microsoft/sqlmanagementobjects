@@ -3,6 +3,13 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 181.38.1
+
+- Harden SQL literal and comment escaping in generated scripts and database operations.
+- Scope security-policy existence checks by schema.
+- Harden Policy-Based Management expression handling and Extended Events XML parsing.
+- Remove dependency discovery support for SQL Server 2012 and earlier.
+
 ## 181.38.0
 
 - Upgrade Microsoft.Data.SqlClient to version 6.1.6.

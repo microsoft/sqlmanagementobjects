@@ -296,11 +296,16 @@ begin
             where @iter_no = t.rank and (t.object_type = @uddt) and (t.object_svr IS null and t.object_db = db_name())
         set @rows = @rows + @@rowcount	
         
-        -- non-schema bound security policies are excluded from sql_expression_policies
-        insert #t1 (object_id, object_name, object_schema, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
+        -- Managed Instance can report major version 12 despite supporting security policies.
+        -- Use a separate batch so SQL Server 2014 never binds the SQL Server 2016 security catalogs.
+        if convert(int, SERVERPROPERTY(N'ProductMajorVersion')) >= 13
+           or convert(int, SERVERPROPERTY(N'EngineEdition')) = 8
+        begin
+          exec(N'insert #t1 (object_id, object_name, object_schema, object_db, object_type, relative_id, relative_name, relative_schema, relative_db, relative_type, schema_bound, rank)
           select distinct pol.object_id, pol.name, SCHEMA_NAME(pol.schema_id), t.object_db, 19, t.object_id, t.object_name, t.object_schema, t.object_db, t.object_type, 0, 2
           from #t1 as t
-          join sys.security_predicates p on p.target_object_id = t.object_id join sys.security_policies pol on pol.object_id = p.object_id and pol.is_schema_bound = 0
+          join sys.security_predicates p on p.target_object_id = t.object_id join sys.security_policies pol on pol.object_id = p.object_id and pol.is_schema_bound = 0')
+        end
     
 
         -- SOFT DEPENDENCIES
