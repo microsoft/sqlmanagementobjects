@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<EnumObject type="FixedDrive" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings main_table="#fixdrv">
+    <version min_major="7" max_major="13">
+      <prefix>
+        create table #fixdrv ( Name sysname NOT NULL, Size bigint NOT NULL, Type sysname NULL ) 
+
+        insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 
+        update #fixdrv set Type = 'Fixed' where Type IS NULL 
+        insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 1 
+        update #fixdrv set Type = 'Remote' where Type IS NULL 
+        insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 2 
+        update #fixdrv set Type = 'Removable' where Type IS NULL
+      </prefix>
+    </version>
+    <version min_major='10' max_major='13'>
+        <prefix>
+            insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 3
+            update #fixdrv set Type = 'CD-ROM' where Type IS NULL
+        </prefix>
+    </version>
+    <version min_major="7" max_major='13'>
+      <prefix >
+          update #fixdrv set Name = Name + ':'
+      </prefix>
+    </version>
+    <version min_major='14'>
+      <prefix>
+          create table #fixdrv ( Name sysname NOT NULL, Size bigint NOT NULL, Type sysname NULL )
+          if exists (select 1 from sys.all_objects where name='dm_os_enumerate_fixed_drives' and type ='V' and is_ms_shipped = 1)
+            begin
+              insert #fixdrv select fixed_drive_path, free_space_in_bytes/(1024*1024), drive_type_desc from sys.dm_os_enumerate_fixed_drives      
+            end
+          else
+            begin
+              insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 
+              update #fixdrv set Type = 'Fixed' where Type IS NULL 
+              insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 1 
+              update #fixdrv set Type = 'Remote' where Type IS NULL 
+              insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 2 
+              update #fixdrv set Type = 'Removable' where Type IS NULL   
+              insert #fixdrv (Name, Size) EXECUTE master.dbo.xp_fixeddrives 3
+              update #fixdrv set Type = 'CD-ROM' where Type IS NULL
+              update #fixdrv set Name = Name + ':'
+            end
+      </prefix>
+    </version>
+    <postfix> 
+      drop table #fixdrv
+    </postfix>
+  </settings>
+  <properties>
+    <property name="Name" type="sysname" access="Read">Name</property>
+    <property name="Size" type="int" access="Read" report_type2="System.Int64">Size</property>
+    <property name="Type" type="sysname" access="Read">Type</property>
+  </properties>
+</EnumObject>

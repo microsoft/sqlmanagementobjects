@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype=">text/microsoft-resx</resheader>
+    <resheader name="version=">2.0</resheader>
+    <resheader name="reader=">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer=">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1="><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing=">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64=">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64=">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata=">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true=">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NoSuchCollection" xml:space="preserve">
+    <value>Collection &apos;{name}&apos; does not exist.</value>
+  </data>
+  <data name="UnsupportedObjectType" xml:space="preserve">
+    <value>Object type {typeName} is not supported by {host}.</value>
+  </data>
+  <data name="UnknownEnumeration" xml:space="preserve">
+    <value>The value for enumeration type {typeName} is not valid.</value>
+  </data>
+  <data name="InvalidArgument" xml:space="preserve">
+    <value>&apos;{arg}&apos; is invalid. </value>
+  </data>
+  <data name="ObjectCannotBeCreated" xml:space="preserve">
+    <value>{obj} cannot be created. </value>
+  </data>
+  <data name="TooManyURNsReturned" xml:space="preserve">
+    <value>Multiple URNs were returned for root condition {typeName}.</value>
+  </data>
+  <data name="RootConditionFailed" xml:space="preserve">
+    <value>Root condition {typeName} failed to retrieve the object.</value>
+  </data>
+  <data name="UnsupportedConnectionType" xml:space="preserve">
+    <value>Connection type &apos;{typeName}&apos; is not supported. Use a SqlStoreConnection or ServerConnection object instead.</value>
+  </data>
+  <data name="Policy" xml:space="preserve">
+    <value>Policy</value>
+  </data>
+  <data name="Condition" xml:space="preserve">
+    <value>Condition</value>
+  </data>
+  <data name="ObjectSet" xml:space="preserve">
+    <value>Object Set</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="RootCondition" xml:space="preserve">
+    <value>Server Condition</value>
+  </data>
+  <data name="EvaluationMode" xml:space="preserve">
+    <value>Evaluation Mode</value>
+  </data>
+  <data name="Schedule" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="TargetSet" xml:space="preserve">
+    <value>Target Set</value>
+  </data>
+  <data name="ManagementFacet" xml:space="preserve">
+    <value>Management Facet</value>
+  </data>
+  <data name="Property" xml:space="preserve">
+    <value>Property</value>
+  </data>
+  <data name="ObjectType" xml:space="preserve">
+    <value>Object type</value>
+  </data>
+  <data name="PolicyStore" xml:space="preserve">
+    <value>Policy Store</value>
+  </data>
+  <data name="CategorySubscription" xml:space="preserve">
+    <value>Category Subscription</value>
+  </data>
+  <data name="NotSupported" xml:space="preserve">
+    <value>{host_type} &apos;{host_name}&apos; does not support {object_type} &apos;{object_name}&apos;. </value>
+  </data>
+  <data name="ObjectAlreadyExists" xml:space="preserve">
+    <value>{objectName} &apos;{name}&apos; already exists. </value>
+  </data>
+  <data name="ObjectDoesntExist" xml:space="preserve">
+    <value>{objectName} &apos;{name}&apos; does not exist. </value>
+  </data>
+  <data name="ArgumentNullOrEmpty" xml:space="preserve">
+    <value>{argument} cannot be Null or Empty.</value>
+  </data>
+  <data name="FailedOperation" xml:space="preserve">
+    <value>{opName} failed for {objType} &apos;{objName}&apos;.</value>
+  </data>
+  <data name="ConsistencyRepair" xml:space="preserve">
+    <value>Consistency Repair</value>
+  </data>
+  <data name="EraseSystemHealthPhantomRecords" xml:space="preserve">
+    <value>Erasing the phantom records from the system_health_state table</value>
+  </data>
+  <data name="ValuePositive" xml:space="preserve">
+    <value>Value must be greater than or equal to zero.</value>
+  </data>
+  <data name="PurgeHealthState" xml:space="preserve">
+    <value>Delete health state</value>
+  </data>
+  <data name="MarkSystemObject" xml:space="preserve">
+    <value>Mark system object</value>
+  </data>
+  <data name="CannotMarkSystemObject" xml:space="preserve">
+    <value>Cannot mark &apos;{objType}&apos; object as System.</value>
+  </data>
+  <data name="DefaultCategory" xml:space="preserve">
+    <value>&lt;Default&gt;</value>
+  </data>
+  <data name="EvaluationModeNoneDescription" xml:space="preserve">
+    <value>On demand</value>
+  </data>
+  <data name="EvaluationModeEnforceDescription" xml:space="preserve">
+    <value>On change: prevent</value>
+  </data>
+  <data name="EvaluationModeCoCDescription" xml:space="preserve">
+    <value>On change: log only</value>
+  </data>
+  <data name="EvaluationModeCoSDescription" xml:space="preserve">
+    <value>On schedule</value>
+  </data>
+  <data name="AdditionalHelpText" xml:space="preserve">
+    <value>Additional help text</value>
+  </data>
+  <data name="AdditionalHelpLink" xml:space="preserve">
+    <value>Additional help link</value>
+  </data>
+  <data name="CheckMode" xml:space="preserve">
+    <value>Check Mode</value>
+  </data>
+  <data name="ConfigureMode" xml:space="preserve">
+    <value>Configure Mode</value>
+  </data>
+  <data name="CheckSqlScriptAsProxyMode" xml:space="preserve">
+    <value>Check Sql Script As Proxy</value>
+  </data>
+  <data name="AdapterAlreadyExists" xml:space="preserve">
+    <value>Adapter for this interface and object pair already exists ({interfaceName}, {objectName}).</value>
+  </data>
+  <data name="AdapterHasTooManyArguments" xml:space="preserve">
+    <value>Adapter {name} has a constructor that has more than one argument</value>
+  </data>
+  <data name="AssemblyAlreadyRegistered" xml:space="preserve">
+    <value>Assembly {name} is already registered.</value>
+  </data>
+  <data name="FailedMethodCall" xml:space="preserve">
+    <value>Method call {methodName} failed for facet type {facetType} over target type {targetName}.</value>
+  </data>
+  <data name="ConfigValueMismatch" xml:space="preserve">
+    <value>Value of property {propertyName} is not in a committed state. Configuration value = {configValue}, Run value = {runValue}. Before policies can evaluate this property, you must restart the service.</value>
+  </data>
+  <data name="OperatorNotApplicable" xml:space="preserve">
+    <value>Operator {operatorName} is not a supported comparison operator for type {typeName}.</value>
+  </data>
+  <data name="FunctionWrongArgumentsNumber" xml:space="preserve">
+    <value>Function {function} received {argsReceived} arguments. The expected number of arguments is {argsExpected}.</value>
+  </data>
+  <data name="FunctionWrongArgumentType" xml:space="preserve">
+    <value>Function {function} received an argument of type {typeReceived}. The expected type is {typeExpected}.</value>
+  </data>
+  <data name="ExpressionTypeMistmatch" xml:space="preserve">
+    <value>Type {typeLeft} cannot be compared to {typeRight}.</value>
+  </data>
+  <data name="NullFacet" xml:space="preserve">
+    <value>Cannot find Facet associated with {facet}.</value>
+  </data>
+  <data name="BadExpressionTree" xml:space="preserve">
+    <value>ExpressionTree is not formed correctly. ({reason}) </value>
+  </data>
+  <data name="EvaluatingOperatorNone" xml:space="preserve">
+    <value>Operator of type NONE cannot be evaluated.</value>
+  </data>
+  <data name="ExpressionNodeNotConfigurableGeneric" xml:space="preserve">
+    <value>Expression cannot be configured.</value>
+  </data>
+  <data name="ExpressionNodeNotConfigurable" xml:space="preserve">
+    <value>Cannot configure the target. The result is not deterministic because of operator [{subtype}].</value>
+  </data>
+  <data name="ExpressionNodeNotConfigurableOperators" xml:space="preserve">
+    <value>Cannot configure property [{propertyName}] to conform to expression [{expression}] because the result is not deterministic.</value>
+  </data>
+  <data name="UnsupportedTargetFilter" xml:space="preserve">
+    <value>Target filter &apos;{filter}&apos; is not supported because it does not point out to one single database.</value>
+  </data>
+  <data name="ParsingError" xml:space="preserve">
+    <value>Error parsing &apos;{input}&apos;. Make sure string constants are enclosed in single quotes and facet properties are prefixed with &apos;@&apos; sign.</value>
+  </data>
+  <data name="ParsingArgumentException" xml:space="preserve">
+    <value>Parsing &apos;{pattern}&apos; - {message}.</value>
+  </data>
+  <data name="ParsingUnclosedBracketMsg" xml:space="preserve">
+    <value>Unterminated [] set</value>
+  </data>
+  <data name="ParsingUnclosedParenthesisMsg" xml:space="preserve">
+    <value>Unterminated () set</value>
+  </data>
+  <data name="ParsingMissingQuotes" xml:space="preserve">
+    <value>Missing quotation marks</value>
+  </data>
+  <data name="ParsingMissingElement" xml:space="preserve">
+    <value>Missing list element</value>
+  </data>
+  <data name="ParsingSyntaxError" xml:space="preserve">
+    <value>Syntax error</value>
+  </data>
+  <data name="ParsingUnquotedDatePart" xml:space="preserve">
+    <value>Error parsing &apos;{input}&apos;. Policy expressions require the first argument of DATEADD and DATEPART functions to be in single quotes. For example, use &quot;DATEADD(&apos;DAY&apos;, -7, GETDATE())&quot;.</value>
+  </data>
+  <data name="UnsupportedFunction" xml:space="preserve">
+    <value>Function &apos;{typeName}&apos; is not supported in filters on this edition of SQL Server.</value>
+  </data>
+  <data name="InvalidOperand" xml:space="preserve">
+    <value>Type &apos;{typeName}&apos; cannot be {operand}.</value>
+  </data>
+  <data name="LeftOperand" xml:space="preserve">
+    <value>left operand</value>
+  </data>
+  <data name="RightOperand" xml:space="preserve">
+    <value>right operand</value>
+  </data>
+  <data name="NonConfigurableReadOnlyProperty" xml:space="preserve">
+    <value>Cannot change property [{propertyName}] because it is read-only.</value>
+  </data>
+  <data name="InvalidInOperator" xml:space="preserve">
+    <value>Operator &apos;{operatorName}&apos; must have a value as its left operand and its right operand must be an Array. </value>
+  </data>
+  <data name="InvalidList" xml:space="preserve">
+    <value>All items in the list must have the same type.</value>
+  </data>
+  <data name="FunctionWrongReturnType" xml:space="preserve">
+    <value>Function {function} specified a return value of type {typeReceived}. The expected type is {typeExpected}.</value>
+  </data>
+  <data name="FunctionNotASmoObject" xml:space="preserve">
+    <value>Function {functionName} attempted with bad target type {targetType}.</value>
+  </data>
+  <data name="FunctionTooManyColumns" xml:space="preserve">
+    <value>Query for scalar function returns more than one column.</value>
+  </data>
+  <data name="WmiException" xml:space="preserve">
+    <value>An error has occurred while accessing WMI: {message}.</value>
+  </data>
+  <data name="CannotProduceScript" xml:space="preserve">
+    <value>Cannot produce configuration script from given object.</value>
+  </data>
+  <data name="NoConfigureScriptForCompliantObject" xml:space="preserve">
+    <value>Object complies with the policy. </value>
+  </data>
+  <data name="PropertyCannotBeSet" xml:space="preserve">
+    <value>Property &apos;{prop}&apos; cannot be Set.</value>
+  </data>
+  <data name="CannotMoveToElement" xml:space="preserve">
+    <value>Cannot find the next element.</value>
+  </data>
+  <data name="UnexpectedElement" xml:space="preserve">
+    <value>Element name &apos;{nameRead}&apos; is unexpected. Expected the name &apos;{nameExpected}&apos;.</value>
+  </data>
+  <data name="UnexpectedType" xml:space="preserve">
+    <value>Unexpected xml-node type &apos;{typeRead}&apos;, name &apos;{nameRead}&apos;. Expected type &apos;{typeExpected}&apos;.</value>
+  </data>
+  <data name="UnexpectedName" xml:space="preserve">
+    <value>Unexpected xml-node type &apos;{typeRead}&apos;, name &apos;{nameRead}&apos;. Expected type &apos;{typeExpected}&apos;, name &apos;{nameExpected}&apos;.</value>
+  </data>
+  <data name="CannotConvertToType" xml:space="preserve">
+    <value>String &apos;{inputString}&apos; cannot be converted to type &apos;{typeName}&apos;.</value>
+  </data>
+  <data name="UnsupportedConstantType" xml:space="preserve">
+    <value>{node} does not support type &apos;{typeName}&apos;.</value>
+  </data>
+  <data name="UnknownPolicy" xml:space="preserve">
+    <value>&lt;unknown policy&gt;</value>
+  </data>
+  <data name="InvalidOrMissingXMLReader" xml:space="preserve">
+    <value>Invalid or missing XML stream to read from.</value>
+  </data>
+  <data name="SinglePolicyDeserializationFailed" xml:space="preserve">
+    <value>Single policy deserialization from an XML stream failed.</value>
+  </data>
+  <data name="PolicyImportFileDoesNotHaveAnyPolicy" xml:space="preserve">
+    <value>Single policy deseralization failed. No policy was found in the given file. </value>
+  </data>
+  <data name="SinglePolicyExpected" xml:space="preserve">
+    <value>Policy &apos;{policyName}&apos; is unexpected. The policy &apos;{policyName2}&apos; was already found and a single policy is expected.</value>
+  </data>
+  <data name="ReferencedObjectExpected" xml:space="preserve">
+    <value>{objectType} &apos;{objectName}&apos; is unexpected. This object should be referenced directly by the Policy or by the Object Set.</value>
+  </data>
+  <data name="PolicyAndConditionNameMismatch" xml:space="preserve">
+    <value>The condition &apos;{conditionName}&apos; is a mismatch. The policy &apos;{policyName}&apos; references the condition &apos;{policyCondition}&apos;.</value>
+  </data>
+  <data name="ObjectSetAndConditionFacetMismatch" xml:space="preserve">
+    <value>Facets mismatch. The Object Set &apos;{objectSetName}&apos; references the Management Facet &apos;{objectSetFacet}&apos;. The Condition &apos;{conditionName}&apos; references the Management Facet &apos;{conditionFacet}&apos;.</value>
+  </data>
+  <data name="ConditionIsNull" xml:space="preserve">
+    <value>The policy cannot be evaluated because it does not contain a condition.</value>
+  </data>
+  <data name="ObjectSetIsNull" xml:space="preserve">
+    <value>Policy not associated with active Object Set cannot be evaluated in this mode.</value>
+  </data>
+  <data name="IncompatiblePolicyEvaluationMode" xml:space="preserve">
+    <value>The policy cannot be evaluated in the given context.</value>
+  </data>
+  <data name="OnlyOneConditionExpression" xml:space="preserve">
+    <value>The policy cannot be evaluated because it does not contain at least one condition expression.</value>
+  </data>
+  <data name="OnlyOneTarget" xml:space="preserve">
+    <value>The QueryExpression &apos;{queryExpression}&apos; should describe one valid target for this method to succeed.</value>
+  </data>
+  <data name="OnlyInSqlClr" xml:space="preserve">
+    <value>This method can be called only inside SQLCLR.</value>
+  </data>
+  <data name="MissingPolicy" xml:space="preserve">
+    <value>Policy &apos;{name}&apos; does not exist.</value>
+  </data>
+  <data name="MissingProperty" xml:space="preserve">
+    <value>Property &apos;{name}&apos; does not exist.</value>
+  </data>
+  <data name="NonRetrievableProperty" xml:space="preserve">
+    <value>Property value &apos;{name}&apos; is not available.</value>
+  </data>
+  <data name="RollBack" xml:space="preserve">
+    <value>Policy &apos;{policy}&apos; has been violated by &apos;{objectQe}&apos;.
+This transaction will be rolled back.
+Policy condition: &apos;{condition}&apos;
+Policy description: &apos;{description}&apos;
+Additional help: &apos;{helpText}&apos; : &apos;{helpLink}&apos;
+Statement: &apos;{statement}&apos;.</value>
+  </data>
+  <data name="OnlyInMsdb" xml:space="preserve">
+    <value>The procedure can be executed only in the msdb database.</value>
+  </data>
+  <data name="OnlyRoleMember" xml:space="preserve">
+    <value>Only members of the &apos;{role}&apos; role can execute this procedure.</value>
+  </data>
+  <data name="PolicyEvaluationFailed" xml:space="preserve">
+    <value>Exception encountered while executing policy &apos;{policyName}&apos;. </value>
+  </data>
+  <data name="PolicyEvaluationFailedOnDelegate" xml:space="preserve">
+    <value>Exception encountered in callback while evaluating policy &apos;{policyName}&apos;. </value>
+  </data>
+  <data name="PolicyEvaluationFailedNoException" xml:space="preserve">
+    <value>Exception encountered while evaluating policy &apos;{policyName}&apos;. Cannot log exception details because exception serialization failed. </value>
+  </data>
+  <data name="NullArgInPolicyEvaluation" xml:space="preserve">
+    <value>The policy evaluation procedure cannot be called with null arguments.</value>
+  </data>
+  <data name="BadEventData" xml:space="preserve">
+    <value>Malformed event data. The value for element &apos;{element}&apos; is wrong. Event body: &apos;{eventName}&apos;.</value>
+  </data>
+  <data name="MissingTypeFacetAssociation" xml:space="preserve">
+    <value>There is no association between type &apos;{typeName}&apos; and facet &apos;{facet}&apos;.</value>
+  </data>
+  <data name="NoScriptInSqlClr" xml:space="preserve">
+    <value>The policy &apos;{policy}&apos; will not be evaluated because it references a condition whose evaluation includes executing T-SQL or WQL scripts. </value>
+  </data>
+  <data name="PolicyViolated" xml:space="preserve">
+    <value>Policy &apos;{policy}&apos; has been violated.</value>
+  </data>
+  <data name="PolicyViolatedTarget" xml:space="preserve">
+    <value>Policy &apos;{policy}&apos; has been violated by target &apos;{targetName}&apos;.</value>
+  </data>
+  <data name="FailedToRetrieveImpersonationCookie" xml:space="preserve">
+    <value>Failed to retrieve impersonation cookie.</value>
+  </data>
+  <data name="CantExecuteLongSqlScriptOn2000" xml:space="preserve">
+    <value>Cannot evaluate an ExecSql() expression with a script size greater than 4000 characters on a SQL Server 2000 target.</value>
+  </data>
+  <data name="PolicyCategoryAlreadySubscribed" xml:space="preserve">
+    <value>The target &apos;{0}&apos; is already subscribed to the Policy Category &apos;{1}&apos;.</value>
+  </data>
+  <data name="PolicyCategoryNotSubscribed" xml:space="preserve">
+    <value>The target &apos;{0}&apos; is not subscribed to the Policy Category &apos;{1}&apos;.</value>
+  </data>
+  <data name="Function" xml:space="preserve">
+    <value>Function</value>
+  </data>
+  <data name="Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="ConversionNotSupported" xml:space="preserve">
+    <value>{obj} &apos;{typeName}&apos; is not supported by Target Set. </value>
+  </data>
+  <data name="TypeNotSupported" xml:space="preserve">
+    <value>Type &apos;{typeName}&apos; cannot be converted to a filter node.</value>
+  </data>
+  <data name="PolicyWithNoFilters" xml:space="preserve">
+    <value>An automated Policy must have an active Object Set defined. </value>
+  </data>
+  <data name="ScheduleDoesntExist" xml:space="preserve">
+    <value>Schedule with provided ScheduleUid &apos;{guid}&apos; doesn&apos;t exist.</value>
+  </data>
+  <data name="ValidationFailed" xml:space="preserve">
+    <value>Validation failed for {objectType} &apos;{objectName}&apos;.</value>
+  </data>
+  <data name="MissingJobSchedule" xml:space="preserve">
+    <value>CheckOnSchedule requires a Schedule. Select an existing Schedule, create a new Schedule, or change the Execution mode.</value>
+  </data>
+  <data name="StringPropertyTooLong" xml:space="preserve">
+    <value>String property &apos;{propertyName}&apos; accepts a maximum of {maxLength} characters. {currentLength} characters were provided.</value>
+  </data>
+  <data name="InvalidHelpLinkMessage" xml:space="preserve">
+    <value>Invalid help link. Help link must start with http://, https:// or mailto:.</value>
+  </data>
+  <data name="ReferencedConditionsCannotContainScript" xml:space="preserve">
+    <value>Conditions referenced by automated policies cannot contain script.</value>
+  </data>
+  <data name="FacetNotSupported" xml:space="preserve">
+    <value>Non-system policies/conditions on Utility facets are not supported in [KJ]. </value>
+  </data>
+  <data name="UnknownTargetDatabase" xml:space="preserve">
+    <value>The policy &apos;{policy}&apos; has listed database &apos;{name}&apos; as a target but this database does not exist.</value>
+  </data>
+  <data name="UnsupportedTqe" xml:space="preserve">
+    <value>Target query expression &apos;{queryEx}&apos; is not currently supported because it points to non-SMO objects.</value>
+  </data>
+  <data name="UnsupportedKey" xml:space="preserve">
+    <value>Cannot create key for object of type &apos;{key}&apos;. It is not a DMF object.</value>
+  </data>
+  <data name="UnsupportedTqeProp" xml:space="preserve">
+    <value>Target query expression &apos;{queryEx}&apos; is not currently supported because it attempts to filter on {prop}.</value>
+  </data>
+  <data name="EnumApplicablePolicies" xml:space="preserve">
+    <value>Enumerate applicable policies</value>
+  </data>
+  <data name="CalculateHealthState" xml:space="preserve">
+    <value>Calculate health state</value>
+  </data>
+  <data name="GetAggregatedHealthState" xml:space="preserve">
+    <value>Get aggregated health state</value>
+  </data>
+  <data name="UnsupportedCrudDependencyAction" xml:space="preserve">
+    <value>&apos;{action}&apos; is not a supported CRUD dependency action.</value>
+  </data>
+  <data name="InvalidUrnSkeleton" xml:space="preserve">
+    <value>Invalid Urn Skeleton &apos;{action}&apos;.</value>
+  </data>
+  <data name="TargetSetCountMismatch" xml:space="preserve">
+    <value>The Object Set &apos;{objectSetName}&apos; has an invalid number of Target Sets was specified for Facet &apos;{facetName}&apos;.</value>
+  </data>
+  <data name="UnsupportedTargetSetForFacet" xml:space="preserve">
+    <value>The Object Set &apos;{objectSetName}&apos; has an unsupported Target Set &apos;{targetSetSkeleton}&apos; specified for Facet &apos;{facetName}&apos;.</value>
+  </data>
+  <data name="NoTargetSetEnabled" xml:space="preserve">
+    <value>At least one Target Set needs to be enabled for the Object Set &apos;{objectSetName}&apos;.</value>
+  </data>
+  <data name="ConditionCannotBeUsedForFiltering" xml:space="preserve">
+    <value>Condition &apos;{condition}&apos; cannot be used for filtering.</value>
+  </data>
+  <data name="CannotChangeFacet" xml:space="preserve">
+    <value>Changing Facet is not allowed for referenced Conditions.</value>
+  </data>
+  <data name="CannotChangeFacetForObjectSet" xml:space="preserve">
+    <value>Changing Facet is not allowed for ObjectSet. Drop and create a new one. </value>
+  </data>
+  <data name="ObjectSetAlreadyReferenced" xml:space="preserve">
+    <value>Object Set &apos;{objectSetName}&apos; is already referenced by Policy &apos;{policyName}&apos;. Only one Policy can reference an Object Set.</value>
+  </data>
+  <data name="VersionNotSupported" xml:space="preserve">
+    <value>Connected version &apos;{curVerison}&apos; doesn&apos;t support this method. The minimal version for this method is &apos;{minVersion}&apos;. </value>
+  </data>
+</root>

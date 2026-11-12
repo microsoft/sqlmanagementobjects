@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalStream" impl_type="SqlObject" min_major='15' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <version min_major='15'>
+        <property_link table="sys.external_streams" alias="ext_stream"/>
+        <property_link fields='#DataSourceName#' join='sys.external_data_sources AS ext_data_source'>ext_data_source.data_source_id = ext_stream.data_source_id</property_link>
+        <property_link fields='#FileFormatName#' join='sys.external_file_formats AS ext_file_format'>ext_file_format.file_format_id = ext_stream.file_format_id</property_link>
+    </version>
+  </settings>
+  <properties>
+    <version min_major='15'>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">ext_stream.name</property>
+        <property name="ID" type="int" access="read">ext_stream.object_id</property>
+        <property name="Type" type="char" size="2" access="read">ext_stream.type</property>
+        <property name="TypeDesc" type="nvarchar" size="60" access="read">ext_stream.type_desc</property>
+        <property name="CreateDate" type="datetime" access="read">ext_stream.create_date</property>
+        <property name="IsSystemObject" type="bit" cast='true' access="read">ext_stream.is_ms_shipped</property>
+        <property name="IsPublished" type="bit" cast='true' access="read">ext_stream.is_published</property>
+        <property name="IsSchemaPublished" type="bit" cast='true' access="read">ext_stream.is_schema_published</property>
+        <property name="DataSourceName" type="sysname">ext_data_source.name</property>
+        <property name="FileFormatName" type="sysname">ext_file_format.name</property>
+        <property name="Location" type="varchar">ext_stream.location</property>
+        <property name="InputOptions" type="varchar">ext_stream.input_options</property>
+        <property name="OutputOptions" type="varchar">ext_stream.output_options</property>
+    </version>
+  </properties>
+</EnumObject>

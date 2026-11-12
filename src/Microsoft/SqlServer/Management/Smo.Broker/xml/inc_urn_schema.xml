@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="inc_urn" impl_type="SqlObject" min_major='7'>
+	<settings>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='4' expression="{0} + '/{3}[@Name=' + quotename({1},'''') + ' and @Schema=' + quotename({2},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="Name" />
+				<link_field type='local' field="Schema" />
+				<link_field field="NType" />				
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

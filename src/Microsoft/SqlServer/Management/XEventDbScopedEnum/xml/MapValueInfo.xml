@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<EnumObject type="MapValueInfo" impl_type="XEventObject" cloud_min_major='12'>
+  <settings>
+    <parent_link>
+      <link parent='ParentID' local='ParentPackageID' />
+      <link parent='Name' local='ValueName' />
+    </parent_link>
+    <property_link table='sys.dm_xe_map_values' alias='mapvalues'></property_link>
+    
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='ParentPackageID' type='uniqueidentifier' hidden='true'>mapvalues.object_package_guid</property>
+    <property name='ValueName' type='nvarchar' size = '512' hidden='true'>mapvalues.name</property>
+    <property name='Name' type='nvarchar' size = '60' cast='true'>mapvalues.map_key</property>
+    <property name='Value' type='nvarchar' size = '2048'>mapvalues.map_value</property>
+
+  </properties>
+</EnumObject>

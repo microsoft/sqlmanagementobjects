@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+<EnumObject type='RemotePlanLog' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings distinct='true'>
+    <property_link table='msdb.dbo.sysmaintplan_log' alias='s'>s.logged_remotely = 1</property_link>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="{0} + '/{2}[@ID=''' + cast ({1} as nvarchar(36)) + ''']'">
+        <link_field type='parent' field="Urn" />
+        <link_field type='local' field="ID" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+
+    <property name='PlanName' type='sysname'>s.plan_name</property>
+    <property name='SubPlanName' type='sysname'>s.subplan_name</property>
+    <property name='ServerName' type='sysname'>s.source_server_name</property>
+    <property name='ID' type='uniqueidentifier'>s.task_detail_id</property>
+    <property name='StartTime' type='datetime'>s.start_time</property>
+    <property name='EndTime' type='datetime'>s.end_time</property>
+    <property name='Succeeded' type='bit'>s.succeeded</property>
+  </properties>
+</EnumObject>

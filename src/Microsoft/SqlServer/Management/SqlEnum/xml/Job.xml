@@ -1,0 +1,79 @@
+<?xml version='1.0' ?>
+<EnumObject type='SysjobsView' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='msdb.dbo.sysjobs_view' alias='sv'/>
+
+		<property_link fields = '#Category#CategoryType#' join='#tmp_sp_help_category' alias='tshc'>sv.category_id = tshc.category_id</property_link>
+
+		<property_link fields = '#OperatorToEmail#' left_join='#tmp_sp_help_operator' alias='tsho_e'>tsho_e.id = sv.notify_email_operator_id</property_link>
+		<property_link fields = '#OperatorToNetSend#' left_join='#tmp_sp_help_operator' alias='tsho_ns'>tsho_ns.id = sv.notify_netsend_operator_id</property_link>
+		<property_link fields = '#OperatorToPage#' left_join='#tmp_sp_help_operator' alias='tsho_p'>tsho_p.id = sv.notify_page_operator_id</property_link>
+
+		<prefix fields = '#Category#CategoryType#'>
+			create table #tmp_sp_help_category
+			(category_id int null, category_type tinyint null, name nvarchar(128) null)
+			insert into #tmp_sp_help_category exec msdb.dbo.sp_help_category
+		</prefix>
+		<version min_major='10'>
+			<prefix fields = '#OperatorToEmail#OperatorToNetSend#OperatorToPage#'>
+				create table #tmp_sp_help_operator
+				(id int null, name nvarchar(128) null, enabled tinyint null, email_address nvarchar(100) null, last_email_date int null, last_email_time int null, pager_address nvarchar(100) null, last_pager_date int null, last_pager_time int null, weekday_pager_start_time int null, weekday_pager_end_time int null, saturday_pager_start_time int null, saturday_pager_end_time int null, sunday_pager_start_time int null, sunday_pager_end_time int null, pager_days tinyint null, netsend_address nvarchar(100) null, last_netsend_date int null, last_netsend_time int null, category_name nvarchar(128) null)
+				insert into #tmp_sp_help_operator exec msdb.dbo.sp_help_operator
+			</prefix>
+		</version>
+		<postfix fields = '#OperatorToEmail#OperatorToNetSend#OperatorToPage#'>
+drop table #tmp_sp_help_operator
+		</postfix>
+		<postfix fields = '#Category#CategoryType#'>
+drop table #tmp_sp_help_category
+		</postfix>
+		<post_process fields = '#CurrentRunRetryAttempt#CurrentRunStatus#CurrentRunStep#HasSchedule#HasServer#HasStep#LastRunDateInt#LastRunTimeInt#LastRunDate#LastRunOutcome#NextRunDateInt#NextRunTimeInt#NextRunDate#NextRunScheduleID#JobType#'
+				class_name='Microsoft.SqlServer.Management.Smo.PostProcessJobActivity'
+				triggered_fields='#job_id#'/>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='4' expression="{0} + '/{3}[@Name=' + quotename({1},'''') + ' and @CategoryID=' + quotename({2},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="Name" />
+				<link_field type='local' field="CategoryID" />
+				<link_field field="NType" />
+			</link_multiple>
+		</property>
+		<property name='Name' type='sysname'>sv.name</property>
+		<property name='JobID' type='uniqueidentifier' access='Read'>sv.job_id</property>
+		<property name='OriginatingServer' type='sysname' access="Read">sv.originating_server</property>
+		<property name='IsEnabled' type='bit' cast='true'>sv.enabled</property>
+		<property name='Description' type='nvarchar' size = '512'>ISNULL(sv.description,N'')</property>
+		<property name='StartStepID' type='int'>sv.start_step_id</property>
+		<property name='OwnerLoginName' type='sysname'>ISNULL(suser_sname(sv.owner_sid), N'')</property>
+		<property name="EventLogLevel" type="int" report_type="Agent.CompletionAction">sv.notify_level_eventlog</property>
+		<property name="EmailLevel" type="int" report_type="Agent.CompletionAction">sv.notify_level_email</property>
+		<property name="NetSendLevel" type="int" report_type="Agent.CompletionAction">sv.notify_level_netsend</property>
+		<property name="PageLevel" type="int" report_type="Agent.CompletionAction">sv.notify_level_page</property>
+		<property name="DeleteLevel" type="int" report_type="Agent.CompletionAction">sv.delete_level</property>
+		<property name='DateCreated' type='datetime' access="Read">sv.date_created</property>
+		<property name='DateLastModified' type='datetime' access="Read">sv.date_modified</property>
+		<property name='VersionNumber' type='int' access='Read'>sv.version_number</property>
+		<property name='Category' type='sysname' expensive = 'true'>tshc.name</property>
+		<property name='CategoryID' type='int' expensive = 'false'>sv.category_id</property>
+		<property name='CategoryType' type='tinyint' expensive = 'true'>tshc.category_type</property>
+		<property name="OperatorToEmail" type="sysname" expensive = 'true'>ISNULL(tsho_e.name,N'')</property>
+		<property name="OperatorToNetSend" type="sysname" expensive = 'true'>ISNULL(tsho_ns.name,N'')</property>
+		<property name="OperatorToPage" type="sysname" expensive = 'true'>ISNULL(tsho_p.name,N'')</property>
+
+		<property name='job_id' type='nvarchar' size = '100' hidden='true' cast='true'>sv.job_id</property>
+		<!-- activity properties -->
+		<property name="CurrentRunRetryAttempt" type="int" access="Read" expensive = 'true' notusage="filter,order">null</property>
+		<property name="CurrentRunStatus" type="int" access="Read" report_type="Agent.JobExecutionStatus" expensive = 'true' notusage="filter,order">null</property>
+		<property name="CurrentRunStep" type="sysname" access="Read" expensive = 'true' notusage="filter,order">null</property>
+		<property name="HasSchedule" type="bit" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="HasServer" type="bit" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="HasStep" type="bit" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="LastRunDate" type="datetime" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="LastRunOutcome" type="int" report_type="Agent.CompletionResult" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="NextRunDate" type="datetime" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="NextRunScheduleID" type="int" access='Read' expensive = 'true' notusage="filter,order">null</property>
+		<property name="JobType" type="int" report_type="Agent.JobType" access='Read' expensive = 'true' notusage="filter,order">null</property>
+	</properties>
+</EnumObject>

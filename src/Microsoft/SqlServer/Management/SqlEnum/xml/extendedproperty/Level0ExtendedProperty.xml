@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExtendedProperty" impl_type="SqlObject" min_major='8' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<version min_major='8' max_major='8'>
+			<parent_link>
+				<link parent="Name" local="ObjName" />
+			</parent_link>
+		
+			<property_link expression_is_for_table_name='true' alias='p'>
+				<link_multiple no='2' expression="::fn_listextendedproperty (NULL, {0}, {1}, default, default, default, default)">
+					<link_field type='parent' field="ObjectTypeName"/>
+					<link_field type='parent' field="ObjectNameFromFilter" />
+				</link_multiple>
+			</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file ="inc_shilohExtendedProperty.xml"/>
+		<version min_major='8' max_major='8'>		
+			<property name="ObjName" type="sysname" hidden="true" cast='true'>cast(p.objname as varbinary(256))</property>
+		</version>
+	</properties>
+</EnumObject>

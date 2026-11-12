@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<EnumObject type="WorkloadGroup" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ResourcePoolID" />
+    </parent_link>
+    <request_parent_select>
+      <field name='ID' />
+    </request_parent_select>
+
+    <property_link table="sys.resource_governor_workload_groups AS wkg"/>
+    <version min_major='13'>
+      <property_link join="sys.resource_governor_external_resource_pools AS pls">wkg.external_pool_id = pls.external_pool_id</property_link>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml'/>
+     <property name="ID" type="int" cast='true'>wkg.group_id</property>
+     <property name="ResourcePoolID" type="int" cast='true' hidden='true'>wkg.pool_id</property>
+     <property name="Name" type="sysname">wkg.name</property>
+     <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when wkg.group_id &lt; 256 then 1 else 0 end</property>
+     <property name="GroupMaximumRequests" type="int">wkg.group_max_requests</property>
+     <property name="Importance" type="int" report_type="WorkloadGroupImportance" >CASE WHEN N'Low' = wkg.importance THEN 0 WHEN N'Medium' = wkg.importance THEN 1 WHEN N'High' = wkg.importance THEN 2  END</property>
+     <property name="RequestMaximumCpuTimeInSeconds" type="int">wkg.request_max_cpu_time_sec</property>
+     <property name="RequestMaximumMemoryGrantPercentage" type="int">wkg.request_max_memory_grant_percent</property>
+     <property name="RequestMemoryGrantTimeoutInSeconds" type="int">wkg.request_memory_grant_timeout_sec</property>
+     <property name="MaximumDegreeOfParallelism" type="int">wkg.max_dop</property>
+     <version min_major='13'>
+        <property name="ExternalResourcePoolName" type="nvarchar" size = '128'>[pls].[name]</property>
+     </version>
+    <version min_major='15'>
+      <property name="RequestMaximumMemoryGrantPercentageAsDouble" type="float">wkg.request_max_memory_grant_percent_numeric</property>
+    </version>
+    <version min_major='17'>
+      <property name="GroupMaximumTempdbDataMB" type="float">ISNULL(wkg.group_max_tempdb_data_mb, -1)</property>
+      <property name="GroupMaximumTempdbDataPercent" type="float">ISNULL(wkg.group_max_tempdb_data_percent, -1)</property>
+    </version>
+     <include file='inc_policy_health_state.xml'/>
+  </properties>
+</EnumObject>	

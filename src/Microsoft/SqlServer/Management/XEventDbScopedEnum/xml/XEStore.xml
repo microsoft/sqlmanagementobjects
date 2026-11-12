@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<EnumObject type="XEStore" impl_type="XEStoreObject" cloud_min_major='12'>
+  <settings>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="'{2}[@Name=' + quotename({0},'''') +' and @ServerName=' + quotename({1},'''') + ']'">
+        <link_field type='local' field="Name" />
+        <link_field type='local' field="ServerName" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+    <property name='Name' type='sysname' cast='true'>db_name()</property>
+    <property name='ServerName' type='sysname' cast='true'>SERVERPROPERTY('servername')</property>
+    <property name='RunningSessionCount' type='int'>(SELECT count(*) FROM sys.dm_xe_database_sessions)</property>
+  </properties>
+</EnumObject>

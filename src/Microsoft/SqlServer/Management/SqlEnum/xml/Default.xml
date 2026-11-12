@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<EnumObject type="Default" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <version min_major='10'  cloud_min_major='12'>
+            <property_link table="sys.objects" alias="obj">obj.type=N'D' and not(obj.parent_object_id > 0)</property_link>
+        </version>
+    </settings>
+    <properties>
+        <include file='inc_object.xml' alias='obj' for='#Urn#Name#Schema#ID#CreateDate#'/>
+        <include file='sql_module_link.xml' alias='obj' for='#Text#BodyStartIndex#' ro_after_creation='#Text#'/>
+        
+        <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

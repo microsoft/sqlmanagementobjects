@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="ClusterSubnet" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table="master.sys.dm_hadr_cluster_networks hcn"></property_link>
+  </settings>
+  <properties>
+      <include file='inc_urn.xml'/>
+      <property name="Name" type="nvarchar" access="Read">hcn.member_name</property>
+      <property name="SubnetIP" type="nvarchar" access="Read">hcn.network_subnet_ip</property>
+      <property name="SubnetIPv4Mask" type="nvarchar" access="Read">hcn.network_subnet_ipv4_mask</property>
+      <property name="SubnetPrefixLength"  type="int" access="Read">hcn.network_subnet_prefix_length</property>
+      <property name="IsPublic" type="bit" access="Read">hcn.is_public</property>
+      <property name="IsIPv4" type="bit" access="Read">hcn.is_ipv4</property>
+    </properties>
+
+</EnumObject>

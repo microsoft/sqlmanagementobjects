@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<EnumObject type="Param" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+			<link parent="ParentNumber" local="Number" />
+		</parent_link>
+		<version min_major='10'  cloud_min_major='12'>
+			<property_link table='mycte' alias='param'/>
+		</version>
+		<prefix>
+			Begin
+			With mycte(object_id, procedure_number,
+			name, parameter_id,
+			system_type_id, user_type_id,
+			max_length, precision,
+			scale, is_output, is_cursor_ref,default_value)
+			as
+			(select object_id, procedure_number,
+			name, parameter_id,
+			system_type_id, user_type_id,
+			max_length, precision,
+			scale, is_output, is_cursor_ref,null as default_value  FROM sys.numbered_procedure_parameters)
+		</prefix>
+		<postfix>
+			end
+		</postfix>
+	</settings>
+	<properties>
+		<include file='parameter.xml' for = '#Urn#Name#ID#DataType#DataTypeSchema#SystemType#Length#NumericPrecision#NumericScale#DefaultValue#'/>
+		<version min_major='10'  cloud_min_major='12'>
+			<property name="IsOutputParameter" type="bit">param.is_output</property>
+			<property name="Number" type="int" hidden='true' cast='true'>param.procedure_number</property>
+		</version>
+	</properties>
+</EnumObject>

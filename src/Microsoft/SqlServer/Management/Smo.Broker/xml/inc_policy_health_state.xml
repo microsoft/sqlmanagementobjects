@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="inc_policy_health_state" impl_type="SqlObject" min_major='10'>
+	<settings>
+    <version min_major='10'>
+      <prefix fields="#PolicyHealthState#">
+        DECLARE @is_policy_automation_enabled bit
+        SET @is_policy_automation_enabled  = (SELECT CONVERT(bit, current_value)
+                                              FROM msdb.dbo.syspolicy_configuration
+                                              WHERE name = 'Enabled')
+      </prefix>
+    </version>
+  </settings>
+	<properties>
+    <version min_major='10'>
+      <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+        <link_multiple no='3' expression="{0} + '/{2}\[@ID=' + convert(nvarchar(20),{1}) + '\]'">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field type='local' field="ID" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      <property name="PolicyHealthState" type="int" expensive ="true" report_type2="Microsoft.SqlServer.Management.Dmf.PolicyHealthState">
+        <link_multiple no='3' expression="case when 1=@is_policy_automation_enabled and exists (select * from msdb.dbo.syspolicy_system_health_state where target_query_expression_with_id like {0}+ '/{2}\[@ID=' + convert(nvarchar(20),{1}) + '\]%' ESCAPE '\') then 1 else 0 end">
+          <link_field type='parent' field="UrnWithId" />
+          <link_field type='local' field="ID" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+    </version>
+  </properties>
+</EnumObject>

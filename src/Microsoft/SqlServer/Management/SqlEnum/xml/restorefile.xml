@@ -1,0 +1,15 @@
+<?xml version='1.0' ?>
+<EnumObject type='restorefile' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent='ID' local = 'RestoreHistoryId'/>
+		</parent_link>
+		<property_link table='msdb.dbo.restorefile rtsf'/>
+	</settings>
+	<properties>
+		<property name='RestoreHistoryId' type='int' hidden = 'true'>rtsf.restore_history_id</property>
+		<property name='FileNumber' type='numeric' size='9'>rtsf.file_number</property>
+		<property name='DestinationPhysDrive' type='varchar' size='260'>rtsf.destination_phys_drive</property>
+		<property name='DestinationPhysName' type='varchar' size='260'>rtsf.destination_phys_name</property>
+	</properties>
+</EnumObject>

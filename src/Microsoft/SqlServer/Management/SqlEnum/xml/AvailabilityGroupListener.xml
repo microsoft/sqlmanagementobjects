@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="AvailabilityGroupListener" impl_type="SqlObject" min_major='11'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent='UniqueId' local='ParentID'/>
+    </parent_link>
+    <property_link table="master.sys.availability_group_listeners" alias="AGL"/>
+  </settings>
+  <properties>
+        <include file='inc_urn.xml'/>
+
+    <version min_major='11'>
+      <property name="ParentID" type="uniqueidentifier" hidden="true">AGL.group_id</property>
+      <property name="Name" type="nvarchar">AGL.dns_name</property>
+      <property name="UniqueId" type="nvarchar" access="Read">AGL.listener_id</property>
+      <property name="PortNumber" type="int">ISNULL(AGL.port, -1)</property>
+      <property name="IsConformant" type="bit" access="Read">AGL.is_conformant</property>
+      <property name="ClusterIPConfiguration" type="nvarchar" access="Read">ISNULL(AGL.ip_configuration_string_from_cluster, N'')</property>
+    </version>
+      
+    </properties>
+
+</EnumObject>

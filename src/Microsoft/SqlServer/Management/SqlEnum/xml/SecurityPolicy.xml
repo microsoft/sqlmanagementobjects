@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<EnumObject type="SecurityPolicy" impl_type="SqlObject" min_major='13' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table='sys.security_policies AS sp' />
+  </settings>
+  <properties>
+      <include file='inc_object.xml' alias='sp' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#' />
+      <!-- extended properties support -->
+      <property name="ObjectTypeName" type="sysname" hidden="true">N'SECURITY POLICY'</property>
+      <property name="NotForReplication" type="bit" cast="true">sp.is_not_for_replication</property>
+      <property name="Enabled" type="bit" cast="true">sp.is_enabled</property>
+      <property name="IsSchemaBound" type="bit" cast="true" read_only_after_creation="true">sp.is_schema_bound</property>
+  </properties>
+</EnumObject>

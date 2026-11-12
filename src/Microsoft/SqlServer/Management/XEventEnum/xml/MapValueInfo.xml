@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<EnumObject type="MapValueInfo" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.dm_xe_map_values' alias='mapvalues'>mapvalues.name = objects.name and mapvalues.object_package_guid = objects.package_guid</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />    
+    <property name='Name' type='nvarchar' size = '60' cast='true'>mapvalues.map_key</property>
+    <property name='Value' type='nvarchar' size = '2048'>mapvalues.map_value</property>
+  </properties>
+</EnumObject>

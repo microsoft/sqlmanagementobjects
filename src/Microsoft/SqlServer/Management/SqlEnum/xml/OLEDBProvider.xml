@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="OLEDBProvider" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings main_table="#OLEDBProv op">
+		<prefix> create table #OLEDBProv ( Name sysname NOT NULL, ParseName sysname NOT 
+			NULL,Description sysname NOT NULL ) insert #OLEDBProv EXECUTE master.dbo.xp_enum_oledb_providers</prefix>
+		<postfix> drop table #OLEDBProv</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="NType" type="sysname" access='Read' hidden='true'>OLEDBProvider</property>
+		<property name="Name" type="sysname" access="Read">op.Name</property>
+		<property name="ParseName" type="sysname" access="Read">op.ParseName</property>
+		<property name="Description" type="sysname" access="Read">op.Description</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<EnumObject type="EdgeConstraint" impl_type="SqlObject" min_major='15'  cloud_min_major='12' datawarehouse_enabled='false' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <version min_major='15'  cloud_min_major='12' datawarehouse_enabled='false'>
+      <property_link table="sys.edge_constraints AS cstr" />
+    </version>
+  </settings>
+
+  <properties>
+    <include file='inc_urn.xml' />
+    <include alias = 'cstr' file='inc_named_object.xml' for='#Name#ID#CreateDate#DateLastModified#'/>
+    <property name="IsSystemNamed" type="bit" cast='true' access='Read'>cstr.is_system_named &amp; 4</property>
+    <property name="DeleteAction" type="tinyint" report_type='EdgeConstraintDeleteAction' read_only_after_creation="true" mode="design">cstr.delete_referential_action</property>
+  </properties>
+
+</EnumObject>

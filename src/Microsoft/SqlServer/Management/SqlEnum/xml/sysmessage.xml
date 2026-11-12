@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="SystemMessage" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10' >
+			<property_link table="sys.messages AS sms" >sms.message_id &lt; 50001</property_link>
+			<property_link fields='#Language#' left_join='sys.syslanguages AS sl '>sms.language_id = sl.lcid</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn_message.xml' />
+		<version min_major='10' >
+			<property name="ID" type="int" access="Read" cast='true' key_index="1">sms.message_id</property>
+			<property name="IsLogged" type="bit" cast='true' access="Read">sms.is_event_logged</property>
+			<property name="Severity" type="tinyint" access="Read" cast="true">sms.severity</property>
+			<property name="Text" type="nvarchar" size="255"  access="Read">sms.text</property>
+			<property name="LanguageID" type="int" access="Read" cast='true'>sms.language_id</property>
+			<property name="Language" type="sysname" access="Read" key_index="0">sl.name</property>
+		</version>
+	</properties>
+</EnumObject>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<EnumObject type="FullTextSemanticLanguage" impl_type="SqlObject" min_major='11' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table="sys.fulltext_semantic_languages ftsl" />
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name="Lcid" type="int" access="Read">ftsl.lcid</property>
+    <property name="Name" type="sysname" access="Read">ftsl.name</property>
+  </properties>
+</EnumObject>

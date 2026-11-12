@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_object" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		</settings>
+	<properties>
+		<include file='inc_urn_schema.xml' />
+		<include alias='{0}' file='inc_named_object.xml' />
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="Schema" type="sysname" mode="design">SCHEMA_NAME({0}.schema_id)</property>
+		</version>
+	</properties>
+</EnumObject>

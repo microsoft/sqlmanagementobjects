@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<EnumObject min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+			<property_link table='sys.database_principals AS rl'>rl.type = 'A'</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">rl.name</property>
+    <version min_major='10'  cloud_min_major='12' datawarehouse_enabled='true'>
+			<property name="ID" type="int">rl.principal_id</property>
+			<property name="DefaultSchema" type="sysname">rl.default_schema_name</property>
+			
+			<property name="CreateDate" type="datetime" access='Read'>rl.create_date</property>
+			<property name="DateLastModified" type="datetime" access='Read'>rl.modify_date</property>
+			
+			<!-- extended properties support -->
+			<property name="ExtPropClass" type="int" hidden='true'>4</property>
+		</version>
+      <property name="DatabaseUrn" type="nvarchar" size="600" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='parent' field="Urn" />
+        </link_multiple>
+      </property>
+      <property name="ExtPropMajorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{0}">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>

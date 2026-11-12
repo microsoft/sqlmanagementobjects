@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='EventField' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="EventClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="EventClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_event_field" alias="ef" />
+		<prefix>
+CREATE TABLE #tmp_event_field(
+    EventFieldId int,
+    EventClassId int,
+    FieldName nvarchar(255),
+    FieldType nvarchar(255),
+    FieldTypeMods nvarchar(255)
+)
+INSERT #tmp_event_field EXEC [SchemaPrefix].NSGetEventFields
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_event_field
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="ID" type="int">ef.EventFieldId</property>
+        <property name="EventClassId" type="int" hidden="true">ef.EventClassId</property>
+		<property name="Name" type="nvarchar" size="255">ef.FieldName</property>
+		<property name="Type" type="nvarchar" size="255">ef.FieldType</property>
+		<property name="TypeModifier" type="nvarchar" size="255">ef.FieldTypeMods</property>
+	</properties>
+</EnumObject>

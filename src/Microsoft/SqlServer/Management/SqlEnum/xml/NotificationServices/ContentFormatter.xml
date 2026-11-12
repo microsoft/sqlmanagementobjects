@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='ContentFormatter' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="NotificationClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="NotificationClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_content_formatter" alias="cf" />
+		<prefix>
+CREATE TABLE #tmp_content_formatter(
+    ContentFormatterId int,
+    NotificationClassId int,
+    ClassName nvarchar(255),
+    AssemblyName nvarchar(max)
+)
+INSERT #tmp_content_formatter EXEC [SchemaPrefix].NSGetContentFormatter
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_content_formatter
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="sysname" cast="true">cf.ClassName</property>
+        <property name="Id" type="int" hidden="true">cf.ContentFormatterId</property>
+		<property name="AssemblyName" type="nvarchar" size="260">cf.AssemblyName</property>
+		<property name="NotificationClassId" type="int" hidden="true">cf.NotificationClassId</property>
+	</properties>
+</EnumObject>

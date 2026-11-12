@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<EnumObject type="Policy" impl_type="PolicyObject" min_major='10'>
+	<settings>
+		<property_link table='msdb.dbo.syspolicy_policies' alias='pp'/>
+		<property_link fields = '#Condition#' left_join='msdb.dbo.syspolicy_conditions' alias='cond'>pp.condition_id = cond.condition_id</property_link>
+    <property_link fields = '#RootCondition#' left_join='msdb.dbo.syspolicy_conditions' alias='rootcond'>pp.root_condition_id = rootcond.condition_id</property_link>
+		<property_link fields = '#PolicyCategory#' left_join='msdb.dbo.syspolicy_policy_categories' alias='categories'>pp.policy_category_id = categories.policy_category_id</property_link>
+    <property_link fields = '#ObjectSet#' left_join='msdb.dbo.syspolicy_object_sets' alias='objectsets'>pp.object_set_id = objectsets.object_set_id</property_link>
+  </settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='ID' type='int' access='Read'>pp.policy_id</property>
+		<property name='Name' type='sysname'>pp.name</property>
+		<property name='Description' type='nvarchar' size = 'max'>pp.description</property>
+    <property name='CreateDate' type='datetime' access='Read'>pp.date_created</property>
+		<property name='ConditionID' type='int' access='Read'>pp.condition_id</property>
+		<property name='Condition' type='sysname'>cond.name</property>
+    <!--property name='ObjectSetID' type='int' access='Read'>pp.object_set_id</property-->
+    <property name='ObjectSet' type='sysname'>ISNULL(objectsets.object_set_name, N'')</property>
+    <property name='RootCondition' type='sysname'>ISNULL(rootcond.name, N'')</property>
+    <property name='AutomatedPolicyEvaluationMode' type='int'>pp.execution_mode</property>
+    <property name='CategoryId' type='int' access='Read'>ISNULL(pp.policy_category_id, 0)</property>
+		<property name='PolicyCategory' type='sysname'>ISNULL(categories.name, N'')</property>
+		<property name='Enabled' type='bit' access='Read'>pp.is_enabled</property>
+		<property name='JobID' type='uniqueidentifier' access='Read'>pp.job_id</property>
+		<property name='ScheduleUid' type='uniqueidentifier'>pp.schedule_uid</property>
+		<property name='CreatedBy' type='sysname' access='Read'>pp.created_by</property>
+		<property name='ModifiedBy' type='sysname' access='Read'>ISNULL(pp.modified_by, N'')</property>
+		<property name='DateModified' type='datetime' access='Read'>pp.date_modified</property>
+    <property name='HelpText' type='nvarchar' size = '4000'>pp.help_text</property>
+    <property name='HelpLink' type='nvarchar' size = '2083'>pp.help_link</property>
+    <!-- BEGIN Schedule properties needed to serialize the schedule -->
+    <property name='Schedule' type='sysname'>N''</property>
+    <property name='FrequencyTypes' type='int'>0</property>
+    <property name='FrequencyInterval' type='int'>0</property>
+    <property name='FrequencySubDayTypes' type='int'>0</property>
+    <property name='FrequencySubDayInterval' type='int'>0</property>
+    <property name='FrequencyRelativeIntervals' type='int'>0</property>
+    <property name='FrequencyRecurrenceFactor' type='int'>0</property>
+    <property name='ActiveStartDate' type='datetime'>null</property>
+    <property name='ActiveStartTimeOfDay' type='bigint' cast='true'>0</property>
+    <property name='ActiveEndTimeOfDay' type='bigint' cast='true'>0</property>
+    <property name='ActiveEndDate' type='datetime'>null</property>
+    <!-- END Schedule properties needed to serialize the schedule -->
+    <version min_major='10' max_major='10' max_minor='0' >
+      <property name='IsSystemObject' type='bit' access='Read'>CAST(0 AS bit)</property>
+    </version>
+    <version min_major='10' min_minor='50'>
+      <property name='IsSystemObject' type='bit' access='Read'>pp.is_system</property>
+    </version>
+  </properties>
+</EnumObject>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='NotificationComputedField' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="NotificationClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="NotificationClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_computed_field" alias="cf" />
+		<prefix>
+CREATE TABLE #tmp_computed_field(
+    ComputedFieldId int,
+    NotificationClassId int,
+    FieldName nvarchar(255),
+    SqlExpression nvarchar(4000),
+    FieldDigestGrouping bit
+)
+INSERT #tmp_computed_field EXEC [SchemaPrefix].NSGetComputedFields
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_computed_field
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="ID" type="int">cf.ComputedFieldId</property>
+        <property name="NotificationClassId" type="int" hidden="true">cf.NotificationClassId</property>
+		<property name="Name" type="nvarchar" size="255">cf.FieldName</property>
+		<property name="SqlExpression" type="nvarchar" size="4000">cf.SqlExpression</property>
+		<property name="DigestGrouping" type="bit">cf.FieldDigestGrouping</property>
+	</properties>
+</EnumObject>

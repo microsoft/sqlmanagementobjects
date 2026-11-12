@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- File name extension must be .runsettings -->
+<!-- this settings file is used for Netcore test runs in Pull Request verification -->
+<RunSettings>
+  <RunConfiguration>
+  <!-- parallel tests against a local docker image will often deadlock so serialize the tests -->
+    <MaxCpuCount>1</MaxCpuCount>
+    <DisableParallelization>true</DisableParallelization>
+  </RunConfiguration>
+</RunSettings>

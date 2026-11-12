@@ -1,0 +1,74 @@
+<?xml version='1.0' ?>
+<EnumObject type='sysjobschedules' impl_type='SqlObject' min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <parent_link>
+            <link parent="JobID" local="JobID" />
+        </parent_link>
+        <request_parent_select>
+            <field name='JobID' />
+        </request_parent_select>
+
+        <property_link table='#tmp_sp_help_jobschedule' alias='tshj'/>
+        <property_link fields='#OwnerLoginName#' left_join='msdb.dbo.sysschedules_localserver_view' alias='sslv' >tshj.schedule_id = sslv.schedule_id</property_link>
+        <version min_major = '10' >
+            <prefix>
+                <link_multiple no='1' expression="
+create table #tmp_sp_help_jobschedule
+(schedule_id int null, schedule_name nvarchar(128) null, enabled int null, freq_type int null, freq_interval int null, freq_subday_type int null, freq_subday_interval int null, freq_relative_interval int null, freq_recurrence_factor int null, active_start_date int null, active_end_date int null, active_start_time int null, active_end_time int null, date_created datetime null, schedule_description nvarchar(4000) null, next_run_date int null, next_run_time int null, schedule_uid uniqueidentifier null,  job_count int null, job_id uniqueidentifier null)
+declare @job_id sysname
+declare crs cursor local fast_forward
+for ( {0} ) 
+open crs 
+fetch crs into @job_id
+while @@fetch_status &gt;= 0 
+begin 
+  insert into #tmp_sp_help_jobschedule (schedule_id, schedule_name, enabled, freq_type, freq_interval, freq_subday_type, freq_subday_interval, freq_relative_interval, freq_recurrence_factor, active_start_date, active_end_date, active_start_time, active_end_time, date_created, schedule_description, next_run_date, next_run_time, schedule_uid, job_count) 
+    exec msdb.dbo.sp_help_jobschedule @job_id = @job_id
+  update #tmp_sp_help_jobschedule set job_id = @job_id where job_id is null
+  fetch crs into @job_id
+end 
+close crs
+deallocate crs">
+                    <link_field field="ParentSelect" />
+                </link_multiple>
+            </prefix>
+        </version>
+        <postfix>
+            drop table #tmp_sp_help_jobschedule
+        </postfix>
+
+        <post_process fields='#ActiveStartDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDate'
+      triggered_fields='#ActiveStartDateInt#' />
+        <post_process fields='#ActiveEndDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDate'
+      triggered_fields='#ActiveEndDateInt#' />
+        <post_process fields='#ActiveStartTimeOfDay#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateTime'
+      triggered_fields='#ActiveStartTimeOfDayInt#' />
+        <post_process fields='#ActiveEndTimeOfDay#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateTime'
+      triggered_fields='#ActiveEndTimeOfDayInt#' />
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name='Name' type='nvarchar' size = '128'>tshj.schedule_name</property>
+        <property name='ID' type='int'>tshj.schedule_id</property>
+        <property name='DateCreated' type='datetime' access="Read">tshj.date_created</property>
+        <property name='IsEnabled' type='bit' cast='true'>tshj.enabled</property>
+        <property name='FrequencyTypes' type='int' report_type='Agent.FrequencyTypes'>tshj.freq_type</property>
+        <property name='FrequencyInterval' type='int'>tshj.freq_interval</property>
+        <property name='FrequencySubDayTypes' type='int' report_type='Agent.FrequencySubDayTypes'>tshj.freq_subday_type</property>
+        <property name='FrequencySubDayInterval' type='int'>tshj.freq_subday_interval</property>
+        <property name='FrequencyRelativeIntervals' type='int' report_type="Agent.FrequencyRelativeIntervals">tshj.freq_relative_interval</property>
+        <property name='FrequencyRecurrenceFactor' type='int'>tshj.freq_recurrence_factor</property>
+        <property name='ActiveStartDate' type='datetime'>null</property>
+        <property name='ActiveStartDateInt' type='int' hidden='true'>tshj.active_start_date</property>
+        <property name="ActiveStartTimeOfDay" type="int" report_type2='System.TimeSpan'>0</property>
+        <property name='ActiveStartTimeOfDayInt' type='int' hidden='true'>tshj.active_start_time</property>
+        <property name="ActiveEndTimeOfDay" type="int" report_type2='System.TimeSpan'>0</property>
+        <property name='ActiveEndTimeOfDayInt' type='int' hidden='true'>tshj.active_end_time</property>
+        <property name='ActiveEndDate' type='datetime'>null</property>
+        <property name='ActiveEndDateInt' type='int' hidden='true'>tshj.active_end_date</property>
+        <property name='JobID' type='uniqueidentifier' hidden='true'>tshj.job_id</property>
+        <property name='JobCount' type='int' access='Read'>tshj.job_count</property>
+        <property name='ScheduleUid' type='uniqueidentifier'>tshj.schedule_uid</property>
+        <property name='OwnerLoginName' type='sysname'>ISNULL(suser_sname(sslv.owner_sid), N'')</property>
+    </properties>
+</EnumObject>

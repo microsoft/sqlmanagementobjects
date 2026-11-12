@@ -1,0 +1,802 @@
+<?xml version="1.0" ?>
+<!-- 
+	This file is used to define in one place code that will be replicated in hundreds of 
+	places with slight variations.
+
+	<body> tags describe the fixed part of the text to replicate
+	<attributes> tags describe the part that varies
+
+	based on cfg.xml bodies are associated with attributes and text is generated
+
+	description of the grammar:
+	
+	<gen>												
+		root node
+		
+	<attributes id = 'atribute_id' load_id='atributes_id'>	
+		defines variables
+		id - atribute tags have an id to identify them by
+		load_id - id of an attributes tag to include in this one
+
+		subtags:
+		<a n='variable_name' v='variable_value' t='type_of_variable'>
+			defines a variable ( term used interchangeably with attribute )
+		<alias to='new_variable_name' from='old_variable_value' t='type_of_variable'>
+			redefines a variable 
+
+	<body id='body_id' generate_outside_class='true/false'>
+		defines text that will be generated
+		id - id of the bidy section
+		generate_outside_class - the text will be inserted inside the class currently being generated or outside
+
+		subtags:
+		<t v='text to write' />
+			defines a portion of plane text represented by the v attribute
+		<p>
+			contains a list of attributes that must be expanded as parameters ( with the type )
+		<a n='attribue name' />
+			tag will be replaced with the value of the attribute ( + type if parameter )
+		<l d="delimiter">
+			contains a list of attributes, they will be replaced with their value, with 'delimiter' in between
+
+	[NL] == NEW LINE	
+	[T] == TAB
+-->
+<gen>
+	<attributes id='0' />
+	<attributes id='base'>
+		<a n='call1' v='PermissionWorker.Execute(' />
+		<a n='granteeNames' v='granteeNames' t='System.String[]' />
+		<a n='cascade' v='cascade' t='bool' />
+		<a n='grantGrant' v='grantGrant' t='bool' />
+		<a n='revokeGrant' v='revokeGrant' t='bool' />
+		<a n='asRole' v='asRole' t='System.String' />
+		<a n='deny' v='PermissionState.Deny, ' />
+		<a n='revoke' v='PermissionState.Revoke, ' />
+		<a n='grant' v='PermissionState.Grant, ' />
+		<a n='false' v='false' />
+		<a n='columnNames' v='null' />
+	</attributes>
+	<attributes id='obj1' load_id='base'>
+		<a n='permission' v='permission' t='ObjectPermissionSet' />
+		<a n='call2' v='this, ' />
+	</attributes>
+	<attributes id='obj2' load_id='obj1'>
+		<alias to='granteeName' from='granteeNames' v='new String [] { granteeName }' t='System.String' />
+	</attributes>
+	<attributes id='db1' load_id='base'>
+		<a n='permission' v='permission' t='DatabasePermissionSet' />
+		<a n='call2' v='this, ' />
+	</attributes>
+	<attributes id='db2' load_id='db1'>
+		<alias to='granteeName' from='granteeNames' v='new String [] { granteeName }' t='System.String' />
+	</attributes>
+	<attributes id='srv1' load_id='base'>
+		<a n='permission' v='permission' t='ServerPermissionSet' />
+		<a n='call2' v='this, ' />
+	</attributes>
+	<attributes id='srv2' load_id='srv1'>
+		<alias to='granteeName' from='granteeNames' v='new String [] { granteeName }' t='System.String' />
+	</attributes>
+	<attributes id='col1' load_id='obj1'>
+		<alias to='columnNames' from='columnNames' v='columnNames' t='System.String[]' />
+	</attributes>
+	<attributes id='col2' load_id='obj2'>
+		<alias to='columnNames' from='columnNames' v='columnNames' t='System.String[]' />
+	</attributes>
+	<body id='1' generate_outside_class='false'>
+		<t v='[NL]public void Deny' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='deny' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+		</l>
+		<t v=', false, false, null' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Deny' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='cascade' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='deny' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='false' />
+			<a n='cascade' />
+		</l>
+		<t v=', null' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Grant' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='grant' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+		</l>
+		<t v=', false, false, null' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Grant' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='grantGrant' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='grant' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='grantGrant' />
+		</l>
+		<t v=', false, null' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Grant' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='grantGrant' />
+			<a n='asRole' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='grant' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='grantGrant' />
+			<a n='false' />
+			<a n='asRole' />
+		</l>
+		<t v='' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Revoke' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='revoke' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+		</l>
+		<t v=', false, false, null' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Revoke' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='revokeGrant' />
+			<a n='cascade' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='revoke' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='revokeGrant' />
+			<a n='cascade' />
+		</l>
+		<t v=', null' />
+		<t v=');[NL]}[NL]' />
+		<t v='[NL]public void Revoke' />
+		<p>
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='revokeGrant' />
+			<a n='cascade' />
+			<a n='asRole' />
+		</p>
+		<t v='[NL]{[NL][T]' />
+		<l>
+			<a n='call1' />
+			<a n='revoke' />
+			<a n='call2' />
+		</l>
+		<l d=", ">
+			<a n='permission' />
+			<a n='granteeNames' />
+			<a n='columnNames' />
+			<a n='revokeGrant' />
+			<a n='cascade' />
+			<a n='asRole' />
+		</l>
+		<t v='' />
+		<t v=');[NL]}[NL]' />
+	</body>
+	<attributes id='enobj' load_id='base'>
+		<a n='type' v='PermissionWorker.PermissionEnumKind.Object, ' />
+		<a n='name' v='Object' />
+		<a n='name_perm' v='Object' />
+	</attributes>
+	<attributes id='endb' load_id='base'>
+		<a n='type' v='PermissionWorker.PermissionEnumKind.Database, ' />
+		<a n='name' v='Database' />
+		<a n='name_perm' v='Database' />
+	</attributes>
+	<attributes id='endball' load_id='base'>
+		<a n='name' v='Object' />
+		<a n='callname' v='All' />
+		<a n='name_perm' v='Object' />
+	</attributes>
+	<attributes id='ensrv' load_id='base'>
+		<a n='type' v='PermissionWorker.PermissionEnumKind.Server, ' />
+		<a n='name' v='Server' />
+		<a n='name_perm' v='Server' />
+	</attributes>
+	<attributes id='ensrvall' load_id='base'>
+		<a n='name' v='Object' />
+		<a n='callname' v='All' />
+		<a n='name_perm' v='Object' />
+	</attributes>
+	<attributes id='encol' load_id='base'>
+		<a n='type' v='PermissionWorker.PermissionEnumKind.Column, ' />
+		<a n='name' v='Column' />
+		<a n='name_perm' v='Object' />
+	</attributes>
+	<body id='2' generate_outside_class='false'>
+		<t v='[NL]public ' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo[] Enum' />
+		<l>
+			<a n='name' />
+		</l>
+		<t v='Permissions()[NL]{[NL][T]return (' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo [])PermissionWorker.Enum' />
+		<l>
+			<a n='callname' />
+		</l>
+		<t v='Permissions(' />
+		<l>
+			<a n='type' />
+		</l>
+		<t v='this, null, null);[NL]}[NL]' />
+		<t v='[NL]public ' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo[] Enum' />
+		<l>
+			<a n='name' />
+		</l>
+		<t v='Permissions(System.String granteeName)[NL]{[NL][T]return (' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo [])PermissionWorker.Enum' />
+		<l>
+			<a n='callname' />
+		</l>
+		<t v='Permissions(' />
+		<l>
+			<a n='type' />
+		</l>
+		<t v='this, granteeName, null);[NL]}[NL]' />
+		<t v='[NL]public ' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo[] Enum' />
+		<l>
+			<a n='name' />
+		</l>
+		<t v='Permissions('/><l><a n='name_perm'/></l><t v='PermissionSet permissions)[NL]{[NL][T]return (' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo [])PermissionWorker.Enum' />
+		<l>
+			<a n='callname' />
+		</l>
+		<t v='Permissions(' />
+		<l>
+			<a n='type' />
+		</l>
+		<t v='this, null, permissions);[NL]}[NL]' />
+		<t v='[NL]public ' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo[] Enum' />
+		<l>
+			<a n='name' />
+		</l>
+		<t v='Permissions(System.String granteeName, '/><l><a n='name_perm'/></l><t v='PermissionSet permissions)[NL]{[NL][T]return (' />
+		<l>
+			<a n='name_perm' />
+		</l>
+		<t v='PermissionInfo [])PermissionWorker.Enum' />
+		<l>
+			<a n='callname' />
+		</l>
+		<t v='Permissions(' />
+		<l>
+			<a n='type' />
+		</l>
+		<t v='this, granteeName, permissions);[NL]}[NL]' />
+	</body>
+	<attributes id='none'>
+		<a n='foo' />
+	</attributes>
+	<body id='ownobj' generate_outside_class='false'>
+		<t v='[NL]public Urn[] EnumOwnedObjects()' />
+		<t v='[NL]{[NL][T]return PermissionWorker.EnumOwnedObjects(this);[NL]}[NL]' />
+	</body>
+
+	<body id='sysnonym_ctors' generate_outside_class='false'>
+		<t>
+		private void Init(Database database, System.String schema, System.String name, System.String baseServer, System.String baseDatabase, System.String baseSchema, System.String baseObject)
+		{
+			this.Name = name;
+			this.Parent = database;
+			if( null != schema )
+			{
+				this.ChangeSchema(schema, false);
+			}
+			this.BaseServer = baseServer;
+			this.BaseDatabase = baseDatabase;
+			this.BaseSchema = baseSchema;	
+			this.BaseObject = baseObject;	
+		}
+
+		public Synonym(Database database, System.String name, System.String schema, System.String baseServer, System.String baseDatabase, System.String baseSchema, System.String baseObject)
+		{
+			Init(database, schema, name, baseServer, baseDatabase, baseSchema, baseObject);
+		}
+
+		public Synonym(Database database, System.String name, System.String baseServer, System.String baseDatabase, System.String baseSchema, System.String baseObject)
+		{
+			Init(database, null, name, baseServer, baseDatabase, baseSchema, baseObject);
+		}
+		</t>
+	</body>
+
+	<body id='mail_profile_ctors' generate_outside_class='false'>	
+		<t>
+			public MailProfile(SqlMail parent, string name, string description)
+			{
+				ValidateName(name);
+				this.key = new SimpleObjectKey(name);
+				this.Parent = parent;
+
+				Properties.Get("Description").Value = description;
+			}
+		</t>
+	</body>
+	
+	<body id='mail_account_ctors' generate_outside_class='false'>	
+		<t>
+			public MailAccount(SqlMail parent, string name, string description)
+			{
+				ValidateName(name);
+				this.key = new SimpleObjectKey(name);
+				this.Parent = parent;
+
+				Properties.Get("Description").Value = description;
+			}
+
+			public MailAccount(SqlMail parent, string name, string description, string displayName, string emailAddress)
+			{
+				ValidateName(name);
+				this.key = new SimpleObjectKey(name);
+				this.Parent = parent;
+
+				Properties.Get("Description").Value = description;
+				Properties.Get("DisplayName").Value = displayName;
+				Properties.Get("EmailAddress").Value = emailAddress;
+			}
+
+		</t>
+	</body>
+
+    <!-- Code generation for MessageTypeMapping starts here -->
+
+    <body id='messagetypemapping_ctors' generate_outside_class='false'>
+        <t>
+        public MessageTypeMapping(ServiceContract servicecontract, System.String messageName, MessageSource messageSource):
+            base()
+        {
+			ValidateName(messageName);
+			this.key = new SimpleObjectKey(messageName);
+			this.Parent = servicecontract;
+
+            this.MessageSource = messageSource;
+        }
+        </t>
+    </body>
+
+    <!-- Code generation for Key Encryption starts here -->
+    <body id='keyencryption_ctors' generate_outside_class='false'>
+        <t>
+        public KeyEncryption ():
+            base()
+        {
+        }
+
+        </t>
+    </body>
+
+	
+    <!-- Code generation for Proxy Account starts here -->
+    <body id='proxyaccount_ctors' generate_outside_class='false'>
+        <t>
+		private void Init(JobServer jobServer, System.String proxyName, System.String credentialName, System.Boolean enabled, System.String description) 
+		{
+			ValidateName(proxyName);
+			this.key = new SimpleObjectKey(proxyName);
+			this.Parent = jobServer;
+
+			m_comparer = jobServer.Parent.Databases["msdb"].StringComparer;
+            
+            this.CredentialName = credentialName;	
+            this.IsEnabled = enabled;	
+            this.Description = description;	
+        }
+        
+        public ProxyAccount(JobServer jobServer, System.String proxyName, System.String credentialName, System.Boolean enabled, System.String description) : 
+             base()
+        {
+			Init(jobServer, proxyName, credentialName, enabled, description);
+        }
+        
+        public ProxyAccount(JobServer jobServer, System.String proxyName, System.String credentialName, System.Boolean enabled):
+            base()
+        {
+			Init(jobServer, proxyName, credentialName,  enabled, " ");
+        }
+
+        public ProxyAccount(JobServer jobServer, System.String proxyName, System.String credentialName):
+            base()
+        {
+			Init(jobServer, proxyName, credentialName,  true, " ");
+        }
+        </t>
+    </body>
+
+  <!-- Code generation for SERVER EVENTS starts here -->
+  <body id='server_events' generate_outside_class='true'>
+    <t>
+      public class </t><l><a n='parentclass'/></l><t>Events
+      {
+      internal </t><l><a n='parentclass'/></l><t>Events(</t><l><a n='parentclass'/></l><t> parent)
+      {
+          this.parent = parent;
+      }
+
+      public </t><l><a n='eventset'/></l><t> GetEventSelection()
+      {
+          InitializeEvents();
+          return (</t><l><a n='eventset'/></l><t>) this.serverEventsWorker.GetEventSelection();
+      }
+
+      public void SubscribeToEvents(</t><l><a n='eventset'/></l><t> events)
+      {
+          InitializeEvents();
+          this.serverEventsWorker.SubscribeToEvents(events, null);
+      }
+
+      public void SubscribeToEvents(</t><l><a n='eventset'/></l><t> events, ServerEventHandler eventHandler)
+      {
+          InitializeEvents();
+          this.serverEventsWorker.SubscribeToEvents(events, eventHandler);
+      }
+
+      public void UnsubscribeFromEvents(</t><l><a n='eventset'/></l><t> events)
+      {
+          if (null != this.serverEventsWorker)
+          {
+              this.serverEventsWorker.UnsubscribeFromEvents(events);
+          }
+      }
+
+      public void UnsubscribeAllEvents()
+      {
+          if (null != this.serverEventsWorker)
+          {
+              this.serverEventsWorker.Dispose();
+              this.serverEventsWorker = null;
+          }
+      }
+
+      public void StartEvents()
+      {
+          if (null != this.serverEventsWorker)
+          {
+              this.serverEventsWorker.StartEvents();
+          }
+      }
+
+      public void StopEvents()
+      {
+          if (null != this.serverEventsWorker)
+          {
+              this.serverEventsWorker.StopEvents();
+          }
+      }
+
+      public event ServerEventHandler ServerEvent
+      {
+          add
+          {
+              InitializeEvents();
+              this.serverEventsWorker.AddDefaultEventHandler(value);
+          }
+
+          remove
+          {
+              if (null != this.serverEventsWorker)
+              {
+                  this.serverEventsWorker.RemoveDefaultEventHandler(value);
+              }
+          }
+      }
+
+      private void InitializeEvents()
+      {
+          if (null == serverEventsWorker)
+          {
+              serverEventsWorker = new </t><l><a n= 'workerclass'/></l><t>(parent);
+
+          }
+      }
+
+      private </t><l><a n= 'workerclass'/></l><t> serverEventsWorker;
+      private </t><l><a n='parentclass'/></l><t> parent;
+      }
+    </t>
+  </body>
+
+  <body id='server_events' generate_outside_class='false'>
+    <t>
+      private </t><l><a n='parentclass'/></l><t>Events events;
+      public </t><l><a n='parentclass'/></l><t>Events Events
+      {
+          [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+          get
+          {
+              if(Microsoft.SqlServer.Server.SqlContext.IsAvailable)
+                  throw new SmoException(ExceptionTemplates.SmoSQLCLRUnAvailable);
+              if (null == this.events)
+              {
+                  this.events = new </t><l><a n='parentclass'/></l><t>Events(this);
+              }
+              return this.events;
+          }
+      }
+    </t>
+  </body>
+
+
+  <body id='parameter_ctors' generate_outside_class='false'>
+		<t>
+		protected Parameter() : 
+			base() 
+		{
+		}
+		</t>
+	</body>
+	
+	<body id='sprocparam_ctor' generate_outside_class='false'>
+		<t>
+		public StoredProcedureParameter(StoredProcedure storedProcedure, System.String name, DataType dataType)
+		{
+			ValidateName(name);
+			this.key = new SimpleObjectKey(name);
+			this.Parent = storedProcedure;
+			this.DataType = dataType;
+		}
+		</t>
+	</body>
+	
+	<body id='udfparam_ctor' generate_outside_class='false'>
+		<t>
+		public UserDefinedFunctionParameter(UserDefinedFunction userDefinedFunction, System.String name, DataType dataType)
+		{
+			ValidateName(name);
+			this.key = new SimpleObjectKey(name);
+			this.Parent = userDefinedFunction;
+			this.DataType = dataType;
+		}
+		</t>
+	</body>
+  <attributes id='database'>
+    <a n='parentclass' v='Database'/>
+    <a n='eventset' v='DatabaseEventSet'/>
+    <a n='workerclass' v='DatabaseEventsWorker'/>
+  </attributes>
+  <attributes id='table'>
+    <a n='parentclass' v='Table'/>
+    <a n='eventset' v='TableEventSet'/>
+    <a n='workerclass' v='TableEventsWorker'/>
+  </attributes>
+  <attributes id='view'>
+    <a n='parentclass' v='View'/>
+    <a n='eventset' v='ViewEventSet'/>
+    <a n='workerclass' v='ViewEventsWorker'/>
+  </attributes>
+  <attributes id='udf'>
+    <a n='parentclass' v='UserDefinedFunction'/>
+    <a n='eventset' v='UserDefinedFunctionEventSet'/>
+    <a n='workerclass' v='UserDefinedFunctionEventsWorker'/>
+  </attributes>
+  <attributes id='sp'>
+    <a n='parentclass' v='StoredProcedure'/>
+    <a n='eventset' v='StoredProcedureEventSet'/>
+    <a n='workerclass' v='StoredProcedureEventsWorker'/>
+  </attributes>
+  <attributes id='assembly'>
+    <a n='parentclass' v='SqlAssembly'/>
+    <a n='eventset' v='SqlAssemblyEventSet'/>
+    <a n='workerclass' v='SqlAssemblyEventsWorker'/>
+  </attributes>
+  <attributes id='approle'>
+    <a n='parentclass' v='ApplicationRole'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='udt'>
+    <a n='parentclass' v='UserDefinedType'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='index'>
+    <a n='parentclass' v='Index'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='login'>
+    <a n='parentclass' v='Login'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='certificate'>
+    <a n='parentclass' v='Certificate'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='pfunction'>
+    <a n='parentclass' v='PartitionFunction'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='pscheme'>
+    <a n='parentclass' v='PartitionScheme'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='serverRole'>
+    <a n='parentclass' v='ServerRole'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='httpendpoint'>
+    <a n='parentclass' v='HttpEndpoint'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='xmlschemacollection'>
+    <a n='parentclass' v='Database'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='schema'>
+    <a n='parentclass' v='Schema'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='statistic'>
+    <a n='parentclass' v='Statistic'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='synonym'>
+    <a n='parentclass' v='Synonym'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='sequence'>
+    <a n='parentclass' v='Sequence'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='trigger'>
+    <a n='parentclass' v='Trigger'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='user'>
+    <a n='parentclass' v='User'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='messagetype'>
+    <a n='parentclass' v='MessageType'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='servicecontract'>
+    <a n='parentclass' v='ServiceContract'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='remoteservicebinding'>
+    <a n='parentclass' v='RemoteServiceBinding'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='serviceroute'>
+    <a n='parentclass' v='ServiceRoute'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='brokerservice'>
+    <a n='parentclass' v='BrokerService'/>
+    <a n='eventset' v='ObjectEventSet'/>
+    <a n='workerclass' v='ObjectEventsWorker'/>
+  </attributes>
+  <attributes id='servicequeue'>
+    <a n='parentclass' v='ServiceQueue'/>
+    <a n='eventset' v='ServiceQueueEventSet'/>
+    <a n='workerclass' v='ServiceQueueEventsWorker'/>
+  </attributes>
+
+</gen>

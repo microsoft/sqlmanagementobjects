@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="IndexedXmlPathNamespace" impl_type="SqlObject" min_major='11' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings >
+		<parent_link>
+			<link parent="ID" local="IndexID" />
+			<link parent="ParentID" local="TableID" />
+		</parent_link>
+
+		<version min_major='11' cloud_min_major='12'>		
+			<property_link table = "sys.selective_xml_index_namespaces as xmlTable" />
+		</version>		
+	</settings>
+	<properties>
+		<version min_major='11' cloud_min_major='12'>	
+            <property name="Name" type="sysname" mode="design#deploy">CASE WHEN xmlTable.prefix IS NULL THEN '' ELSE xmlTable.prefix END</property> 
+			<property name="TableID" type="int" hidden='true'>xmlTable.object_id</property>
+			<property name="IndexID" type="int" hidden='true'>xmlTable.index_id</property>
+            <property name="Uri" type="nvarchar" size='4000' read_only_after_creation="true" >xmlTable.uri</property>
+	    	<property name="IsDefaultUri" type="bit" read_only_after_creation="true">xmlTable.is_default_uri</property>
+        </version>		
+	</properties>
+</EnumObject>

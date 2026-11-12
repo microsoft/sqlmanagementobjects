@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='ProtocolRetrySchedule' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="NotificationClassProtocolId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="NotificationClassProtocolId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_protocol_retry_schedule" alias="prs" />
+		<prefix>
+CREATE TABLE #tmp_protocol_retry_schedule(
+    ProtocolRetryScheduleId int,
+    NotificationClassProtocolId int,
+    IntervalOrdinal tinyint,
+    Interval int
+)
+INSERT #tmp_protocol_retry_schedule EXEC [SchemaPrefix].NSGetProtocolRetrySchedules
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_protocol_retry_schedule
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="sysname" cast="true">prs.ProtocolRetryScheduleId</property>
+        <property name="NotificationClassProtocolId" type="int" hidden="true">prs.NotificationClassProtocolId</property>
+		<property name="Interval" type="int">prs.Interval</property>
+        <property name="ID" type="tinyint">prs.IntervalOrdinal</property>
+	</properties>
+</EnumObject>

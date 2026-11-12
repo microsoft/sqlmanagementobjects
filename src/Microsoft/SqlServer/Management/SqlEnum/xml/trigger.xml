@@ -1,0 +1,53 @@
+<EnumObject type="Trigger" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<version min_major='10'  cloud_min_major='10'>
+			<property_link table='sys.objects AS tr'>tr.type in (&lt;msparam&gt;TR&lt;/msparam&gt;, &lt;msparam&gt;TA&lt;/msparam&gt;)</property_link>
+			<property_link table='sys.triggers AS trr'
+				fields='#IsEnabled#InsteadOf#NotForReplication#'>trr.object_id = tr.object_id</property_link>
+			<property_link fields='#Insert#InsertOrder#' left_join='sys.trigger_events AS tei'>tei.object_id = tr.object_id and tei.type=&lt;msparam&gt;1&lt;/msparam&gt;</property_link>
+			<property_link fields='#Update#UpdateOrder#' left_join='sys.trigger_events AS teu'>teu.object_id = tr.object_id and teu.type=&lt;msparam&gt;2&lt;/msparam&gt;</property_link>
+			<property_link fields='#Delete#DeleteOrder#' left_join='sys.trigger_events AS ted'>ted.object_id = tr.object_id and ted.type=&lt;msparam&gt;3&lt;/msparam&gt;</property_link>
+		</version>
+		<version min_major='10'>
+		  <property_link fields='#ClassName#MethodName#AssemblyName#'
+								left_join='sys.assembly_modules AS mod'>mod.object_id = tr.object_id</property_link>
+		  <property_link fields='#AssemblyName#'
+								left_join='sys.assemblies AS asmbl'>asmbl.assembly_id = mod.assembly_id</property_link>
+		</version>
+		<version min_major="13">
+			<property_link fields="#IsNativelyCompiled#IsSchemaBound#" left_join="sys.all_sql_modules AS sm">sm.object_id = tr.object_id</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<include file='inc_named_object.xml' alias='tr' for="#Name#ID#CreateDate#DateLastModified#ParentID#ExtPropClass#ExtPropMajorID#ExtPropMinorID#ObjectNameFromFilter#"/>
+        <include file='inc_system_object.xml' alias='tr' for="#IsSystemObject#" />
+		<include file='mixed_module_link.xml' alias='tr' 
+			for='#ExecutionContextPrincipal#ExecutionContext#MethodName#ClassName#AssemblyName#AnsiNullsStatus#QuotedIdentifierStatus#Text#BodyStartIndex#IsEncrypted#' />
+    <!-- extended properties support-->		
+		<version min_major='10'   cloud_min_major='10'>
+			<property name="IsEnabled" type="bit" mode="design">~trr.is_disabled</property>
+			<property name="InsteadOf" type="bit" mode="design">trr.is_instead_of_trigger</property>
+			<property name="Insert" type="bit" cast='true' mode="design">ISNULL(tei.object_id,0)</property>
+			<property name="InsertOrder" type="int" report_type="Agent.ActivationOrder" mode="design">CASE WHEN tei.is_first = 1 THEN 0 WHEN tei.is_last = 1 THEN 2 ELSE 1 END</property>
+			<property name="Update" type="bit" cast='true' mode="design">ISNULL(teu.object_id,0)</property>
+			<property name="UpdateOrder" type="int" report_type="Agent.ActivationOrder" mode="design">CASE WHEN teu.is_first = 1 THEN 0 WHEN teu.is_last = 1 THEN 2	ELSE 1 END</property>
+			<property name="Delete" type="bit" cast='true' mode="design">ISNULL(ted.object_id,0)</property>
+			<property name="DeleteOrder" type="int" report_type="Agent.ActivationOrder" mode="design">CASE WHEN ted.is_first = 1 THEN 0 WHEN ted.is_last = 1 THEN 2	ELSE 1 END</property>
+			<property name="ImplementationType" type="int" report_type="ImplementationType" mode="design">CASE WHEN tr.type = N'TR' THEN 1 WHEN tr.type = N'TA' THEN 2 ELSE 1 END</property>
+		</version>
+		<version min_major='10' cloud_min_major='10'>
+			<property name="NotForReplication" type="bit" mode="deploy">trr.is_not_for_replication</property>
+		</version>
+		<version min_major='10'>
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+		<version min_major='13'>
+			<property name="IsNativelyCompiled" type="bit">ISNULL(sm.uses_native_compilation,0)</property>
+            <property name="IsSchemaBound" type="bit">ISNULL(sm.is_schema_bound,0)</property>
+        </version>
+	</properties>
+</EnumObject>

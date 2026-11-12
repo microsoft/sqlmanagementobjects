@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<EnumObject type="IndexedXmlPath" impl_type="SqlObject" min_major='11'   cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings >
+		<parent_link>
+			<link parent="ID" local="IndexID" />
+			<link parent="ParentID" local="TableID" />
+		</parent_link>
+	
+		<version min_major='11'   cloud_min_major='12'>		
+			<!-- accept key, include and xml column, reject RID and partition columns -->
+			<property_link table = "sys.selective_xml_index_paths as xmlTable" />
+		</version>		
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+      <include file='inc_type.xml' alias='xmlTable' for='#DataType#NumericPrecision#NumericScale#DataTypeSchema#SystemType#Length#' ro_after_creation='#DataType#NumericPrecision#NumericScale#DataTypeSchema#SystemType#Length#'/>
+ 
+
+		<version min_major='11'  cloud_min_major='12' >	
+			<property name="Name" type="sysname" mode="design#deploy">xmlTable.name</property>
+
+			<property name="ID" type="int" access="Read">xmlTable.path_id</property>
+			<property name="TableID" type="int" hidden='true'>xmlTable.object_id</property>
+			<property name="IndexID" type="int" hidden='true'>xmlTable.index_id</property>
+
+		    <property name="Path" type="nvarchar" size='20' read_only_after_creation="true" >xmlTable.path</property>
+			
+			<property name="PathType" type="tinyint" report_type="IndexedXmlPathType" read_only_after_creation="true" cast='true'>xmlTable.path_type</property>
+
+			<property name="PathTypeDesc" type="sysname" read_only_after_creation="true">xmlTable.path_type_desc</property>
+      
+			<property name="XmlComponentID" type="int" read_only_after_creation="true">xmlTable.xml_component_id</property>
+            
+            <property name="XQueryTypeDescription" type="nvarchar" size='4000' read_only_after_creation="true" >ISNULL(xmlTable.xquery_type_description, N'') </property>
+
+			<property name="IsXQueryTypeInferred" type="bit" access="Read">xmlTable.is_xquery_type_inferred</property>
+			<property name="IsXQueryMaxlengthInferred" type="bit" access="Read">xmlTable.is_xquery_max_length_inferred</property>
+            <property name="XQueryMaxLength" type="int" read_only_after_creation="true">ISNULL(xmlTable.xquery_max_length,-1)</property>
+            
+			<property name="SqlTypeCollationName" type="sysname" read_only_after_creation="true">xmlTable.collation_name</property>
+    		<property name="IsNode" type="bit" read_only_after_creation="true">xmlTable.is_node</property>
+    		<property name="IsSingleton" type="bit" read_only_after_creation="true">xmlTable.is_singleton </property>
+         
+        </version>		
+	</properties>
+</EnumObject>

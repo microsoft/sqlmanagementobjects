@@ -1,0 +1,39 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpJobhistory' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="JobID" local="JobID" />
+		</parent_link>
+
+		<property_link table='#tmp_sp_help_jobhistory' alias='tshj' />
+		<prefix>
+create table #tmp_sp_help_jobhistory
+(instance_id int null, job_id uniqueidentifier null, job_name sysname null, step_id int null, step_name sysname null, sql_message_id int null, sql_severity int null, message nvarchar(4000) null, run_status int null, run_date int null, run_time int null, run_duration int null, operator_emailed sysname null, operator_netsent sysname null, operator_paged sysname null, retries_attempted int null, server sysname null)
+insert into #tmp_sp_help_jobhistory exec msdb.dbo.sp_help_jobhistory @mode='FULL'
+		</prefix>
+		<postfix>
+drop table #tmp_sp_help_jobhistory
+		</postfix>
+	</settings>
+	<properties>
+		<property name='InstanceID' type='int'>tshj.instance_id</property>
+		<property name='SqlMessageID' type='int'>tshj.sql_message_id</property>
+		<property name='Message' type='nvarchar' size = '4000'>tshj.message</property>
+		<property name='StepID' type='int'>tshj.step_id</property>
+		<property name='StepName' type='sysname'>tshj.step_name</property>
+		<property name='SqlSeverity' type='int'>tshj.sql_severity</property>
+
+		<property name='JobID' type='uniqueidentifier'>tshj.job_id</property>
+		<property name='JobName' type='sysname'>tshj.job_name</property>
+		<property name='RunStatus' type='int' report_type='Agent.CompletionResult'>tshj.run_status</property>
+
+		<property name='RunDate' type='datetime'>convert(datetime, stuff(stuff(cast(tshj.run_date as nchar(8)), 7, 0, '-'), 5, 0, '-') + N' ' + stuff(stuff(substring(cast(1000000 + tshj.run_time as nchar(7)), 2, 6), 5, 0, ':'), 3, 0, ':'), 120)</property>
+
+		<property name='RunDuration' type='int'>tshj.run_duration</property>
+		<property name='OperatorEmailed' type='sysname'>tshj.operator_emailed</property>
+		<property name='OperatorNetsent' type='sysname'>tshj.operator_netsent</property>
+		<property name='OperatorPaged' type='sysname'>tshj.operator_paged</property>
+		<property name='RetriesAttempted' type='int'>tshj.retries_attempted</property>
+		<property name='Server' type='sysname'>tshj.server</property>
+	</properties>
+</EnumObject>

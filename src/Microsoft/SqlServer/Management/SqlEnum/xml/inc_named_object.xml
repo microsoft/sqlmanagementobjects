@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_named_object" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+    <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+      <property_link fields = '#Owner#' left_join='sys.database_principals AS s{0}'>s{0}.principal_id = ISNULL({0}.principal_id, (OBJECTPROPERTY({0}.object_id, 'OwnerId')))</property_link>
+    </version>
+ 	</settings>
+	<properties>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="Name" type="sysname" mode="design">{0}.name</property>
+			<property name="ID" type="int" access='Read'>{0}.object_id</property>
+			<property name="CreateDate" type="datetime" access='Read'>{0}.create_date</property>
+			<property name="DateLastModified" type="datetime" access='Read'>{0}.modify_date</property>
+			<property name="ParentID" type="int" hidden='true'>{0}.parent_object_id</property>
+		      <property name="ExtPropClass" type="int" hidden='true'>1</property>
+    </version>
+    
+
+		<!-- extended properties support -->
+      <property name="ExtPropMajorID" type="int" hidden='true'>
+        <link_multiple no='1' expression="{{0}}">
+          <link_field type='local' field="ID" />
+        </link_multiple>
+      </property>
+      <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'  cloud_min_major='10'  datawarehouse_enabled='true'>
+      <property name="Owner" type="sysname" mode="design">ISNULL(s{0}.name, N'')</property>
+      <property name="IsSchemaOwned" type="bit" access="Read" cast="true" mode="design">case when {0}.principal_id is null then 1 else 0 end</property>
+     </version>
+    </properties>
+</EnumObject>

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="LogFile" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10'>
+			<property_link table="sys.database_files AS s">s.type = 1</property_link>
+            <property_link fields='#NumberOfDiskReads#NumberOfDiskWrites#BytesReadFromDisk#BytesWrittenToDisk#' join='sys.dm_io_virtual_file_stats(default, default) AS fs'>fs.database_id = db_id() AND fs.file_id = s.file_id</property_link>
+        </version>
+
+  </settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<version min_major='10' >
+			<include file='inc_DbFile.xml' />
+		</version>
+		<property name="UsedSpace" type="float" access='Read' expensive="true">CAST(FILEPROPERTY(s.name, 'SpaceUsed') AS float)* CONVERT(float,8)</property>
+    <version min_major ="10" >
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

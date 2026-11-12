@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PropertyReadOnly" xml:space="preserve">
+    <value>Property '{propertyName}' is read-only.</value>
+  </data>
+  <data name="PropertyNotSet" xml:space="preserve">
+    <value>Property '{propertyName}' is not set.</value>
+  </data>
+  <data name="OperationValidOnlyInPendingState" xml:space="preserve">
+    <value>This operation is only valid when the object is in the Pending state.</value>
+  </data>
+  <data name="SfcObjectInitFailed" xml:space="preserve">
+    <value>The initialize operation on object {objName} failed.</value>
+  </data>
+  <data name="SfcInvalidConnectionContextModeChange" xml:space="preserve">
+    <value>The connection context mode cannot be changed from {fromMode} to {toMode}.</value>
+  </data>
+  <data name="InvalidKey" xml:space="preserve">
+    <value>The {keyName} key is not a valid key. This can be because member variables are not yet set.</value>
+  </data>
+  <data name="InvalidKeyChain" xml:space="preserve">
+    <value>The parent or key of the KeyChain is not the same as the previously set parent or key.</value>
+  </data>
+  <data name="InvalidRename" xml:space="preserve">
+    <value>The rename failed.</value>
+  </data>
+  <data name="InvalidMove" xml:space="preserve">
+    <value>The move failed.</value>
+  </data>
+  <data name="KeyExists" xml:space="preserve">
+    <value>The {key} key already exists in the collection.</value>
+  </data>
+  <data name="KeyNotFound" xml:space="preserve">
+    <value>The {key} key is not found in the collection.</value>
+  </data>
+  <data name="KeyAlreadySet" xml:space="preserve">
+    <value>The key to this object is already set. Setting the keychain is not allowed.</value>
+  </data>
+  <data name="KeyChainAlreadySet" xml:space="preserve">
+    <value>The key chain to this object already exists and the parents do not match.</value>
+  </data>
+  <data name="SfcInvalidArgument" xml:space="preserve">
+    <value>The '{argumentName}' argument is either null or invalid.</value>
+  </data>
+  <data name="SfcInvalidReaderStream" xml:space="preserve">
+    <value>The '{argumentName}' input stream is closed, at end-of-file or in an error state.</value>
+  </data>
+  <data name="SfcInvalidWriterStream" xml:space="preserve">
+    <value>The '{argumentName}' output stream is closed or in an error state.</value>
+  </data>
+  <data name="SfcInvalidSerialization" xml:space="preserve">
+    <value>Serialization output is invalid.</value>
+  </data>
+  <data name="SfcInvalidDeserialization" xml:space="preserve">
+    <value>Deserialization input in corrupt.</value>
+  </data>
+  <data name="SfcInvalidDeserializationMissingParent" xml:space="preserve">
+    <value>Deserialization input is invalid. The parent entry of '{instanceUri}' is missing. The parent entry '{parentUri}' is expected to occurs before its children.</value>
+  </data>
+  <data name="SfcInvalidSerializationInstance" xml:space="preserve">
+    <value>Serialization operation on {instanceName} has failed.</value>
+  </data>
+  <data name="SfcInvalidDeserializationInstance" xml:space="preserve">
+    <value>Deserialization operation on {instanceName} has failed.</value>
+  </data>
+  <data name="SfcNullArgumentToSerialize" xml:space="preserve">
+    <value>The instance passed in to serialize is a null instance.</value>
+  </data>
+  <data name="SfcNullArgumentToResolve" xml:space="preserve">
+    <value>The instance passed in to resolve is a null instance.</value>
+  </data>
+  <data name="SfcNullArgumentToResolveCollection" xml:space="preserve">
+    <value>The instance passed in to resolve collection is a null instance.</value>
+  </data>
+  <data name="SfcNullArgumentToSfcReferenceAttribute" xml:space="preserve">
+    <value>The resolver type passed in to the '{attribute}' attribute is null.</value>
+  </data>
+  <data name="SfcNullInvalidSfcReferenceResolver" xml:space="preserve">
+    <value>The resolver type '{resolverType}' does not implement interface '{resolverInterface}' needed to perform resolving.</value>
+  </data>
+  <data name="SfcNullArgumentToViewAttribute" xml:space="preserve">
+    <value>The view name passed in to the relation view attribute is null.</value>
+  </data>
+  <data name="SfcNullArgumentToProxyInstance" xml:space="preserve">
+    <value>The instance passed in to the proxy as the referenced instance is null.</value>
+  </data>
+  <data name="SfcNullWriterToSerialize" xml:space="preserve">
+    <value>The writer passed in to serialize is a null instance.</value>
+  </data>
+  <data name="SfcNullReaderToSerialize" xml:space="preserve">
+    <value>The reader passed in to serialize is a null instance.</value>
+  </data>
+  <data name="SfcNonSerializableType" xml:space="preserve">
+    <value>Type {typeName} is not supported for serialization. </value>
+  </data>
+  <data name="SfcInvalidWriteWithoutDiscovery" xml:space="preserve">
+    <value>Write method invoked without setting instances to serialize.</value>
+  </data>
+  <data name="SfcNonSerializableProperty" xml:space="preserve">
+    <value>Serializer cannot handle the property {property}. The property is not in the property bag of the instance type.</value>
+  </data>
+  <data name="UnregisteredXmlSfcDomain" xml:space="preserve">
+    <value>The Xml contains an unregistered Sfc Domain '{sfcDomainName}'</value>
+  </data>
+  <data name="UnregisteredSfcXmlType" xml:space="preserve">
+    <value>The Xml contains an unregistered Sfc Domain '{sfcDomain}' with Type '{sfcType}'</value>
+  </data>
+  <data name="CannotDeserializeNonSerializableProperty" xml:space="preserve">
+    <value>The Xml contains property '{propertyName}' within Sfc Type '{sfcTypeName}' that is attributed as non-serializable.</value>
+  </data>
+  <data name="SfcUnsupportedVersion" xml:space="preserve">
+    <value>The serialized content's version is higher than the domain's current version. Deserialization cannot proceed.</value>
+  </data>
+  <data name="SfcUnsupportedDomainUpgrade" xml:space="preserve">
+    <value>The domain does not support Serialization upgrade. Deserialization cannot proceed with older version content.</value>
+  </data>
+  <data name="EmptySfcXml" xml:space="preserve">
+    <value>The Xml passed in is either empty or does not contain any Xml elements that could be deserialized.</value>
+  </data>
+  <data name="InvalidSfcXmlParentType" xml:space="preserve">
+    <value>The Xml expects a parent object in Sfc Domain '{sfcExpectedParentDomain}' with Type '{sfcExpectedParentType}', but the parent object Type is '{sfcGivenParentType}'.</value>
+  </data>
+  <data name="InvalidSMOQuery" xml:space="preserve">
+    <value>'{query}' is an invalid query expression for a SMO ObjectQuery. The query is expected to start with 'Server'.</value>
+  </data>
+  <data name="ParentHasNoConnecton" xml:space="preserve">
+    <value>Cannot set a parent that is a root but does not have a connection.</value>
+  </data>
+  <data name="SfcQueryConnectionUnavailable" xml:space="preserve">
+    <value>A query connection is unavailable or not supported for the requested query execution environment. This is usually due to a request for Multiple Active Queries on a single user mode server or other condition preventing a valid connection.</value>
+  </data>
+  <data name="BadCreateIdentityKey" xml:space="preserve">
+    <value>CreateIdentityKey returned null. The domain implementation is incorrect.</value>
+  </data>
+  <data name="InvalidState" xml:space="preserve">
+    <value>Unable to perform this operation on an object in state '{current_state}'. The object must be in state '{required_state}'.</value>
+  </data>
+  <data name="CRUDOperationFailed" xml:space="preserve">
+    <value>Operation '{opname}' on object '{objname}' failed during execution.</value>
+  </data>
+  <data name="ObjectNotScriptabe" xml:space="preserve">
+    <value>Domain error: object '{objname}' is in the dependency graph but CRUD operation cannot be scripted. Consider changing IsCrudActionHandledByParent in TypeMetadata for class '{className}'.</value>
+  </data>
+  <data name="UnsupportedAction" xml:space="preserve">
+    <value>The action '{action}' is unsupported for type '{className}'.</value>
+  </data>
+  <data name="MissingParent" xml:space="preserve">
+    <value>Must set the Parent to perform this operation.</value>
+  </data>
+  <data name="opCreate" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="opRename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="opMove" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="opAlter" xml:space="preserve">
+    <value>Alter</value>
+  </data>
+  <data name="opDrop" xml:space="preserve">
+    <value>Drop</value>
+  </data>
+  <data name="CannotMoveNoDestination" xml:space="preserve">
+    <value>Cannot move object '{obj}', no destination parent object given.</value>
+  </data>
+  <data name="CannotMoveDestinationIsDescendant" xml:space="preserve">
+    <value>Cannot move object '{obj}', the destination parent object '{destObj}' may not be our descendant.</value>
+  </data>
+  <data name="CannotMoveDestinationHasDuplicate" xml:space="preserve">
+    <value>Cannot move object '{obj}', the destination parent object '{destObj}' has a duplicate child.</value>
+  </data>
+  <data name="CannotRenameNoProperties" xml:space="preserve">
+    <value>Cannot rename object '{obj}', key has no properties.</value>
+  </data>
+  <data name="CannotRenameMissingProperty" xml:space="preserve">
+    <value>Cannot rename object '{obj}', must have property '{missingProperty}'.</value>
+  </data>
+  <data name="CannotRenameNoKey" xml:space="preserve">
+    <value>Cannot rename object '{obj}', no key given.</value>
+  </data>
+  <data name="CannotRenameDestinationHasDuplicate" xml:space="preserve">
+    <value>Cannot rename object '{obj}', the key '{key}' already exists.</value>
+  </data>
+  <data name="PermissionDenied" xml:space="preserve">
+    <value>Don't have rights to execute requested operation.</value>
+  </data>
+  <data name="IncompatibleWithSfcListAdapterCollection" xml:space="preserve">
+    <value>Provided Collection is not compatible with SfcListAdapter. It should implement IList, IListSource or IEnumerable&lt;{type}&gt;.</value>
+  </data>
+  <data name="BadQueryForConnection" xml:space="preserve">
+    <value>'{query}': invalid query expression root when connected to '{rootName}'</value>
+  </data>
+  <data name="CannotCreateDestinationHasDuplicate" xml:space="preserve">
+    <value>Object '{obj}' already exists</value>
+  </data>
+  <data name="MissingSqlCeTools" xml:space="preserve">
+    <value>Unable to Load Microsoft SQL Server Compact. Install Microsoft SQL Server Compact MSIs from the folder - Servers\Setup on the SQL Server installation media. For more details, please refer to KB Article 952218.</value>
+  </data>
+  <data name="AttributeConflict" xml:space="preserve">
+    <value>The '{firstAttribute}' and '{secondAttribute}' attributes on '{typeName}.{propertyName}' are conflicting.</value>
+  </data>
+  <data name="DomainNotFound" xml:space="preserve">
+    <value>Domain '{name}' was not found on the list of registered domain.</value>
+  </data>
+  <data name="PropertyUsageError" xml:space="preserve">
+    <value>Property {name} cannot be used for {usage}</value>
+  </data>
+  <data name="UsageRequest" xml:space="preserve">
+    <value>request</value>
+  </data>
+  <data name="UsageFilter" xml:space="preserve">
+    <value>filter</value>
+  </data>
+  <data name="UsageOrderBy" xml:space="preserve">
+    <value>order by</value>
+  </data>
+  <data name="PropertyCannotHaveAlias" xml:space="preserve">
+    <value>Property {name} cannot have an alias. It is not requested.</value>
+  </data>
+  <data name="InvalidPrefixAlias" xml:space="preserve">
+    <value>Cannot find alias for property {name}. The Prefix property is null.</value>
+  </data>
+  <data name="AliasNotSpecified" xml:space="preserve">
+    <value>Cannot find alias for property {name}. Alias was not specified.</value>
+  </data>
+  <data name="InvalidAlias" xml:space="preserve">
+    <value>Invalid alias kind.</value>
+  </data>
+  <data name="ResultNotSupported" xml:space="preserve">
+    <value>result type not supported</value>
+  </data>
+  <data name="UnknownProperty" xml:space="preserve">
+    <value>unknown property {property}</value>
+  </data>
+  <data name="UnknownType" xml:space="preserve">
+    <value>unknown type {type}</value>
+  </data>
+  <data name="XPathUnclosedString" xml:space="preserve">
+    <value>unclosed string</value>
+  </data>
+  <data name="XPathSyntaxError" xml:space="preserve">
+    <value>syntax error</value>
+  </data>
+  <data name="FailedToLoadAssembly" xml:space="preserve">
+    <value>failed to load assembly {assembly}.</value>
+  </data>
+  <data name="CouldNotInstantiateObj" xml:space="preserve">
+    <value>could not instantiate object {objType}.</value>
+  </data>
+  <data name="UnknowNodeType" xml:space="preserve">
+    <value>unknown node type</value>
+  </data>
+  <data name="UnknownOperator" xml:space="preserve">
+    <value>unknown operator</value>
+  </data>
+  <data name="UnknownFunction" xml:space="preserve">
+    <value>unknown function</value>
+  </data>
+  <data name="VariablesNotSupported" xml:space="preserve">
+    <value>variables not supported</value>
+  </data>
+  <data name="UnknownElemType" xml:space="preserve">
+    <value>unknown element type</value>
+  </data>
+  <data name="ChildrenNotSupported" xml:space="preserve">
+    <value>child expressions are not supported.</value>
+  </data>
+  <data name="UnsupportedExpresion" xml:space="preserve">
+    <value>unsupported expression</value>
+  </data>
+  <data name="NotDerivedFrom" xml:space="preserve">
+    <value>{objType} is not derived from {objName}.</value>
+  </data>
+  <data name="ISupportInitDataNotImplement" xml:space="preserve">
+    <value>{objType} doesn't implement ISupportInitData, but it has a configuration file.</value>
+  </data>
+  <data name="UrnCouldNotBeResolvedAtLevel" xml:space="preserve">
+    <value>urn could not be resolved at level {level}.</value>
+  </data>
+  <data name="InvalidNode" xml:space="preserve">
+    <value>invalid node.</value>
+  </data>
+  <data name="NoPropertiesRequested" xml:space="preserve">
+    <value>The query must have at least one property to return.</value>
+  </data>
+  <data name="FailedRequest" xml:space="preserve">
+    <value>Failed to retrieve data for this request.</value>
+  </data>
+  <data name="IncorrectVersionTag" xml:space="preserve">
+    <value>Incorrect version tag. You must specify either a min_major, cloud_min_major or datawarehouse_enabled attribute. 
+
+{elementContent}</value>
+  </data>
+  <data name="InvalidAttributeValue" xml:space="preserve">
+    <value>Value '{value}' on attribute '{attributeName}' was unable to be parsed correctly.</value>
+  </data>
+  <data name="NullVersionOnLoadingCfgFile" xml:space="preserve">
+    <value>Version was not specified on loading configuration file.</value>
+  </data>
+  <data name="EnumObjectTagNotFound" xml:space="preserve">
+    <value>Enumeration object tag was not found.</value>
+  </data>
+  <data name="InvalidConnectionType" xml:space="preserve">
+    <value>Connection type is not valid.</value>
+  </data>
+  <data name="OnlyPathOrFullName" xml:space="preserve">
+    <value>Only Path or only FullName must be specified.</value>
+  </data>
+  <data name="DatabaseNameMustBeSpecified" xml:space="preserve">
+    <value>Database name must be specified.</value>
+  </data>
+  <data name="FailedToLoadResFile" xml:space="preserve">
+    <value>File {fileName} was not found.
+The file might be missing in sources or misspelled in config.xml (note: file name in config.xml is case sensitive)</value>
+  </data>
+  <data name="UnsupportedTypeDepDiscovery" xml:space="preserve">
+    <value>{objType} is not supported in dependency discovery. Only objects of the following types are supported: {suppList}.</value>
+  </data>
+  <data name="QueryNotSupportedPostProcess" xml:space="preserve">
+    <value>Cannot provide DataReader because of the properties: {propList}</value>
+  </data>
+  <data name="FailedToCreateUrn" xml:space="preserve">
+    <value>Failed to create URN for object code: '{objCode}'</value>
+  </data>
+  <data name="PropMustBeSpecified" xml:space="preserve">
+    <value>{prop} must be specified on {obj}.</value>
+  </data>
+  <data name="InvalidUrnForDepends" xml:space="preserve">
+    <value>Urn is not valid for dependency discovery: {urn}</value>
+  </data>
+  <data name="TooManyDbLevels" xml:space="preserve">
+    <value>too many database levels.</value>
+  </data>
+  <data name="InvalidConfigurationFile" xml:space="preserve">
+    <value>Configuration file is not valid.</value>
+  </data>
+  <data name="MissingSection" xml:space="preserve">
+    <value>invalid configuration file: missing section {section}.</value>
+  </data>
+  <data name="NotDbObject" xml:space="preserve">
+    <value>object is not under database.</value>
+  </data>
+  <data name="NotSingleDb" xml:space="preserve">
+    <value>objects are not in a single database.</value>
+  </data>
+  <data name="NoClassNamePostProcess" xml:space="preserve">
+    <value>&lt;post_process&gt; tag missing class_name.</value>
+  </data>
+  <data name="InvalidVersion" xml:space="preserve">
+    <value>Operation not supported on version {version}.</value>
+  </data>
+  <data name="InvalidSqlServer" xml:space="preserve">
+    <value>Operation not supported on {productName}.</value>
+  </data>
+  <data name="DatabaseNameMustBeSpecifiedinTheUrn" xml:space="preserve">
+    <value>The database name must be specified in the urn: {urn}</value>
+  </data>
+  <data name="CouldNotGetInfoFromDependencyRow" xml:space="preserve">
+    <value>Failed to retrieve dependency information ({rowInformation}).</value>
+  </data>
+  <data name="SqlServer90Name" xml:space="preserve">
+    <value>SQL Server 2005</value>
+  </data>
+  <data name="SqlServer80Name" xml:space="preserve">
+    <value>SQL Server 2000</value>
+  </data>
+  <data name="InvalidTypeForProperty" xml:space="preserve">
+    <value>The property '{propertyName}' is not valid from the type '{typeName}' context</value>
+  </data>
+  <data name="InvalidUrn" xml:space="preserve">
+    <value>Invalid URN.</value>
+  </data>
+  <data name="UnknownDomain" xml:space="preserve">
+    <value>URN starts with an unknown root element '{root}'.</value>
+  </data>
+  <data name="NoProvider" xml:space="preserve">
+    <value>No provider is available for URN '{urn}'.</value>
+  </data>
+  <data name="LevelNotFound" xml:space="preserve">
+    <value>Unknown level '{level}' in URN '{urn}'.</value>
+  </data>
+  <data name="InvalidKeyValue" xml:space="preserve">
+    <value>Empty key '{key}' in URN '{urn}'.</value>
+  </data>
+  <data name="MissingKeys" xml:space="preserve">
+    <value>URN '{urn}' has one or more missing keys at level '{level}'.</value>
+  </data>
+  <data name="ServerNameMissing" xml:space="preserve">
+    <value>Server name is missing from URN '{urn}'.</value>
+  </data>
+  <data name="DomainRootUnknown" xml:space="preserve">
+    <value>Domain root for type '{fullTypeName}' is unknown. Cannot retrieve logical version.</value>
+  </data>
+  <data name="PropertyNotsupported" xml:space="preserve">
+    <value>Property not supported for current server version.</value>
+  </data>
+  <data name="ObjectNotSupportedOnSqlDw" xml:space="preserve">
+    <value>This object is not supported on Azure Synapse Analytics databases.</value>
+  </data>
+</root>

@@ -1,0 +1,27 @@
+<?xml version='1.0' ?>
+<EnumObject type='MasterKeyEncryption' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='sys.key_encryptions' alias='ke'/>
+	</settings>
+	<properties>
+        <property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='4' expression="{0} + '/{3}[@Thumbprint=''' + {1} + ''' and @SymmetricKeyEncryptionType = ''' + {2} + ''']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="Thumbprint_hid" />
+                <link_field type='local' field="SymmetricKeyEncryptionType_hid" />
+				<link_field field="NType" />
+			</link_multiple>
+          </property>
+		<property name='ParentID' type='int' access='read' hidden='true'>ke.key_id</property>
+        <property name='Thumbprint' type='varbinary' size = '32' access='read'>ke.thumbprint</property>
+        <property name='Thumbprint_hid' type='nvarchar' size = '64' access='read' hidden='true' cast='true'>ISNULL(ke.thumbprint, 0x00)</property>
+		<property name='SymmetricKeyEncryptionType' type='int' report_type='SymmetricKeyEncryptionType' access='read'>(case ke.crypt_type 
+						when 'ESKS' then 0 when 'EPUC' then 1 when 'ESKP' then 2 when 'EPUA' then 3 when 'ESKM' then 4 else -1 end)</property>
+		<property name='SymmetricKeyEncryptionType_hid' type='nvarchar' size='20' hidden='true' cast='true'>(case ke.crypt_type 
+						when 'ESKS' then 0 when 'EPUC' then 1 when 'ESKP' then 2 when 'EPUA' then 3 when 'ESKM' then 4 else -1 end)</property>
+        <property name='CryptProperty' type='varbinary' access='read'>ke.crypt_property</property>
+	</properties>
+</EnumObject>

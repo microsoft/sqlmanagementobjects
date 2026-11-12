@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="Permission" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="Name" local="Object" />
+		</parent_link>
+		<include file='inc_perm.xml' />
+		<property_link table = 'master.dbo.spt_values a'>
+(( p.action in (193, 197) and ((p.columns &amp; 1) = 1) ) or ( p.action in (195, 196, 224, 26) ))
+and (convert(tinyint, substring( isnull(p.columns, 0x01), a.low, 1)) &amp; a.high != 0) 
+and a.type = N'P' 
+and a.number = 0		
+		</property_link>
+	</settings>
+	<properties>
+		<property name="Object" type="nvarchar" size="300">object_name(p.id)</property>
+	</properties>
+</EnumObject>

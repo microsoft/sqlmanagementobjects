@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type='SubscriptionConditionEventRule' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+  <settings>
+    <parent_link>
+      <link parent="Id" local="SubscriptionClassId" />
+    </parent_link>
+    <request_parent_select>
+      <field name="SubscriptionClassId" />
+    </request_parent_select>
+    <property_link table="#tmp_condition_event_rule" alias="cer" />
+    <prefix>
+CREATE TABLE #tmp_condition_event_rule(
+    RuleId int,
+    RuleName nvarchar(255),
+    RuleType tinyint,
+    Action ntext,
+    ActionTimeout int,
+    EventClassId int,
+    SubscriptionClassId int,
+    EventClassName nvarchar(255),
+    InputTypeName nvarchar (128),
+    InputTypeSchema nvarchar (128),
+    SqlUserName nvarchar (128),
+    SqlLoginName nvarchar (128)
+)
+INSERT #tmp_condition_event_rule EXEC [SchemaPrefix].NSGetRulesOnType @RuleType = 3
+    </prefix>
+    <postfix>
+DROP TABLE #tmp_condition_event_rule
+    </postfix>
+  </settings>
+  <properties>
+    <include file='inc_urn_single.xml' />
+    <property name="Id" type="int" hidden="true">cer.RuleId</property>
+    <property name="Name" type="nvarchar" size="255">cer.RuleName</property>
+    <property name="SqlExpression" type="ntext">cer.Action</property>
+    <property name="ActionTimeout" type="int">cer.ActionTimeout</property>
+    <property name="EventClassName" type="nvarchar" size="255">cer.EventClassName</property>
+    <property name="SubscriptionClassId" type="int" hidden="true">cer.SubscriptionClassId</property>
+    <property name="InputTypeName" type="nvarchar" size="255">cer.InputTypeName</property>
+    <property name="InputTypeSchema" type="nvarchar" size="255">cer.InputTypeSchema</property>
+    <property name="SqlUserName" type="nvarchar" size="255">cer.SqlUserName</property>
+    <property name="SqlLoginName" type="nvarchar" size="255">cer.SqlLoginName</property>
+  </properties>
+</EnumObject>

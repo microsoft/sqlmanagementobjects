@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <Description>
+  The SQL Server Management Objects (SMO) Framework is a set of objects designed for programmatic management of Microsoft SQL Server and Microsoft Azure SQL Database.
+    </Description>
+    <Authors>Microsoft</Authors>
+    <Company>Microsoft Corporation</Company>
+    <BaseProduct>Microsoft Sql Server</BaseProduct>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <!-- add Source Link info to package/pdbs-->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype=">text/microsoft-resx</resheader>
+    <resheader name="version=">2.0</resheader>
+    <resheader name="reader=">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer=">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1="><value>this is my long string</value></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing=">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64=">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64=">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata=">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true=">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ConnectionCannotBeChanged" xml:space="preserve">
+    <value>Connection properties cannot be changed after a connection has been established.</value>
+  </data>
+  <data name="NotInTransaction" xml:space="preserve">
+    <value>Cannot perform this operation as there is no open transaction.</value>
+  </data>
+  <data name="ConnectionFailure" xml:space="preserve">
+    <value>Failed to connect to server {server}.</value>
+  </data>
+  <data name="InvalidPropertyValue" xml:space="preserve">
+    <value>Cannot apply value &apos;{value}&apos; to property {property}: {reason}.</value>
+  </data>
+  <data name="InvalidPropertyValueReasonString" xml:space="preserve">
+    <value>Value cannot be null.</value>
+  </data>
+  <data name="InvalidIntegratedSecureValue" xml:space="preserve">
+    <value>Property {property} is only supported on Windows operating systems.</value>
+  </data>
+  <data name="InvalidPropertyValueReasonInt" xml:space="preserve">
+    <value>Value cannot be smaller than {value}.</value>
+  </data>
+  <data name="ExecutionFailure" xml:space="preserve">
+    <value>An exception occurred while executing a Transact-SQL statement or batch.</value>
+  </data>
+  <data name="PropertyNotSetException" xml:space="preserve">
+    <value>Property {property} was not set.</value>
+  </data>
+  <data name="CannotSetWhenLoginSecure" xml:space="preserve">
+    <value>Cannot set {property} property because LoginSecure property is set to true.</value>
+  </data>
+  <data name="PropertyNotAvailable" xml:space="preserve">
+    <value>Property {property} cannot be changed or read after a connection string has been set.</value>
+  </data>
+  <data name="ConnectToInvalidVersion" xml:space="preserve">
+    <value>This SQL Server version ({serverVersion}) is not supported.</value>
+  </data>
+  <data name="ClassDefaulConstructorCannotBeUsed" xml:space="preserve">
+    <value>{className} class default constructor cannot be used.</value>
+  </data>
+  <data name="ParseError" xml:space="preserve">
+    <value>Parse error occurred while looking for GO statement. Line {line}.</value>
+  </data>
+  <data name="PasswordCouldNotBeChanged" xml:space="preserve">
+    <value>Password could not be changed.</value>
+  </data>
+  <data name="InvalidLockTimeout" xml:space="preserve">
+    <value>Invalid LockTimeout value: {lockTimeout}.</value>
+  </data>
+  <data name="InvalidArgumentCacheCapacity" xml:space="preserve">
+    <value>Cache capacity must be greater than {capacity}.</value>
+  </data>
+  <data name="InvalidArgumentCacheNullKey" xml:space="preserve">
+    <value>The cache item returns a null key.</value>
+  </data>
+  <data name="InvalidArgumentCacheDuplicateKey" xml:space="preserve">
+    <value>The cache already contains an item with the same key {key}.</value>
+  </data>
+  <data name="SqlAzureDatabaseEdition" xml:space="preserve">
+    <value>Microsoft Azure SQL Database Edition</value>
+  </data>
+  <data name="SqlDataWarehouseEdition" xml:space="preserve">
+    <value>Microsoft Azure Synapse Analytics dedicated SQL pools Edition</value>
+  </data>
+  <data name="EnterpriseEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Enterprise Edition</value>
+  </data>
+  <data name="ExpressEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Express Edition</value>
+  </data>
+  <data name="PersonalEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Personal Edition</value>
+  </data>
+  <data name="StandardEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Standard Edition</value>
+  </data>
+  <data name="StretchEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Stretch Database Edition</value>
+  </data>
+  <data name="SqlManagedInstanceEdition" xml:space="preserve">
+    <value>Microsoft Azure SQL Database Managed Instance Edition</value>
+  </data>
+  <data name="SqlOnDemandEdition" xml:space="preserve">
+    <value>Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition</value>
+  </data>
+  <data name="SqlDatabaseEdgeEdition" xml:space="preserve">
+    <value>Microsoft Azure SQL Edge Edition</value>
+  </data>
+  <data name="SqlAzureArcManagedInstanceEdition" xml:space="preserve">
+    <value>Microsoft Azure Arc SQL Managed Instance Edition</value>
+  </data>
+  <data name="SqlAzureDatabase" xml:space="preserve">
+    <value>Microsoft Azure SQL Database</value>
+  </data>
+  <data name="Standalone" xml:space="preserve">
+    <value>Standalone SQL Server</value>
+  </data>
+  <data name="InstAPIIsNotInstalled" xml:space="preserve">
+    <value>InstAPI is required for this type, but it is not installed on this computer.</value>
+  </data>
+  <data name="CouldNotInstantiateInstAPI" xml:space="preserve">
+    <value>Could not instantiate InstAPI.</value>
+  </data>
+  <data name="CouldNotLoadMethodInfoFromInstAPI" xml:space="preserve">
+    <value>Could not load MethodInfo from InstAPI.</value>
+  </data>
+  <data name="AssemblyLoadFailed" xml:space="preserve">
+    <value>Failed to load assembly {assemblyName}. Error message: {originalerror}</value>
+  </data>
+  <data name="SmoSQLCLRUnAvailable" xml:space="preserve">
+    <value>This functionality is disabled in the SQLCLR. It is recommended that you execute from your client application.</value>
+  </data>
+  <data name="CannotBeSetWhileConnected" xml:space="preserve">
+    <value>ServerVersion cannot be set while connected.</value>
+  </data>
+  <data name="CannotPerformOperationWhileDisconnected" xml:space="preserve">
+    <value>Operation cannot be performed when the connection is forced to be disconnected.</value>
+  </data>
+  <data name="CannotSetTrueName" xml:space="preserve">
+    <value>TrueName cannot be set, unless the connection is forced to be disconnected.</value>
+  </data>
+  <data name="TrueNameMustBeSet" xml:space="preserve">
+    <value>TrueName must be set if the connection is forced to be disconnected.</value>
+  </data>
+  <data name="UnableToSavePasswordFormat" xml:space="preserve">
+    <value>The password for user &apos;{userName}&apos; could not be saved to the Windows credential manager.</value>
+  </data>
+</root>

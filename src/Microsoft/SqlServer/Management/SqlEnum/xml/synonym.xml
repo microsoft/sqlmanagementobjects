@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<EnumObject type="Collation" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='sys.synonyms' alias='s' />
+		<post_process fields='#BaseServer#BaseDatabase#BaseSchema#BaseObject#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessSplitFourPartName'
+			triggered_fields='#BaseObjectName#' />
+	</settings>
+	<properties>
+		<include file='inc_object.xml' alias='s' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#' />
+
+    <version min_major='10'>
+      <property name="BaseServer" type="nvarchar" usage='request' read_only_after_creation="true" mode="deploy">N''</property>
+    </version>
+		<property name="BaseDatabase" type="nvarchar" usage='request' read_only_after_creation="true" mode="design">N''</property>
+		<property name="BaseSchema" type="nvarchar" usage='request' read_only_after_creation="true" mode="design">N''</property>
+		<property name="BaseObject" type="nvarchar" usage='request' read_only_after_creation="true" mode="design">N''</property>
+		<property name="BaseObjectName" type="nvarchar" size='1035' hidden='true'>s.base_object_name</property>
+		<property name="BaseType" type="int" access='read' report_type="SynonymBaseType">
+			CASE OBJECTPROPERTYEX(s.object_id,'BaseType') 
+				WHEN N'U' THEN 1 
+				WHEN N'V' THEN 2 
+				WHEN N'P' THEN 3 
+				WHEN N'FN' THEN 4 
+				WHEN N'TF' THEN 5 
+				WHEN N'IF' THEN 6 
+				WHEN N'X' THEN 7 
+				WHEN N'RF' THEN 8 
+				WHEN N'PC' THEN 9 
+				WHEN N'FS' THEN 10 
+				WHEN N'FT' THEN 11 
+				WHEN N'AF' THEN 12 ELSE 0 END
+		</property>
+		<version min_major='10' >
+			<include file='inc_policy_health_state.xml'/>
+		</version>
+  </properties>
+</EnumObject>

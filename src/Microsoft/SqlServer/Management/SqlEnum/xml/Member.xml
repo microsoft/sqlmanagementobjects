@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<EnumObject type="Member" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <version min_major='10'>
+            <parent_link>
+                <link_multiple no="1" expression="{0} = m.role_principal_id">
+                    <link_field type="parent" field="ID" />
+                </link_multiple>
+            </parent_link>
+            <property_link table = 'sys.server_role_members m'/>
+            <property_link table = 'sys.server_principals p'>
+				p.principal_id = m.member_principal_id
+            </property_link>
+        </version>
+        <version cloud_min_major='12'>
+            <parent_link>
+                <link_multiple no="1" expression="{0} = sqlrolemember.role_principal_id">
+                    <link_field type="parent" field="ID" />
+                </link_multiple>
+            </parent_link>
+            <property_link table='#SmoMemberTemp sqlrolemember'></property_link>
+            <prefix>
+                select * into #SmoMemberTemp from 
+                (SELECT
+                s.name collate DATABASE_DEFAULT AS name,
+                s.type collate DATABASE_DEFAULT AS type,
+                m.role_principal_id AS role_principal_id
+                FROM sys.server_role_members m
+                JOIN sys.sql_logins AS s
+                ON m.member_principal_id = s.principal_id AND s.type = N'S'
+                UNION
+                SELECT
+                p.name collate DATABASE_DEFAULT AS name,
+                p.type collate DATABASE_DEFAULT AS type,
+                m.role_principal_id AS role_principal_id
+                FROM sys.server_role_members m
+                JOIN sys.server_principals AS p
+                ON m.member_principal_id = p.principal_id AND (p.type =N'X' OR p.type=N'E')) as Temptable
+            </prefix>
+            <postfix>
+                drop table #SmoMemberTemp
+            </postfix>
+        </version>
+    </settings>
+<properties>
+    <version min_major='10'>
+      <property name="Name" type="sysname">p.name</property>
+      <property name="LoginType" type="int" report_type="LoginType" access='read'>CASE p.type WHEN N'U' THEN 0 WHEN N'G' THEN 1 WHEN N'S' THEN 2 WHEN N'C' THEN 3 WHEN N'K' THEN 4 END</property>
+    </version>
+    <version min_major='11'>
+      <property name="IsLogin" type="bit" cast='true' access='Read'>CASE p.type WHEN N'R' THEN 0 ELSE 1 END</property>
+    </version>
+    <version cloud_min_major='12'>
+      <property name="Name" type="sysname">sqlrolemember.name</property>
+      <property name="LoginType" type="int" report_type="LoginType" access='read'>CASE sqlrolemember.type WHEN N'S' THEN 2 WHEN N'E' THEN 5 WHEN N'X' THEN 6 END</property>
+      <property name="IsLogin" type="bit" cast='true' access='Read'>1</property>
+    </version>
+  </properties>
+
+</EnumObject>

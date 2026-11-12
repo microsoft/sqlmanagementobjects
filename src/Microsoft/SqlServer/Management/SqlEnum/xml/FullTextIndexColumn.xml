@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<EnumObject type="FullTextIndexColumn" impl_type="SqlObject" min_major='10' cloud_min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ParentID" local="ParentID" />
+    </parent_link>
+    <version min_major='10' cloud_min_major='12' >
+      <property_link table='sys.fulltext_index_columns AS icol' />
+      <property_link fields = '#Name#' join='sys.columns AS col'>col.object_id = icol.object_id and col.column_id = icol.column_id</property_link>
+      <property_link fields='#Language#' join='sys.fulltext_languages AS sl'>sl.lcid=icol.language_id</property_link>
+      <property_link fields='#TypeColumnName#' left_join='sys.columns AS col2'>col2.column_id = icol.type_column_id and col2.object_id = icol.object_id</property_link>
+    </version>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <version min_major='10' cloud_min_major='12' >
+      <property name="Name" type="sysname">col.name</property>
+      <property name="ParentID" type="int" hidden='true'>icol.object_id</property>
+      <property name="Language" type="sysname" read_only_after_creation="true">sl.name</property>
+      <property name="TypeColumnName" type="sysname" read_only_after_creation="true">ISNULL(col2.name,N'')</property>
+    </version>
+    <version min_major='11' cloud_min_major='12' >
+      <property name="StatisticalSemantics" type="int" read_only_after_creation="true">icol.statistical_semantics</property>
+    </version>
+  </properties>
+</EnumObject>

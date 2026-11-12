@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_ddl_trigger_event" impl_type="SqlObject" min_major='10'  cloud_min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<post_process fields='#DdlTriggerEvents#' triggered_fields = "#DdlTriggerEventsInternal#" class_name='Microsoft.SqlServer.Management.Smo.PostProcessDatabaseDdlTriggerEvents'/>
+	</settings>
+  <properties>
+    <property name="DdlTriggerEventsInternal" type="nvarchar" size="50" expensive='true' hidden="true"  >
+      <link_multiple no='1' expression="cast(db_id() as varchar(20)) + '_' + cast({{0}} as varchar(20))">
+        <link_field type='local' field="ID" />
+      </link_multiple>
+    </property>
+    <property name="DdlTriggerEvents" type="sql_variant" cast="true"  expensive="true" report_type2="Microsoft.SqlServer.Management.Smo.DatabaseDdlTriggerEventSet">null</property>
+  </properties>
+</EnumObject>

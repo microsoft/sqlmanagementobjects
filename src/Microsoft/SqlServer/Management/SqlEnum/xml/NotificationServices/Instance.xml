@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='Instance' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<property_link table="#tmp_instance_db_names" alias="dtb" />
+        <prefix>
+CREATE TABLE #tmp_instance_db_names (
+	Name nvarchar(64), 
+	InstanceDatabase nvarchar (255),
+    SchemaName nvarchar (255),
+	VersionId int,
+	UpdateDescription nvarchar (255),
+	UpdateStarted datetime,
+	UpdateFinished datetime,
+	UpdateUserId nvarchar (255),
+	NSEdition nvarchar(255),
+	NSVersionMajor int,
+	NSVersionMinor int,
+	NSVersionBuild int,
+	NSVersionRevision int,
+	ConfigVersionMajor int,
+	ConfigVersionMinor int,
+	ConfigVersionBuild int,
+	ConfigVersionRevision int,
+	AdfVersionMajor int,
+	AdfVersionMinor int,
+	AdfVersionBuild int,
+	AdfVersionRevision int,
+    EncryptArguments bit
+)
+
+CREATE TABLE #tmp_instance_info (
+	Name nvarchar(64), 
+	InstanceDatabase nvarchar (255),
+    SchemaName nvarchar (255),
+	VersionId int,
+	UpdateDescription nvarchar (255),
+	UpdateStarted datetime,
+	UpdateFinished datetime,
+	UpdateUserId nvarchar (255),
+	NSEdition nvarchar(255),
+	NSVersionMajor int,
+	NSVersionMinor int,
+	NSVersionBuild int,
+	NSVersionRevision int,
+	ConfigVersionMajor int,
+	ConfigVersionMinor int,
+	ConfigVersionBuild int,
+	ConfigVersionRevision int,
+	AdfVersionMajor int,
+	AdfVersionMinor int,
+	AdfVersionBuild int,
+	AdfVersionRevision int
+)
+
+CREATE TABLE #tmp_instance_encryption (
+	Name nvarchar(64), 
+    EncryptArguments bit
+)
+
+IF OBJECT_ID(N'msdb.NS90.NSInstances') IS NOT NULL
+BEGIN
+    DECLARE @dbname NVARCHAR (255)
+    DECLARE @SchemaName NVARCHAR (255)
+    DECLARE @sql NVARCHAR(MAX)
+
+    DECLARE instance_db_names_cursor CURSOR FOR
+    SELECT DatabaseName, SchemaName FROM [msdb].[NS90].[NSInstances]
+    FOR READ ONLY
+
+    OPEN instance_db_names_cursor
+
+    FETCH instance_db_names_cursor into @dbname, @SchemaName
+    WHILE @@FETCH_STATUS >= 0
+    BEGIN
+        SET @sql = CONVERT (NVARCHAR (MAX), N' USE ' + quotename(@dbname))
+		SET @sql = @sql + CONVERT (NVARCHAR (MAX), N' IF OBJECT_ID(N' + quotename (quotename (@SchemaName) + N'.NSGetVersionInfo', N'''') + N') IS NOT NULL')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N' BEGIN')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'   IF EXISTS (SELECT * FROM sys.columns AS Columns WHERE Columns.object_id = OBJECT_ID (N' + quotename (quotename (@SchemaName) + N'.NSInstanceConfig', N'''') + N') AND Columns.name = ''EncryptArguments'')')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'   BEGIN')   
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'       INSERT #tmp_instance_info')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'       EXEC ' + quotename (@SchemaName) + N'.NSGetVersionInfo')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'       INSERT #tmp_instance_encryption')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'       EXEC ' + quotename (@SchemaName) + N'.NSGetInstanceConfig')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N'   END')
+        SET @sql = @sql + CONVERT (NVARCHAR (MAX), N' END')
+        EXEC (@sql) 
+        FETCH instance_db_names_cursor into @dbname, @SchemaName
+    END
+    
+    INSERT INTO #tmp_instance_db_names
+        SELECT
+            Info.Name, Info.InstanceDatabase, Info.SchemaName, Info.VersionId,
+            Info.UpdateDescription, Info.UpdateStarted, Info.UpdateFinished, Info.UpdateUserId,
+            Info.NSEdition, Info.NSVersionMajor, Info.NSVersionMinor, Info.NSVersionBuild, Info.NSVersionRevision,
+            Info.ConfigVersionMajor, Info.ConfigVersionMinor, Info.ConfigVersionBuild, Info.ConfigVersionRevision,
+            Info.AdfVersionMajor, Info.AdfVersionMinor, Info.AdfVersionBuild, Info.AdfVersionRevision,
+            Config.EncryptArguments
+        FROM #tmp_instance_info AS Info, #tmp_instance_encryption AS Config
+        WHERE Info.Name = Config.Name
+        
+    CLOSE instance_db_names_cursor
+    DEALLOCATE instance_db_names_cursor
+END
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_instance_encryption
+DROP TABLE #tmp_instance_info
+DROP TABLE #tmp_instance_db_names
+        </postfix>
+        <post_process fields="#Version#" 
+			class_name="Microsoft.SqlServer.Management.Smo.PostProcessVersion" 
+			triggered_fields="#VersionMajor#VersionMinor#VersionBuild#VersionRevision#" />
+		<post_process fields="#InstanceConfigurationFileVersion#" 
+			class_name="Microsoft.SqlServer.Management.Smo.PostProcessVersion" 
+			triggered_fields="#ConfigVersionMajor#ConfigVersionMinor#ConfigVersionBuild#ConfigVersionRevision#" />
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="64">dtb.Name</property>
+        <property name="DatabaseName" type="nvarchar" size="255">dtb.InstanceDatabase</property>
+        <property name="SchemaName" type="nvarchar" size="255">dtb.SchemaName</property>
+        <property name="Version" type="int" report_type2="System.Version" access="Read">null</property>
+        <property name="VersionMajor" type="int" hidden="true">dtb.NSVersionMajor</property>
+        <property name="VersionMinor" type="int" hidden="true">dtb.NSVersionMinor</property>
+        <property name="VersionBuild" type="int" hidden="true">dtb.NSVersionBuild</property>
+        <property name="VersionRevision" type="int" hidden="true">dtb.NSVersionRevision</property>
+		<property name="InstanceConfigurationFileVersion" type="int" report_type2="System.Version">null</property>
+        <property name="ConfigVersionMajor" type="int" hidden="true">dtb.ConfigVersionMajor</property>
+        <property name="ConfigVersionMinor" type="int" hidden="true">dtb.ConfigVersionMinor</property>
+        <property name="ConfigVersionBuild" type="int" hidden="true">dtb.ConfigVersionBuild</property>
+        <property name="ConfigVersionRevision" type="int" hidden="true">dtb.ConfigVersionRevision</property>
+        <property name="EncryptArguments" type="bit" size="1">dtb.EncryptArguments</property>
+    </properties>
+</EnumObject>

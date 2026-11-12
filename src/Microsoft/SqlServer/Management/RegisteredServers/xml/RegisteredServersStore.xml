@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="RegisteredServersStore" impl_type="RegisteredServersStore" min_major='10'>
+	<settings>
+		<property_link table='@tmp_shared_server_store_stub' alias='store'/>
+		<prefix>
+declare @tmp_shared_server_store_stub TABLE
+(ID int)
+insert into @tmp_shared_server_store_stub (ID) values (0)
+		</prefix>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">N'RegisteredServersStore'</property>
+		<property name='ID' type='int' access='Read'>store.ID</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="Sequence" impl_type="SqlObject" min_major='11' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='sys.sequences' alias='seq' />
+	</settings>
+	<properties>
+		<include file='inc_object.xml' alias='seq' for='#Urn#Name#Schema#ID#CreateDate#DateLastModified#Owner#IsSchemaOwned#' />
+    <include file='inc_type.xml' alias='seq' for='#DataType#NumericPrecision#NumericScale#DataTypeSchema#SystemType#' ro_after_creation='#DataType#NumericPrecision#NumericScale#DataTypeSchema#SystemType#'/>
+    <property name="StartValue" type="sql_variant" >ISNULL(seq.start_value,N'')</property>
+    <property name="IncrementValue" type="sql_variant" >ISNULL(seq.increment,N'')</property>
+    <property name="MinValue" type="sql_variant" >ISNULL(seq.minimum_value,N'')</property>
+    <property name="MaxValue" type="sql_variant" >ISNULL(seq.maximum_value,N'')</property>
+    <property name="IsCycleEnabled" type="bit" cast='true' >seq.is_cycling</property>
+    <property name="SequenceCacheType" type="int" report_type="SequenceCacheType" cast='true'>case when seq.is_cached = 0 then 1 when seq.cache_size IS NULL then 0 else 2 end</property>
+    <property name="CacheSize" type="int"  >ISNULL(seq.cache_size,0)</property>
+    <!--<property name="CurrentPersistedValue" type="sql_variant" >ISNULL(seq.persisted_value,N'')</property>-->
+    <property name="CurrentValue" type="sql_variant" access="Read">ISNULL(seq.current_value,N'')</property>
+    <property name="IsExhausted" type="bit" cast='true' access="Read">seq.is_exhausted</property>
+
+    <version min_major='11'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

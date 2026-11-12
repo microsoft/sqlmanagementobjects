@@ -1,0 +1,60 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpAlert' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='#tmp_sp_help_alert' alias='tsha' />
+		<version min_major='10'>
+			<prefix>
+create table #tmp_sp_help_alert
+(id int null, name nvarchar(128) null, event_source nvarchar(100) null, event_category_id int null, event_id int null, message_id int null, severity int null, enabled tinyint null, delay_between_responses int null, last_occurrence_date int null, last_occurrence_time int null, last_response_date int null, last_response_time int null, notification_message nvarchar(512) null, include_event_description tinyint null, database_name nvarchar(128) null, event_description_keyword nvarchar(100) null, occurrence_count int null, count_reset_date int null, count_reset_time int null, job_id uniqueidentifier null, job_name nvarchar(128) null, has_notification int null, flags int null, performance_condition nvarchar(512) null, category_name nvarchar(128) null, wmi_namespace nvarchar(max) null, wmi_query nvarchar(max) null, type int null)
+insert into #tmp_sp_help_alert exec msdb.dbo.sp_help_alert
+			</prefix>
+		</version>
+		<postfix>
+drop table #tmp_sp_help_alert
+		</postfix>
+		
+		<post_process fields='#CountResetDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDateTime'
+			triggered_fields='#CountResetDateInt#CountResetTimeInt#' />
+		<post_process fields='#LastOccurrenceDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDateTime'
+			triggered_fields='#LastOccurrenceDateInt#LastOccurrenceTimeInt#' />
+		<post_process fields='#LastResponseDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDateTime'
+			triggered_fields='#LastResponseDateInt#LastResponseTimeInt#' />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		
+		<property name='ID' type='int'>tsha.id</property>
+		<property name='Name' type='nvarchar' size='128'>tsha.name</property>
+		<property name='EventSource' type='nvarchar' size='100' access='Read'>ISNULL(tsha.event_source,N'')</property>
+		<property name='MessageID' type='int'>tsha.message_id</property>
+		<property name='Severity' type='int'>tsha.severity</property>
+		<property name='IsEnabled' type='bit' cast='true'>tsha.enabled</property>
+		<property name='DelayBetweenResponses' type='int'>tsha.delay_between_responses</property>
+		<property name='LastOccurrenceDate' type='datetime'>null</property>
+		<property name='LastOccurrenceDateInt' type='int' hidden='true'>tsha.last_occurrence_date</property>
+		<property name='LastOccurrenceTimeInt' type='int' hidden='true'>tsha.last_occurrence_time</property>
+		<property name='LastResponseDate' type='datetime'>null</property>
+		<property name='LastResponseDateInt' type='int' hidden='true'>tsha.last_response_date</property>
+		<property name='LastResponseTimeInt' type='int' hidden='true'>tsha.last_response_time</property>
+		<property name='NotificationMessage' type='nvarchar' size='512'>ISNULL(tsha.notification_message,N'')</property>
+		<property name='IncludeEventDescription' type='tinyint' report_type='Agent.NotifyMethods'>tsha.include_event_description</property>
+		<property name='DatabaseName' type='nvarchar' size='128'>ISNULL(tsha.database_name,N'')</property>
+		<property name='EventDescriptionKeyword' type='nvarchar' size='100'>ISNULL(tsha.event_description_keyword,N'')</property>
+		<property name='OccurrenceCount' type='int' access='Read'>tsha.occurrence_count</property>
+		<property name='CountResetDate' type='datetime'>null</property>
+		<property name='CountResetDateInt' type='int' hidden='true'>tsha.count_reset_date</property>
+		<property name='CountResetTimeInt' type='int' hidden='true'>tsha.count_reset_time</property>
+		<property name='JobID' type='uniqueidentifier'>ISNULL(tsha.job_id, convert(uniqueidentifier, N'00000000-0000-0000-0000-000000000000'))</property>
+		<property name='JobName' type='nvarchar' size='128' access='Read'>ISNULL(tsha.job_name,N'')</property>
+		<property name='HasNotification' type='int' access='Read'>tsha.has_notification</property>
+		<property name='PerformanceCondition' type='nvarchar' size='512'>ISNULL(tsha.performance_condition,N'')</property>
+		<property name='CategoryName' type='nvarchar' size='128'>ISNULL(tsha.category_name,N'')</property>
+		
+		<version min_major='10'>
+			<property name='WmiEventNamespace' type='nvarchar' size='max'>ISNULL(tsha.wmi_namespace,N'')</property>
+			<property name='WmiEventQuery' type='nvarchar' size='max'>ISNULL(tsha.wmi_query,N'')</property>
+		</version>
+		
+		<property name='AlertType' type='int' report_type='Agent.AlertType' access='Read'>tsha.type</property>
+	</properties>
+</EnumObject>
