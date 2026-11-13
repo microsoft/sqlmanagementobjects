@@ -5,9 +5,7 @@ Once we push a new version to nuget.org add a double hash header for that versio
 
 ## 181.38.1
 
-- Harden SQL literal and comment escaping in generated scripts and database operations.
-- Scope security-policy existence checks by schema.
-- Harden Policy-Based Management expression handling and Extended Events XML parsing.
+- Restrict Policy-Based Management enum deserialization to trusted assemblies; generic and assembly-qualified type names are not supported.
 - Remove dependency discovery support for SQL Server 2012 and earlier.
 
 ## 181.38.0
