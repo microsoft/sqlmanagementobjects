@@ -707,10 +707,6 @@
       <LogicalName>JobStepOutputLog.xml</LogicalName>
       <Link>xml\JobStepOutputLog.xml</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\KatmaiDependency.sql">
-      <LogicalName>KatmaiDependency.sql</LogicalName>
-      <Link>xml\KatmaiDependency.sql</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\KeyEncryption.xml">
       <LogicalName>KeyEncryption.xml</LogicalName>
       <Link>xml\KeyEncryption.xml</Link>
@@ -1112,10 +1108,6 @@
       <LogicalName>SharedSchedule.xml</LogicalName>
       <Link>xml\SharedSchedule.xml</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\ShilohDependency.sql">
-      <LogicalName>ShilohDependency.sql</LogicalName>
-      <Link>xml\ShilohDependency.sql</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SmartAdmin.xml">
       <LogicalName>SmartAdmin.xml</LogicalName>
       <Link>xml\SmartAdmin.xml</Link>
@@ -1124,13 +1116,9 @@
       <LogicalName>SPParams.xml</LogicalName>
       <Link>xml\SPParams.xml</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SQL11Dependency.sql">
-      <LogicalName>SQL11Dependency.sql</LogicalName>
-      <Link>xml\SQL11Dependency.sql</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SQL13Dependency.sql">
-      <LogicalName>SQL13Dependency.sql</LogicalName>
-      <Link>xml\SQL13Dependency.sql</Link>
+    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SQL12Dependency.sql">
+      <LogicalName>SQL12Dependency.sql</LogicalName>
+      <Link>xml\SQL12Dependency.sql</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\SqlAssembly.xml">
       <LogicalName>SqlAssembly.xml</LogicalName>
@@ -1263,10 +1251,6 @@
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\XStoredProcedure.xml">
       <LogicalName>XStoredProcedure.xml</LogicalName>
       <Link>xml\XStoredProcedure.xml</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\YukonDependency.sql">
-      <LogicalName>YukonDependency.sql</LogicalName>
-      <Link>xml\YukonDependency.sql</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="$(SqlEnumSourcesFiles)\xml\Yukonuserownedobject.xml">
       <LogicalName>Yukonuserownedobject.xml</LogicalName>

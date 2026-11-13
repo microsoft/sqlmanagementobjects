@@ -863,14 +863,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 else if (azureEdition != null && this.DatabaseEngineEdition == sp.TargetDatabaseEngineEdition)
                 {
-                    statementBuilder.SetParameter("EDITION", azureEdition.ToString());
+                    statementBuilder.SetParameter("EDITION", SqlString(azureEdition.ToString()));
                 }
 
                 if (this.DatabaseEngineEdition == sp.TargetDatabaseEngineEdition && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand)
                 {
                     if (slo != null)
                     {
-                        statementBuilder.SetParameter("SERVICE_OBJECTIVE", slo.ToString());
+                        statementBuilder.SetParameter("SERVICE_OBJECTIVE", SqlString(slo.ToString()));
                     }
                     if ((isMaxSizeApplicable != null && bool.Parse(isMaxSizeApplicable.ToString())) || (maxSizeInBytes != null && (double)maxSizeInBytes > 0))
                     {
@@ -957,10 +957,10 @@ namespace Microsoft.SqlServer.Management.Smo
                     switch (property.Name.ToLowerInvariant())
                     {
                         case "azureedition":
-                            statementBuilder.SetParameter("EDITION", property.Value.ToString());
+                            statementBuilder.SetParameter("EDITION", SqlString(property.Value.ToString()));
                             break;
                         case "azureserviceobjective":
-                            statementBuilder.SetParameter("SERVICE_OBJECTIVE", property.Value.ToString());
+                            statementBuilder.SetParameter("SERVICE_OBJECTIVE", SqlString(property.Value.ToString()));
                             break;
                         case "maxsizeinbytes":
                             statementBuilder.SetParameter("MAXSIZE", GetMaxSizeString((double) property.Value), ParameterValueFormat.NotString);

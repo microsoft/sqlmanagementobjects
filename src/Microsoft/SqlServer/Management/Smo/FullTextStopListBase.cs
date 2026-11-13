@@ -172,8 +172,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         {
                             foreach (string str in kvp.Value)
                             {
-                                sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER FULLTEXT STOPLIST {0} ADD '{1}' LANGUAGE '{2}';",
-                                            MakeSqlBraket(this.Name), str, kvp.Key);
+                                sb.AppendFormat(SmoApplication.DefaultCulture, "ALTER FULLTEXT STOPLIST {0} ADD {1} LANGUAGE {2};",
+                                            MakeSqlBraket(this.Name), MakeSqlString(str), MakeSqlString(kvp.Key));
                                 sb.Append(sp.NewLine);
                             }
                         }

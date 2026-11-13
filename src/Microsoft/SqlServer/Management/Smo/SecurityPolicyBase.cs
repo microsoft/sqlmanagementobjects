@@ -158,7 +158,7 @@ namespace Microsoft.SqlServer.Management.Smo
             if (sp.IncludeScripts.ExistenceCheck && sp.TargetServerVersion < SqlServerVersion.Version130)
             {
                 sb.Append(string.Format(SmoApplication.DefaultCulture,
-                   Scripts.INCLUDE_EXISTS_SECURITY_POLICY, String.Empty, fullyFormattedName));
+                   Scripts.INCLUDE_EXISTS_SECURITY_POLICY, String.Empty, FormatFullNameForScripting(sp, false), MakeSqlString(GetSchema(sp))));
                 sb.Append(sp.NewLine);
                 sb.Append(Scripts.BEGIN);
                 sb.Append(sp.NewLine);
@@ -217,7 +217,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (sp.IncludeScripts.ExistenceCheck) // do we need to perform existing object check?
             {
-                sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_SECURITY_POLICY, "NOT", this.Name);
+                sb.AppendFormat(SmoApplication.DefaultCulture, Scripts.INCLUDE_EXISTS_SECURITY_POLICY, "NOT", FormatFullNameForScripting(sp, false), MakeSqlString(GetSchema(sp)));
                 sb.Append(sp.NewLine);
                 sb.Append(Scripts.BEGIN);
                 sb.Append(sp.NewLine);
@@ -452,4 +452,3 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 }
-

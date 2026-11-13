@@ -256,8 +256,8 @@ namespace Microsoft.SqlServer.Management.Smo
             }
 
             var ssb = new ScriptStringBuilder(String.Format(SmoApplication.DefaultCulture, "CREATE COLUMN MASTER KEY {0}{1}WITH{1}", fullyFormattedName, sp.NewLine), sp);
-            ssb.SetParameter("KEY_STORE_PROVIDER_NAME", KeyStoreProviderName, ParameterValueFormat.NVarCharString);
-            ssb.SetParameter("KEY_PATH", KeyPath, ParameterValueFormat.NVarCharString);
+            ssb.SetParameter("KEY_STORE_PROVIDER_NAME", SqlString(KeyStoreProviderName), ParameterValueFormat.NVarCharString);
+            ssb.SetParameter("KEY_PATH", SqlString(KeyPath), ParameterValueFormat.NVarCharString);
 
             if (IsSupportedProperty("AllowEnclaveComputations", sp))
             {
@@ -330,6 +330,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
             }
 
+
             return output;
         }
 
@@ -360,4 +361,3 @@ namespace Microsoft.SqlServer.Management.Smo
         }
     }
 }
-

@@ -599,7 +599,7 @@ namespace Microsoft.SqlServer.Management.Smo
 
             if (isMaskedColumn)
             {
-                sb.AppendFormat(SmoApplication.DefaultCulture, " MASKED WITH (FUNCTION = '{0}')", maskingFunction);
+                sb.AppendFormat(SmoApplication.DefaultCulture, " MASKED WITH (FUNCTION = '{0}')", SqlString(maskingFunction));
             }
 
             if (sp.Table.Identities && null != Properties.Get("Identity").Value && (bool)Properties["Identity"].Value)
@@ -944,6 +944,27 @@ namespace Microsoft.SqlServer.Management.Smo
                     // reset all properties
                     this.DefaultConstraint.Properties.SetAllDirty(false);
                 }
+            }
+        }
+
+        protected override void CleanObject()
+        {
+            Property maskingFunction = IsSupportedProperty(nameof(MaskingFunction))
+                ? Properties.Get(nameof(MaskingFunction))
+                : null;
+            bool maskingFunctionChanged = maskingFunction != null && maskingFunction.Dirty;
+            if (maskingFunctionChanged && IsDesignMode && maskingFunction.Value is string function)
+            {
+                // Offline objects must mirror the escaped representation returned by sys.masked_columns.
+                maskingFunction.SetValue(SqlString(function));
+            }
+
+            base.CleanObject();
+
+            if (maskingFunctionChanged && !IsDesignMode)
+            {
+                // Reload the catalog representation lazily after applying a caller-supplied definition.
+                maskingFunction.SetRetrieved(false);
             }
         }
 
@@ -1303,7 +1324,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     alterQuery.Add(String.Format(SmoApplication.DefaultCulture,
                         "ALTER TABLE {0} ALTER COLUMN {1} ADD MASKED WITH (FUNCTION = '{2}')",
                         ParentColl.ParentInstance.FullQualifiedName,
-                        FullQualifiedName, maskingFunction));
+                        FullQualifiedName, SqlString(maskingFunction)));
                 }
             }
 
@@ -1325,6 +1346,11 @@ namespace Microsoft.SqlServer.Management.Smo
             if (isMaskedColumn && (null != maskingFunctionObj))
             {
                 maskingFunction = (string)maskingFunctionObj;
+                if (!Properties.Get(nameof(MaskingFunction)).Dirty)
+                {
+                    // SQL Server returns doubled apostrophes. Undo that escaping so SqlString does not double them again.
+                    maskingFunction = maskingFunction.Replace("''", "'");
+                }
                 // We no longer validate masking functions on the client.
                 // When SQL Server adds new ones we don't want to have to update SMO to support them.
             }

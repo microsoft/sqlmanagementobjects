@@ -181,9 +181,23 @@ namespace Microsoft.SqlServer.Management.XEvent
                     throw new XEventException(ExceptionTemplates.FileNotExist);
                 }
 
-                XmlDocument doc = new XmlDocument();
-                doc.Load(fileName);
-                XmlSchema schema = XmlSchema.Read(new StringReader(XsdResource.xeconfig), null);
+                var doc = new XmlDocument
+                {
+                    XmlResolver = null
+                };
+
+                var settings = new XmlReaderSettings
+                {
+                    DtdProcessing = DtdProcessing.Prohibit,
+                    XmlResolver = null
+                };
+
+                using (var reader = XmlReader.Create(fileName, settings))
+                {
+                    doc.Load(reader);
+                }
+
+                var schema = XmlSchema.Read(new StringReader(XsdResource.xeconfig), null);
                 doc.Schemas.Add(schema);
                 doc.Validate(null);
 

@@ -482,7 +482,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
                 firstColumn = false;
 
-                columnNameSQL.Append(String.Format(CultureInfo.InvariantCulture, "[{0}]", col.Name));
+                columnNameSQL.Append(SqlSmoObject.MakeSqlBraket(col.Name));
                 selectSQL.Append(FormatValueByTypeForSelect(col));
             }
         }
@@ -608,6 +608,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private string FormatValueByTypeForSelect(Column col)
         {
             string formattedValue = string.Empty;
+            string bracketQuotedName = SqlSmoObject.MakeSqlBraket(col.Name);
 
             SqlDataType sqlDataType = col.UnderlyingSqlDataType;
             // SMO_NEW_DATATYPE
@@ -622,7 +623,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 case SqlDataType.DateTimeOffset:
                 case SqlDataType.Date:
                 case SqlDataType.SmallDateTime:
-                    formattedValue = String.Format(CultureInfo.InvariantCulture, "[{0}]", col.Name);
+                    formattedValue = bracketQuotedName;
                     break;
 
                 case SqlDataType.Variant:
@@ -632,12 +633,12 @@ namespace Microsoft.SqlServer.Management.Smo
                     // later for explicit casting, so we make sure underlying types across databases are preserved
                     // the third column is the collation that is used when scripting out char,varchar, and text data
                     //
-                    formattedValue = String.Format(CultureInfo.InvariantCulture,
-                        "[{0}], SQL_VARIANT_PROPERTY([{0}], N'basetype'), SQL_VARIANT_PROPERTY([{0}], N'Collation')", col.Name);
+                    formattedValue =
+                        $"{bracketQuotedName}, SQL_VARIANT_PROPERTY({bracketQuotedName}, N'basetype'), SQL_VARIANT_PROPERTY({bracketQuotedName}, N'Collation')";
                     break;
 
                 default:
-                    formattedValue = String.Format(CultureInfo.InvariantCulture, "[{0}]", col.Name);
+                    formattedValue = bracketQuotedName;
                     break;
             }
 
@@ -1094,5 +1095,3 @@ namespace Microsoft.SqlServer.Management.Smo
         #endregion
     }
 }
-
-

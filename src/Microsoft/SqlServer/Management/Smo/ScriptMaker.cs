@@ -1122,7 +1122,7 @@ namespace Microsoft.SqlServer.Management.Smo
         private void ScriptCreateUnresolvedEntity(Urn urn, ref ObjectScriptingType scriptType)
         {
             StringCollection createCollection = new StringCollection();
-            string comment = string.Format(SmoApplication.DefaultCulture, @"/****** Cannot script Unresolved Entities : {0} ******/", urn.Parent.Parent.ToString());
+            string comment = $"/****** Cannot script Unresolved Entities : {SmoUtility.EscapeSqlBlockComment(urn.Parent.Parent.ToString())} ******/";
             createCollection.Add(comment);
             ScriptObjectToWriter(createCollection, urn.Parent);
             scriptType = ObjectScriptingType.Comment;

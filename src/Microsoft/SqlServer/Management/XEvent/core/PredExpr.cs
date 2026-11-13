@@ -6,7 +6,7 @@
 // expression.
 
 using System.Globalization;
-
+using System.IO;
 using System.Text;
 using System.Xml;
 
@@ -35,8 +35,21 @@ namespace Microsoft.SqlServer.Management.XEvent
             }
 
             xeStore = store;
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(predicateXml);
+
+            var doc = new XmlDocument
+            {
+                XmlResolver = null
+            };
+
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null
+            };
+
+            using var textReader = new StringReader(predicateXml);
+            using var reader = XmlReader.Create(textReader, settings);
+            doc.Load(reader);
 
             XmlElement root = (XmlElement)doc.FirstChild;
             return RecursiveTraverse(root);

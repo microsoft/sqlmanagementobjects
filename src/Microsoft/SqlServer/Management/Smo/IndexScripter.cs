@@ -3172,8 +3172,8 @@ namespace Microsoft.SqlServer.Management.Smo
                             }
                             newNamespaces = true; // There is at least one added namespace
 
-                            sbNamespaces.AppendFormat(SmoApplication.DefaultCulture, "'{0}' as {1}",
-                                ns.Uri, ns.Name);
+                            sbNamespaces.AppendFormat(SmoApplication.DefaultCulture, "{0} as {1}",
+                                MakeSqlString(ns.Uri), ns.Name);
                         }
                     }
                     if (newNamespaces)
@@ -3253,13 +3253,13 @@ namespace Microsoft.SqlServer.Management.Smo
                         IndexedXmlPathNamespace xmlNamespace = this.index.IndexedXmlPathNamespaces[i];
                         if(xmlNamespace.GetPropValueOptional<bool>("IsDefaultUri",false))
                         {
-                            sb.AppendFormat(SmoApplication.DefaultCulture, "DEFAULT '{0}'",
-                                xmlNamespace.Uri);
+                            sb.AppendFormat(SmoApplication.DefaultCulture, "DEFAULT {0}",
+                                MakeSqlString(xmlNamespace.Uri));
                         }
                         else
                         {
-                            sb.AppendFormat(SmoApplication.DefaultCulture, "'{0}' as {1}",
-                                xmlNamespace.Uri, xmlNamespace.Name);
+                            sb.AppendFormat(SmoApplication.DefaultCulture, "{0} as {1}",
+                                MakeSqlString(xmlNamespace.Uri), xmlNamespace.Name);
                         }
 
                         if (i != xmlNamespacesCount - 1)
@@ -3321,7 +3321,7 @@ namespace Microsoft.SqlServer.Management.Smo
                  *
                  */
                 // <path_name>
-                sb.AppendFormat(SmoApplication.DefaultCulture, "{0} = '{1}'", MakeSqlBraket(path.Name), path.Path);
+                sb.AppendFormat(SmoApplication.DefaultCulture, "{0} = {1}", MakeSqlBraket(path.Name), MakeSqlString(path.Path));
 
                 // XQUERY VS SQL
                 if (!path.GetPropValueOptional<IndexedXmlPathType>("PathType").HasValue)
@@ -3340,7 +3340,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     }
                     else if (!string.IsNullOrEmpty(path.GetPropValueOptional<string>("XQueryTypeDescription", string.Empty)))
                     {
-                        sb.AppendFormat(SmoApplication.DefaultCulture, " as XQUERY '{0}'", path.XQueryTypeDescription);
+                        sb.AppendFormat(SmoApplication.DefaultCulture, " as XQUERY {0}", MakeSqlString(path.XQueryTypeDescription));
 
                         // [MAXLENGTH(x)]
                         if (path.GetPropValueOptional<int>("XQueryMaxLength").HasValue)

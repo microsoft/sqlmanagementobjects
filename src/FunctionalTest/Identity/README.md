@@ -21,11 +21,6 @@ Add a credential with these settings:
 Issuer: `https://vstoken.dev.azure.com/<ADO project id>`
 Subject identifier: `sc://<ADO org name>/<ADO project name>/<service connection name>`
 
-Example, for the `DacFxTests` service connection in the msdata SQLToolsAndLibraries project:
-
-Issuer: `https://vstoken.dev.azure.com/8b119ea1-2e2a-4839-8db7-8c9e8d50f6fa`
-Subject identifier: `sc://msdata/SQLToolsAndLibraries/DacFxTests`
-
 ### Add the service connection to your pipeline
 
 Use a standard task like `AzureCLI@2` to tell ADO to expose the service connection endpoint to your pipeline. Skip this step if you are using managed identity.
@@ -37,7 +32,7 @@ Example template:
 parameters:
   - name: smoTestServiceConnectionName
     type: string
-    default: 'DacFxTests'
+    default: 'YourServiceConnection'
   - name: clientIdVarName
     type: string
     default: 'AZURE_CLIENT_ID'

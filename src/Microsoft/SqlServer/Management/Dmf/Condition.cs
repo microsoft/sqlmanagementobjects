@@ -1032,8 +1032,8 @@ namespace Microsoft.SqlServer.Management.Dmf
                 }
                 else
                 {
-                    // NOTE: ConvertUrnToPath escapes */ so injection is not possible here
-                    header = "/*  Scripting: '" + SfcSqlPathUtilities.ConvertUrnToPath(((SqlSmoObject)target).Urn) + "'  */ ";
+                    var targetPath = SfcSqlPathUtilities.ConvertUrnToPath(((SqlSmoObject)target).Urn);
+                    header = $"/*  Scripting: '{SmoUtility.EscapeSqlBlockComment(targetPath)}'  */ ";
                 }
 
                 // Evaluate directly - don't want to raise events

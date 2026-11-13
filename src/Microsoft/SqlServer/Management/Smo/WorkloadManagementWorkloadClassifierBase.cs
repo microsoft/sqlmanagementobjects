@@ -224,12 +224,12 @@ namespace Microsoft.SqlServer.Management.Smo
         {
             StringBuilder parameters = new StringBuilder(Globals.INIT_BUFFER_SIZE);
 
-            GetParameter(parameters, so, "GroupName", "WORKLOAD_GROUP='{0}'", ref count);
-            GetParameter(parameters, so, "MemberName", "MEMBERNAME='{0}'", ref count);
-            GetParameter(parameters, so, "WlmLabel", "WLM_LABEL='{0}'", ref count);
-            GetParameter(parameters, so, "WlmContext", "WLM_CONTEXT='{0}'", ref count);
-            GetParameter(parameters, so, "StartTime", "START_TIME='{0}'", ref count);
-            GetParameter(parameters, so, "EndTime", "END_TIME='{0}'", ref count);
+            GetClassifierStringParameter(parameters, so, nameof(GroupName), "WORKLOAD_GROUP={0}", ref count);
+            GetClassifierStringParameter(parameters, so, nameof(MemberName), "MEMBERNAME={0}", ref count);
+            GetClassifierStringParameter(parameters, so, nameof(WlmLabel), "WLM_LABEL={0}", ref count);
+            GetClassifierStringParameter(parameters, so, nameof(WlmContext), "WLM_CONTEXT={0}", ref count);
+            GetClassifierStringParameter(parameters, so, nameof(StartTime), "START_TIME={0}", ref count);
+            GetClassifierStringParameter(parameters, so, nameof(EndTime), "END_TIME={0}", ref count);
             GetImportanceTSql(parameters, ref count);
 
             if (0 < count)
@@ -239,6 +239,25 @@ namespace Microsoft.SqlServer.Management.Smo
                 sb.AppendFormat(SmoApplication.DefaultCulture,
                     " WITH({0})",
                     parameters.ToString());
+            }
+        }
+
+        private void GetClassifierStringParameter(StringBuilder buffer, ScriptingPreferences sp, string propertyName,
+            string sqlPropScript, ref int count)
+        {
+            Property property = Properties.Get(propertyName);
+            // Unlike GetStringParameter, classifier options must retain empty strings during CREATE.
+            if (property.Value != null && (!sp.ScriptForAlter || property.Dirty))
+            {
+                if (count++ > 0)
+                {
+                    buffer.Append(Globals.commaspace);
+                    buffer.Append(Globals.newline);
+                    buffer.Append(Globals.tab);
+                    buffer.Append(Globals.tab);
+                }
+
+                buffer.AppendFormat(SmoApplication.DefaultCulture, sqlPropScript, MakeSqlString((string)property.Value));
             }
         }
     }

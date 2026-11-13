@@ -380,7 +380,7 @@ namespace Microsoft.SqlServer.Management.Smo
                         backupScriptAdded = true;
                     }
                     // force the database to be single user
-                    string query = string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] SET {1} WITH ROLLBACK IMMEDIATE", this.DatabaseName, "SINGLE_USER");
+                    var query = $"ALTER DATABASE {SqlSmoObject.MakeSqlBraket(this.DatabaseName)} SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
                     script.Add(query);
                 }
             }
@@ -443,7 +443,7 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     oldUserAccessStr = "RESTRICTED_USER";
                 }
-                string query = string.Format(SmoApplication.DefaultCulture, "ALTER DATABASE [{0}] SET {1}", this.DatabaseName, oldUserAccessStr);
+                string query = $"ALTER DATABASE {SqlSmoObject.MakeSqlBraket(this.DatabaseName)} SET {oldUserAccessStr}";
                 script.Add(query);
             }
         }

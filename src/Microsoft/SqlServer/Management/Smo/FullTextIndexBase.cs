@@ -264,7 +264,7 @@ namespace Microsoft.SqlServer.Management.Smo
                                 string language = (string)propLan;
                                 if (language.Length > 0)
                                 {
-                                    sb.AppendFormat(SmoApplication.DefaultCulture, @" LANGUAGE '{0}'", SqlBraket(language));
+                                    sb.AppendFormat(SmoApplication.DefaultCulture, @" LANGUAGE {0}", MakeSqlString(language));
                                 }
                             }
                         }
@@ -1060,6 +1060,4 @@ namespace Microsoft.SqlServer.Management.Smo
     }
 
 }
-
-
 

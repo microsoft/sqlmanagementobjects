@@ -322,7 +322,7 @@ namespace Microsoft.SqlServer.Management.Smo
             {
                 if (!String.IsNullOrEmpty(m_databaseName))
                 {
-                    parameters.Add(String.Format(SmoApplication.DefaultCulture, "@database_name = {0}", m_databaseName));
+                    parameters.Add(String.Format(SmoApplication.DefaultCulture, "@database_name = {0}", SqlSmoObject.MakeSqlString(m_databaseName)));
                 }
 
                 Property backupRetentionPeriod = Properties.Get("BackupRetentionPeriodInDays");
@@ -341,7 +341,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (credentialName.Dirty || !sp.ScriptForAlter)
                     {
                         // script credential name
-                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@credential_name = N'{0}'", credentialName.Value.ToString()));
+                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@credential_name = {0}", SqlSmoObject.MakeSqlString(credentialName.Value.ToString())));
                     }
                 }
 
@@ -351,7 +351,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (storageUrl.Dirty || !sp.ScriptForAlter)
                     {
                         // script storage url
-                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@storage_url = N'{0}'", storageUrl.Value.ToString()));
+                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@storage_url = {0}", SqlSmoObject.MakeSqlString(storageUrl.Value.ToString())));
                     }
                 }
 
@@ -361,7 +361,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (encryptionAlgorithm.Dirty || !sp.ScriptForAlter)
                     {
                         // script encryption algorithm
-                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@encryption_algorithm = N'{0}'", encryptionAlgorithm.Value.ToString()));
+                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@encryption_algorithm = {0}", SqlSmoObject.MakeSqlString(encryptionAlgorithm.Value.ToString())));
                     }
                 }
 
@@ -371,7 +371,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (encryptorType.Dirty || !sp.ScriptForAlter)
                     {
                         // script encryptor type
-                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@encryptor_type = N'{0}'", encryptorType.Value.ToString()));
+                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@encryptor_type = {0}", SqlSmoObject.MakeSqlString(encryptorType.Value.ToString())));
                     }
                 }
 
@@ -381,7 +381,7 @@ namespace Microsoft.SqlServer.Management.Smo
                     if (encryptorName.Dirty || !sp.ScriptForAlter)
                     {
                         // script encryptor name
-                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@encryptor_name = N'{0}'", encryptorName.Value.ToString()));
+                        parameters.Add(String.Format(SmoApplication.DefaultCulture, "@encryptor_name = {0}", SqlSmoObject.MakeSqlString(encryptorName.Value.ToString())));
                     }
                 }
             }
@@ -455,8 +455,8 @@ namespace Microsoft.SqlServer.Management.Smo
                         encryption_algorithm,
                         encryptor_type,
                         encryptor_name
-                    FROM  [msdb].[smart_admin].[fn_backup_db_config]('{0}')",
-                this.m_databaseName);
+                    FROM  [msdb].[smart_admin].[fn_backup_db_config]({0})",
+                SqlSmoObject.MakeSqlString(this.m_databaseName));
 
             DataSet ds = ExecutionManager.ExecuteWithResults(databaseBackupQuery);
             DataTable dt = null;
@@ -540,4 +540,3 @@ namespace Microsoft.SqlServer.Management.Smo
         #endregion
     }
 }
-

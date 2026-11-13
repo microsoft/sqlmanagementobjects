@@ -331,7 +331,7 @@ IF @RoleName <> N'public' and (select is_fixed_role from sys.server_principals w
         public static readonly string INCLUDE_EXISTS_XML_COLLECTION = "IF {0} EXISTS (SELECT * FROM sys.xml_schema_collections c, sys.schemas s WHERE c.schema_id = s.schema_id AND (quotename(s.name) + '.' + quotename(c.name)) = N'{1}')";
 
         public static readonly string INCLUDE_EXISTS_SYNONYM = "IF {0} EXISTS (SELECT * FROM sys.synonyms WHERE name = {1} AND schema_id = SCHEMA_ID({2}))";
-        public static readonly string INCLUDE_EXISTS_SECURITY_POLICY = "IF {0} EXISTS (SELECT * FROM sys.security_policies WHERE name = '{1}')";
+        public static readonly string INCLUDE_EXISTS_SECURITY_POLICY = "IF {0} EXISTS (SELECT * FROM sys.security_policies WHERE name = {1} AND schema_id = SCHEMA_ID({2}))";
         public static readonly string INCLUDE_EXISTS_SECURITY_PREDICATE = "IF {0} EXISTS (SELECT * FROM sys.security_predicates WHERE target_object_id = {1} and object_id = {2})";
         public static readonly string INCLUDE_EXISTS_SEQUENCE = "IF {0} EXISTS (SELECT * FROM sys.sequences WHERE name = {1} AND schema_id = SCHEMA_ID({2}))";
         public static readonly string INCLUDE_EXISTS_COLUMN_MASTER_KEY = "IF {0} EXISTS (SELECT * FROM sys.column_master_keys WHERE name = {1})";
@@ -522,4 +522,3 @@ if (@schema_uid is not null and     -- schema is present
         public static readonly string InstanceNameSeparator = " ";
     }
 }
-

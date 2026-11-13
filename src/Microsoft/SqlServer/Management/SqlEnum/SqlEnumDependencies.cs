@@ -344,6 +344,21 @@ namespace Microsoft.SqlServer.Management.Smo
             m_tempDependencies = new SortedList();
         }
 
+        internal static string GetDependencyScriptResourceFileName(ServerVersion targetVersion, bool isDbCloud)
+        {
+            if (isDbCloud)
+            {
+                return "CloudDependency.sql";
+            }
+
+            if (targetVersion.Major < 12)
+            {
+                throw new InvalidVersionEnumeratorException(StringSqlEnumerator.FormatInvalidVersion(targetVersion.ToString()));
+            }
+
+            return "SQL12Dependency.sql";
+        }
+
         bool isCloud = false;
         private bool IsDbCloud
         {
@@ -453,6 +468,8 @@ namespace Microsoft.SqlServer.Management.Smo
             m_ci = ci;
             m_targetVersion = ExecuteSql.GetServerVersion(m_ci);
             IsDbCloud = (ExecuteSql.GetDatabaseEngineType(ci) == DatabaseEngineType.SqlAzureDatabase);
+            string resourceFileName = GetDependencyScriptResourceFileName(m_targetVersion, IsDbCloud);
+
             SqlRequest sr = new SqlRequest();
 
             sr.ResultType = ResultType.Reserved1;
@@ -603,34 +620,6 @@ namespace Microsoft.SqlServer.Management.Smo
 
             queries.Add("COMMIT TRANSACTION");
 
-            string resourceFileName = string.Empty;
-            if (IsDbCloud)
-            {
-                resourceFileName = "CloudDependency.sql";
-            }
-            else
-            {
-                if (m_targetVersion.Major <= 8)
-                {
-                    resourceFileName = "ShilohDependency.sql";
-                }
-                else if (m_targetVersion.Major == 9)
-                {
-                    resourceFileName = "YukonDependency.sql";
-                }
-                else if (m_targetVersion.Major == 10)
-                {
-                    resourceFileName = "KatmaiDependency.sql";
-                }
-                else if (m_targetVersion.Major < 13)
-                {
-                    resourceFileName = "SQL11Dependency.sql";
-                }
-                else
-                {
-                    resourceFileName = "SQL13Dependency.sql";
-                }
-            }
             String sp = String.Format(CultureInfo.InvariantCulture, 
                 "declare @find_referencing_objects int\nset @find_referencing_objects = {0}\n",
                 rd.ParentDependencies ? 0 : 1);
