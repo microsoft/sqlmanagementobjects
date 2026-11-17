@@ -4627,6 +4627,7 @@ set nocount off;
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, HostPlatform = HostPlatformNames.Windows, Edition = DatabaseEngineEdition.Enterprise, MinMajor = 11)]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)]
         public void SmoTable_enumerating_twenty_thousand_tables_with_scripting_properties_runs_quickly()
         {
             ExecuteTest(() =>

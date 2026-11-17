@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Test.IdentityUnitTests</RootNamespace>
+    <OutputPath>$(BaseOutputPath)\IdentityUnitTests\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(EnlistmentRoot)\src\TestReferences.proj"/>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FunctionalTest\Identity\Microsoft.SqlServer.ADO.Identity.csproj" />
+  </ItemGroup>
+</Project>

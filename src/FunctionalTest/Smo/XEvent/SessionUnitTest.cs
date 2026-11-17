@@ -6,6 +6,7 @@ using System;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.XEvent;
+using Microsoft.SqlServer.Test.Manageability.Utils;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
@@ -241,14 +242,13 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
             target.TargetFields["max_memory"].Value = 8192;
 
             string sql = session.ScriptCreate().ToString();
-            Assert.AreEqual(@"CREATE EVENT SESSION [ut1] ON DATABASE 
-ADD EVENT sqlserver.rpc_starting(
-    ACTION(sqlserver.sql_text))
-ADD TARGET package0.ring_buffer(SET max_memory=(8192))
-", sql);
-            sql = session.ScriptDrop().ToString();
-            sql = sql.Remove(sql.LastIndexOf("\r\n", StringComparison.Ordinal)).TrimEnd();
-            Assert.AreEqual("DROP EVENT SESSION [" + name + "] ON DATABASE", sql);
+            var expected = $"CREATE EVENT SESSION [ut1] ON DATABASE {Environment.NewLine}" +
+                $"ADD EVENT sqlserver.rpc_starting({Environment.NewLine}" +
+                $"    ACTION(sqlserver.sql_text)){Environment.NewLine}" +
+                $"ADD TARGET package0.ring_buffer(SET max_memory=(8192)){Environment.NewLine}";
+            Assert.That(sql.FixNewLines(), Is.EqualTo(expected), "CREATE EVENT SESSION script");
+            sql = session.ScriptDrop().ToString().TrimEnd();
+            Assert.That(sql, Is.EqualTo("DROP EVENT SESSION [" + name + "] ON DATABASE"), "DROP EVENT SESSION script");
         }
 
         /// <summary>

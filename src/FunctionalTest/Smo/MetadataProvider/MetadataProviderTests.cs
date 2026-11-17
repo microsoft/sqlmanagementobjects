@@ -32,6 +32,7 @@ namespace Microsoft.SqlServer.Test.SMO.MetadataProvider
         [TestMethod]
         [UnsupportedDatabaseEngineType(DatabaseEngineType.Standalone)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDatabaseEdge)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Contained-user authentication fails in the container.
         public void When_user_has_no_access_to_master_CreateConnectedProvider_succeeds()
         {
             ExecuteWithDbDrop((db) =>

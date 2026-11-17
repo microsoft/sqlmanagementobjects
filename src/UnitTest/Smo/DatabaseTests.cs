@@ -127,6 +127,112 @@ Unexpected Collection Types :
             Assert.That(script.Cast<string>(), Is.EqualTo(new[] { "CREATE DATABASE [dbname]" }), "database.Script() in design mode");
         }
 
+        [TestCategory("Unit")]
+        [DataTestMethod]
+        [DataRow(DatabaseEngineType.SqlAzureDatabase, -978196525L, 596, true)]
+        [DataRow(DatabaseEngineType.SqlAzureDatabase, 1674378470L, 596, false)]
+        [DataRow(DatabaseEngineType.SqlAzureDatabase, 0L, 596, false)]
+        [DataRow(DatabaseEngineType.Standalone, -978196525L, 596, false)]
+        [DataRow(DatabaseEngineType.SqlAzureDatabase, -978196525L, 3702, false)]
+        [DataRow(DatabaseEngineType.SqlAzureDatabase, -978196525L, -2, false)]
+        [DataRow(DatabaseEngineType.SqlAzureDatabase, -978196525L, 50000, false)]
+        public void Database_expected_container_drop_error_requires_container_identity(
+            DatabaseEngineType engineType, long editionId, int errorNumber, bool expected)
+        {
+            var server = ServerTests.GetDesignModeServer(12, engineType);
+            server.ConnectionContext.EditionID = editionId;
+            var database = new Database(server, "DropErrorDatabase");
+
+            Assert.That(database.IsExpectedContainerDropError(errorNumber), Is.EqualTo(expected),
+                $"Container DROP error handling for engine {engineType}, EditionID {editionId}, error {errorNumber}");
+        }
+
+        [TestCategory("Unit")]
+        [DataTestMethod]
+        [DataRow(-978196525L, false, false)]
+        [DataRow(-978196525L, true, false)]
+        [DataRow(1674378470L, false, true)]
+        [DataRow(1674378470L, true, true)]
+        [DataRow(0L, false, true)]
+        [DataRow(0L, true, true)]
+        public void Database_ScriptCreate_omits_service_tier_only_for_AzureSqlDbContainer(
+            long editionId, bool existingDatabase, bool expectServiceTier)
+        {
+            var server = ServerTests.GetDesignModeServer(12, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase);
+            server.ConnectionContext.EditionID = editionId;
+            var database = new Database(server, "ContainerDatabase", DatabaseEngineEdition.SqlDatabase)
+            {
+                AzureEdition = "Hyperscale",
+                AzureServiceObjective = "HS_Gen5_8",
+                MaxSizeInBytes = 1024.0 * 1024 * 1024,
+                CatalogCollation = CatalogCollationType.DatabaseDefault,
+                IsLedger = false
+            };
+            if (existingDatabase)
+            {
+                database.SetState(SqlSmoState.Existing);
+            }
+
+            var statements = database.Script().Cast<string>().ToArray();
+            var expectedOptions = expectServiceTier
+                ? "EDITION = 'Hyperscale', SERVICE_OBJECTIVE = 'HS_Gen5_8', MAXSIZE = 1 GB"
+                : "MAXSIZE = 1 GB";
+            var expected = $"CREATE DATABASE [ContainerDatabase]  ({expectedOptions}) WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF;{System.Environment.NewLine}";
+
+            Assert.That(statements.Where(statement => statement.StartsWith("CREATE DATABASE", StringComparison.Ordinal)),
+                Is.EqualTo(new[] { expected }), $"CREATE script for EditionID {editionId}, existing database: {existingDatabase}");
+            Assert.That(database.AzureEdition, Is.EqualTo("Hyperscale"), "Scripting must not change the stored edition");
+            Assert.That(database.AzureServiceObjective, Is.EqualTo("HS_Gen5_8"), "Scripting must not change the stored service objective");
+        }
+
+        [TestCategory("Unit")]
+        [DataTestMethod]
+        [DataRow(-978196525L)]
+        [DataRow(1674378470L)]
+        public void Database_ScriptCreate_to_SqlDataWarehouse_retains_required_service_tier(long editionId)
+        {
+            var server = ServerTests.GetDesignModeServer(12, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase);
+            server.ConnectionContext.EditionID = editionId;
+            var database = new Database(server, "WarehouseTarget", DatabaseEngineEdition.SqlDatabase);
+            var options = new ScriptingOptions
+            {
+                TargetDatabaseEngineType = DatabaseEngineType.SqlAzureDatabase,
+                TargetDatabaseEngineEdition = DatabaseEngineEdition.SqlDataWarehouse
+            };
+
+            var statements = database.Script(options).Cast<string>().ToArray();
+
+            Assert.That(statements, Has.Some.Contains("EDITION = 'DataWarehouse', SERVICE_OBJECTIVE = 'DW100c'"),
+                "Cross-scripting to SQL DW must retain its required provisioning parameters");
+        }
+
+        [TestCategory("Unit")]
+        [DataTestMethod]
+        [DataRow(-978196525L, false)]
+        [DataRow(1674378470L, true)]
+        public void Database_ScriptCreate_for_direct_execution_filters_container_service_tier(long editionId, bool expectServiceTier)
+        {
+            var server = ServerTests.GetDesignModeServer(12, DatabaseEngineType.SqlAzureDatabase, DatabaseEngineEdition.SqlDatabase);
+            server.ConnectionContext.EditionID = editionId;
+            var database = new Database(server, "DirectDatabase", DatabaseEngineEdition.SqlDatabase)
+            {
+                AzureEdition = "GeneralPurpose",
+                AzureServiceObjective = "GP_Gen5_2"
+            };
+            var preferences = database.GetScriptingPreferencesForCreate();
+            preferences.ForDirectExecution = true;
+            var statements = new StringCollection();
+
+            database.ScriptCreate(statements, preferences);
+
+            var expectedOptions = expectServiceTier
+                ? "(EDITION = 'GeneralPurpose', SERVICE_OBJECTIVE = 'GP_Gen5_2')"
+                : string.Empty;
+            Assert.That(statements.Cast<string>(), Is.EqualTo(new[]
+            {
+                $"CREATE DATABASE [DirectDatabase]  {expectedOptions};{System.Environment.NewLine}"
+            }), $"Direct CREATE script for EditionID {editionId}");
+        }
 
         [TestCategory("Unit")]
         [TestMethod]

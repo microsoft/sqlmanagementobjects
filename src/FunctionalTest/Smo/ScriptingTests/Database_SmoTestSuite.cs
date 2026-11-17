@@ -245,6 +245,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.SqlOnDemand)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // The container does not expose the hosted dbmanager role.
         public void Trying_To_Access_AzureDB_With_DBManager_Role_Only_Does_Not_Throw()
         {
             // We use the ExecuteWithMasterDb() overload to get back "master", so we can create a "low-privileged" login/user
@@ -400,6 +401,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Changing the service tier is not supported by the container.
         public void SmoDatabaseScriptAlter_AllServers()
         {
             this.ExecuteWithDbDrop(
@@ -548,6 +550,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
             Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // The container rejects this SMO database-create path.
         public void CatalogCollation_IsScriptedCorrectly()
         {
             this.ExecuteTest(server => TestCatalogCollationType(server, CatalogCollationType.DatabaseDefault));
@@ -585,13 +588,17 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                         db = new Database(server, dbName);
                         db.Create();
 
-                        // Generate database creation script
+                        // Keep the generated statements in separate batches so Managed Instance can resolve the
+                        // new database before a subsequent USE statement executes.
                         //
-                        var createDatabaseScript = db.Script().ToSingleString();
+                        var createDatabaseScript = db.Script();
 
                         // Replace database name with a new one in a generated script
                         //
-                        createDatabaseScript = createDatabaseScript.Replace(dbName, newDbName);
+                        for (var statementIndex = 0; statementIndex < createDatabaseScript.Count; statementIndex++)
+                        {
+                            createDatabaseScript[statementIndex] = createDatabaseScript[statementIndex].Replace(dbName, newDbName);
+                        }
 
                         // Try to create a new database
                         //
@@ -1288,6 +1295,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)]
         public void Database_DBComparerTest()
         {
             this.ExecuteTest(
@@ -1370,6 +1378,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase, MinMajor = 12)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)]
         public void Database_Rename_Does_Not_Break_Functionality()
         {
             ExecuteWithDbDrop((db) =>
@@ -1475,6 +1484,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedDatabaseEngineEdition(DatabaseEngineEdition.SqlOnDemand, DatabaseEngineEdition.SqlDataWarehouse, DatabaseEngineEdition.Express)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // The container does not preserve LEDGER = ON during database creation.
         public void Database_IsLedger_On()
         {
             this.ExecuteTest(

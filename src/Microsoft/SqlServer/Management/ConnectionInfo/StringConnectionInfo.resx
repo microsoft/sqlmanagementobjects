@@ -206,6 +206,9 @@
   <data name="SqlAzureArcManagedInstanceEdition" xml:space="preserve">
     <value>Microsoft Azure Arc SQL Managed Instance Edition</value>
   </data>
+  <data name="SqlDatabaseInFabricEdition" xml:space="preserve">
+    <value>Microsoft Fabric SQL Database Edition</value>
+  </data>
   <data name="SqlAzureDatabase" xml:space="preserve">
     <value>Microsoft Azure SQL Database</value>
   </data>

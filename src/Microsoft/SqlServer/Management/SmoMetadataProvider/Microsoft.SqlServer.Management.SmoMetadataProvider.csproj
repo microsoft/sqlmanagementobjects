@@ -5,6 +5,7 @@
     <RootNamespace>Microsoft.SqlServer.Management.SmoMetadataProvider</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.SqlServer.Test.SmoUnitTests" Key="$(RealPublicKey)" />
     <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
     <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
     <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />

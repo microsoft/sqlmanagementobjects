@@ -91,13 +91,13 @@ namespace Microsoft.SqlServer.Management.Common
         Personal = 0x000001,
 
         /// <summary>
-        /// Standard (For Standard, Web, and Business Intelligence.)
+        /// Standard (For Standard, Standard Developer, Web, and Business Intelligence.)
         /// </summary>
         [CommonDisplayNameKey("StandardEdition")]
         Standard = 0x000002,
 
         /// <summary>
-        /// Enterprise (For Evaluation, Developer, and Enterprise editions.)
+        /// Enterprise (For Enterprise, Enterprise Developer, Developer, and Evaluation editions.)
         /// </summary>
         [CommonDisplayNameKey("EnterpriseEdition")]
         Enterprise = 0x000003,
@@ -145,10 +145,16 @@ namespace Microsoft.SqlServer.Management.Common
         SqlAzureArcManagedInstance = 0x00000A,
 
         /// <summary>
-        /// Azure Synapse serverless SQL pool (SQL OnDemand)
+        /// Azure Synapse serverless SQL pool or Microsoft Fabric
         /// </summary>
         [CommonDisplayNameKey("SqlOnDemandEdition")]
         SqlOnDemand = 0x00000B,
+
+        /// <summary>
+        /// Microsoft Fabric SQL database
+        /// </summary>
+        [CommonDisplayNameKey("SqlDatabaseInFabricEdition")]
+        SqlDatabaseInFabric = 0x00000C,
 
         /*
         * NOTE: If you're adding new value here,
@@ -392,6 +398,7 @@ namespace Microsoft.SqlServer.Management.Common
                     yield return DatabaseEngineEdition.SqlDatabase;
                     yield return DatabaseEngineEdition.SqlDataWarehouse;
                     yield return DatabaseEngineEdition.SqlOnDemand;
+                    yield return DatabaseEngineEdition.SqlDatabaseInFabric;
                     break;
                 case DatabaseEngineType.Standalone:
                     yield return DatabaseEngineEdition.Personal;

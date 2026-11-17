@@ -44,7 +44,7 @@ namespace Microsoft.SqlServer.Management.Common
                 if (RebuildConnectionStringInternal)
                 {
                     ConnectionStringInternal = EncryptionUtility.EncryptString(String.Format(System.Globalization.CultureInfo.InvariantCulture,
-                                                                                             "server={0};", 
+                                                                                             "server={0};",
                                                                                              this.ServerName));
                     RebuildConnectionStringInternal = false;
                 }
@@ -103,4 +103,3 @@ namespace Microsoft.SqlServer.Management.Common
         }
     }
 }
-

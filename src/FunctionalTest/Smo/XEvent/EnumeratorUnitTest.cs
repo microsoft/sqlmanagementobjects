@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = NUnit.Framework.Assert;
 using NUnit.Framework;
 using System.Linq;
+using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 
 namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
 {
@@ -264,28 +265,28 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
         {
             request.Urn = this.storeUrn + "/Package[@Name='sqlserver']/EventInfo[@Name='allocation_ring_buffer_recorded']/EventColumnInfo[@Name='collect_call_stack']";
             result = enumerator.Process(connection, request);
+            DataTable dataTable = result;
 
-            
-            // sys.dm_xe_packages 
-            if (connection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
+            // The container exposes this metadata, unlike hosted Azure SQL Database.
+            if (connection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && !TestDescriptorContext.IsAzureSqlDbContainer)
             {
-                DataTable dataTable = result;
-                Assert.AreEqual(dataTable.Rows.Count, 0);
+                Assert.That(dataTable.Rows, Is.Empty, "Hosted Azure should hide collect_call_stack metadata");
             }
             else
             {
-                DataTable dataTable = result;
-                Assert.AreEqual(dataTable.Rows.Count, 1);
+                Assert.That(dataTable.Rows, Has.Count.EqualTo(1), $"Expected collect_call_stack metadata for {request.Urn}");
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    Assert.IsNotNull(row);
-                    Assert.AreEqual(0, row["ID"]);
-                    Assert.AreEqual("boolean", row["TypeName"]);
-                    Assert.AreEqual("package0", row["TypePackageName"]);
-                    Assert.AreEqual("false", row["Value"]);
-                    Assert.AreNotEqual(DBNull.Value, row["Description"]);
-                    Assert.AreEqual(65536, row["Capabilities"]);
-                    Assert.IsNotNull(row["CapabilitiesDesc"]);
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(row["ID"], Is.EqualTo(0), "collect_call_stack column ID");
+                        Assert.That(row["TypeName"], Is.EqualTo("boolean"), "collect_call_stack type");
+                        Assert.That(row["TypePackageName"], Is.EqualTo("package0"), "collect_call_stack type package");
+                        Assert.That(row["Value"], Is.EqualTo("false"), "collect_call_stack default value");
+                        Assert.That(row["Description"], Is.Not.EqualTo(DBNull.Value), "collect_call_stack description");
+                        Assert.That(row["Capabilities"], Is.EqualTo(65536), "collect_call_stack capabilities");
+                        Assert.That(row["CapabilitiesDesc"], Is.Not.Null, "collect_call_stack capability description");
+                    });
                 }
             }
         }
@@ -297,24 +298,27 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
         {
             request.Urn = this.storeUrn + "/Package[@Name='package0']/TargetInfo[@Name='pair_matching']";
             result = enumerator.Process(connection, request);
+            DataTable dataTable = result;
 
-            
-            // sys.dm_xe_packages 
-            if (connection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
+            if (connection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && !TestDescriptorContext.IsAzureSqlDbContainer)
             {
-                DataTable dataTable = result;
-                Assert.AreEqual(0, dataTable.Rows.Count, "Expected 0 rows for pair_matching target in azure");
+                Assert.That(dataTable.Rows, Is.Empty, "Hosted Azure should hide the pair_matching target");
             }
             else
             {
-                DataTable dataTable = result;
-                Assert.AreEqual(dataTable.Rows.Count, 1);
+                Assert.That(dataTable.Rows, Has.Count.EqualTo(1), $"Expected pair_matching target metadata for {request.Urn}");
+                var expectedCapabilities = TestDescriptorContext.IsAzureSqlDbContainer ? 264 : 256;
+                var expectedCapabilitiesDesc = TestDescriptorContext.IsAzureSqlDbContainer
+                    ? "mi_hidden process_whole_buffers"
+                    : "process_whole_buffers";
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    Assert.IsNotNull(row);
-                    Assert.AreEqual("Pairing target", row["Description"]);
-                    Assert.AreEqual(256, row["Capabilities"]);
-                    Assert.AreEqual("process_whole_buffers", row["CapabilitiesDesc"]);
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(row["Description"], Is.EqualTo("Pairing target"), "pair_matching description");
+                        Assert.That(row["Capabilities"], Is.EqualTo(expectedCapabilities), "pair_matching capabilities");
+                        Assert.That(row["CapabilitiesDesc"], Is.EqualTo(expectedCapabilitiesDesc), "pair_matching capability description");
+                    });
                 }
             }
         }
@@ -326,29 +330,27 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
         {
             request.Urn = this.storeUrn + "/Package[@Name='Package0']/TargetInfo[@Name='pair_matching']/TargetColumnInfo[@Name='end_event']";
             result = enumerator.Process(connection, request);
+            DataTable dataTable = result;
 
-            
-            // sys.dm_xe_packages 
-            if (connection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase)
+            if (connection.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase && !TestDescriptorContext.IsAzureSqlDbContainer)
             {
-                DataTable dataTable = result;
-                Assert.AreEqual(0, dataTable.Rows.Count, "Expected no data for pair_matching target in azure");
+                Assert.That(dataTable.Rows, Is.Empty, "Hosted Azure should hide pair_matching target columns");
             }
             else
             {
-                DataTable dataTable = result;
-                Assert.AreEqual(dataTable.Rows.Count, 1);
+                Assert.That(dataTable.Rows, Has.Count.EqualTo(1), $"Expected pair_matching end_event metadata for {request.Urn}");
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    Assert.IsNotNull(row);
-                    Assert.AreEqual(3, row["ID"]);
-                    Assert.AreEqual("unicode_string_ptr", row["TypeName"]);
-                    Assert.AreEqual("package0", row["TypePackageName"]);
-                    //Assert.AreEqual("customizable", row["ColumnType"]);
-                    Assert.AreEqual(System.DBNull.Value, row["Value"]);
-                    Assert.AreEqual("Event name specifying the ending event in a paired sequence", row["Description"]);
-                    Assert.AreEqual(1, row["Capabilities"]);
-                    Assert.AreEqual("mandatory", row["CapabilitiesDesc"]);
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(row["ID"], Is.EqualTo(3), "end_event column ID");
+                        Assert.That(row["TypeName"], Is.EqualTo("unicode_string_ptr"), "end_event type");
+                        Assert.That(row["TypePackageName"], Is.EqualTo("package0"), "end_event type package");
+                        Assert.That(row["Value"], Is.EqualTo(DBNull.Value), "end_event default value");
+                        Assert.That(row["Description"], Is.EqualTo("Event name specifying the ending event in a paired sequence"), "end_event description");
+                        Assert.That(row["Capabilities"], Is.EqualTo(1), "end_event capabilities");
+                        Assert.That(row["CapabilitiesDesc"], Is.EqualTo("mandatory"), "end_event capability description");
+                    });
                 }
             }
         }

@@ -27,7 +27,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         static public IList<TestServerDescriptor> TryLoadServerConnections()
         {
             var jsonFile = Environment.GetEnvironmentVariable("EnvironmentJsonFilePath");
-            if (jsonFile == null)
+            if (string.IsNullOrWhiteSpace(jsonFile))
             {
                 Trace.TraceInformation("EnvironmentJsonFilePath not set. Skipping json load path.");
                 return new List<TestServerDescriptor>();

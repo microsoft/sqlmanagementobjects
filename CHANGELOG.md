@@ -3,10 +3,16 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
-## 181.38.1
+## 181.46.0
 
+- Add read-only `Server.EditionID` and `Server.Information.EditionID` properties exposing `SERVERPROPERTY('EditionID')` as a 64-bit integer.
 - Restrict Policy-Based Management enum deserialization to trusted assemblies; generic and assembly-qualified type names are not supported.
+- Pin System.Security.Cryptography.Pkcs to patched versions 8.0.2 and 9.0.21 to address CVE-2026-84008.
+- Preserve vector dimensions and base types in SmoMetadataProvider data type lookups.
+- Upgrade Microsoft.SqlServer.Management.SqlParser to version 181.0.0.
 - Remove dependency discovery support for SQL Server 2012 and earlier.
+- Add support for Azure SQL DB containers
+- Add `DatabaseEngineEdition.SqlDatabaseInFabric` for the documented `SERVERPROPERTY('EngineEdition')` value 12.
 - Upgrade Microsoft.Data.SqlClient to version 6.1.6.
 
 ## 181.37.1

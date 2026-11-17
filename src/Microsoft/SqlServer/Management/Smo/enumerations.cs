@@ -410,12 +410,12 @@ namespace Microsoft.SqlServer.Management.Smo
         PersonalOrDesktopEngine = 0x000001,
 
         /// <summary>
-        /// Standard (For Standard, Web, and Business Intelligence.)
+        /// Standard (For Standard, Standard Developer, Web, and Business Intelligence.)
         /// </summary>
         Standard = 0x000002,
 
         /// <summary>
-        /// Enterprise (For Evaluation, Developer, and Enterprise editions.)
+        /// Enterprise (For Enterprise, Enterprise Developer, Developer, and Evaluation editions.)
         /// </summary>
         EnterpriseOrDeveloper = 0x000003,
 
@@ -458,9 +458,14 @@ namespace Microsoft.SqlServer.Management.Smo
         SqlAzureArcManagedInstance = 0x00000A,
 
         /// <summary>
-        /// Azure Synapse serverless SQL pool (SQL OnDemand)
+        /// Azure Synapse serverless SQL pool or Microsoft Fabric
         /// </summary>
         SqlOnDemand = 0x00000B,
+
+        /// <summary>
+        /// Microsoft Fabric SQL database
+        /// </summary>
+        SqlDatabaseInFabric = 0x00000C,
         /*
          * NOTE: If you're adding new value here,
          * please update as well ScriptDatabaseEngineEdition enum

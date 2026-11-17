@@ -101,5 +101,63 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                 script.StartsWith("CREATE SELECTIVE XML INDEX ") || script.StartsWith("ALTER INDEX ")).ToArray();
         }
 
+        /// <summary>
+        /// Verifies that checking XML compression state on SQL Server 2019 does not
+        /// attempt to read metadata for the unsupported XmlCompression property.
+        /// </summary>
+        [TestMethod]
+        public void PhysicalPartitionCollection_IsXmlCompressionStateDirty_returns_false_when_property_is_unsupported()
+        {
+            // SQL Server 2019 predates XML compression support.
+            var index = CreatePartitionedIndex(15);
+
+            Assert.That(
+                index.PhysicalPartitions.IsXmlCompressionStateDirty(1),
+                Is.False,
+                "XmlCompression dirty state should be false on SQL Server 2019 because the property is unsupported.");
+        }
+
+        /// <summary>
+        /// Verifies that the support guard still allows dirty XML compression state
+        /// to be detected on SQL Server 2022 and later.
+        /// </summary>
+        [TestMethod]
+        public void PhysicalPartitionCollection_IsXmlCompressionStateDirty_returns_true_when_supported_property_is_dirty()
+        {
+            var index = CreatePartitionedIndex(16);
+
+            // Changing the supported property must continue to mark the partition dirty.
+            index.PhysicalPartitions[0].XmlCompression = XmlCompressionType.On;
+
+            Assert.That(
+                index.PhysicalPartitions.IsXmlCompressionStateDirty(1),
+                Is.True,
+                "XmlCompression dirty state should be true after changing the supported property on SQL Server 2022.");
+        }
+
+        private static Index CreatePartitionedIndex(int serverMajorVersion)
+        {
+            // Design mode supplies version-aware metadata without requiring a live server.
+            var server = ServerTests.GetDesignModeServer(serverMajorVersion);
+            var database = new Database(server, "TestDatabase");
+            var table = new Table(database, "TestTable");
+            table.Columns.Add(new Column(table, "Id", DataType.Int));
+            table.SetState(SqlSmoState.Existing);
+
+            var index = new Index(table, "TestIndex")
+            {
+                IndexType = IndexType.ClusteredIndex
+            };
+            index.IndexedColumns.Add(new IndexedColumn(index, "Id"));
+
+            // The regression only needs one existing partition whose property bag can
+            // be inspected by the partition-rebuild scripting path.
+            var partition = new PhysicalPartition(index, 1, DataCompressionType.None);
+            index.PhysicalPartitions.Add(partition);
+            partition.SetState(SqlSmoState.Existing);
+            index.SetState(SqlSmoState.Existing);
+
+            return index;
+        }
     }
 }

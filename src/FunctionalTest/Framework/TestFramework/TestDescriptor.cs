@@ -21,6 +21,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         public IEnumerable<SqlFeature> EnabledFeatures { get; set; }
 
         /// <summary>
+        /// Whether this target is explicitly configured as an Azure SQL Database container.
+        /// </summary>
+        public bool IsAzureSqlDbContainer => EnabledFeatures?.Contains(SqlFeature.AzureSqlDbContainer) == true;
+
+        /// <summary>
         /// The features that the server is reserved for.
         /// </summary>
         public IEnumerable<SqlFeature> ReservedFor { get; set; } = Enumerable.Empty<SqlFeature>();

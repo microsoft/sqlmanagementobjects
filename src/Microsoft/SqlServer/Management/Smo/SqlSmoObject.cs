@@ -3085,7 +3085,7 @@ namespace Microsoft.SqlServer.Management.Smo
         /// We want to avoid this retry when handleSevereError is true.
         /// </summary>
         /// <param name="isDropIfExists"></param>
-        /// <param name="handleSevereError">Indicates whether we should ignore the internal service error raised by management service (42019)</param>
+        /// <param name="handleSevereError">Indicates whether to ignore expected connection-termination errors when dropping the current Azure database (42019, or 596 for containers).</param>
         internal protected void DropImpl(bool isDropIfExists, bool handleSevereError)
         {
             if (isDropIfExists)
@@ -3127,8 +3127,13 @@ namespace Microsoft.SqlServer.Management.Smo
                             ex = ex.InnerException;
                             sqlException = ex as SqlException;
                         }
-                        // 42019 is the management service failed operation error code
-                        if (sqlException == null || sqlException.Number != 42019)
+                        // Hosted Azure returns a management service error:
+                        // 42019 - DROP DATABASE operation failed. Internal service error.
+                        // Containers kill the session directly and return a different error:
+                        // 596 - Cannot continue the execution because the session is in the kill state.
+                        if (sqlException == null ||
+                            (sqlException.Number != 42019 &&
+                             !IsExpectedContainerDropError(sqlException.Number)))
                         {
                             throw;
                         }
@@ -3150,6 +3155,12 @@ namespace Microsoft.SqlServer.Management.Smo
                 throw new FailedOperationException(ExceptionTemplates.Drop, this, e);
             }
         }
+
+        internal bool IsExpectedContainerDropError(int errorNumber) =>
+            errorNumber == 596 &&
+            this is Database database &&
+            DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
+            database.Parent.ConnectionContext.EditionID == Database.AzureSqlDbContainerEditionId;
 
         ///<summary>
         /// drops the object
@@ -9174,4 +9185,3 @@ namespace Microsoft.SqlServer.Management.Smo
     }
     #endregion
 }
-

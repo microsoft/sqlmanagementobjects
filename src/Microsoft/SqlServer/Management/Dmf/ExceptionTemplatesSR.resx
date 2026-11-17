@@ -567,6 +567,6 @@ Statement: &apos;{statement}&apos;.</value>
     <value>Object Set &apos;{objectSetName}&apos; is already referenced by Policy &apos;{policyName}&apos;. Only one Policy can reference an Object Set.</value>
   </data>
   <data name="VersionNotSupported" xml:space="preserve">
-    <value>Connected version &apos;{curVerison}&apos; doesn&apos;t support this method. The minimal version for this method is &apos;{minVersion}&apos;. </value>
+    <value>Connected version &apos;{curVersion}&apos; doesn&apos;t support this method. The minimal version for this method is &apos;{minVersion}&apos;. </value>
   </data>
 </root>

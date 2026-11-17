@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
@@ -77,9 +76,6 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
                 }
             }
 
-            // Generate and attach the tested classes and properties file
-            AttachTestedClassesReport(testedClassesAndProperties, totalCheckedProperties, totalTypesScanned, allErrors);
-
             // Fail the test if there are missing localization strings
             if (allErrors.Count > 0)
             {
@@ -101,6 +97,8 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             // Ensure we actually checked something
             Assert.That(totalCheckedProperties, Is.GreaterThan(0), 
                 "Expected to check at least some properties, but none were found. This may indicate a test setup issue.");
+
+            LogTestedClassesReport(testedClassesAndProperties, totalCheckedProperties, totalTypesScanned);
         }
 
         /// <summary>
@@ -223,9 +221,6 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             var (errors, checkedProperties, testedClassesAndProperties, typesScanned) = ValidateAssemblyLocalization(smoAssembly);
 
 
-            // Generate and attach the tested classes and properties file
-            AttachTestedClassesReport(testedClassesAndProperties, checkedProperties, typesScanned, errors);
-
             // Fail the test if there are missing localization strings
             if (errors.Count > 0)
             {
@@ -246,44 +241,27 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
 
             Assert.That(checkedProperties, Is.GreaterThan(0), 
                 "Expected to check at least some properties, but none were found. This may indicate a test setup issue.");
+
+            LogTestedClassesReport(testedClassesAndProperties, checkedProperties, typesScanned);
         }
 
 
         /// <summary>
-        /// Generates a text file report of all tested classes and properties and attaches it to the test results.
+        /// Logs all tested classes and properties to the test output.
         /// </summary>
-        private void AttachTestedClassesReport(Dictionary<string, List<string>> testedClassesAndProperties, int totalProperties, int totalTypes, List<string> missingStrings = null)
+        private void LogTestedClassesReport(Dictionary<string, List<string>> testedClassesAndProperties, int totalProperties, int totalTypes)
         {
             var sb = new StringBuilder();
             sb.AppendLine("=============================================================================");
             sb.AppendLine("SMO Localizable Property Resources Test - Tested Classes and Properties");
             sb.AppendLine("=============================================================================");
             sb.AppendLine();
-            sb.AppendLine($"Generated: {DateTime.UtcNow:o}");
             sb.AppendLine($"Total Types Scanned: {totalTypes}");
             sb.AppendLine($"Total Properties Tested: {totalProperties}");
             sb.AppendLine($"Types with Tested Properties: {testedClassesAndProperties.Count}");
-            if (missingStrings != null && missingStrings.Count > 0)
-            {
-                sb.AppendLine($"Missing Localization Strings: {missingStrings.Count}");
-            }
             sb.AppendLine();
             sb.AppendLine("=============================================================================");
             sb.AppendLine();
-
-            // Report missing strings first if any
-            if (missingStrings != null && missingStrings.Count > 0)
-            {
-                sb.AppendLine("MISSING LOCALIZATION STRINGS:");
-                sb.AppendLine("-----------------------------");
-                foreach (var missing in missingStrings.OrderBy(s => s))
-                {
-                    sb.AppendLine($"  - {missing}");
-                }
-                sb.AppendLine();
-                sb.AppendLine("=============================================================================");
-                sb.AppendLine();
-            }
 
             sb.AppendLine("TESTED CLASSES AND PROPERTIES:");
             sb.AppendLine("------------------------------");
@@ -307,11 +285,7 @@ namespace Microsoft.SqlServer.Test.SmoUnitTests
             sb.AppendLine("End of Report");
             sb.AppendLine("=============================================================================");
 
-            // Write to a temporary file and attach to test results
-            var tempPath = Path.Combine(Path.GetTempPath(), $"LocalizablePropertyResourcesTest_TestedClasses_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
-            File.WriteAllText(tempPath, sb.ToString());
-
-            TestContext?.AddResultFile(tempPath);
+            TestContext?.WriteLine(sb.ToString());
         }
 
         /// <summary>

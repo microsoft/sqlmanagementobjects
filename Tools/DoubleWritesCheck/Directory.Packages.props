@@ -1,0 +1,8 @@
+<!-- Empty on purpose. Stops NuGet from importing the repo-wide Directory.Packages.props
+     (Central Package Management) so the Check-DoubleWrites file-based app can pin its
+     package version inline via the #:package directive. -->
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

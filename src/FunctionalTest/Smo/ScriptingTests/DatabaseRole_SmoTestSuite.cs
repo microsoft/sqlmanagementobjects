@@ -111,6 +111,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Async role enumeration returns no members in the container.
         public async Task DatabaseRole_EnumMembersAsync_ReturnsDirectAndNestedRoleMembers()
         {
             await ExecuteFromDbPoolAsync(
@@ -134,6 +135,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         /// </summary>
         [TestMethod]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Async role enumeration returns no members in the container.
         public async Task DatabaseRole_EnumDirectMembersAsync_ReturnsOnlyDirectMembersNotNestedMembers()
         {
             await ExecuteFromDbPoolAsync(

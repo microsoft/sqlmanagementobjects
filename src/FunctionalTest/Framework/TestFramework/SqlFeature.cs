@@ -48,5 +48,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         /// Fabric Hosted
         /// </summary>
         Fabric,
+
+        /// <summary>
+        /// Azure SQL Database running in a test container rather than the hosted service.
+        /// </summary>
+        AzureSqlDbContainer,
     }
 }

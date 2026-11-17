@@ -9,6 +9,7 @@ using Microsoft.SqlServer.Management.XEvent;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
+using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 
 namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
 {
@@ -32,6 +33,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
         #endregion
 
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // The container does not return the expected XE predicate metadata.
         public void DbScoped_Event_Tests()
         {
             ExecuteFromDbPool(PoolName,  (db) => ExecuteTest(db, () =>

@@ -30,6 +30,31 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
 
         #region Server Functionality Tests
 
+        [TestMethod]
+        public void Server_EditionID_matches_server_property()
+        {
+            ExecuteTest(() =>
+            {
+                var expected = Convert.ToInt64(ServerContext.ConnectionContext.ExecuteScalar(
+                    "SELECT CONVERT(bigint, ISNULL(SERVERPROPERTY(N'EditionID'), 0))"));
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(ServerContext.EditionID, Is.EqualTo(expected), "Server.EditionID");
+                    Assert.That(ServerContext.Information.EditionID, Is.EqualTo(expected), "Server.Information.EditionID");
+                    Assert.That(ServerContext.ConnectionContext.EditionID, Is.EqualTo(expected), "ServerConnection.EditionID");
+                });
+
+                ServerContext.Refresh();
+                ServerContext.Information.Refresh();
+                Assert.Multiple(() =>
+                {
+                    Assert.That(ServerContext.EditionID, Is.EqualTo(expected), "Server.EditionID after Refresh");
+                    Assert.That(ServerContext.Information.EditionID, Is.EqualTo(expected), "Server.Information.EditionID after Refresh");
+                });
+            });
+        }
+
 
         /// <summary>
         /// Tests that Server.CompareUrn works correctly with both case-sensitive and case-insensitive collation. 

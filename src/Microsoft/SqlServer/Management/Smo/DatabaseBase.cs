@@ -32,6 +32,11 @@ namespace Microsoft.SqlServer.Management.Smo
     public partial class Database : ScriptNameObjectBase, ICreatable, IAlterable, IDroppable, IDropIfExists,
     ISafeRenamable, IExtendedProperties, IScriptable, IDatabaseOptions
     {
+        /// <summary>
+        /// SERVERPROPERTY('EditionID') value distinguishing Azure SQL DB containers from hosted Azure SQL Database.
+        /// </summary>
+        internal const long AzureSqlDbContainerEditionId = -978196525;
+
         internal Database(AbstractCollectionBase parentColl, ObjectKeyBase key, SqlSmoState state) :
             base(parentColl, key, state)
         {
@@ -854,6 +859,9 @@ namespace Microsoft.SqlServer.Management.Smo
                 }
 
                 var statementBuilder = new ScriptStringBuilder(baseStatement);
+                // Containers expose service-tier metadata but do not accept these options in CREATE DATABASE.
+                var isAzureSqlDbContainer = this.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
+                    this.Parent.ConnectionContext.EditionID == AzureSqlDbContainerEditionId;
 
                 // Bugfix: 9289937 Don't script out incompatible edition parameters if the edition types don't match
                 // SLO/maxsize etc don't cross-script between DW and regular Azure SQL DB
@@ -861,14 +869,14 @@ namespace Microsoft.SqlServer.Management.Smo
                 {
                     statementBuilder.SetParameter("EDITION", "DataWarehouse");
                 }
-                else if (azureEdition != null && this.DatabaseEngineEdition == sp.TargetDatabaseEngineEdition)
+                else if (!isAzureSqlDbContainer && azureEdition != null && this.DatabaseEngineEdition == sp.TargetDatabaseEngineEdition)
                 {
                     statementBuilder.SetParameter("EDITION", SqlString(azureEdition.ToString()));
                 }
 
                 if (this.DatabaseEngineEdition == sp.TargetDatabaseEngineEdition && sp.TargetDatabaseEngineEdition != DatabaseEngineEdition.SqlOnDemand)
                 {
-                    if (slo != null)
+                    if (!isAzureSqlDbContainer && slo != null)
                     {
                         statementBuilder.SetParameter("SERVICE_OBJECTIVE", SqlString(slo.ToString()));
                     }
@@ -1830,7 +1838,6 @@ namespace Microsoft.SqlServer.Management.Smo
                 ||
                 Parent.ConnectionContext.CurrentDatabase.Equals(Name, StringComparison.InvariantCultureIgnoreCase)
                 );
-         
             base.DropImpl(ifExists, handleSevereError);
         }
 

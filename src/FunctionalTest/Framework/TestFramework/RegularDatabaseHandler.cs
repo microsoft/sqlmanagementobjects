@@ -29,13 +29,9 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils.TestFramework
         }
         public override Database HandleDatabaseCreation(DatabaseParameters dbParameters)
         {
-            if (dbParameters == null)
-            {
-                return this.ServerContext.CreateDatabaseWithRetry();
-            }
-
-            var db = this.ServerContext.CreateDatabaseWithRetry(
-                            dbParameters);
+            var db = dbParameters == null
+                ? this.ServerContext.CreateDatabaseWithRetry()
+                : this.ServerContext.CreateDatabaseWithRetry(dbParameters);
             this.DatabaseDisplayName = db.Name;
 
             return db;

@@ -160,7 +160,10 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
                 try
                 {
                     index.PhysicalPartitions[1].XmlCompression = _SMO.XmlCompressionType.On;
-                    Assert.That(index.Rebuild, Throws.Nothing, "rebuild index should succeed");
+                    Assert.That(
+                        () => index.Rebuild(2),
+                        Throws.Nothing,
+                        "Rebuilding partition 2 with XML compression should succeed.");
 
                     db.Parent.SetDefaultInitFields(typeof(_SMO.PhysicalPartition), true);
                     index.PhysicalPartitions.ClearAndInitialize(string.Empty, new string[0]);
@@ -234,6 +237,62 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         }
 
         /// <summary>
+        /// Reproduces a partition-level index rebuild on SQL Server 2017 and 2019 and verifies
+        /// that SMO does not read the unsupported XmlCompression property.
+        /// </summary>
+        /// <remarks>
+        /// The test creates a partition function, partition scheme, partitioned table,
+        /// and clustered index with T-SQL. It then refreshes the table collection so the
+        /// index is loaded from SQL Server through SMO and calls <see cref="_SMO.Index.Rebuild(int)"/>
+        /// for partition 2. Before the regression fix, rebuild scripting checked whether
+        /// XmlCompression was dirty even though SQL Server 2017 and 2019 have no such property,
+        /// causing UnknownPropertyException before ALTER INDEX could execute.
+        /// </remarks>
+        [_VSUT.TestMethod]
+        [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 14, MaxMajor = 15)]
+        public void SmoIndex_RebuildPartition_does_not_read_unsupported_XmlCompression()
+        {
+            ExecuteFromDbPool(database =>
+            {
+                string suffix = Guid.NewGuid().ToString("N");
+                string tableName = $"XmlCompressionRebuildTable{suffix}";
+                string indexName = $"XmlCompressionRebuildIndex{suffix}";
+                string partitionFunctionName = $"XmlCompressionRebuildFunction{suffix}";
+                string partitionSchemeName = $"XmlCompressionRebuildScheme{suffix}";
+
+                TraceHelper.TraceInformation(
+                    "On database [{0}], create partition function [{1}], partition scheme [{2}], table [dbo].[{3}], and clustered index [{4}].",
+                    database.Name,
+                    partitionFunctionName,
+                    partitionSchemeName,
+                    tableName,
+                    indexName);
+
+                // Use T-SQL for setup so the behavior under test starts with SMO loading
+                // an existing partitioned index.
+                database.ExecuteNonQuery($@"
+CREATE PARTITION FUNCTION [{partitionFunctionName}](int) AS RANGE RIGHT FOR VALUES (1, 2);
+CREATE PARTITION SCHEME [{partitionSchemeName}] AS PARTITION [{partitionFunctionName}] ALL TO ([PRIMARY]);
+CREATE TABLE [dbo].[{tableName}] ([Id] int NOT NULL) ON [{partitionSchemeName}]([Id]);
+CREATE CLUSTERED INDEX [{indexName}] ON [dbo].[{tableName}] ([Id]) ON [{partitionSchemeName}]([Id]);");
+
+                TraceHelper.TraceInformation(
+                    "Refresh SMO tables and retrieve index [{0}] from [dbo].[{1}].",
+                    indexName,
+                    tableName);
+                database.Tables.Refresh();
+                var index = database.Tables[tableName].Indexes[indexName];
+
+                TraceHelper.TraceInformation(
+                    "Call Index.Rebuild(2). On SQL Server 2017 and 2019 this must execute the partition rebuild without reading XmlCompression.");
+                Assert.That(
+                    () => index.Rebuild(2),
+                    Throws.Nothing,
+                    "On SQL Server 2017 and 2019, rebuilding partition 2 should not read unsupported XmlCompression metadata.");
+            });
+        }
+
+        /// <summary>
         /// Tests dropping an index with IF EXISTS option through SMO on SQL16 and later.
         /// </summary>
         [_VSUT.TestMethod]
@@ -296,6 +355,7 @@ namespace Microsoft.SqlServer.Test.SMO.ScriptingTests
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.Standalone, MinMajor = 13)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // The container service tier does not support In-Memory OLTP.
         public void HekatonColumnstoreScripting()
         {
             ExecuteWithDbDrop(
