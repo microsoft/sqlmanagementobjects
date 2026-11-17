@@ -1,3 +1,0 @@
-<!-- Empty on purpose. Stops MSBuild from importing the repo-wide Directory.Build.targets
-     for the Check-DoubleWrites file-based app in this folder. -->
-<Project />
