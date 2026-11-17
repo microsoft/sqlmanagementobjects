@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 using Microsoft.SqlServer.Management.XEvent;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.SqlServer.Test.Manageability.Utils.TestFramework;
 
 namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
 {
@@ -17,6 +18,7 @@ namespace Microsoft.SqlServer.Management.XEventDbScoped.UnitTests
     public class XEStoreUnitTest : DbScopedXEventTestBase
     {
         [TestMethod]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // XE predicates do not round-trip in the container.
         public void DbScoped_XeStore_Tests()
         {
             ExecuteFromDbPool(PoolName, (db) => ExecuteTest(db, () =>

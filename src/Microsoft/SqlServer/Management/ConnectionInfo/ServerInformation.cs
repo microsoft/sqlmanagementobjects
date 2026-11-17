@@ -204,8 +204,13 @@ else
 
                 var engineType = (DatabaseEngineType)dataSet.Tables[0].Rows[0]["DatabaseEngineType"];
                 var edition = (DatabaseEngineEdition)dataSet.Tables[0].Rows[0]["DatabaseEngineEdition"];
-                // Treat unknown editions from Azure the same as Azure SQL database
-                if (engineType == DatabaseEngineType.SqlAzureDatabase && !validEditions.Contains(edition))
+                // We explicitly choose to treat Fabric SQL Database (edition 12) as Azure SQL
+                // so that it's treated the same as Azure (since they share mostly the same capabilities).
+                // While this isn't ideal from a correctness point of view, this was the way chosen when
+                // Fabric support was first added and changing it would be a pretty big breaking change
+                // (SSMS, for example, checks engine edition in many places), so it should not be done lightly.
+                if (engineType == DatabaseEngineType.SqlAzureDatabase &&
+                    (!validEditions.Contains(edition) || edition == DatabaseEngineEdition.SqlDatabaseInFabric))
                 {
                     if (edition != dynamicsCrmEdition) // Dynamics CRM databases have additional restrictions; don't treat them as Azure SQL DB.  See note above.
                     {

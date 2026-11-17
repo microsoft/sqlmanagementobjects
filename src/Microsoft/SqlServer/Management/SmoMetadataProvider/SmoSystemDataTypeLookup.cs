@@ -47,7 +47,12 @@ namespace Microsoft.SqlServer.Management.SmoMetadataProvider
 
             if (typeSpec != null)
             {
-                if (typeSpec.ArgSpec2 != null)
+                if (smoDataType.SqlDataType == Smo.SqlDataType.Vector)
+                {
+                    systemDataType = this.Find(typeSpec, smoDataType.VectorDimensions,
+                        string.IsNullOrEmpty(smoDataType.VectorBaseType) ? null : smoDataType.VectorBaseType);
+                }
+                else if (typeSpec.ArgSpec2 != null)
                 {
                     systemDataType = this.Find(typeSpec, smoDataType.NumericPrecision, smoDataType.NumericScale);
                 }

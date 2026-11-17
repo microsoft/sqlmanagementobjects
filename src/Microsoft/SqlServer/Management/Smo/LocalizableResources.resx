@@ -4479,6 +4479,12 @@
   <data name="Server_EditionDesc" xml:space="preserve">
     <value>Gets the edition of the instance of Microsoft SQL Server.</value>
   </data>
+  <data name="Server_EditionIDName" xml:space="preserve">
+    <value>Edition ID</value>
+  </data>
+  <data name="Server_EditionIDDesc" xml:space="preserve">
+    <value>Gets the edition identifier of the instance of Microsoft SQL Server, or zero if it is unavailable.</value>
+  </data>
   <data name="Server_ErrorLogSizeKbName" xml:space="preserve">
     <value>Error Log Size KB</value>
   </data>

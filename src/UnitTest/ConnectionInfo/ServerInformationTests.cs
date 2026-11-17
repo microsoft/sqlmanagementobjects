@@ -127,10 +127,11 @@ else
         [TestMethod]
         [TestCategory("Unit")]
         [DataTestMethod]
-        [DataRow(DatabaseEngineEdition.SqlDatabase, DatabaseEngineEdition.SqlDatabase)] // Server reports self as Azure SQL Database edition, should remain unchanged
-        [DataRow((DatabaseEngineEdition)1000, (DatabaseEngineEdition)1000)] // Server reports self as Dynamics, should remain unchanged
-        [DataRow((DatabaseEngineEdition)555, DatabaseEngineEdition.SqlDatabase)] // Server reports self as unknown SqlAzureDatabase edition, should be converted to SqlDatabase
-        public void Edition_is_handled_properly_for_Azure_servers(DatabaseEngineEdition engineEdition, DatabaseEngineEdition expectedEdition)
+        [DataRow(DatabaseEngineEdition.SqlDatabase, DatabaseEngineEdition.SqlDatabase, false)] // Server reports self as Azure SQL Database edition, should remain unchanged
+        [DataRow(DatabaseEngineEdition.SqlDatabaseInFabric, DatabaseEngineEdition.SqlDatabase, true)] // Preserve the existing Azure SQL behavior while exposing Fabric separately
+        [DataRow((DatabaseEngineEdition)1000, (DatabaseEngineEdition)1000, false)] // Server reports self as Dynamics, should remain unchanged
+        [DataRow((DatabaseEngineEdition)555, DatabaseEngineEdition.SqlDatabase, false)] // Server reports self as unknown SqlAzureDatabase edition, should be converted to SqlDatabase
+        public void Edition_is_handled_properly_for_Azure_servers(DatabaseEngineEdition engineEdition, DatabaseEngineEdition expectedEdition, bool isFabricServer)
         {
             // NOTE: Dynamics CRM databases have unique restrictions (master not accessible, CREATE TABLE not permitted) that make
             // neither SqlDatabase or Unknown editions usable.  Because adding it as a defined DatabaseEngineEdition would result in
@@ -151,14 +152,15 @@ else
                 (DataSet ds) =>
                 {
                     // Simulate Azure SQL Database returning various editions
-                    FillTestDataSet(ds, versionString, "SQL Azure", 4294967296L, DatabaseEngineType.SqlAzureDatabase, engineEdition, 0x10000FA0, HostPlatformNames.Windows, "TCP", false, "SQL_Latin1_General_CP1_CI_AS");
+                    FillTestDataSet(ds, versionString, "SQL Azure", 4294967296L, DatabaseEngineType.SqlAzureDatabase, engineEdition, 0x10000FA0, HostPlatformNames.Windows, "TCP", isFabricServer, "SQL_Latin1_General_CP1_CI_AS");
                 });
 
             var si = ServerInformation.GetServerInformation(connectMock.Object, dataAdapterMock.Object, versionString);
 
             // Verify that edition is converted as expected
             Assert.That(si.DatabaseEngineType, Is.EqualTo(DatabaseEngineType.SqlAzureDatabase), "Engine type should be SqlAzureDatabase");
-            Assert.That(si.DatabaseEngineEdition, Is.EqualTo(expectedEdition), $"Edition {engineEdition} from Azure should convert to {engineEdition}");
+            Assert.That(si.DatabaseEngineEdition, Is.EqualTo(expectedEdition), $"Edition {engineEdition} from Azure should convert to {expectedEdition}");
+            Assert.That(si.IsFabricServer, Is.EqualTo(isFabricServer), "Fabric status should remain independent of the normalized engine edition");
 
         }
 

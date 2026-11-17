@@ -28,6 +28,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [DataRow(false)]
         [DataRow(true)]
         [SupportedServerVersionRange(MinMajor = 10)]
+        [UnsupportedFeature(SqlFeature.Fabric)]
         public void AsymmetricKey_Drop_GeneratesCorrectScript(bool removeProviderKey)
         {
             ExecuteFromDbPool((db) =>

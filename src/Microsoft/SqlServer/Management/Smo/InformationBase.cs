@@ -53,6 +53,18 @@ namespace Microsoft.SqlServer.Management.Smo
 			}
 		}
 
+        /// <summary>
+        /// Gets the edition identifier returned by SERVERPROPERTY('EditionID'), or zero if it is unavailable.
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
+        public long EditionID
+        {
+            get
+            {
+                return (long)this.Properties.GetValueWithNullReplacement(nameof(EditionID));
+            }
+        }
+
         [SfcProperty(SfcPropertyFlags.Standalone)]
         public Edition EngineEdition
         {
@@ -89,7 +101,6 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 	}
 }
-
 
 
 

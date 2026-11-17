@@ -39,8 +39,13 @@
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" /> <!-- prevent double writes -->
     <PackageVersion Include="System.Security.AccessControl" Version="6.0.1" />
+    <!-- Pin patched Pkcs versions for CVE-2026-84008 until a SqlClient upgrade
+         supplies safe minimum versions. -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" Condition="'$(TargetFramework)' != 'net10.0'" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="9.0.21" Condition="'$(TargetFramework)' == 'net10.0'" />
     <PackageVersion Include="System.Text.Encodings.Web" Version="9.0.5" />
     <PackageVersion Include="System.Text.Json" Version="9.0.5" />
+    <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.0" /> <!-- prevent double writes -->
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netfx'">
     <PackageVersion Include="System.Data.OleDb" Version="$(DotNetPackagesVersion)" />

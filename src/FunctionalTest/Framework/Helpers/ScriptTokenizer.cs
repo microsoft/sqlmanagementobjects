@@ -158,7 +158,7 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             var edgeConstraintNameRegex = new Regex(@"(EC__.*__[A-Z0-9a-z]*)");
             var sequenceIdRegex = new Regex(@"(DF__TestSequence__Id__[A-Z0-9a-z]*)");
 
-            var scriptDateRegex = new Regex(@"(Script Date:.* [P|A]M)", RegexOptions.IgnoreCase);
+            var scriptDateRegex = new Regex(@"Script Date:[^\r\n]*?(?=\s+\*+/)", RegexOptions.IgnoreCase);
             var scriptStatsStreamRegex = new Regex(@"(STATS_STREAM = (?:0[xX])?[0-9a-fA-F]+)", RegexOptions.IgnoreCase);
             //The string used to do the replacement, $1 and $2 are the 2 groups which consist of all the matched characters that are not
             //the actual DB name (so the prefix and postfix)
@@ -201,6 +201,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             int firstDot = svr.Name.IndexOf('.');
             if (firstDot >= 0)
             {
+                // External-data-source LOCATION fixtures expand ClusterDomainName using everything after
+                // the connection address's first dot. For container IPs this includes the mapped port,
+                // so tokenize the exact suffix instead of relying only on the .com/.net domain regex.
+                var endpointSuffixRegex = new Regex(
+                    @"\$\((BracketEscapedServerName|SingleQuoteEscapedServerName|ServerName)\)" +
+                    Regex.Escape(svr.Name.Substring(firstDot)), RegexOptions.IgnoreCase);
+                str = endpointSuffixRegex.Replace(str, "$($1)" + TOKEN_ClusterDomainName);
                 str = ClusterDomainNameRegex.Replace(str, "$($1)" + TOKEN_ClusterDomainName);
             }
 
@@ -461,6 +468,10 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             {
                 string domain = svr.Name.Substring(dotIndex);
                 ret = ret.Replace(TOKEN_ClusterDomainName, domain);
+            }
+            else
+            {
+                ret = ret.Replace(TOKEN_ClusterDomainName, string.Empty);
             }
 
             // Replace SQL Mi random paths

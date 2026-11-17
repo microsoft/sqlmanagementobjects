@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -19,9 +18,16 @@ namespace Microsoft.SqlServer.ADO.Identity
     /// A <see cref="TokenCredential"/> for use in ADO pipelines with AzureRM service connections
     /// set up for workload identity federation.
     /// </summary>
+    [Obsolete("Use Azure.Identity.AzurePipelinesCredential instead.")]
     public class AzureDevOpsFederatedTokenCredential : TokenCredential
     {
-        private readonly HttpClient _httpClient = new HttpClient();
+        private static readonly HttpClient s_httpClient = new HttpClient(new HttpClientHandler
+        {
+            AllowAutoRedirect = false,
+        })
+        {
+            Timeout = TimeSpan.FromSeconds(30),
+        };
         private readonly string _systemAccessToken;
         private readonly Uri _oidcRequestUri;
         private readonly IConfidentialClientApplication _confidentialClientApplication;
@@ -37,7 +43,6 @@ namespace Microsoft.SqlServer.ADO.Identity
 
             _systemAccessToken = options.SystemAccessToken;
             _oidcRequestUri = BuildOidcRequestUri(options);
-            Trace.TraceInformation("Oidc Uri " + _oidcRequestUri?.ToString() ?? "NONE");
             _confidentialClientApplication = BuildConfidentialClientApplication(options);
         }
 
@@ -90,13 +95,27 @@ namespace Microsoft.SqlServer.ADO.Identity
                 return null;
             }
 
-            var baseUri = new Uri(options.TeamFoundationCollectionUri);
+            if (!Uri.TryCreate(options.TeamFoundationCollectionUri, UriKind.Absolute, out var baseUri) || !IsValidAzureDevOpsEndpoint(baseUri))
+            {
+                throw new CredentialUnavailableException("The Azure DevOps OIDC endpoint must use HTTPS on port 443 and have a recognized Azure DevOps host.");
+            }
+
+            if (!Guid.TryParse(options.ServiceConnectionId, out var serviceConnectionId))
+            {
+                throw new CredentialUnavailableException("The Azure DevOps service connection ID must be a valid GUID.");
+            }
+
             var teamProjectId = Uri.EscapeDataString(options.TeamProjectId);
             var planId = Uri.EscapeDataString(options.PlanId);
             var jobId = Uri.EscapeDataString(options.JobId);
+            var uriBuilder = new UriBuilder(baseUri)
+            {
+                Fragment = string.Empty,
+                Path = FormattableString.Invariant($"{baseUri.AbsolutePath.TrimEnd('/')}/{teamProjectId}/_apis/distributedtask/hubs/build/plans/{planId}/jobs/{jobId}/oidctoken"),
+                Query = FormattableString.Invariant($"api-version=7.1-preview.1&serviceConnectionId={Uri.EscapeDataString(serviceConnectionId.ToString())}"),
+            };
 
-            return new Uri(FormattableString.Invariant(
-                $"{baseUri}{teamProjectId}/_apis/distributedtask/hubs/build/plans/{planId}/jobs/{jobId}/oidctoken?api-version=7.1-preview.1&serviceConnectionId={options.ServiceConnectionId}"));
+            return uriBuilder.Uri;
         }
 
         private IConfidentialClientApplication BuildConfidentialClientApplication(AzureDevOpsFederatedTokenCredentialOptions options)
@@ -113,7 +132,12 @@ namespace Microsoft.SqlServer.ADO.Identity
                 .Build();
         }
 
-        private static bool IsValidAzureDevOpsHost(Uri baseUri) =>  baseUri.DnsSafeHost.EndsWith(".visualstudio.com", StringComparison.OrdinalIgnoreCase) || baseUri.DnsSafeHost.EndsWith("dev.azure.com", StringComparison.OrdinalIgnoreCase);
+        private static bool IsValidAzureDevOpsEndpoint(Uri endpoint) =>
+            endpoint.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) &&
+            endpoint.Port == 443 &&
+            (endpoint.DnsSafeHost.Equals("dev.azure.com", StringComparison.OrdinalIgnoreCase) ||
+             endpoint.DnsSafeHost.EndsWith(".dev.azure.com", StringComparison.OrdinalIgnoreCase) ||
+             endpoint.DnsSafeHost.EndsWith(".visualstudio.com", StringComparison.OrdinalIgnoreCase));
 
 
         private async Task<string> GetClientAssertionAsync(AssertionRequestOptions options)
@@ -121,12 +145,6 @@ namespace Microsoft.SqlServer.ADO.Identity
             if (_oidcRequestUri is null || string.IsNullOrEmpty(_systemAccessToken))
             {
                 throw new CredentialUnavailableException("We were not provided with all the necessary information to construct an OIDC request URI!");
-            }
-
-            if (!IsValidAzureDevOpsHost(_oidcRequestUri))
-            {
-                throw new CredentialUnavailableException(FormattableString.Invariant(
-                    $"We were provided with a host ({_oidcRequestUri.DnsSafeHost}) that we do not believe is a valid ADO host. Rejecting due to security concerns."));
             }
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, _oidcRequestUri)
@@ -144,14 +162,13 @@ namespace Microsoft.SqlServer.ADO.Identity
                 },
             })
             {
+                request.Headers.Add("X-TFS-FedAuthRedirect", "Suppress");
 
-                using (var response = await _httpClient.SendAsync(request, options.CancellationToken).ConfigureAwait(false))
+                using (var response = await s_httpClient.SendAsync(request, options.CancellationToken).ConfigureAwait(false))
                 {
-                    var headers = string.Join(",", response.Headers.Select(h => $"<{h.Key}: {string.Join(",", h.Value)}>"));
                     if (!response.IsSuccessStatusCode)
                     {
-                        var error = await response.Content.ReadAsStringAsync();
-                        Trace.TraceInformation($"Got response from OidcToken: {response.StatusCode}:{error}:{headers}");
+                        Trace.TraceInformation($"Azure DevOps OIDC endpoint returned status {response.StatusCode}");
                     }
                     _ = response.EnsureSuccessStatusCode();
 

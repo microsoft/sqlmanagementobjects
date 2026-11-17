@@ -150,30 +150,64 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         }
 
         /// <summary>
-        /// 
+        /// Dropping the current Azure SQL database handles the resulting connection termination.
         /// </summary>
-        [TestMethod]
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
         [SupportedServerVersionRange(Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedFeature(SqlFeature.NoDropCreate)]
         [UnsupportedFeature(SqlFeature.Fabric)]
-        public void Database_Drop_does_not_throw_when_Parent_is_user_database()
+        public void Database_Drop_does_not_throw_when_Parent_is_user_database(bool dropIfExists)
         {
             ExecuteWithDbDrop(db =>
             {
+                var databaseName = db.Name;
+                var databases = db.Parent.Databases;
                 var connString = new SqlConnectionStringBuilder(this.SqlConnectionStringBuilder.ConnectionString)
                 {
-                    InitialCatalog = db.Name
+                    InitialCatalog = databaseName,
+                    Pooling = false
                 };
-                var server = new _SMO.Server(new ServerConnection(new SqlConnection(connString.ConnectionString)));
-                var dbToDrop = server.Databases[db.Name];
-                var droppedEventRaised = false;
-                SmoApplication.EventsSingleton.ObjectDropped += (s, e) =>
+                using (var sqlConnection = new SqlConnection(connString.ConnectionString))
                 {
-                    if (e.Urn == dbToDrop.Urn) droppedEventRaised = true;
-                };
-                Assert.DoesNotThrow(() => dbToDrop.Drop(), "Drop when initial catalog is database name");
-                Assert.Throws<_SMO.FailedOperationException>(() => db.Refresh(), "Refresh should fail after db is dropped");
-                Assert.That(droppedEventRaised, Is.EqualTo(true), "Dropped event should be raised");
+                    var server = new _SMO.Server(new ServerConnection(sqlConnection));
+                    var dbToDrop = server.Databases[databaseName];
+                    Assert.That(server.ConnectionContext.CurrentDatabase, Is.EqualTo(databaseName),
+                        "DROP must execute from the target user database");
+                    var expectedUrn = dbToDrop.Urn;
+                    var droppedEvents = 0;
+                    SmoApplication.ObjectDroppedEventHandler droppedHandler = (s, e) =>
+                    {
+                        if (e.Urn == expectedUrn)
+                        {
+                            droppedEvents++;
+                        }
+                    };
+                    SmoApplication.EventsSingleton.ObjectDropped += droppedHandler;
+                    try
+                    {
+                        if (dropIfExists)
+                        {
+                            dbToDrop.DropIfExists();
+                        }
+                        else
+                        {
+                            dbToDrop.Drop();
+                        }
+                        // Container DROP terminates the user session before asynchronous deletion finishes.
+                        Assert.That(() =>
+                        {
+                            databases.Refresh();
+                            return databases.Contains(databaseName);
+                        }, Is.False.After(30000, 1000), "The dropped database should disappear from the server catalog");
+                        Assert.That(droppedEvents, Is.EqualTo(1), "An executed DROP should raise exactly one event");
+                    }
+                    finally
+                    {
+                        SmoApplication.EventsSingleton.ObjectDropped -= droppedHandler;
+                    }
+                }
             });
         }
 
@@ -224,6 +258,7 @@ namespace Microsoft.SqlServer.Test.SMO.GeneralFunctionality
         [TestCategory("Legacy")]    /* slow test, not for PR validation */
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase, Edition = DatabaseEngineEdition.SqlDatabase)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Re-enable when direct CREATE DATABASE supports edition and service-objective options.
         public void Database_SpaceAvailable_Is_Zero_For_Hyperscale()
         {
             ExecuteTest(
@@ -392,7 +427,7 @@ END");
                         db.PrefetchObjects(typeof(Table));
                     }
                     eventRecorder.Stop();
-                    var messages = string.Join(Environment.NewLine, eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString()));
+                    var messages = string.Join(Environment.NewLine, eventRecorder.Events.SelectMany(e => e.Payload).Select(p => p.ToString())).FixNewLines();
                     messages = messages.Replace(@"select 
             1
         from 
@@ -883,6 +918,7 @@ END");
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Re-enable when direct CREATE DATABASE supports edition and service-objective options.
         public void Script_HyperScale_With_MaxSizeInBytes()
         {
             this.ExecuteTest(
@@ -907,6 +943,7 @@ END");
         /// </summary>
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Re-enable when direct CREATE DATABASE supports edition and service-objective options.
         public void Script_HyperScale_Without_MaxSizeInBytes()
         {
             this.ExecuteTest(
@@ -940,6 +977,7 @@ END");
         [TestMethod]
         [SupportedServerVersionRange(DatabaseEngineType = DatabaseEngineType.SqlAzureDatabase)]
         [UnsupportedFeature(SqlFeature.Fabric)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // Re-enable when direct CREATE DATABASE supports edition and service-objective options.
         public void Script_HyperScale_DataBase()
         {
             string backupFile = null;

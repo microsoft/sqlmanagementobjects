@@ -175,6 +175,18 @@ namespace Microsoft.SqlServer.Management.Smo
             }
         }
 
+        /// <summary>
+        /// Gets the edition identifier returned by SERVERPROPERTY('EditionID'), or zero if it is unavailable.
+        /// </summary>
+        [SfcProperty(SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
+        public long EditionID
+        {
+            get
+            {
+                return (long)this.Properties.GetValueWithNullReplacement(nameof(EditionID));
+            }
+        }
+
         [SfcProperty(SfcPropertyFlags.Standalone | SfcPropertyFlags.SqlAzureDatabase)]
         public Edition EngineEdition
         {
@@ -3025,9 +3037,9 @@ namespace Microsoft.SqlServer.Management.Smo
             else if (typeObject == typeof(Database))
             {
                 yield return nameof(Database.Name);
-                // The DatabaseEngineEdition value of a Fabric database will still be SqlDatabase but
-                // apps frequently need to distinguish Fabric instances from non-Fabric instances so make it relatively
-                // cheap to determine.
+                // Fabric SQL Database reports engine edition 12, which connection discovery normalizes to
+                // SqlDatabase for compatibility. Initialize IsFabricDatabase by default so apps can cheaply
+                // distinguish it and Fabric Warehouse from other cloud instances.
                 yield return nameof(Database.IsFabricDatabase);
                 // If we are connected to an OnDemand or DataWarehouse instance through the ServerConnection
                 // the Database can only be the same edition as the ServerConnection.
@@ -4629,4 +4641,3 @@ namespace Microsoft.SqlServer.Management.Smo
         private Server parent;
     }
 }
-

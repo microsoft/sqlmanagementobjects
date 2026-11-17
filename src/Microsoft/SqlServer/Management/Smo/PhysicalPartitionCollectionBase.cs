@@ -182,9 +182,14 @@ namespace Microsoft.SqlServer.Management.Smo
         }
 
         internal bool IsXmlCompressionStateDirty(int partitionNumber)
-         {
+        {
             Debug.Assert(partitionNumber > 0);
-            return this[partitionNumber - 1].IsDirty("XmlCompression");
+            PhysicalPartition partition = this[partitionNumber - 1];
+
+            // XmlCompression metadata is unavailable before SQL Server 2022. Looking up
+            // its dirty state without this guard throws on down-level servers.
+            return partition.IsSupportedProperty(nameof(partition.XmlCompression))
+                && partition.IsDirty(nameof(partition.XmlCompression));
         }
 
         internal string GetXmlCompressionCode(int partitionNumber)

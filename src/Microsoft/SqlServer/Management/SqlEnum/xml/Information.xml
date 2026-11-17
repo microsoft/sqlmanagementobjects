@@ -270,6 +270,7 @@
     <version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
       <property name="VersionString" type="sysname" access="Read">SERVERPROPERTY(N'ProductVersion')</property>
       <property name="Edition" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'Edition')</property>
+      <property name="EditionID" type="bigint" access="Read" cast='true'>ISNULL(SERVERPROPERTY(N'EditionID'), 0)</property>
       <property name="ProductLevel" type="sysname" access="Read" cast='true'>SERVERPROPERTY(N'ProductLevel')</property>
 
       <property name="IsSingleUser" type="bit" access="Read" cast='true'>SERVERPROPERTY('IsSingleUser')</property>

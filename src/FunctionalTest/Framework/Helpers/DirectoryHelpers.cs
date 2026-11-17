@@ -36,5 +36,40 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 Thread.Sleep(retrySleepTimeMs);
             }
         }
+
+        /// <summary>
+        /// Deletes a file, retrying when another process temporarily prevents deletion.
+        /// </summary>
+        /// <param name="path">The file to delete.</param>
+        /// <param name="retryCount">The number of retries after the initial attempt.</param>
+        /// <param name="retrySleepTimeMs">The delay between retries.</param>
+        public static void SynchronousFileDelete(string path, int retryCount = 3, int retrySleepTimeMs = 1000)
+        {
+            for (var attempt = 0; attempt <= retryCount; attempt++)
+            {
+                try
+                {
+                    File.Delete(path);
+                    if (!File.Exists(path))
+                    {
+                        return;
+                    }
+                }
+                catch (IOException) when (attempt < retryCount)
+                {
+                }
+                catch (UnauthorizedAccessException) when (attempt < retryCount)
+                {
+                }
+
+                if (attempt == retryCount)
+                {
+                    throw new InvalidOperationException(
+                        $"File '{path}' isn't deleted even after retrying");
+                }
+
+                Thread.Sleep(retrySleepTimeMs);
+            }
+        }
     }
 }

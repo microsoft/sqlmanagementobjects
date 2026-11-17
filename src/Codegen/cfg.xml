@@ -57,6 +57,7 @@
       <property name="VersionString" generate="true" is_intrinsic="false" />
       <property name="NetName" generate="true" is_intrinsic="false" />
       <property name="Edition" generate="true" is_intrinsic="false" />
+      <property name="EditionID" generate="false" is_intrinsic="false" />
       <property name="HasNullSaPassword" generate="false" is_intrinsic="false" />
 
       <property name="Status" generate="true" is_intrinsic="false" />
@@ -1672,6 +1673,7 @@
       <property name="BuildNumber" generate="true" is_intrinsic="false" />
       <property name="Collation" generate="true" is_intrinsic="false" />
       <property name="Edition" generate="true" is_intrinsic="false" />
+      <property name="EditionID" generate="false" is_intrinsic="false" />
       <property name="EngineEdition" generate="false" is_intrinsic="false" />
       <property name="ErrorLogPath" generate="true" is_intrinsic="false" />
       <property name="HasNullSaPassword" generate="false" is_intrinsic="false" />

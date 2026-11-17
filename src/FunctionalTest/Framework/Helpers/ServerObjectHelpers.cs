@@ -34,6 +34,14 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
     {
         private static readonly Semaphore azureDbCreateLock = new Semaphore(3, 3);
 
+        private static bool UseMinimalDatabaseCreation(SMO.Server server, SqlTestBase.AzureDatabaseEdition edition)
+        {
+            return edition != SqlTestBase.AzureDatabaseEdition.DataWarehouse &&
+                server.DatabaseEngineType == DatabaseEngineType.SqlAzureDatabase &&
+                server.DatabaseEngineEdition == DatabaseEngineEdition.SqlDatabase &&
+                server.ConnectionContext.EditionID == -978196525;
+        }
+
         /// <summary>
         /// Restores a database from the specified backup file. It's the callers responsibility to ensure the server
         /// has read access for the file.
@@ -510,6 +518,11 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
             {
                 TraceHelper.TraceInformation("Creating new database '{0}' on server '{1}'", databaseName,
                     server.Name);
+                if (UseMinimalDatabaseCreation(server, dbAzureDatabaseEdition))
+                {
+                    // Use only CREATE DATABASE while service-tier options and SET READ_WRITE are unsupported by the test image.
+                    return new Database(server, databaseName);
+                }
                 // No valid backup file location so default to creating our own
                 switch (dbAzureDatabaseEdition)
                 {
@@ -636,7 +649,13 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                     // Bacpac files have to be applied after the database is created
                     if (string.IsNullOrEmpty(dbParameters.BackupFile) || dbParameters.BackupFile.IsPackageFileName())
                     {
-                        if (server.DatabaseEngineType != DatabaseEngineType.SqlAzureDatabase)
+                        var useMinimalDatabaseCreation = UseMinimalDatabaseCreation(server, dbParameters.AzureDatabaseEdition);
+                        if (useMinimalDatabaseCreation)
+                        {
+                            // Fixture provisioning must not require cloud service tiers or SET READ_WRITE.
+                            db = new Database(server, databaseName);
+                        }
+                        else if (server.DatabaseEngineType != DatabaseEngineType.SqlAzureDatabase)
                         {
                             db = new Database(server, databaseName) { ReadOnly = false };
                         }
@@ -729,7 +748,30 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                             try
                             {
                                 _ = azureDbCreateLock.WaitOne();
-                                db.Create();
+                                if (useMinimalDatabaseCreation)
+                                {
+                                    using (var connection = new SqlConnection(server.ConnectionContext.ConnectionString))
+                                    {
+                                        connection.Open();
+                                        using (var command = connection.CreateCommand())
+                                        {
+                                            command.CommandText = $"CREATE DATABASE {databaseName.SqlBracketQuoteString()}";
+                                            if (!string.IsNullOrEmpty(dbParameters.Collation))
+                                            {
+                                                command.CommandText += $" COLLATE {dbParameters.Collation.SqlBracketQuoteString()}";
+                                            }
+                                            command.CommandTimeout = server.ConnectionContext.StatementTimeout;
+                                            command.ExecuteNonQuery();
+                                        }
+                                    }
+                                    server.Databases.Refresh();
+                                    db = server.Databases[databaseName]
+                                        ?? throw new InvalidOperationException($"Created test database '{databaseName}' was not found.");
+                                }
+                                else
+                                {
+                                    db.Create();
+                                }
                                 // Give the db a few seconds to be ready for action
                                 Thread.Sleep(5000);
                             }

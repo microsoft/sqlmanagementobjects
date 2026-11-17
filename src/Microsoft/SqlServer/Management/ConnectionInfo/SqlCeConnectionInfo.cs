@@ -101,7 +101,7 @@ namespace Microsoft.SqlServer.Management.Common
                     sb = null;
                     RebuildConnectionStringInternal = false;
                 }
-                return EncryptionUtility.DecryptSecureString(ConnectionStringInternal); 
+                return EncryptionUtility.DecryptSecureString(ConnectionStringInternal);
             }
         }
 

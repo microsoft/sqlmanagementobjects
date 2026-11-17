@@ -139,6 +139,7 @@ namespace Microsoft.SqlServer.Test.SMO.XEvent
         [DataRow("", null)]
         [DataRow("", CatalogCollationType.SQLLatin1GeneralCP1CIAS)]
         [DataRow("", CatalogCollationType.DatabaseDefault)]
+        [UnsupportedFeature(SqlFeature.AzureSqlDbContainer)] // SMO database creation with catalog collation fails in the container.
         public void EnumerateSessionsWithCaseSensitiveCatalogCollation(string collation, CatalogCollationType? catalogCollationType)
         {
             ExecuteTest(() =>

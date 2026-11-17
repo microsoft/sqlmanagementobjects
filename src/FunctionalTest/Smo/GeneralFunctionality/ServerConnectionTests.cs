@@ -64,7 +64,8 @@ SELECT @edition AS Edition,
                     var expectedEngineEdition = (DatabaseEngineEdition)Convert.ToInt32(expectedValues["DatabaseEngineEdition"]);
                     const DatabaseEngineEdition dynamicsCrmEdition = (DatabaseEngineEdition)1000;
                     if (expectedEngineType == DatabaseEngineType.SqlAzureDatabase &&
-                        !Enum.IsDefined(typeof(DatabaseEngineEdition), expectedEngineEdition) &&
+                        (!Enum.IsDefined(typeof(DatabaseEngineEdition), expectedEngineEdition) ||
+                         expectedEngineEdition == DatabaseEngineEdition.SqlDatabaseInFabric) &&
                         expectedEngineEdition != dynamicsCrmEdition)
                     {
                         expectedEngineEdition = DatabaseEngineEdition.SqlDatabase;
@@ -152,10 +153,17 @@ SELECT @edition AS Edition,
                     secureString.AppendChar(c);
                 }
                 secureString.MakeReadOnly();
+                var credentialConnectionString = new SqlConnectionStringBuilder(this.SqlConnectionStringBuilder.ConnectionString)
+                {
+                    Pooling = false
+                };
+                credentialConnectionString.Remove("User ID");
+                credentialConnectionString.Remove(nameof(SqlConnectionStringBuilder.Password));
+                credentialConnectionString.Remove(nameof(SqlConnectionStringBuilder.Authentication));
                 using (
                     var sqlConnection =
                         new SqlConnection(
-                            string.Format("Pooling=false;data source={0}", this.SqlConnectionStringBuilder.DataSource),
+                            credentialConnectionString.ConnectionString,
                             new SqlCredential(this.SqlConnectionStringBuilder.UserID, secureString)))
                 {
                     var masterConnection = new ServerConnection(sqlConnection);

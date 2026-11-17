@@ -93,6 +93,12 @@ namespace Microsoft.SqlServer.Test.Manageability.Utils
                 {
                     //SqlTestTargetServersFilter env variable was empty/didn't exist or it contained this server, add to our overall list
                     var svr = new SMO.Server(new ServerConnection(new SqlConnection(testServerDescriptor.ConnectionString)));
+                    if (testServerDescriptor.IsAzureSqlDbContainer &&
+                        (svr.DatabaseEngineType != DatabaseEngineType.SqlAzureDatabase ||
+                         svr.DatabaseEngineEdition != DatabaseEngineEdition.SqlDatabase))
+                    {
+                        throw new InvalidOperationException("An Azure SQL DB container target must report the Azure SQL Database engine type and edition.");
+                    }
                     var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(testServerDescriptor.ConnectionString);
                     TraceHelper.TraceInformation("Loaded connection string '{0}' = '{1}'{2}",
                          descriptor.Name,

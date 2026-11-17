@@ -3,6 +3,14 @@
 Update this document for externally visible changes. Put most recent changes first.
 Once we push a new version to nuget.org add a double hash header for that version.
 
+## 181.46.0
+
+- Add read-only `Server.EditionID` and `Server.Information.EditionID` properties exposing `SERVERPROPERTY('EditionID')` as a 64-bit integer.
+- Preserve vector dimensions and base types in SmoMetadataProvider data type lookups.
+- Upgrade Microsoft.SqlServer.Management.SqlParser to version 181.0.0.
+- Add support for Azure SQL DB containers
+- Add `DatabaseEngineEdition.SqlDatabaseInFabric` for the documented `SERVERPROPERTY('EngineEdition')` value 12.
+
 ## 181.38.1
 
 - Restrict Policy-Based Management enum deserialization to trusted assemblies; generic and assembly-qualified type names are not supported.
