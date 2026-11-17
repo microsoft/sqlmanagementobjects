@@ -1,0 +1,94 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpJobstep' impl_type='SqlObject' min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="JobID" local="JobID" />
+		</parent_link>
+		<request_parent_select>
+			<field name='JobID' />
+		</request_parent_select>
+	
+	
+		<property_link table='#tmp_sp_help_jobstep' alias='tshj'/>
+        <version min_major='10' > 
+            <property_link fields='#ProxyName#' left_join='#tmp_sp_help_proxy' alias = 'sp'>sp.proxy_id = tshj.proxy_id</property_link>
+        </version>
+		
+		<version min_major='10' >
+			<prefix>
+				<link_multiple no='1' expression="
+create table #tmp_sp_help_jobstep
+(step_id int null, step_name nvarchar(128) null, subsystem nvarchar(128) collate Latin1_General_CI_AS null, command nvarchar(max) null, flags int null, cmdexec_success_code int null, on_success_action tinyint null, on_success_step_id int null, on_fail_action tinyint null, on_fail_step_id int null, server nvarchar(128) null, database_name sysname null, database_user_name sysname null, retry_attempts int null, retry_interval int null, os_run_priority int null, output_file_name nvarchar(300) null, last_run_outcome int null, last_run_duration int null, last_run_retries int null, last_run_date int null, last_run_time int null, proxy_id int null, job_id uniqueidentifier null)
+
+declare @job_id uniqueidentifier
+declare crs cursor local fast_forward
+for ( {0} ) 
+open crs 
+fetch crs into @job_id
+while @@fetch_status &gt;= 0 
+begin 
+	insert into #tmp_sp_help_jobstep(step_id, step_name, subsystem, command, flags, cmdexec_success_code, on_success_action, on_success_step_id, on_fail_action, on_fail_step_id, server, database_name, database_user_name, retry_attempts, retry_interval, os_run_priority, output_file_name, last_run_outcome, last_run_duration, last_run_retries, last_run_date, last_run_time, proxy_id) 
+		exec msdb.dbo.sp_help_jobstep @job_id = @job_id
+	update #tmp_sp_help_jobstep set job_id = @job_id where job_id is null
+	fetch crs into @job_id
+end 
+close crs
+deallocate crs">
+					<link_field field="ParentSelect" />
+				</link_multiple>
+			</prefix>
+		</version>
+		<prefix fields ="#ProxyName#">
+create table #tmp_sp_help_proxy
+(proxy_id int null, name nvarchar(300) null, credential_identity nvarchar(300) null, enabled tinyint null, description nvarchar(max) null, user_sid binary(200) null, credential_id int null, credential_identity_exists int null)
+insert into #tmp_sp_help_proxy(proxy_id, name, credential_identity, enabled, description, user_sid, credential_id, credential_identity_exists)
+		exec msdb.dbo.sp_help_proxy
+		</prefix>
+		<postfix fields ="#ProxyName#">
+drop table #tmp_sp_help_proxy
+		</postfix>
+		<postfix>
+drop table #tmp_sp_help_jobstep
+		</postfix>
+		<post_process fields = '#LastRunDate#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessCreateDateTime' 
+				triggered_fields='#LastRunDateInt#LastRunTimeInt#'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='nvarchar' size = '128'>tshj.step_name</property>		
+		<property name='ID' type='int' access="Write" read_only_after_creation="true">tshj.step_id</property>
+        <property name="SubSystem" type="int" report_type="Agent.AgentSubSystem"
+			>CASE LOWER(tshj.subsystem) when 'tsql' THEN 1 WHEN 'activescripting' THEN 2 WHEN 'cmdexec' THEN 3 
+WHEN 'snapshot' THEN 4 WHEN 'logreader' THEN 5 WHEN 'distribution' THEN 6 
+WHEN 'merge' THEN 7 WHEN 'queuereader' THEN 8 WHEN 'analysisquery' THEN 9 
+WHEN 'analysiscommand' THEN 10 WHEN 'dts' THEN 11 WHEN 'ssis' THEN 11 WHEN 'powershell' THEN 12 ELSE 0 END</property>
+         <version min_major='10' >
+			<property name='Command' type='nvarchar' size = 'max'>ISNULL(tshj.command,N'')</property>		
+		</version>       
+		<property name='CommandExecutionSuccessCode' type='int'>tshj.cmdexec_success_code</property>
+		<property name='OnSuccessAction' type='tinyint' report_type="Agent.StepCompletionAction">tshj.on_success_action</property>		
+		<property name='OnSuccessStep' type='int'>tshj.on_success_step_id</property>		
+		<property name='OnFailAction' type='tinyint' report_type="Agent.StepCompletionAction">tshj.on_fail_action</property>		
+		<property name='OnFailStep' type='int'>tshj.on_fail_step_id</property>		
+		<property name='Server' type='nvarchar' size = '128'>ISNULL(tshj.server,N'')</property>		
+		<property name='DatabaseName' type='sysname'>ISNULL(tshj.database_name,N'')</property>		
+		<property name='DatabaseUserName' type='sysname'>ISNULL(tshj.database_user_name,N'')</property>		
+		<property name='RetryAttempts' type='int'>tshj.retry_attempts</property>
+		<property name='RetryInterval' type='int'>tshj.retry_interval</property>
+		<property name='OSRunPriority' type='int' report_type="Agent.OSRunPriority">tshj.os_run_priority</property>		
+		<property name='OutputFileName' type='nvarchar' size = '300'>ISNULL(tshj.output_file_name,N'')</property>
+		<property name='LastRunOutcome' type='int' report_type="Agent.CompletionResult" access="Read">tshj.last_run_outcome</property>
+		<property name='LastRunDuration' type='int' access="Read">tshj.last_run_duration</property>
+		<property name='LastRunRetries' type='int' access="Read">tshj.last_run_retries</property>
+		<property name="LastRunDate" type="datetime" access="Read">null</property>
+		<property name='LastRunDateInt' type='int' hidden='true'>tshj.last_run_date</property>
+		<property name='LastRunTimeInt' type='int' hidden='true'>tshj.last_run_time</property>
+		<property name="JobStepFlags" type="int" report_type="Agent.JobStepFlags">tshj.flags</property>		
+
+		<version min_major='10' >
+			<property name="ProxyName" type="nvarchar" size="300">ISNULL(sp.name,N'')</property>		
+		</version>
+		
+		<property name="JobID" type="uniqueidentifier" hidden='true'>tshj.job_id</property>
+	</properties>
+</EnumObject>

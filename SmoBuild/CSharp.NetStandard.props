@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+</Project>

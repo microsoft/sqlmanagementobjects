@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<EnumObject type="Column" impl_type="SqlObject" min_major='7' max_major='8' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+	</settings>
+	<properties>
+		<property name="ParentObjName" type="sysname" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="Name" />
+			</link_multiple>
+		</property>
+		<property name="ParentOwner" type="sysname" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="Schema" />
+			</link_multiple>
+		</property>
+		<property name="ParentObjectSchemaFromFilter" type="sysname" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="ObjectSchemaFromFilter" />
+			</link_multiple>
+		</property>
+		<property name="ParentObjectTypeName" type="sysname" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="ObjectTypeName" />
+			</link_multiple>
+		</property>
+		<property name="ParentObjectNameFromFilter" type="sysname" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='parent' field="ObjectNameFromFilter" />
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

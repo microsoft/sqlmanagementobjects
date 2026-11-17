@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServerProxyAccount" impl_type="ServerProxyAccount" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+		<version min_major='10' >
+    		<property_link>@account_name is not null</property_link>
+			<prefix fields="#IsEnabled#"> 
+				declare @SysAdminOnly int
+                set @SysAdminOnly = (select count(*) from sys.credentials c where c.name = N'##xp_cmdshell_proxy_account##')
+			</prefix>
+			<prefix> 
+declare @account_name nvarchar(4000)
+set @account_name = (select top 1 credential_identity from sys.credentials c where c.name = N'##xp_cmdshell_proxy_account##')
+if (@account_name is null)
+begin
+  set @account_name=N''
+end
+			</prefix>
+            </version>
+    </settings>
+   <properties>
+       <property name="Urn" type="nvarchar" size="600">
+           <link_multiple no='1' expression="{0} + '/ServerProxyAccount'">
+               <link_field type='parent' field="Urn" />
+           </link_multiple>
+       </property>
+           <property name="IsEnabled" type="bit" cast='true'>@SysAdminOnly</property>
+    	   <property name="WindowsAccount" type="nvarchar" size='4000'>@account_name</property>
+    </properties>
+</EnumObject>

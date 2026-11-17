@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExtendedProperty" impl_type="SqlObject" min_major='8' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ExtPropMajorID" local="MajorID" />
+			<link parent="ExtPropMinorID" local="MinorID" />
+			<link parent="ExtPropClass" local="Class" />
+		</parent_link>
+		<version min_major='8' max_major='8'>
+			<property_link table='dbo.sysproperties AS p' />
+		</version>
+		<version min_major='9' cloud_min_major='12'>
+			<property_link table='sys.extended_properties AS p' />
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname">p.name</property>
+		<property name="Value" type='sql_variant' cast='false'>p.value</property>
+		<version min_major='8' max_major='8'>
+			<property name="MajorID" type="int" hidden='true'>p.id</property>
+			<property name="MinorID" type="int" hidden='true'>p.smallid</property>
+			<property name="Class" type="int" hidden='true'>p.type</property>
+		</version>
+		<version min_major='9' cloud_min_major='12'>
+			<property name="MajorID" type="int" hidden='true'>p.major_id</property>
+			<property name="MinorID" type="int" hidden='true'>p.minor_id</property>
+			<property name="Class" type="int" hidden='true'>p.class</property>
+		</version>
+	</properties>
+</EnumObject>

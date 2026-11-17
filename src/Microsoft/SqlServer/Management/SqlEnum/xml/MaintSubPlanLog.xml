@@ -1,0 +1,25 @@
+<?xml version='1.0' ?>
+<EnumObject type='MaintenancePlan' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='msdb.dbo.sysmaintplan_log' alias='spl'/>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='3' expression="{0} + '/{2}[@ID=''' + cast ({1} as nvarchar(36)) + ''']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="ID" />
+				<link_field field="NType" />				
+			</link_multiple>
+		</property>
+	
+		<property name='ID' type='uniqueidentifier'>spl.task_detail_id</property>
+		<property name='StartTime' type='datetime'>spl.start_time</property>
+		<property name='EndTime' type='datetime'>spl.end_time</property>	
+		<property name='Succeeded' type='bit'>spl.succeeded</property>		
+
+		<property name='ParentID' type='uniqueidentifier' hidden='true'>spl.subplan_id</property>
+	</properties>
+</EnumObject>

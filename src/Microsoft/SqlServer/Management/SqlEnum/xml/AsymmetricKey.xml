@@ -1,0 +1,43 @@
+<?xml version='1.0' ?>
+<EnumObject type='AsymmetricKey' impl_type='SqlObject' min_major='10'  cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='sys.asymmetric_keys' alias='a'/>
+		<version min_major='10'>
+			<property_link fields='#ProviderName#' left_join='sys.cryptographic_providers' alias='cp'>cp.guid = a.cryptographic_provider_guid</property_link>
+		</version>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='Name' type='sysname'>a.name</property>
+		<property name='ID' type='int'>a.asymmetric_key_id</property>
+		<property name='Owner' type='sysname'>user_name(a.principal_id)</property>
+		<property name='KeyEncryptionAlgorithm' type='int' report_type='AsymmetricKeyEncryptionAlgorithm' 
+					access='read'>(case a.algorithm when '1R' then 0 when '2R' then 1 when '3R' then 2 else -1 end)</property>
+		<property name='KeyLength' type='int' access='read'>a.key_length</property>
+		<property name='PrivateKeyEncryptionType' type='int' report_type = 'PrivateKeyEncryptionType' 
+			access='read'>case a.pvt_key_encryption_type when 'NA' then 0 when 'MK' then 1 when 'PW' then 2 when 'CP' then 3 end</property>
+		<property name='PublicKey' type='varbinary' size='max' access='read'>a.public_key</property>
+		<property name='Sid' type='varbinary' size='85' access='read'>a.sid</property>
+		<property name='Thumbprint' type='varbinary' size='32' access='read'>a.thumbprint</property>
+		<version min_major='10'>
+			<property name='ProviderName' type='sysname'>ISNULL(cp.name, '')</property>
+		</version>
+
+		<!-- not available
+		<property name='CreateDate' type='datetime' access='read'>a.create_date</property>
+		<property name='DateLastModified' type='datetime' access='read'>a.modify_date</property>
+		-->
+
+		<!-- enable permissions -->
+		<property name="ExtPropClass" type="int" hidden='true'>26</property>
+		<property name="ExtPropMajorID" type="int" hidden='true'>
+			<link_multiple no='1' expression="{0}">
+				<link_field type='local' field="ID" />
+			</link_multiple>
+		</property>
+		<property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    <version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

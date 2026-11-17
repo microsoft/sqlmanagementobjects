@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalLibraryFile" impl_type="SqlObject" min_major='14' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <parent_link>
+            <link parent="ID" local="ParentID" />
+        </parent_link>
+        <property_link table='sys.external_library_files AS lfiles' />
+        <property_link fields='#Owner#' join='sys.external_libraries AS library'>lfiles.external_library_id = library.external_library_id</property_link>      
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="ParentID" type="int" hidden="true">lfiles.external_library_id</property>
+        <property name="Platform" type="nvarchar" size='120'>lfiles.platform_desc</property>
+        <property name="Name" type="sysname">library.name</property>
+        <property name="Content" type="image" access='Read'>lfiles.content</property>
+    </properties>
+</EnumObject>

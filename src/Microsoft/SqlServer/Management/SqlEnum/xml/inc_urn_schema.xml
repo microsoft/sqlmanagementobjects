@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_procedures" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+	</settings>
+	<properties>
+      <property name="Urn" type="nvarchar" size="600">
+        <link_multiple no='4' expression="{0} + '/{3}[@Name=' + quotename({1},'''') + ' and @Schema=' + quotename({2},'''') + ']'">
+          <link_field type='parent' field="Urn" />
+          <link_field type='local' field="Name" />
+          <link_field type='local' field="Schema" />
+          <link_field field="NType" />
+        </link_multiple>
+      </property>
+      <property name="FullName" type="nvarchar" size="300" hidden='true'>
+        <link_multiple no='2' expression="QUOTENAME({1}) + '.' + QUOTENAME({0})">
+          <link_field type='local' field="Name" />
+          <link_field type='local' field="Schema" />
+        </link_multiple>
+      </property>
+	</properties>
+</EnumObject>

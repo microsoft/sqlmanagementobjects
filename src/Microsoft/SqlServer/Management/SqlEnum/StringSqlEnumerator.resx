@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="IncorrectVersionTag" xml:space="preserve">
+    <value>Incorrect version tag. You must specify either a min_major, cloud_min_major or datawarehouse_enabled attribute. 
+
+{elementContent}</value>
+  </data>
+  <data name="ObjectNotSupportedOnSqlDw" xml:space="preserve">
+    <value>This object is not supported on Azure Synapse Analytics databases.</value>
+  </data>
+  <data name="ObjectSupportedOnlyOnSqlEdge" xml:space="preserve">
+    <value>This object is only supported on Azure SQL Edge.</value>
+  </data>
+  <data name="InvalidAttributeValue" xml:space="preserve">
+    <value>Value '{value}' on attribute '{attributeName}' was unable to be parsed correctly.</value>
+  </data>
+  <data name="NullVersionOnLoadingCfgFile" xml:space="preserve">
+    <value>Version was not specified on loading configuration file.</value>
+  </data>
+  <data name="EnumObjectTagNotFound" xml:space="preserve">
+    <value>Enumeration object tag was not found.</value>
+  </data>
+  <data name="InvalidConnectionType" xml:space="preserve">
+    <value>Connection type is not valid.</value>
+  </data>
+  <data name="OnlyPathOrFullName" xml:space="preserve">
+    <value>Only Path or only FullName must be specified.</value>
+  </data>
+  <data name="FileNameMustHavePath" xml:space="preserve">
+    <value>A Path must be specified with a FileName.</value>
+  </data>
+  <data name="DatabaseNameMustBeSpecified" xml:space="preserve">
+    <value>Database name must be specified.</value>
+  </data>
+  <data name="FailedToLoadResFileFromPaths" xml:space="preserve">
+    <value>File '{fileName}' was not found. Search paths were:
+{paths}
+The file might be missing in sources or misspelled in config.xml, or case sensitivity may not be preserved.</value>
+  </data>
+  <data name="FailedToLoadResFileFromAssembly" xml:space="preserve">
+    <value>File '{fileName}' was not found in Assembly {assembly}.
+The file might be missing in sources or misspelled in config.xml, or case sensitivity may not be preserved.</value>
+  </data>
+  <data name="UnsupportedTypeDepDiscovery" xml:space="preserve">
+    <value>{objType} is not supported in dependency discovery. Only objects of the following types are supported: {suppList}.</value>
+  </data>
+  <data name="QueryNotSupportedPostProcess" xml:space="preserve">
+    <value>Cannot provide DataReader because of the properties: {propList}</value>
+  </data>
+  <data name="FailedToLoadAssembly" xml:space="preserve">
+    <value>failed to load assembly {assembly}.</value>
+  </data>
+  <data name="FailedToCreateUrn" xml:space="preserve">
+    <value>failed to create Urn for object code: {objCode}</value>
+  </data>
+  <data name="UnknownOperator" xml:space="preserve">
+    <value>Unknown operator.</value>
+  </data>
+  <data name="PropMustBeSpecified" xml:space="preserve">
+    <value>{prop} must be specified on {obj}.</value>
+  </data>
+  <data name="InvalidUrnForDepends" xml:space="preserve">
+    <value>Urn is not valid for dependency discovery: {urn}</value>
+  </data>
+  <data name="TooManyDbLevels" xml:space="preserve">
+    <value>too many database levels.</value>
+  </data>
+  <data name="CouldNotInstantiateObj" xml:space="preserve">
+    <value>could not instantiate object {objType}.</value>
+  </data>
+  <data name="NotDerivedFrom" xml:space="preserve">
+    <value>{objType} is not derived from {objName}.</value>
+  </data>
+  <data name="UnknownType" xml:space="preserve">
+    <value>Unknown type: {type}.</value>
+  </data>
+  <data name="InvalidConfigurationFile" xml:space="preserve">
+    <value>Configuration file is not valid.</value>
+  </data>
+  <data name="MissingSection" xml:space="preserve">
+    <value>invalid configuration file: missing section {section}.</value>
+  </data>
+  <data name="NotDbObject" xml:space="preserve">
+    <value>object is not under database.</value>
+  </data>
+  <data name="NotSingleDb" xml:space="preserve">
+    <value>objects are not in a single database.</value>
+  </data>
+  <data name="NoClassNamePostProcess" xml:space="preserve">
+    <value>&lt;post_process&gt; tag missing class_name.</value>
+  </data>
+  <data name="InvalidVersion" xml:space="preserve">
+    <value>Operation not supported on version {version}.</value>
+  </data>
+  <data name="InvalidSqlServer" xml:space="preserve">
+    <value>Operation not supported on {productName}.</value>
+  </data>
+  <data name="CouldNotGetInfoFromDependencyRow" xml:space="preserve">
+    <value>Failed to retrieve dependency information ({rowInformation}).</value>
+  </data>
+  <data name="SqlServer90Name" xml:space="preserve">
+    <value>SQL Server 2005</value>
+  </data>
+  <data name="SqlServer80Name" xml:space="preserve">
+    <value>SQL Server 2000</value>
+  </data>
+  <data name="SmoSQLCLRUnAvailable" xml:space="preserve">
+    <value>The functionality you're trying to execute is disabled inside SQLCLR, if you still want to execute this functionality you can try executing it inside your client application.</value>
+  </data>
+  <data name="UnknownPermissionType" xml:space="preserve">
+    <value>Unknown Permission type {permissionType}</value>
+  </data>
+  <data name="UnknownPermissionCode" xml:space="preserve">
+    <value>Undefined permission code {code}</value>
+  </data>
+  <data name="Executing" xml:space="preserve">
+    <value>Executing</value>
+  </data>
+  <data name="WaitingForWorkerThread" xml:space="preserve">
+    <value>Waiting for worker thread</value>
+  </data>
+  <data name="BetweenRetries" xml:space="preserve">
+    <value>Between retries</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Not running</value>
+  </data>
+  <data name="Suspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
+  <data name="WaitingForStepToFinish" xml:space="preserve">
+    <value>Waiting for step to finish</value>
+  </data>
+  <data name="PerformingCompletionAction" xml:space="preserve">
+    <value>Performing completion action</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Queued" xml:space="preserve">
+    <value>Queued</value>
+  </data>
+  <data name="ctNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="ctPartial" xml:space="preserve">
+    <value>Partial</value>
+  </data>
+  <data name="rmFull" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="rmBulkLogged" xml:space="preserve">
+    <value>Bulk Logged</value>
+  </data>
+  <data name="rmSimple" xml:space="preserve">
+    <value>Simple</value>
+  </data>
+  <data name="msNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="msSuspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
+  <data name="msDisconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="msSynchronizing" xml:space="preserve">
+    <value>Synchronizing</value>
+  </data>
+  <data name="msPendingFailover" xml:space="preserve">
+    <value>Pending Failover</value>
+  </data>
+  <data name="msSynchronized" xml:space="preserve">
+    <value>Synchronized</value>
+  </data>
+  <data name="agshNoneSynchronizing" xml:space="preserve">
+    <value>None Synchronizing</value>
+  </data>
+  <data name="agshPartiallySynchronizing" xml:space="preserve">
+    <value>Partially Synchronizing</value>
+  </data>
+  <data name="agshAllSynchronizing" xml:space="preserve">
+    <value>All Synchronizing</value>
+  </data>
+  <data name="agshAllSynchronized" xml:space="preserve">
+    <value>All Synchronized</value>
+  </data>
+  <data name="arosPendingFailover" xml:space="preserve">
+    <value>Pending Failover</value>
+  </data>
+  <data name="arosPending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="arosOnline" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="arosOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="arosFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="arosFailedNoQuorum" xml:space="preserve">
+    <value>Failed No Quorum</value>
+  </data>
+  <data name="arrhInProgress" xml:space="preserve">
+    <value>In Progress</value>
+  </data>
+  <data name="arrhOnline" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="arshNotSynchronizing" xml:space="preserve">
+    <value>Not Synchronizing</value>
+  </data>
+  <data name="arshSynchronizing" xml:space="preserve">
+    <value>Synchronizing</value>
+  </data>
+  <data name="arshSynchronized" xml:space="preserve">
+    <value>Synchronized</value>
+  </data>
+  <data name="arrUninitialized" xml:space="preserve">
+    <value>Uninitialized</value>
+  </data>
+  <data name="arrResolving" xml:space="preserve">
+    <value>Resolving</value>
+  </data>
+  <data name="arrSecondary" xml:space="preserve">
+    <value>Secondary</value>
+  </data>
+  <data name="arrPrimary" xml:space="preserve">
+    <value>Primary</value>
+  </data>
+  <data name="arcsDisconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="arcsConnected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="hmsPendingCommunication" xml:space="preserve">
+    <value>Pending communication</value>
+  </data>
+  <data name="hmsRunning" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="hmsFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="cqtNodeMajority" xml:space="preserve">
+    <value>Node Majority</value>
+  </data>
+  <data name="cqtNodeAndDiskMajority" xml:space="preserve">
+    <value>Node and Disk Majority</value>
+  </data>
+  <data name="cqtNodeAndFileshareMajority" xml:space="preserve">
+    <value>Node and Fileshare Majority</value>
+  </data>
+  <data name="cqtDiskOnly" xml:space="preserve">
+    <value>Disk Only</value>
+  </data>
+  <data name="cqtNotApplicable" xml:space="preserve">
+    <value>Not Applicable</value>
+  </data>
+  <data name="cqtCloudWitness" xml:space="preserve">
+    <value>Cloud Witness</value>
+  </data>
+  <data name="cqsUnknownQuorumState" xml:space="preserve">
+    <value>Unknown Quorum State</value>
+  </data>
+  <data name="cqsNormalQuorum" xml:space="preserve">
+    <value>Normal Quorum</value>
+  </data>
+  <data name="cqsForcedQuorum" xml:space="preserve">
+    <value>Forced Quorum</value>
+  </data>
+  <data name="cqsNotApplicable" xml:space="preserve">
+    <value>Not Applicable</value>
+  </data>
+  <data name="cmtNode" xml:space="preserve">
+    <value>Node</value>
+  </data>
+  <data name="cmtDiskWitness" xml:space="preserve">
+    <value>Disk Witness</value>
+  </data>
+  <data name="cmtFileshareWitness" xml:space="preserve">
+    <value>Fileshare Witness</value>
+  </data>
+  <data name="cmtCloudWitness" xml:space="preserve">
+    <value>Cloud Witness</value>
+  </data>
+  <data name="cmsOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="cmsPartiallyOnline" xml:space="preserve">
+    <value>Partially Online</value>
+  </data>
+  <data name="cmsOnline" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="cmsUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="replicaReadModeNoConnections" xml:space="preserve">
+    <value>Disallow connections</value>
+  </data>
+  <data name="replicaReadModeReadIntentConnectionsOnly" xml:space="preserve">
+    <value>Allow only read-intent connections</value>
+  </data>
+  <data name="replicaReadModeAllConnections" xml:space="preserve">
+    <value>Allow all connections</value>
+  </data>
+  <data name="cmprReadWriteConnections" xml:space="preserve">
+    <value>Allow read/write connections</value>
+  </data>
+  <data name="cmprAllConnections" xml:space="preserve">
+    <value>Allow all connections</value>
+  </data>
+  <data name="cmsrNoConnections" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="cmsrReadIntentConnectionsOnly" xml:space="preserve">
+    <value>Read-intent only</value>
+  </data>
+  <data name="cmsrAllConnections" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="seedingModeAutomatic" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="seedingModeManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="aramSynchronousCommit" xml:space="preserve">
+    <value>Synchronous commit</value>
+  </data>
+  <data name="aramAsynchronousCommit" xml:space="preserve">
+    <value>Asynchronous commit</value>
+  </data>
+  <data name="aramConfigurationOnly" xml:space="preserve">
+    <value>Configuration only</value>
+  </data>
+  <data name="arfmAutomatic" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="arfmManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="arfmExternal" xml:space="preserve">
+    <value>External</value>
+  </data>
+  <data name="arjsNotJoined" xml:space="preserve">
+    <value>Not Joined</value>
+  </data>
+  <data name="arjsJoinedStandaloneInstance" xml:space="preserve">
+    <value>Joined Standalone Instance</value>
+  </data>
+  <data name="arjsJoinedFailoverClusterInstance" xml:space="preserve">
+    <value>Joined SQL Server Failover Cluster Instance</value>
+  </data>
+  <data name="adssNotSynchronizing" xml:space="preserve">
+    <value>Not Synchronizing</value>
+  </data>
+  <data name="adssSynchronizing" xml:space="preserve">
+    <value>Synchronizing</value>
+  </data>
+  <data name="adssSynchronized" xml:space="preserve">
+    <value>Synchronized</value>
+  </data>
+  <data name="adssReverting" xml:space="preserve">
+    <value>Reverting</value>
+  </data>
+  <data name="adssInitializing" xml:space="preserve">
+    <value>Initializing</value>
+  </data>
+  <data name="drsrSuspendFromUser" xml:space="preserve">
+    <value>Suspend From User</value>
+  </data>
+  <data name="drsrSuspendFromPartner" xml:space="preserve">
+    <value>Suspend From Partner</value>
+  </data>
+  <data name="drsrSuspendFromRedo" xml:space="preserve">
+    <value>Suspend From Redo</value>
+  </data>
+  <data name="drsrSuspendFromApply" xml:space="preserve">
+    <value>Suspend From Apply</value>
+  </data>
+  <data name="drsrSuspendFromCapture" xml:space="preserve">
+    <value>Suspend From Capture</value>
+  </data>
+  <data name="drsrSuspendFromRestart" xml:space="preserve">
+    <value>Suspend From Restart</value>
+  </data>
+  <data name="drsrSuspendFromUndo" xml:space="preserve">
+    <value>Suspend From Undo</value>
+  </data>
+  <data name="drsrNotApplicable" xml:space="preserve">
+    <value>Not Applicable</value>
+  </data>
+  <data name="agabpPrimary" xml:space="preserve">
+    <value>Primary</value>
+  </data>
+  <data name="agabpSecondaryOnly" xml:space="preserve">
+    <value>Secondary Only</value>
+  </data>
+  <data name="agabpSecondary" xml:space="preserve">
+    <value>Secondary</value>
+  </data>
+  <data name="agabpNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="agfcOnServerDown" xml:space="preserve">
+    <value>On Server Down</value>
+  </data>
+  <data name="agfcOnServerUnresponsive" xml:space="preserve">
+    <value>On Server Unresponsive</value>
+  </data>
+  <data name="agfcOnCriticalServerErrors" xml:space="preserve">
+    <value>On Critical Server Errors</value>
+  </data>
+  <data name="agfcOnModerateServerErrors" xml:space="preserve">
+    <value>On Moderate Server Errors</value>
+  </data>
+  <data name="agfcOnAnyQualifiedFailureCondition" xml:space="preserve">
+    <value>On Any Qualified Failure Condition</value>
+  </data>
+  <data name="aglipOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="aglipOnline" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="aglipOnlinePending" xml:space="preserve">
+    <value>Online Pending</value>
+  </data>
+  <data name="agliFailure" xml:space="preserve">
+    <value>Failure</value>
+  </data>
+  <data name="agliUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="agctExternal" xml:space="preserve">
+    <value>EXTERNAL</value>
+  </data>
+  <data name="agctNone" xml:space="preserve">
+    <value>NONE</value>
+  </data>
+  <data name="agctWsfc" xml:space="preserve">
+    <value>Windows Server Failover Cluster</value>
+  </data>
+  <data name="fgtRowsFileGroup" xml:space="preserve">
+    <value>A filegroup used for row data</value>
+  </data>
+  <data name="fgtFileStreamDataFileGroup" xml:space="preserve">
+    <value>A filegroup used for filestream data</value>
+  </data>
+  <data name="fgtMemoryOptimizedDataFileGroup" xml:space="preserve">
+    <value>A filegroup used for memory optimized data</value>
+  </data>
+  <data name="securityPredicateTypeFilter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="securityPredicateTypeBlock" xml:space="preserve">
+    <value>Block</value>
+  </data>
+  <data name="securityPredicateOperationAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="securityPredicateOperationAfterInsert" xml:space="preserve">
+    <value>After Insert</value>
+  </data>
+  <data name="securityPredicateOperationAfterUpdate" xml:space="preserve">
+    <value>After Update</value>
+  </data>
+  <data name="securityPredicateOperationBeforeUpdate" xml:space="preserve">
+    <value>Before Update</value>
+  </data>
+  <data name="securityPredicateOperationBeforeDelete" xml:space="preserve">
+    <value>Before Delete</value>
+  </data>
+  <data name="Clustered" xml:space="preserve">
+    <value>Clustered</value>
+  </data>
+  <data name="NonClustered" xml:space="preserve">
+    <value>Non-Clustered</value>
+  </data>
+  <data name="PrimaryXml" xml:space="preserve">
+    <value>Primary XML</value>
+  </data>
+  <data name="SecondaryXml" xml:space="preserve">
+    <value>Secondary XML</value>
+  </data>
+  <data name="Spatial" xml:space="preserve">
+    <value>Spatial</value>
+  </data>
+  <data name="NonClusteredColumnStore" xml:space="preserve">
+    <value>Non-Clustered Columnstore</value>
+  </data>
+  <data name="NonClusteredHash" xml:space="preserve">
+    <value>Non-Clustered Hash</value>
+  </data>
+  <data name="SelectiveXml" xml:space="preserve">
+    <value>Selective XML</value>
+  </data>
+  <data name="SecondarySelectiveXml" xml:space="preserve">
+    <value>Secondary Selective XML</value>
+  </data>
+  <data name="ClusteredColumnStore" xml:space="preserve">
+    <value>Clustered Columnstore</value>
+  </data>
+  <data name="Heap" xml:space="preserve">
+    <value>Heap</value>
+  </data>
+  <data name="Vector" xml:space="preserve">
+    <value>Vector</value>
+  </data>
+  <data name="Json" xml:space="preserve">
+    <value>JSON</value>
+  </data>
+  <data name="TransactSql" xml:space="preserve">
+    <value>Transact-SQL script (T-SQL)</value>
+  </data>
+  <data name="ActiveScripting" xml:space="preserve">
+    <value>ActiveX Script</value>
+  </data>
+  <data name="CmdExec" xml:space="preserve">
+    <value>Operating system (CmdExec)</value>
+  </data>
+  <data name="AnalysisCommand" xml:space="preserve">
+    <value>SQL Server Analysis Services Command</value>
+  </data>
+  <data name="AnalysisQuery" xml:space="preserve">
+    <value>SQL Server Analysis Services Query</value>
+  </data>
+  <data name="ReplDistribution" xml:space="preserve">
+    <value>Replication Distributor</value>
+  </data>
+  <data name="ReplMerge" xml:space="preserve">
+    <value>Replication Merge</value>
+  </data>
+  <data name="ReplQueueReader" xml:space="preserve">
+    <value>Replication Queue Reader</value>
+  </data>
+  <data name="ReplSnapshot" xml:space="preserve">
+    <value>Replication Snapshot</value>
+  </data>
+  <data name="ReplLogReader" xml:space="preserve">
+    <value>Replication Transaction-Log Reader</value>
+  </data>
+  <data name="SSIS" xml:space="preserve">
+    <value>SQL Server Integration Services Package</value>
+  </data>
+  <data name="PowerShell" xml:space="preserve">
+    <value>PowerShell</value>
+  </data>
+  <data name="dbCatalogCollationDatabaseDefault" xml:space="preserve">
+    <value>Database Default</value>
+  </data>
+  <data name="dbCatalogCollationContained" xml:space="preserve">
+    <value>Latin1_General_100_CI_AS_KS_WS_SC</value>
+  </data>
+  <data name="dbCatalogCollationSQL_Latin1_General_CP1_CI_AS" xml:space="preserve">
+    <value>SQL_Latin1_General_CP1_CI_AS</value>
+  </data>
+  <data name="UnknownDest" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="FileDest" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="SecurityLogDest" xml:space="preserve">
+    <value>Security Log</value>
+  </data>
+  <data name="ApplicationLogDest" xml:space="preserve">
+    <value>Application Log</value>
+  </data>
+  <data name="UrlDest" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="ExternalMonitorDest" xml:space="preserve">
+    <value>External Monitor</value>
+  </data>
+  <data name="OnFailureActionContinue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="OnFailureActionShutdown" xml:space="preserve">
+    <value>Shutdown SQL Server instance</value>
+  </data>
+  <data name="OnFailureActionFail" xml:space="preserve">
+    <value>Fail operation</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ReadOnly" xml:space="preserve">
+    <value>Read only</value>
+  </data>
+  <data name="ReadWrite" xml:space="preserve">
+    <value>Read write</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Custom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="DatabaseNameMustBeSpecifiedinTheUrn" xml:space="preserve">
+    <value>The database name must be specified in the urn: {urn}</value>
+  </data>
+</root>

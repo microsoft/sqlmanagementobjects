@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="Condition" impl_type="PolicyObject" min_major='10'>
+	<settings>
+		<property_link table='msdb.dbo.syspolicy_conditions' alias='pc'/>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name='ID' type='int' access='Read'>pc.condition_id</property>
+		<property name='Name' type='sysname'>pc.name</property>
+		<property name='Description' type='nvarchar' size = 'max'>pc.description</property>
+		<property name='Facet' type='nvarchar' size = 'max'>ISNULL(pc.facet,N'')</property>
+		<property name='Expression' type='nvarchar' size = 'max'>pc.expression</property>
+		<property name='CreateDate' type='datetime' access='Read'>pc.date_created</property>
+		<property name='CreatedBy' type='sysname' access='Read'>pc.created_by</property>
+		<property name='DateModified' type='datetime' access='Read'>pc.date_modified</property>
+		<property name='ModifiedBy' type='sysname' access='Read'>pc.modified_by</property>
+    <version min_major='10' max_major='10' max_minor='0' >
+      <property name='IsSystemObject' type='bit' access='Read'>CAST(0 AS bit)</property>
+    </version>
+    <version min_major='10' min_minor='50'>
+      <property name='IsSystemObject' type='bit' access='Read'>pc.is_system</property>
+    </version>
+  </properties>
+</EnumObject>

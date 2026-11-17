@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_text" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<!--TableVariableName is need in udf - we need to parse the text to get the name of the retun table, 
+		it is not present in the metadata-->
+		<post_process fields='#Text#BodyStartIndex#HasColumnSpecification#TableVariableName#' class_name='Microsoft.SqlServer.Management.Smo.PostProcessBodyText'
+					triggered_fields='#Definition#'/>
+	</settings>
+	<properties>
+		<!-- Definition must be already there-->
+		<version min_major = '10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="Text" type="nvarchar" size='max' expensive='true' access="Read">NULL</property>		
+		</version>
+		<property name="BodyStartIndex" type="int" expensive='true' access="Read">NULL</property>
+	</properties>
+</EnumObject>

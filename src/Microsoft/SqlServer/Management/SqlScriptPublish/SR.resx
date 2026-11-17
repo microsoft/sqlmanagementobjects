@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype=">text/microsoft-resx</resheader>
+    <resheader name="version=">2.0</resheader>
+    <resheader name="reader=">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer=">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1="><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing=">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64=">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64=">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata=">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true=">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Table" xml:space="preserve">
+    <value>Tables</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>Views </value>
+  </data>
+  <data name="StoredProcedure" xml:space="preserve">
+    <value>Stored Procedures</value>
+  </data>
+  <data name="UserDefinedFunction" xml:space="preserve">
+    <value>User-Defined Functions</value>
+  </data>
+  <data name="UserDefinedDataType" xml:space="preserve">
+    <value>User-Defined Data Types</value>
+  </data>
+  <data name="UserDefinedTableType" xml:space="preserve">
+    <value>User-Defined Table Types</value>
+  </data>
+  <data name="SecurityPolicy" xml:space="preserve">
+    <value>Security Policies</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Defaults</value>
+  </data>
+  <data name="Rule" xml:space="preserve">
+    <value>Rules</value>
+  </data>
+  <data name="ApplicationRole" xml:space="preserve">
+    <value>Application Roles</value>
+  </data>
+  <data name="SqlAssembly" xml:space="preserve">
+    <value>SQL Assemblies</value>
+  </data>
+  <data name="DdlTrigger" xml:space="preserve">
+    <value>DDL Triggers</value>
+  </data>
+  <data name="DatabaseRole" xml:space="preserve">
+    <value>Database Roles</value>
+  </data>
+  <data name="Synonym" xml:space="preserve">
+    <value>Synonyms</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="XmlSchemaCollection" xml:space="preserve">
+    <value>Xml Schema Collections</value>
+  </data>
+  <data name="Schema" xml:space="preserve">
+    <value>Schemas</value>
+  </data>
+  <data name="PlanGuide" xml:space="preserve">
+    <value>Plan Guides</value>
+  </data>
+  <data name="UserDefinedType" xml:space="preserve">
+    <value>User-DefinedTypes</value>
+  </data>
+  <data name="UserDefinedAggregate" xml:space="preserve">
+    <value>User-Defined Aggregates</value>
+  </data>
+  <data name="FullTextCatalog" xml:space="preserve">
+    <value>FullText Catalogs</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Not Run</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>In progress</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="UnableToConnect" xml:space="preserve">
+    <value>Unable to connect to {server}.</value>
+  </data>
+  <data name="UnableToFind" xml:space="preserve">
+    <value>Unable to find {objectName}.</value>
+  </data>
+  <data name="ValueIsNull" xml:space="preserve">
+    <value>&apos;{str}&apos; is null.</value>
+  </data>
+  <data name="ValueIsNullOrEmpty" xml:space="preserve">
+    <value>&apos;{str}&apos; is null or empty.</value>
+  </data>
+  <data name="InvalidObjectType" xml:space="preserve">
+    <value>Invalid object type &apos;{typeName}&apos;.</value>
+  </data>
+  <data name="InvalidObjectTypeForVersion" xml:space="preserve">
+    <value>Object &apos;{name}&apos; of type &apos;{type}&apos; is not valid for the selected database engine type.</value>
+  </data>
+  <data name="ERROR_ScriptingFailed" xml:space="preserve">
+    <value>An error occurred while scripting the objects.</value>
+  </data>
+  <data name="ERROR_NotebookWriterNotRegistered" xml:space="preserve">
+    <value>No Notebook writer factory has been registered. Call SqlScriptGenerator.NotebookWriterFactory to register an ISmoScriptWriter implementation for Notebook output before using ScriptDestination.ToNotebook..</value>
+  </data>
+  <data name="InvalidScriptPreText" xml:space="preserve">
+    <value>/* * * *
+The following script is not valid for the specified SQL Server database engine type and must be updated.
+* * * */
+</value>
+  </data>
+  <data name="InvalidScriptPostText" xml:space="preserve">
+    <value>/* * * *
+End of invalid script block.
+* * * */
+</value>
+  </data>
+  <data name="ERROR_PublishDataInternalError" xml:space="preserve">
+    <value>An error occurred while trying to publish data for table {tableName}.</value>
+  </data>
+  <data name="ERROR_PublishDataUdtError" xml:space="preserve">
+    <value>Cannot publish data for table {tableName} with user defined type.</value>
+  </data>
+  <data name="ERROR_RowExceedsMaxRequestSize" xml:space="preserve">
+    <value>Row number {rowNumber} in table {tableName} is longer than the max request size allowed by the web service.</value>
+  </data>
+  <data name="ERROR_PublishScriptFailed" xml:space="preserve">
+    <value>An error occurred while trying to publish the following script:{script}</value>
+  </data>
+  <data name="ERROR_UnsupportedDatabaseEngineEditionAndDatabaseEngineTypeOptionCombination" xml:space="preserve">
+    <value>The database engine edition &apos;{databaseEngineEdition}&apos; is not supported on database engine type &apos;{databaseEngineType}&apos;.</value>
+  </data>
+  <data name="ERROR_UnexpectedDatabaseEngineTypeDetected" xml:space="preserve">
+    <value>Unexpected database engine type detected &apos;{databaseEngineType}&apos;.</value>
+  </data>
+  <data name="ERROR_UnexpectedDatabaseEngineEditionDetected" xml:space="preserve">
+    <value>Unexpected database engine edition detected &apos;{databaseEngineEdition}&apos;.</value>
+  </data>
+</root>

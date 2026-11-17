@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EnumObject type="BrokerPriority" impl_type="ServiceBrokerSqlObject" min_major='10'>
+    <settings>
+        <property_link table="sys.conversation_priorities AS bp"/>
+        <property_link fields='#ContractName#' left_join="sys.service_contracts AS sc">bp.service_contract_id = sc.service_contract_id</property_link>
+        <property_link fields='#LocalServiceName#' left_join="sys.services AS ss">ss.service_id = bp.local_service_id</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname" access='Read'>bp.name</property>
+        <property name="ID" type="int" access='Read'>bp.priority_id</property>
+        <property name="ContractName" type="sysname" >ISNULL(sc.name,N'')</property>
+        <property name="LocalServiceName" type="sysname" >ISNULL(ss.name,N'')</property>
+        <property name="RemoteServiceName" type="nvarchar" size="256" >ISNULL(bp.remote_service_name,N'')</property>
+        <property name="PriorityLevel" type="tinyint" >bp.priority</property>
+      <include file='inc_policy_health_state.xml'/>
+    </properties>
+</EnumObject>

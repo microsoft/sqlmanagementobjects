@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<EnumObject type="ServerAuditSpecificationDetail" impl_type="SqlObject" min_major="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table="sys.server_audit_specification_details AS details"></property_link>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='1' expression="{0} + '/ServerAuditSpecificationDetail'">
+        <link_field type='parent' field="Urn" />
+      </link_multiple>
+    </property>
+    <property name="ParentID" type="int">details.server_specification_id</property>
+    <property name="AuditActionType" type="char" size="4">details.audit_action_name</property>
+    <property name="ObjectClass" type="sysname">''</property>
+    <property name="ObjectSchema" type="sysname">''</property>
+    <property name="ObjectName" type="sysname">''</property>
+    <property name="Principal" type="sysname">''</property>
+  </properties>
+</EnumObject>

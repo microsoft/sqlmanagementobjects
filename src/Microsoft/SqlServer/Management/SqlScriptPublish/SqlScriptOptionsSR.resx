@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype=">text/microsoft-resx</resheader>
+    <resheader name="version=">2.0</resheader>
+    <resheader name="reader=">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer=">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1="><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing=">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64=">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64=">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata=">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true=">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+    <comment> For localizers and UE (These comments will be seen in LocStudio)</comment>
+  </data>
+  <data name="TableView" xml:space="preserve">
+    <value>Table/View Options</value>
+  </data>
+  <data name="OptionsLabel" xml:space="preserve">
+    <value>&amp;Options</value>
+  </data>
+  <data name="PublishingOptions" xml:space="preserve">
+    <value>Publishing Options</value>
+  </data>
+  <data name="TrueText" xml:space="preserve">
+    <value>True</value>
+  </data>
+  <data name="FalseText" xml:space="preserve">
+    <value>False</value>
+  </data>
+  <data name="ScriptUseDatabase" xml:space="preserve">
+    <value>Script USE DATABASE</value>
+  </data>
+  <data name="Generateusedatabase" xml:space="preserve">
+    <value>Generate USE DATABASE statement.</value>
+  </data>
+  <data name="ScriptLogins" xml:space="preserve">
+    <value>Script Logins</value>
+  </data>
+  <data name="Generatescriptfordatabaselogins" xml:space="preserve">
+    <value>Script all logins available on the server. Passwords will not be scripted.</value>
+  </data>
+  <data name="ScriptObjectLevelPermissions" xml:space="preserve">
+    <value>Script Object-Level Permissions</value>
+  </data>
+  <data name="Generateobjectlevelpermissions" xml:space="preserve">
+    <value>Generate object-level permissions.</value>
+  </data>
+  <data name="PublishObjectLevelPermissions" xml:space="preserve">
+    <value>Publish Object-Level Permissions</value>
+  </data>
+  <data name="PublishDObjectLevelPermissions" xml:space="preserve">
+    <value>Publish object-level permissions</value>
+  </data>
+  <data name="ScriptCreate" xml:space="preserve">
+    <value>Script CREATE</value>
+  </data>
+  <data name="ScriptDrop" xml:space="preserve">
+    <value>Script DROP</value>
+  </data>
+  <data name="ScriptCreateDrop" xml:space="preserve">
+    <value>Script DROP and CREATE</value>
+  </data>
+  <data name="ScriptCreateDropDescription" xml:space="preserve">
+    <value>Script Object CREATE/DROP statements.</value>
+  </data>
+  <data name="TypesOfDataToScriptDesc" xml:space="preserve">
+    <value>Generates script that contains schema only or schema and data.</value>
+  </data>
+  <data name="TypesOfDataToScript" xml:space="preserve">
+    <value>Types of data to script</value>
+  </data>
+  <data name="DataOnly" xml:space="preserve">
+    <value>Data only</value>
+  </data>
+  <data name="SchemaOnly" xml:space="preserve">
+    <value>Schema only</value>
+  </data>
+  <data name="SchemaAndData" xml:space="preserve">
+    <value>Schema and data</value>
+  </data>
+  <data name="CreateMode" xml:space="preserve">
+    <value>Generate Object CREATE statements.</value>
+  </data>
+  <data name="DropMode" xml:space="preserve">
+    <value>Generate Object DROP statements.</value>
+  </data>
+  <data name="GenerateScriptForDependentObjects" xml:space="preserve">
+    <value>Generate Script for Dependent Objects</value>
+  </data>
+  <data name="Generatescriptfordependentobjectsofeachtablescripted" xml:space="preserve">
+    <value>Generate script for dependent objects for each object scripted.</value>
+  </data>
+  <data name="PublishForDependentObjects" xml:space="preserve">
+    <value>Publish Dependent Objects</value>
+  </data>
+  <data name="Publishfordependentobjectsofeachtablescripted" xml:space="preserve">
+    <value>Publish dependent objects for each object that is published.</value>
+  </data>
+  <data name="IncludeDescriptiveHeaders" xml:space="preserve">
+    <value>Include Descriptive Headers</value>
+  </data>
+  <data name="Includedescriptiveheadersforeachtablescripted" xml:space="preserve">
+    <value>Include descriptive headers for each object scripted.</value>
+  </data>
+  <data name="IncludeScriptingParametersHeader" xml:space="preserve">
+    <value>Include Scripting Parameters Header</value>
+  </data>
+  <data name="IncludeScriptingParametersHeaderDescription" xml:space="preserve">
+    <value>Include header containing information about the scripting parameters used.</value>
+  </data>
+  <data name="ContinueScriptingOnError" xml:space="preserve">
+    <value>Continue scripting on Error</value>
+  </data>
+  <data name="Continuescriptifanerroroccuredorotherwisestop" xml:space="preserve">
+    <value>Continue to script if an error occurs. Otherwise, stop.</value>
+  </data>
+  <data name="AppendToFile" xml:space="preserve">
+    <value>Append to File</value>
+  </data>
+  <data name="Appendtofilethegeneratedscript" xml:space="preserve">
+    <value>Append the generated script to a file.</value>
+  </data>
+  <data name="ScriptExtendedProperties" xml:space="preserve">
+    <value>Script Extended Properties</value>
+  </data>
+  <data name="Scriptextendedpropertiesforeachtablescripted" xml:space="preserve">
+    <value>Script the Extended Properties for each object scripted.</value>
+  </data>
+  <data name="PublishExtendedProperties" xml:space="preserve">
+    <value>Publish Extended Properties</value>
+  </data>
+  <data name="Publishextendedpropertiesforeachtablescripted" xml:space="preserve">
+    <value>Publish the Extended Properties for each object that is scripted.</value>
+  </data>
+  <data name="ScriptOwnerForTheObjects" xml:space="preserve">
+    <value>Script owner for the objects.</value>
+  </data>
+  <data name="ScriptOwner" xml:space="preserve">
+    <value>Script Owner</value>
+  </data>
+  <data name="Prefixschemaforobjects" xml:space="preserve">
+    <value>Prefix object names with the object schema.</value>
+  </data>
+  <data name="SchemaQualify" xml:space="preserve">
+    <value>Schema qualify object names.</value>
+  </data>
+  <data name="IncludeIfNotExists" xml:space="preserve">
+    <value>Check for object existence</value>
+  </data>
+  <data name="Scriptobjectswithifnotexistoption" xml:space="preserve">
+    <value>Check that an object with the given name exists before dropping or altering or that an object with the given name does not exist before creating.</value>
+  </data>
+  <data name="GenerateScriptCollation" xml:space="preserve">
+    <value>Script Collation</value>
+  </data>
+  <data name="Scriptobjectswithcollation" xml:space="preserve">
+    <value>Script the objects that use collation.</value>
+  </data>
+  <data name="PublishCollation" xml:space="preserve">
+    <value>Publish Collation</value>
+  </data>
+  <data name="Publishobjectswithcollation" xml:space="preserve">
+    <value>Publish the objects that use collation.</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Script Defaults</value>
+  </data>
+  <data name="ScriptChangeTracking" xml:space="preserve">
+    <value>Script Change Tracking</value>
+  </data>
+  <data name="ScriptChangeTrackingInformation" xml:space="preserve">
+    <value>Scripts the change tracking information.</value>
+  </data>
+  <data name="ScriptDefaults" xml:space="preserve">
+    <value>Script the default values.</value>
+  </data>
+  <data name="ScriptDataCompression" xml:space="preserve">
+    <value>Script Data Compression Options</value>
+  </data>
+  <data name="ScriptXmlCompression" xml:space="preserve">
+    <value>Script Xml Compression Options</value>
+  </data>
+  <data name="ScriptDataCompressionInformation" xml:space="preserve">
+    <value>Scripts the data compression information.</value>
+  </data>
+  <data name="ScriptXmlCompressionInformation" xml:space="preserve">
+    <value>Scripts the xml compression information.</value>
+  </data>
+  <data name="PublishDefault" xml:space="preserve">
+    <value>Publish Defaults</value>
+  </data>
+  <data name="PublishDefaults" xml:space="preserve">
+    <value>Publish the default values.</value>
+  </data>
+  <data name="Onlyscript70compatiblefeaturesforeachtablescripted" xml:space="preserve">
+    <value>Generate script only for SQL Server 7.0 compatible features for each object scripted.</value>
+  </data>
+  <data name="ScriptIndexes" xml:space="preserve">
+    <value>Script Indexes</value>
+  </data>
+  <data name="Scriptindexesforeachtablescripted" xml:space="preserve">
+    <value>Script the indexes (including XML and clustered indexes) for each table or indexed view scripted.</value>
+  </data>
+  <data name="PublishIndexes" xml:space="preserve">
+    <value>Publish Indexes</value>
+  </data>
+  <data name="Publishindexesforeachtablescripted" xml:space="preserve">
+    <value>Publish the indexes for each table or indexed view that is published. This includes XML and clustered indexes.</value>
+  </data>
+  <data name="ScriptFullTextIndexes" xml:space="preserve">
+    <value>Script Full-Text Indexes</value>
+  </data>
+  <data name="Scriptfulltextindexesforeachtablescripted" xml:space="preserve">
+    <value>Script the full-text indexes for each table or indexed view scripted.</value>
+  </data>
+  <data name="PublishFullTextIndexes" xml:space="preserve">
+    <value>Publish Full-Text Indexes</value>
+  </data>
+  <data name="Publishfulltextindexesforeachtablescripted" xml:space="preserve">
+    <value>Publish the full-text indexes for each table or indexed view that is published.</value>
+  </data>
+  <data name="ScriptTriggers" xml:space="preserve">
+    <value>Script Triggers</value>
+  </data>
+  <data name="Scripttriggersforeachtablescripted" xml:space="preserve">
+    <value>Script the triggers for each table or view scripted.</value>
+  </data>
+  <data name="PublishTriggers" xml:space="preserve">
+    <value>Publish Triggers</value>
+  </data>
+  <data name="Publishtriggersforeachtablescripted" xml:space="preserve">
+    <value>Publish the triggers for each table or view that is published.</value>
+  </data>
+  <data name="ScriptPrimaryKeys" xml:space="preserve">
+    <value>Script Primary Keys</value>
+  </data>
+  <data name="Scriptprimarykeysforeachtablescripted" xml:space="preserve">
+    <value>Script the primary keys for each table or view scripted.</value>
+  </data>
+  <data name="PublishPrimaryKeys" xml:space="preserve">
+    <value>Publish Primary Keys</value>
+  </data>
+  <data name="Publishprimarykeysforeachtablescripted" xml:space="preserve">
+    <value>Publish the primary keys for each table or view that is published.</value>
+  </data>
+  <data name="ScriptUniqueKeys" xml:space="preserve">
+    <value>Script Unique Keys</value>
+  </data>
+  <data name="Scriptuniqueskeysforeachtablescripted" xml:space="preserve">
+    <value>Script the unique keys for each table or view scripted.</value>
+  </data>
+  <data name="PublishUniqueKeys" xml:space="preserve">
+    <value>Publish Unique Keys</value>
+  </data>
+  <data name="Publishuniqueskeysforeachtablescripted" xml:space="preserve">
+    <value>Publish the unique keys for each table or view that is published.</value>
+  </data>
+  <data name="ScriptForeignKeys" xml:space="preserve">
+    <value>Script Foreign Keys</value>
+  </data>
+  <data name="Scriptforeignkeysforeachtablescripted" xml:space="preserve">
+    <value>Script the foreign keys for each table scripted.</value>
+  </data>
+  <data name="PublishForeignKeys" xml:space="preserve">
+    <value>Publish Foreign Keys</value>
+  </data>
+  <data name="Publishforeignkeysforeachtablescripted" xml:space="preserve">
+    <value>Publish the foreign keys for each table that is published.</value>
+  </data>
+  <data name="ScriptCheckConstraints" xml:space="preserve">
+    <value>Script Check Constraints</value>
+  </data>
+  <data name="Scriptcheckconstraintsforeachtablescripted" xml:space="preserve">
+    <value>Script the check constraints for each table or view scripted.</value>
+  </data>
+  <data name="PublishCheckConstraints" xml:space="preserve">
+    <value>Publish CHECK Constraints</value>
+  </data>
+  <data name="Publishcheckconstraintsforeachtablescripted" xml:space="preserve">
+    <value>Publish CHECK constraints for each table or view that is published.</value>
+  </data>
+  <data name="ScriptConvertUDDT" xml:space="preserve">
+    <value>Convert UDDTs to Base Types</value>
+  </data>
+  <data name="Generateconvertuddt" xml:space="preserve">
+    <value>Convert user-defined data types to base types.</value>
+  </data>
+  <data name="ScriptStatistics" xml:space="preserve">
+    <value>Script Statistics</value>
+  </data>
+  <data name="generatescriptstatistics" xml:space="preserve">
+    <value>Script statistics, and optionally include histograms, for each selected table or view.</value>
+  </data>
+  <data name="ScriptStatisticsNone" xml:space="preserve">
+    <value>Do not script statistics</value>
+  </data>
+  <data name="ScriptStatisticsDDL" xml:space="preserve">
+    <value>Script statistics</value>
+  </data>
+  <data name="ScriptStatisticsAll" xml:space="preserve">
+    <value>Script statistics and histograms</value>
+  </data>
+  <data name="PublishStatistics" xml:space="preserve">
+    <value>Publish Statistics</value>
+  </data>
+  <data name="Publishgeneratescriptstatistics" xml:space="preserve">
+    <value>Publish statistics, and optionally include histograms, for each table or view that is selected.</value>
+  </data>
+  <data name="PublishStatisticsNone" xml:space="preserve">
+    <value>Do not publish statistics</value>
+  </data>
+  <data name="PublishStatisticsDDL" xml:space="preserve">
+    <value>Publish statistics</value>
+  </data>
+  <data name="PublishStatisticsAll" xml:space="preserve">
+    <value>Publish statistics and histograms</value>
+  </data>
+  <data name="IncludeVarDecimal" xml:space="preserve">
+    <value>Script Vardecimal Options</value>
+  </data>
+  <data name="IncludeVarDecimalDescription" xml:space="preserve">
+    <value>Script options to set vardecimal storage format.</value>
+  </data>
+  <data name="Bindings" xml:space="preserve">
+    <value>Script Bindings</value>
+  </data>
+  <data name="BindingsDescription" xml:space="preserve">
+    <value>Script options to set bindings option.</value>
+  </data>
+  <data name="PublishIncludeVarDecimal" xml:space="preserve">
+    <value>Publish Vardecimal Options</value>
+  </data>
+  <data name="PublishIncludeVarDecimalDescription" xml:space="preserve">
+    <value>Publish options to set vardecimal storage format.</value>
+  </data>
+  <data name="ScriptDriIncludeSystemNames" xml:space="preserve">
+    <value>Include system constraint names</value>
+  </data>
+  <data name="generateDriIncludeSystemNames" xml:space="preserve">
+    <value>Include system generated constraint names to enforce declarative referential integrity. </value>
+  </data>
+  <data name="ScriptAnsiPadding" xml:space="preserve">
+    <value>ANSI Padding</value>
+  </data>
+  <data name="generateAnsiPadding" xml:space="preserve">
+    <value>Generates ANSI padding statements.</value>
+  </data>
+  <data name="ScriptDatabaseCreate" xml:space="preserve">
+    <value>Script Database Create</value>
+  </data>
+  <data name="genreatescriptdatabasecreate" xml:space="preserve">
+    <value>Generate the CREATE DATABASE script when it scripts the whole database.</value>
+  </data>
+  <data name="UseTransactionForPublish" xml:space="preserve">
+    <value>Publish by using a transaction.</value>
+  </data>
+  <data name="UseTransactionForPublishDesc" xml:space="preserve">
+    <value>Publish to provider atomically by using a transaction.</value>
+  </data>
+  <data name="GenerateCreateCommand" xml:space="preserve">
+    <value>Generate CREATE Command</value>
+  </data>
+  <data name="GenerateDropCommand" xml:space="preserve">
+    <value>Generate DROP Command</value>
+  </data>
+  <data name="CompatibleFeatures" xml:space="preserve">
+    <value>Script for Server Version</value>
+  </data>
+  <data name="CompatibleFeaturesDescription" xml:space="preserve">
+    <value>Script only features compatible with the specified version of SQL Server</value>
+  </data>
+  <data name="PublishCompatibleFeatures" xml:space="preserve">
+    <value>Publish for Server Version</value>
+  </data>
+  <data name="PublishCompatibleFeaturesDescription" xml:space="preserve">
+    <value>Publish only the features that are compatible with the specified version of SQL Server.</value>
+  </data>
+  <data name="OnlyScript90CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2005</value>
+  </data>
+  <data name="OnlyScript100CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2008</value>
+  </data>
+  <data name="OnlyScript105CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2008 R2</value>
+  </data>
+  <data name="OnlyScript110CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2012</value>
+  </data>
+  <data name="OnlyScript120CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2014</value>
+  </data>
+  <data name="OnlyScript130CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2016</value>
+  </data>
+  <data name="OnlyScript140CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2017</value>
+  </data>
+  <data name="OnlyScript150CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2019</value>
+  </data>
+  <data name="OnlyScript160CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2022</value>
+  </data>
+  <data name="OnlyScript170CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server 2025</value>
+  </data>
+  <data name="OnlyScript180CompatibleFeatures" xml:space="preserve">
+    <value>SQL Server vNext</value>
+  </data>
+  <data name="TargetEngineType" xml:space="preserve">
+    <value>Script for the database engine type</value>
+  </data>
+  <data name="TargetEngineTypeDescription" xml:space="preserve">
+    <value>Script only features compatible with the specified SQL Server database engine type.</value>
+  </data>
+  <data name="TargetEngineEdition" xml:space="preserve">
+    <value>Script for the database engine edition</value>
+  </data>
+  <data name="TargetEngineEditionDescription" xml:space="preserve">
+    <value>Script only features compatible with the specified SQL Server database engine edition.</value>
+  </data>
+  <data name="SingleInstanceEngineType" xml:space="preserve">
+    <value>Stand-alone instance</value>
+  </data>
+  <data name="SqlAzureEngineType" xml:space="preserve">
+    <value>Microsoft Azure SQL Database</value>
+  </data>
+  <data name="PersonalEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Personal Edition</value>
+  </data>
+  <data name="StandardEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Standard Edition</value>
+  </data>
+  <data name="EnterpriseEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Enterprise Edition</value>
+  </data>
+  <data name="ExpressEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Express Edition</value>
+  </data>
+  <data name="SqlAzureDatabaseEdition" xml:space="preserve">
+    <value>Microsoft Azure SQL Database Edition</value>
+  </data>
+  <data name="SqlDataWarehouseEdition" xml:space="preserve">
+    <value>Microsoft Azure Synapse Analytics dedicated SQL pools Edition</value>
+  </data>
+  <data name="StretchEdition" xml:space="preserve">
+    <value>Microsoft SQL Server Stretch Database Edition</value>
+  </data>
+  <data name="SqlServerManagedInstanceEdition" xml:space="preserve">
+    <value>Microsoft Azure SQL Database Managed Instance Edition</value>
+  </data>
+  <data name="SqlServerOnDemandEdition" xml:space="preserve">
+    <value>Microsoft Azure Synapse Analytics serverless SQL pool on-demand Edition</value>
+  </data>
+  <data name="SqlDatabaseEdgeEdition" xml:space="preserve">
+    <value>Microsoft Azure SQL Edge Edition</value>
+  </data>
+  <data name="SqlAzureArcManagedInstanceEdition" xml:space="preserve">
+    <value>Microsoft Azure Arc SQL Managed Instance Edition</value>
+  </data>
+  <data name="IncludeUnsupportedStatements" xml:space="preserve">
+    <value>Include unsupported statements</value>
+  </data>
+  <data name="IncludeUnsupportedStatementsDescription" xml:space="preserve">
+    <value>Include statements in the script that are not supported on the specified SQL Server database engine type.</value>
+  </data>
+  <data name="GenerateScriptProgressTitle" xml:space="preserve">
+    <value>Generate Script Progress</value>
+  </data>
+  <data name="PublishProgressTitle" xml:space="preserve">
+    <value>Publish Database Progress</value>
+  </data>
+  <data name="GenerateScriptTable" xml:space="preserve">
+    <value>Table </value>
+  </data>
+  <data name="GenerateScriptView" xml:space="preserve">
+    <value>View </value>
+  </data>
+  <data name="GenerateScriptSP" xml:space="preserve">
+    <value>Stored procedure </value>
+  </data>
+  <data name="GenerateScriptUdf" xml:space="preserve">
+    <value>User-defined function </value>
+  </data>
+  <data name="GenerateScriptUddt" xml:space="preserve">
+    <value>User-defined data type</value>
+  </data>
+  <data name="GenerateScriptUdtt" xml:space="preserve">
+    <value>User-defined table type</value>
+  </data>
+  <data name="GenerateScriptDefault" xml:space="preserve">
+    <value>Default </value>
+  </data>
+  <data name="GenerateScriptRule" xml:space="preserve">
+    <value>Rule </value>
+  </data>
+  <data name="GenerateScriptAppRole" xml:space="preserve">
+    <value>Application role</value>
+  </data>
+  <data name="GenerateScriptAssembly" xml:space="preserve">
+    <value>Assembly</value>
+  </data>
+  <data name="GenerateScriptDatabaseTrigger" xml:space="preserve">
+    <value>Database (DDL) trigger</value>
+  </data>
+  <data name="GenerateScriptDatabaseRole" xml:space="preserve">
+    <value>Database role</value>
+  </data>
+  <data name="GenerateScriptSynonym" xml:space="preserve">
+    <value>Synonym</value>
+  </data>
+  <data name="GenerateScriptUser" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="GenerateScriptXMLSchema" xml:space="preserve">
+    <value>XML schema collection</value>
+  </data>
+  <data name="GenerateScriptSchema" xml:space="preserve">
+    <value>Schema</value>
+  </data>
+  <data name="GenerateScriptDatabase" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="GenerateScriptPlanGuide" xml:space="preserve">
+    <value>Plan guide</value>
+  </data>
+  <data name="GenerateScriptProgressDiscovery" xml:space="preserve">
+    <value>Determining objects in database &apos;{databaseName}&apos; that will be scripted.</value>
+  </data>
+  <data name="GenerateScriptUserDefinedType" xml:space="preserve">
+    <value>User-defined type</value>
+  </data>
+  <data name="GenerateScriptFullTextCatalog" xml:space="preserve">
+    <value>Full text catalog</value>
+  </data>
+  <data name="GenerateScriptUserDefinedAggregate" xml:space="preserve">
+    <value>User-defined aggregate</value>
+  </data>
+  <data name="GenerateScriptDBNotFound" xml:space="preserve">
+    <value>Database &apos;{databaseName}&apos; is unavailable.</value>
+  </data>
+  <data name="GenerateScriptNoObjects" xml:space="preserve">
+    <value>There are no objects in database &apos;{databaseName}&apos; of the types scriptable by this wizard.</value>
+  </data>
+  <data name="GenerateScriptFileExists" xml:space="preserve">
+    <value>The file &apos;{fileName}&apos; already exists. Do you want to overwrite this file?</value>
+  </data>
+  <data name="GenerateScriptInvalidDirectory" xml:space="preserve">
+    <value>The path name &apos;{directoryName}&apos; is not valid. The path may not exist, you may not have permissions to access that folder, or the disk may be full or write-protected. Provide a valid path name to continue.</value>
+  </data>
+  <data name="GenarateScriptInvalidFile" xml:space="preserve">
+    <value>The path or file name &apos;{filename}&apos; is not valid. The path may not exist, you may not have permissions to create a file in that folder, or the disk may be full or write-protected. Provide a valid path and file name to continue.</value>
+  </data>
+  <data name="GenerateScriptStatsWarning" xml:space="preserve">
+    <value>Scripting statistics and histograms can significantly increase the time that is required to generate the scripts. Additionally this will increase the size of the resulting script file.</value>
+  </data>
+  <data name="ProviderListTitle" xml:space="preserve">
+    <value>Hosting Providers</value>
+  </data>
+  <data name="ConfiguredProviders" xml:space="preserve">
+    <value>&amp;Configured providers: </value>
+  </data>
+  <data name="MSAAConfiguredProviders" xml:space="preserve">
+    <value>Configured providers: </value>
+  </data>
+  <data name="ProviderName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="WebServiceAddress" xml:space="preserve">
+    <value>Web service address</value>
+  </data>
+  <data name="NewText" xml:space="preserve">
+    <value>&amp;New...</value>
+  </data>
+  <data name="EditText" xml:space="preserve">
+    <value>&amp;Edit...</value>
+  </data>
+  <data name="TestText" xml:space="preserve">
+    <value>&amp;Test</value>
+  </data>
+  <data name="DeleteText" xml:space="preserve">
+    <value>&amp;Delete</value>
+  </data>
+  <data name="MSAANewText" xml:space="preserve">
+    <value>New...</value>
+  </data>
+  <data name="MSAAEditText" xml:space="preserve">
+    <value>Edit...</value>
+  </data>
+  <data name="MSAATestText" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="MSAADeleteText" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ProviderDeleteMessage" xml:space="preserve">
+    <value>This command will remove the selected provider.  Continue?</value>
+  </data>
+  <data name="ProviderDeleteTitle" xml:space="preserve">
+    <value>Delete provider</value>
+  </data>
+  <data name="TestTitleSuccess" xml:space="preserve">
+    <value>Test successful</value>
+  </data>
+  <data name="TestSuccessMessage" xml:space="preserve">
+    <value>The connection to {providerName} was successful.</value>
+  </data>
+  <data name="TestTitleFailure" xml:space="preserve">
+    <value>Test failed</value>
+  </data>
+  <data name="TestFailureMessage" xml:space="preserve">
+    <value>{providerName} could not be contacted.</value>
+  </data>
+  <data name="TestFailureUsernamePasswordMessage" xml:space="preserve">
+    <value>The username and password for {providerName} are incorrect.</value>
+  </data>
+  <data name="ProviderListSaveChangeMessage" xml:space="preserve">
+    <value>Providers have changed.
+Do you want to save the changes?</value>
+  </data>
+  <data name="ProviderListSaveChangeTitle" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="ERROR_SaveFailedTitle" xml:space="preserve">
+    <value>Saving Error</value>
+  </data>
+  <data name="ERROR_DeleteFailedTitle" xml:space="preserve">
+    <value>Deleting Error</value>
+  </data>
+  <data name="MSAAButtonPanel" xml:space="preserve">
+    <value>Button Panel</value>
+  </data>
+  <data name="ProviderDetailTitle" xml:space="preserve">
+    <value>Provider configuration for {providerName}</value>
+  </data>
+  <data name="ProviderDetailProviderName" xml:space="preserve">
+    <value>Na&amp;me</value>
+  </data>
+  <data name="MSAAProviderDetailProviderName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ProviderDetailWebAdd" xml:space="preserve">
+    <value>&amp;Web service address</value>
+  </data>
+  <data name="MSAAProviderDetailWebAdd" xml:space="preserve">
+    <value>Web service address</value>
+  </data>
+  <data name="ProviderDetailWebSerAuth" xml:space="preserve">
+    <value>Web service authentication</value>
+  </data>
+  <data name="ProviderDetailWebSerUser" xml:space="preserve">
+    <value>&amp;User name</value>
+  </data>
+  <data name="ProviderDetailWebSerPassword" xml:space="preserve">
+    <value>&amp;Password</value>
+  </data>
+  <data name="ProviderDetailWebSerSavePassword" xml:space="preserve">
+    <value>&amp;Save password</value>
+  </data>
+  <data name="ProviderDetailDatabaseGroup" xml:space="preserve">
+    <value>&amp;Available databases</value>
+  </data>
+  <data name="SetAsDefaultText" xml:space="preserve">
+    <value>Set as de&amp;fault</value>
+  </data>
+  <data name="MSAAProviderDetailWebSerUser" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="MSAAProviderDetailWebSerPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="MSAAProviderDetailWebSerSavePassword" xml:space="preserve">
+    <value>Save password</value>
+  </data>
+  <data name="MSAAProviderDetailDatabaseGroup" xml:space="preserve">
+    <value>Available databases</value>
+  </data>
+  <data name="MSAASetAsDefaultText" xml:space="preserve">
+    <value>Set as default</value>
+  </data>
+  <data name="DownloadConfigurationsText" xml:space="preserve">
+    <value>Download configurations</value>
+  </data>
+  <data name="ProviderDetailDeleteMessage" xml:space="preserve">
+    <value>This command will remove the selected database from the list.  Continue?</value>
+  </data>
+  <data name="ProviderDetailDeleteTitle" xml:space="preserve">
+    <value>Remove database</value>
+  </data>
+  <data name="ProviderDetailConfirmDownloadTitle" xml:space="preserve">
+    <value>Download Database Configurations</value>
+  </data>
+  <data name="ProviderDetailConfirmDownloadText" xml:space="preserve">
+    <value>This command will connect to the hosting provider and download database configuration information.
+If the operation is successful, existing database configurations will be deleted.
+
+Continue?</value>
+  </data>
+  <data name="ProviderDetailDownloadSucceedTitle" xml:space="preserve">
+    <value>Download Succeeded</value>
+  </data>
+  <data name="ProviderDetailDownloadSucceedText" xml:space="preserve">
+    <value>Database configurations were downloaded successfully.</value>
+  </data>
+  <data name="ProviderDetailDownloadFailedTitle" xml:space="preserve">
+    <value>Download Failed</value>
+  </data>
+  <data name="ProviderDetailDownloadFailedNotConfigured" xml:space="preserve">
+    <value>Database configurations could not be downloaded.
+The hosting provider has not been configured to support this operation.</value>
+  </data>
+  <data name="ProviderDetailDownloadFailedCannotConnect" xml:space="preserve">
+    <value>{providerName} could not be contacted.</value>
+  </data>
+  <data name="ProviderDetailDownloadFailedUserPassword" xml:space="preserve">
+    <value>The user name and password for {providerName} are incorrect.</value>
+  </data>
+  <data name="ProviderDetailSaveChangeMessage" xml:space="preserve">
+    <value>Provider {providerName} has changed.
+Do you want to save the changes? </value>
+  </data>
+  <data name="ProviderDetailSaveChangeTitle" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="ProviderDetailEmptyProviderNameMessage" xml:space="preserve">
+    <value>{fieldName} is required.</value>
+  </data>
+  <data name="ProviderDetailEmptyProviderNameMessageTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ProviderDetailNewProvider" xml:space="preserve">
+    <value>new provider</value>
+  </data>
+  <data name="DatabaseDetailTitle" xml:space="preserve">
+    <value>Database {databaseName}</value>
+  </data>
+  <data name="DatabaseDetailDatabaseName" xml:space="preserve">
+    <value>&amp;Database name</value>
+  </data>
+  <data name="DatabaseDetailServerName" xml:space="preserve">
+    <value>Se&amp;rver name</value>
+  </data>
+  <data name="MSAADatabaseDetailDatabaseName" xml:space="preserve">
+    <value>Database name</value>
+  </data>
+  <data name="MSAADatabaseDetailServerName" xml:space="preserve">
+    <value>Server name</value>
+  </data>
+  <data name="DatabaseDetailAuthentication" xml:space="preserve">
+    <value>Database &amp;authentication</value>
+  </data>
+  <data name="DatabaseDetailUserName" xml:space="preserve">
+    <value>&amp;User name</value>
+  </data>
+  <data name="DatabaseDetailPassword" xml:space="preserve">
+    <value>&amp;Password</value>
+  </data>
+  <data name="DatabaseDetailSavePassword" xml:space="preserve">
+    <value>&amp;Save password</value>
+  </data>
+  <data name="MSAADatabaseDetailUserName" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="MSAADatabaseDetailPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="MSAADatabaseDetailSavePassword" xml:space="preserve">
+    <value>Save password</value>
+  </data>
+  <data name="DatabaseDetailSaveChangeMessage" xml:space="preserve">
+    <value>Database {databaseName} has changed.
+Do you want to save the changes?</value>
+  </data>
+  <data name="DatabaseDetailSaveChangeTitle" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="DatabaseDetailEmptyDatabaseNameMessage" xml:space="preserve">
+    <value>{fieldName} is required.</value>
+  </data>
+  <data name="DatabaseDetailEmptyDatabaseNameMessageTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="DatabaseDetailNewDatabase" xml:space="preserve">
+    <value>new database</value>
+  </data>
+  <data name="RemoteCreditDialogTitle" xml:space="preserve">
+    <value>Enter User Credentials</value>
+  </data>
+  <data name="RemoteCreditSubTitle" xml:space="preserve">
+    <value>Enter username and password:</value>
+  </data>
+  <data name="RemoteCreditProviderGroupText" xml:space="preserve">
+    <value>Provider</value>
+  </data>
+  <data name="RemoteCreditDatabaseGroupText" xml:space="preserve">
+    <value>Remote database</value>
+  </data>
+  <data name="RemoteCreditProviderName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="RemoteCreditWebAdd" xml:space="preserve">
+    <value>Web service address</value>
+  </data>
+  <data name="RemoteCreditWebSerUser" xml:space="preserve">
+    <value>&amp;User name</value>
+  </data>
+  <data name="RemoteCreditWebSerPassword" xml:space="preserve">
+    <value>&amp;Password</value>
+  </data>
+  <data name="MSAARemoteCreditWebSerUser" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="MSAARemoteCreditWebSerPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="RemoteCreditDatabaseName" xml:space="preserve">
+    <value>Database name</value>
+  </data>
+  <data name="RemoteCreditServerName" xml:space="preserve">
+    <value>Server name</value>
+  </data>
+  <data name="RemoteCreditUserName" xml:space="preserve">
+    <value>Use&amp;r name</value>
+  </data>
+  <data name="RemoteCreditPassword" xml:space="preserve">
+    <value>Pass&amp;word</value>
+  </data>
+  <data name="MSAARemoteCreditUserName" xml:space="preserve">
+    <value>MSAA User name</value>
+  </data>
+  <data name="MSAARemoteCreditPassword" xml:space="preserve">
+    <value>MSAA Password</value>
+  </data>
+  <data name="PublishOutputOptionTitle" xml:space="preserve">
+    <value>Select an Output Location</value>
+  </data>
+  <data name="PublishOutputOptionSubTitle" xml:space="preserve">
+    <value>Select the database and Web service that you want to publish the database to.</value>
+  </data>
+</root>

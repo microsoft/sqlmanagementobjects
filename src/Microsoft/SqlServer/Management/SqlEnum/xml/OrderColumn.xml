@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<EnumObject type="OrderColumn" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings >
+		<parent_link>
+			<link parent="ID" local="UdfID" />
+		</parent_link>
+		<property_link table = "sys.function_order_columns AS oc"></property_link>
+		<property_link fields = '#Name#' join="sys.columns AS clmns">clmns.object_id = oc.object_id and clmns.column_id = oc.column_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="ID" type="int" access="Read">oc.order_column_id</property>
+		<property name="Descending" type="bit">oc.is_descending</property>		
+		<property name="Name" type="sysname">clmns.name</property>
+		<property name="UdfID" type="int" hidden='true'>oc.object_id</property>
+	</properties>
+</EnumObject>

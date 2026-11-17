@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<EnumObject type="Session" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.server_event_sessions' alias='session'/>
+    <property_link fields='#IsRunning#StartTime#' left_join='#rs' alias='running'>running.name = session.name</property_link>
+    <property_link fields='#MaxDuration#' left_join='#md' alias='maxdur'>maxdur.event_session_id = session.event_session_id</property_link>
+    <prefix fields='#IsRunning#StartTime#'>
+      create table #rs (name sysname not null, create_time datetimeoffset not null)
+      insert into #rs select name, create_time from sys.dm_xe_sessions
+    </prefix>
+    <prefix fields='#MaxDuration#'>
+      create table #md (event_session_id int not null, max_duration bigint null)
+      if exists (select 1 from sys.all_columns where object_id = object_id('sys.server_event_sessions') and name = 'max_duration')
+      begin
+        declare @sql nvarchar(max) = 'insert into #md select event_session_id, max_duration from sys.server_event_sessions'
+        exec sp_executesql @sql
+      end
+    </prefix>
+    <postfix fields='#IsRunning#StartTime#'>
+      drop table #rs
+    </postfix>
+    <postfix fields='#MaxDuration#'>
+      drop table #md
+    </postfix>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />
+    <property name='ID' type='int'>session.event_session_id</property>
+    <property name='Name' type='sysname'>session.name</property>
+    <property name='IsRunning' type='bit'>(CASE WHEN (running.create_time IS NULL) THEN 0 ELSE 1 END)</property>
+    <property name='EventRetentionMode' type='nchar' size='1'>session.event_retention_mode</property>
+    <property name='MaxDispatchLatency' type='int'>session.max_dispatch_latency</property>
+    <property name='MaxMemory' type='int'>session.max_memory</property>
+    <property name='MaxEventSize' type='int'>session.max_event_size</property>
+    <property name='MemoryPartitionMode' type='nchar' size='1'>session.memory_partition_mode</property>
+    <property name='TrackCausality' type='bit'>session.track_causality</property>
+    <property name='AutoStart' type='bit'>session.startup_state</property>
+    <property name='StartTime' type='datetime'>running.create_time</property>
+    <property name='MaxDuration' type='bigint'>ISNULL(maxdur.max_duration, 0)</property>
+  </properties>
+</EnumObject>

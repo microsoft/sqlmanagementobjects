@@ -1,0 +1,22 @@
+<?xml version='1.0' ?>
+<EnumObject type='backupmediaset' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='msdb.dbo.backupmediaset bkpms'/>
+	</settings>
+	<properties>
+		<property name='ID' type='int'>bkpms.media_set_id</property>
+		<property name='MediaUuid' type='uniqueidentifier'>bkpms.media_uuid</property>
+		<property name='MediaFamilyCount' type='tinyint'>bkpms.media_family_count</property>
+		<property name='Name' type='nvarchar' size='128'>bkpms.name</property>
+		<property name='Description' type='nvarchar' size='255'>bkpms.description</property>
+		<property name='SoftwareName' type='nvarchar' size='128'>bkpms.software_name</property>
+		<property name='SoftwareVendorId' type='int'>bkpms.software_vendor_id</property>
+		<property name='MTFMajorVersion' type='tinyint'>bkpms.MTF_major_version</property>
+		<version min_major='10'>
+			<property name='IsCompressed' type='bit' cast='true'>bkpms.is_compressed</property>
+		</version>
+		<version min_major='11'  min_build='9143'>
+			<property name='IsEncrypted' type='bit' cast='true'>bkpms.is_encrypted</property>
+		</version>
+	</properties>
+</EnumObject>

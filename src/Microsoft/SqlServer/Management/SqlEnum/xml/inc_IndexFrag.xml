@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<EnumObject type="Inc_Fragmentation" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<version min_major='10'>
+			<parent_link>
+				<link parent='TableID' local='TableID' />
+				<link parent='IndexID' local='IndexID' />
+			</parent_link>
+			
+			<property_link expression_is_for_table_name='true' alias='fi'>
+				<link_multiple no='1' expression="sys.dm_db_index_physical_stats(@database_id, NULL, NULL, NULL, '{0}')">
+					<link_field type='local' field="FragmentationLevel" />
+				</link_multiple>
+			</property_link>
+
+			<prefix>
+declare @database_id int
+select @database_id = db_id()
+			</prefix>
+
+		</version>
+	</settings>
+	<properties>
+		<version min_major='10'>
+			<property name="IndexID" type="int" hidden='true'>fi.index_id</property>
+			<property name="TableID" type="int" hidden='true'>fi.object_id</property>
+			<property name="Depth" type="tinyint">fi.index_depth</property>
+			<property name="Pages" type="bigint">fi.page_count</property>
+			<property name="Rows" type="bigint">fi.record_count</property>
+			<property name="MinimumRecordSize" type="int">fi.min_record_size_in_bytes</property>
+			<property name="MaximumRecordSize" type="int">fi.max_record_size_in_bytes</property>
+			<property name="AverageRecordSize" type="float">fi.avg_record_size_in_bytes</property>
+			<property name="ForwardedRecords" type="bigint">fi.forwarded_record_count</property>
+			<property name="AveragePageDensity" type="float">fi.avg_page_space_used_in_percent</property>
+			<property name="IndexType" type="nvarchar" size="30">fi.index_type_desc</property>
+			<property name="PartitionNumber" type="int">fi.partition_number</property>
+			<property name="GhostRows" type="bigint">fi.ghost_record_count</property>
+			<property name="VersionGhostRows" type="bigint">fi.version_ghost_record_count</property>
+			<property name="AverageFragmentation" type="float">fi.avg_fragmentation_in_percent</property>
+		</version>
+	</properties>
+</EnumObject>

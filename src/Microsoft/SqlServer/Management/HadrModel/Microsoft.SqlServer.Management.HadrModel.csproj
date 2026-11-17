@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>  
+    <TargetFrameworks>$(TargetFrameworks)</TargetFrameworks>
+    <RootNamespace>Microsoft.SqlServer.Management.HadrModel</RootNamespace>
+  </PropertyGroup>
+ 
+  <!-- Project references -->
+  <ItemGroup>
+    <ProjectReference Include="$(SmoSrc)\Microsoft.SqlServer.Smo.csproj" />
+    <ProjectReference Include="$(SfcSrc)\Microsoft.SqlServer.Management.Sdk.Sfc.csproj" />
+    <ProjectReference Include="$(ConnectionInfoSrc)\Microsoft.SqlServer.ConnectionInfo.csproj" />
+    <ProjectReference Include="$(HadrDataSrc)\Microsoft.SqlServer.Management.HadrData.csproj" />
+    <ProjectReference Include="$(XEventSrc)\Microsoft.SqlServer.Management.XEvent.csproj" />
+    <ProjectReference Include="$(SmoExtendedSrc)\Microsoft.SqlServer.SmoExtended.csproj" />
+  </ItemGroup>
+  <!-- Enable ResxSourceGenerator with EmitFormatMethods -->
+  <ItemGroup>
+    <EmbeddedResource Update="**\*.resx" EmitFormatMethods="true" />
+  </ItemGroup>
+</Project>

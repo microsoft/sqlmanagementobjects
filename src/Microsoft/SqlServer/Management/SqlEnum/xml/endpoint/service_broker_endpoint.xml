@@ -1,0 +1,46 @@
+<?xml version='1.0' ?>
+<EnumObject type='ServiceBrokerEndpoints' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="EndpointID" />
+		</parent_link>
+	
+		<property_link table='sys.service_broker_endpoints' alias='sbe'/>
+		<property_link fields='#Certificate#' left_join='sys.certificates AS cert'>cert.certificate_id = sbe.certificate_id</property_link>		
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />	
+		<property name='IsMessageForwardingEnabled' type='bit'>sbe.is_message_forwarding_enabled</property>
+		<property name='MessageForwardingSize' type='int'>sbe.message_forwarding_size</property>
+		<property name='Certificate' type='sysname'>(case when SERVERPROPERTY('EngineEdition') != 8 then ISNULL(cert.name,N'') else ISNULL(cert.name, N'##MS_InstanceCertificate##') end)</property>
+		<property name='EndpointEncryption' type='int' report_type='EndpointEncryption'>
+                        case 
+                            when sbe.encryption_algorithm = 0 then 0 
+                            when sbe.encryption_algorithm in (3,4,7,8) then 1 
+                            when sbe.encryption_algorithm in (1,2,5,6) then 2 
+                            else 0 
+                        end
+        </property>
+		<property name='EndpointEncryptionAlgorithm' type='int' report_type='EndpointEncryptionAlgorithm'>
+                        case sbe.encryption_algorithm 
+                            when 0 then 0
+                            when 1 then 1
+                            when 2 then 2
+                            when 3 then 1
+                            when 4 then 2
+                            when 5 then 4
+                            when 6 then 3
+                            when 7 then 4
+                            when 8 then 3
+                            else 0
+                        end
+        </property>
+		<property name='EndpointAuthenticationOrder' type='int' report_type='EndpointAuthenticationOrder'>sbe.connection_auth</property>
+		
+		<property name='EndpointID' type='int' hidden='true'>sbe.endpoint_id</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when sbe.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>

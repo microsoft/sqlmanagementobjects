@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<EnumObject type="UserOption" impl_type="UserOption" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <version min_major='10' cloud_min_major='12'>
+            <prefix>
+        declare @UserOption int
+        select @UserOption=convert(int, c.value) from sys.configurations c where c.name='user options'
+      </prefix>
+        </version>
+    </settings>
+    <properties>
+        <property name="DisableDefaultConstraintCheck" type="bit" cast='true' mode="deploy">@UserOption &amp; 1</property>
+        <property name="ImplicitTransactions" type="bit" cast='true' mode="deploy">@UserOption &amp; 2</property>
+        <property name="CursorCloseOnCommit" type="bit" cast='true' mode="deploy">@UserOption &amp; 4</property>
+        <property name="AnsiWarnings" type="bit" cast='true' mode="deploy">@UserOption &amp; 8</property>
+        <property name="AnsiPadding" type="bit" cast='true' mode="deploy">@UserOption &amp; 16</property>
+        <property name="AnsiNulls" type="bit" cast='true' mode="deploy">@UserOption &amp; 32</property>
+        <property name="AbortOnArithmeticErrors" type="bit" cast='true' mode="deploy">@UserOption &amp; 64</property>
+        <property name="IgnoreArithmeticErrors" type="bit" cast='true' mode="deploy">@UserOption &amp; 128</property>
+        <property name="QuotedIdentifier" type="bit" cast='true' mode="deploy">@UserOption &amp; 256</property>
+        <property name="NoCount" type="bit" cast='true' mode="deploy">@UserOption &amp; 512</property>
+        <property name="AnsiNullDefaultOn" type="bit" cast='true' mode="deploy">@UserOption &amp; 1024</property>
+        <property name="AnsiNullDefaultOff" type="bit" cast='true' mode="deploy">@UserOption &amp; 2048</property>
+        <property name="ConcatenateNullYieldsNull" type="bit" cast='true' mode="deploy">@UserOption &amp; 4096</property>
+        <property name="NumericRoundAbort" type="bit" cast='true' mode="deploy">@UserOption &amp; 8192</property>
+        <property name="AbortTransactionOnError" type="bit" cast='true' mode="deploy">@UserOption &amp; 16384</property>
+    </properties>
+</EnumObject>

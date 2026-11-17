@@ -1,0 +1,25 @@
+<?xml version='1.0' ?>
+<EnumObject type='RemotePlanLog' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ParentID" />
+    </parent_link>
+    <property_link table='msdb.dbo.sysmaintplan_logdetail' alias='ld'/>
+  </settings>
+  <properties>
+    <property name='Line1' type='nvarchar' size = '256'>ld.line1</property>
+    <property name='Line2' type='nvarchar' size = '256'>ld.line2</property>
+    <property name='Line3' type='nvarchar' size = '256'>ld.line3</property>
+    <property name='Line4' type='nvarchar' size = '256'>ld.line4</property>
+    <property name='Line5' type='nvarchar' size = '256'>ld.line5</property>
+    <property name='ServerName' type='sysname'>ld.server_name</property>
+    <property name='StartTime' type='datetime'>ld.start_time</property>
+    <property name='EndTime' type='datetime'>ld.end_time</property>
+    <property name='ErrorNo' type='int'>ld.error_number</property>
+    <property name='ErrorMessage' type='nvarchar' size = 'max'>ld.error_message</property>
+    <property name='Command' type='nvarchar' size = 'max'>ld.command</property>
+    <property name='Succeeded' type='bit'>ld.succeeded</property>
+
+    <property name='ParentID' type='uniqueidentifier' hidden='true'>ld.task_detail_id</property>
+  </properties>
+</EnumObject>

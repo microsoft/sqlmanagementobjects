@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype=">text/microsoft-resx</resheader>
+    <resheader name="version=">2.0</resheader>
+    <resheader name="reader=">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer=">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1="><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing=">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64=">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64=">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata=">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true=">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MultipartNameName" xml:space="preserve">
+    <value>Multipart Name</value>
+  </data>
+  <data name="MultipartNameDesc" xml:space="preserve">
+    <value>Describes name information of an object, including name and schema.</value>
+  </data>
+  <data name="ServerSecurityName" xml:space="preserve">
+    <value>Server Security</value>
+  </data>
+  <data name="ServerSecurityDesc" xml:space="preserve">
+    <value>Exposes properties of the Server object that encapsulates security aspects of an instance of the Database Engine. </value>
+  </data>
+  <data name="ServerPerformanceName" xml:space="preserve">
+    <value>Server Performance</value>
+  </data>
+  <data name="ServerPerformanceDesc" xml:space="preserve">
+    <value>Exposes properties of the Server object that encapsulate performance aspects of an instance of the Database Engine.</value>
+  </data>
+  <data name="ServerAuditName" xml:space="preserve">
+    <value>Server Audit</value>
+  </data>
+  <data name="ServerAuditDesc" xml:space="preserve">
+    <value>Exposes properties of the Server object that encapsulates audit aspects of an instance of the Database Engine.</value>
+  </data>
+  <data name="ServerSurfaceAreaConfigurationName" xml:space="preserve">
+    <value>Surface Area Configuration</value>
+  </data>
+  <data name="ServerSurfaceAreaConfigurationDesc" xml:space="preserve">
+    <value>Surface area configuration for features of the Database Engine. Only the features required by your application should be enabled. Disabling unused features helps protect your server by reducing the surface area.</value>
+  </data>
+  <data name="NameName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="SchemaName" xml:space="preserve">
+    <value>Schema</value>
+  </data>
+  <data name="NameDesc" xml:space="preserve">
+    <value>Object name.</value>
+  </data>
+  <data name="SchemaDesc" xml:space="preserve">
+    <value>Object schema.</value>
+  </data>
+  <data name="PublicServerRoleIsGrantedPermissionsName" xml:space="preserve">
+    <value>Public Server Role Permissions</value>
+  </data>
+  <data name="LoginModeName" xml:space="preserve">
+    <value>Login  Mode</value>
+  </data>
+  <data name="XPCmdShellEnabledName" xml:space="preserve">
+    <value>xp_cmdshell Enabled</value>
+  </data>
+  <data name="CrossDBOwnershipChainingEnabledName" xml:space="preserve">
+    <value>Cross DB Ownership Chaining Enabled</value>
+  </data>
+  <data name="CommonCriteriaComplianceEnabledName" xml:space="preserve">
+    <value>Common Criteria Compliance Enabled</value>
+  </data>
+  <data name="ServiceBrokerEndpointActiveName" xml:space="preserve">
+    <value>Service Broker Endpoint Active</value>
+  </data>
+  <data name="ServiceBrokerEndpointActiveDesc" xml:space="preserve">
+    <value>Service Broker provides queuing and reliable messaging for the Database Engine. Service Broker uses an endpoint for communication between instances, which opens a TCP/IP port on the server. Enable the Service Broker endpoint only if your applications use Service Broker to communicate between instances. Returns TRUE when a Service Broker endpoint exists and is in the STARTED state. Returns FALSE when Service Broker does not exist on the computer or it exists but is not started. Configure the endpoint to TRUE to start a stopped or disabled endpoint. The operation will fail if the endpoint does not exist on the server. Configure the endpoint to FALSE to disable the Service Broker endpoint.</value>
+  </data>
+  <data name="SoapEndpointsEnabledName" xml:space="preserve">
+    <value>SOAP Endpoints Enabled</value>
+  </data>
+  <data name="SoapEndpointsEnabledDesc" xml:space="preserve">
+    <value>The SOAP endpoint can be in either a started, stopped or disabled state. Returns TRUE if at least one SOAP endpoint is responding to SOAP requests. Returns FALSE if all SOAP endpoints are disabled or if there are no SOAP endpoints. Configuring it to FALSE will disable all the soap endpoints.</value>
+  </data>
+  <data name="PublicServerRoleIsGrantedPermissionsDesc" xml:space="preserve">
+    <value>Returns True if the Public server role has permissions set on the server.</value>
+  </data>
+  <data name="LoginModeDesc" xml:space="preserve">
+    <value>Authentication Mode on SQL Server</value>
+  </data>
+  <data name="XPCmdShellEnabledDesc" xml:space="preserve">
+    <value>xp_cmdshell creates a Windows process that has same security rights as the SQL Server service.</value>
+  </data>
+  <data name="CrossDBOwnershipChainingEnabledDesc" xml:space="preserve">
+    <value>Configures cross-database ownership chaining for an instance of SQL Server.</value>
+  </data>
+  <data name="CommonCriteriaComplianceEnabledDesc" xml:space="preserve">
+    <value>The common criteria compliance enabled option enables the following: Residual Information Protection (RIP), the ability to view login statistics, and that column GRANT should not override table DENY.</value>
+  </data>
+  <data name="BlockedProcessThresholdName" xml:space="preserve">
+    <value>Blocked Process Threshold</value>
+  </data>
+  <data name="AffinityMaskName" xml:space="preserve">
+    <value>Affinity Mask </value>
+  </data>
+  <data name="Affinity64MaskName" xml:space="preserve">
+    <value>Affinity64 Mask </value>
+  </data>
+  <data name="AffinityMaskIOName" xml:space="preserve">
+    <value>Affinity Mask I/O</value>
+  </data>
+  <data name="Affinity64IOMaskName" xml:space="preserve">
+    <value>Affinity64 Mask I/O</value>
+  </data>
+  <data name="DynamicLocksName" xml:space="preserve">
+    <value>Dynamic Locks </value>
+  </data>
+  <data name="LightweightPoolingEnabledName" xml:space="preserve">
+    <value>Lightweight Pooling Enabled</value>
+  </data>
+  <data name="MaxDegreeOfParallelismName" xml:space="preserve">
+    <value>Max Degree Of Parallelism</value>
+  </data>
+  <data name="CostThresholdforParallelismName" xml:space="preserve">
+    <value>Cost Threshold for Parallelism</value>
+  </data>
+  <data name="MaxWorkerThreadsName" xml:space="preserve">
+    <value>Max Worker Threads </value>
+  </data>
+  <data name="NetworkPacketSizeName" xml:space="preserve">
+    <value>Network Packet Size</value>
+  </data>
+  <data name="OpenObjectsName" xml:space="preserve">
+    <value>Open Objects </value>
+  </data>
+  <data name="BlockedProcessThresholdDesc" xml:space="preserve">
+    <value>Specifies the threshold, in seconds, at which blocked process reports are generated.</value>
+  </data>
+  <data name="AffinityMaskDesc" xml:space="preserve">
+    <value>Binds SQL Server disk I/O to a specified subset of CPUs.</value>
+  </data>
+  <data name="Affinity64MaskDesc" xml:space="preserve">
+    <value>Binds SQL Server disk I/O to a specified subset of CPUs. This option is available only on the 64-bit version of Microsoft SQL Server.</value>
+  </data>
+  <data name="AffinityMaskIODesc" xml:space="preserve">
+    <value>Binds SQL Server threads to a specified subset of CPUs.</value>
+  </data>
+  <data name="Affinity64IOMaskDesc" xml:space="preserve">
+    <value>Binds processors to specific threads. This option is similar to the affinity mask option. Use affinity mask to bind the first 32 processors, and use affinity64 mask to bind the remaining processors on the computer. This option is available only on the 64-bit version of Microsoft SQL Server.</value>
+  </data>
+  <data name="DynamicLocksDesc" xml:space="preserve">
+    <value>Sets the maximum number of available locks. This option limits the amount of memory the Database Engine uses for locks.</value>
+  </data>
+  <data name="LightweightPoolingEnabledDesc" xml:space="preserve">
+    <value>Provides a means of reducing the system overhead that is associated with the excessive context switching that occurs sometimes in symmetric multiprocessing (SMP) environments.</value>
+  </data>
+  <data name="MaxDegreeOfParallelismDesc" xml:space="preserve">
+    <value>Limits the number of processors that are used to run a single statement for each parallel plan execution.</value>
+  </data>
+  <data name="CostThresholdforParallelismDesc" xml:space="preserve">
+    <value>Specifies the threshold at which SQL Server creates and runs parallel plans for queries. </value>
+  </data>
+  <data name="MaxWorkerThreadsDesc" xml:space="preserve">
+    <value>Configures the number of worker threads that are available to SQL Server processes.</value>
+  </data>
+  <data name="NetworkPacketSizeDesc" xml:space="preserve">
+    <value>Sets the packet size (in bytes) that is used across the whole network</value>
+  </data>
+  <data name="OpenObjectsDesc" xml:space="preserve">
+    <value>Sets the maximum number of database objects that can be open at one time on an instance of SQL Server 2000 Database objects are those objects that are defined in the sysobjects table: tables, views, rules, stored procedures, defaults, and triggers</value>
+  </data>
+  <data name="DefaultTraceEnabledName" xml:space="preserve">
+    <value>Default Trace Enabled</value>
+  </data>
+  <data name="C2AuditTracingEnabledName" xml:space="preserve">
+    <value>C2 Audit Tracing Enabled</value>
+  </data>
+  <data name="LoginAuditLevelName" xml:space="preserve">
+    <value>Login Audit Level</value>
+  </data>
+  <data name="DefaultTraceEnabledDesc" xml:space="preserve">
+    <value>Enables the default trace option. The default trace option provides a persistent log of activity and changes that are primarily related to the configuration options.</value>
+  </data>
+  <data name="C2AuditTracingEnabledDesc" xml:space="preserve">
+    <value>Audits all attempts to access statements and objects. Writes attempts to a file in the SQL Server Data folder.</value>
+  </data>
+  <data name="LoginAuditLevelDesc" xml:space="preserve">
+    <value>Sets auditing mode for tracking Logins that have logged with success/failure.</value>
+  </data>
+  <data name="AdHocRemoteQueriesEnabledName" xml:space="preserve">
+    <value>Ad-hoc Remote Queries Enabled</value>
+  </data>
+  <data name="DatabaseMailEnabledName" xml:space="preserve">
+    <value>Database Mail Enabled</value>
+  </data>
+  <data name="ClrIntegrationEnabledName" xml:space="preserve">
+    <value>CLR Integration Enabled</value>
+  </data>
+  <data name="OleAutomationEnabledName" xml:space="preserve">
+    <value>OLE Automation Enabled</value>
+  </data>
+  <data name="RemoteDacEnabledName" xml:space="preserve">
+    <value>Remote DAC Enabled</value>
+  </data>
+  <data name="SqlMailEnabledName" xml:space="preserve">
+    <value>SqlMail Enabled</value>
+  </data>
+  <data name="WebAssistantEnabledName" xml:space="preserve">
+    <value>Web Assistant Enabled</value>
+  </data>
+  <data name="AdHocRemoteQueriesEnabledDesc" xml:space="preserve">
+    <value>The OPENROWSET and OPENDATASOURCE functions support ad hoc connections to remote data sources without linked or remote servers. Enable these functions only if your applications and scripts call them.</value>
+  </data>
+  <data name="DatabaseMailEnabledDesc" xml:space="preserve">
+    <value>Database Mail is a component for sending e-mail messages from the Database Engine using SMTP. Enable Database Mail stored procedures only if you plan to configure and use Database Mail.</value>
+  </data>
+  <data name="ClrIntegrationEnabledDesc" xml:space="preserve">
+    <value>Common language runtime (CLR) integration enables you to write stored procedures, triggers, user-defined types and user-defined functions using any .NET Framework language. Enable CLR integration only if you use the CLR.</value>
+  </data>
+  <data name="OleAutomationEnabledDesc" xml:space="preserve">
+    <value>The OLE Automation extended stored procedures (XPs) allow Transact-SQL batches, stored procedures, and triggers to reference custom OLE Automation objects. Enable OLE Automation only if applications or Transact-SQL scripts use OLE Automation XPs.</value>
+  </data>
+  <data name="RemoteDacEnabledDesc" xml:space="preserve">
+    <value>A dedicated administrator connection (DAC) allows an administrator to connect to a server when the Database Engine will not respond to regular connections. Enable this option only if you will use DAC from a remote computer.</value>
+  </data>
+  <data name="SqlMailEnabledDesc" xml:space="preserve">
+    <value>SQL Mail supports legacy applications that send and receive e-mail messages from the Database Engine. SQL Mail is deprecated in SQL Server 2005 and replaced by Database Mail. Enable SQL Mail stored procedures only if you plan to configure and use SQL Mail for backward compatibility.</value>
+  </data>
+  <data name="WebAssistantEnabledDesc" xml:space="preserve">
+    <value>Web Assistant stored procedures, which generate HTML files from SQL Server databases, are deprecated in SQL Server 2005. Enable Web Assistance only if your applications generate HTML using Web Assistant stored procedures.</value>
+  </data>
+  <data name="XPCmdShellEnabledDescSAC" xml:space="preserve">
+    <value>The xp_cmdshell extended stored procedure runs operating system commands from within the Database Engine. Enable xp_cmdshell only if your application or scripts must use xp_cmdshell to run operating system commands.</value>
+  </data>
+  <data name="IServerSecurityFacet_CmdExecRightsForSystemAdminsOnlyName" xml:space="preserve">
+    <value>CmdExec Rights for System Admins Only</value>
+  </data>
+  <data name="IServerSecurityFacet_CmdExecRightsForSystemAdminsOnlyDesc" xml:space="preserve">
+    <value>Confirms that only members of sysadmins fixed server role can execute CmdExec and ActiveX Script job steps. Applies only to SQL Server 2000.</value>
+  </data>
+  <data name="IServerSecurityFacet_ProxyAccountIsGrantedToPublicRoleName" xml:space="preserve">
+    <value>ProxyAccount Granted To Public</value>
+  </data>
+  <data name="IServerSecurityFacet_ProxyAccountIsGrantedToPublicRoleDesc" xml:space="preserve">
+    <value>Checks whether SQL Server Agent proxy account has been granted to the Public role. Returns True if a SQL Server Agent proxy account has been granted to the Public role. Applies only to SQL Server 2005 and later versions.</value>
+  </data>
+  <data name="IServerSecurityFacet_ReplaceAlertTokensEnabledName" xml:space="preserve">
+    <value>Replace Alert Token Replacement Enabled</value>
+  </data>
+  <data name="IServerSecurityFacet_ReplaceAlertTokensEnabledDesc" xml:space="preserve">
+    <value>Alert Replacement flag enables replacement of alert tokens. Applies only to SQL Server 2005 Service Pack 1 and later versions.</value>
+  </data>
+  <data name="IServerSecurityFacet_ProxyAccountEnabledName" xml:space="preserve">
+    <value>Server Proxy Account Enabled</value>
+  </data>
+  <data name="IServerSecurityFacet_ProxyAccountEnabledDesc" xml:space="preserve">
+    <value>xp_cmdshell is executed under the context of the Server Proxy account.</value>
+  </data>
+  <data name="AvailabilityGroupStateName" xml:space="preserve">
+    <value>Availability Group State</value>
+  </data>
+  <data name="AvailabilityGroupStateDesc" xml:space="preserve">
+    <value>A logical facet exposing the state of an Availability Group.</value>
+  </data>
+  <data name="AvailabilityGroupState_IsOnlineName" xml:space="preserve">
+    <value>Is Online</value>
+  </data>
+  <data name="AvailabilityGroupState_IsOnlineDesc" xml:space="preserve">
+    <value>A Boolean value indicating whether a primary replica exists in the Availability Group.</value>
+  </data>
+  <data name="AvailabilityGroupState_IsAutoFailoverName" xml:space="preserve">
+    <value>Is Automatic Failover</value>
+  </data>
+  <data name="AvailabilityGroupState_IsAutoFailoverDesc" xml:space="preserve">
+    <value>A Boolean value indicating whether the Availability Group has a primary that is set to Automatic Failover Mode.</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfSynchronizedSecondaryReplicasName" xml:space="preserve">
+    <value>Number of Synchronized Secondary Replicas</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfSynchronizedSecondaryReplicasDesc" xml:space="preserve">
+    <value>The number of Synchronous replicas with Automatic Failover Mode that are in Synchronized state.</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfNotSynchronizingReplicasName" xml:space="preserve">
+    <value>Number of Not Synchronizing Replicas</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfNotSynchronizingReplicasDesc" xml:space="preserve">
+    <value>The number of Synchronous replicas that are in Not Synchronizing state.</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfNotSynchronizedReplicasName" xml:space="preserve">
+    <value>Number of Synchronizing Synchronous Replicas</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfNotSynchronizedReplicasDesc" xml:space="preserve">
+    <value>The number of Synchronous replicas that are not in Synchronized state.</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfReplicasWithUnhealthyRoleName" xml:space="preserve">
+    <value>Number of Resolving Replicas</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfReplicasWithUnhealthyRoleDesc" xml:space="preserve">
+    <value>The number of replicas that are in Resolving role.</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfDisconnectedReplicasName" xml:space="preserve">
+    <value>Number of Disconnected Replicas</value>
+  </data>
+  <data name="AvailabilityGroupState_NumberOfDisconnectedReplicasDesc" xml:space="preserve">
+    <value>The number of replicas that are not in Connected state.</value>
+  </data>
+  <data name="SmartAdminStateName" xml:space="preserve">
+    <value>SmartAdmin State</value>
+  </data>
+  <data name="SmartAdminStateDesc" xml:space="preserve">
+    <value>A logical facet exposing the state of Smartadmin.</value>
+  </data>
+  <data name="SmartAdminState_IsMasterSwitchEnabledName" xml:space="preserve">
+    <value>Is Master switch enabled</value>
+  </data>
+  <data name="SmartAdminState_IsMasterSwitchEnabledDesc" xml:space="preserve">
+    <value>A Boolean value indicating whether master switch is turned on.</value>
+  </data>
+  <data name="SmartAdminState_IsBackupEnabledName" xml:space="preserve">
+    <value>Is Smart backup enabled</value>
+  </data>
+  <data name="SmartAdminState_IsBackupEnabledDesc" xml:space="preserve">
+    <value> A Boolean value indicating whether smartbackup is enabled.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfStorageConnectivityErrorsName" xml:space="preserve">
+    <value>Number of Storage Connectivity Errors</value>
+  </data>
+  <data name="SmartAdminState_NumberOfStorageConnectivityErrorsDesc" xml:space="preserve">
+    <value>The number of storage connectivity errors while performing backups or file retention.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfSqlErrorsName" xml:space="preserve">
+    <value>Number of Sql Server errors</value>
+  </data>
+  <data name="SmartAdminState_NumberOfSqlErrorsDesc" xml:space="preserve">
+    <value>The number of  Sql Server errors.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfInvalidCredentialErrorsName" xml:space="preserve">
+    <value>Number of Invalid Credential errors</value>
+  </data>
+  <data name="SmartAdminState_NumberOfInvalidCredentialErrorsDesc" xml:space="preserve">
+    <value>The number of Invalid Credential errors</value>
+  </data>
+  <data name="SmartAdminState_NumberOfOtherErrorsName" xml:space="preserve">
+    <value>Number of other errors.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfOtherErrorsDesc" xml:space="preserve">
+    <value>The number of all other errors.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfCorruptedOrDeletedBackupsName" xml:space="preserve">
+    <value>Number of corrupted or deleted backups.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfCorruptedOrDeletedBackupsDesc" xml:space="preserve">
+    <value> The number of corrupted or deleted backups.</value>
+  </data>
+  <data name="SmartAdminState_IsSmartBackupOnlineName" xml:space="preserve">
+    <value>Is SmartBackup online.</value>
+  </data>
+  <data name="SmartAdminState_IsSmartBackupOnlineDesc" xml:space="preserve">
+    <value>A Boolean value indicating whether smartbackup is turned on.</value>
+  </data>
+  <data name="SmartAdminState_IsStorageAccountAccessibleName" xml:space="preserve">
+    <value>Is Storage Account accessible.</value>
+  </data>
+  <data name="SmartAdminState_IsStorageAccountAccessibleDesc" xml:space="preserve">
+    <value>A Boolean value indicating whether storage account is accessible.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfBackupsWithRestoreHeaderOnlyFailedName" xml:space="preserve">
+    <value>Number of backups with restore header only failed.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfBackupsWithRestoreHeaderOnlyFailedDesc" xml:space="preserve">
+    <value>The number of backups that had issues while restoring backup header.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfUserDeletedBackupsName" xml:space="preserve">
+    <value>Number of backups thar were deleted by the user.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfUserDeletedBackupsDesc" xml:space="preserve">
+    <value>The number of backup files that were deleted by user </value>
+  </data>
+  <data name="SmartAdminState_NumberOfBackupLoopsName" xml:space="preserve">
+    <value>Number of backup loops.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfBackupLoopsDesc" xml:space="preserve">
+    <value>The number of backup loops.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfRetentionLoopsName" xml:space="preserve">
+    <value>Number of retention loops.</value>
+  </data>
+  <data name="SmartAdminState_NumberOfRetentionLoopsDesc" xml:space="preserve">
+    <value>The number of retention loops.</value>
+  </data>
+</root>

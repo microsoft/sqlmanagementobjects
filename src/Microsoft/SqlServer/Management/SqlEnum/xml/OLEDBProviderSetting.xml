@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<EnumObject type="OLEDBProvider" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table="#OLEDBProv" alias="op" />
+		<property_link fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'
+			join="#oledbprop" alias='o'>o.provider_name=op.Name</property_link>
+			<prefix>
+create table #OLEDBProv (id int identity(1,1), Name sysname NOT NULL, ParseName sysname NOT NULL,Description sysname NOT NULL )
+			</prefix>
+			
+		<version min_major='10' >
+			<prefix>
+insert #OLEDBProv (Name, ParseName,Description) EXECUTE master.dbo.sp_enum_oledb_providers
+			</prefix>
+		</version>
+		<prefix>
+			delete from #OLEDBProv where exists ( select 1 from #OLEDBProv oprov where oprov.Name = #OLEDBProv.Name and oprov.id &lt; #OLEDBProv.id )
+		</prefix>
+		<version min_major='10' >
+			<prefix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
+create table #oledbprop (allow_in_process bit, disallow_adhoc_access bit, dynamic_parameters bit, index_as_access_path bit,
+				level_zero_only bit, nested_queries bit, non_transacted_updates bit, sql_server_like bit, provider_name sysname null) 
+		
+declare name_cursor cursor local fast_forward
+	FOR (select Name from  #OLEDBProv)
+open name_cursor 
+DECLARE @providername sysname 
+FETCH NEXT FROM name_cursor INTO @providername 
+WHILE (@@FETCH_STATUS &lt;&gt; -1) 
+BEGIN 
+	IF (@@FETCH_STATUS &lt;&gt; -2) 
+	BEGIN 
+		SELECT @providername = RTRIM(@providername) 
+
+		insert #oledbprop (provider_name, allow_in_process, disallow_adhoc_access, dynamic_parameters, index_as_access_path, level_zero_only, 
+			nested_queries, non_transacted_updates, sql_server_like) 
+		exec master.dbo.sp_MSset_oledb_prop @providername
+	END 
+	FETCH NEXT FROM name_cursor INTO @providername 
+END 
+CLOSE name_cursor 
+DEALLOCATE name_cursor
+		</prefix>
+		</version>
+		<postfix fields='#AllowInProcess#DisallowAdHocAccess#DynamicParameters#IndexAsAccessPath#LevelZeroOnly#NestedQueries#NonTransactedUpdates#SqlServerLike#'>
+drop table #oledbprop
+		</postfix>
+		<postfix> drop table #OLEDBProv</postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="Name" type="sysname" access="Read">op.Name</property>
+		<property name="Description" type="sysname" access="Read">op.Description</property>
+		<property name='AllowInProcess' type='bit'>o.allow_in_process</property>
+		<property name='DisallowAdHocAccess' type='bit'>o.disallow_adhoc_access</property>
+		<property name='DynamicParameters' type='bit'>o.dynamic_parameters</property>
+		<property name='IndexAsAccessPath' type='bit'>o.index_as_access_path</property>
+		<property name='LevelZeroOnly' type='bit'>o.level_zero_only</property>
+		<property name='NestedQueries' type='bit'>o.nested_queries</property>
+		<property name='NonTransactedUpdates' type='bit'>o.non_transacted_updates</property>
+		<property name='SqlServerLike' type='bit'>o.sql_server_like</property>
+	</properties>
+</EnumObject>

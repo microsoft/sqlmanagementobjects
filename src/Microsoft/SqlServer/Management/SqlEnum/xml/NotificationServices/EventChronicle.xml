@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='EventChronicle' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="EventId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="Id" />
+		</request_parent_select>
+		<property_link table="#tmp_event_chronicle" alias="echn" />
+		<prefix>
+CREATE TABLE #tmp_event_chronicle(
+	EventChronicleId int,
+	ChronicleName nvarchar(255), 
+	EventClassId int,
+    SqlStatementsXml nvarchar(max)
+)
+INSERT #tmp_event_chronicle EXEC [SchemaPrefix].NSGetEventChronicles
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_event_chronicle
+        </postfix>
+        <post_process fields="#SqlStatements#" 
+            class_name="Microsoft.SqlServer.Management.Smo.PostProcessXmlToList" 
+            triggered_fields="#SqlStatementsXml#" />
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		<property name="Name" type="nvarchar" size="255">echn.ChronicleName</property>
+        <property name="Id" type="int" hidden="true">echn.EventChronicleId</property>
+        <property name="EventId" type="int" hidden="true">echn.EventClassId</property>
+		<property name="SqlStatements" type="int" report_type2="System.Object">null</property>
+        <property name="SqlStatementsXml" type="nvarchar" size="max" hidden="true">echn.SqlStatementsXml</property>
+	</properties>
+</EnumObject>

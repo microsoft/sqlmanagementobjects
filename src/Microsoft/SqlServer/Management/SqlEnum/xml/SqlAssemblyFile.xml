@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<EnumObject type="SqlAssemblyFile" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table='sys.assembly_files AS afiles' />
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+		<property name="ParentID" type="int" hidden="true">afiles.assembly_id</property>			
+		<property name="Name" type="nvarchar" size='260'>afiles.name</property>
+		<property name="ID" type="int" access='Read'>afiles.file_id</property>
+		<property name="FileBytes" type="image" access='Read' expensive='true'>afiles.content</property>
+	</properties>
+</EnumObject>

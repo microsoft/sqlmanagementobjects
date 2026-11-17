@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="TargetSetLevel" impl_type="PolicyObject" min_major='10'>
+	<settings>
+    <parent_link>
+      <link parent="ID" local="TargetSetID" />
+    </parent_link>
+    <property_link table='msdb.dbo.syspolicy_target_set_levels' alias='cr'/>
+    <property_link fields = '#Condition#' left_join='msdb.dbo.syspolicy_conditions' alias='cond'>cr.condition_id = cond.condition_id</property_link>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="max">
+			<link_multiple no='3' expression="{0} + '/{2}[@TargetTypeSkeleton=' + quotename({1},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="TargetTypeSkeleton" />
+				<link_field field="NType" />
+			</link_multiple>
+		</property>
+		<property name='ID' type='int' access='Read'>cr.target_set_level_id</property>
+		<property name='TargetSetID' type='int' access='Read' hidden='true'>cr.target_set_id</property>
+		<property name='TargetTypeSkeleton' type='nvarchar' size = 'max' access='Read'>cr.type_skeleton</property>
+    <property name='Condition' type='sysname'>ISNULL(cond.name,N'')</property>
+    <property name='LevelName' type='sysname' access='Read'>cr.level_name</property>
+  </properties>
+</EnumObject>

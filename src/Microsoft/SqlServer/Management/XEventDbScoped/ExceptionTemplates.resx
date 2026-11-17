@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype=">text/microsoft-resx</resheader>
+    <resheader name="version=">2.0</resheader>
+    <resheader name="reader=">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer=">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1="><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing=">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64=">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64=">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata=">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true=">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NoSuchCollection" xml:space="preserve">
+    <value>The collection &apos;{name}&apos; does not exist.</value>
+  </data>
+  <data name="UnsupportedKey" xml:space="preserve">
+    <value>Cannot create key for object of type &apos;{key}&apos;.</value>
+  </data>
+  <data name="UnsupportedConnectionType" xml:space="preserve">
+    <value>The connection type &apos;{type}&apos; is not supported. Use a SqlStoreConnection or ServerConnection object instead.</value>
+  </data>
+  <data name="SqlExecutionFailure" xml:space="preserve">
+    <value>Failed to execute Transact-SQL statement &apos;{sql}&apos;.</value>
+  </data>
+  <data name="FileAlreadyExists" xml:space="preserve">
+    <value>The file already exists. You must specify a different name.</value>
+  </data>
+  <data name="FileNotExist" xml:space="preserve">
+    <value>The file does not exist.</value>
+  </data>
+  <data name="ChangeNameForExistingSession" xml:space="preserve">
+    <value>To change the name of an existing session, you must drop and re-create the session.</value>
+  </data>
+  <data name="ChangePropertyForExistingEvent" xml:space="preserve">
+    <value>To change the property &apos;{propertyName}&apos; for an existing event, drop the event, and then add the event by using the ALTER EVENT SESSION DDL statement.</value>
+  </data>
+  <data name="NewSessionMustContainEvent" xml:space="preserve">
+    <value>Cannot create a session without any events.</value>
+  </data>
+  <data name="InvalidParameter" xml:space="preserve">
+    <value>The parameter &apos;{param}&apos; is invalid.</value>
+  </data>
+  <data name="ParentNull" xml:space="preserve">
+    <value>The parent XEStore cannot be null.</value>
+  </data>
+  <data name="NameNullEmpty" xml:space="preserve">
+    <value>The Name property cannot be null or an empty string.</value>
+  </data>
+  <data name="CannotSetNameForExistingObject" xml:space="preserve">
+    <value>You cannot change the Name property for an existing object.</value>
+  </data>
+  <data name="Expression2NotNull" xml:space="preserve">
+    <value>The second expression must be null for a NOT logical expression.</value>
+  </data>
+  <data name="InvalidProperty" xml:space="preserve">
+    <value>The property setting is invalid.</value>
+  </data>
+  <data name="PackageNotExist" xml:space="preserve">
+    <value>The package &apos;{name}&apos; does not exist.</value>
+  </data>
+  <data name="ObjectNotExist" xml:space="preserve">
+    <value>The object &apos;{name}&apos; does not exist.</value>
+  </data>
+  <data name="CannotAddActionToExistingEvent" xml:space="preserve">
+    <value>You cannot add the action to an existing event. You must drop the event, and then add the event with the action.</value>
+  </data>
+  <data name="CannotChangeFieldForExistingEvent" xml:space="preserve">
+    <value>You cannot change the field values for an existing event. You must drop the event, and then add the event with the field.</value>
+  </data>
+  <data name="CannotChangeFieldForExistingTarget" xml:space="preserve">
+    <value>You cannot change the field values for an existing target. You must drop the target, and then add the target with the field.</value>
+  </data>
+  <data name="CannotSetEventInfoForExistingEvent" xml:space="preserve">
+    <value>You cannot change the EventInfo object for an existing event.</value>
+  </data>
+  <data name="CannotSetTargetInfoForExistingTarget" xml:space="preserve">
+    <value>You cannot change the TargetInfo object for an existing target.</value>
+  </data>
+  <data name="CannotSetActionInfoForExistingAction" xml:space="preserve">
+    <value>You cannot change the ActionInfo object for an existing action.</value>
+  </data>
+  <data name="SaveTemplateForExistingSession" xml:space="preserve">
+    <value>You can only invoke the SaveSessionToTemplate method on an existing session. Call the Session.Create method to validate the session.</value>
+  </data>
+  <data name="PackageNameNotUnique" xml:space="preserve">
+    <value>The package name &apos;{name}&apos; is not unique. You must use a fully-qualified name, in the format &apos;[module_guid].package_name&apos;.</value>
+  </data>
+  <data name="ObjectNameNotUnique" xml:space="preserve">
+    <value>The object name &apos;{name}&apos; is not unique. You must use a fully-qualified name, in the format &apos;[module_guid].package_name.object_name&apos;.</value>
+  </data>
+  <data name="UnknownType" xml:space="preserve">
+    <value>Unknown type.</value>
+  </data>
+  <data name="NoBlockingEventNotAllowedInNoEventLossSession" xml:space="preserve">
+    <value>Events with &quot;NO_BLOCK&quot; capability cannot be added to a session with a &quot;NO_EVENT_LOSS&quot; event retention mode. Therefore, event &apos;{eventName}&apos; cannot be added to session {sessionName}.</value>
+  </data>
+  <data name="InvalidState" xml:space="preserve">
+    <value>You cannot perform this operation on an object in state &apos;{current_state}&apos;. The object must be in state &apos;{required_state}&apos;.</value>
+  </data>
+  <data name="AlterValidationFailure" xml:space="preserve">
+    <value>Session validation for the alter operation failed.</value>
+  </data>
+  <data name="CannotReadTargetData" xml:space="preserve">
+    <value>Cannot read target data. Please check session and target status.</value>
+  </data>
+  <data name="ActionNameNotUnique" xml:space="preserve">
+    <value>Action {name} already exists in the session and cannot be added again.</value>
+  </data>
+  <data name="InvalidConnectionType" xml:space="preserve">
+    <value>Connection type is not valid.</value>
+  </data>
+  <data name="InvalidVersion" xml:space="preserve">
+    <value>Operation not supported on version {version}.</value>
+  </data>
+</root>

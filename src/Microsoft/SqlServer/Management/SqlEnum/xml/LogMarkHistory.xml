@@ -1,0 +1,14 @@
+<?xml version='1.0' ?>
+<EnumObject type='Logmarkhistory' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<property_link table='msdb.dbo.logmarkhistory' alias='l'/>
+	</settings>
+	<properties>
+		<property name='DatabaseName' type='nvarchar' size = '128'>l.database_name</property>
+		<property name='MarkName' type='nvarchar' size = '128'>l.mark_name</property>
+		<property name='Description' type='nvarchar' size = '255'>l.description</property>
+		<property name='UserName' type='nvarchar' size = '128'>l.user_name</property>
+		<property name='LogSequenceNumber' type='numeric'>l.lsn</property>
+		<property name='CommitTime ' type='datetime'>l.mark_time</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,51 @@
+<?xml version='1.0' ?>
+<EnumObject type='SPHelpTargetservergroupMember' impl_type='SqlObject' min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link local='GroupName' parent='Name'/>
+		</parent_link>
+		<request_parent_select>
+			<field name='Name' />
+		</request_parent_select>
+
+		<property_link table='#tmp_sp_help_targetservergroup_member' alias='tshtm'/>
+		<prefix>
+			<link_multiple no='1' expression="
+create table #tmp_sp_help_targetservergroup_member
+(server_id int null, server_name sysname null, servergroup_name sysname null)
+
+declare @servergroup_name sysname
+declare crs cursor local fast_forward
+for ( {0} )
+open crs
+fetch crs into @servergroup_name
+while @@fetch_status &gt;= 0
+begin
+insert into #tmp_sp_help_targetservergroup_member(server_id, server_name)
+		exec msdb.dbo.sp_help_targetservergroup @name=@servergroup_name
+	update #tmp_sp_help_targetservergroup_member set servergroup_name = @servergroup_name where servergroup_name is null
+	fetch crs into @servergroup_name
+end
+close crs
+deallocate crs">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix>
+drop table #tmp_sp_help_targetservergroup_member
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='2' expression="{0} + '/TargetServer[@Name=' + quotename({1},'''') + ']'">
+				<link_field type='parent' field="ParentUrn" />
+				<link_field type='local' field="Name" />
+			</link_multiple>
+		</property>
+
+		<property name='Name' type='sysname'>tshtm.server_name</property>
+		<property name='ID' type='int'>tshtm.server_id</property>
+
+		<property name='GroupName' type='sysname' hidden='true'>tshtm.servergroup_name</property>
+	</properties>
+</EnumObject>

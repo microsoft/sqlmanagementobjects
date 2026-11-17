@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings />
+	<properties>
+		<version min_major='10'   cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="IsEncrypted" type="bit" cast='true' mode="deploy">CASE WHEN ISNULL({0}.definition, s{0}.definition) IS NULL THEN 1 ELSE 0 END</property>
+			<property name="Recompile" type="bit" cast='true' mode="design">ISNULL({0}.is_recompiled, s{0}.is_recompiled)</property>
+			<!-- here we just offer support for text, every object will do whatever it sees fit
+			take the whole text, parse it, etc -->
+			<property name="Definition" type="nvarchar" size='max' hidden='true'>ISNULL({0}.definition, s{0}.definition)</property>
+		</version>
+		<property name="ParentNumber" type='smallint' hidden='true'>0</property>
+		<include file='inc_text.xml' />
+	</properties>
+</EnumObject>

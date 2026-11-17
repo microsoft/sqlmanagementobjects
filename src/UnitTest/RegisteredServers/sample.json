@@ -1,0 +1,147 @@
+{
+    "notebook.sqlKernelEnabled": true,
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        },
+        {
+            "name": "Group1",
+            "id": "2fb35a29-9e2e-4ac1-9d3b-8174f3e5a4b5",
+            "parentId": "C777F06B-202E-4480-B475-FA416154D458",
+            "color": "#515151",
+            "description": "group1"
+        },
+        {
+            "name": "Subgroup1",
+            "id": "88327664-13d2-48dd-aaf2-a1b9265205c8",
+            "parentId": "2fb35a29-9e2e-4ac1-9d3b-8174f3e5a4b5",
+            "color": "#515151",
+            "description": ""
+        },
+        {
+            "name": "Group2",
+            "id": "94984460-c9e9-4249-b21c-af3337054ef3",
+            "parentId": "C777F06B-202E-4480-B475-FA416154D458",
+            "color": "#515151",
+            "description": "Group2"
+        }
+    ],
+    "datasource.connections": [
+        {
+            "options": {
+                "connectionName": "",
+                "server": "sqltools2017-3",
+                "database": "",
+                "authenticationType": "Integrated",
+                "user": "",
+                "password": "",
+                "applicationName": "sqlops",
+                "databaseDisplayName": ""
+            },
+            "groupId": "94984460-c9e9-4249-b21c-af3337054ef3",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "7a700b4c-97ce-4e74-a766-f8aef087fd6e"
+        },
+        {
+            "options": {
+                "connectionName": "",
+                "server": "sqltools2016-3",
+                "database": "",
+                "authenticationType": "SqlLogin",
+                "user": "sa",
+                "password": "",
+                "applicationName": "sqlops",
+                "databaseDisplayName": ""
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "a22f922d-3708-4236-9fa5-c68e4af48cd2"
+        },
+        {
+            "options": {
+                "connectionName": "",
+                "server": "sqltools2019-3",
+                "database": "",
+                "authenticationType": "SqlLogin",
+                "user": "sa",
+                "password": "",
+                "applicationName": "sqlops",
+                "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+                "databaseDisplayName": ""
+            },
+            "groupId": "2fb35a29-9e2e-4ac1-9d3b-8174f3e5a4b5",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "48f45913-ad30-4025-b6ca-a65822e02b4b"
+        },
+        {
+            "options": {
+                "connectionName": "",
+                "server": "davidshi-2019",
+                "database": "slash\\quote\"1",
+                "authenticationType": "Integrated",
+                "user": "",
+                "password": "",
+                "applicationName": "sqlops",
+                "databaseDisplayName": "slash\\quote\"1"
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "97fe6786-fd07-48d6-b91b-1579ceb7bc9e"
+        },
+        {
+            "options": {
+                "connectionName": "",
+                "server": "davidshi-2019",
+                "database": "slash\\quote\"1",
+                "authenticationType": "SqlLogin",
+                "user": "sa",
+                "password": "",
+                "applicationName": "sqlops",
+                "databaseDisplayName": "slash\\quote\"1"
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "f4128f4f-6b67-462c-982b-9fe5cd54ebcd"
+        },
+        {
+            "options": {
+                "connectionName": "",
+                "server": "davidshi-2019",
+                "database": "",
+                "authenticationType": "SqlLogin",
+                "user": "sa",
+                "password": "",
+                "applicationName": "sqlops",
+                "databaseDisplayName": ""
+            },
+            "groupId": "88327664-13d2-48dd-aaf2-a1b9265205c8",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "081cd8bb-ed65-41f1-8efc-61c47ed92f68"
+        },
+        {
+            "options": {
+                "connectionName": "",
+                "server": "sqltools2019-3",
+                "database": "Keep_WideWorldImporters",
+                "authenticationType": "Integrated",
+                "user": "",
+                "password": "",
+                "applicationName": "sqlops",
+                "databaseDisplayName": "Keep_WideWorldImporters"
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "MSSQL",
+            "savePassword": true,
+            "id": "e93bdff3-a693-4900-97b6-228acd164d9c"
+        }
+    ],
+    "dashboard.server.properties": "collapsed"
+}

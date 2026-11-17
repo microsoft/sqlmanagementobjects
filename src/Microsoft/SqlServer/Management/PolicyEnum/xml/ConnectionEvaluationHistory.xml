@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" ?>
+<EnumObject type="ConnectionEvaluationHistory" impl_type="PolicyObject" min_major='10'>
+  <!-- Since the local history does not have a connection table, we use the information from the execution_history table -->
+  <settings>
+    <parent_link>
+      <link parent="ID" local="EvaluationId" />
+    </parent_link>
+    <property_link table='msdb.dbo.syspolicy_policy_execution_history' alias='ch'/>
+  </settings>
+  <properties>
+    <include file='inc_urnByID.xml' />
+    <property name='ID' type='bigint' access='Read'>ch.history_id</property>
+    <property name='EvaluationId' type='bigint' access='Read'>ch.history_id</property>
+    <property name='Result' type='bit' access='Read'>ch.result</property>
+    <property name='ServerInstance' access='Read' type="sysname" cast='true'>serverproperty(N'Servername')</property>
+    <property name='Exception' access='Read' type='nvarchar' size='max' cast='true'>ISNULL(ch.exception, N'')</property>
+  </properties>
+</EnumObject>

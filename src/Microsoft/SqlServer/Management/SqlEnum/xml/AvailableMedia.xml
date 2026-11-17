@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<EnumObject type="AvailableMedia" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings main_table="#avmed am">
+		<version min_major='10'>
+			<property_link fields='#SharedDrive#'
+				left_join='#tmpsrdDrive srddrv'>convert(nchar(1), am.name)= convert(nchar(1), srddrv.DriveName)</property_link>
+		</version>
+
+		<prefix>
+			create table #avmed (name nvarchar(512), low_free int, high_free int, type int)
+			insert #avmed exec master.dbo.xp_availablemedia
+			update #avmed set name = convert(nchar(2), name) where type != 4
+		</prefix>
+		<version min_major='10' max_major='11'>
+			<!-- make temp table to avoid collation conflict -->
+			<prefix fields='#SharedDrive#'>
+create table #tmpsrdDrive ( DriveName nvarchar(255) )
+insert #tmpsrdDrive	select * from sys.fn_servershareddrives()
+			</prefix>
+		</version>
+		<version min_major='12'>
+			<!-- make temp table to avoid collation conflict -->
+			<prefix fields='#SharedDrive#'>
+create table #tmpsrdDrive ( DriveName nvarchar(512) )
+insert #tmpsrdDrive	select path_name from sys.dm_io_cluster_valid_path_names
+			</prefix>
+		</version>
+		<postfix>
+drop table #avmed
+		</postfix>
+		<version min_major='10'>
+			<postfix fields='#SharedDrive#'>
+				drop table #tmpsrdDrive
+			</postfix>
+		</version>
+	</settings>
+	<properties>
+		<property name="Name" type="nvarchar" size='512'>am.name</property>
+		<property name="LowFree" type="int">am.low_free</property>
+		<property name="HighFree" type="int">am.high_free</property>
+		<property name="FreeSpace" type="float" cast="true">case when am.low_free >= 0 then 0. + am.low_free else 4294967296. + am.low_free end + 4294967296. * am.high_free</property>
+		<property name="MediaTypes" type="int" report_type='MediaTypes'>am.type</property>
+		<version min_major='10'>
+			<property name="SharedDrive" type="bit" cast='true'>case when srddrv.DriveName is null then 0 else 1 end</property>
+		</version>
+	</properties>
+</EnumObject>

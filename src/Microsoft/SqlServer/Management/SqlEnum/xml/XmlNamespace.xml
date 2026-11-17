@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<EnumObject type="XmlNamespace" impl_type="SqlObject" min_major='10'  cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings >
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+		<property_link table="sys.xml_schema_namespaces AS xn" />
+		<property_link fields='#Text#' 
+				join='sys.xml_schema_collections AS xsc2'>xsc2.xml_collection_id = xn.xml_collection_id</property_link>
+		<property_link fields='#Text#' 
+				join='sys.schemas AS sch2'>xsc.schema_id = sch2.schema_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn_collate_default.xml' />
+		<property name="Name" type="sysname">xn.name</property>			
+		<property name="ID" type="int" access='Read'>xn.xml_namespace_id</property>
+		<property name="Text" type="xml">XML_SCHEMA_NAMESPACE(sch2.Name, xsc2.name, xn.name)</property>
+		
+		<property name="ParentID" type="int" hidden='true'>xn.xml_collection_id</property>
+		
+	</properties>
+</EnumObject>

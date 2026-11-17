@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<EnumObject type="ResourcePoolAffinityInfo" impl_type="SqlObject" min_major='11' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+	<version min_major='11'>
+      <property_link table="sys.dm_resource_governor_resource_pools" alias= "[pls]"/>
+      <property_link fields="#GroupID#CpuIds#CpuAffinityMask#" join="
+                     (SELECT SUM ([cpu_affinity_mask]) AS [cpu_affinity_mask], 
+		              SUM([online_scheduler_mask]) AS [online_scheduler_mask],
+		              [processor_group],
+		              [node_state_desc],
+		              [memory_node_id]
+		              FROM [sys].[dm_os_nodes] 
+		              GROUP BY [memory_node_id], [node_state_desc], [processor_group]) AS [mn]"> [mn].[memory_node_id] &lt; (CASE WHEN @@version like '%(X64)%' THEN 64 ELSE 32 END)
+      </property_link>
+      <property_link fields="#GroupID#CpuIds#CpuAffinityMask#" left_join="(SELECT DISTINCT [pa].[pool_id] FROM [sys].[dm_resource_governor_resource_pool_affinity] AS [pa]) AS [plaff]">
+        [pls].[pool_id] = [plaff].[pool_id]
+      </property_link>
+      <postfix fields="#GroupID#CpuIds#CpuAffinityMask#">ORDER BY [pls].[pool_id], [mn].[memory_node_id] ASC</postfix>
+    </version>
+  </settings>
+  <properties>
+	<version min_major='11'>
+        <property name="PoolID" type="int">[pls].[pool_id]</property>
+        <property name="AffinityType" type="int">
+          CASE WHEN [plaff].[pool_id] IS NULL
+          THEN 2 ELSE 1
+          END
+        </property>
+		<property name="ID" type="int" access="Read">[mn].[memory_node_id]</property>
+		<property name="GroupID" type="int" access="Read">[mn].[processor_group]</property>
+		<property name="CpuIds" type="bigint" access="Read">[mn].[cpu_affinity_mask]</property>
+		<property name="CpuAffinityMask" type="bigint" access="Read">[mn].[online_scheduler_mask]</property>
+    </version>
+  </properties>
+</EnumObject>

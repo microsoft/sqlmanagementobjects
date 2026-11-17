@@ -1,0 +1,8 @@
+/Restore
+/ConsoleLoggerParameters:Verbosity=Minimal;Summary
+/FileLoggerParameters:LogFile=msbuild.log;Verbosity=Diagnostic
+/MaxCPUCount
+/NodeReuse:false
+/Property:NuGetInteractive=true
+/BinaryLogger
+

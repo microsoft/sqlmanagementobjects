@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="SmartAdmin" impl_type="SmartAdmin" min_major='12'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <property_link table="msdb.smart_admin.fn_backup_instance_config () AS ic"/>
+  </settings>
+  <properties>
+    <include file='inc_urn_single.xml' />
+    <property name="MasterSwitch" type="bit">(SELECT ISNULL(msdb.smart_admin.fn_is_master_switch_on (), 0))</property>
+    <property name='BackupEnabled' type='bit' cast='true'>ISNULL(ic.is_managed_backup_enabled, 0)</property>
+    <property name="CredentialName" type="sysname">ISNULL(ic.credential_name, N'')</property>
+    <property name="BackupRetentionPeriodInDays" type="int">ISNULL(ic.retention_days, 0)</property>
+    <property name='StorageUrl' type='nvarchar' size='1024'>ISNULL(ic.storage_url, N'')</property>
+    <property name='EncryptionAlgorithm' type='sysname'>ISNULL(ic.encryption_algorithm, N'')</property>
+    <property name='EncryptorType' type='nvarchar' size='32'>ISNULL(ic.encryptor_type, N'')</property>
+    <property name='EncryptorName' type='sysname'>ISNULL(ic.encryptor_name, N'')</property>
+    <!--This object does not have an ID or a  name.
+    Note that this has to be consistent with the API implementation of UrnWithId.-->
+    <property name="UrnWithId" type="nvarchar" size="4000" hidden="true">
+      <link_multiple no='1' expression="'Server/{0}'">
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+  </properties>
+</EnumObject>

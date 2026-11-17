@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="PredSourceInfo" impl_type="XEventObject" min_major='11'>
+  <settings>
+    <property_link table='sys.dm_xe_objects' alias='objects'>objects.object_type = N'pred_source' AND objects.package_guid = packages.guid AND (objects.capabilities &amp; 1 = 0 OR objects.capabilities IS NULL)</property_link>
+    <property_link join='sys.dm_xe_packages' alias='typepackage'>objects.type_package_guid = typepackage.guid</property_link>
+  </settings>
+  <properties>
+    <include file='inc_urn.xml' />    
+    <property name='Name' type='nvarchar' size = '60'>objects.name</property>
+    <property name='Description' type='nvarchar' size = '512'>objects.description</property>
+    <property name='TypeName' type='nvarchar' size = '60'>objects.type_name</property>
+    <property name='TypePackageID' type='uniqueidentifier' cast='true'>objects.type_package_guid</property>
+    <property name='TypePackageName' type='nvarchar' size ='60'>typepackage.name</property>
+  </properties>
+</EnumObject>

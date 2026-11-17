@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<EnumObject type="StoredProcedure" impl_type="SqlObject" min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+  <settings>
+    <parent_link>
+      <link parent="ID" local="ID" />
+    </parent_link>
+
+    <version min_major='10' cloud_min_major='12'>
+      <property_link table='sys.numbered_procedures' alias = 'nsp'/>
+    </version>
+  </settings>
+  <properties>
+    <property name="Urn" type="nvarchar" size="600">
+      <link_multiple no='3' expression="{0} + '/{2}[@Number=' + cast({1} AS nvarchar(20)) + ']'">
+        <link_field type='parent' field="Urn" />
+        <link_field type='local' field="Number" />
+        <link_field field="NType" />
+      </link_multiple>
+    </property>
+    <version min_major='10'  cloud_min_major='12'>
+      <property name="Number" type="smallint" access='Read'>nsp.procedure_number</property>
+      <property name="Name" type="sysname" read_only_after_creation="true">object_name(nsp.object_id) + ';' + cast(nsp.procedure_number as nvarchar(20))</property>
+      <property name="IsEncrypted" type="bit" cast='true'>CASE WHEN nsp.definition IS NULL THEN 1 ELSE 0 END</property>
+
+      <!-- here we just offer support for text, every object will do whatever it sees fit
+      take the whole text, parse it, etc -->
+      <property name="Definition" type="nvarchar" size='max' hidden='true'>nsp.definition</property>
+      <property name="ParentNumber" type='smallint' hidden='true'>nsp.procedure_number</property>
+      <property name="ID" type='int' hidden='true'>nsp.object_id</property>
+    </version>
+    <property name="IsSystemObject" type="int" hidden='true'>0</property>
+    <include file='inc_text.xml' />
+  </properties>
+</EnumObject>

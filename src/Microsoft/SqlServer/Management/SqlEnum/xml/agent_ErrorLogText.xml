@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<EnumObject type="ErrorLogText" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent='ArchiveNo' local='ArchiveNo' />
+		</parent_link>
+	
+		<request_parent_select>
+			<field name='ArchiveNo' />
+		</request_parent_select>
+
+		<property_link table="#err_log_text_tmp ert" />
+		<prefix>
+			<link_multiple no='1' expression="
+create table #err_log_text_tmp(LogDate datetime null, ErrorLevel int null, Text nvarchar(4000), ContinuationRow bit, ArchiveNo int null)
+declare @ArchiveNoChild int
+
+declare crs insensitive cursor 
+for ( {0} ) 
+for read only 
+open crs 
+fetch crs into @ArchiveNoChild
+while @@fetch_status &gt;= 0 
+begin 
+	insert #err_log_text_tmp (LogDate, ErrorLevel, Text) exec master.dbo.sp_readerrorlog @ArchiveNoChild, 2
+	update #err_log_text_tmp set ArchiveNo = @ArchiveNoChild where ArchiveNo is null
+	fetch crs into @ArchiveNoChild
+end 
+close crs
+deallocate crs
+">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+
+        <postfix>
+			drop table #err_log_text_tmp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="LogDate" type="datetime">ert.LogDate</property>
+		<property name="ErrorLevel" type="int">ert.ErrorLevel</property>
+		<property name="Text" type="nvarchar" size='4000'>ert.Text</property>
+		<property name="ArchiveNo" type="int" hidden='true'>ert.ArchiveNo</property>
+	</properties>
+</EnumObject>

@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="PolicyStore" impl_type="PolicyObject" min_major='10'>
+<settings>
+</settings>
+<properties>
+    <property name="Urn" type="nvarchar" size="600">
+        <link_multiple no='2' expression="'{1}[@Name=' + quotename({0},'''') + ']'">
+            <link_field type='local' field="Name" />
+			<link_field field="NType" />				
+        </link_multiple>
+    </property>
+    <property name="Name" type="sysname" cast='true'>serverproperty(N'Servername')</property>
+	<property name="Enabled" type="bit" cast='true'>
+		(SELECT current_value FROM msdb.dbo.syspolicy_configuration WHERE name = 'Enabled')
+	</property>
+	<property name="HistoryRetentionInDays" type="int" cast='true'>
+		(SELECT current_value FROM msdb.dbo.syspolicy_configuration WHERE name = 'HistoryRetentionInDays')
+	</property>
+  <property name="LogOnSuccess" type="bit" cast='true'>
+    (SELECT current_value FROM msdb.dbo.syspolicy_configuration WHERE name = 'LogOnSuccess')
+  </property>
+</properties>
+</EnumObject>

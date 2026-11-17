@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+<EnumObject type='TcpEndpoints' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="EndpointID" />
+		</parent_link>
+	
+		<property_link table='sys.tcp_endpoints' alias='te'/>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+		
+		<property name='ListenerPort' type='int'>te.port</property>
+		<property name='IsDynamicPort' type='bit' access = 'read'>te.is_dynamic_port</property>
+		<property name='ListenerIPAddress' type='varchar' size = '45'>ISNULL(te.ip_address,'')</property>
+		
+		<property name='EndpointID' type='int' hidden='true'>te.endpoint_id</property>
+
+    <!--IsSystemObject An endpoint with an ID less then 65536 is a system endpoint.-->
+    <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when te.endpoint_id &lt; 65536 then 1 else 0 end</property>
+
+  </properties>
+</EnumObject>

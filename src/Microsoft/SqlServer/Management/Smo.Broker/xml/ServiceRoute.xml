@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<EnumObject type="ServiceRoute" impl_type="ServiceBrokerSqlObject" min_major='9'>
+	<settings>
+		<property_link table = 'sys.routes sr'/>
+        <property_link fields='#Owner#' join="sys.database_principals AS dp">dp.principal_id = sr.principal_id</property_link>
+	</settings>
+	<properties>
+		<include file='inc_urn.xml' />
+        <!-- extended properties support -->
+        <include file='inc_ext_prop.xml' />
+        <property name="ExtPropClass" type="int" hidden='true'>19</property>
+		<property name="NType" type="sysname" access='Read' hidden='true'>ServiceRoute</property>
+		<property name="Name" type="sysname">sr.name</property>
+		<property name="ID" type="int" access='Read' >sr.route_id</property>		
+		<property name="Owner" type="sysname" read_only_after_creation="true">dp.name</property>
+		<property name="BrokerInstance" type="sysname">ISNULL(sr.broker_instance, N'')</property>
+		<property name="ExpirationDate" type="datetime">sr.lifetime</property>
+		<property name="Address" type="nvarchar" size="1024">sr.address</property>
+		<property name="RemoteService" type="sysname">ISNULL(sr.remote_service_name, N'')</property>
+		<property name="MirrorAddress" type="nvarchar" size="1024">ISNULL(sr.mirror_address, N'')</property>
+		<version min_major='10'>
+      <include file='inc_policy_health_state.xml'/>
+    </version>
+  </properties>
+</EnumObject>

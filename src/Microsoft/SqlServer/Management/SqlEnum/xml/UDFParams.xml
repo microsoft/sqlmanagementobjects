@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<EnumObject type="Param" impl_type="SqlObject" min_major='10'  cloud_min_major='10' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property_link table='sys.all_parameters' alias='param'>param.is_output = 0</property_link>
+		</version>
+	</settings>
+	<properties>
+		<property name="Number" type="int" hidden='true'>-1</property>
+		<version min_major='10'  cloud_min_major='10' datawarehouse_enabled='true'>
+			<property name="IsReadOnly" type="bit" mode="design">param.is_readonly</property>
+		</version>
+		<version min_major='17' cloud_min_major='12'>
+			<!-- Some versions of this DMV have vector_dimensions as a tinyint, which causes us to fail casting. So ensure this is always a full int -->
+			<property name="VectorDimensions" type="int" cast="true" mode="design">ISNULL(param.vector_dimensions, 0)</property>
+			<property name="VectorBaseType" type="nvarchar" size="10" mode="design">ISNULL(param.vector_base_type_desc, N'')</property>
+		</version>
+		<include file='parameter.xml'/>
+	</properties>
+</EnumObject>

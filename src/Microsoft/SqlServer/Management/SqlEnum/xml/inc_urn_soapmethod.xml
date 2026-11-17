@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<EnumObject type="inc_urn_soapmethod" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+	</settings>
+	<properties>
+		<property name="Urn" type="nvarchar" size="600">
+			<link_multiple no='4' expression="{0} + '/{1}[@Name=' + quotename(cast(cast({2} as varbinary(256)) as sysname),'''') collate database_default + ' and @Namespace=' + quotename({3},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field field="NType" />				
+				<link_field type='local' field="Name" />
+				<link_field type='local' field="Namespace" />
+			</link_multiple>
+		</property>
+	</properties>
+</EnumObject>

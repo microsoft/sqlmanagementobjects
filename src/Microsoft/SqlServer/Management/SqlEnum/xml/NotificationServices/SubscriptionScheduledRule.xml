@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<EnumObject type='SubscriptionScheduledRule' impl_type='SqlObject' min_major='9' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../EnumObject.xsd" >
+	<settings>
+		<parent_link>
+			<link parent="Id" local="SubscriptionClassId" /> 
+		</parent_link>
+		<request_parent_select>
+			<field name="SubscriptionClassId" /> 
+		</request_parent_select>
+		<property_link table="#tmp_subscription_scheduled_rule" alias="ssr" />
+		<prefix>
+CREATE TABLE #tmp_subscription_scheduled_rule(
+    RuleId int,
+    RuleName nvarchar(255),
+    RuleType tinyint,
+    Action ntext,
+    ActionTimeout int,
+    EventClassId int,
+    SubscriptionClassId int,
+    EventClassName nvarchar(255),
+    InputTypeName nvarchar (128),
+    InputTypeSchema nvarchar (128),
+    SqlUserName nvarchar (128),
+    SqlLoginName nvarchar (128)
+)
+INSERT #tmp_subscription_scheduled_rule EXEC [SchemaPrefix].NSGetRulesOnType @RuleType = 2
+		</prefix>
+        <postfix>
+DROP TABLE #tmp_subscription_scheduled_rule
+        </postfix>
+	</settings>
+	<properties>
+		<include file='inc_urn_single.xml' />
+        <property name="Id" type="int" hidden="true">ssr.RuleId</property>
+		<property name="Name" type="nvarchar" size="255">ssr.RuleName</property>
+        <property name="SubscriptionClassId" type="int" hidden="true">ssr.SubscriptionClassId</property>
+		<property name="Action" type="ntext">ssr.Action</property>
+		<property name="ActionTimeout" type="int">ssr.ActionTimeout</property>
+		<property name="EventClassId" type="int" hidden="true">ssr.EventClassId</property>
+	</properties>
+</EnumObject>

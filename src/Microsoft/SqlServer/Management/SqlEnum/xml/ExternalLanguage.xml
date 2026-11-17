@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<EnumObject type="ExternalLanguage" impl_type="SqlObject" min_major='15' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+    <settings>
+        <property_link table='sys.external_languages AS language' />
+        <property_link fields='#Owner#' join='sys.database_principals AS princip'>princip.principal_id = language.principal_id</property_link>
+    </settings>
+    <properties>
+        <include file='inc_urn.xml' />
+        <property name="Name" type="sysname">language.language</property>
+        <property name="ID" type="int" access='Read'>language.external_language_id</property>
+        <property name="Owner" type="sysname">princip.name</property>
+        <!-- Engines before 18.0.248 have no is_system_language column, so fall back to the name check. -->
+        <version min_major='15' max_major='17'>
+            <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when language.language in ('R','Python') then 1 else 0 end</property>
+        </version>
+        <version min_major='18' max_major='18' min_minor='0' max_minor='0' max_build='247'>
+            <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when language.language in ('R','Python') then 1 else 0 end</property>
+        </version>
+        <!-- The name check is kept as a superset so R/Python stay flagged as before. -->
+        <version min_major='18' min_minor='0' min_build='248'>
+            <property name="IsSystemObject" type="bit" access='Read' cast='true'>case when language.is_system_language = 1 or language.language in ('R','Python') then 1 else 0 end</property>
+        </version>
+        <!-- extended properties support -->
+        <property name="ExtPropClass" type="int" hidden='true'>34</property>
+        <property name="ExtPropMajorID" type="int" hidden='true'>
+            <link_multiple no='1' expression="{0}">
+                <link_field type='local' field="ID" />
+            </link_multiple>
+        </property>
+        <property name="ExtPropMinorID" type="int" hidden='true'>0</property>
+    </properties>
+</EnumObject>

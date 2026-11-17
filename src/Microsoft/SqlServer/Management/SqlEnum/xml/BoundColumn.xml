@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnumObject type="BoundColumn" impl_type="SqlObject" min_major='10' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="ID" local="UserTypeID" />
+		</parent_link>
+		<version min_major = '10'>
+			<property_link table = 'sys.columns AS c'/>
+			<property_link fields = '#ObjectName#ObjectSchema#' join="sys.tables AS t">t.object_id = c.object_id</property_link>
+		</version>			
+	</settings>
+	<properties>
+		<property name="Name" type="sysname">c.name</property>	
+		<property name="ObjectName" type="sysname" access="Read">t.name</property>
+		<version min_major = '10'>
+			<property name="ObjectSchema" type="sysname" access="Read">schema_name(t.schema_id)</property>		
+			<property name="UserTypeID" type="int" hidden = 'true'>c.user_type_id</property>
+		</version>
+	</properties>
+</EnumObject>

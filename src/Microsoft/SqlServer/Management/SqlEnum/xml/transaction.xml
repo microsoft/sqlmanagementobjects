@@ -1,0 +1,54 @@
+<?xml version='1.0' ?>
+<EnumObject type='Transactions' impl_type='SqlObject' min_major='10' cloud_min_major='12' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+<!--
+1. we want all transactions normal and snapshot 
+2. if it is in dm_tran_active_snapshot_database_transactions we call a transaction versioned 
+3. it is possible for a transaction to be in dm_tran_active_snapshot_database_transactions but not in dm_tran_session_transactions we still want to show it then 
+4. it is possible for a transaction to be in dm_tran_active_snapshot_database_transactions but not in dm_tran_active_transactions, in this case the tran_begin_time is null and the name is user_transaction
+5. it is possible for a transaction to be both in dm_tran_active_snapshot_database_transactions and in dm_tran_session_transactions, in this case we only want to show one row.
+
+We will have one row if the transaction does not have an associated db or a row for every database in which the transaction is involved
+-->
+	<union>
+		<!-- session transaction: normal transactions + some snapshot transactions-->	
+		<settings>
+			<property_link table='sys.dm_tran_session_transactions' alias='ts'/>
+			<property_link left_join='sys.dm_tran_database_transactions' 
+				alias='dt'>dt.transaction_id = ts.transaction_id</property_link>
+			<property_link fields='#IsVersioned#' left_join='sys.dm_tran_active_snapshot_database_transactions' 
+				alias='tsnp'>tsnp.transaction_id = ts.transaction_id</property_link>
+			<property_link fields='#Name#BeginTime#' left_join='sys.dm_tran_active_transactions' 
+				alias='ta'>ta.transaction_id = ts.transaction_id</property_link>
+		</settings>
+		<properties>
+			<property name='Name' type='sysname'>ta.name</property>
+			<property name='TransactionID' type='bigint'>ts.transaction_id</property>
+			<property name='BeginTime' type='datetime'>ta.transaction_begin_time</property>
+			<property name='Spid' type='int'>ts.session_id</property>
+			<property name='DatabaseName' type='sysname'>db_name(dt.database_id)</property>
+			<property name='DatabaseID' type='sysname'>dt.database_id</property>						
+			<property name='DatabaseBeginTime' type='datetime'>dt.database_transaction_begin_time</property>
+			<property name='IsVersioned' type='bit' cast='true'>case when tsnp.transaction_id is null then 0 else 1 end</property>
+		</properties>
+	</union>
+	<union>
+		<!-- snapshot transactions-->	
+		<settings>
+			<property_link table='sys.dm_tran_active_snapshot_database_transactions' alias='tsnp'/>
+			<property_link left_join='sys.dm_tran_database_transactions' 
+				alias='dt'>dt.transaction_id = tsnp.transaction_id</property_link>
+			<property_link fields='#Name#BeginTime#' left_join='sys.dm_tran_active_transactions' 
+				alias='ta'>ta.transaction_id = tsnp.transaction_id</property_link>
+		</settings>
+		<properties>
+			<property name='Name' type='sysname'>ta.name</property>
+			<property name='TransactionID' type='bigint'>tsnp.transaction_id</property>
+			<property name='BeginTime' type='datetime'>ta.transaction_begin_time</property>
+			<property name='Spid' type='int'>tsnp.session_id</property>			
+			<property name='DatabaseName' type='sysname'>db_name(dt.database_id)</property>			
+			<property name='DatabaseID' type='sysname'>dt.database_id</property>						
+			<property name='DatabaseBeginTime' type='datetime'>dt.database_transaction_begin_time</property>
+			<property name='IsVersioned' type='bit' cast='true'>1</property>
+		</properties>
+	</union>
+</EnumObject>

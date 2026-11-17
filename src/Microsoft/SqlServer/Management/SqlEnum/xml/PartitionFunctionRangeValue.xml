@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<EnumObject type="RangeValue" impl_type="SqlObject" min_major='10' cloud_min_major='12' datawarehouse_enabled='true' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings main_table="sys.partition_range_values sprv" >
+		<parent_link>
+			<link parent="ID" local="ParentID" />
+		</parent_link>
+	</settings>
+	<properties>
+		<property name="ID" type="int" access='Read'>sprv.boundary_id</property>
+		<property name="ParentID" type="int" hidden="true">sprv.function_id</property>
+		<property name="Value" type="sql_variant" access='Read'>sprv.value</property>
+	</properties>
+</EnumObject>

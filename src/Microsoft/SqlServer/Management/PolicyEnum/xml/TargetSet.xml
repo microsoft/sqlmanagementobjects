@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<EnumObject type="TargetSet" impl_type="PolicyObject" min_major='10'>
+	<settings>
+    <parent_link>
+      <link parent="ID" local="ObjectSetID" />
+    </parent_link>
+		<property_link table='msdb.dbo.syspolicy_target_sets' alias='ts'/>
+	</settings>
+	<properties>
+         <property name="Urn" type="nvarchar" size="max">
+   			<link_multiple no='3' expression="{0} + '/{2}[@TargetTypeSkeleton=' + quotename({1},'''') + ']'">
+				<link_field type='parent' field="Urn" />
+				<link_field type='local' field="TargetTypeSkeleton" />
+				<link_field field="NType" />
+			</link_multiple>
+        </property>
+		<property name='ID' type='int' access='Read'>ts.target_set_id</property>
+		<property name='ObjectSetID' type='int' access='Read' hidden='true'>ts.object_set_id</property>
+		<property name='TargetTypeSkeleton' type='nvarchar' size = 'max' access='Read'>ts.type_skeleton</property>
+    <property name='TargetType' type='sysname' access='Read'>ts.type</property>
+    <property name='Enabled' type='bit'>ts.enabled</property>
+  </properties>
+</EnumObject>

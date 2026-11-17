@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<EnumObject type="OLEDBProviderProp" impl_type="SqlObject" min_major='10'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EnumObject.xsd">
+	<settings>
+		<parent_link>
+			<link parent="Name" local="Name"/>
+		</parent_link>
+		<request_parent_select>
+			<field name='Name' />
+		</request_parent_select>
+		<property_link table="#OLEDBProvProp prop" />
+		<prefix>
+			<link_multiple no='1' expression="
+			create table #OLEDBProvProp (ID int NOT NULL,Description sysname NOT NULL , Flags int NOT NULL, Name sysname null) 
+			declare name_cursor cursor 
+				FOR {0} 
+				for read only 
+			open name_cursor 
+			DECLARE @providername sysname 
+			FETCH NEXT FROM name_cursor INTO @providername 
+			WHILE (@@FETCH_STATUS &lt;&gt; -1) 
+			BEGIN 
+				IF (@@FETCH_STATUS &lt;&gt; -2) 
+				BEGIN 
+					SELECT @providername = RTRIM(@providername) 
+					insert #OLEDBProvProp (ID,Description, Flags) EXECUTE master.dbo.xp_prop_oledb_provider @providername 
+					update #OLEDBProvProp set Name = @providername where Name is null
+				END 
+				FETCH NEXT FROM name_cursor INTO @providername 
+			END 
+			CLOSE name_cursor 
+			DEALLOCATE name_cursor">
+				<link_field field="ParentSelect" />
+			</link_multiple>
+		</prefix>
+		<postfix> 
+			drop table #OLEDBProvProp
+		</postfix>
+	</settings>
+	<properties>
+		<property name="Name" type="sysname">prop.Name</property>
+		<property name="ID" type="int">prop.ID</property>
+		<property name="Description" type="sysname">prop.Description</property>
+		<property name="Flags" type="int">prop.Flags</property>
+	</properties>
+</EnumObject>
