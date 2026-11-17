@@ -6,7 +6,6 @@ Once we push a new version to nuget.org add a double hash header for that versio
 ## 181.46.0
 
 - Add read-only `Server.EditionID` and `Server.Information.EditionID` properties exposing `SERVERPROPERTY('EditionID')` as a 64-bit integer.
-- Pin System.Security.Cryptography.Pkcs to patched versions 8.0.2 and 9.0.21 to address CVE-2026-84008.
 - Preserve vector dimensions and base types in SmoMetadataProvider data type lookups.
 - Upgrade Microsoft.SqlServer.Management.SqlParser to version 181.0.0.
 - Add support for Azure SQL DB containers
