@@ -9,6 +9,7 @@ Once we push a new version to nuget.org add a double hash header for that versio
 - Preserve vector dimensions and base types in SmoMetadataProvider data type lookups.
 - Upgrade Microsoft.SqlServer.Management.SqlParser to version 181.0.0.
 - Add support for Azure SQL DB containers
+- Fix partition-level index rebuilds on SQL Server 2019 failing with `UnknownPropertyException` when checking XML compression metadata.
 - Add `DatabaseEngineEdition.SqlDatabaseInFabric` for the documented `SERVERPROPERTY('EngineEdition')` value 12.
 
 ## 181.38.1
